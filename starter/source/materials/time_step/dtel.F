@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dtel       ../starter/source/materials/time_step/dtel.F
-      !||--- called by ------------------------------------------------------
-      !||    dt105law   ../starter/source/materials/time_step/dt105law.F
-      !||    dt10law    ../starter/source/materials/time_step/dt10law.F
-      !||    dt14law    ../starter/source/materials/time_step/dt14law.F
-      !||    dt15law    ../starter/source/materials/time_step/dt15law.F
-      !||    dt16law    ../starter/source/materials/time_step/dt16law.F
-      !||    dt1law     ../starter/source/materials/time_step/dt1law.F
-      !||    dt21law    ../starter/source/materials/time_step/dt21law.F
-      !||    dt25law    ../starter/source/materials/time_step/dt25law.F
-      !||    dt34law    ../starter/source/materials/time_step/dt34law.F
-      !||    dt37law    ../starter/source/materials/time_step/dt37law.F
-      !||    dt38law    ../starter/source/materials/time_step/dt138aw.F
-      !||    dt3law     ../starter/source/materials/time_step/dt3law.F
-      !||    dt42law    ../starter/source/materials/time_step/dt42law.F
-      !||    dt51law    ../starter/source/materials/time_step/dt51law.F
-      !||    dt5law     ../starter/source/materials/time_step/dt5law.F
-      !||    dt6law     ../starter/source/materials/time_step/dt6law.F
-      !||====================================================================
+!||====================================================================
+!||    dtel       ../starter/source/materials/time_step/dtel.F
+!||--- called by ------------------------------------------------------
+!||    dt105law   ../starter/source/materials/time_step/dt105law.F
+!||    dt10law    ../starter/source/materials/time_step/dt10law.F
+!||    dt14law    ../starter/source/materials/time_step/dt14law.F
+!||    dt15law    ../starter/source/materials/time_step/dt15law.F
+!||    dt16law    ../starter/source/materials/time_step/dt16law.F
+!||    dt1law     ../starter/source/materials/time_step/dt1law.F
+!||    dt21law    ../starter/source/materials/time_step/dt21law.F
+!||    dt25law    ../starter/source/materials/time_step/dt25law.F
+!||    dt34law    ../starter/source/materials/time_step/dt34law.F
+!||    dt37law    ../starter/source/materials/time_step/dt37law.F
+!||    dt38law    ../starter/source/materials/time_step/dt138aw.F
+!||    dt3law     ../starter/source/materials/time_step/dt3law.F
+!||    dt42law    ../starter/source/materials/time_step/dt42law.F
+!||    dt51law    ../starter/source/materials/time_step/dt51law.F
+!||    dt5law     ../starter/source/materials/time_step/dt5law.F
+!||    dt6law     ../starter/source/materials/time_step/dt6law.F
+!||====================================================================
       SUBROUTINE DTEL(SSP,PM,GEO,PID,MAT,
      .     RHO0, VIS,
      .     DELTAX, AIRE, VOL, DTX)
 C------------------------
-C     CALCUL DT ELEMENT
+C     CALCULATION OF ELEMENT DT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -99,16 +99,16 @@ C
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    dt70el    ../starter/source/materials/time_step/dtel.F
-      !||--- called by ------------------------------------------------------
-      !||    dt70law   ../starter/source/materials/time_step/dt70law.F
-      !||====================================================================
+!||====================================================================
+!||    dt70el    ../starter/source/materials/time_step/dtel.F
+!||--- called by ------------------------------------------------------
+!||    dt70law   ../starter/source/materials/time_step/dt70law.F
+!||====================================================================
       SUBROUTINE DT70EL(SSP,PM,GEO,PID,MAT,
      .     RHO0, VIS,
      .     DELTAX, AIRE, VOL, DTX,IGEO)
 C------------------------
-C     CALCUL DT ELEMENT
+C     CALCULATION OF ELEMENT DT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

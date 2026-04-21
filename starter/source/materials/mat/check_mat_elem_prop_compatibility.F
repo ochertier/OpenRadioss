@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    check_mat_elem_prop_compatibility   ../starter/source/materials/mat/check_mat_elem_prop_compatibility.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                              ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                              ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                         ../starter/share/message_module/message_mod.F
-      !||    stack_mod                           ../starter/share/modules1/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    check_mat_elem_prop_compatibility   ../starter/source/materials/mat/check_mat_elem_prop_compatibility.F
+!||--- called by ------------------------------------------------------
+!||    lectur                              ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                              ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                         ../starter/share/message_module/message_mod.F
+!||    stack_mod                           ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE CHECK_MAT_ELEM_PROP_COMPATIBILITY(
      .  ELBUF_STR,IPARG    ,IPM      ,IGEO     ,NUMMAT   ,NUMGEO   ,
      .  NGROUP   ,NPARG    ,NPROPMI  ,NPROPGI  ,MAT_PARAM,N2D      ,
@@ -42,6 +42,7 @@ C-----------------------------------------------
       USE STACK_MOD
       USE MESSAGE_MOD      
       USE MATPARAM_DEF_MOD
+      use element_mod , only : nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,7 +61,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: NG,IGTYP,PID,PROP_ID,NLAY,IL,IMAT,ILAW,IEOS,MAT_ID,K,ITY,ISNOD,NFT,IVISC
+      INTEGER :: NG,IGTYP,PID,PROP_ID,NLAY,IL,IMAT,ILAW,IEOS,MAT_ID,ITY,ISNOD,NFT,IVISC,MLW
       LOGICAL :: COMPAT_ELEM,COMPAT_PROP,COMPAT_EOS,COMPAT_VISC
       CHARACTER (LEN = 10) :: ELTYP
       PID = -HUGE(PID)
@@ -73,25 +74,26 @@ c
       DO NG = 1,NGROUP
 c
         ! Group parameters
-        ITY   = IPARG(5,NG)         ! -> Element type 
+        ITY   = IPARG(5,NG)         ! -> Type element 
         IGTYP = ELBUF_STR(NG)%IGTYP ! -> Property type 
-        NLAY  = ELBUF_STR(NG)%NLAY  ! -> Number of layers 
+        NLAY  = ELBUF_STR(NG)%NLAY  ! -> Number of layers
+        MLW   = IPARG(1,NG)         ! -> Material law type
 c
         !-----------------------------------------------------------------
         ! Solid, Shell, Integrated Beam and SPH
         !-----------------------------------------------------------------
         IF (NLAY > 0) THEN
-c
-          ! Property parameters
-          PID = IPARG(62,NG)    ! -> Property internal ID 
-          PROP_ID = IGEO(1,PID) ! -> Property user ID
 c 
           ! Loop over layers 
           DO IL = 1,NLAY
-c              
+
+            ! Property parameters
+            PID = IPARG(62,NG)    ! -> Property internal ID
+            PROP_ID = IGEO(1,PID) ! -> Property user ID
+c
             ! Layer parameters                                         
             IMAT   = ELBUF_STR(NG)%BUFLY(IL)%IMAT  ! -> Material internal ID 
-            ILAW   = ELBUF_STR(NG)%BUFLY(IL)%ILAW  ! -> Material law type
+            ILAW   = ELBUF_STR(NG)%BUFLY(IL)%ILAW  ! -> Material law type    (or submaterial law type for MULTIMAT-ALE)
             IEOS   = MAT_PARAM(IMAT)%IEOS
             IVISC  = MAT_PARAM(IMAT)%IVISC         ! -> for viscosity 
             MAT_ID = IPM(1,IMAT) ! -> Material user ID
@@ -139,7 +141,7 @@ c
               ! 3 nodes shell elements or triangles
               CASE (7,8)
                 IF (N2D > 0) THEN 
-                  IF (ILAW /= 151) COMPAT_ELEM = .FALSE.
+                  IF (MLW /= 151) COMPAT_ELEM = .FALSE.
                   ELTYP = 'TRIA'
                 ELSE 
                   IF (MAT_PARAM(IMAT)%PROP_SHELL == 0) COMPAT_ELEM = .FALSE.
@@ -192,12 +194,27 @@ c
               ! SOLID PROPERTIES
               ! ------------------------------------------------------------ 
               ! Isotropic solids property
-              CASE (14,20)
+              ! -> Brick and tetrahedral elements
+              CASE (14)
+                IF (MAT_PARAM(IMAT)%PROP_SOLID /= 1 .AND. 
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 5 .AND.
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 6 .AND.
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 7) COMPAT_PROP = .FALSE.
+              ! -> Thickshell elements
+              CASE (20)
                 IF (MAT_PARAM(IMAT)%PROP_SOLID /= 1 .AND. 
      .              MAT_PARAM(IMAT)%PROP_SOLID /= 5 .AND.
      .              MAT_PARAM(IMAT)%PROP_SOLID /= 6) COMPAT_PROP = .FALSE.
               ! Orthotropic solids property
-              CASE (6,21)
+              ! -> Brick and tetrahedral elements
+              CASE (6)
+                IF (MAT_PARAM(IMAT)%PROP_SOLID /= 1 .AND. 
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 2 .AND.               
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 6 .AND.
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 7 .AND.
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 8) COMPAT_PROP = .FALSE.
+              ! -> Thickshell elements
+              CASE (21)
                 IF (MAT_PARAM(IMAT)%PROP_SOLID /= 1 .AND. 
      .              MAT_PARAM(IMAT)%PROP_SOLID /= 2 .AND.               
      .              MAT_PARAM(IMAT)%PROP_SOLID /= 6) COMPAT_PROP = .FALSE.
@@ -210,7 +227,8 @@ c
               ! Cohesive solids property
               CASE (43)
                 IF (MAT_PARAM(IMAT)%PROP_SOLID /= 4 .AND.                   
-     .              MAT_PARAM(IMAT)%PROP_SOLID /= 6) COMPAT_PROP = .FALSE.
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 6 .AND.
+     .              MAT_PARAM(IMAT)%PROP_SOLID /= 7) COMPAT_PROP = .FALSE.
               ! Porous solids property
               CASE (15)          
                 IF (MAT_PARAM(IMAT)%PROP_SOLID /= 5) COMPAT_PROP = .FALSE.

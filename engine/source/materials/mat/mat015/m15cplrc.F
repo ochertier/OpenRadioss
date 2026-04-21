@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m15cplrc    ../engine/source/materials/mat/mat015/m15cplrc.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps15c   ../engine/source/materials/mat/mat015/sigeps15c.F
-      !||====================================================================
-      SUBROUTINE M15CPLRC(JFT    ,JLT    ,PM     ,WPLA   ,
+!||====================================================================
+!||    m15cplrc    ../engine/source/materials/mat/mat015/m15cplrc.F
+!||--- called by ------------------------------------------------------
+!||    sigeps15c   ../engine/source/materials/mat/mat015/sigeps15c.F
+!||====================================================================
+      SUBROUTINE M15CPLRC(NEL    ,PM     ,WPLA   ,
      2                    IMATLY ,DAMT   ,SHF    ,NGL    ,SIGE  ,
      3                    DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX,
      4                    SIGOXX ,SIGOYY ,SIGOXY ,SIGOYZ ,SIGOZX,
      5                    SIGNXX ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX,
-     6                    EPSP   ,ISRATE ,NEL    ,TSAIWU )
+     6                    EPSD_PG,EPSD   ,ISRATE ,ASRATE ,TSAIWU )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,11 +48,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NGL(MVSIZ),NEL
-      INTEGER JFT,JLT, ISRATE
+      INTEGER NGL(MVSIZ)
+      INTEGER NEL, ISRATE
 C     REAL
       my_real
-     .   PM(NPROPM,*),WPLA(*),DAMT(NEL,2),SHF(*),EPSP(*),
+     .   PM(NPROPM,*),WPLA(*),DAMT(NEL,2),SHF(*),
      .   SIGE(MVSIZ,5),
      .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
      .   DEPSZX(MVSIZ),
@@ -60,12 +60,14 @@ C     REAL
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
      .   SIGNXX(NEL),SIGNYY(NEL),SIGNXY(NEL),
      .   SIGNYZ(NEL),SIGNZX(NEL),TSAIWU(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN)    :: EPSD_PG  ! global element strain rate
+      my_real, DIMENSION(NEL), INTENT(INOUT) :: EPSD     ! lbuf%epsd
+      my_real, INTENT(IN)    :: ASRATE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IMATLY,JFLAG,FAIL
-      INTEGER ICC(MVSIZ),IFLAG(MVSIZ),FAIL_OLD(MVSIZ)
-C     REAL
+      INTEGER I, IMATLY
+      INTEGER ICC(MVSIZ)
       my_real
      .   DP1(MVSIZ), DP2(MVSIZ), DP3(MVSIZ),CB(MVSIZ),CN(MVSIZ),
      .   E11(MVSIZ), E22(MVSIZ), NU12(MVSIZ), NU21(MVSIZ),
@@ -76,18 +78,12 @@ C     REAL
      .   T2(MVSIZ), T3(MVSIZ),LAMDA(MVSIZ), COEF(MVSIZ), 
      .   A11(MVSIZ), A12(MVSIZ), A22(MVSIZ),
      .   SO1(MVSIZ), SO2(MVSIZ), SO3(MVSIZ),WPLAMX(MVSIZ),
-     .   EPS1T1(MVSIZ), EPS2T1(MVSIZ), SIGRST1(MVSIZ),
-     .   EPS1T2(MVSIZ), EPS2T2(MVSIZ), SIGRST2(MVSIZ),
-     .   EPS1C1(MVSIZ), EPS2C1(MVSIZ), SIGRSC1(MVSIZ),
-     .   EPS1C2(MVSIZ), EPS2C2(MVSIZ), SIGRSC2(MVSIZ),
-     .   EPS1T12(MVSIZ), EPS2T12(MVSIZ), SIGRST12(MVSIZ), 
      .   CC(MVSIZ),EPDR(MVSIZ), FYLD(MVSIZ),
      .   F1(MVSIZ), F2(MVSIZ), F12(MVSIZ), F11(MVSIZ), F22(MVSIZ), 
-     .   F33(MVSIZ),WPLAREF(MVSIZ),BETA(MVSIZ),SOFT(3),
-     .   SCALE, CNN, SCALE1, SCALE2, DAM1, DAM2,SIGYT1,SIGYT2,SIGYC1,
-     .   SIGYC2,SIGYT12,ALPHA,STRP12,COEFA,COEFB,DELTA
+     . F33(MVSIZ),WPLAREF(MVSIZ),BETA(MVSIZ),
+     . SCALE, CNN, SCALE1, SCALE2
 C=======================================================================       
-      DO I=JFT,JLT
+      DO I=1,NEL
         DE(I)     =PM(44,IMATLY)
         E11(I)    =PM(33,IMATLY)
         E22(I)    =PM(34,IMATLY)
@@ -114,12 +110,12 @@ C=======================================================================
         IF (TT == ZERO) DAMT(I,2)=ONE
       ENDDO
 C-------------------------------------------------------------------
-C     REDUCTION DE SIG SUR CRITERE WPLA_OLD >= WPLAMX
+C     reduction of sig based on the criterion wpla_old >= wplamx
 C-------------------------------------------------------------------
 C-------------------------------------------------------------------
 C     DEFORMATIONS ELASTIQUES
 C-----------------------------
-      DO I=JFT,JLT
+      DO I=1,NEL
         DE1(I)=ONE
         DE2(I)=ONE
         SCALE =ONE         
@@ -136,7 +132,7 @@ C-----------------------------
         S5(I) = SIGOZX(I)/MAX(DE1(I)*G31(I)*SHF(I),EM30)
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         S1(I)=S1(I)+DEPSXX(I)
         S2(I)=S2(I)+DEPSYY(I)
         S3(I)=S3(I)+DEPSXY(I)
@@ -144,7 +140,7 @@ C
         S5(I)=S5(I)+DEPSZX(I)
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         DE1(I)=ONE
         DE2(I)=ONE
         SCALE1=ONE
@@ -159,9 +155,9 @@ C
         A12(I) = NU21(I)*A11(I)*SCALE1
       ENDDO
 C-----------------------------
-C     CONTRAINTES ELASTIQUES
+C     ELASTIC STRESSES
 C-----------------------------
-      DO I=JFT,JLT
+      DO I=1,NEL
         T1(I)   = A11(I)*S1(I)+A12(I)*S2(I)
         T2(I)   = A12(I)*S1(I)+A22(I)*S2(I)
         T3(I)   = DE1(I)*DE2(I)*G12(I)*S3(I)
@@ -171,66 +167,69 @@ C-----------------------------
 C-------------------------------------------------------------------
 C     STRAIN RATE
 C-------------------------------------------------------------------
-      DO I=JFT,JLT
-        IF (ISRATE == 0) EPSP(I) = MAX(
-     .                     ABS(DEPSXX(I)),ABS(DEPSYY(I)),ABS(DEPSXY(I)),
-     .                     ABS(DEPSYZ(I)),ABS(DEPSZX(I))) / MAX(DT1,EM30)
-        IF (EPSP(I) > EPDR(I)) THEN
-          EPSP(I)=LOG(EPSP(I)/EPDR(I))
+      DO I=1,NEL
+        IF (ISRATE == 0) THEN
+          EPSD(I) = MAX(ABS(DEPSXX(I)),ABS(DEPSYY(I)),ABS(DEPSXY(I)),
+     .                  ABS(DEPSYZ(I)),ABS(DEPSZX(I))) / MAX(DT1,EM20)
         ELSE
-          EPSP(I)=ZERO
+          EPSD(I) = ASRATE*EPSD_PG(I) + (ONE-ASRATE)*EPSD(I)
+        END IF
+        IF (EPSD(I) > EPDR(I)) THEN
+          EPSD(I)=LOG(EPSD(I)/EPDR(I))
+        ELSE
+          EPSD(I)=ZERO
         ENDIF
         COEF(I)=ZERO
       ENDDO
 C
-      DO I=JFT,JLT
-        EPSP(I) = ONE + CC(I) * EPSP(I)
-        FYLD(I) = (ONE+CB(I)*WPLA(I)**CN(I))*EPSP(I)
+      DO I=1,NEL
+        EPSD(I) = ONE + CC(I) * EPSD(I)
+        FYLD(I) = (ONE+CB(I)*WPLA(I)**CN(I))*EPSD(I)
         IF (ICC(I) == 1 .OR. ICC(I) == 3) THEN
-          FMAX(I) = FMAX(I)*EPSP(I)
+          FMAX(I) = FMAX(I)*EPSD(I)
         ENDIF
         IF (ICC(I) == 3 .OR. ICC(I) == 4) THEN
-          WPLAMX(I) = WPLAMX(I)*EPSP(I)
+          WPLAMX(I) = WPLAMX(I)*EPSD(I)
         ENDIF
         FYLD(I)= MIN(FMAX(I),FYLD(I))
       ENDDO
 C-------------------------------------------------------------------
 C     PLASTICITE
 C-------------------------------------------------------------------
-      DO I=JFT,JLT
+      DO I=1,NEL
         WVEC(I)=F1(I) *T1(I)       + F2(I) *T2(I) +
      .          F11(I)*T1(I)*T1(I) + F22(I)*T2(I)*T2(I) +
      .          F33(I)*T3(I)*T3(I) + TWO*F12(I)*T1(I)*T2(I)
         TSAIWU(I) = MAX(MIN(WVEC(I)/FYLD(I),ONE),TSAIWU(I))
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         CNN=CN(I)-ONE
         WVEC(I)=ZERO
         IF (WPLA(I) > ZERO .AND. FYLD(I) < FMAX(I)) 
-     .      WVEC(I)=EPSP(I)*WPLA(I)**CNN
+     .      WVEC(I)=EPSD(I)*WPLA(I)**CNN
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         BETA(I) = ONE
         SO1(I)=BETA(I)*SIGOXX(I)
         SO2(I)=BETA(I)*SIGOYY(I)
         SO3(I)=BETA(I)*SIGOXY(I)
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         DP1(I)=F1(I)+2*F11(I)*SO1(I)+2*F12(I)*SO2(I)
         DP2(I)=F2(I)+2*F22(I)*SO2(I)+2*F12(I)*SO1(I)
         DP3(I)=2*F33(I)*SO3(I)
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         DS1(I)=T1(I)-SO1(I)
         DS2(I)=T2(I)-SO2(I)
         DS3(I)=T3(I)-SO3(I)
       ENDDO
 C 
-      DO I=JFT,JLT
+      DO I=1,NEL
         LAMDA(I)=(DP1(I)*DS1(I)+DP2(I)*DS2(I)+DP3(I)*DS3(I))*COEF(I)
         IF (LAMDA(I) == ZERO) CYCLE
         LAMDA(I)=LAMDA(I)*COEF(I)/
@@ -241,26 +240,26 @@ C
      .       *CN(I)*CB(I)*WVEC(I))
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         DP1(I)=LAMDA(I)*DP1(I)
         DP2(I)=LAMDA(I)*DP2(I)
         DP3(I)=LAMDA(I)*DP3(I)
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         T1(I)=T1(I)-A11(I)*DP1(I)-A12(I)*DP2(I)
         T2(I)=T2(I)-A12(I)*DP1(I)-A22(I)*DP2(I)
         T3(I)=T3(I)-G12(I)*DE1(I)*DE2(I)*DP3(I)*TWO
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         WPLA(I)=WPLA(I)+HALF*(DP1(I)*(T1(I)+SO1(I))+
      .                          DP2(I)*(T2(I)+SO2(I))+
      .                     TWO*DP3(I)*(T3(I)+SO3(I)))
         WPLA(I)= MAX(WPLA(I),ZERO) / WPLAREF(I)
       ENDDO
 C
-      DO I=JFT,JLT
+      DO I=1,NEL
         SIGNXX(I)=T1(I)
         SIGNYY(I)=T2(I)
         SIGNXY(I)=T3(I)
@@ -268,7 +267,7 @@ C
 C-------------------
 C     PLASTICITY END
 C-------------------
-      DO I=JFT,JLT
+      DO I=1,NEL
         SIGE(I,1)=SIGNXX(I)
         SIGE(I,2)=SIGNYY(I)
         SIGE(I,3)=SIGNXY(I)

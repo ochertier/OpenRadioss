@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    qbilan                ../engine/source/elements/solid_2d/quad/qbilan.F
-      !||--- called by ------------------------------------------------------
-      !||    bforc2                ../engine/source/ale/bimat/bforc2.F
-      !||    q4forc2               ../engine/source/elements/solid_2d/quad4/q4forc2.F
-      !||    qforc2                ../engine/source/elements/solid_2d/quad/qforc2.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    qbilan                ../engine/source/elements/solid_2d/quad/qbilan.F
+!||--- called by ------------------------------------------------------
+!||    bforc2                ../engine/source/ale/bimat/bforc2.F
+!||    q4forc2               ../engine/source/elements/solid_2d/quad4/q4forc2.F
+!||    qforc2                ../engine/source/elements/solid_2d/quad/qforc2.F
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE QBILAN(
      1   PARTSAV, OFF,     EINT,    RHO,
      2   RK,      VOL,     VY1,     VY2,
@@ -40,7 +40,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5   EHOU,    R22,     R23,     R32,
      6   R33,     GRESAV,  GRTH,    IGRTH,
      7   IEXPAN,  EINTTH,  ITASK,   NEL,
-     8   JTUR,    JCVT,    IGRE,SENSORS)
+     8   JTUR,    JCVT,    IGRE,SENSORS,
+     9   G_WPLA,  WPLA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -72,6 +73,8 @@ C-----------------------------------------------
       INTEGER IEXPAN,ITASK,
      .   IPARTQ(*),GRTH(*),IGRTH(*)
       type (sensors_),INTENT(INOUT) :: SENSORS
+      INTEGER, INTENT(IN) :: G_WPLA
+      my_real,DIMENSION(NEL*G_WPLA), INTENT(IN) :: WPLA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -88,7 +91,7 @@ C-----------------------------------------------
       XM_SAV = ZERO
       YM_SAV = ZERO
       ZM_SAV = ZERO
-
+      
       DO I=1,NEL
         VYA(I)=VY1(I)+VY2(I)+VY3(I)+VY4(I)
         VZA(I)=VZ1(I)+VZ2(I)+VZ3(I)+VZ4(I)
@@ -139,6 +142,7 @@ C-----------------------------------------------
         PARTSAV(4,M)=PARTSAV(4,M) + XMAS(I)*VYA(I)*FOURTH
         PARTSAV(5,M)=PARTSAV(5,M) + XMAS(I)*VZA(I)*FOURTH
         PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I)
+        IF (G_WPLA > 0)  PARTSAV(29,M)=PARTSAV(29,M) + WPLA(I)
       ENDDO
 
       IF(JTUR/=0)THEN

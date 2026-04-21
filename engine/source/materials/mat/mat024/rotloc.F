@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rotloc   ../engine/source/materials/mat/mat024/rotloc.F
-      !||--- called by ------------------------------------------------------
-      !||    conc24   ../engine/source/materials/mat/mat024/conc24.F
-      !||====================================================================
+!||====================================================================
+!||    rotloc   ../engine/source/materials/mat/mat024/rotloc.F
+!||--- called by ------------------------------------------------------
+!||    conc24   ../engine/source/materials/mat/mat024/conc24.F
+!||====================================================================
       SUBROUTINE ROTLOC(
      1   NEL,     GAMA,    RX,      RY,
      2   RZ,      SX,      SY,      SZ,
@@ -90,10 +90,9 @@ C=======================================================================
             ENDDO
           ELSE
 C---------------------------------------------
-C            EN 2D LES CONTRAINTES SONT :
+C            in 2d the stresses are:
 C            1=YY 2=ZZ 3=TT 4=YZ 5=0 6=0
-C            EN CONTRADICTION AVEC X=T
-C            ATTENTION DGAMAER!
+C            CONTRADICTION WITH X=T
 C---------------------------------------------
             DO I = 1,NEL
             RR   = SQRT(SY(I)**2+SZ(I)**2)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_dfs_detcord         ../starter/source/initial_conditions/detonation/read_dfs_detcord.F
-      !||--- called by ------------------------------------------------------
-      !||    read_detonators          ../starter/source/initial_conditions/detonation/read_detonators.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    detcord0                 ../starter/source/initial_conditions/detonation/detcord0.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    ifrontplus               ../starter/source/spmd/node/frontplus.F
-      !||    nintri                   ../starter/source/system/nintrr.F
-      !||    nodgrnr5                 ../starter/source/starter/freform.F
-      !||    unused_mat_detonator     ../starter/source/initial_conditions/detonation/unused_mat_detonator.F
-      !||    usr2sys                  ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod           ../starter/share/modules1/detonators_mod.F
-      !||    format_mod               ../starter/share/modules1/format_mod.F90
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_dfs_detcord         ../starter/source/initial_conditions/detonation/read_dfs_detcord.F
+!||--- called by ------------------------------------------------------
+!||    read_detonators          ../starter/source/initial_conditions/detonation/read_detonators.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    detcord0                 ../starter/source/initial_conditions/detonation/detcord0.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    ifrontplus               ../starter/source/spmd/node/frontplus.F
+!||    nintri                   ../starter/source/system/nintrr.F
+!||    nodgrnr5                 ../starter/source/starter/freform.F
+!||    unused_mat_detonator     ../starter/source/initial_conditions/detonation/unused_mat_detonator.F
+!||    usr2sys                  ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod           ../starter/share/modules1/detonators_mod.F
+!||    format_mod               ../starter/share/modules1/format_mod.F90
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE READ_DFS_DETCORD(DETONATORS,X,IGRNOD,IPM,ITABM1,UNITAB,LSUBMODEL,ITAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -197,17 +197,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   O u t p u t   F o r m a t
 C-----------------------------------------------      
- 1001 FORMAT(///'DETONATING CORD           ',I10,/5X,
+ 1001 FORMAT(///5X,
+     &          'DETONATING CORD           ',I10,/5X,
      &          '---------------           ',/5X,
      &          'CONFIDENTIAL DATA')    
- 1700 FORMAT(///'DETONATING CORD            ',I10,/5X,
+ 1700 FORMAT(///5X,
+     &          'DETONATING CORD            ',I10,/5X,
      &          '----------------           ',/5X,
      &          'NODE GROUP IDENTIFIER     =',I10     ,/5X,
      &          'NUMBER OF POINTS(CORD)    =',I10     ,/5X,         
      &          'LIGHTING TIME             =',1PG20.13,/5X,
      &          'EXPLOSIVE MATERIAL NUMBER =',I10     ,/5X,
      &          'CORD DEFINITION :          ')     
- 1701 FORMAT(///'DETONATING CORD            ',I10,/5X,
+ 1701 FORMAT(///5X,
+     &          'DETONATING CORD            ',I10,/5X,
      &          '----------------           ',/5X,
      &          'NODE GROUP IDENTIFIER     =',I10     ,/5X,
      &          'NUMBER OF POINTS(CORD)    =',I10     ,/5X,         

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    anim_set2zero_struct   ../engine/source/output/anim/reader/anim_set2zero_struct.F
-      !||--- called by ------------------------------------------------------
-      !||    freanim                ../engine/source/output/anim/reader/freanim.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod               ../common_source/modules/output/anim_mod.F
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||====================================================================
-      SUBROUTINE ANIM_SET2ZERO_STRUCT(SENSORS)
+!||====================================================================
+!||    anim_set2zero_struct   ../engine/source/output/anim/reader/anim_set2zero_struct.F
+!||--- called by ------------------------------------------------------
+!||    freanim                ../engine/source/output/anim/reader/freanim.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||====================================================================
+      SUBROUTINE ANIM_SET2ZERO_STRUCT(OUTPUT,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
       USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -50,12 +50,13 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
+      TYPE(output_), intent(inout) :: OUTPUT
       TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
-      TANIM0            = ZERO
-      TANIM_STOP0       = ZERO
-      DTANIM0           = ZERO
-      TANIMSENS         = ZERO
+      OUTPUT%TANIM0            = ZERO
+      OUTPUT%TANIM_STOP0       = ZERO
+      OUTPUT%DTANIM0           = ZERO
+      OUTPUT%TANIMSENS         = ZERO
       SENSORS%ANIM_DT   = ZERO
       SENSORS%ANIM_ID   = 0
       ANIM_M            = 0

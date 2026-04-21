@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_gatherv_int   ../engine/source/mpi/generic/spmd_gatherv_int.F
-      !||--- called by ------------------------------------------------------
-      !||    init_th            ../engine/source/output/th/init_th.F
-      !||    read_dynain        ../engine/source/output/dynain/read_dynain.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_gatherv_int      ../engine/source/mpi/generic/spmd_gatherv_int.F
+!||--- called by ------------------------------------------------------
+!||    init_th               ../engine/source/output/th/init_th.F
+!||    read_dynain           ../engine/source/output/dynain/read_dynain.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
         SUBROUTINE SPMD_GATHERV_INT(SENDBUF,RECVBUF,PROC,SEND_SIZE,TOTAL_RCV_SIZE,RCV_SIZE,DIPLS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -43,11 +46,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(in) :: SEND_SIZE,TOTAL_RCV_SIZE
-        INTEGER, INTENT(in) :: PROC
+        INTEGER, INTENT(inout) :: SEND_SIZE,TOTAL_RCV_SIZE
+        INTEGER, INTENT(inout) :: PROC
         INTEGER, DIMENSION(NSPMD) :: RCV_SIZE,DIPLS
-        INTEGER, DIMENSION(SEND_SIZE), INTENT(in) :: SENDBUF
-        INTEGER, DIMENSION(TOTAL_RCV_SIZE), INTENT(out) :: RECVBUF
+        INTEGER, DIMENSION(SEND_SIZE), INTENT(inout) :: SENDBUF
+        INTEGER, DIMENSION(TOTAL_RCV_SIZE), INTENT(inout) :: RECVBUF
 
 #ifdef MPI
 C-----------------------------------------------

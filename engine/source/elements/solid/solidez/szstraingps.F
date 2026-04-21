@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    szstraingps      ../engine/source/elements/solid/solidez/szstraingps.F
-      !||--- called by ------------------------------------------------------
-      !||    gpsstrain_skin   ../engine/source/output/anim/generate/tensgpstrain.F
-      !||    strn_tenscor3    ../engine/source/output/h3d/h3d_results/h3d_strn_tenscor3.F
-      !||    tensgpstrain     ../engine/source/output/anim/generate/tensgpstrain.F
-      !||====================================================================
+!||====================================================================
+!||    szstraingps      ../engine/source/elements/solid/solidez/szstraingps.F
+!||--- called by ------------------------------------------------------
+!||    gpsstrain_skin   ../engine/source/output/anim/generate/tensgpstrain.F
+!||    strn_tenscor3    ../engine/source/output/h3d/h3d_results/h3d_strn_tenscor3.F
+!||    tensgpstrain     ../engine/source/output/anim/generate/tensgpstrain.F
+!||====================================================================
       SUBROUTINE SZSTRAINGPS(
      1   STRAIN,  STR_PI,  STRHG,   NEL)
 C-----------------------------------------------
@@ -49,9 +49,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,  J,IR,IS,IT,IP
+      INTEGER I,IR,IS,IT,IP
       my_real
-     .   KSI,ETA,ZETA,COEF,F1,F2,F3,F1X,F2Y,F3Z
+     .   KSI,ETA,ZETA,F1,F2,F3
       my_real
      .  A_GAUSS(9,9)
       DATA A_GAUSS / 

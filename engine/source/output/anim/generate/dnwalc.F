@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dnwalc      ../engine/source/output/anim/generate/dnwalc.F
-      !||--- called by ------------------------------------------------------
-      !||    dsecnor     ../engine/source/output/anim/generate/dsecnor.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_s_c   ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    dnwalc      ../engine/source/output/anim/generate/dnwalc.F
+!||--- called by ------------------------------------------------------
+!||    dsecnor     ../engine/source/output/anim/generate/dsecnor.F
+!||--- calls      -----------------------------------------------------
+!||    write_s_c   ../common_source/tools/input_output/write_routines.c
+!||====================================================================
       SUBROUTINE DNWALC(X ,RWL ,MSR )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -43,9 +43,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J
       my_real
-     .   XWL, YWL, ZWL,XN,YN,ZN,D,DX,DY,DZ,XL, V1, V2, V3, VV1,
-     .   VV2, VV3, VV,S,C,XX,YY,ZZ,ALPHA,X0,Y0,Z0
-      REAL R4
+     . XWL, YWL, ZWL,XN,YN,ZN,D, V1, V2, V3, VV1,
+     . VV2, VV3, VV,S,C,XX,YY,ZZ,ALPHA
 C-----------------------------------------------
 C
        XN =RWL(1)

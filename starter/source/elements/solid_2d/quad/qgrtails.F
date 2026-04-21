@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    qgrtails               ../starter/source/elements/solid_2d/quad/qgrtails.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    zeroin                 ../starter/source/system/zeroin.F
-      !||--- uses       -----------------------------------------------------
-      !||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||====================================================================
+!||====================================================================
+!||    qgrtails               ../starter/source/elements/solid_2d/quad/qgrtails.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    zeroin                 ../starter/source/system/zeroin.F
+!||--- uses       -----------------------------------------------------
+!||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||====================================================================
       SUBROUTINE QGRTAILS(
      1       IXQ    ,PM      ,IPARG  ,GEO    ,
      2       EADD   ,ND      ,DD_IAD ,IDX    ,
@@ -48,15 +48,17 @@ C-----------------------------------------------
       USE INIVOL_DEF_MOD , ONLY : INIVOL_STRUCT_, NUM_INIVOL
       USE MATPARAM_DEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
-C-----------------------------------------------M
+      USE ALE_MOD , ONLY : ALE
+      use element_mod , only : nixq
+C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
 C     IXQ(7,NUMELQ)      TABLEAU CONECS+PID+MID+NOS SOLIDES 4N      E
-C     PM(NPROPM,NUMMAT)  TABLEAU DES CARACS DES MATERIAUX           E
+C     PM(NPROPM,NUMMAT)  ARRAY OF MATERIAL PROPERTIES           E
 C     IPARG(NPARG,NGROUP)TABLEAU DES CARACTERISTIQUES DES GROUPES   E/S
-C     GEO(NPROPG,NUMGEO) TABLEAU DES CARACS DES PID                 E
+C     GEO(NPROPG,NUMGEO) ARRAY OF PID CHARACTERISTICS                 E
 C     EADD(NUMELQ)       TABLEAU DES ADRESEES DANS IDAM CHGT DAMIER E 
-C     DD_IAD             TABLEAU DE LA DD EN SUPER GROUPES          S
+C     DD_IAD             ARRAY OF DD IN SUPER GROUPS          S
 C     INUM(8,NUMELQ)     TABLEAU DE TRAVAIL                         E/S
 C     INDEX(NUMELQ)      TABLEAU DE TRAVAIL                         E/S
 C     CEP(NUMELQ)        TABLEAU DE TRAVAIL                         E/S
@@ -106,11 +108,11 @@ C-----------------------------------------------
       CHARACTER(LEN=NCHARTITLE)::TITR
       LOGICAL lFOUND
 C--------------------------------------------------------------
-C         BORNAGE DES GROUPES DE MVSIZ
+C         bounding of MVSIZ groups
 C--------------------------------------------------------------
       NGR1 = NGROUP + 1
 C
-C phase 1 : domain decompostition
+C Phase 1: Domain Decomposition
 C
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
@@ -123,8 +125,8 @@ C initialisation dd_iad
        END DO
       ENDDO
 C
-C phase 2 : bornage en groupe de mvsiz
-C ngroup est global, iparg est global mais organise en fonction de dd
+C Phase 2: MVSIZ Group Bounds
+C ngroup is global, iparg is global but organized based on dd
 C
       DO N=1,ND
         NEL = EADD(N+1)-EADD(N)
@@ -191,7 +193,7 @@ C
       ENDDO
 
 C
-C RENUMEROTATION POUR SURFACES
+C renumbering for surfaces
 C
       DO I=1,NSURF
         NN=IGRSURF(I)%NSEG
@@ -201,7 +203,7 @@ C
         ENDDO
       ENDDO
 C
-C RENUMEROTATION POUR GROUPES DE SHELL
+C renumbering for shell groups
 C
       DO I=1,NGRQUAD
         NN=IGRQUAD(I)%NENTITY
@@ -272,6 +274,21 @@ C ngroup global
             JALE=0
             JEUL=1
           ENDIF
+
+          !ALE REZONING/REMAPING : number of MAT/EOS variables to treat (used by staggered scheme only : arezon.F)
+          !  With ALE framework, since the Mesh is arbitrary, the variable must be updated to map thei expected location and not follow the arbitrary mesh displacement
+          !  this numbering here will be used in arezon.F to loop over variables to rezon/remap
+          IF(JALE == 1)THEN
+            ALE%REZON%NUM_NUVAR_MAT = MAX(ALE%REZON%NUM_NUVAR_MAT, MAT_PARAM(MID)%REZON%NUM_NUVAR_MAT )
+            ALE%REZON%NUM_NUVAR_EOS = MAX(ALE%REZON%NUM_NUVAR_EOS, MAT_PARAM(MID)%REZON%NUM_NUVAR_EOS )
+          ENDIF
+
+          !ALE UVAR REZONING  (81:MAT,  82:EOS)
+          IF(JALE == 1)THEN
+            IPARG(81,NGROUP) = MAT_PARAM(MID)%REZON%NUM_NUVAR_MAT
+            IPARG(82,NGROUP) = MAT_PARAM(MID)%REZON%NUM_NUVAR_EOS
+          ENDIF
+
           JTUR=NINT(PM(70,MID))
           JTHE=NINT(PM(71,MID))
                     
@@ -387,7 +404,7 @@ c          IPARG(4,NGROUP) = LBUFEL+1
           IPARG(7,NGROUP) = JALE
           IPARG(11,NGROUP)= JEUL
           IPARG(12,NGROUP)= JTUR
-          IF(JALE==0 .AND. JEUL==0)THEN
+          IF(JALE == 0 .AND. JEUL == 0)THEN
             IPARG(13,NGROUP)=-ABS(JTHE)  ! -1 nodal temperature    +1 centroid temperature
           ELSE
             IPARG(13,NGROUP)=+ABS(JTHE)  ! -1 nodal temperature    +1 centroid temperature
@@ -404,9 +421,9 @@ c          IPARG(4,NGROUP) = LBUFEL+1
           IPARG(26,NGROUP)= ML2
           IPARG(27,NGROUP)= JPOR
           IPARG(29,NGROUP)= IPLAST
-C reperage groupe/processeur
+C Group/Processor Splition
           IPARG(32,NGROUP)= P-1
-C  attention en toute rigeur >=46
+C  Be careful in all rigor> = 46
           IPARG(34,NGROUP)= NINT(PM(10,MID))
           IPARG(37,NGROUP)= JCVT
           IPARG(38,NGROUP)= IGT
@@ -426,7 +443,7 @@ C         flag for group of duplicated elements in multidomains
          NGP(P)=NGROUP-NGP(P)
         ENDIF
        ENDDO
-C DD_IAD => nb groupes par sous domaine
+C Dd_iad => nb groups by sub -domain
        NGP(NSPMD+1)=0
        DO P = 1, NSPMD
          NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)
@@ -437,7 +454,7 @@ C
   300 CONTINUE
 C                                      
       NSPGROUP = NSPGROUP + ND
-C Traitement CFD sur MID negatif sur tous les solides si ineg=1
+C CFD treatment on MID negative on all solids if ineg=1
       IF (INEG==1) THEN
         DO I = 1, NUMELQ
           IXQ(1,I) = ABS(IXQ(1,I))

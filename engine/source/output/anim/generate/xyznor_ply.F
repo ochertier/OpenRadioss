@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    xyznor_ply             ../engine/source/output/anim/generate/xyznor_ply.F
-      !||--- called by ------------------------------------------------------
-      !||    genani                 ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_anim_ply_xyznor   ../engine/source/mpi/anim/spmd_anim_ply_xyznor.F
-      !||    write_s_c              ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod            ../engine/share/modules/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    xyznor_ply             ../engine/source/output/anim/generate/xyznor_ply.F
+!||--- called by ------------------------------------------------------
+!||    genani                 ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_anim_ply_xyznor   ../engine/source/mpi/anim/spmd_anim_ply_xyznor.F
+!||    write_s_c              ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod            ../engine/share/modules/plyxfem_mod.F
+!||====================================================================
       SUBROUTINE XYZNOR_PLY(IPLY,XNORM,NODGLOB,WEIGHT,EMPSIZPL)
 C-----------------------------------------------
       USE PLYXFEM_MOD
@@ -54,7 +54,7 @@ C     REAL
 C     REAL
       my_real
      .   S3000,S
-      INTEGER I,INORM(3),K,P,IXNN,N,ARSZ,EMPL
+      INTEGER I,IXNN,N,ARSZ,EMPL
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: INORMAR
 C-----------------------------------------------
       S3000 = THREE1000

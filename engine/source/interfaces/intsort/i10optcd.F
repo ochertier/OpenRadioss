@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i10optcd          ../engine/source/interfaces/intsort/i10optcd.F
-      !||--- called by ------------------------------------------------------
-      !||    i10main_opt_tri   ../engine/source/interfaces/intsort/i10opt_opt_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    sync_data         ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box           ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i10optcd          ../engine/source/interfaces/intsort/i10optcd.F
+!||--- called by ------------------------------------------------------
+!||    i10main_opt_tri   ../engine/source/interfaces/intsort/i10opt_opt_tri.F
+!||--- calls      -----------------------------------------------------
+!||    sync_data         ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box           ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I10OPTCD(NSV  ,CAND_E,CAND_N,X     ,I_STOK,
      1                    IRECT,GAP   ,GAP_S ,GAP_M ,IGAP  ,
      2                    ITASK,NIN   ,NSN   ,STFN  ,STF   ,
@@ -135,7 +135,7 @@ C
        NLT = NLS
        NLS=0
         DO LS = NLF, NLT
-C   conserver LISTI et LIST pour optimiser le code genere (IA64)
+C   keep LISTI and LIST to optimize the generated code (IA64)
          IS = LISTI(LS)
          I=JS+IS
          L  = CAND_E(I)

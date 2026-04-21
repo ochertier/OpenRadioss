@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,14 +25,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !! \details  Subroutine to define for each segment 
 !!   the list of th surfaces  where a pressure is applied 
 
-      !||====================================================================
-      !||    th_surf_load_pressure   ../starter/source/output/th/th_surf_load_pressure.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                  ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    th_surf_load_pressure   ../starter/source/output/th/th_surf_load_pressure.F
+!||--- called by ------------------------------------------------------
+!||    lectur                  ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE TH_SURF_LOAD_PRESSURE(IGRSURF  ,TH_SURF  , IPRES   ,ILOADP   ,LLOADP  ,
      .                                 SIZLOADP ,NLOADP   ,SLLOADP  ,NIBCLD   ,NPRELD  ,
      .                                 NSURF    ,NUMNOD   )
@@ -64,7 +64,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,NOD1,NOD2,NOD3,NOD4,NSEGPL,NSEGPLOAD,IAD,
-     .   NS,NL,NLOADPL,N,NN,N1,N2,N3,N4,NLOADPRESS,IS,SIZE_NEW,NSEGLOADP,NSEGLOADFB,ADSEG
+     .   NS,NL,N,NN,N1,N2,N3,N4,NLOADPRESS,IS,SIZE_NEW,NSEGLOADP,ADSEG
       INTEGER, DIMENSION (:), ALLOCATABLE :: OLD_TAB
       INTEGER, DIMENSION (:), ALLOCATABLE :: TAG
 C-----------------------------------------------

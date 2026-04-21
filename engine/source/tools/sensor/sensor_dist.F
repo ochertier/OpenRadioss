@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
-      !||====================================================================
-      !||    sensor_dist   ../engine/source/tools/sensor/sensor_dist.F
-      !||--- called by ------------------------------------------------------
-      !||    sensor_base   ../engine/source/tools/sensor/sensor_base.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod    ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sensor_dist   ../engine/source/tools/sensor/sensor_dist.F
+!||--- called by ------------------------------------------------------
+!||    sensor_base   ../engine/source/tools/sensor/sensor_base.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod    ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SENSOR_DIST(SENSOR ,X      ,XSENS   )
 C-----------------------------------------------
 C   M o d u l e s
@@ -56,8 +56,7 @@ C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------
       INTEGER :: N1,N2,ICRIT,DFLAG,IFLAG,ACTI
-      my_real :: DX,DY,DZ,DD,DMIN,DMAX,TSTART,TMIN,TDELAY,INFINITY
-      PARAMETER (INFINITY = 1.0E20)
+      my_real :: DX,DY,DZ,DD,DMIN,DMAX,TSTART,TMIN,TDELAY
 C=======================================================================
       TSTART  = SENSOR%TSTART
       TDELAY = SENSOR%TDELAY

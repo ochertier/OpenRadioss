@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
-      !||====================================================================
-      !||    sensor_section   ../engine/source/tools/sensor/sensor_section.F
-      !||--- called by ------------------------------------------------------
-      !||    sensor_base      ../engine/source/tools/sensor/sensor_base.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sensor_section   ../engine/source/tools/sensor/sensor_section.F
+!||--- called by ------------------------------------------------------
+!||    sensor_base      ../engine/source/tools/sensor/sensor_base.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SENSOR_SECTION(SENSOR  ,DIMFB   ,STABS   ,TABS    ,
      .                          FSAV    ,FBSAV6  )
 C-----------------------------------------------
@@ -58,10 +58,9 @@ C-----------------------------------------------
 C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------
-      INTEGER I,SECT_ID,IDIR,ICRIT,ISECT,IAD,IFLAG
+      INTEGER SECT_ID,IDIR,ICRIT,ISECT,IAD,IFLAG
 c
-      my_real :: FMIN,FMAX,FX,FY,FZ,FF,TSTART,TMIN,TDELAY,INFINITY
-      PARAMETER (INFINITY = 1.0E20)
+      my_real :: FMIN,FMAX,FX,FY,FZ,FF,TSTART,TMIN,TDELAY
 C=======================================================================
       IF (SENSOR%STATUS == 1) RETURN   ! already activated
       FF = ZERO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    iniebcsp0          ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur             ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    iniebcs_dp         ../starter/source/boundary_conditions/ebcs/iniebcs_dp.F
-      !||    iniebcs_nrf_tcar   ../starter/source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
-      !||    iniebcsp           ../starter/source/boundary_conditions/ebcs/iniebcsp.F
-      !||--- uses       -----------------------------------------------------
-      !||    inigrav            ../starter/share/modules1/inigrav_mod.F
-      !||====================================================================
+!||====================================================================
+!||    iniebcsp0          ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
+!||--- called by ------------------------------------------------------
+!||    lectur             ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    iniebcs_dp         ../starter/source/boundary_conditions/ebcs/iniebcs_dp.F
+!||    iniebcs_nrf_tcar   ../starter/source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
+!||    iniebcsp           ../starter/source/boundary_conditions/ebcs/iniebcsp.F
+!||--- uses       -----------------------------------------------------
+!||    inigrav            ../starter/share/modules1/inigrav_mod.F
+!||====================================================================
       SUBROUTINE INIEBCSP0(X, IPARG, ELBUF_STR, EBCS_TAB, IXS, IXQ, IXTG, IPARTS, IPARTQ, IPARTTG, PM, IPM, MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -40,6 +40,7 @@ C-----------------------------------------------
       USE EBCS_MOD
       USE INIGRAV
       USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
+      use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,6 +84,7 @@ C=======================================================================
            TYPE IS (t_ebcs_nrf)
              lFOUND_EBCS_NRF = .TRUE.
              NSEG = twf%nb_elem
+             NOD = twf%nb_node
              CALL INIEBCS_DP(NSEG, NOD, twf%iseg, twf%ielem, twf%elem_list, twf%node_list,
      .                       IPARG, ELBUF_STR, X, IXS, IXQ, IXTG, twf%DP0,
      .                       IPARTS, IPARTQ, IPARTTG)    

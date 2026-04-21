@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s6cke3         ../engine/source/elements/thickshell/solide6c/s6cke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
-      !||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_s6       ../engine/source/implicit/assem_s6.F
-      !||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
-      !||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
-      !||    s6ccumg3       ../engine/source/elements/thickshell/solide6c/s6ccumg3.F
-      !||    s6cderi3       ../engine/source/elements/thickshell/solide6c/s6cderi3.F
-      !||    s6ckgeo3       ../engine/source/elements/thickshell/solide6c/s6ckgeo3.F
-      !||    s6clke3        ../engine/source/elements/thickshell/solide6c/s6clke3.F
-      !||    s6rcoork       ../engine/source/elements/thickshell/solide6c/s6rcoork.F
-      !||    s8eoff         ../engine/source/elements/solid/solide8/s8eoff.F
-      !||    s8zsigp3       ../engine/source/elements/solid/solide8z/s8zsigp3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s6cke3         ../engine/source/elements/thickshell/solide6c/s6cke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
+!||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_s6       ../engine/source/implicit/assem_s6.F
+!||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
+!||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
+!||    s6ccumg3       ../engine/source/elements/thickshell/solide6c/s6ccumg3.F
+!||    s6cderi3       ../engine/source/elements/thickshell/solide6c/s6cderi3.F
+!||    s6ckgeo3       ../engine/source/elements/thickshell/solide6c/s6ckgeo3.F
+!||    s6clke3        ../engine/source/elements/thickshell/solide6c/s6clke3.F
+!||    s6rcoork       ../engine/source/elements/thickshell/solide6c/s6rcoork.F
+!||    s8eoff         ../engine/source/elements/solid/solide8/s8eoff.F
+!||    s8zsigp3       ../engine/source/elements/solid/solide8z/s8zsigp3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE S6CKE3(
      1   PM,       GEO,      IXS,      X,
      2   ELBUF_STR,ETAG,     IDDL,     NDOF,
@@ -51,6 +52,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD            
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,7 +75,7 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: JHBE
       INTEGER, INTENT(IN) :: ISORTH
       INTEGER, INTENT(INOUT) :: ISORTHG
-      INTEGER  ICP, ICSIG,IKGEO,NEL ,NPG
+      INTEGER ICP, ICSIG, IKGEO, NEL
       INTEGER ETAG(*),IDDL(*)  ,NDOF(*)  ,IADK(*) ,JDIK(*),
      .   IXS(NIXS,*),IPM(NPROPMI,*),IGEO(NPROPGI,*)
 C
@@ -88,19 +90,18 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LCO, NF1, IFLAG, NB3S, I,IS,IAD0
-      INTEGER IADBUF,IKORTH,IBID,IUN,IP,NLAY
-      INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),PID
+      INTEGER NF1, I, IS, IAD0
+      INTEGER IADBUF, IKORTH, IBID, IUN, NLAY
+      INTEGER MXT(MVSIZ), NGL(MVSIZ), NGEO(MVSIZ)
       my_real
-     . VOLN(MVSIZ), DELTAX(MVSIZ),
+     . VOLN(MVSIZ),
      . AJ1(MVSIZ) , AJ2(MVSIZ) , AJ3(MVSIZ) ,
-     . AJ4(MVSIZ) , AJ5(MVSIZ) , AJ6(MVSIZ) , 
-     . AJ7(MVSIZ) , AJ8(MVSIZ) , AJ9(MVSIZ) 
+     . AJ4(MVSIZ) , AJ5(MVSIZ) , AJ6(MVSIZ) 
 C----------------
       INTEGER NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ), 
-     .        NC5(MVSIZ), NC6(MVSIZ), NC7(MVSIZ), NC8(MVSIZ)
+     . NC5(MVSIZ), NC6(MVSIZ)
       my_real
-     .   OFF(MVSIZ) ,BID(1),  
+     . BID(1),
      .   X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ),
      .   X5(MVSIZ), X6(MVSIZ), 
      .   Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),

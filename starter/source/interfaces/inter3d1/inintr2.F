@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,32 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    i20sta                 ../starter/source/interfaces/inter3d1/inintr2.F
-      !||    i24surf_pxfem          ../starter/source/interfaces/inter3d1/inintr2.F
-      !||    i2_dtn                 ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||    i2_dtn_27              ../starter/source/interfaces/inter3d1/i2_dtn_27.F
-      !||    i2_dtn_28              ../starter/source/interfaces/inter3d1/i2_dtn_28.F
-      !||    iniend                 ../starter/source/interfaces/inter3d1/iniend.F
-      !||    iniend2d               ../starter/source/interfaces/inter3d1/iniend.F
-      !||    int2cy_chk             ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||    int2modif_nd           ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    itagsl12               ../starter/source/interfaces/inter3d1/inintr2.F
-      !||    itagsl2                ../starter/source/interfaces/inter3d1/itagsl2.F
-      !||    remn_i2_edgop          ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||    remn_i2op              ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||    remn_self24            ../starter/source/interfaces/inter3d1/remn_self24.F
-      !||    ri2_int24p_ini         ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||--- uses       -----------------------------------------------------
-      !||    intbufscratch_mod      ../starter/source/interfaces/interf1/intbufscratch_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    i20sta                 ../starter/source/interfaces/inter3d1/inintr2.F
+!||    i24surf_pxfem          ../starter/source/interfaces/inter3d1/inintr2.F
+!||    i2_dtn                 ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||    i2_dtn_27              ../starter/source/interfaces/inter3d1/i2_dtn_27.F
+!||    i2_dtn_28              ../starter/source/interfaces/inter3d1/i2_dtn_28.F
+!||    iniend                 ../starter/source/interfaces/inter3d1/iniend.F
+!||    iniend2d               ../starter/source/interfaces/inter3d1/iniend.F
+!||    int2cy_chk             ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||    int2modif_nd           ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    itagsl12               ../starter/source/interfaces/inter3d1/inintr2.F
+!||    itagsl2                ../starter/source/interfaces/inter3d1/itagsl2.F
+!||    remn_i2_edgop          ../starter/source/interfaces/inter3d1/i7remnode.F
+!||    remn_i2op              ../starter/source/interfaces/inter3d1/i7remnode.F
+!||    remn_self24            ../starter/source/interfaces/inter3d1/remn_self24.F
+!||    ri2_int24p_ini         ../starter/source/interfaces/inter3d1/i7remnode.F
+!||--- uses       -----------------------------------------------------
+!||    intbufscratch_mod      ../starter/source/interfaces/interf1/intbufscratch_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ININTR2(IPARI   ,INSCR   ,X     ,
      .                   IXS     ,IXQ    ,IXC   ,PM      ,GEO   ,
      .                   INTC    ,ITAB   ,MS    ,NPBY    ,LPBY  ,
@@ -165,7 +165,7 @@ C
         ENDIF
       ENDDO
 C
-C TAGAGE DESACTIVATION SECONDARY INTERF 12 AVEC CONDITION CINEMATIQUE
+C TAGAGE DESACTIVATION SECONDARY INTERF 12 WITH CONDITION CINEMATIQUE
 C
       DO N=1,NINTER
        NTY = IPARI(7,N)
@@ -176,7 +176,7 @@ C
        ENDIF
       ENDDO
 C
-C     SWITCH INTERF 2 AVEC CONDITION CINEMATIQUE => METHODE PENALITE
+C     SWITCH INTERF 2 WITH CONDITION CINEMATIQUE => METHODE penalty
 C
       CALL ITAGSL2(IPARI ,NOM_OPT,ITAB  ,IKINE  ,INTBUF_TAB,
      .                   ITAGND,ICNDS10,NSTRF ,ITAGCYC,IRBE2     ,
@@ -246,15 +246,15 @@ C-----------
       RETURN
       END
 C
-      !||====================================================================
-      !||    itagsl12        ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    kinset          ../starter/source/constraints/general/kinset.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    itagsl12        ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- called by ------------------------------------------------------
+!||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    kinset          ../starter/source/constraints/general/kinset.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ITAGSL12(IPARI,ITAB,IKINE,INTBUF_TAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -304,13 +304,13 @@ C
       DO I=1,NSN
       NSV=INTBUF_TAB%NSV(I)
 C Cas1 corps rigide ou interface 2
-C Cas3 Condition au limite en translation
+C Case3 Condition at the limit in translation
       CAS1=ITF(IKINE(NSV))+IRB(IKINE(NSV))
       CAS2=CAS1+
      .  IBC(IKINE(NSV))+IKINE(NSV+NUMNOD) - 10*IKINE(NSV+NUMNOD)/10
 c        IF(ITF(IKINE(NSV))/=0 .OR. IRB(IKINE(NSV))/=0 )THEN
 c
-c si SECONDARY d'une autre interface 2 ou 9 ou 12 ou rby on tag le SECONDARY pour dsactivation
+c If SECONDARY from another interface 2, 9, 12, or rby, tag SECONDARY for deactivation
 c
         IF(     (IPARI(11)==3 .AND. CAS2/=0)
      .     .OR. (IPARI(11)==2 .AND. CAS1/=0) )THEN
@@ -351,14 +351,14 @@ C-----------------------------------------------------------------------
  2010 FORMAT(' NO PROBLEM FOUND IN INTERFACE',I10,/)
 C----------------------------------------------------------------------- 
       END
-      !||====================================================================
-      !||    i20sta          ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    i20stab         ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i20sta          ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- called by ------------------------------------------------------
+!||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    i20stab         ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I20STA(IPARI,STIFN,INTBUF_TAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -388,11 +388,11 @@ C
       RETURN
 C----------------------------------------------------------------------- 
       END
-      !||====================================================================
-      !||    i20stab   ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- called by ------------------------------------------------------
-      !||    i20sta    ../starter/source/interfaces/inter3d1/inintr2.F
-      !||====================================================================
+!||====================================================================
+!||    i20stab   ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- called by ------------------------------------------------------
+!||    i20sta    ../starter/source/interfaces/inter3d1/inintr2.F
+!||====================================================================
       SUBROUTINE I20STAB(NLN,NLG,STFA,STIFN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -421,24 +421,24 @@ C-----------
       RETURN
 C----------------------------------------------------------------------- 
       END
-      !||====================================================================
-      !||    i24surf_pxfem   ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    usr2sys         ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i24surf_pxfem   ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- called by ------------------------------------------------------
+!||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    usr2sys         ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I24SURF_PXFEM(NRTM  ,IRECT,INOD_PXFEM,INTPLY,
      .                         NVOISIN, MSEGTYP ,MS_PLY , ISEG_PXFEM,
      .                         ISEG_PLY)
 C      
       USE MESSAGE_MOD
 C-----------------------------------------------------------------------
-C     LECTURE DES SURFACES ET DECOMPTE DES SEGMENTS
+C     Reading surfaces and counting segments
 C           ENTREE : 
-C                    NRT NOMBRE DE RENSEIGNEMENTS A LIRE
+C                    NRT NUMBER OF ITEMS TO READ
 C           SORTIE : 
 C                    IRECT 
 C-----------------------------------------------

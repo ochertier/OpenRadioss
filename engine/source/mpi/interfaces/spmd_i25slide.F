@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_i25_slide_exch   ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_slid          ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||    mpi_commod            ../engine/share/modules/mpi_comm_mod.F
-      !||    pointerdef            ../engine/share/modules/pointerdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i25_slide_exch   ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- called by ------------------------------------------------------
+!||    i25main_slid          ../engine/source/interfaces/int25/i25main_slid.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    mpi_commod            ../engine/share/modules/mpi_comm_mod.F
+!||    pointerdef            ../engine/share/modules/pointerdef_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_I25_SLIDE_EXCH(IBUF    ,RBUF      ,ISIZ    ,RSIZ 
      .                              ,NB      ,COMM_INT, COMM_REAL, COMM_SIZ
      .                              ,MODE    ,NIN,      COMM_PATTERN)
@@ -42,6 +43,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -224,22 +226,24 @@ C          ENDIF
 
 
 C   
-      !||====================================================================
-      !||    spmd_i25_slide_gat   ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_slid         ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- calls      -----------------------------------------------------
-      !||    deallocate_fi1_tmp   ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||    my_orders            ../common_source/tools/sort/my_orders.c
-      !||    reallocate_fi1       ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||    reallocate_fi2       ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod              ../engine/share/modules/h3d_mod.F
-      !||    ifront_mod           ../engine/share/modules/ifront_mod.F
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||    tri25tmp             ../engine/share/modules/tri25tmp_mod.F
-      !||    tri7box              ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i25_slide_gat    ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- called by ------------------------------------------------------
+!||    i25main_slid          ../engine/source/interfaces/int25/i25main_slid.F
+!||--- calls      -----------------------------------------------------
+!||    deallocate_fi1_tmp    ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||    my_orders             ../common_source/tools/sort/my_orders.c
+!||    reallocate_fi1        ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||    reallocate_fi2        ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod               ../engine/share/modules/h3d_mod.F
+!||    ifront_mod            ../engine/share/modules/ifront_mod.F
+!||    intbufdef_mod         ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri25tmp              ../engine/share/modules/tri25tmp_mod.F
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_I25_SLIDE_GAT(NSN  ,NIN, NI25,
      2                             IGAP  ,NSNR   ,INTTH   ,ILEV,INTBUF_TAB,
      3                             FR_NOR, IAD_FRNOR, NB_SLID   ,ITAB, H3D_DATA,
@@ -266,7 +270,7 @@ c - INDEX( "numbering on old FI" ) = numbering in new FI
 c   - This is be used to renumber the remote part of CAND_N , CAND_OPT_N
 c   
 c   Remark If a secnd node known as an old remote slides
-c    (present in XREM and old TMP%*FI strucutre), then the values in *FI structures
+c    (present in XREM and old TMP%*FI structure), then the values in *FI structures
 c    are replaced by the values coming from [XI]REM. 
 c
 c  Example using NSPMD = 4. 
@@ -344,6 +348,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -370,26 +375,24 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NSNR_OLD,NSNR_NEW,NODFI,NNP,LSKYFI,
-     .        NOD, LOC_PROC, I, N, NN, P, IDEB, J, K,L,JJ, I_STOK, IX, II
+      INTEGER NSNR_OLD,NSNR_NEW,NODFI,LSKYFI,
+     .        LOC_PROC, I, N, NN, P, IDEB, J, K,L,JJ, IX
       INTEGER NSNR_TOT
       INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX ! renumbering cand_n
-      INTEGER  NN2,RSHIFT,ISHIFT, IOLDNSNFI, ND, JDEB, Q
+      INTEGER  RSHIFT,ISHIFT, JDEB
       INTEGER, DIMENSION(:), ALLOCATABLE :: IAUX,IAUX_LOCAL,IAUX_REV,IAUX_K,IAUX_L
       INTEGER IDEB_NEW  ! shift for resulting *FI 
       INTEGER IDEB_OLD  ! shift for old *FI
       INTEGER IDEB_SLID ! shift for new sliding nodes
       INTEGER PNEW,POLD,ID_OLD,ID_NEW 
-      INTEGER SNEW,SOLD,PMAIN,NB_SLID_TOT
-      my_real,
-     .    DIMENSION(:), ALLOCATABLE :: PENEFI_OLD, STIFFI_OLD
-      INTEGER MARGIN,N_NEW_SECND,UID
+      INTEGER NB_SLID_TOT
+      INTEGER UID
       TYPE(I25_TMP_STRUCT) :: TMP
       TYPE(int_pointer) , DIMENSION(NSPMD) :: INDX_FOR_P,UID_FOR_P
       INTEGER, ALLOCATABLE, DIMENSION(:) :: PERMUTATIONS, PROC_ORIG
       INTEGER SINDEX(NSPMD), SIZE_PERM_MAX, PROC_FROM
       INTEGER WORK(70000)
-      INTEGER PLOCAL, NBLOCAL, PM, KK, KM, KI, LL, SIZREMNORFI, SIZ, NE
+      INTEGER PLOCAL, NBLOCAL, KK, KM, KI, LL, SIZREMNORFI, SIZ, NE
       INTEGER, DIMENSION(:), ALLOCATABLE :: REMNOR_FI_TMP
 C-----------------------------------------------
 C   S o u r c e  L i n e s
@@ -399,10 +402,10 @@ C-----------------------------------------------
       LSKYFI= 0
       NB_SLID_TOT = 0
       NSNR_TOT = 0
-C Reperage des candidats
+C locating candidates
 
 C
-C Allocation des tableaux de frontieres interfaces
+C allocation of interface boundary arrays
 C
       DO P = 1,NSPMD
          NODFI =  NODFI + NSNFI(NIN)%P(P) + NB_SLID(P)
@@ -422,7 +425,7 @@ C
       CALL REALLOCATE_FI1(NODFI,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,FLAGREMN,IVIS2,ISTIF_MSDT,IFSUB_CAREA)
       NSNFI(NIN)%P(1:NSPMD) = TMP%NSNFI%P(1:NSPMD)
 C
-C Compactage des candidats
+C compacting candidates
 C
       IDEB = 0
       IDEB_NEW = 0  
@@ -469,7 +472,7 @@ C
       ENDIF
       DO P = 1, NSPMD
       ! Pour l'instant on garde l'iteration P = LOC_PROC
-      ! voir avec  ce qu'il faut faire dans ce cas
+      ! see with what to do in this case
         NN = 0
         NSNR_OLD = NSNFI(NIN)%P(P)
         NSNR_NEW = SINDEX(P) ! NSNR from XREM, we don't know yet if they are already known
@@ -586,7 +589,7 @@ C ========================================================
 
 
 
-          ! NN = Taille de XREM + Taille ancien FI - noeuds communs
+          ! Nn = size of xrem + old size fi - common nodes
           NN = NSNFI(NIN)%P(P)
           NSNFI(NIN)%P(P) = NN - NBLOCAL
 
@@ -663,7 +666,7 @@ C  symmetric plane
 
 C
 C specific cases ../..
-          IF(IGAP==1 .OR. IGAP==2)THEN
+          IF(IGAP==1 .OR. IGAP==2 .OR. IGAP==5)THEN
             NBLOCAL = 0
             DO J=1,NN
               I = IAUX(J)
@@ -875,7 +878,7 @@ C         IF(ITYP==25)THEN
                  PENE_OLDFI(NIN)%P(2,K)     = XREM(RSHIFT+5,L)
                  STIF_OLDFI(NIN)%P(2,K)     = XREM(RSHIFT+6,L)
                  PENE_OLDFI(NIN)%P(3,K)     = XREM(RSHIFT+7,L)
-                 PENE_OLDFI(NIN)%P(3,K)     = XREM(RSHIFT+8,L)
+                 PENE_OLDFI(NIN)%P(4,K)     = XREM(RSHIFT+8,L)
                  PENE_OLDFI(NIN)%P(5,K)     = XREM(RSHIFT+9,L)
                ELSEIF(I == 0) THEN
                  K = IAUX_K(J) 
@@ -927,7 +930,7 @@ C         IF(ITYP==25)THEN
             ISHIFT = ISHIFT + 5
  
             IF (ILEV==2) THEN  
-C          NBINFLFI local ne semble pas toujours alloue 
+C          Local nbinflfi does not always seem allocated 
                NBLOCAL = 0
                DO J = 1, NN
                  I = IAUX(J)
@@ -1086,7 +1089,7 @@ C ================================================================
 
 
 C
-C Deallocation de XREM IREM
+C Deallocation of XREM IREM
 C
       IF(ALLOCATED(XREM)) DEALLOCATE(XREM)
       IF(ALLOCATED(IREM)) DEALLOCATE(IREM)
@@ -1128,15 +1131,16 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    reallocate_fi1       ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i25_slide_gat   ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||    tri25tmp             ../engine/share/modules/tri25tmp_mod.F
-      !||    tri7box              ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    reallocate_fi1        ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i25_slide_gat    ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri25tmp              ../engine/share/modules/tri25tmp_mod.F
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE REALLOCATE_FI1(NEW_SIZE,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,
      .                          FLAGREMN,IVIS2,ISTIF_MSDT,IFSUB_CAREA)
 C-----------------------------------------------
@@ -1148,6 +1152,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "assert.inc"
 C-----------------------------------------------
@@ -1307,15 +1312,16 @@ C
 
       RETURN
       END SUBROUTINE    
-      !||====================================================================
-      !||    deallocate_fi1_tmp   ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i25_slide_gat   ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||    tri25tmp             ../engine/share/modules/tri25tmp_mod.F
-      !||    tri7box              ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    deallocate_fi1_tmp    ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i25_slide_gat    ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri25tmp              ../engine/share/modules/tri25tmp_mod.F
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE DEALLOCATE_FI1_TMP(NEW_SIZE,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,
      .                          FLAGREMN,IVIS2,ISTIF_MSDT,IFSUB_CAREA)
 C-----------------------------------------------
@@ -1327,6 +1333,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -1411,18 +1418,19 @@ C
       END SUBROUTINE    
 
 
-      !||====================================================================
-      !||    reallocate_fi2       ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i25_slide_gat   ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg               ../engine/source/output/message/message.F
-      !||    arret                ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod              ../engine/share/modules/h3d_mod.F
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||    tri7box              ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    reallocate_fi2        ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i25_slide_gat    ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod               ../engine/share/modules/h3d_mod.F
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE REALLOCATE_FI2(NIN, INTTH, NODFI, LSKYFI,H3D_DATA,NODADT_THERM) 
 C
 C                               
@@ -1436,6 +1444,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -1589,7 +1598,7 @@ C
         CALL ARRET(2)
       ENDIF
 C
-C allocations conditionnelles output pression/ friction energy
+C Output Pressure/ Friction Energy conditional allowances
 C
       IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT >0)THEN
         IF(ASSOCIATED(FNCONTI(NIN)%P)) DEALLOCATE(FNCONTI(NIN)%P)
@@ -1642,13 +1651,14 @@ C
       RETURN
       END SUBROUTINE
 
-      !||====================================================================
-      !||    check_fi      ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    tri25tmp      ../engine/share/modules/tri25tmp_mod.F
-      !||    tri7box       ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    check_fi              ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri25tmp              ../engine/share/modules/tri25tmp_mod.F
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE CHECK_FI()
 C use for debug only
 C
@@ -1660,6 +1670,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    compute_connect_partelm   ../starter/source/model/sets/compute_connect_partelm.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                    ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    inverted_group_alloc      ../starter/source/model/sets/inverted_group_alloc.F
-      !||    inverted_group_init       ../starter/source/model/sets/inverted_group_init.F
-      !||--- uses       -----------------------------------------------------
-      !||    inverted_group_mod        ../starter/share/modules1/inverted_group_mod.F
-      !||====================================================================
+!||====================================================================
+!||    compute_connect_partelm   ../starter/source/model/sets/compute_connect_partelm.F
+!||--- called by ------------------------------------------------------
+!||    lectur                    ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    inverted_group_alloc      ../starter/source/model/sets/inverted_group_alloc.F
+!||    inverted_group_init       ../starter/source/model/sets/inverted_group_init.F
+!||--- uses       -----------------------------------------------------
+!||    inverted_group_mod        ../starter/share/modules1/inverted_group_mod.F
+!||====================================================================
       SUBROUTINE COMPUTE_CONNECT_PARTELM( IPARTS,IPARTQ,IPARTC,IPARTT,IPARTP,
      .                                    IPARTTG,IPARTR ,IPARTSP, INV_GROUP,NUMSPH,
      .                                    NISP   ,KXSP   )
@@ -73,7 +73,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,EL,NCOUNT,PART,IND,FIRST,LAST
+      INTEGER I, PART, IND
       INTEGER, DIMENSION (:), ALLOCATABLE :: PART_COUNT
 C-----------------------------------------------
       ! allocation of INV_GROUP% array

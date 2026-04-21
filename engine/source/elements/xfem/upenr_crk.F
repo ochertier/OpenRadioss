@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    upenr_crk       ../engine/source/elements/xfem/upenr_crk.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    upenr_crk       ../engine/source/elements/xfem/upenr_crk.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||====================================================================
       SUBROUTINE UPENR_CRK(ADDCNE_CRK ,INOD_CRK ,NODFT ,NODLT,
      .                     NODENR     ,ENRTAG   ,NODLEVXF,PROCNE_CRK)
 C-----------------------------------------------
@@ -48,7 +48,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,KK,N,NSX,NCT_CRK,NC_CRK,EN0,ENR,ILEV,NLEV,OK_UP,ENR_MAX
+      INTEGER KK,N,NSX,NCT_CRK,NC_CRK,EN0,ENR,ILEV,NLEV,OK_UP,ENR_MAX
       INTEGER, DIMENSION(:),ALLOCATABLE :: IFAC0
 C=======================================================================
       ALLOCATE(IFAC0(0:IENRNOD))
@@ -66,7 +66,7 @@ c
             EN0 = ABS(CRKLVSET(ILEV)%ENR0(1,KK))                            
             IF (EN0 > 0) THEN
               ENR_MAX = ENRTAG(N,EN0)                           
-              IF (ENR_MAX > 0) THEN  ! il y a une fissure dans l'adresse sky  
+              IF (ENR_MAX > 0) THEN  ! there is a crack in the sky address
                 IFAC0(EN0) = ENR_MAX                                          
                 OK_UP = 1                                                     
               ENDIF                                                           

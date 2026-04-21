@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #ifdef MPI
-      !||====================================================================
-      !||    spmd_fxb_for_pon   ../engine/source/mpi/kinematic_conditions/spmd_fxb_for_pon.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbyfor            ../engine/source/constraints/fxbody/fxbyfor.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar               ../engine/source/input/nvar.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_fxb_for_pon      ../engine/source/mpi/kinematic_conditions/spmd_fxb_for_pon.F
+!||--- called by ------------------------------------------------------
+!||    fxbyfor               ../engine/source/constraints/fxbody/fxbyfor.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_FXB_FOR_PON(FXBIPM, MFEXTP, FSKYFXB, DSKY, IADN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -54,7 +55,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NFX, NMOD, NME, NSN, NVAR, PMAIN, IAD, NSNT, I, J, JJ,
+      INTEGER NFX, NMOD, NME, NSN, PMAIN, IAD, NSNT, I, J, JJ,
      .        ITAG, MSGOFF, NSNP(NSPMD-1), NSNPMAX, LEN, K, KK, AVAR,
      .        IERR, REQ(NSPMD-1), STAT(MPI_STATUS_SIZE,NSPMD-1),
      .        II
@@ -155,18 +156,19 @@ C
 #elif 1 
 
 
-C version simplifiee pour mono non SPMD
-      !||====================================================================
-      !||    spmd_fxb_for_pon   ../engine/source/mpi/kinematic_conditions/spmd_fxb_for_pon.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbyfor            ../engine/source/constraints/fxbody/fxbyfor.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar               ../engine/source/input/nvar.F
-      !||====================================================================
+C simplified version for mono non-SPMD
+!||====================================================================
+!||    spmd_fxb_for_pon      ../engine/source/mpi/kinematic_conditions/spmd_fxb_for_pon.F
+!||--- called by ------------------------------------------------------
+!||    fxbyfor               ../engine/source/constraints/fxbody/fxbyfor.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_FXB_FOR_PON(FXBIPM, MFEXTP, FSKYFXB, DSKY, IADN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s

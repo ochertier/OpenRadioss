@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dsecnor     ../starter/source/output/anim/dsecnor.F
-      !||--- called by ------------------------------------------------------
-      !||    genani1     ../starter/source/output/anim/genani1.F
-      !||--- calls      -----------------------------------------------------
-      !||    dnwalc      ../starter/source/output/anim/dnwalc.F
-      !||    dnwals      ../starter/source/output/anim/dnwals.F
-      !||====================================================================
+!||====================================================================
+!||    dsecnor     ../starter/source/output/anim/dsecnor.F
+!||--- called by ------------------------------------------------------
+!||    genani1     ../starter/source/output/anim/genani1.F
+!||--- calls      -----------------------------------------------------
+!||    dnwalc      ../starter/source/output/anim/dnwalc.F
+!||    dnwals      ../starter/source/output/anim/dnwals.F
+!||====================================================================
       SUBROUTINE DSECNOR(X    ,RWBUF,NPRW)                              
 C-----------------------------------------------                        
 C   I m p l i c i t   T y p e s                                         
@@ -48,7 +48,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s                                       
 C-----------------------------------------------                        
       INTEGER J,N,K,N2,N3,N4,ITYP,I3000,NXX,NYY,NZZ                     
-      my_real XX,YY,ZZ                                                  
       I3000 = 3000                                                      
       DO N=1,NSECT+NRWALL                                               
          CALL WRITE_S_C(I3000,1)                                        

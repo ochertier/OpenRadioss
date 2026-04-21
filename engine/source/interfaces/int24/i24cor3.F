@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24cor3          ../engine/source/interfaces/int24/i24cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24mainf         ../engine/source/interfaces/int24/i24main.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24fic_getn      ../engine/source/interfaces/int24/i24for3e.F
-      !||--- uses       -----------------------------------------------------
-      !||    debug_mod        ../engine/share/modules/debug_mod.F
-      !||    parameters_mod   ../common_source/modules/interfaces/parameters_mod.F
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24cor3          ../engine/source/interfaces/int24/i24cor3.F
+!||--- called by ------------------------------------------------------
+!||    i24mainf         ../engine/source/interfaces/int24/i24main.F
+!||--- calls      -----------------------------------------------------
+!||    i24fic_getn      ../engine/source/interfaces/int24/i24for3e.F
+!||--- uses       -----------------------------------------------------
+!||    debug_mod        ../engine/share/modules/debug_mod.F
+!||    parameters_mod   ../common_source/modules/interfaces/parameters_mod.F
+!||    tri7box          ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24COR3(
      1               JLT      ,X        ,IRECT   ,NSV     ,CAND_E   ,
      2               CAND_N   ,CAND_T   ,STF     ,STFN    ,STIF     ,
@@ -143,7 +143,7 @@ C
            IF(NI<=NSN)THEN
              IG = NSV(NI)
              NSVG(I) = IG
-C---------------voir KINET(IG) est initi   quand    
+C-------------- see Kinet (IG) is initial when    
             IF (IG <= NUMNOD) THEN         
              KINI(I) = KINET(IG)
              XI(I) = X(1,IG)
@@ -635,7 +635,7 @@ C----------
         ENDDO
       ENDIF
          
-C----Friction model : secnd part IDs---------
+C----Friction model : second part IDs---------
       IF(INTFRIC > 0) THEN
          DO I=1,JLT
            NI = CAND_N(I)
@@ -670,7 +670,7 @@ C
          ENDDO
        ENDIF
 C
-C----Friction model : secnd part IDs---------
+C----Friction model : second part IDs---------
       IF(INTNITSCHE > 0) THEN
          DO I=1,JLT
            NI = CAND_N(I)
@@ -690,7 +690,7 @@ C----Friction model : secnd part IDs---------
 C
       IF(NINLOADP > 0) THEN
 C-----------------------------------------------
-C         Distance between secnd node 
+C         Distance between second node 
 C              and main segment 
 C-----------------------------------------------
         DO I=1,JLT 
@@ -718,9 +718,9 @@ C
        ENDIF
       RETURN
       END
-      !||====================================================================
-      !||    i24ini_ispt2   ../engine/source/interfaces/int24/i24cor3.F
-      !||====================================================================
+!||====================================================================
+!||    i24ini_ispt2   ../engine/source/interfaces/int24/i24cor3.F
+!||====================================================================
       SUBROUTINE I24INI_ISPT2(
      1               JLT     ,NSV   ,CAND_N ,NSN   ,IRTSE  ,
      2               IS2SE   ,ISPT2 ,ISEGPT ,IRTLM ,NSNE   ,
@@ -742,7 +742,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C----- get edge NS1,NS2 and--Secnd seg id :IE-
+C----- get edge NS1,NS2 and--Second seg id :IE-
       INTEGER ITAG(NRTSE),IE1,IE2
       INTEGER I ,J  ,IL, L, NN, IG,JFT, IX,  NI,IGF,IPT,IE,NS1,NS2,
      .        ICONT1,ICONT2,NSI,IPT2,NS,ip
@@ -800,11 +800,11 @@ C
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    i24ispt2_ini   ../engine/source/interfaces/int24/i24cor3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box        ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24ispt2_ini   ../engine/source/interfaces/int24/i24cor3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box        ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24ISPT2_INI(
      1               JLT     ,NSV   ,CAND_N ,NSN   ,IRTSE  ,
      2               IS2SE   ,ISPT2 ,ISEGPT ,IRTLM ,NSNE   ,
@@ -827,7 +827,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C----- get edge NS1,NS2 and--Secnd seg id :IE-
+C----- get edge NS1,NS2 and--Second seg id :IE-
       INTEGER IE1,IE2
       INTEGER I ,J  ,IL, L, NN, IG,JFT, IX,  NI,IGF,IPT,IE,NS1,NS2,
      .        ICONT1,ICONT2,NSI,IPT2,NS,ip
@@ -878,14 +878,14 @@ C-----------
       RETURN
       END
 C
-      !||====================================================================
-      !||    i24ispt2_ini_opttri   ../engine/source/interfaces/int24/i24cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24optcd              ../engine/source/interfaces/intsort/i24optcd.F
-      !||--- uses       -----------------------------------------------------
-      !||    debug_mod             ../engine/share/modules/debug_mod.F
-      !||    tri7box               ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24ispt2_ini_opttri   ../engine/source/interfaces/int24/i24cor3.F
+!||--- called by ------------------------------------------------------
+!||    i24optcd              ../engine/source/interfaces/intsort/i24optcd.F
+!||--- uses       -----------------------------------------------------
+!||    debug_mod             ../engine/share/modules/debug_mod.F
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24ISPT2_INI_OPTTRI(
      1               JFT,JLT     ,NSV   ,CAND_N ,NSN   ,IRTSE  ,
      2               IS2SE   ,ISPT2 ,ISEGPT ,IRTLM ,NSNE   ,
@@ -905,7 +905,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C----- get edge NS1,NS2 and--Secnd seg id :IE-
+C----- get edge NS1,NS2 and--Second seg id :IE-
       INTEGER IE1,IE2
       INTEGER I ,J  ,IL, L, IG,JFT, IX,  NI,IGF,IPT,IE,NS1,NS2,
      .        ICONT1,ICONT2,NSI,IPT2,ip,SN
@@ -940,14 +940,14 @@ C-----------
       RETURN
       END
 C
-      !||====================================================================
-      !||    i_corpfit3   ../engine/source/interfaces/int24/i24cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24mainf     ../engine/source/interfaces/int24/i24main.F
-      !||    i25mainf     ../engine/source/interfaces/int25/i25mainf.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i_corpfit3   ../engine/source/interfaces/int24/i24cor3.F
+!||--- called by ------------------------------------------------------
+!||    i24mainf     ../engine/source/interfaces/int24/i24main.F
+!||    i25mainf     ../engine/source/interfaces/int25/i25mainf.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I_CORPFIT3(
      1               JLT      ,STF     ,STFN    ,STIF     ,NSN    ,
      2               CAND_E   ,CAND_N  ,NIN     ,IGSTI   ,KMIN     ,
@@ -978,9 +978,10 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I ,J  ,L, NN, IG,JFT, IX,  NI
       my_real
-     .   STIF_S,STIF_R(MVSIZ),F_PFIT,FA,FB,FAB
+     .   STIF_S,STIF_R(MVSIZ),F_PFIT,FA,FB,FAB,R_MIN
 C-----------------------------------------------
 C--- fixing min(stif) with Inacti=-1
+      R_MIN = ONE
       IF (INACTI==-1)THEN
          DO I=1,JLT
           L  = CAND_E(I)
@@ -991,9 +992,10 @@ C--- fixing min(stif) with Inacti=-1
             NN = NI - NSN
             STIF_S =ABS(STIFI(NIN)%P(NN))
           END IF
-c      STIF_R(I) = MIN(STIF_S,STF(L))/MAX(EM20,STIF(I))
           STIF(I) = MIN(STIF_S,STF(L))
-          IF(IGSTI==2) STIF(I) = HALF*(STIF_S+STF(L))
+          STIF_R(I) = STIF(I)/MAX(STIF_S,STF(L))
+          R_MIN = MIN(R_MIN,STIF_R(I))
+          IF(IGSTI==2) STIF(I) = HALF*(STIF_S+STF(L)) !option Inacti=-2
          ENDDO
       ELSEIF (IGSTI==-1)THEN
          DO I=1,JLT
@@ -1005,19 +1007,31 @@ c      STIF_R(I) = MIN(STIF_S,STF(L))/MAX(EM20,STIF(I))
              NN = NI - NSN
              STIF_S =ABS(STIFI(NIN)%P(NN))
            END IF
-           STIF_R(I) = MIN(STIF_S,STF(L))/MAX(STIF_S,STF(L))
            STIF(I) = MIN(STIF_S,STF(L))
+           STIF_R(I) = STIF(I)/MAX(STIF_S,STF(L))
          ENDDO
       END IF
       IF(NCFIT>0)THEN
          FA = MIN(ONE,THREE*TNCY)
          FAB= MAX(ZERO,THREE*TNCY-ONE)
          FB = MAX(ZERO,THREE*TNCY-TWO)
-         F_PFIT = EM04*(FA+FAB)+FB
+         IF (IGSTI==2.AND.R_MIN>ZEP05) THEN
+           F_PFIT = EM04*FA+EM02*FAB+FB
+         ELSE
+           F_PFIT = EM04*(FA+FAB)+FB
+         END IF
          STIF(1:JLT)=F_PFIT*STIF(1:JLT)
-         IF (FB >ZERO.AND.IGSTI/=2) IKNON(1:JLT) = 1 ! -> nonlinear stiff
+         IF (FB >ZERO.AND.IGSTI/=2) THEN 
+           DO I=1,JLT
+             IF (STIF_R(I)<ZEP05) IKNON(I) = 1 
+           ENDDO
+         ELSEIF (FAB >ZERO.AND.IGSTI/=2) THEN 
+           IKNON(1:JLT) = -1 ! special quadratic 
+         END IF
       ELSEIF (INACTI==-1.AND.IGSTI/=2)THEN
-         IKNON(1:JLT) = 1 
+         DO I=1,JLT
+           IF (STIF_R(I)<ZEP05) IKNON(I) = 1 
+         ENDDO
       ELSEIF (IGSTI ==-1)THEN
          DO I=1,JLT
            IF (STIF_R(I) > 0.9 ) THEN
@@ -1032,13 +1046,13 @@ c      STIF_R(I) = MIN(STIF_S,STF(L))/MAX(EM20,STIF(I))
 C
       RETURN
       END
-      !||====================================================================
-      !||    i_cor_epfit3   ../engine/source/interfaces/int24/i24cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i25mainf       ../engine/source/interfaces/int25/i25mainf.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box        ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i_cor_epfit3   ../engine/source/interfaces/int24/i24cor3.F
+!||--- called by ------------------------------------------------------
+!||    i25mainf       ../engine/source/interfaces/int25/i25mainf.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box        ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I_COR_EPFIT3(
      1               JLT      ,STFE    ,STIF    ,CAND_S ,CAND_M ,
      3               NEDGE    ,NIN     ,INACTI  ,NCFIT   ,TNCY) 

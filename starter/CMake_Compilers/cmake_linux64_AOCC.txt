@@ -22,8 +22,11 @@ set ( cpprel  "-DCPP_rel=96" )
 # ---------------------
 
 #hm_reader
-set ( reader_lib "-L${source_directory}/../extlib/hm_reader/linux64/ -lhm_reader_linux64 ${source_directory}/../extlib/hm_reader/linux64/libapr-1.so.0 "  )
-
+if ( USE_OPEN_READER STREQUAL 1 )
+       set ( reader_lib "-L${source_directory}/../exec -lopen_reader_linux64")
+else ()
+       set ( reader_lib "-L${source_directory}/../extlib/hm_reader/linux64/ -lhm_reader_linux64 -lapr-1" )
+endif()
 
 #Lapack
 set (lapack_lib "${source_directory}/../extlib/lapack-3.10.0/lib_linux64_AOCC/liblapack.a ${source_directory}/../extlib/lapack-3.10.0/lib_linux64_AOCC/libblas.a  ${source_directory}/../extlib/lapack-3.10.0/lib_linux64_gf/libtmglib.a")
@@ -34,6 +37,10 @@ set (metis_lib "${source_directory}/../extlib/metis/linux64/libmetis_linux64_gcc
 #ZLIB
 set (zlib_inc "-I${source_directory}/../extlib/zlib/linux64/include")
 set (zlib_lib "${source_directory}/../extlib/zlib/linux64/lib/libz.a")
+
+# MD5
+set (md5_inc "-I${source_directory}/../extlib/md5/include")
+set (md5_lib "-L${source_directory}/../extlib/md5/linux64/ -lmd5")
 
 #
 # compiler Flags
@@ -74,10 +81,10 @@ if ( debug STREQUAL "1" )
 set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} -DCPP_comp=f90 -DCOMP_AOCC=1  -g -O0 -ffp-contract=off -frounding-math -fopenmp -Mextend -Mbackslash ${ADF} " )
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} -O0 -g -fopenmp " )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} ${md5_inc} -O0 -g -fopenmp " )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} -O0 -g  -fopenmp -std=c++11  " )
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} ${md5_inc} -O0 -g  -fopenmp -std=c++11  " )
 
 else ()
 
@@ -85,10 +92,10 @@ else ()
 set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS " -O3  ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} -DCPP_comp=f90 -DCOMP_AOCC=1  -O3 -ffp-contract=off -frounding-math -fopenmp -Mextend  -Mbackslash ${ADF} " )
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} -O3 -fopenmp " )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} ${md5_inc} -O3 -fopenmp " )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} -O3 -fopenmp -std=c++11  " )
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} ${md5_inc} -O3 -fopenmp -std=c++11  " )
 
 endif()
 
@@ -97,9 +104,9 @@ set (CMAKE_EXE_LINKER_FLAGS " -rdynamic -no-pie -O2 -fopenmp ${FSANITIZE}" )
 
 #Libraries
 if ( static_link STREQUAL "1" )
-set (LINK "dl  ${flexpipe_lib} ${metis_lib} ${reader_lib}  ${lapack_lib} ${zlib_lib} -ldl -static-libgfortran -static-libstdc++ -static-libgcc -Wunused-function"  )
+set (LINK "dl  ${flexpipe_lib} ${metis_lib} ${reader_lib}  ${lapack_lib} ${zlib_lib} ${md5_lib} -ldl -static-libgfortran -static-libstdc++ -static-libgcc -Wunused-function"  )
 else()
-set (LINK "dl  ${flexpipe_lib} ${metis_lib} ${reader_lib}  ${lapack_lib} ${zlib_lib} -ldl -Wunused-function"  )
+set (LINK "dl  ${flexpipe_lib} ${metis_lib} ${reader_lib}  ${lapack_lib} ${zlib_lib} ${md5_lib} -ldl -Wunused-function"  )
 endif()
 
 # -------------------------------------------------------------------------------------------------------------------------------------------

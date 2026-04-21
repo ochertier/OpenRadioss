@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop51                ../starter/source/properties/shell/hm_read_prop51.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties            ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                        ../starter/source/output/message/message.F
-      !||    hm_get_float_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_float_array_2indexes.F
-      !||    hm_get_float_array_index      ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv                 ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_2indexes     ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index        ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted        ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    subrotvect                    ../starter/source/model/submodel/subrot.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod                  ../starter/source/modules/defaults_mod.F90
-      !||    elbuftag_mod                  ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||    stack_mod                     ../starter/share/modules1/stack_mod.F
-      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop51                ../starter/source/properties/shell/hm_read_prop51.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties            ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                        ../starter/source/output/message/message.F
+!||    hm_get_float_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_float_array_2indexes.F
+!||    hm_get_float_array_index      ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv                 ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_2indexes     ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index        ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted        ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    subrotvect                    ../starter/source/model/submodel/subrot.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod                  ../starter/source/modules/defaults_mod.F90
+!||    elbuftag_mod                  ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    stack_mod                     ../starter/share/modules1/stack_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP51(
      .           GEO      ,IGEO     ,PM       ,IPM       ,ISKN     ,  
      .           PROP_ID  ,PROP_TAG ,RTRANS   ,SUB_ID   ,STACK_INFO,
@@ -87,14 +87,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,J,K,KK,M1,ISHELL,ISH3N,ISMSTR,ISROT,ISTRAIN,IINT,ITHK,
-     .   IORTH,IPOS,IGMAT,ISHEAR,IPLAST,NPLY,NP,NSUB,NISUB,IGTYP,IMID,
-     .   ISK,IDSK,PLY_ID,IPID0,IDSUB,INTER,IS,LAMIN,IPID1,IPID2,NPT_SUB,
-     .   IRP,IG
-      INTEGER     IHBE_D,IPLA_D,ISTR_D,ITHK_D,ISHEA_D,ISST_D,
+     .   IORTH,IPOS,IGMAT,ISHEAR,IPLAST,NPLY,NSUB,NISUB,IGTYP,IMID,
+     .   ISK,IDSK,PLY_ID,IPID0,IDSUB,IS,LAMIN,IPID1,IPID2,NPT_SUB,
+     .   IRP
+      INTEGER     IHBE_D,IPLA_D,ITHK_D,ISHEA_D,ISST_D,
      .           ISH3N_D, ISTRA_D,NPTS_D,IDRIL_D
       my_real :: PTHK,ZSHIFT,HM,HF,HR,DM,DN,ASHEAR,VX,VY,VZ,FAILEXP,CVIS,
      .           NORM,ANG,POS,PTHKLY,WEIGHT
-      LOGICAL :: IS_AVAILABLE, IS_ENCRYPTED, LFOUND
+      LOGICAL :: IS_AVAILABLE, IS_ENCRYPTED
 C=======================================================================
       IS_AVAILABLE = .FALSE.
       IS_ENCRYPTED = .FALSE.

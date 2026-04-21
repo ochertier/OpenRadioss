@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps111       ../engine/source/materials/mat/mat111/sigeps111.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
-      !||--- calls      -----------------------------------------------------
-      !||    cardan_method   ../engine/source/materials/mat/mat111/sigeps111.F
-      !||    finter          ../engine/source/tools/curve/finter.F
-      !||    prodaat         ../engine/source/materials/tools/prodAAT.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps111       ../engine/source/materials/mat/mat111/sigeps111.F
+!||--- called by ------------------------------------------------------
+!||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
+!||--- calls      -----------------------------------------------------
+!||    cardan_method   ../engine/source/materials/mat/mat111/sigeps111.F
+!||    finter          ../engine/source/tools/curve/finter.F
+!||    prodaat         ../engine/source/materials/tools/prodAAT.F
+!||====================================================================
        SUBROUTINE SIGEPS111(
      1      NEL    , NUPARAM, NUVAR   , NFUNC , IFUNC , NPF   ,
      2      TF     , TIME   , TIMESTEP, UPARAM, RHO0  , RHO   ,
@@ -80,20 +80,20 @@ C----------------------------------------------------------------
 C  VARIABLES FOR FUNCTION INTERPOLATION 
 C----------------------------------------------------------------
       INTEGER  :: NPF(*), NFUNC, IFUNC(NFUNC)
-      my_real  :: FINTER,FINTTE,TF(*),FINT2V
+      my_real  :: FINTER,FINTTE,TF(*)
       EXTERNAL FINTER,FINTTE
 C----------------------------------------------------------------
 C  L O C A L  V A R I B L E S
 C----------------------------------------------------------------
-      INTEGER ::   I,J,ITEST,ONLY_TENSION_DATA
+      INTEGER ::   I,ITEST,ONLY_TENSION_DATA
       INTEGER , DIMENSION(NEL) :: ICOMP
       my_real :: DW_DI,L2,L3,L5,DELTA,
-     .           G,RBULK,SCALE,T,EPST,DF,DU,
-     .           TRACE,P,FAC,INVJDETF,NU,GINI,RBULKINI,DIFF
-      my_real :: B(NEL,6),LAM2(NEL,3),
-     .           LAMBDA(NEL,3),EVD(3),BD(NEL,6)
+     .           G,RBULK,SCALE,T,EPST,DF,
+     .           TRACE,P,INVJDETF,NU,GINI,DIFF
+      my_real :: B(NEL,6),
+     .           BD(NEL,6)
       my_real ,DIMENSION(NEL) :: JDETF,I1,I1B,LAMT,J2THIRD,
-     .                           T1,T2,T3,ETI,GS,K
+     .                           GS,K
       my_real, DIMENSION(NEL,3,3) :: F,FFT
 c----------------------------------------------------------------
 c     UVAR(1) = engineering strain
@@ -192,7 +192,7 @@ C
                 UVAR(I,1) = LAMT(I) - ONE
                 UVAR(I,2) = JDETF(I)*SIGNZZ(I) / LAMT(I) ! only for testing
               ENDDO
-          CASE(2)  ! equibiaxail traction test 
+          CASE(2)  ! Equibiaxial Test TRACTION 
         !
         !     solving 2*lt**6 - I*lt**4 + 1 = 0
         !      By considering lt**2 = x --> 2*x**3 - I*x**2 +1 = 0
@@ -283,11 +283,11 @@ c-----------
       RETURN
       END
 C  
-      !||====================================================================
-      !||    cardan_method   ../engine/source/materials/mat/mat111/sigeps111.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps111       ../engine/source/materials/mat/mat111/sigeps111.F
-      !||====================================================================
+!||====================================================================
+!||    cardan_method   ../engine/source/materials/mat/mat111/sigeps111.F
+!||--- called by ------------------------------------------------------
+!||    sigeps111       ../engine/source/materials/mat/mat111/sigeps111.F
+!||====================================================================
       SUBROUTINE CARDAN_METHOD(ITEST,NEL,I1,ICOMP,LAMT)
 C  solve X**3 - I*X + 2 = 0
 C-----------------------------------------------
@@ -305,7 +305,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER :: I
         my_real
-     .    X0,X1,X2,DELTA,AA,BB,HUNDRED8,HUIT1,ROOT,FACT
+     .    X0,X1,X2,DELTA,AA,BB,HUNDRED8,HUIT1
 C
         HUNDRED8   = HUNDRED + EIGHT
         HUIT1   = 81

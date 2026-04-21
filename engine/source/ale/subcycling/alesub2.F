@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alesub2      ../engine/source/ale/subcycling/alesub2.F
-      !||--- called by ------------------------------------------------------
-      !||    resol        ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    bcs3v        ../engine/source/ale/inter/bcs3v.F
-      !||    my_barrier   ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod      ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alesub2      ../engine/source/ale/subcycling/alesub2.F
+!||--- called by ------------------------------------------------------
+!||    resol        ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    bcs3v        ../engine/source/ale/inter/bcs3v.F
+!||    my_barrier   ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod      ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE ALESUB2(
      1   NALE   ,V    ,DSAVE ,ICODT  ,ISKEW  ,
      2   SKEW   ,ASAVE,A     ,D      ,NELTST ,
      3   ITYPTST,ITASK,NODFT ,NODLT  ,DT2SAVE,
-     4   STIFN  ,DT2T ,NELTSA,ITYPTSA,NELTS  ,
+     4   DT2T   ,NELTSA,ITYPTSA,NELTS  ,
      5   WEIGHT ,FSKY ,FSKYV )
 C-----------------------------------------------
 C   M o d u l e s
@@ -67,7 +67,7 @@ C-----------------------------------------------
       INTEGER NALE(*),ICODT(*),ISKEW(*), WEIGHT(*), NELTST ,ITYPTST,
      .        ITASK,NODFT,NODLT,NELTSA ,ITYPTSA, NELTS
       my_real V(3,NUMNOD),DSAVE(3,*),SKEW(LSKEW,*),ASAVE(3,*),A(3,NUMNOD),D(3,NUMNOD),
-     .         DT2SAVE,STIFN(*),DT2T,FSKY(8,LSKY),FSKYV(LSKY,8)
+     .         DT2SAVE,DT2T,FSKY(8,LSKY),FSKYV(LSKY,8)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i22ass0   ../engine/source/interfaces/int22/i22assembly.F
-      !||--- called by ------------------------------------------------------
-      !||    i22for3   ../engine/source/interfaces/int22/i22for3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box   ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i22ass0   ../engine/source/interfaces/int22/i22assembly.F
+!||--- called by ------------------------------------------------------
+!||    i22for3   ../engine/source/interfaces/int22/i22for3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box   ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I22ASS0(JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
      2                  NSVG  ,H1   ,H2   ,H3   ,H4     ,STIF ,
      3                  FX1   ,FY1  ,FZ1  ,FX2  ,FY2    ,FZ2  ,
@@ -68,7 +68,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J1, IG
+      INTEGER I, J1
 C
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -104,19 +104,20 @@ C
       END
 
 
-      !||====================================================================
-      !||    i22ass2          ../engine/source/interfaces/int22/i22assembly.F
-      !||--- called by ------------------------------------------------------
-      !||    i22for3          ../engine/source/interfaces/int22/i22for3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../engine/source/output/message/message.F
-      !||    arret            ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    i22bufbric_mod   ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22tri_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i22ass2          ../engine/source/interfaces/int22/i22assembly.F
+!||--- called by ------------------------------------------------------
+!||    i22for3          ../engine/source/interfaces/int22/i22for3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../engine/source/output/message/message.F
+!||    arret            ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||    i22bufbric_mod   ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22tri_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    message_mod      ../engine/share/message_module/message_mod.F
+!||    tri7box          ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I22ASS2(JLT   ,IX1   ,IX2   ,IX3    ,IX4     ,ITAB   ,
      2                   NSVG  ,H1    ,H2    ,H3     ,H4      ,STIF   ,
      3                   FX1   ,FY1   ,FZ1   ,FX2    ,FY2     ,FZ2    ,
@@ -132,6 +133,7 @@ C-----------------------------------------------
       USE I22TRI_MOD
       USE I22BUFBRIC_MOD 
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -166,7 +168,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J1, IG, NISKYL1, NISKYL,IGP,IGM,IDR,NISKYFIL, K
+      INTEGER I, NISKYL1, NISKYL,NISKYFIL, K
 C
       NISKYL1 = 0
       NISKYL1 = NISKYL1 + 4*JLT

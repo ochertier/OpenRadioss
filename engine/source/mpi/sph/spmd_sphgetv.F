@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_sphgetv          ../engine/source/mpi/sph/spmd_sphgetv.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep               ../engine/source/elements/sph/sphprep.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_ialltoallv       ../engine/source/mpi/generic/spmd_ialltoallv.F
-      !||    spmd_ialltoallv_int   ../engine/source/mpi/generic/spmd_ialltoallv_int.F
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox                ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetv          ../engine/source/mpi/sph/spmd_sphgetv.F
+!||--- called by ------------------------------------------------------
+!||    sphprep               ../engine/source/elements/sph/sphprep.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_ialltoallv       ../engine/source/mpi/generic/spmd_ialltoallv.F
+!||    spmd_ialltoallv_int   ../engine/source/mpi/generic/spmd_ialltoallv_int.F
+!||--- uses       -----------------------------------------------------
+!||    sphbox                ../engine/share/modules/sphbox.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETV(KXSP ,SPBUF, V, MS, ISORTSP, IPARTSP)
 C-----------------------------------------------
 C   M o d u l e s
@@ -38,6 +39,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -60,9 +62,9 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
+      INTEGER P, NN, N, IDEB, LOC_PROC,
      .        IERROR, ICELL, INOD,
-     .        REQ_SD(NSPMD), REQ_SD2(NSPMD),
+     .         
      .        STATUS(MPI_STATUS_SIZE),MSGOFF,MSGOFF2
        my_real, DIMENSION(:,:), ALLOCATABLE :: BUFS, BUFR
 
@@ -82,7 +84,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi flag cellules actives
+C FLAG sending active cells
 C      
 !   -------------------------
 !   compute the displacement, number of element
@@ -118,7 +120,7 @@ C
      .          REQUEST_ISPHR,SPMD_COMM_WORLD,NSPMD)
 !   -------------------------
 
-C Envoi V, M, RHO sur cellules actives
+C Shipping V, M, RHO on active cells
 C
 
 !   -------------------------

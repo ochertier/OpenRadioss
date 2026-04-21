@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps60    ../engine/source/materials/mat/mat060/sigeps60.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw       ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8      ../engine/source/materials/mat_share/mulaw8.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter      ../engine/source/tools/curve/finter.F
-      !||    finter2     ../engine/source/tools/curve/vinter.F
-      !||    inter_rat   ../engine/source/materials/mat/mat060/sigeps60c.F
-      !||    vinter      ../engine/source/tools/curve/vinter.F
-      !||    vinter2     ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps60    ../engine/source/materials/mat/mat060/sigeps60.F
+!||--- called by ------------------------------------------------------
+!||    mulaw       ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8      ../engine/source/materials/mat_share/mulaw8.F90
+!||--- calls      -----------------------------------------------------
+!||    finter      ../engine/source/tools/curve/finter.F
+!||    finter2     ../engine/source/tools/curve/vinter.F
+!||    inter_rat   ../engine/source/materials/mat/mat060/sigeps60c.F
+!||    vinter      ../engine/source/tools/curve/vinter.F
+!||    vinter2     ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE SIGEPS60(
      1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC   ,NPF    ,
      2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0    ,RHO    ,
@@ -101,7 +101,6 @@ C---------+---------+---+---+--------------------------------------------
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "scr17_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com08_c.inc"
 #include      "units_c.inc"
@@ -157,11 +156,11 @@ C-----------------------------------------------
      .        ILEN1(MVSIZ),IAD2(MVSIZ),ILEN2(MVSIZ),
      .        IFUNC(100),NFUNCV,PFUN,
      .        IPOSP(MVSIZ),IADP(MVSIZ),ILENP(MVSIZ),NFUNCM,NRATEM,
-     .        IPFLAG,IPARAM,NPAR,IPOS3(MVSIZ),IPOS4(MVSIZ),IAD3(MVSIZ),
+     .        IPFLAG,IPOS3(MVSIZ),IPOS4(MVSIZ),IAD3(MVSIZ),
      .        ILEN3(MVSIZ),IAD4(MVSIZ),ILEN4(MVSIZ),J1, J2, J3, J4,
      .        NINDX,INDX(MVSIZ), NN,OPTE,IFUNCE,MX
       my_real
-     .        E(MVSIZ),NU,P,DAV,VM,R,FAC,EPST,EP1,EP2,EP3,EP4,EP5,EP6,
+     .        E(MVSIZ),NU,P,DAV,VM,R,FAC,EPST,
      .        E1,E2,E3,E4,E5,E6,C,CC,D,Y,YP,E42,E52,E62,EPST2,
      .        C1(MVSIZ),G(MVSIZ),G2(MVSIZ),G3(MVSIZ),
      .        EPSMAX,RATE(MVSIZ,4),YFAC(MVSIZ,4),
@@ -443,7 +442,7 @@ C
 C
 C
 C---  PRESSURE DEPENDENT YIELD FUNCTION FACTOR
-      IF (IPFLAG==NEL.AND.(IMACH/=3.OR.IPARIT==0)) THEN
+      IF (IPFLAG==NEL.AND.(IPARIT==0)) THEN
 C------- to optimize in SPMD & PARIT/ON case add a global flag 
 C        in a case of homogeneous element groups (to do if needed)
         DO I=1,NEL

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    outp_mt           ../engine/source/output/sty/outp_mt.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp           ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl2          ../engine/source/input/freform.F
-      !||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||====================================================================
+!||====================================================================
+!||    outp_mt           ../engine/source/output/sty/outp_mt.F
+!||--- called by ------------------------------------------------------
+!||    genoutp           ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl2          ../engine/source/input/freform.F
+!||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||====================================================================
       SUBROUTINE OUTP_MT(PM,NPART,PARTSAV,IPART,IPM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -65,7 +65,7 @@ C
           PARTSAV2(M,I) = PARTSAV(M,I)
         ENDDO
       END DO
-C pre traitement SPMD : gather de PARTSAV et mise a zero sur procs remote
+C SPMD pre-processing: gather of PARTSAV and zeroing on remote procs
       IF(NSPMD > 1) THEN
         CALL SPMD_GLOB_DSUM9(PARTSAV2,NPSAV*NPART)
         IF(ISPMD/=0) THEN

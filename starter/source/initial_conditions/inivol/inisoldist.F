@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inisoldist       ../starter/source/initial_conditions/inivol/inisoldist.F
-      !||--- called by ------------------------------------------------------
-      !||    init_inivol      ../starter/source/initial_conditions/inivol/init_inivol.F90
-      !||--- calls      -----------------------------------------------------
-      !||    qcoor2           ../starter/source/elements/solid_2d/quad/qcoor2.F
-      !||    ratio_fill       ../starter/source/initial_conditions/inivol/ratio_fill.F
-      !||    s4coor3          ../starter/source/elements/solid/solide4/s4coor3.F
-      !||    scoor3           ../starter/source/elements/solid/solide/scoor3.F
-      !||    srcoor3          ../starter/source/elements/solid/solide/srcoor3.F
-      !||--- uses       -----------------------------------------------------
-      !||    inivol_def_mod   ../starter/share/modules1/inivol_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inisoldist       ../starter/source/initial_conditions/inivol/inisoldist.F
+!||--- called by ------------------------------------------------------
+!||    init_inivol      ../starter/source/initial_conditions/inivol/init_inivol.F90
+!||--- calls      -----------------------------------------------------
+!||    qcoor2           ../starter/source/elements/solid_2d/quad/qcoor2.F
+!||    ratio_fill       ../starter/source/initial_conditions/inivol/ratio_fill.F
+!||    s4coor3          ../starter/source/elements/solid/solide4/s4coor3.F
+!||    scoor3           ../starter/source/elements/solid/solide/scoor3.F
+!||    srcoor3          ../starter/source/elements/solid/solide/srcoor3.F
+!||--- uses       -----------------------------------------------------
+!||    inivol_def_mod   ../starter/share/modules1/inivol_mod.F
+!||====================================================================
        SUBROUTINE INISOLDIST(
      .          IFILL      ,IXS       ,X         ,GEO       ,NG        ,
      .          IPARG      ,IDP       ,IPART_    ,XREFS     ,GLOB_THERM,
@@ -50,6 +50,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE INIVOL_DEF_MOD , ONLY : INIVOL_STRUCT_
       use glob_therm_mod
+      use element_mod , only :nixs,nixq,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

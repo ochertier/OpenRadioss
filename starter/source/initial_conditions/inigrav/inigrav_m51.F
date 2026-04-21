@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inigrav_m51            ../starter/source/initial_conditions/inigrav/inigrav_m51.F
-      !||--- called by ------------------------------------------------------
-      !||    inigrav_load           ../starter/source/initial_conditions/inigrav/inigrav_load.F
-      !||--- calls      -----------------------------------------------------
-      !||    polysolve              ../starter/source/initial_conditions/inigrav/inigrav_m51.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    inigrav_m51            ../starter/source/initial_conditions/inigrav/inigrav_m51.F
+!||--- called by ------------------------------------------------------
+!||    inigrav_load           ../starter/source/initial_conditions/inigrav/inigrav_load.F
+!||--- calls      -----------------------------------------------------
+!||    polysolve              ../starter/source/initial_conditions/inigrav/inigrav_m51.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INIGRAV_M51(NELG, NEL , NG   , MATID, IPM, GRAV0, DEPTH, PM,     BUFMAT, ELBUF_TAB,
      .                       PSURF,LIST, ALE_CONNECTIVITY, NV46 , IX , NIX  , NFT  , BUFMATG, IPARG)
 C-----------------------------------------------
@@ -59,13 +59,13 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I, K1, K2, K3, K4, NUVAR,K,J,IFORM,IFORMv,NV46,IV,IADBUF,ML,NGv,KTY,KLT,N,MFT,IS,NELGv
-      my_real ::  PGRAV, RHO, GAM, RHO0, 
+      my_real ::  PGRAV, RHO0, 
      .     ALPHA1, ALPHA2, ALPHA3, ALPHA4, 
      .     C01, C11, C21, C31, C41, C51, 
      .     C02, C12, C22, C32, C42, C52, 
      .     C03, C13, C23, C33, C43, C53, 
      .     C04, PEXT,
-     .     RHO10, RHO20, RHO30, RHO40, RHO1, RHO2, RHO3, RHO4, MU, 
+     .     RHO10, RHO20, RHO30, RHO40, RHO1, RHO2, RHO3, MU, 
      .     EINT1, EINT2, EINT3, EINT4, VOL, VOL1, VOL2, VOL3,
      .     EINT10, EINT20, EINT30, EINT40
       TYPE(G_BUFEL_), POINTER :: GBUF
@@ -274,11 +274,11 @@ C
       
       END SUBROUTINE INIGRAV_M51
 
-      !||====================================================================
-      !||    polysolve     ../starter/source/initial_conditions/inigrav/inigrav_m51.F
-      !||--- called by ------------------------------------------------------
-      !||    inigrav_m51   ../starter/source/initial_conditions/inigrav/inigrav_m51.F
-      !||====================================================================
+!||====================================================================
+!||    polysolve     ../starter/source/initial_conditions/inigrav/inigrav_m51.F
+!||--- called by ------------------------------------------------------
+!||    inigrav_m51   ../starter/source/initial_conditions/inigrav/inigrav_m51.F
+!||====================================================================
       SUBROUTINE POLYSOLVE(C0, C1, C2, C3, C4, C5, PRES, EINT, MU, RHO0, VOL0, PEXT, UID)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -294,7 +294,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real :: TOL, ERROR, FUNC, DFUNC, INCR, VOL, VOL_prev,PP
+      my_real :: TOL, ERROR, FUNC, DFUNC, INCR, VOL, VOL_prev
       INTEGER :: ITER, MAX_ITER
       LOGICAL :: CONT
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,19 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_chkw     ../engine/source/mpi/generic/spmd_chkw.F
-      !||--- called by ------------------------------------------------------
-      !||    fvstats       ../engine/source/airbag/fvstats.F
-      !||    fxbypid       ../engine/source/constraints/fxbody/fxbypid.F
-      !||    lectur        ../engine/source/input/lectur.F
-      !||    rbypid        ../engine/source/constraints/general/rbody/rbypid.F
-      !||    resol         ../engine/source/engine/resol.F
-      !||    sz_print      ../engine/source/output/restart/arralloc.F
-      !||--- uses       -----------------------------------------------------
-      !||    io_mod        ../engine/share/modules/io_mod.F
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_chkw     ../engine/source/mpi/generic/spmd_chkw.F
+!||--- called by ------------------------------------------------------
+!||    fvstats       ../engine/source/airbag/fvstats.F
+!||    fxbypid       ../engine/source/constraints/fxbody/fxbypid.F
+!||    lectur        ../engine/source/input/lectur.F
+!||    rbypid        ../engine/source/constraints/general/rbody/rbypid.F
+!||    resol         ../engine/source/engine/resol.F
+!||    sz_print      ../engine/source/output/restart/arralloc.F
+!||--- uses       -----------------------------------------------------
+!||    io_mod        ../engine/share/modules/io_mod.F
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SPMD_CHKW(IWIOUT,IOUT)
       USE MESSAGE_MOD 
             USE IO_MOD
@@ -58,12 +58,12 @@ C-----------------------------------------------
       DO WHILE(IOS==0)
         READ(UNIT=IOUT,IOSTAT=IOS,FMT='(A)') LINE
         IF(IOS==0) THEN
-C calcul du nombre exacte de ligne de 80c
+C calculation of the exact number of lines of 80c
           IWIOUT = IWIOUT + NCHAROUT
         ENDIF
       ENDDO
             IWIOUT_SAVE = IWIOUT
-C ajout rewind ds ts les cas (necessaire sur sgi au moins)
+C Addition Rewind ds cases (necessary on SGI at least)
       REWIND(UNIT=IOUT)
       READ(UNIT=IOUT,IOSTAT=IOS,FMT='(A)')
 C

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10coor3         ../starter/source/elements/solid/solide10/s10coor3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10init3         ../starter/source/elements/solid/solide10/s10init3.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkvolume_4n   ../starter/source/elements/solid/solide/checksvolume.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s10coor3         ../starter/source/elements/solid/solide10/s10coor3.F
+!||--- called by ------------------------------------------------------
+!||    s10init3         ../starter/source/elements/solid/solide10/s10init3.F
+!||--- calls      -----------------------------------------------------
+!||    checkvolume_4n   ../starter/source/elements/solid/solide/checksvolume.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S10COOR3(
      1                    X      ,V     ,IXS   ,IXS10 ,XX  ,
      2                    YY     ,ZZ    ,VX    ,VY    ,VZ  ,
@@ -38,6 +38,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6                    NINTEMP)
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -178,7 +179,7 @@ C
 C
 C   initial nodal temperature
 C
-        IF(JTHE < 0 ) THEN
+        IF (JTHE < 0 .or. NINTEMP > 0) THEN             
          IF(NINTEMP > 0 ) THEN
           DO N =1,10
             DO I=LFT,LLT  
@@ -209,15 +210,15 @@ C
 CC        
       RETURN
       END
-      !||====================================================================
-      !||    s10coor3_old     ../starter/source/elements/solid/solide10/s10coor3.F
-      !||--- called by ------------------------------------------------------
-      !||    inirig_mat       ../starter/source/elements/initia/inirig_mat.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkvolume_4n   ../starter/source/elements/solid/solide/checksvolume.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s10coor3_old     ../starter/source/elements/solid/solide10/s10coor3.F
+!||--- called by ------------------------------------------------------
+!||    inirig_mat       ../starter/source/elements/initia/inirig_mat.F
+!||--- calls      -----------------------------------------------------
+!||    checkvolume_4n   ../starter/source/elements/solid/solide/checksvolume.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S10COOR3_OLD(X,V, IXS,IXS10,
      .   XX, YY, ZZ, VX, VY, VZ,NC,
      .   NGL,MXT,NGEO,MASS,DTELEM,STI,
@@ -225,6 +226,7 @@ CC
      .   TEMP,NEL,NINTEMP)
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -364,7 +366,7 @@ C
 C
 C   initial nodal temperature
 C
-        IF(JTHE < 0 ) THEN
+        IF (JTHE < 0 .or. NINTEMP > 0) THEN             
          IF(NINTEMP > 0 ) THEN
           DO N =1,10
             DO I=LFT,LLT  

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_rst_check   ../engine/source/mpi/init/spmd_rst_check.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2         ../engine/source/engine/radioss2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../engine/source/output/message/message.F
-      !||    arret            ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_rst_check        ../engine/source/mpi/init/spmd_rst_check.F
+!||--- called by ------------------------------------------------------
+!||    radioss2              ../engine/source/engine/radioss2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_RST_CHECK()
 C-----------------------------------------------
 C   M o d u l e s
@@ -38,6 +39,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -59,14 +61,14 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
 
-      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,MSGTYP2,
-     .        REQ_R(NSPMD),REQ_S(NSPMD), IRINDEX(NSPMD),
-     .        INDEX, NBIRECV,I,MSGTYP,MSGOFF
+      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,
+     .        
+     .         I,MSGTYP,MSGOFF
       DATA MSGOFF/100/
 
 
       my_real
-     .        TTREC,TTST
+     .        TTREC
 
       CHARACTER FILNAM*100, FILNAM1*100,RSRUN*4,RSRUN1*4
 
@@ -79,7 +81,7 @@ C   ENVOI DE TT AU PROC 0
      .               SPMD_COMM_WORLD,ierror)
        ELSE
          DO I=2,NSPMD
-C   Check sur TT
+C   Check on TT
            MSGTYP = MSGOFF
            CALL MPI_RECV(TTREC,1,REAL,IT_SPMD(I),
      .                         MSGTYP,SPMD_COMM_WORLD,STATUS,ierror)

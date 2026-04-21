@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,39 +20,40 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    python_element_mod    ../common_source/modules/python_element_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    python_element_init   ../engine/source/mpi/python_spmd_mod.F90
-      !||    python_element_sync   ../engine/source/mpi/python_spmd_mod.F90
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    python_register       ../engine/source/tools/curve/python_register.F90
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    python_element_mod    ../common_source/modules/python_element_mod.F90
+!||--- called by ------------------------------------------------------
+!||    python_element_init   ../engine/source/mpi/python_spmd_mod.F90
+!||    python_element_sync   ../engine/source/mpi/python_spmd_mod.F90
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    python_register       ../engine/source/tools/curve/python_register.F90
+!||====================================================================
       module python_element_mod
-        use iso_c_binding
+        use, intrinsic :: iso_c_binding
+        implicit none
+
         integer, parameter :: NAME_LEN = 100
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                               Interface
 ! ----------------------------------------------------------------------------------------------------------------------
         interface
           subroutine python_update_elemental_entity(name,val,uid) bind(c,name="cpp_python_update_elemental_entity")
-            use iso_c_binding
+            use, intrinsic :: iso_c_binding
             integer(kind=c_int), value, intent(in) :: uid
             real(kind=c_double), value, intent(in) :: val
             character(kind=c_char), dimension(100), intent(in) :: name
-          end subroutine
+          end subroutine python_update_elemental_entity
           subroutine python_get_number_elemental_entities(nb) bind(c,name="cpp_python_get_number_elemental_entities")
-            use iso_c_binding, only : c_int
+            use, intrinsic :: iso_c_binding, only : c_int
             integer(kind=c_int), intent(inout) :: nb
-          end subroutine
+          end subroutine python_get_number_elemental_entities
 !  void cpp_python_get_elemental_entity(int nb,  char *name, int *uid)
           subroutine python_get_elemental_entity(nb,name,uid) bind(c,name="cpp_python_get_elemental_entity")
-            use iso_c_binding
+            use, intrinsic :: iso_c_binding
             integer(kind=c_int), value, intent(in) :: nb
             integer(kind=c_int), intent(inout) :: uid !< returns the user id of the nth variable found in the python code
             character(kind=c_char), dimension(100), intent(inout) :: name !< variable name, as defined in H3D keyword
-          end subroutine
+          end subroutine python_get_elemental_entity
         end interface
 
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -92,9 +93,9 @@
 !                                                   Subroutines
 ! ----------------------------------------------------------------------------------------------------------------------
 !! \brief get the size to serialize the python elemental variables found in the python function
-      !||====================================================================
-      !||    element_get_size   ../common_source/modules/python_element_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    element_get_size   ../common_source/modules/python_element_mod.F90
+!||====================================================================
         integer function element_get_size(element) result(length)
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -111,10 +112,10 @@
           return
         end function element_get_size
 !! \brief serialize the python elemental variables found in the python function
-      !||====================================================================
-      !||    element_serialize   ../common_source/modules/python_element_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    element_serialize   ../common_source/modules/python_element_mod.F90
+!||--- calls      -----------------------------------------------------
+!||====================================================================
         subroutine element_serialize(element, buffer,buffer_size)
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -141,13 +142,13 @@
             pos = pos + NAME_LEN
             buffer(pos:pos+1) = element%user_ids(i)
             pos = pos + 1
-          enddo
+          end do
         end subroutine element_serialize
 
 !! \brief deserialize the python elemental variables found in the python function
-      !||====================================================================
-      !||    element_deserialize   ../common_source/modules/python_element_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    element_deserialize   ../common_source/modules/python_element_mod.F90
+!||====================================================================
         subroutine element_deserialize(element, buffer)
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -177,7 +178,7 @@
             pos = pos + NAME_LEN
             element%user_ids(i) = buffer(pos)
             pos = pos + 1
-          enddo
+          end do
 
           ! allocate the other arrays
           if(allocated(element%values)) deallocate(element%values)

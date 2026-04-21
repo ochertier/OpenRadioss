@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r23l113def3        ../engine/source/elements/spring/r23l113def3.F
-      !||--- called by ------------------------------------------------------
-      !||    r23law113          ../engine/source/elements/spring/r23law113.F
-      !||--- calls      -----------------------------------------------------
-      !||    redef3_law113      ../engine/source/elements/spring/redef3_law113.F
-      !||    repla3             ../engine/source/elements/spring/repla3.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod   ../common_source/modules/python_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    r23l113def3        ../engine/source/elements/spring/r23l113def3.F
+!||--- called by ------------------------------------------------------
+!||    r23law113          ../engine/source/elements/spring/r23law113.F
+!||--- calls      -----------------------------------------------------
+!||    redef3             ../engine/source/elements/spring/redef3.F90
+!||    repla3             ../engine/source/elements/spring/repla3.F
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    redef3_mod         ../engine/source/elements/spring/redef3.F90
+!||====================================================================
       SUBROUTINE R23L113DEF3(PYTHON,
      1   SKEW,    IPM,     IGEO,    MID,
      2   PID,     GEO,     UPARAM,  FX,
@@ -58,7 +59,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      P   VX1,     VX2,     VY1,     VY2,
      Q   VZ1,     VZ2,     NUVAR,   UVAR,
      R   MASS,    DX0,     DY0,     DZ0,
-     S   RX0,     RY0,     RZ0,     NFT)
+     S   RX0,     RY0,     RZ0,     NFT,
+     T   STF,     SANIN,   IRESP,   SNPC,
+     U   SZYIELD_COMP,SZXXOLD_COMP,YIELDXC,YIELDYC, 
+     V   YIELDZC, YIELDRXC,YIELDRYC,YIELDRZC,
+     W   DXOLDC,  DYOLDC,  DZOLDC,  DRXOLDC, 
+     W   DRYOLDC, DRZOLDC)
+C
+        USE REDEF3_MOD
         USE python_funct_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -87,6 +95,12 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: NFT
       INTEGER NPF(*),IGEO(NPROPGI,*),NEL,NGL(*),PID(*),MID(*),NUVAR,
      .     IPM(NPROPMI,*)
+      INTEGER, INTENT(IN) :: STF    !< Size of TF
+      INTEGER, INTENT(IN) :: SANIN  !< Size of ANIM
+      INTEGER, INTENT(IN) :: IRESP  !< Single precision flag
+      INTEGER, INTENT(IN) :: SNPC   !< Size of NPF
+      INTEGER, INTENT(IN) :: SZYIELD_COMP
+      INTEGER, INTENT(IN) :: SZXXOLD_COMP
 C     REAL
       my_real
      .   SKEW(LSKEW,*), GEO(NPROPG,*), FX(*), FY(*), FZ(*), E(*), DX(*),
@@ -94,8 +108,7 @@ C     REAL
      .   FYEP(*), FZEP(*), X0(*), Y0(*), Z0(*), XMOM(*), YMOM(*),
      .   ZMOM(*), RX(*), RY(*), RZ(*), RPX(*), RPY(*), RPZ(*), XMEP(*),
      .   YMEP(*), ZMEP(*), DPX2(*), DPY2(*), DPZ2(*),RPX2(*), RPY2(*),
-     .   RPZ2(*),ANIM(*),POSX(*),POSY(*),POSZ(*),POSXX(*),
-     .   POSYY(*),POSZZ(*),FR_WAVE(*),E6(NEL,6),
+     .   RPZ2(*),ANIM(*),FR_WAVE(*),E6(NEL,6),
      .   EXX2(MVSIZ), EYX2(MVSIZ), EZX2(MVSIZ),
      .   EXY2(MVSIZ), EYY2(MVSIZ), EZY2(MVSIZ),
      .   EXZ2(MVSIZ), EYZ2(MVSIZ), EZZ2(MVSIZ),
@@ -109,6 +122,13 @@ C     REAL
      .   XKR(MVSIZ),VX1(MVSIZ),VX2(MVSIZ),VY1(MVSIZ),VY2(MVSIZ),
      .   VZ1(MVSIZ),VZ2(MVSIZ),UVAR(NUVAR,*),UPARAM(*),MASS(*),
      .   DX0(*),DY0(*),DZ0(*),RX0(*),RY0(*),RZ0(*)
+      my_real, DIMENSION(6,NEL), INTENT(INOUT) :: POSX,POSY,POSZ,POSXX,POSYY,POSZZ
+      my_real, INTENT(INOUT) :: YIELDXC(SZYIELD_COMP),YIELDYC(SZYIELD_COMP), 
+     .   YIELDZC(SZYIELD_COMP),YIELDRXC(SZYIELD_COMP),YIELDRYC(SZYIELD_COMP),
+     .   YIELDRZC(SZYIELD_COMP)
+      my_real, INTENT(INOUT) :: DXOLDC(SZXXOLD_COMP),DYOLDC(SZXXOLD_COMP),
+     .   DZOLDC(SZXXOLD_COMP),DRXOLDC(SZXXOLD_COMP),DRYOLDC(SZXXOLD_COMP),
+     .   DRZOLDC(SZXXOLD_COMP)
       TARGET :: UVAR
       DOUBLE PRECISION ALDP(MVSIZ),AL2DP(MVSIZ)
 C-----------------------------------------------
@@ -118,7 +138,7 @@ C-----------------------------------------------
      .        IECROU(MVSIZ), IFUNC(MVSIZ), IFV(MVSIZ), IFUNC2(MVSIZ),
      .        I, ILENG, J, KK, IFAIL(MVSIZ),IFAIL2(MVSIZ),
      .        NINDX,ISRATE, IFUNC3(MVSIZ),I1,I2,I3,I4,I5,I6,I7,I8,
-     .        I9,I10,I11,I12,I13,I14,IF1,IF2,IF3,IF4,IADBUF,NUPAR,
+     .        I9,I10,I11,I12,I13,I14,I15,IF1,IF2,IF3,IF4,IADBUF,NUPAR,
      .        IF5,IFUNC4(MVSIZ)
 C     REAL
       my_real
@@ -136,10 +156,12 @@ C     REAL
      .     VX21, VY21, VZ21, RYAVP, RZAVP,EYZP,EXZP,
      .     RYAV, RZAV,DEN, C, CP, EXYP,
      .     X21PHI, Y21PHI, Z21PHI, VX21PHI, VY21PHI, VZ21PHI,
-     .     RYAV1, RZAV1, RYAV1P, RZAV1P,ASRATE,NOT_USED
+     .     RYAV1, RZAV1, RYAV1P, RZAV1P,ASRATE,NOT_USED(2)
+      my_real :: MAX_SLOPE(MVSIZ)
       DOUBLE PRECISION X0DP(MVSIZ)
       my_real ,DIMENSION(:), POINTER :: COORD_OLD
       LOGICAL :: ANY_PYTHON_FUNCTION
+      TARGET :: NOT_USED 
 C-----------------------------------------------
 C
       NOT_USED = ZERO
@@ -160,6 +182,7 @@ C
       I13 = I12 + 6
       I14 = I13 + 6
       NUPAR = NUPAR +  84    
+      I15 = I14 + 6 + 28 ! 4 + 14*6 + 28
       DO I=1,NEL
        IADBUF= IPM(7,MID(I)) - 1
        EPLA(I)=ZERO
@@ -334,16 +357,25 @@ C-------------------------------
         DMN(I)   = UPARAM(IADBUF + I8 + 1)
         DMX(I)   = UPARAM(IADBUF + I9 + 1)
       ENDDO
-      IF (NUVAR >=1) COORD_OLD => UVAR(1,1:NEL)
-      CALL REDEF3_LAW113(PYTHON, NEL, NFT ,
-     .            FX      ,XK      ,DX      ,FXEP       ,DXOLD   ,
-     .            DPX     ,TF      ,NPF     ,XC         ,OFF     ,
-     .            E6(1,1) ,DPX2    ,ANIM    ,ANIM_FE(11),POSX    ,
-     .            XL0     ,DMN     ,DMX     ,DV         ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDX  ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,IFUNC4  , 
-     .            EPLA    , COORD_OLD  )
+      IF (NUVAR >=1) THEN
+        COORD_OLD => UVAR(1,1:NEL)
+      ELSE
+        COORD_OLD => NOT_USED
+      ENDIF
+      CALL REDEF3(PYTHON,
+     .            FX,         XK,         DX,         FXEP,
+     .            DXOLD,      DPX,        TF,         NPF,
+     .            XC,         OFF,        E6(1,1),    DPX2,
+     .            ANIM,       ANIM_FE(11),POSX,      
+     .            XL0,        DMN,        DMX,        DV,
+     .            FF,         LSCALE,     EE,         GF3,
+     .            IFUNC3,     YIELDX,     ALDP,       AK,
+     .            B,          D,          IECROU,     IFUNC,
+     .            IFV,        IFUNC2,     EPLA,       COORD_OLD,
+     .            NEL,        NFT,        STF,        SANIN,
+     .            DT1,        IRESP,      IMPL_S,     IDYNA,
+     .            SNPC,       YIELDC=YIELDXC, XX_OLDC=DXOLDC,
+     .            FX0=UPARAM(IADBUF+I15+1),IFUNC4=IFUNC4,POS6=POSX(6,1))    
 C
       DO I=1,NEL
         CC = UPARAM(IADBUF + NUPAR + 3)
@@ -407,16 +439,25 @@ C
       ENDDO
 C
       KK = 1 + NUMELR * ANIM_FE(11)
-      IF (NUVAR >= 2) COORD_OLD => UVAR(2,1:NEL)
-      CALL REDEF3_LAW113(PYTHON, NEL, NFT ,
-     .            FY      ,YK     ,DY      ,FYEP       ,DYOLD   ,
-     .            DPY     ,TF     ,NPF     ,YC         ,OFF     ,
-     .            E6(1,2) ,DPY2   ,ANIM(KK),ANIM_FE(12),POSY    ,
-     .            XL0    ,DMN     ,DMX     ,DV      ,
-     .            FF      ,LSCALE ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDY  ,AK      ,B      ,D       ,
-     .            IECROU  ,IFUNC  ,IFV     ,IFUNC2     ,IFUNC4  , 
-     .            EPLA    , COORD_OLD    )
+      IF (NUVAR >= 2) THEN
+        COORD_OLD => UVAR(2,1:NEL)
+      ELSE
+        COORD_OLD => NOT_USED
+      ENDIF
+      CALL REDEF3(PYTHON,
+     .            FY,         YK,         DY,         FYEP,
+     .            DYOLD,      DPY,        TF,         NPF,
+     .            YC,         OFF,        E6(1,2),    DPY2,
+     .            ANIM(KK),   ANIM_FE(12),POSY,      
+     .            XL0,        DMN,        DMX,        DV,
+     .            FF,         LSCALE,     EE,         GF3,
+     .            IFUNC3,     YIELDY,     ALDP,       AK,
+     .            B,          D,          IECROU,     IFUNC,
+     .            IFV,        IFUNC2,     EPLA,       COORD_OLD,
+     .            NEL,        NFT,        STF,        SANIN,
+     .            DT1,        IRESP,      IMPL_S,     IDYNA,
+     .            SNPC,       YIELDC=YIELDYC, XX_OLDC=DYOLDC,
+     .            FX0=UPARAM(IADBUF+I15+2),IFUNC4=IFUNC4, POS6=POSY(6,1))
 C
       DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
@@ -481,16 +522,25 @@ C
       ENDDO
 C
       KK = 1 + NUMELR * (ANIM_FE(11)+ANIM_FE(12))
-      IF (NUVAR >= 3) COORD_OLD => UVAR(3,1:NEL)
-      CALL REDEF3_LAW113(PYTHON, NEL, NFT ,
-     .            FZ      ,ZK     ,DZ      ,FZEP       ,DZOLD   ,
-     .            DPZ     ,TF     ,NPF     ,ZC         ,OFF     ,
-     .            E6(1,3) ,DPZ2   ,ANIM(KK),ANIM_FE(13),POSZ    ,
-     .            XL0    ,DMN     ,DMX     ,DV      ,
-     .            FF      ,LSCALE ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDZ  ,AK      ,B      ,D       ,
-     .            IECROU  ,IFUNC  ,IFV     ,IFUNC2     ,IFUNC4  , 
-     .            EPLA    , COORD_OLD    )
+      IF (NUVAR >= 3) THEN
+        COORD_OLD => UVAR(3,1:NEL)
+      ELSE
+        COORD_OLD => NOT_USED
+      ENDIF      
+      CALL REDEF3(PYTHON,
+     .            FZ,         ZK,         DZ,         FZEP,
+     .            DZOLD,      DPZ,        TF,         NPF,
+     .            ZC,         OFF,        E6(1,3),    DPZ2,
+     .            ANIM(KK),   ANIM_FE(13),POSZ,      
+     .            XL0,        DMN,        DMX,        DV,
+     .            FF,         LSCALE,     EE,         GF3,
+     .            IFUNC3,     YIELDZ,     ALDP,       AK,
+     .            B,          D,          IECROU,     IFUNC,
+     .            IFV,        IFUNC2,     EPLA,       COORD_OLD,
+     .            NEL,        NFT,        STF,        SANIN,
+     .            DT1,        IRESP,      IMPL_S,     IDYNA,
+     .            SNPC,       YIELDC=YIELDZC, XX_OLDC=DZOLDC,
+     .            FX0=UPARAM(IADBUF+I15+3),IFUNC4=IFUNC4, POS6=POSZ(6,1))
 C
       DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
@@ -599,16 +649,25 @@ C-------------------------------
         DMN(I)   = UPARAM(IADBUF + I8 + 4)
         DMX(I)   = UPARAM(IADBUF + I9 + 4)
       ENDDO
-      IF (NUVAR >= 4) COORD_OLD => UVAR(4,1:NEL)
-      CALL REDEF3_LAW113(PYTHON, NEL, NFT,
-     .            XMOM    ,XK      ,RX      ,XMEP       ,DXOLD   ,
-     .            RPX     ,TF      ,NPF     ,XC         ,OFF     ,
-     .            E6(1,4) ,RPX2    ,ANIM    ,0          ,POSXX   ,
-     .            XL0     ,DMN     ,DMX     ,DV      ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDX2 ,AK      ,B       ,D       ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,IFUNC4  , 
-     .            EPLA    , COORD_OLD    )
+      IF (NUVAR >= 4) THEN
+        COORD_OLD => UVAR(4,1:NEL)
+      ELSE
+        COORD_OLD => NOT_USED
+      ENDIF
+      CALL REDEF3(PYTHON,
+     .            XMOM,       XK,         RX,         XMEP,
+     .            DXOLD,      RPX,        TF,         NPF,
+     .            XC,         OFF,        E6(1,4),    RPX2,
+     .            ANIM,       0,          POSXX,   
+     .            XL0,        DMN,        DMX,        DV,
+     .            FF,     LSCALE,     EE,         GF3,
+     .            IFUNC3,     YIELDX2,    ALDP,       AK,
+     .            B,          D,          IECROU,     IFUNC,
+     .            IFV,        IFUNC2,     EPLA,       COORD_OLD,
+     .            NEL,        NFT,        STF,        SANIN,
+     .            DT1,        IRESP,      IMPL_S,     IDYNA,
+     .            SNPC,       YIELDC=YIELDRXC, XX_OLDC=DRXOLDC,
+     .            FX0=UPARAM(IADBUF+I15+4),IFUNC4=IFUNC4, POS6=POSXX(6,1))
 C
       DO I=1,NEL
         IADBUF= IPM(7,MID(I)) - 1
@@ -671,16 +730,25 @@ C
         DMN(I)   = UPARAM(IADBUF + I8 + 5)
         DMX(I)   = UPARAM(IADBUF + I9 + 5)
       ENDDO
-      IF (NUVAR >= 5) COORD_OLD => UVAR(5,1:NEL)
-      CALL REDEF3_LAW113(PYTHON, NEL,NFT,
-     .            YMOM    ,YK      ,RY      ,YMEP       ,DYOLD   ,
-     .            RPY     ,TF      ,NPF     ,YC         ,OFF     ,
-     .            E6(1,5) ,RPY2    ,ANIM    ,0          ,POSYY   ,
-     .            XL0     ,DMN     ,DMX     ,DV      ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDY2  ,AK      ,B      ,D       ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,IFUNC4  , 
-     .            EPLA    , COORD_OLD    )
+      IF (NUVAR >= 5) THEN
+        COORD_OLD => UVAR(5,1:NEL)
+      ELSE
+        COORD_OLD => NOT_USED
+      ENDIF
+      CALL REDEF3(PYTHON,
+     .            YMOM,       YK,         RY,         YMEP,
+     .            DYOLD,      RPY,        TF,         NPF,
+     .            YC,         OFF,        E6(1,5),    RPY2,
+     .            ANIM,       0,          POSYY,   
+     .            XL0,        DMN,        DMX,        DV,
+     .            FF,     LSCALE,     EE,         GF3,
+     .            IFUNC3,     YIELDY2,    ALDP,       AK,
+     .            B,          D,          IECROU,     IFUNC,
+     .            IFV,        IFUNC2,     EPLA,       COORD_OLD,
+     .            NEL,        NFT,        STF,        SANIN,
+     .            DT1,        IRESP,      IMPL_S,     IDYNA,
+     .            SNPC,       YIELDC=YIELDRYC, XX_OLDC=DRYOLDC,
+     .            FX0=UPARAM(IADBUF+I15+5),IFUNC4=IFUNC4, POS6=POSYY(6,1))
 C
       DO I=1,NEL
         IADBUF= IPM(7,MID(I)) - 1
@@ -743,16 +811,25 @@ C
         DMN(I)   = UPARAM(IADBUF + I8 + 6)
         DMX(I)   = UPARAM(IADBUF + I9 + 6)
       ENDDO
-      IF (NUVAR >= 6) COORD_OLD => UVAR(6,1:NEL)
-      CALL REDEF3_LAW113(PYTHON, NEL,NFT,
-     .            ZMOM    ,ZK      ,RZ      ,ZMEP       ,DZOLD    ,
-     .            RPZ     ,TF      ,NPF     ,ZC         ,OFF      ,
-     .            E6(1,6) ,RPZ2    ,ANIM    ,0          ,POSZZ    ,
-     .            XL0     ,DMN     ,DMX     ,DV       ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3   ,
-     .            YIELDZ2 ,AK      ,B       ,D        ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,IFUNC4  , 
-     .            EPLA    , COORD_OLD    )
+      IF (NUVAR >= 6) THEN
+        COORD_OLD => UVAR(6,1:NEL)
+      ELSE
+        COORD_OLD => NOT_USED
+      ENDIF
+      CALL REDEF3(PYTHON,
+     .            ZMOM,       ZK,         RZ,         ZMEP,
+     .            DZOLD,      RPZ,        TF,         NPF,
+     .            ZC,         OFF,        E6(1,6),    RPZ2,
+     .            ANIM,       0,          POSZZ,   
+     .            XL0,        DMN,        DMX,        DV,
+     .            FF,         LSCALE,     EE,         GF3,
+     .            IFUNC3,     YIELDZ2,    ALDP,       AK,
+     .            B,          D,          IECROU,     IFUNC,
+     .            IFV,        IFUNC2,     EPLA,       COORD_OLD,
+     .            NEL,        NFT,        STF,        SANIN,
+     .            DT1,        IRESP,      IMPL_S,     IDYNA,
+     .            SNPC,       YIELDC=YIELDRZC, XX_OLDC=DRZOLDC,
+     .            FX0=UPARAM(IADBUF+I15+6),IFUNC4=IFUNC4,POS6=POSZZ(6,1))
 C
       DO I=1,NEL
         IADBUF= IPM(7,MID(I)) - 1

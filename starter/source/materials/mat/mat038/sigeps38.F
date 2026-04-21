@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps38    ../starter/source/materials/mat/mat038/sigeps38.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw       ../starter/source/materials/mat_share/mulaw.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkaxes   ../starter/source/materials/mat/mat038/sigeps38.F
-      !||    dreh        ../starter/source/materials/tools/matrix.F
-      !||    finter      ../starter/source/tools/curve/finter.F
-      !||    jacobiew    ../starter/source/materials/tools/matrix.F
-      !||    valpvec     ../starter/source/materials/tools/matrix.F
-      !||    valpvecdp   ../starter/source/materials/tools/matrix.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps38    ../starter/source/materials/mat/mat038/sigeps38.F
+!||--- called by ------------------------------------------------------
+!||    mulaw       ../starter/source/materials/mat_share/mulaw.F
+!||--- calls      -----------------------------------------------------
+!||    checkaxes   ../starter/source/materials/mat/mat038/sigeps38.F
+!||    dreh        ../starter/source/materials/tools/matrix.F
+!||    finter      ../starter/source/tools/curve/finter.F
+!||    jacobiew    ../starter/source/materials/tools/matrix.F
+!||    valpvec     ../starter/source/materials/tools/matrix.F
+!||    valpvecdp   ../starter/source/materials/tools/matrix.F
+!||====================================================================
       SUBROUTINE SIGEPS38(
      1      NEL    , NUPARAM, NUVAR   , NFUNC , IFUNC , NPF   ,
      2      TF     , TIME   , TIMESTEP, UPARAM, RHO0  , RHO   ,
@@ -370,7 +370,7 @@ C ROTATE STORED VALUES IN GLOBAL DIRECTIONS INTO NEW PRINCIPAL DIRECTIONS
                 UVAR(I,N+3*(M-1)) = SN(N,N)
               ENDDO
             ENDDO
-C           pour la partie decay et hysteresis
+C           for the decay and hysteresis part
             IF (BETA>TINY) THEN
             DO M=1,2
               DO  N=1,3
@@ -979,11 +979,11 @@ C SOUNDSPEED
 
       END
 
-      !||====================================================================
-      !||    checkaxes   ../starter/source/materials/mat/mat038/sigeps38.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps38    ../starter/source/materials/mat/mat038/sigeps38.F
-      !||====================================================================
+!||====================================================================
+!||    checkaxes   ../starter/source/materials/mat/mat038/sigeps38.F
+!||--- called by ------------------------------------------------------
+!||    sigeps38    ../starter/source/materials/mat/mat038/sigeps38.F
+!||====================================================================
       SUBROUTINE CHECKAXES(TRAN1,TRAN2,AMIN,AMAX,UNCHANGED,TOL)
 C----------------------------------------------------------------
       IMPLICIT NONE

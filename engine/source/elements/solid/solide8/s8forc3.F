@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,37 +20,38 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8forc3                ../engine/source/elements/solid/solide8/s8forc3.F
-      !||--- called by ------------------------------------------------------
-      !||    forint                 ../engine/source/elements/forint.F
-      !||--- calls      -----------------------------------------------------
-      !||    mmain8                 ../engine/source/materials/mat_share/mmain8.F
-      !||    s8bilan                ../engine/source/elements/solid/solide8/s8bilan.F
-      !||    s8coor3                ../engine/source/elements/solid/solide8/s8coor3.F
-      !||    s8cumu3                ../engine/source/elements/solid/solide8/s8cumu3.F
-      !||    s8defo3                ../engine/source/elements/solid/solide8/s8defo3.F
-      !||    s8deri3                ../engine/source/elements/solid/solide8/s8deri3.F
-      !||    s8fint3                ../engine/source/elements/solid/solide8/s8fint3.F
-      !||    s8lagr3                ../engine/source/elements/solid/solide8/s8lagr3.F
-      !||    s8rota3                ../engine/source/elements/solid/solide8/s8rota3.F
-      !||    scumu3p                ../engine/source/elements/solid/solide/scumu3p.F
-      !||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
-      !||    sr8bilan               ../engine/source/elements/solid/solide8/sr8bilan.F
-      !||    sr8coor3               ../engine/source/elements/solid/solide8/sr8coor3.F
-      !||    srrota3                ../engine/source/elements/solid/solide/srrota3.F
-      !||    startime               ../engine/source/system/timer_mod.F90
-      !||    stoptime               ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    table_mod              ../engine/share/modules/table_mod.F
-      !||    timer_mod              ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE S8FORC3(TIMERS,
+!||====================================================================
+!||    s8forc3                ../engine/source/elements/solid/solide8/s8forc3.F
+!||--- called by ------------------------------------------------------
+!||    forint                 ../engine/source/elements/forint.F
+!||--- calls      -----------------------------------------------------
+!||    mmain8                 ../engine/source/materials/mat_share/mmain8.F
+!||    s8bilan                ../engine/source/elements/solid/solide8/s8bilan.F
+!||    s8coor3                ../engine/source/elements/solid/solide8/s8coor3.F
+!||    s8cumu3                ../engine/source/elements/solid/solide8/s8cumu3.F
+!||    s8defo3                ../engine/source/elements/solid/solide8/s8defo3.F
+!||    s8deri3                ../engine/source/elements/solid/solide8/s8deri3.F
+!||    s8fint3                ../engine/source/elements/solid/solide8/s8fint3.F
+!||    s8lagr3                ../engine/source/elements/solid/solide8/s8lagr3.F
+!||    s8rota3                ../engine/source/elements/solid/solide8/s8rota3.F
+!||    scumu3p                ../engine/source/elements/solid/solide/scumu3p.F
+!||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
+!||    sr8bilan               ../engine/source/elements/solid/solide8/sr8bilan.F
+!||    sr8coor3               ../engine/source/elements/solid/solide8/sr8coor3.F
+!||    srrota3                ../engine/source/elements/solid/solide/srrota3.F
+!||    startime               ../engine/source/system/timer_mod.F90
+!||    stoptime               ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    table_mod              ../engine/share/modules/table_mod.F
+!||    timer_mod              ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE S8FORC3(TIMERS, OUTPUT,
      1                   ELBUF_STR,PM       ,GEO    ,IXS      ,X      ,
      2                   A        ,V        ,MS     , 
      3                   VEUL     ,FV       ,ALE_CONNECT  ,IPARG    ,
@@ -64,6 +65,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TIMER_MOD
+      USE OUTPUT_MOD, ONLY : OUTPUT_
       USE TABLE_MOD
       USE MAT_ELEM_MOD         
       USE ALE_CONNECTIVITY_MOD
@@ -90,6 +92,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER,INTENT(IN) :: SNPC
       INTEGER,INTENT(IN) :: NUMGEO
       INTEGER,INTENT(IN) :: SBUFMAT
@@ -113,7 +116,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,LCO,IFLAG,IPT,IBI
+      INTEGER LCO,IFLAG,IPT,IBI
       INTEGER NC(8,MVSIZ),MXT(MVSIZ),NGL(MVSIZ),PID(MVSIZ)
       my_real
      .  FBI
@@ -135,7 +138,7 @@ C-----------------------------------------------
      .   XGXA(MVSIZ),XGYA(MVSIZ),XGZA(MVSIZ),
      .   XGXYA(MVSIZ),XGYZA(MVSIZ),XGZXA(MVSIZ),
      .   XGXA2(MVSIZ),XGYA2(MVSIZ),XGZA2(MVSIZ)
-C Variables utilisees en arguments dans les routines solides 
+C variables used as arguments in solid routines
       my_real
      .   R11(MVSIZ),R12(MVSIZ),R13(MVSIZ),
      .   R21(MVSIZ),R22(MVSIZ),R23(MVSIZ),
@@ -178,7 +181,7 @@ C-----------------------------------------------
      .             XGXYA,XGYZA,XGZXA,IPARG(1,NG))
       ENDIF
 C-----------------------------------------------
-C FONCTIONS DE FORME, DEFORMATION, ET OBJECTIVITE 
+C shape functions, strain, and objectivity
 C PXJ(K,I) FONCTION J DU PT INTEGRATION K ELEMENT I
 C-----------------------------------------------
       CALL S8DERI3(
@@ -217,7 +220,7 @@ C------------------------------------------------------
 C     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
 C------------------------------------------------------
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
-      CALL MMAIN8(TIMERS, PM   ,GEO   ,ELBUF_STR,MAT_ELEM ,
+      CALL MMAIN8(TIMERS, OUTPUT, PM   ,GEO   ,ELBUF_STR,MAT_ELEM ,
      2            IXS  ,IPARG ,V        ,TF    ,    
      3            NPF  ,BUFMAT,STI    ,X     ,D1    ,
      4            D2   ,D3    ,D4     ,D5    ,D6    ,
@@ -232,7 +235,7 @@ C------------------------------------------------------
      D            NTABLE)
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 C--------------------------
-C     BILANS PAR MATERIAU
+C     balances by material
 C--------------------------
         IFLAG=MOD(NCYCLE,NCPRI)
         IF(IOUTPRT>0)THEN       

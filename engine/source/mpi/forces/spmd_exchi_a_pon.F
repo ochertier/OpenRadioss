@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_exchi_a_pon   ../engine/source/mpi/forces/spmd_exchi_a_pon.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_exch2_a_pon   ../engine/source/mpi/forces/spmd_exch2_a_pon.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod        ../engine/share/modules/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exchi_a_pon      ../engine/source/mpi/forces/spmd_exchi_a_pon.F
+!||--- called by ------------------------------------------------------
+!||    spmd_exch2_a_pon      ../engine/source/mpi/forces/spmd_exch2_a_pon.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod           ../engine/share/modules/plyxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCHI_A_PON(
      1   IAD_ELEM,FR_ELEM ,SIZI   ,ISKY   ,FSKYI ,
      2   FSKYIF  ,ITAGX   ,ADSKYI ,NBIRCT ,NBISDT,
@@ -39,6 +40,7 @@ C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -71,7 +73,7 @@ C-----------------------------------------------
      .        SIZ,L,NB_NOD,CC,NBIRECV, II, JJ, L0,MSGOFF,
      .        IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD),IRINDEX(NSPMD),
-     .        STATUS(MPI_STATUS_SIZE),POINT,LSAV
+     .        STATUS(MPI_STATUS_SIZE),LSAV
       my_real, DIMENSION(:), ALLOCATABLE :: RBUF,SBUF
       DATA MSGOFF/170/
 C-----------------------------------------------
@@ -140,7 +142,7 @@ C
                END IF
              END DO
             END IF
-C + la th  ermique
+C + the thermal
            ELSE
             IF(NFSKYI==4)THEN
              IF(NODADT_THERM == 1) THEN
@@ -257,7 +259,7 @@ C
                END IF
              END DO
             END IF
-C + la th  ermique
+C + the thermal
            ELSE
             IF(NFSKYI==4)THEN
              IF(NODADT_THERM == 1) THEN
@@ -363,7 +365,7 @@ C
        END IF
       END DO
 C
-C decompactage partie interface
+C COMPACTING PART INTERFACE
 C
       NBIRCT = 0
       DO II=1,NBIRECV
@@ -401,7 +403,7 @@ C
               L = L + SIZI
             ENDDO
            ENDIF
-C + la thermique
+C + the thermal
           ELSE
            IF(NFSKYI==4)THEN
             IF(NODADT_THERM == 1) THEN
@@ -506,7 +508,7 @@ C
               L = L + SIZI
             ENDDO
            ENDIF
-C + la thermique
+C + the thermal
           ELSE
            IF(NFSKYI==4)THEN
             IF(NODADT_THERM == 1) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,46 +20,52 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    init_monvol                      ../starter/source/airbag/init_monvol.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                           ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    aleno                            ../starter/source/airbag/fvmbag1.F
-      !||    ancmsg                           ../starter/source/output/message/message.F
-      !||    constit                          ../starter/source/elements/nodes/constit.F
-      !||    fvbric0                          ../starter/source/airbag/fvbric0.F
-      !||    fvbric01                         ../starter/source/airbag/fvbric01.F
-      !||    fvbric1                          ../starter/source/airbag/fvbric1.F
-      !||    fvbric2                          ../starter/source/airbag/fvbric2.F
-      !||    fvbric3                          ../starter/source/airbag/fvbric3.F
-      !||    fvelprint                        ../starter/source/airbag/fvelprint.F
-      !||    fvelsurf                         ../starter/source/airbag/fvelsurf.F
-      !||    fvinject                         ../starter/source/airbag/fvinject.F
-      !||    fvnodi                           ../starter/source/airbag/fvmbag1.F
-      !||    fvventhole                       ../starter/source/airbag/fvventhole.F
-      !||    hypermesh_tetra                  ../starter/stub/fvmbags_stub.F
-      !||    monvol_check_delete_duplicated   ../starter/source/airbag/monvol_check_delete_duplicated.F
-      !||    monvol_triangulate_surface       ../starter/source/airbag/monvol_triangulate_surface.F
-      !||    usr2sys                          ../starter/source/system/sysfus.F
-      !||    writemesh                        ../starter/source/airbag/writeMesh.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                      ../starter/share/message_module/message_mod.F
-      !||    monvol_struct_mod                ../starter/share/modules1/monvol_struct_mod.F
-      !||    r2r_mod                          ../starter/share/modules1/r2r_mod.F
-      !||====================================================================
+!||====================================================================
+!||    init_monvol_mod   ../starter/source/airbag/init_monvol.F
+!||--- called by ------------------------------------------------------
+!||    lectur            ../starter/source/starter/lectur.F
+!||====================================================================
+      MODULE INIT_MONVOL_MOD
+      CONTAINS
+!||====================================================================
+!||    init_monvol                      ../starter/source/airbag/init_monvol.F
+!||--- called by ------------------------------------------------------
+!||    lectur                           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    aleno                            ../starter/source/airbag/fvmbag1.F
+!||    ancmsg                           ../starter/source/output/message/message.F
+!||    constit                          ../starter/source/elements/nodes/constit.F
+!||    fvbric0                          ../starter/source/airbag/fvbric0.F
+!||    fvbric01                         ../starter/source/airbag/fvbric01.F
+!||    fvbric1                          ../starter/source/airbag/fvbric1.F
+!||    fvbric2                          ../starter/source/airbag/fvbric2.F
+!||    fvbric3                          ../starter/source/airbag/fvbric3.F
+!||    fvelprint                        ../starter/source/airbag/fvelprint.F
+!||    fvelsurf                         ../starter/source/airbag/fvelsurf.F
+!||    fvinject                         ../starter/source/airbag/fvinject.F
+!||    fvnodi                           ../starter/source/airbag/fvmbag1.F
+!||    fvventhole                       ../starter/source/airbag/fvventhole.F
+!||    hypermesh_tetra                  ../starter/stub/fvmbags_stub.F
+!||    monvol_check_delete_duplicated   ../starter/source/airbag/monvol_check_delete_duplicated.F
+!||    monvol_triangulate_surface       ../starter/source/airbag/monvol_triangulate_surface.F
+!||    usr2sys                          ../starter/source/system/sysfus.F
+!||    writemesh                        ../starter/source/airbag/writeMesh.F
+!||--- uses       -----------------------------------------------------
+!||    fvbric1_mod                      ../starter/source/airbag/fvbric1.F
+!||    fvbric2_mod                      ../starter/source/airbag/fvbric2.F
+!||    message_mod                      ../starter/share/message_module/message_mod.F
+!||    monvol_struct_mod                ../starter/share/modules1/monvol_struct_mod.F
+!||    r2r_mod                          ../starter/share/modules1/r2r_mod.F
+!||====================================================================
       SUBROUTINE INIT_MONVOL(T_MONVOL, T_MONVOL_METADATA,
-     2     GEO       ,PM      ,
-     3     IXC       ,IXTG    ,X       ,NPC     ,
-     4     ITABM1    ,ITAB    ,IGRSURF ,
-     5     SENSORS   ,IGRBRIC ,MFI     ,
-     6     NAIRWA    ,IXS     ,V       ,LIBAGALE,
-     7     NPT       ,PLD     ,LRBAGALE,IPM     ,IGEO    ,
-     8     UNITAB    )
+     1                       IXC       ,IXTG    ,X       ,NPC     ,
+     2                       ITAB      ,IGRSURF ,
+     3                       SENSORS   ,IGRBRIC ,MFI     ,
+     4                       IXS       ,V       ,LIBAGALE,
+     5                       LRBAGALE  )
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
-      USE UNITAB_MOD
       USE R2R_MOD
       USE MESSAGE_MOD
       USE FVMBAG_MESHCONTROL_MOD
@@ -68,6 +74,9 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE MY_ALLOC_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE FVBRIC1_MOD , ONLY : FVBRIC1
+      USE FVBRIC2_MOD , ONLY : FVBRIC2
+      use element_mod , only : nixs,nixc,nixtg
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,14 +92,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER  IXC(NIXC,*),IXTG(NIXTG,*),NPC(*),
-     .     ITABM1(*),ITAB(*),
-     .     MFI,NAIRWA ,IXS(NIXS,*),
-     .     LIBAGALE,NPT(*),LRBAGALE,IPM(NPROPMI,NUMMAT),IGEO(NPROPGI,NUMGEO)
-      my_real
-     .     GEO(NPROPG,NUMGEO), PM(NPROPM,NUMMAT), X(3,*), V(3,*),
-     .     PLD(2,*), MEMBAG
+      INTEGER  IXC(NIXC,*),IXTG(NIXTG,*),NPC(*),ITAB(*),MFI,IXS(NIXS,*),LIBAGALE,LRBAGALE
+      my_real X(3,*), V(3,*)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
@@ -100,62 +103,35 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: NN, MM, LCA, LIBJET, LRBJET, LIBHOL, LRBHOL
-      INTEGER I, J, J1, ID, UID, ITYPE, K, NC, NCA, N, IEQUI,
-     .     IMASS, ITEMP, IFLU, IFUNC, ISENS, IS, NUM,
-     .     IPVENT, IJET,NJ1,NJ2,NJ3,IPT,IPA,IPZ,ISH34,
-     .     NN1,NNI,IAD,IAD1,NTGI,I1,I2,I3,I4,P,
-     .     IPORT,IPORP,IPORA,IPORT1,IPORP1,IPORA1,
+      INTEGER :: NN, LCA, LIBJET, LRBJET, LIBHOL, LRBHOL
+      INTEGER I, J, ID, ITYPE, K, NCA, N,
+     .     IMASS, ITEMP, IFLU, ISENS,
+     .     IJET,NJ1,NJ2,NJ3,IPT,IPA,IPZ,
+     .     NNI,NTGI,
      .     NJET,NVENT,
-     .     NGROOT,IDEF,
-     .     DECREASE, IP, NP, IOK, IVEL, ITVENT, NBX, NBY, NBZ,
-     .     IBRIC, IGMERG, ILVOUT, NLAYER, NFACMAX, NPPMAX, IADALE,
+     .     NGROOT,
+     .     NP,
+     .     IBRIC, ILVOUT, IADALE,
      .     RADALE, NNS, IADALE2, NNO, NTG, IADALE3, IADALE4, NBRIC,
      .     IADALE5, IADALE6, IADALE7, IADALE8, NTGA, NNA, IADALE9,
-     .     IADALE10, IADALE11,MID_INI,I_INJ,I_INJSYS,MID,NGASES,
-     .     IFVENT,ICURJETMAX,ICURJETMAX_OK,MID_INISYS, IADALE12,
-     .     ITTF,IDTPDEF,NVB,KFRAME,IREF,IFOUND,JI,JI1,ITY,ITY1,
-     .     NEL,CHKSURF,ITYPFUN,NVENTHOLES,NPORSURF,IBLOCKAGE,IVENTYP,
-     .     IE, NE, 
-     .     IERR1, IERR2, IERR3, IADBRIC, IADALE13, NTGT, II, IBID(1), JJ, ITMP
-      INTEGER IVDP,IFLAGUNIT,ID1,ID2, NSWITCH, AUTO_UP_SWITCH
-      INTEGER TITREVENT(20), MAX_ID
-      INTEGER IFBULK, IFMIN, IFMOUTT, IFMOUTP, IFP0, IFPMAX, IFUNCT_ID
-      INTEGER, DIMENSION(:), ALLOCATABLE :: TAGE, ITABINV, TAGVENT,
-     .     ITABINV1, ITABINV2, INDEX
+     .     IADALE10, IADALE11,
+     .     IADALE12,
+     .     NVB,
+     .     IADALE13, NTGT, II, IBID(1), JJ
+      INTEGER ID1,ID2
+      INTEGER  MAX_ID
+      INTEGER, DIMENSION(:), ALLOCATABLE :: TAGE, ITABINV, TAGVENT, ITABINV1, ITABINV2, INDEX
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNODBR
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAB_SAVE
-      INTEGER :: RET_VAL,NFVMBAGS
-      my_real :: PARAM, TMP
-      INTEGER :: IMESH_ALL, ICOPY, NJET_NEW(NVOLU)
+      INTEGER :: NFVMBAGS
+      INTEGER :: NJET_NEW(NVOLU)
+      TYPE(GROUP_) :: DUMMY(2)
 
-      my_real
-     .     AMU, PEXT, PINI, TI,  RHOI, EI,RHOEI,
-     .     GAMAI, CPAI, CPBI, CPCI, CPDI, CPEI, CPFI,
-     .     RMWI, MI, CVI, CPI,MWI,
-     .     GAMA, CPA, CPB, CPC, CPD, CPE, CPF,
-     .     RMWG, CPG, CVG,
-     .     FMASS, FTEMP, FVDP,FAC_M,FAC_L,FAC_T,FAC_C,
-     .     DPDEF, DTPDEF, AVENT, BVENT, TVENT, TSTOPE, CLEAK,
-     .     CP, CV, NX, NY, NZ, VOL, ROT, DIR,
-     .     XX, YY, ZZ, X13, Y13, Z13, X24, Y24, Z24,
-     .     X12,Y12,Z12,DS,BID,
-     .     SV, SX, SY, SZ, SA, VINC, PMAX,VEPS,VMIN,
-     .     FFUN,FPORT,FPORP,FPORA,FPORT1,FPORP1,FPORA1,FPT,FPA,FPZ,
-     .     SCAL_T,SCAL_P,SCAL_S,SCAL_A,SCAL_D,SJET,SHOL,FVEL,DIRX,DIRY,
-     .     DIRZ,DIR2X,DIR2Y,DIR2Z,ORIGX,ORIGY,ORIGZ,LX,LY,LZ,CGMERG,
-     .     CNMERG,PTOLE,QA,QB,HMIN,MW_TMP,R_IGC1,HCONV,ESPECI,TI2,
-     .     TTFIRE,TRELAX,TSWITCH,CFL_COEF, DTMIN
-      my_real
-     .     SFBULK, SFMIN, SFMOUTT, SFMOUTP, SFP0, SFPMAX
-C     
+      my_real TI,GAMAI, CPAI, CPBI, CPCI, CPDI, CPEI, CPFI, GAMA, CPA, CPB, CPC,RMWG, CPG, CVG, FMASS, FTEMP
       CHARACTER MESS*40
-      CHARACTER(len=ncharkey) :: KEY
-      CHARACTER(len=nchartitle) :: TITR,TITRSURF,TITR1,TITR2,TITR3
+      CHARACTER(len=nchartitle) :: TITR,TITR1
       CHARACTER*10 MONVOLTYP(11)
-      CHARACTER*20 VENTTITLE
       INTEGER :: NB_TETRA, NB_VERTICES, NB_EXTRA_VERTICES
-      INTEGER :: EXT_SURFID, INT_SURFID
       LOGICAL :: FOUND
       INTEGER :: SIZE1, SIZE2,LENGTH
       INTEGER :: COMM_TAG(NVOLU), NCOMMU
@@ -178,9 +154,7 @@ C-----------------------------------------------
       K   = 0
       MFI = 0
       NVB = 0
-!     
       IBID = 0
-
 C-------------------------------------
 C     Allocate KMESH (for type 8 airbags)
 C-------------------------------------
@@ -243,11 +217,11 @@ C     FVMABG2 are in fact FVMBAG1 with simplified input
          NN =IGRSURF(T_MONVOL(N)%EXT_SURFID)%NSEG
          IF (ITYPE == 6.OR.ITYPE == 8) THEN
 C------------------------------------------
-C     Elements de l'airbag et elements internes
+C     Elements of airbag and internal elements
 C------------------------------------------
             T_MONVOL(N)%IVOLU(31)=IADALE-1
             T_MONVOL(N)%IVOLU(34)=RADALE-1
-C     Tag les noeuds des briques additionnelles
+C     Tag the nodes of additional bricks
             ALLOCATE(TAGNODBR(NUMNOD))
             TAGNODBR(1:NUMNOD)=0
             IBRIC=T_MONVOL(N)%IVOLU(61)
@@ -330,7 +304,6 @@ C
                ALLOCATE(T_MONVOL(N)%THSURF_TAG(NSURF, NTGI + 1))
             ENDIF
 
-
             IF (T_MONVOL(N)%INT_SURFID /= 0) THEN
                IF (.NOT. TETRAMESHER_USED) THEN
                   CALL FVBRIC01(T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM(1, NTG + 1), NTGI, NUMNOD, NBRIC, IXS,
@@ -393,7 +366,7 @@ C
                CALL FVBRIC0(
      .              IBUFSSG_TEMP,IXS_TEMP              ,2    ,NB_TETRA,
      .              T_MONVOL(N)%ID  ,T_MONVOL(N)%IVOLU(44)           ,TITR ,TAGNODBR,
-     .              T_MONVOL(N)%TBRIC    ,T_MONVOL(N)%TFAC,NB_TOTAL_NODE ,IBID,IBRIC,ITYPE)
+     .              T_MONVOL(N)%TBRIC    ,T_MONVOL(N)%TFAC,NB_TOTAL_NODE ,DUMMY,IBRIC,ITYPE)
                IF (T_MONVOL(N)%INT_SURFID > 0) THEN
                   CALL FVBRIC01(T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM(1, NTG + 1), NTGI, NB_TOTAL_NODE, 
      .                 NB_TETRA, IXS_TEMP, T_MONVOL(N)%TBRIC, T_MONVOL(N)%TFAC)
@@ -403,7 +376,7 @@ C
             ENDIF
 
 C--------------------------------------
-C     Elements d'injecteur et de vent holes
+C     Holes injector and wind elements
 C--------------------------------------
             NJET=T_MONVOL(N)%IVOLU(8)
             ALLOCATE(T_MONVOL(N)%ITAGEL(T_MONVOL(N)%NTG +T_MONVOL(N)%NTGI))
@@ -445,7 +418,6 @@ C--------------------------------------
             ENDIF
             DEALLOCATE(TAGVENT)
             DEALLOCATE(T_MONVOL(N)%FVBAG_ELEMID)
-        
 C     
             IF (TETRAMESHER_USED) THEN
                CALL FVELPRINT(
@@ -457,7 +429,7 @@ C
      .              T_MONVOL(N)%IBAGHOL, ILVOUT, 0 )
             ENDIF
 C----------------------------------
-C     Elements volumiques additionnels
+C     Additional volume elements
 C----------------------------------
             IBRIC=T_MONVOL(N)%IVOLU(61)
             IF (IBRIC/=0 .OR. (IBRIC==0 .AND. KMESH(N)>=2)) THEN
@@ -487,7 +459,7 @@ C----------------------------------
                T_MONVOL(N)%TAGELS(:) = 0
                IF (TETRAMESHER_USED) THEN
                   CALL FVBRIC1(T_MONVOL(N),
-     .                 T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM, IXS_TEMP,     IBRIC,
+     .                 T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM, IXS_TEMP,
      .                 T_MONVOL(N)%TBRIC,NTG,              NTGA,    NBRIC,
      .                 T_MONVOL(N)%TFAC,T_MONVOL(N)%TAGELS, T_MONVOL(N)%ID, NTGI,
      .                 NNA,              T_MONVOL(N)%IVOLU(44),
@@ -495,7 +467,7 @@ C----------------------------------
      .                 NB_TOTAL_NODE)
                ELSE
                   CALL FVBRIC1(T_MONVOL(N),
-     .                 T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM, IXS,     IBRIC,
+     .                 T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM, IXS,
      .                 T_MONVOL(N)%TBRIC,NTG,              NTGA,    NBRIC,
      .                 T_MONVOL(N)%TFAC,T_MONVOL(N)%TAGELS, T_MONVOL(N)%ID, NTGI,
      .                 NNA,              T_MONVOL(N)%IVOLU(44),
@@ -507,14 +479,14 @@ C
                IADALE11=IADALE10+NTGA
                IF (TETRAMESHER_USED) THEN
                   CALL FVBRIC2(
-     .                 T_MONVOL(N)%NODES,   T_MONVOL(N)%ELEM, IXS_TEMP,  NTG+NTGI, NBRIC,
+     .                 T_MONVOL(N)%ELEM,   IXS_TEMP,         NTG+NTGI,          NBRIC,
      .                 T_MONVOL(N)%TBRIC,  T_MONVOL(N)%TFAC, T_MONVOL(N)%TAGELS, NTGA,
      .                 T_MONVOL(N)%IBUFA,  NNA,              T_MONVOL(N)%ELEMA,
      .                 T_MONVOL(N)%TAGELA, T_MONVOL(N)%BRNA, 
      .                 NB_TOTAL_NODE)
                ELSE
                   CALL FVBRIC2(
-     .                 T_MONVOL(N)%NODES,   T_MONVOL(N)%ELEM, IXS,  NTG+NTGI, NBRIC,
+     .                 T_MONVOL(N)%ELEM,   IXS,              NTG+NTGI,           NBRIC,
      .                 T_MONVOL(N)%TBRIC,  T_MONVOL(N)%TFAC, T_MONVOL(N)%TAGELS, NTGA,
      .                 T_MONVOL(N)%IBUFA,  NNA,              T_MONVOL(N)%ELEMA,
      .                 T_MONVOL(N)%TAGELA, T_MONVOL(N)%BRNA, NUMNOD)
@@ -663,7 +635,7 @@ C
          ENDIF
       ENDDO
 !     ***************    !
-!     Venthole adress    !
+!     Venthole Address!
 !     ***************    !
       NVENTTOT = 0
       DO NN = 1, NVOLU
@@ -684,7 +656,7 @@ C
          ENDIF
       ENDDO
 C----------------------------------------------------------------------------
-C     airbags communiquants, verifie les caracteristiques du gaz a l'initial.
+C     Airbags communicators, check the characteristics of the gas at the initial.
 C----------------------------------------------------------------------------
       DO N=1,NVOLU
          ITYPE=T_MONVOL(N)%IVOLU(2)
@@ -751,6 +723,9 @@ C----------------------------------------------------------------------------
                      RBAGJET_SAVE(JJ, II) = T_MONVOL(NN)%RBAGJET(JJ, II)
                   ENDDO
                ENDDO
+            ELSE
+              ALLOCATE(IBAGJET_SAVE(NIBJET, 0))
+              ALLOCATE(RBAGJET_SAVE(NRBJET, 0))   
             ENDIF
             IF (ALLOCATED(T_MONVOL(NN)%RBAGJET)) DEALLOCATE(T_MONVOL(NN)%RBAGJET)
             IF (ALLOCATED(T_MONVOL(NN)%IBAGJET)) DEALLOCATE(T_MONVOL(NN)%IBAGJET)
@@ -787,6 +762,9 @@ C----------------------------------------------------------------------------
                      RBAGJET_SAVE(JJ, II) = T_MONVOL(NN)%RBAGJET(JJ, II)
                   ENDDO
                ENDDO
+            ELSE
+               ALLOCATE(IBAGJET_SAVE(NIBJET, 0))
+               ALLOCATE(RBAGJET_SAVE(NRBJET, 0))
             ENDIF
             IF (ALLOCATED(T_MONVOL(NN)%RBAGJET)) DEALLOCATE(T_MONVOL(NN)%RBAGJET)
             IF (ALLOCATED(T_MONVOL(NN)%IBAGJET)) DEALLOCATE(T_MONVOL(NN)%IBAGJET)
@@ -811,7 +789,7 @@ C----------------------------------------------------------------------------
      
 
 C-------------------------------------
-C     airbags communiquants, echange des caracteristiques des gaz.
+C     Airbags communicators, exchange of gas characteristics.
 C-------------------------------------
       DO N=1,NVOLU
          ITYPE=T_MONVOL(N)%TYPE
@@ -820,7 +798,7 @@ C-------------------------------------
             NJET   =T_MONVOL(N)%IVOLU(8)
             DO J=1,NJET
 C---------------------------------------------------------------------------------
-C     informe le volume pere des caracteristiques du gaz injecte dans un fils
+C     informs the pere volume of the gas characteristics injects into a son
 C---------------------------------------------------------------------------------
                T_MONVOL(COMM_TAG(N))%RBAGJET(1, NGROOT + J) = T_MONVOL(N)%RBAGJET(1, J)
                T_MONVOL(COMM_TAG(N))%RBAGJET(2, NGROOT + J) = T_MONVOL(N)%RBAGJET(2, J)
@@ -834,7 +812,7 @@ C-------------------------------------------------------------------------------
                   T_MONVOL(COMM_TAG(N))%IBAGJET(13, NGROOT + J) = T_MONVOL(N)%IBAGJET(13, J)
                ENDIF
 C----------------------------------------------------
-C     deplace les infos relatives a l'injection.
+C     DEPLACE INJECTION INFOS.
 C----------------------------------------------------
                IF(J-1/=NGROOT)THEN
                   DO K=1,NIBJET
@@ -853,7 +831,7 @@ C----------------------------------------------------
          ENDIF
       ENDDO
 C----------------------------------------------------------
-C     informe tous les volumes des caracteristiques des gaz.
+C     informs all the volumes of the gas characteristics.
 C----------------------------------------------------------
       DO N=1,NVOLU
          ITYPE=T_MONVOL(N)%TYPE
@@ -883,7 +861,7 @@ C
       ENDDO
 
 !     ***************    !
-!     Injector adress    !
+!     Injector address    !
 !     ***************    !
       LIBJET = 0
       LRBJET = 0
@@ -1045,4 +1023,5 @@ C
  3000 FORMAT(
      .     //,'      MONITORED VOLUMES TYPE COMMU : GAS ORGANIZATION'/
      .     '      -----------------------------------------------')
-      END
+      END SUBROUTINE INIT_MONVOL
+      END MODULE INIT_MONVOL_MOD

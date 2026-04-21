@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mvoludt   ../engine/source/airbag/mvoludt.F
-      !||--- called by ------------------------------------------------------
-      !||    resol     ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    mvoludt   ../engine/source/airbag/mvoludt.F
+!||--- called by ------------------------------------------------------
+!||    resol     ../engine/source/engine/resol.F
+!||====================================================================
       SUBROUTINE MVOLUDT(MONVOL,VOLMON)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -57,13 +57,10 @@ C
       KK1 = 0
       DO I=1,NVOLU
        ITYP=MONVOL(K1+1)
-C communication dans resol juste avant mvoludt et envoi a proc0 des volmon
-C evite difference en parallele quand processeur ne traite pas ts les airbags
-C voir formules sur min dty / max dtx
-C       IF(IMACH==3) THEN
-C debranchement a part pour le proc main (proc ayant a jour p,v,s)
-C         IF(FR_MV(NSPMD+2,I)/=ISPMD+1) GOTO 100
-C       END IF
+C communication in resol just before mvoludt and sending to proc0 of volmon
+C avoid difference in parallel when processor does not handle all airbags
+C see formulas on min dty / max dtx
+C separate branch for the main proc (proc having updated p,v,s)
        IF(ITYP/=1)THEN
         GAMA=VOLMON(KK1+1)
         AL=VOLMON(KK1+2)
@@ -78,7 +75,6 @@ C       END IF
           DTX=MAX(SQRT(ONE+DT2**2*GAMA*P*S/V/ROT),DTX)
         ENDIF
        ENDIF
- 100   CONTINUE
        K1  = K1  + NIMV
        KK1 = KK1 + NRVOLU
       ENDDO

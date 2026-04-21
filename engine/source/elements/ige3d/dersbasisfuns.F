@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dersbasisfuns   ../engine/source/elements/ige3d/dersbasisfuns.F
-      !||--- called by ------------------------------------------------------
-      !||    ige3daire       ../engine/source/elements/ige3d/ig3daire.F
-      !||====================================================================
+!||====================================================================
+!||    dersbasisfuns   ../engine/source/elements/ige3d/dersbasisfuns.F
+!||--- called by ------------------------------------------------------
+!||    ige3daire       ../engine/source/elements/ige3d/ig3daire.F
+!||====================================================================
       SUBROUTINE DERSBASISFUNS(IDXI, PXI, XI, KXI, DERS1, DERS2)
 C--------------------------------------------------------------------------------------------------------
 C
@@ -51,24 +51,17 @@ C-------------------------------------------------------------------------------
 C Dummy Arguments 
 C--------------------------------------------------------------------------------------------------------
       INTEGER PXI, IDXI
-      my_real, 
-     .  INTENT(IN) :: XI
-      my_real, 
-     .  DIMENSION(*), INTENT(IN) :: KXI
-      my_real, 
-     .  DIMENSION(*), INTENT(OUT) :: DERS1, DERS2
+      my_real, INTENT(IN) :: XI
+      my_real, DIMENSION(*), INTENT(IN) :: KXI
+      my_real, DIMENSION(*), INTENT(OUT) :: DERS1, DERS2
 C--------------------------------------------------------------------------------------------------------
 C Local variables 
 C--------------------------------------------------------------------------------------------------------
-      INTEGER I, J, K, L, KR, KP, J1, J2, NDERS, LS1, LS2
-      my_real 
-     .  SAVED, TEMP, D
-      my_real, 
-     .  DIMENSION(PXI+1) :: ALEFT, RIGHT
-      my_real, 
-     .  DIMENSION(2,PXI+1) :: DERS, A
-      my_real, 
-     .  DIMENSION(PXI+1,PXI+1) :: ANDU
+      INTEGER J, K, L, KR, KP, J1, J2, NDERS, LS1, LS2
+      my_real SAVED, TEMP, D
+      my_real, DIMENSION(PXI+1) :: ALEFT, RIGHT
+      my_real, DIMENSION(2,PXI+1) :: DERS, A
+      my_real, DIMENSION(PXI+1,PXI+1) :: ANDU
 
       NDERS=1
       ANDU(1,1)=ONE
@@ -148,9 +141,9 @@ C MULTIPLY THROUGH BY THE CORRECT FACTORS
       RETURN
       END
 C
-      !||====================================================================
-      !||    basisfuns   ../engine/source/elements/ige3d/dersbasisfuns.F
-      !||====================================================================
+!||====================================================================
+!||    basisfuns   ../engine/source/elements/ige3d/dersbasisfuns.F
+!||====================================================================
       SUBROUTINE BASISFUNS(IDXI, PXI, XI, KXI, DERS1)
 C--------------------------------------------------------------------------------------------------------
 C
@@ -176,22 +169,16 @@ C-------------------------------------------------------------------------------
 C Dummy Arguments 
 C--------------------------------------------------------------------------------------------------------
       INTEGER PXI, IDXI
-      my_real, 
-     .  INTENT(IN) :: XI
-      my_real, 
-     .  DIMENSION(*), INTENT(IN) :: KXI
-      my_real, 
-     .  DIMENSION(*), INTENT(OUT) :: DERS1
+      my_real, INTENT(IN) :: XI
+      my_real, DIMENSION(*), INTENT(IN) :: KXI
+      my_real, DIMENSION(*), INTENT(OUT) :: DERS1
 C--------------------------------------------------------------------------------------------------------
 C Local variables 
 C--------------------------------------------------------------------------------------------------------
-      INTEGER I, J, K, L
-      my_real 
-     .  SAVED, TEMP
-      my_real, 
-     .  DIMENSION(PXI+1) :: ALEFT, RIGHT
-      my_real, 
-     .  DIMENSION(PXI+1,PXI+1) :: ANDU
+      INTEGER J, L
+      my_real SAVED, TEMP
+      my_real, DIMENSION(PXI+1) :: ALEFT, RIGHT
+      my_real, DIMENSION(PXI+1,PXI+1) :: ANDU
 
       ANDU(1,1)=ONE
 

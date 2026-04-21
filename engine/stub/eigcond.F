@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,22 +21,23 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #ifndef DNC
-      !||====================================================================
-      !||    eigcond                ../engine/stub/eigcond.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                  ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    cluster_mod            ../engine/share/modules/cluster_mod.F
-      !||    crackxfem_mod          ../engine/share/modules/crackxfem_mod.F
-      !||    drape_mod              ../engine/share/modules/drape_mod.F
-      !||    dsgraph_mod            ../engine/share/modules/dsgraph_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    stack_mod              ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    eigcond                ../engine/stub/eigcond.F
+!||--- calls      -----------------------------------------------------
+!||    arret                  ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    cluster_mod            ../engine/share/modules/cluster_mod.F
+!||    crackxfem_mod          ../engine/share/modules/crackxfem_mod.F
+!||    drape_mod              ../engine/share/modules/drape_mod.F
+!||    dsgraph_mod            ../engine/share/modules/dsgraph_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    groupdef_mod           ../common_source/modules/groupdef_mod.F
+!||    h3d_mod                ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod          ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    stack_mod              ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE EIGCOND(GRAPHE      , EIGIPM    , EIGRPM  , IKC0      , NDDL0       ,
      2                   K_DIAG      , K_LT      , IADK    , JDIK      , MS          ,
      3                   IN          , NDOF      , NDDL    , EIGIBUF   , X           ,

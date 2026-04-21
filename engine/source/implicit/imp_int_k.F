@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    imp_int_k       ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_chkm        ../engine/source/implicit/imp_solv.F
-      !||    imp_solv        ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    i10ke3          ../engine/source/interfaces/int10/i10ke3.F
-      !||    i11ke3          ../engine/source/interfaces/int11/i11ke3.F
-      !||    i24ke3          ../engine/source/interfaces/int24/i24ke3.F
-      !||    i5ke3           ../engine/source/interfaces/inter3d/i5ke3.F
-      !||    i7ke3           ../engine/source/interfaces/int07/i7ke3.F
-      !||    upd_int_k       ../engine/source/implicit/upd_glob_k.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    imp_int_k       ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_chkm        ../engine/source/implicit/imp_solv.F
+!||    imp_solv        ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    i10ke3          ../engine/source/interfaces/int10/i10ke3.F
+!||    i11ke3          ../engine/source/interfaces/int11/i11ke3.F
+!||    i24ke3          ../engine/source/interfaces/int24/i24ke3.F
+!||    i5ke3           ../engine/source/interfaces/inter3d/i5ke3.F
+!||    i7ke3           ../engine/source/interfaces/int07/i7ke3.F
+!||    upd_int_k       ../engine/source/implicit/upd_glob_k.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intbuf      ../engine/share/modules/imp_mod_def.F90
+!||    imp_inttd       ../engine/share/modules/imp_mod_def.F90
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    sensor_mod      ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE IMP_INT_K( A     ,V         ,
      1                      ICODT ,ICODR ,ISKEW  ,IBFV  ,NPC    ,
      2                      TF    ,VEL   ,NSENSOR,SENSOR_TAB,XFRAME ,
@@ -365,19 +368,20 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_intdt          ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_dtkin          ../engine/source/implicit/imp_int_k.F
-      !||    imp_inttd0         ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11main_crit_tri   ../engine/source/interfaces/intsort/i11main_crit_tri.F
-      !||    i7main_crit_tri    ../engine/source/interfaces/intsort/i7main_crit_tri.F
-      !||    imp_icomcrit       ../engine/source/implicit/imp_int_k.F
-      !||    spmd_min_s         ../engine/source/mpi/implicit/imp_spmd.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    imp_intdt          ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_dtkin          ../engine/source/implicit/imp_int_k.F
+!||    imp_inttd0         ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    i11main_crit_tri   ../engine/source/interfaces/intsort/i11main_crit_tri.F
+!||    i7main_crit_tri    ../engine/source/interfaces/intsort/i7main_crit_tri.F
+!||    imp_icomcrit       ../engine/source/implicit/imp_int_k.F
+!||    spmd_min_s         ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod      ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE IMP_INTDT(
      1       IPARI    ,INTBUF_TAB,X        ,
      2       V        ,VR      ,ISENDTO ,IRECVFROM,
@@ -426,7 +430,7 @@ C     REAL
      .        XSLV_L(18,NINTER),XMSR_L(12,NINTER),
      .        VSLV_L(6,NINTER),VMSR_L(6,NINTER),
      .        SIZE_T(NINTER),DTI,FAC, TS
-C-------------DT kine par interface--------
+C-------------DT kin by interface--------
 C Init variable globale interface
 C      DO KK=1,NBINTC
 C        N = INTLIST(KK)
@@ -535,18 +539,19 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_icomcrit      ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_intdt         ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    intab             ../engine/source/implicit/ind_glob_k.F
-      !||    spmd_get_stif     ../engine/source/mpi/interfaces/send_cand.F
-      !||    spmd_get_stif11   ../engine/source/mpi/interfaces/send_cand.F
-      !||    spmd_sync_mmx     ../engine/source/mpi/interfaces/spmd_sync_mmx.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod        ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    imp_icomcrit      ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_intdt         ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    intab             ../engine/source/implicit/ind_glob_k.F
+!||    spmd_get_stif     ../engine/source/mpi/interfaces/send_cand.F
+!||    spmd_get_stif11   ../engine/source/mpi/interfaces/send_cand.F
+!||    spmd_sync_mmx     ../engine/source/mpi/interfaces/spmd_sync_mmx.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    sensor_mod        ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE IMP_ICOMCRIT(
      1  INTBUF_TAB,IPARI  ,NEWFRONT,ISENDTO,
      2  IRCVFROM,DT2T   ,ITAB   ,XSLV_L  ,XMSR_L ,
@@ -599,7 +604,7 @@ C-----------------------------------------------
       EXTERNAL INTAB
 C
 C
-C Precalcul des interfaces utiles
+C Pre-calculation of useful interfaces
 C
       DO J=1,NINTER
        PMAX=ZERO
@@ -658,16 +663,16 @@ C
             ENDIF
           ENDIF
           END IF !(NSPMD>1) THEN
-C maj dist = tzinf - gap ***: seulement pour etre coherent avec smp 
+C Maj Dist = Tzinf - Gap ***: Only to be coherent with SMP 
            INTBUF_TAB(I)%VARIABLES(5) = INTBUF_TAB(I)%VARIABLES(8)-
      -                                INTBUF_TAB(I)%VARIABLES(2)
-C calcul du critere de tri DIST0
+C calculation of the sorting criterion DIST0
           XX=MAX(XSLV_L(1,I)-XMSR_L(4,I),XMSR_L(1,I)-XSLV_L(4,I),ZERO)
           XY=MAX(XSLV_L(2,I)-XMSR_L(5,I),XMSR_L(2,I)-XSLV_L(5,I),ZERO)
           XZ=MAX(XSLV_L(3,I)-XMSR_L(6,I),XMSR_L(3,I)-XSLV_L(6,I),ZERO)
           DIST0 = INTBUF_TAB(I)%VARIABLES(5) - SQRT(XX**2+XY**2+XZ**2)
 C
-C Traitement VMAX
+C Vmax treatment
 C
           VX=MAX(VSLV_L(1,I)-VMSR_L(4,I),VMSR_L(1,I)-VSLV_L(4,I),ZERO)
           VY=MAX(VSLV_L(2,I)-VMSR_L(5,I),VMSR_L(2,I)-VSLV_L(5,I),ZERO)
@@ -676,7 +681,7 @@ C
           IF (VV/=ZERO) THEN
             GAPINF = INTBUF_TAB(I)%VARIABLES(6)
             IF (GAPINF==ZERO) GAPINF = INTBUF_TAB(I)%VARIABLES(2)
-C-------supposee s est encore loin de M ------
+C-------assumed s is still far from M ------
               GAPINF =GAPINF+MAX(ZERO,DIST0)
             DTI = ONEP8*GAPINF/VV
 Ctmp            DTI = ZEP9*GAPINF/VV
@@ -689,25 +694,28 @@ Ctmp            DTI = ZEP9*GAPINF/VV
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_inttd0       ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv         ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    cp_inttd         ../engine/source/implicit/imp_int_k.F
-      !||    imp_i11xv        ../engine/source/implicit/imp_int_k.F
-      !||    imp_i7xv         ../engine/source/implicit/imp_int_k.F
-      !||    imp_intdt        ../engine/source/implicit/imp_int_k.F
-      !||    imp_tripi        ../engine/source/implicit/imp_int_k.F
-      !||--- uses       -----------------------------------------------------
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    groupdef_mod     ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod          ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||    timer_mod        ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE IMP_INTTD0(TIMERS,
+!||====================================================================
+!||    imp_inttd0       ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv         ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    cp_inttd         ../engine/source/implicit/imp_int_k.F
+!||    imp_i11xv        ../engine/source/implicit/imp_int_k.F
+!||    imp_i7xv         ../engine/source/implicit/imp_int_k.F
+!||    imp_intdt        ../engine/source/implicit/imp_int_k.F
+!||    imp_tripi        ../engine/source/implicit/imp_int_k.F
+!||--- uses       -----------------------------------------------------
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    groupdef_mod     ../common_source/modules/groupdef_mod.F
+!||    h3d_mod          ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod    ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    interfaces_mod   ../common_source/modules/interfaces/interfaces_mod.F90
+!||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F90
+!||    output_mod       ../common_source/modules/output/output_mod.F90
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||    timer_mod        ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE IMP_INTTD0(output, TIMERS,
      1       IPARI ,INTBUF_TAB     ,X       ,D       ,
      2       MS    ,ITAB   ,IN    ,D_IMP   ,DR_IMP  ,
      3       IMSCH ,I2MSCH ,ISIZXV,ILENXV  ,IGRBRIC ,
@@ -724,6 +732,7 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      use output_mod
       USE TIMER_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
@@ -748,6 +757,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(output_) :: output
       TYPE(TIMER_) :: TIMERS
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*),
@@ -795,7 +805,7 @@ C-------------before inttri------
        DO N = 1,NINTER
         NUM_IMP1(N)=0
        ENDDO
-C----deactive cette fonction.     
+C----deactivate this function.
        IF (ITTOFF>0) RETURN
        NTHR_CP = NTHREAD
        IF (NTHREAD>1) NTHREAD = 1
@@ -822,7 +832,7 @@ C----deactive cette fonction.
        DO N = 1,NINTER
         NUM_IMP(N) = 0
        END DO
-C-------------dans inttri------
+C-------------in inttri------
 c      NI18 = 0
 c      LI18 = 1
 c      IAD17 = 1
@@ -867,7 +877,7 @@ C
      2  INTBUF_TAB(N)%STFNS,X_TMP       ,D_IMP   ,DR_IMP       ,V     ,
      3  VR           ,FAC          ,FAC1         )
         ENDIF
-        CALL IMP_TRIPI(TIMERS,
+        CALL IMP_TRIPI(output, TIMERS,
      1       IPARI ,INTBUF_TAB,X_TMP   ,D       ,
      2       V     ,MS     ,ITAB ,VR      ,IN      ,
      3       IMSCH ,I2MSCH ,ISIZXV,ILENXV ,IGRBRIC ,
@@ -885,18 +895,18 @@ C
       ENDDO
 C
       NT_IMP1=IAD-1
-C---------necessair pour spmd-----
+C---------necessary for spmd-----
       CALL CP_INTTD(NT_IMP1,NUM_IMP ,NS_IMP,NE_IMP,IND_IMP,NUM_IMP1)
  1000 CONTINUE
       IF (NTHR_CP>1) NTHREAD = NTHR_CP 
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_i11xv    ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_inttd0   ../engine/source/implicit/imp_int_k.F
-      !||====================================================================
+!||====================================================================
+!||    imp_i11xv    ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_inttd0   ../engine/source/implicit/imp_int_k.F
+!||====================================================================
        SUBROUTINE IMP_I11XV(
      1       X       ,NSV   ,MSR   ,NSN   ,NMN     ,
      1       X_TMP   ,D     ,DR    ,V     ,VR      ,
@@ -974,11 +984,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_i7xv     ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_inttd0   ../engine/source/implicit/imp_int_k.F
-      !||====================================================================
+!||====================================================================
+!||    imp_i7xv     ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_inttd0   ../engine/source/implicit/imp_int_k.F
+!||====================================================================
        SUBROUTINE IMP_I7XV(
      1       X       ,NSV   ,MSR   ,NSN   ,NMN     ,
      1       STFN    ,X_TMP ,D     ,DR    ,V       ,
@@ -1056,34 +1066,38 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_tripi         ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_inttd0        ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    i10main_opt_tri   ../engine/source/interfaces/intsort/i10opt_opt_tri.F
-      !||    i10main_tri       ../engine/source/interfaces/intsort/i10main_tri.F
-      !||    i11main_opt_tri   ../engine/source/interfaces/intsort/i11main_opt_tri.F
-      !||    i11main_tri       ../engine/source/interfaces/intsort/i11main_tri.F
-      !||    i20main_opt_tri   ../engine/source/interfaces/intsort/i20main_opt_tri.F
-      !||    i20main_tri       ../engine/source/interfaces/intsort/i20main_tri.F
-      !||    i7main_opt_tri    ../engine/source/interfaces/intsort/i7main_opt_tri.F
-      !||    i7main_tri        ../engine/source/interfaces/intsort/i7main_tri.F
-      !||    imp_i10mainf      ../engine/source/interfaces/int10/i10ke3.F
-      !||    imp_i11mainf      ../engine/source/interfaces/int11/i11ke3.F
-      !||    imp_i7mainf       ../engine/source/interfaces/int07/i7ke3.F
-      !||    spmd_i7xvcom2     ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
-      !||    spmd_ifront       ../engine/source/mpi/interfaces/spmd_ifront.F
-      !||    spmd_sd_xv        ../engine/source/mpi/nodes/spmd_sd_xv.F
-      !||--- uses       -----------------------------------------------------
-      !||    glob_therm_mod    ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    groupdef_mod      ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod           ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod     ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    sensor_mod        ../common_source/modules/sensor_mod.F90
-      !||    timer_mod         ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE IMP_TRIPI(TIMERS,
+!||====================================================================
+!||    imp_tripi         ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_inttd0        ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    i10main_opt_tri   ../engine/source/interfaces/intsort/i10opt_opt_tri.F
+!||    i10main_tri       ../engine/source/interfaces/intsort/i10main_tri.F
+!||    i11main_opt_tri   ../engine/source/interfaces/intsort/i11main_opt_tri.F
+!||    i11main_tri       ../engine/source/interfaces/intsort/i11main_tri.F
+!||    i20main_opt_tri   ../engine/source/interfaces/intsort/i20main_opt_tri.F
+!||    i20main_tri       ../engine/source/interfaces/intsort/i20main_tri.F
+!||    i7main_opt_tri    ../engine/source/interfaces/intsort/i7main_opt_tri.F
+!||    i7main_tri        ../engine/source/interfaces/intsort/i7main_tri.F
+!||    imp_i10mainf      ../engine/source/interfaces/int10/i10ke3.F
+!||    imp_i11mainf      ../engine/source/interfaces/int11/i11ke3.F
+!||    imp_i7mainf       ../engine/source/interfaces/int07/i7ke3.F
+!||    spmd_i7xvcom2     ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
+!||    spmd_ifront       ../engine/source/mpi/interfaces/spmd_ifront.F
+!||    spmd_sd_xv        ../engine/source/mpi/nodes/spmd_sd_xv.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod       ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod    ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    groupdef_mod      ../common_source/modules/groupdef_mod.F
+!||    h3d_mod           ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    interfaces_mod    ../common_source/modules/interfaces/interfaces_mod.F90
+!||    multi_fvm_mod     ../common_source/modules/ale/multi_fvm_mod.F90
+!||    output_mod        ../common_source/modules/output/output_mod.F90
+!||    sensor_mod        ../common_source/modules/sensor_mod.F90
+!||    timer_mod         ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE IMP_TRIPI(output, TIMERS,
      1       IPARI ,INTBUF_TAB   ,X       ,D       ,
      2       V     ,MS     ,ITAB ,VR      ,IN      ,
      3       IMSCH ,I2MSCH ,ISIZXV,ILENXV ,IGRBRIC ,
@@ -1100,6 +1114,7 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE OUTPUT_MOD
       USE TIMER_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
@@ -1108,6 +1123,7 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE INTERFACES_MOD
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1119,10 +1135,10 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_) :: output
       TYPE(TIMER_) :: TIMERS
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*),
@@ -1165,14 +1181,14 @@ C     REAL
      .        DTI, TS
       my_real
      .  RDUM(3,1)
-C-------------dans inttri------
+C------------ In Intri -------
         LSKYI_SMS_NEW = 0 ! Value is set to zero than ignored.
         INT24E2EUSE=0
         RDUM(1:3,1)=ZERO
         IBID =0
         JTASK = ITASK + 1
         IF (NSPMD>1) THEN
-         IF(ISIZXV>0) CALL SPMD_SD_XV(
+         IF(ISIZXV>0) CALL SPMD_SD_XV(output,
      1     X     ,D       ,V      ,VR    ,MS   ,
      2     IN    ,IAD_ELEM,FR_ELEM,WEIGHT,IMSCH,
      3     D     ,ISIZXV ,ILENXV  ,XDP)
@@ -1187,7 +1203,7 @@ C-------------dans inttri------
      5       IGRBRIC ,TEMP   ,1       ,IRLEN7T ,ISLEN7T ,
      6       IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
      7       ISLEN20E,IKINE  ,DIAG_SMS,SENSOR_TAB,INTBUF_TAB,INT24E2EUSE,
-     8       FORNEQS ,MULTI_FVM,INTERFACES)
+     8       FORNEQS ,MULTI_FVM,INTERFACES,IBID)
            CALL SPMD_I7XVCOM2(
      1       IPARI   ,X       ,V       ,MS      ,
      2       IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
@@ -1196,7 +1212,7 @@ C-------------dans inttri------
      5       IGRBRIC ,TEMP   ,2       ,IRLEN7T ,ISLEN7T ,
      6       IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
      7       ISLEN20E,IKINE  ,DIAG_SMS,SENSOR_TAB,INTBUF_TAB,INT24E2EUSE,
-     8       FORNEQS ,MULTI_FVM,INTERFACES)
+     8       FORNEQS ,MULTI_FVM,INTERFACES,IBID)
         ENDIF
           NRTM_T = IPARI(4,N)
           ESHIFT = 0
@@ -1212,7 +1228,7 @@ C
           IF(TT>=TS) THEN  ! If interface is activated
             CALL I7MAIN_TRI(TIMERS,
      1 IPARI   ,X       ,V         ,
-     2 MS      ,N            ,ITASK        ,WAG     ,WEIGHT    ,
+     2 MS      ,N            ,ITASK        ,WEIGHT    ,
      3 ISENDTO ,IRECVFROM    ,RETRI        ,IAD_ELEM,FR_ELEM   ,
      4 ITAB    ,KINET        ,TEMP         ,NRTM_T  ,RENUM     ,
      5 NSNFIOLD,ESHIFT       ,IBID         ,IBID    ,IBID      ,
@@ -1256,8 +1272,8 @@ C
      5 IBID    ,INTBUF_TAB   ,H3D_DATA     ,GLOB_THERM)
         ENDIF
 C
-        IF (IMACH==3.AND.NSPMD>1.AND.RETRI==1) THEN
-C--------- a modifier par interface---
+        IF (NSPMD>1.AND.RETRI==1) THEN
+C--------- to be modified by interface---
          CALL SPMD_IFRONT(
      1    IPARI  ,NEWFRONT,ISENDTO ,IRECVFROM,
      2    NSENSOR,NBINTC ,INTLIST ,IBIDLEN ,IBIDLEN  ,
@@ -1311,14 +1327,9 @@ C
      1       IPARI     ,INTBUF_TAB(N),X   ,V  ,
      2       N         ,ITASK ,COUNT_REMSLV ,COUNT_REMSLVE  )
         ENDIF
-C-------------dans intfop2------
-        IF(IMACH==3) THEN
-C LINDMAX = NCONT*MULTIMP
-          LINDMAX  = IPARI(18,N)*IPARI(23,N)
-        ELSE
-C LINDMAX = NSN*MULTIMP
-          LINDMAX  = IPARI(5,N)*IPARI(23,N)
-        ENDIF
+C-------------in intfop2------
+        LINDMAX  = IPARI(18,N)*IPARI(23,N)
+
 C
         IF(NTY==7)THEN
 C
@@ -1363,14 +1374,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    cp_inttd     ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_inttd0   ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    cp_int       ../engine/source/implicit/produt_v.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    cp_inttd     ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_inttd0   ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    cp_int       ../engine/source/implicit/produt_v.F
+!||--- uses       -----------------------------------------------------
+!||    imp_inttd    ../engine/share/modules/imp_mod_def.F90
+!||====================================================================
       SUBROUTINE CP_INTTD(NT_IMP1,NUMIMP ,NS_IMP,NE_IMP,IND_IMP,NUMIMP1)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1419,12 +1431,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    sav_inttd   ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv    ../engine/source/implicit/imp_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    sav_inttd   ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv    ../engine/source/implicit/imp_solv.F
+!||--- uses       -----------------------------------------------------
+!||    imp_inttd   ../engine/share/modules/imp_mod_def.F90
+!||====================================================================
       SUBROUTINE SAV_INTTD(NT_IMP,NUMIMP,NS_IMP,NE_IMP,IND_IMP,
      1                     NUMIMP1)
 C-----------------------------------------------
@@ -1455,8 +1468,8 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
        IF(NT_IMP1==0) RETURN
-C------dans NS_IMP1 input: NT_IMP1 , output:d'abord NT_IMP1, + NT_IMP-NT_IMP1
-C------dans NS_IMP input:d'abord NT_IMP1, + NT_IMP-NT_IMP1, output: NT_IMP
+C------in NS_IMP1 input: NT_IMP1 , output:d'abord NT_IMP1, + NT_IMP-NT_IMP1
+C------in NS_IMP input:d'abord NT_IMP1, + NT_IMP-NT_IMP1, output: NT_IMP
        NT_IMP = NT_IMP + NT_IMP1
        IF(NSPMD>1) THEN
         IAD1 = 0
@@ -1522,16 +1535,17 @@ C--------change ind for NUM_IMP---
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_rnumcd    ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    i10main_tri   ../engine/source/interfaces/intsort/i10main_tri.F
-      !||    i20main_tri   ../engine/source/interfaces/intsort/i20main_tri.F
-      !||    i22main_tri   ../engine/source/interfaces/intsort/i22main_tri.F
-      !||    i23main_tri   ../engine/source/interfaces/intsort/i23main_tri.F
-      !||    i7main_tri    ../engine/source/interfaces/intsort/i7main_tri.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    imp_rnumcd    ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    i10main_tri   ../engine/source/interfaces/intsort/i10main_tri.F
+!||    i20main_tri   ../engine/source/interfaces/intsort/i20main_tri.F
+!||    i22main_tri   ../engine/source/interfaces/intsort/i22main_tri.F
+!||    i23main_tri   ../engine/source/interfaces/intsort/i23main_tri.F
+!||    i7main_tri    ../engine/source/interfaces/intsort/i7main_tri.F
+!||--- uses       -----------------------------------------------------
+!||    imp_inttd     ../engine/share/modules/imp_mod_def.F90
+!||====================================================================
       SUBROUTINE IMP_RNUMCD(CAND_N ,NIN,NSN,NUM_IMP,INDEX )
 C-----------------------------------------------
 C   M o d u l e s
@@ -1563,15 +1577,16 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_dtkin       ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv        ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_intdt       ../engine/source/implicit/imp_int_k.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    imp_dtkin       ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv        ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    imp_intdt       ../engine/source/implicit/imp_int_k.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    sensor_mod      ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE IMP_DTKIN(
      1       IPARI ,INTBUF_TAB      ,X       ,V       ,
      2       VR    ,ITAB   ,D_IMP   ,DR_IMP  ,NBINTC  ,
@@ -1664,19 +1679,20 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    kin_knl         ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv        ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    dim_kinkn       ../engine/source/implicit/imp_int_k.F
-      !||    iddl_mint       ../engine/source/implicit/imp_int_k.F
-      !||    ini_kinkn       ../engine/source/implicit/imp_int_k.F
-      !||    rbe3_mint       ../engine/source/implicit/imp_int_k.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
-      !||    imp_knon        ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    kin_knl         ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv        ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    dim_kinkn       ../engine/source/implicit/imp_int_k.F
+!||    iddl_mint       ../engine/source/implicit/imp_int_k.F
+!||    ini_kinkn       ../engine/source/implicit/imp_int_k.F
+!||    rbe3_mint       ../engine/source/implicit/imp_int_k.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
+!||    imp_knon        ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE KIN_KNL(         
      1    IPARI     ,INTBUF_TAB ,NUM_IMP   ,NS_IMP    ,NE_IMP    ,
      2    NPBY      ,LPBY      ,ITAB      ,NRBYAC    ,IRBYAC    ,
@@ -1731,7 +1747,7 @@ C
       IF (NUMN_KN > 0) THEN
        ID_KN = -7    
        N = 0
-C------------valeur nega pour les nsl nodes-----      
+C------------negative value for nsl nodes-----
        DO I=1,NUMNOD
        IF (NDOFII(I)>0) THEN
         N = N + 1
@@ -1832,14 +1848,15 @@ C------------return origine NDOFI(I)----
       ENDDO 
       RETURN
       END
-      !||====================================================================
-      !||    dim_kinkn       ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    kin_knl         ../engine/source/implicit/imp_int_k.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
-      !||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dim_kinkn       ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    kin_knl         ../engine/source/implicit/imp_int_k.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
+!||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE DIM_KINKN(
      1    NPBY      ,LPBY      ,NRBYAC    ,IRBYAC    ,NINT2     ,
      2    IINT2     ,IPARI     ,INTBUF_TAB,INLOC     ,IBFV      ,
@@ -1969,14 +1986,15 @@ C-----Rbe2------
 C----6---------------------------------------------------------------7---------8
       RETURN
       END
-      !||====================================================================
-      !||    ini_kinkn       ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    kin_knl         ../engine/source/implicit/imp_int_k.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
-      !||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ini_kinkn       ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    kin_knl         ../engine/source/implicit/imp_int_k.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
+!||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INI_KINKN(
      1    NPBY      ,LPBY      ,NRBYAC    ,IRBYAC    ,NINT2     ,
      2    IINT2     ,IPARI     ,INTBUF_TAB,INLOC     ,IBFV      ,
@@ -2161,12 +2179,13 @@ C ---
 C----6---------------------------------------------------------------7---------8
       RETURN
       END
-      !||====================================================================
-      !||    iddl_mint       ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    kin_knl         ../engine/source/implicit/imp_int_k.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    iddl_mint       ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    kin_knl         ../engine/source/implicit/imp_int_k.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE IDDL_MINT(NML    ,IML     ,IDDL    ,IKC     ,NDOF     ,
      .                    IDDLM   ,IPARI   ,INTBUF_TAB,IDDML   ,NRB_FR   ,
      .                    IFRSR   ,IDDMR   ,NI2_FR  ,IFRS2   ,IDDMI2   ,
@@ -2259,7 +2278,7 @@ C------MSR(NMN)-----
          ELSE
           NNOD=4
          ENDIF
-C-------si noeud main est dependant aussi-----
+C------ SI Main node is also dependent -----
          DO M=1,NNOD
           NJ=INTBUF_TAB(N)%IRECTM(NL+M)
           NDD = 0
@@ -2318,13 +2337,13 @@ C------RBE2
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_mint   ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    kin_knl     ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    rbe3cl      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_mint   ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    kin_knl     ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    rbe3cl      ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE RBE3_MINT(IRBE3   ,LRBE3    ,FRBE3   ,X     ,SKEW,
      .                     NRBE3_KN,IRBE3_KN ,FRCDI   ,MRCDI )
 C-----------------------------------------------
@@ -2370,18 +2389,19 @@ C-------
 C
       RETURN
       END
-      !||====================================================================
-      !||    int_matv        ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    mav_lt2         ../engine/source/implicit/produt_v.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp3_a2b        ../engine/source/airbag/monv_imp0.F
-      !||    imp3_u2x        ../engine/source/airbag/monv_imp0.F
-      !||    int_fku3        ../engine/source/implicit/imp_int_k.F
-      !||    zeror           ../engine/source/system/zero.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_knon        ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    int_matv        ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    mav_lt2         ../engine/source/implicit/produt_v.F
+!||--- calls      -----------------------------------------------------
+!||    imp3_a2b        ../engine/source/airbag/monv_imp0.F
+!||    imp3_u2x        ../engine/source/airbag/monv_imp0.F
+!||    int_fku3        ../engine/source/implicit/imp_int_k.F
+!||    zeror           ../engine/source/system/zero.F
+!||--- uses       -----------------------------------------------------
+!||    imp_knon        ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INT_MATV(IPARI  ,INTBUF_TAB     ,NDOF   ,NUM_IMP,
      1                    NS_IMP ,NE_IMP ,INDEX2 ,A      ,AR     ,
      2                    V      ,X      ,MS     ,X_IMP  ,IBFV   ,
@@ -2460,23 +2480,24 @@ C----------------
       ENDIF     
       RETURN
       END
-      !||====================================================================
-      !||    int_matvp       ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    mav_lth         ../engine/source/implicit/produt_v.F
-      !||    mav_lth0        ../engine/source/implicit/produt_v.F
-      !||    mav_ltp         ../engine/source/implicit/produt_v.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp3_a2b        ../engine/source/airbag/monv_imp0.F
-      !||    imp3_u2x        ../engine/source/airbag/monv_imp0.F
-      !||    int_fku3        ../engine/source/implicit/imp_int_k.F
-      !||    spmd_ifcd       ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_ifcf       ../engine/source/mpi/implicit/imp_spmd.F
-      !||    zeror           ../engine/source/system/zero.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm        ../engine/share/modules/imp_intm.F
-      !||    imp_knon        ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    int_matvp       ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    mav_lth         ../engine/source/implicit/produt_v.F
+!||    mav_lth0        ../engine/source/implicit/produt_v.F
+!||    mav_ltp         ../engine/source/implicit/produt_v.F
+!||--- calls      -----------------------------------------------------
+!||    imp3_a2b        ../engine/source/airbag/monv_imp0.F
+!||    imp3_u2x        ../engine/source/airbag/monv_imp0.F
+!||    int_fku3        ../engine/source/implicit/imp_int_k.F
+!||    spmd_ifcd       ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_ifcf       ../engine/source/mpi/implicit/imp_spmd.F
+!||    zeror           ../engine/source/system/zero.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm        ../engine/share/modules/imp_intm.F
+!||    imp_knon        ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INT_MATVP(IPARI  ,INTBUF_TAB  ,NDOF   ,NUM_IMP,
      1                    NS_IMP ,NE_IMP ,INDEX2 ,A      ,AR     ,
      2                    V      ,X      ,MS     ,X_IMP  ,IBFV   ,
@@ -2527,7 +2548,7 @@ C----------------actualise D,X_IMP---------------------
      .              IRBE2_KN,ID_KNM4)
       CALL ZEROR(A,NUMNOD)
       IF ((NRB_KN+NI2_KN+NRBE3_KN)>0) CALL ZEROR(AR,NUMNOD)
-C-----renvoie D (NSL) et receive DFI (NSREM)-----
+C----- Return of (nsl) and Receive DFI (nsrem) ------
       IF ((NSREM+NSL)>0) THEN
        CALL SPMD_IFCD(D  ,NSL, NSREM)
        IF (NSREM>0) CALL ZEROR(FFI,NSREM)
@@ -2564,17 +2585,18 @@ C----------------
       ENDIF     
       RETURN
       END
-      !||====================================================================
-      !||    int_fku3        ../engine/source/implicit/imp_int_k.F
-      !||--- called by ------------------------------------------------------
-      !||    int_matv        ../engine/source/implicit/imp_int_k.F
-      !||    int_matvp       ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    i10fku3         ../engine/source/interfaces/int10/i10ke3.F
-      !||    i11fku3         ../engine/source/interfaces/int11/i11ke3.F
-      !||    i7fku3          ../engine/source/interfaces/int07/i7ke3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    int_fku3        ../engine/source/implicit/imp_int_k.F
+!||--- called by ------------------------------------------------------
+!||    int_matv        ../engine/source/implicit/imp_int_k.F
+!||    int_matvp       ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    i10fku3         ../engine/source/interfaces/int10/i10ke3.F
+!||    i11fku3         ../engine/source/interfaces/int11/i11ke3.F
+!||    i7fku3          ../engine/source/interfaces/int07/i7ke3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INT_FKU3(A      ,V      ,MS     ,D      ,IPARI  ,
      1                   INTBUF_TAB      ,X      ,NUM_IMP,NS_IMP ,
      1                    NE_IMP ,INDEX2 ,IUPD   )
@@ -2630,9 +2652,9 @@ c      IMP_INT7 = I_INT7
 C      
       RETURN
       END
-      !||====================================================================
-      !||    pr_kint   ../engine/source/implicit/imp_int_k.F
-      !||====================================================================
+!||====================================================================
+!||    pr_kint   ../engine/source/implicit/imp_int_k.F
+!||====================================================================
       SUBROUTINE PR_KINT(NDDLI  ,IMCONV,
      3                  IADI  ,JDII  ,ITOK   ,DIAG_I ,LT_I   )
 C-----------------------------------------------

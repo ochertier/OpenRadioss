@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,14 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    chk_shell_offset_mod   ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    chk_shell_offset_mod   ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||====================================================================
       module chk_shell_offset_mod
+
+      implicit none
 
       contains
 ! ======================================================================================================================
@@ -35,40 +37,37 @@
 !=======================================================================================================================
 !!\brief This subroutine check if there is shell offset in the model
 !=======================================================================================================================
-      !||====================================================================
-      !||    chk_shell_offset   ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur             ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    chk_shell_offset   ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
+!||--- called by ------------------------------------------------------
+!||    lectur             ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
         subroutine chk_shell_offset(                                           &
-                       ngroup,    nparg,      iparg,        npropg,            &
-                       numgeo,      geo,    ioffset)
+          ngroup,    nparg,      iparg,        npropg,            &
+          numgeo,      geo,    ioffset)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use constant_mod, only : zero,half
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           integer, intent (in   )                         :: ngroup           !< number of elem group
-          integer, intent (in   )                         :: nparg            !< 1er dim of iparg
-          integer, intent (in   )                         :: npropg           !< 1er dim of geo
+          integer, intent (in   )                         :: nparg            !< first dimension of iparg
+          integer, intent (in   )                         :: npropg           !< first dimension of geo
           integer, intent (in   )                         :: numgeo           !< number of prop
           integer, intent (in   ) ,dimension(nparg,ngroup):: iparg            !< elem group array
           integer, intent (inout)                         :: ioffset          !< flag for offset treatment
-          my_real, intent (in   ),dimension(npropg,numgeo):: geo              !< property array
+          real(kind=WP), intent (in   ),dimension(npropg,numgeo):: geo              !< property array
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i,igtyp,ity,nnode,pid,ifoset,ng
-          my_real shelloff
+          integer :: igtyp,ity,pid,ifoset,ng
+          real(kind=WP) :: shelloff
 !
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24cork3   ../engine/source/interfaces/int24/i24cork3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24cork3   ../engine/source/interfaces/int24/i24cork3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24CORK3(
      1               JLT     ,X      ,IRECT ,NSV   ,CAND_E ,
      2               CAND_N  ,STF    ,STFN  ,STIF  ,
@@ -50,7 +50,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*),
-     .        JLT,IDT, NOINT ,NDDIM, NSN, ITY, NIN, IGSTI,
+     .        JLT , NSN, ITY, NIN, IGSTI,
      .        NVOISIN(8,*), KINI(*)
       INTEGER IXX(MVSIZ,13), NSVG(MVSIZ), ITRIV(4,MVSIZ)
 C     REAL
@@ -67,7 +67,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,IL, L, NN, IG,JFT, IX,  NI
+      INTEGER I   , L, NN, IG, IX,  NI
 C-----------------------------------------------
 C
 C
@@ -477,16 +477,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    i24corp3   ../engine/source/interfaces/int24/i24cork3.F
-      !||--- called by ------------------------------------------------------
-      !||    i7forcf3   ../engine/source/interfaces/int07/i7ke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret      ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm   ../engine/share/modules/imp_intm.F
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24corp3   ../engine/source/interfaces/int24/i24cork3.F
+!||--- called by ------------------------------------------------------
+!||    i7forcf3   ../engine/source/interfaces/int07/i7ke3.F
+!||--- calls      -----------------------------------------------------
+!||    arret      ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm   ../engine/share/modules/imp_intm.F
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24CORP3(JLT   ,X     ,IRECT ,CAND_E  ,CAND_N  ,
      1                   STIF  ,H1    ,H2    ,H3      ,H4      ,
      2                   N1    ,N2    ,N3    ,IX1     ,IX2     ,
@@ -523,7 +523,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,NI, L, NN, NS ,NE,IC(4,4),ITQ
+      INTEGER I   ,NI, L, NN, NS ,NE,IC(4,4),ITQ
       DATA IC / 
      1    3, 4, 1, 2, 
      2    4, 1, 2, 3,
@@ -572,15 +572,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i24corkm    ../engine/source/interfaces/int24/i24cork3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24ke3      ../engine/source/interfaces/int24/i24ke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24msegv1   ../engine/source/interfaces/int24/i24cork3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box     ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24corkm    ../engine/source/interfaces/int24/i24cork3.F
+!||--- called by ------------------------------------------------------
+!||    i24ke3      ../engine/source/interfaces/int24/i24ke3.F
+!||--- calls      -----------------------------------------------------
+!||    i24msegv1   ../engine/source/interfaces/int24/i24cork3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box     ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24CORKM(
      1               JLT     ,X      ,IRECT ,NSV   ,CAND_E ,
      2               CAND_N  ,STIF   ,STIF_IMP,XI     ,YI    ,
@@ -618,7 +618,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,IL, L, NN, IG,JFT, IX,  NI,IRTLM(4),NE,NEI
+      INTEGER I   , L, NN, IG,  NI,IRTLM(4),NE,NEI
 C-----------------------------------------------
 C
 C
@@ -675,11 +675,11 @@ C
 C      
       RETURN
       END
-      !||====================================================================
-      !||    i24msegv1   ../engine/source/interfaces/int24/i24cork3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24corkm    ../engine/source/interfaces/int24/i24cork3.F
-      !||====================================================================
+!||====================================================================
+!||    i24msegv1   ../engine/source/interfaces/int24/i24cork3.F
+!||--- called by ------------------------------------------------------
+!||    i24corkm    ../engine/source/interfaces/int24/i24cork3.F
+!||====================================================================
       SUBROUTINE I24MSEGV1(IRTLMV  ,SUBTRIA,IRTLM ,NVOISIN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -692,7 +692,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IX,IC(4,20),IXX(13),j
+      INTEGER IX,IC(4,20),IXX(13)
 C-----------------------------------------------
 C        11-------10       
 C         |\ 19  /|        

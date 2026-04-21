@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,20 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_init_idel   ../engine/source/mpi/interfaces/spmd_init_idel.F
-      !||--- called by ------------------------------------------------------
-      !||    chkload          ../engine/source/interfaces/chkload.F
-      !||    chkstfn3n        ../engine/source/interfaces/interf/chkstfn3.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_init_idel        ../engine/source/mpi/interfaces/spmd_init_idel.F
+!||--- called by ------------------------------------------------------
+!||    chkload               ../engine/source/interfaces/chkload.F
+!||    chkstfn3n             ../engine/source/interfaces/interf/chkstfn3.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_INIT_IDEL(NINDEX,IRSIZE, IRECV,IAD_ELEM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -80,7 +83,7 @@ C-----------------------------------------------
         ENDIF
       ENDDO
 C
-C Test reception envoi NINDEX
+C Nindex shipping test
 C
       DO I = 1, NSPMD
         SIZ = (IAD_ELEM(1,I+1)-IAD_ELEM(1,I))

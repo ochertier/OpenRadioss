@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C new subroutine for simplified flow (euler euqation
+C new subroutine for simplified flow (euler equation
 C can be used also for Navier stocks equation
-      !||====================================================================
-      !||    ffint3    ../engine/source/elements/solid/solide/ffint3.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3    ../engine/source/elements/solid/solide/sforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod   ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ffint3    ../engine/source/elements/solid/solide/ffint3.F
+!||--- called by ------------------------------------------------------
+!||    sforc3    ../engine/source/elements/solid/solide/sforc3.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod   ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE FFINT3(
      1   SIG,     DFE,     PX1,     PX2,
      2   PX3,     PX4,     PY1,     PY2,
@@ -81,11 +81,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
       my_real
      .   S1(MVSIZ), S2(MVSIZ), S3(MVSIZ),
      .   S4(MVSIZ), S5(MVSIZ), S6(MVSIZ),    
-     .   FINT,FINTD,P(MVSIZ)
+     .   FINT,P(MVSIZ)
 C-----------------------------------------------
       IF(ALE%GLOBAL%ICAA == 0)THEN
         DO I=1,NEL

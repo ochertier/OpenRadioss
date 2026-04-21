@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    c_pon          ../starter/source/restart/ddsplit/c_pon.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c_pon          ../starter/source/restart/ddsplit/c_pon.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE C_PON(ADDCNE ,NUMNOD_L,NODGLOB ,LCNE_L,I2NSNT ,
      2                 ADDCNI2,LCNI2_L ,MONVOL  ,
      3                 CEP    ,PROC    ,NNMV_L  ,NNMVC_L,ADDCNE_PXFEM,
@@ -60,11 +60,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,I,K0,K1,K2,K6,IS,NN,IAD,J,ITY,OFFC,OFFTG,NN_L,N1,
-     .        ITYP,NVENT,IV,IADHOL,KIBHOL,KIBJET,NNC,KAD,NAV,IPVENT
+      INTEGER N,I,K0,K1,K2,K6,IS,NN,J,ITY,OFFC,OFFTG,NN_L,N1,
+     .        ITYP,NVENT,IV,IADHOL,KIBHOL,KIBJET,NNC,NAV,IPVENT
 C-----------------------------------------------
 C
-C taille Matrice connectivite locale
+C Local connectivity matrix size
 C
       LCNE_L = 0
       DO I = 1, NUMNOD_L
@@ -116,7 +116,7 @@ C
         ENDDO
       ENDIF
 C
-C Taille connectivite airbag
+C Airbag connectivity size
 C
       OFFC = NUMELS+NUMELQ
       OFFTG =NUMELS+NUMELQ+ NUMELC+NUMELT+NUMELP+NUMELR

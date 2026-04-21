@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_compute_dt   ../engine/source/multifluid/multi_compute_dt.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain            ../engine/source/ale/alemain.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod        ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod      ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    multi_compute_dt   ../engine/source/multifluid/multi_compute_dt.F
+!||--- called by ------------------------------------------------------
+!||    alemain            ../engine/source/ale/alemain.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod        ../engine/share/resol/initbuf.F
+!||    multi_fvm_mod      ../common_source/modules/ale/multi_fvm_mod.F90
+!||====================================================================
       SUBROUTINE MULTI_COMPUTE_DT(DT2T, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .     PM, IPM, MULTI_FVM, WGRID, XGRID,
      .     NELTST, ITYPTST)
@@ -38,6 +39,7 @@ C-----------------------------------------------
       USE INITBUF_MOD      
       USE ELBUFDEF_MOD
       USE MULTI_FVM_MOD
+      use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -109,7 +111,7 @@ C     Number of faces in an element
                NB_FACE = 3
             ENDIF
             
-C     Flux computation
+C     Computation flow
             DTEL(1:NEL) = ZERO
             DO II = 1, NEL
                I = II + NFT               

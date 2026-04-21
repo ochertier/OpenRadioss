@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps120             ../engine/source/materials/mat/mat120/sigeps120.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw                 ../engine/source/materials/mat_share/mulaw.F90
-      !||--- calls      -----------------------------------------------------
-      !||    sigeps120_dp          ../engine/source/materials/mat/mat120/sigeps120_dp.F
-      !||    sigeps120_tab_dp      ../engine/source/materials/mat/mat120/sigeps120_tab_dp.F
-      !||    sigeps120_tab_vm      ../engine/source/materials/mat/mat120/sigeps120_tab_vm.F
-      !||    sigeps120_vm          ../engine/source/materials/mat/mat120/sigeps120_vm.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps120             ../engine/source/materials/mat/mat120/sigeps120.F
+!||--- called by ------------------------------------------------------
+!||    mulaw                 ../engine/source/materials/mat_share/mulaw.F90
+!||--- calls      -----------------------------------------------------
+!||    sigeps120_dp          ../engine/source/materials/mat/mat120/sigeps120_dp.F
+!||    sigeps120_tab_dp      ../engine/source/materials/mat/mat120/sigeps120_tab_dp.F
+!||    sigeps120_tab_vm      ../engine/source/materials/mat/mat120/sigeps120_tab_vm.F
+!||    sigeps120_vm          ../engine/source/materials/mat/mat120/sigeps120_vm.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE SIGEPS120(
      1           NEL     ,NUPARAM ,NUVAR   ,NVARTMP ,NUMTABL ,ITABLE  ,
      2           TABLE   ,TIME    ,TIMESTEP,SOUNDSP ,UVAR    ,VARTMP  ,
@@ -41,7 +41,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5           DEPSXX  ,DEPSYY  ,DEPSZZ  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      6           SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7           SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     8           JTHE    ,INLOC   ,DPLANL  ,DMG     ,DMG_SCALE)
+     8           INLOC   ,DPLANL  ,DMG     ,DMG_SCALE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -58,7 +58,7 @@ C-----------------------------------------------
 C----------------------------------------------------------------
 C  D u m m y   A R G U M E N T S
 C----------------------------------------------------------------
-      INTEGER :: NEL,NUPARAM,NUVAR,NVARTMP,NUMTABL,JTHE,INLOC
+      INTEGER :: NEL,NUPARAM,NUVAR,NVARTMP,NUMTABL,INLOC
       my_real :: TIME,TIMESTEP
       INTEGER ,DIMENSION(NEL)     ,INTENT(IN) :: NGL
       INTEGER ,DIMENSION(NUMTABL) ,INTENT(IN) :: ITABLE
@@ -92,7 +92,7 @@ c------------------------------------------------------------------
      5         SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6         SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      7         NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,
-     8         JTHE    ,INLOC   ,DPLANL  ,DMG     , DMG_SCALE)
+     8         INLOC   ,DPLANL  ,DMG     , DMG_SCALE)
         ELSE                     ! tabulated Von-Mises formulation
           CALL SIGEPS120_TAB_VM(
      1         NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
@@ -102,7 +102,7 @@ c------------------------------------------------------------------
      5         SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6         SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      7         NTABLE  ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,
-     8         JTHE    ,INLOC   ,DPLANL  ,DMG     , DMG_SCALE)
+     8         INLOC   ,DPLANL  ,DMG     , DMG_SCALE)
         END IF
 c
       ELSE

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_grpart           ../starter/source/groups/hm_read_grpart.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_submodpart            ../starter/source/groups/hm_submodpart.F
-      !||    hm_tagpart               ../starter/source/groups/hm_tagpart.F
-      !||    udouble_igr              ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_grpart           ../starter/source/groups/hm_read_grpart.F
+!||--- called by ------------------------------------------------------
+!||    lectur                   ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_submodpart            ../starter/source/groups/hm_submodpart.F
+!||    hm_tagpart               ../starter/source/groups/hm_tagpart.F
+!||    udouble_igr              ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_GRPART(
      1           IGRPART   ,IPART   ,ISUBMOD ,FLAG    ,NGRPRT  ,
      2           LSUBMODEL ,SUBSET  )
@@ -87,7 +87,7 @@ C-----------------------------------------------
 C    IGRPART(IGS)%ID : GROUP identifier
 C    IGRPART(IGS)%TITLE : GROUP title
 C    IGRPART(IGS)%NENTITY : Entities (parts) number of the GROUP
-C    IGRPART(IGS)%GRTYPE : TYPE ( 0-NOEUDS, 1-BRIC, 2-QUAD,   3-SHELL_4N,
+C    IGRPART(IGS)%GRTYPE : TYPE ( 0-NODES, 1-BRIC, 2-QUAD,   3-SHELL_4N,
 !                                4-TRUSS,  5-BEAM, 6-SPRINGS,7-SHELL_3N,
 C                               -1 PARTS)
 !!                   GRTYPE --- > OBSOLETE
@@ -117,7 +117,7 @@ C-----------------------------------------------
       TITR1='PART GROUP'
 C-------------------------
 C-------------------------
-C groupes d' elements + init IGRN(1,IGS)
+C Elements groups + Init igrn (1, IGS)
 C-------------------------
 
       CALL HM_OPTION_START('/GRPART')
@@ -152,33 +152,33 @@ C-------------------------
             IGRPART(IGS)%TITLE=TITR
 C
             IF(KEY(1:6) == 'GRPART')THEN
-C             groupes de groupes
+C             groups of groups
               IGRPART(IGS)%NENTITY=-1
               IGRPART(IGS)%GRPGRP=2
               IT0=IT0+1
             ELSEIF(KEY(1:4) == 'PART' .OR. KEY(1:6) == 'SUBSET' .OR. KEY(1:3) == 'MAT' .OR. KEY(1:4) == 'PROP') THEN
-C             groupe de SUBSET PART MAT OU PROP
+C             group of SUBSET PART MAT OR PROP
               IT2=IT2+1
               IF (FLAG == 0) THEN
                 IGRPART(IGS)%NENTITY=0
                 IGRPART(IGS)%GRPGRP=3
               ENDIF
             ELSEIF(KEY(1:4) == 'GENE' )THEN
-C            groupe d'elements dans un box
+C            group of elements in a box
              IT3=IT3+1
              IF (FLAG == 0) THEN
                IGRPART(IGS)%NENTITY=0
                IGRPART(IGS)%GRPGRP=4
              ENDIF
             ELSEIF(KEY(1:6) == 'SUBMOD')THEN
-C             groupe de parts dans un submodel
+C             group of parts in a submodel
               IT4=IT4+1
               IF (FLAG  == 0) THEN
                 IGRPART(IGS)%NENTITY=0
                 IGRPART(IGS)%GRPGRP=5
               ENDIF
             ELSEIF(KEY(1:8) == 'GEN_INCR' )THEN
-C            groupe d'elements gen_inc first last offset
+C            group of elements gen_inc first last offset
               IT5=IT5+1
               IF (FLAG == 0) THEN
                 IGRPART(IGS)%NENTITY=0
@@ -189,7 +189,7 @@ C
       ENDDO
 
 C-------------------------------------
-C Recherche des ID doubles
+C Search for double IDs
 C-------------------------------------
       IF (FLAG == 0) THEN
         DO IGS=1,NGRPRT
@@ -198,7 +198,7 @@ C-------------------------------------
         CALL UDOUBLE_IGR(LIST_IGR,NGRPRT,MES,0,BID)
       ENDIF
 C-------------------------
-C groupes de SUBSETS,PART,MAT,PROP
+C groups of subsets, share, mat, prop
 C-------------------------                                                      
       IF (IT2 > 0) THEN
         CALL HM_OPTION_START('/GRPART')
@@ -280,7 +280,7 @@ C-------------------------
       ENDIF
       
 C-------------------------
-C groupes de SUBMODELS
+C groups of SUBMODELS
 C-------------------------
       IF (IT4 > 0) THEN   
         CALL HM_OPTION_START('/GRPART')                                               

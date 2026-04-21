@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,14 +24,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !> \brief Writing TH/SURF tabs in restart file
 !! \details  /PLOAD option
 
-      !||====================================================================
-      !||    w_th_surf_pload   ../starter/source/restart/ddsplit/w_th_surf_pload.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit           ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    w_th_surf_pload   ../starter/source/restart/ddsplit/w_th_surf_pload.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit           ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod       ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE W_TH_SURF_PLOAD(IBCL  ,NODLOCAL  ,PROC  ,LEN_IA  ,CEP    ,
      .                          TH_SURF,NUMNOD   ,NIBCLD ,NCONLD  ,LEN_CEP,
      .                          OFF    )
@@ -62,7 +62,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, NSEGP, NSEGPL, NL, NS, N4
+      INTEGER I, J, NSEGP, NSEGPL, NS, N4
       INTEGER, DIMENSION(:),ALLOCATABLE :: KSEGS_L, SEGS_L
 C-----------------------------------------------
 C   S o u r c e   L i n e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_anim_ply_xyznor   ../engine/source/mpi/anim/spmd_anim_ply_xyznor.F
-      !||--- called by ------------------------------------------------------
-      !||    xyznor_ply             ../engine/source/output/anim/generate/xyznor_ply.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_s_c              ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod            ../engine/share/modules/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_anim_ply_xyznor   ../engine/source/mpi/anim/spmd_anim_ply_xyznor.F
+!||--- called by ------------------------------------------------------
+!||    xyznor_ply             ../engine/source/output/anim/generate/xyznor_ply.F
+!||--- calls      -----------------------------------------------------
+!||    write_s_c              ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod            ../engine/share/modules/plyxfem_mod.F
+!||    spmd_comm_world_mod    ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_ANIM_PLY_XYZNOR( NODGLOB,IPLY,XNORM,EMPSIZPL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -37,6 +38,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -52,16 +54,16 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NODGLOB(*)
-      INTEGER IPLY,IDPLY,EMPSIZPL
+      INTEGER IPLY, EMPSIZPL
       my_real
      .   XNORM(3,*)
-      REAL R4
+ 
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGOFF,MSGOFF2,STAT(MPI_STATUS_SIZE,NSPMD-1), IERR
-      INTEGER I,N,ND,EMPL,P,ITAG,INORM(3),K,IXNN
+      INTEGER I, ND, EMPL, P, ITAG, INORM(3), IXNN
 
       INTEGER PLYSIZ
       my_real
@@ -82,7 +84,7 @@ C
         PLYSIZ  = PLYNOD (IPLY)%PLYNUMNODS
         ALLOCATE(WRTBUF(3,PLYSIZG(IPLY)))
 
-C Les plynods du proc 0
+C The plynods of proc 0
         DO ND=1,PLYSIZ
              I = PLYNOD(IPLY)%NODES(ND)
              EMPL =  PLYNOD(IPLY)%PLYNODID(ND)-EMPSIZPL
@@ -103,7 +105,7 @@ C Les plynods du proc 0
              WRTBUF(2,EMPL)= INORM(2)
              WRTBUF(3,EMPL)= INORM(3)
         END DO
-C Les plynods des autres procs
+C The plynods of other procs
            DO P=2,NSPMD
               ALLOCATE(IRECBUF(PLYIADNOD(IPLY,P)))
               ALLOCATE(FRECBUF(3,PLYIADNOD(IPLY,P)))

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_a           ../engine/source/mpi/forces/spmd_exch_a.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    acceleration_dp_mod   ../engine/share/modules/acceleration_dp_mod.F
-      !||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_a           ../engine/source/mpi/forces/spmd_exch_a.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    h3d_mod               ../engine/share/modules/h3d_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_A(
-     1   A        ,AR     ,STIFN,STIFR ,MS  ,
+     1   A, ADP        ,AR     ,STIFN,STIFR ,MS  ,
      2   IAD_ELEM ,FR_ELEM,MSNF ,IFSUBM,SIZE,
      3   LENR     ,FTHE   ,MCP  ,DMSPH ,CONDN, 
      4   MS_2D,MCP_OFF,
      5   FORNEQS  ,NFACNIT,LENC  ,FCONT ,H3D_DATA ,
      6   FNCONT  ,FTCONT, GLOB_THERM)
 C--------------------------------------
-      USE ACCELERATION_DP_MOD
       USE H3D_MOD
       USE GLOB_THERM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -69,6 +69,8 @@ C-----------------------------------------------
      .        AR(3,*),STIFN(*),STIFR(*),MS(*),MSNF(*),
      .        FTHE(*),MCP(*), DMSPH(*),CONDN(*)
       my_real, DIMENSION(3,*), INTENT(inout), TARGET :: A
+      REAL(kind=8), DIMENSION(3,*), INTENT(inout), TARGET :: ADP
+
       my_real
      .        MS_2D(*),MCP_OFF(*),
      .        FORNEQS(3,*)
@@ -81,7 +83,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,MSGOFF,
-     .        SIZ,J,K,L,NB_NOD,IADMSPH,
+     .        SIZ,J,L,NB_NOD,IADMSPH,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD)
@@ -95,7 +97,7 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 #ifdef MYREAL4
-        ACC_POINTER=>ACC_DP(1:3,1:NUMNOD)
+        ACC_POINTER=>ADP(1:3,1:NUMNOD)
 #else
         ACC_POINTER=>A(1:3,1:NUMNOD)
 #endif    
@@ -173,7 +175,7 @@ C preparation envoi  partie fixe (elem) a proc I
               L = L + SIZE
             END DO
           ENDIF
-C cas 2D la masse est recalculee a chaque cycle, il faut la cumuler
+C 2D case the mass is recalculated at each cycle, it must be accumulated
         ELSEIF(N2D/=0.AND.IFSUBM==1)THEN
           IF(IRODDL/=0) THEN
 #include      "vectorize.inc"
@@ -265,7 +267,7 @@ C cas 2D la masse est recalculee a chaque cycle, il faut la cumuler
           ENDIF
         ENDIF
 C
-C -- plus la thermique
+C -- more the thermal
 C
       ELSE
          IF (N2D==0.AND.IFSUBM==0) THEN
@@ -316,7 +318,7 @@ C
               END DO
             ENDIF
           ENDIF
-C cas 2D la masse est recalculee a chaque cycle, il faut la cumuler
+C 2D case the mass is recalculated at each cycle, it must be accumulated
         ELSEIF(N2D/=0.AND.IFSUBM==1)THEN
           IF(IRODDL/=0) THEN
 #include      "vectorize.inc"
@@ -445,8 +447,8 @@ C --- /CONT/MAX output
           END DO
        ENDIF
 C
-C --- /PCONT/MAX output
-      IF(H3D_DATA%N_VECT_CONT_MAX /=0.AND.NINTSTAMP==0) THEN
+C --- /PCONT/MAX output or /PCONT
+      IF(LENC>=6) THEN
 #include      "vectorize.inc"
           DO J=IAD_ELEM(1,I),IAD_ELEM(1,I+1)-1
              NOD = FR_ELEM(J)
@@ -468,7 +470,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
        IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN
           MSGTYP = MSGOFF 
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -502,7 +504,7 @@ C
       END IF
 C
       DO I = 1, NSPMD
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
         NB_NOD = IAD_ELEM(1,I+1)-IAD_ELEM(1,I)
         IF(NB_NOD>0)THEN
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -626,7 +628,7 @@ C cas 2D
               ENDIF
             ENDIF
 C
-C ----plus la thermique
+C ----more the thermal
 C
          ELSE
           IF (N2D==0.AND.IFSUBM==0) THEN
@@ -821,8 +823,8 @@ C --- /CONT/MAX output
           END DO
        ENDIF
 C
-C --- /PCONT/MAX output
-      IF(H3D_DATA%N_VECT_PCONT_MAX /=0.AND.NINTSTAMP==0) THEN
+C --- /PCONT/MAX or /PCONT output
+      IF(LENC>=6) THEN
 #include      "vectorize.inc"
           DO J=IAD_ELEM(1,I),IAD_ELEM(1,I+1)-1
              NOD = FR_ELEM(J)

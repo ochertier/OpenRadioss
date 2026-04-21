@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cr_spline_length     ../common_source/tools/interpolation/cr_spline_length.F
-      !||--- called by ------------------------------------------------------
-      !||    detcord              ../starter/source/initial_conditions/detonation/detcord.F
-      !||--- calls      -----------------------------------------------------
-      !||    cr_spline_interpol   ../common_source/tools/interpolation/cr_spline_interpol.F
-      !||    cr_spline_knots      ../common_source/tools/interpolation/cr_spline_knots.F
-      !||====================================================================
-       SUBROUTINE CR_SPLINE_LENGTH(LOCAL_PT,ALPHA,T,LEN)
+!||====================================================================
+!||    cr_spline_length     ../common_source/tools/interpolation/cr_spline_length.F
+!||--- called by ------------------------------------------------------
+!||    detcord              ../starter/source/initial_conditions/detonation/detcord.F
+!||--- calls      -----------------------------------------------------
+!||    cr_spline_interpol   ../common_source/tools/interpolation/cr_spline_interpol.F
+!||    cr_spline_knots      ../common_source/tools/interpolation/cr_spline_knots.F
+!||====================================================================
+      SUBROUTINE CR_SPLINE_LENGTH(LOCAL_PT,ALPHA,T,LEN)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
-       !compute SPLINE length with third order method (SIMPSON)
-       !  INPUT  - LOCAL_PT : 4 control points P0,P1,P2,P3
-       !  INPUT  - ALPHA : CCR SPLINE PARAMETER
-       !  INPUT  - T : position [0,1] on SPLINE [T1,T2].  1.0 means full spline length
-       !  OUTPUT - LEN : length of the curve parametrised with t in [0,T]  T<=1.0
+        !compute SPLINE length with third order method (SIMPSON)
+        !  INPUT - Local_pt: 4 control points P0, P1, P2, P3
+        !  INPUT  - ALPHA : CCR SPLINE PARAMETER
+        !  INPUT  - T : position [0,1] on SPLINE [T1,T2].  1.0 means full spline length
+        !  OUTPUT - LEN : length of the curve parametrised with t in [0,T]  T<=1.0
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,8 +49,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        my_real               :: KNOTS(4),C(3),C_D(3),C_DD(3),T_,DT, COLD(3)
-        my_real               :: F,F_D,VAL(6),K(2)
+        my_real               :: KNOTS(4),C(3),C_D(3),C_DD(3),T_
+        my_real               :: VAL(6),K(2)
         INTEGER            :: ITER,NITER
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -58,18 +58,18 @@ C-----------------------------------------------
         CALL CR_SPLINE_KNOTS(LOCAL_PT, KNOTS, ALPHA)
         LEN = 0.
         NITER=20
-         DO ITER=1,NITER-1
+        DO ITER=1,NITER-1
           !first point
           T_=T*(1.*ITER-1.)/(NITER-1.)
           CALL CR_SPLINE_INTERPOL(LOCAL_PT,KNOTS,T_,C,C_D,C_DD)
           VAL(1)=SQRT(DOT_PRODUCT(C_D(1:3),C_D(1:3)))
           K(1)=KNOTS(2)+T_*(KNOTS(3)-KNOTS(2))
-          !middle point
+          !Middle Point
           T_=(1.*ITER-1.)/(1.*NITER-1.) + 0.5*1./(NITER-1.)
           T_=T_*T
           CALL CR_SPLINE_INTERPOL(LOCAL_PT,KNOTS,T_,C,C_D,C_DD)
           VAL(2)=SQRT(DOT_PRODUCT(C_D(1:3),C_D(1:3)))
-          !last point
+          !Last point
           T_=T*(1.*ITER)/(NITER-1.)
           CALL CR_SPLINE_INTERPOL(LOCAL_PT,KNOTS,T_,C,C_D,C_DD)
           VAL(3)=SQRT(DOT_PRODUCT(C_D(1:3),C_D(1:3)))
@@ -77,4 +77,4 @@ C-----------------------------------------------
           !length
           LEN = LEN+(K(2)-K(1))/6. * (VAL(1)+4.*VAL(2)+VAL(3))
         ENDDO
-       END SUBROUTINE CR_SPLINE_LENGTH
+      END SUBROUTINE CR_SPLINE_LENGTH

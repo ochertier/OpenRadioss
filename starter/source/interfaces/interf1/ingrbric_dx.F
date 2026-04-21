@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ingrbric_dx            ../starter/source/interfaces/interf1/ingrbric_dx.F
-      !||--- called by ------------------------------------------------------
-      !||    lecint                 ../starter/source/interfaces/interf1/lecint.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ingrbric_dx            ../starter/source/interfaces/interf1/ingrbric_dx.F
+!||--- called by ------------------------------------------------------
+!||    lecint                 ../starter/source/interfaces/interf1/lecint.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INGRBRIC_DX(NBRIC    , IBUFSSG, GLOBAL_GAP     , IXS        , X      ,  
      .                       NOINT    , TITR   , IS_GAP_COMPUTED, PM         , IPM    ,
      .                       IDDLEVEL , ISTIFF , AUTO_RHO       , AUTO_LENGTH,
@@ -49,6 +49,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE MULTI_FVM_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -71,7 +72,7 @@ C-----------------------------------------------
       my_real, INTENT(INOUT) :: AUTO_RHO, AUTO_LENGTH
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM      
 C-----------------------------------------------
-C   L o c a l   V a r a i b l e s
+C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I, J, J2, IEDG, CONNECT1(12), CONNECT2(12),IE,IMAT, ENUM, ILAW
       my_real :: MIN_X,MIN_Y,MIN_Z
@@ -79,7 +80,7 @@ C-----------------------------------------------
       my_real :: XX,YY,ZZ
       my_real :: XX2,YY2,ZZ2
       my_real :: DX,DY,DZ
-      my_real :: DIAG, DIAG_MAX , MAX_RATIO, LEN_EDGE(12), LMAX, LMIN, RATIO2
+      my_real :: DIAG, DIAG_MAX , LEN_EDGE(12), LMAX, LMIN, RATIO2
       my_real :: RHO_MAX, RHO0
       LOGICAL :: CHECK_ASPECT 
       CHARACTER(LEN=NCHARTITLE) :: MSGTITL

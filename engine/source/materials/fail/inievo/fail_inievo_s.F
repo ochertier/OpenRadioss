@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_inievo_s         ../engine/source/materials/fail/inievo/fail_inievo_s.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain                 ../engine/source/materials/mat_share/mmain.F90
-      !||    mulaw                 ../engine/source/materials/mat_share/mulaw.F90
-      !||    usermat_solid         ../engine/source/materials/mat_share/usermat_solid.F
-      !||--- calls      -----------------------------------------------------
-      !||    jacobiew_v            ../engine/source/materials/mat_share/jacobview_v.F
-      !||    table_vinterp         ../engine/source/tools/curve/table_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fail_inievo_s         ../engine/source/materials/fail/inievo/fail_inievo_s.F
+!||--- called by ------------------------------------------------------
+!||    mmain                 ../engine/source/materials/mat_share/mmain.F90
+!||    mulaw                 ../engine/source/materials/mat_share/mulaw.F90
+!||    usermat_solid         ../engine/source/materials/mat_share/usermat_solid.F
+!||--- calls      -----------------------------------------------------
+!||    jacobiew_v            ../engine/source/materials/mat_share/jacobview_v.F
+!||    table_vinterp         ../engine/source/tools/curve/table_tools.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE FAIL_INIEVO_S (
-     1     NEL      ,NUPARAM  ,NUVAR    ,
+     1     NEL      ,NUPARAM  ,NUVAR    ,NVARTMP  ,VARTMP   ,
      2     TABLE    ,NTABLF   ,ITABLF   ,TIME     ,UPARAM   , 
      3     NGL      ,ALDT     ,DPLA     ,EPSP     ,UVAR     ,     
      4     SIGNXX   ,SIGNYY   ,SIGNZZ   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,            
@@ -61,8 +61,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: 
-     .        NEL,NUPARAM,NUVAR,NGL(NEL),NPG,IPG,NTABLF,INLOC
+      INTEGER, INTENT(IN) :: NEL,NUPARAM,NUVAR,NVARTMP,NPG,IPG,NTABLF,INLOC
+      INTEGER, INTENT(IN) :: NGL(NEL)
+      INTEGER, DIMENSION(NEL,NVARTMP) ,INTENT(INOUT) :: VARTMP
       INTEGER, DIMENSION(NTABLF) ,INTENT(IN) :: ITABLF
       my_real, INTENT(IN) ::
      .        TIME,UPARAM(NUPARAM),ALDT(NEL),
@@ -78,8 +79,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,INDX(NEL),NINDX,FAILIP,IPOS(NEL,2),
-     .        NROT(NEL),NINIEVO,ILEN
+      INTEGER I,J,K,L,INDX(NEL),NINDX,FAILIP,NROT(NEL),NINIEVO,ILEN
       INTEGER, DIMENSION(:), ALLOCATABLE :: 
      .        INITYPE,EVOTYPE,EVOSHAP,COMPTYP,TAB_ID,
      .        TAB_EL,FCRIT 
@@ -89,7 +89,7 @@ C-----------------------------------------------
       my_real, DIMENSION(:,:), ALLOCATABLE :: 
      .        DMGINI,DMGEVO
       my_real
-     .        LAMBDA,FAC,DF,L0(NEL)     ,TRIAX(NEL)  ,EPSF(NEL)   ,
+     .        L0(NEL)     ,TRIAX(NEL)  ,EPSF(NEL)   ,
      .        DEPSF(NEL)  ,XVEC(NEL,2)  ,SXX,SYY,SZZ ,SIZEFAC(NEL),
      .        EPSMOD(NEL) ,P(NEL)       ,SVM(NEL)    ,DMGMAX(NEL) ,
      .        DMGMUL(NEL) ,SIGTENS(NEL,3,3)          ,SIG_PR(NEL,3),
@@ -262,8 +262,8 @@ c
             ENDDO
         END SELECT
         XVEC(1:NEL,2)   = EPSP(1:NEL)/SR_REF(J)
-        IPOS(1:NEL,1:2) = 1
-        CALL TABLE_VINTERP(TABLE(TAB_ID(J)),NEL,NEL,IPOS,XVEC,EPSF,DEPSF)
+        K = J*2 - 1
+        CALL TABLE_VINTERP(TABLE(TAB_ID(J)),NEL,NEL,VARTMP(1:NEL,K:K+1),XVEC,EPSF,DEPSF)
         EPSF(1:NEL) = EPSF(1:NEL)*FSCALE(J)
 c
         ! Compute the element size regularization factor 
@@ -283,8 +283,8 @@ c
                 XVEC(I,2) = (SVM(I) + INI_P1(J)*P(I))/MAX(SIGPMAJ(I),EM08)
               ENDDO            
           END SELECT
-          IPOS(1:NEL,1:2) = 1
-          CALL TABLE_VINTERP(TABLE(TAB_EL(J)),NEL,NEL,IPOS,XVEC,SIZEFAC,DSIZE)
+          L = K + NINIEVO*2
+          CALL TABLE_VINTERP(TABLE(TAB_EL(J)),NEL,NEL,VARTMP(1:NEL,L:L+1),XVEC,SIZEFAC,DSIZE)
           SIZEFAC(1:NEL) = SIZEFAC(1:NEL)*ELSCAL(J)
           EPSF(1:NEL) = EPSF(1:NEL)*SIZEFAC(1:NEL)
         ENDIF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_skin_scalar        ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                 ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_fld_strain         ../engine/source/output/h3d/h3d_results/h3d_fld_strain.F
-      !||    h3d_fld_tsh            ../engine/source/output/h3d/h3d_results/h3d_fld_tsh.F
-      !||    h3d_pre_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||    h3d_sol_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||    initbuf                ../engine/share/resol/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_inc_mod            ../engine/share/modules/h3d_inc_mod.F
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    schlieren_mod          ../engine/share/modules/schlieren_mod.F
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    table_mod              ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_skin_scalar        ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                 ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_fld_strain         ../engine/source/output/h3d/h3d_results/h3d_fld_strain.F
+!||    h3d_fld_tsh            ../engine/source/output/h3d/h3d_results/h3d_fld_tsh.F
+!||    h3d_pre_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||    h3d_sol_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||    initbuf                ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    h3d_inc_mod            ../engine/share/modules/h3d_inc_mod.F
+!||    h3d_mod                ../engine/share/modules/h3d_mod.F
+!||    initbuf_mod            ../engine/share/resol/initbuf.F
+!||    loads_mod              ../common_source/modules/loads/loads_mod.F90
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||    pblast_mod             ../common_source/modules/loads/pblast_mod.F90
+!||    schlieren_mod          ../engine/share/modules/schlieren_mod.F
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    table_mod              ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE H3D_SKIN_SCALAR(
      .                  ELBUF_TAB       ,SKIN_SCALAR  ,IFUNC     ,IPARG       ,GEO         ,
      .                  IXS             ,IXS10 ,IXS16 , IXS20   ,PM          ,
@@ -67,6 +70,7 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE ELBUFDEF_MOD
       USE PBLAST_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -111,21 +115,17 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real
      .   VALUE(MVSIZ),RINDX,STRAIN(3,MVSIZ),F_EXP,F_GAUSS(9)
-      INTEGER I,I1,II,J,NG,NEL,NPTR,NPTS,NPTT,NLAY,L,IFAIL,ILAY,
-     .        IR,IS,IT,IL,MLW, NUVAR,IUS,LENF,PTF,PTM,PTS,NFAIL,
-     .        N,NN,K,K1,K2,JTURB,MT,IMID,IALEL,IPID,ISH3N,NNI,
-     .        NN1,NN2,NN3,NN4,NN5,NN6,NN9,NF,BUF,NVARF,
-     .        OFFSET,IHBE,NPTM,NPG, MPT,IPT,IADD,IADR,IPMAT,IFAILT,
-     .        IIGEO,IADI,ISUBSTACK,ITHK,NB_PLYOFF,IUVAR,IDX,IPOS,ITRIMAT,
-     .        IALEFVM_FLG, IMAT,IADBUF,NUPARAM,IOK_PART(MVSIZ),
+      INTEGER I, NG, NEL, NPTR, NPTS, NPTT, NLAY, IFAIL, ILAY, 
+     .        IR,IS,IT,MLW,NFAIL,
+     .        N,IOK_PART(MVSIZ),
      .        MLWI,PID,MID,MX,KCVT,IOR_TSH,ICSTR
       INTEGER 
-     .        IS_WRITTEN_VALUE(MVSIZ),NFRAC,IU(4),IV,NB_FACE,KFACE,NSKIN
+     .        IS_WRITTEN_VALUE(MVSIZ),NSKIN
       INTEGER NGL(MVSIZ) 
-      TYPE(G_BUFEL_)  ,POINTER :: GBUF     
-      TYPE(L_BUFEL_)  ,POINTER :: LBUF  
-      TYPE(BUF_MAT_)  ,POINTER :: MBUF      
-      TYPE(BUF_LAY_)  ,POINTER :: BUFLY     
+ 
+ 
+ 
+ 
       TYPE(BUF_FAIL_) ,POINTER :: FBUF 
       DATA F_GAUSS / 
      9 1.000000000000000,1.732050807568877,1.290994448735806,
@@ -499,27 +499,29 @@ C------for solid elements
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    h3d_pre_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_skin_scalar        ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                 ../engine/source/tools/curve/finter.F
-      !||    finter_smooth          ../engine/source/tools/curve/finter_smooth.F
-      !||    get_u_numsens          ../engine/source/user_interface/usensor.F
-      !||    get_u_sens_fpar        ../engine/source/user_interface/usensor.F
-      !||    get_u_sens_ipar        ../engine/source/user_interface/usensor.F
-      !||    get_u_sens_value       ../engine/source/user_interface/usensor.F
-      !||    press_seg3             ../engine/source/loads/general/load_pcyl/press_seg3.F
-      !||    set_u_sens_value       ../engine/source/user_interface/usensor.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_inc_mod            ../engine/share/modules/h3d_inc_mod.F
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    table_mod              ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_pre_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||--- called by ------------------------------------------------------
+!||    h3d_skin_scalar        ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||--- calls      -----------------------------------------------------
+!||    finter                 ../engine/source/tools/curve/finter.F
+!||    finter_smooth          ../engine/source/tools/curve/finter_smooth.F
+!||    get_u_numsens          ../engine/source/user_interface/usensor.F
+!||    get_u_sens_fpar        ../engine/source/user_interface/usensor.F
+!||    get_u_sens_ipar        ../engine/source/user_interface/usensor.F
+!||    get_u_sens_value       ../engine/source/user_interface/usensor.F
+!||    press_seg3             ../engine/source/loads/general/load_pcyl/press_seg3.F
+!||    set_u_sens_value       ../engine/source/user_interface/usensor.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_inc_mod            ../engine/share/modules/h3d_inc_mod.F
+!||    h3d_mod                ../engine/share/modules/h3d_mod.F
+!||    loads_mod              ../common_source/modules/loads/loads_mod.F90
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||    pblast_mod             ../common_source/modules/loads/pblast_mod.F90
+!||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    table_mod              ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE H3D_PRE_SKIN_SCALAR(SKIN_SCALAR,NODAL_IPART,
      .                   IS_WRITTEN_SKIN  ,H3D_PART,INFO1   ,KEYWORD ,
      .                   IB ,ILOADP,LLOADP,FAC ,NPC,TF ,SENSOR_TAB,
@@ -563,7 +565,7 @@ C-----------------------------------------------
      .   SKIN_SCALAR(*),TF(*),X(3,*),V(3,*)
       my_real, INTENT(IN) :: DIS(3,NUMNOD)
       CHARACTER(LEN=NCHARLINE100) :: KEYWORD
-      TYPE (H3D_DATABASE) :: H3D_DATA
+ 
       INTEGER , DIMENSION(NUMSKINP0), INTENT(IN) ::  IMAPSKP
       INTEGER
      .   H3D_PART(*),IS_WRITTEN_SKIN(*),INFO1,NPC(*)
@@ -581,27 +583,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5,
-     .        IAD ,NP ,IFUNC ,NPRES,NSKIN0,NSKIN1,N1FRAM,DIR_HSP,I,N
-      INTEGER K1, K2, K3, ISENS,K,LL,IERR,
+      INTEGER NL, N1, N2, N3, N4, N5, 
+     .        IAD ,NP ,IFUNC ,NSKIN0,DIR_HSP,I,N
+      INTEGER K1, K2, K3, ISENS, K, 
      .        N_OLD, ISMOOTH,IDEL,NINTERP ,NPL,TAGN1,TAGN2,TAGN3,TAGN4,
-     .        FUN_CX,FUN_VEL,DIR_VEL,IFRA2, IANIM,IJK,UP_BOUND,
-     .        IZ_UPDATE,ABAC_ID,ISIZ_SEG,IERR1,
-     .        Phi_I, ID, USER_ID, ITA_SHIFT,NDT,NDT0,
-     .        NITER,ITER,IMODEL,IL,IS,SEGCONT,FUN_HSP,IFRA1,IFLOAD,NP0,NPI
+     .        FUN_CX,FUN_VEL,DIR_VEL,IFRA2,ISIZ_SEG,
+     .        ID,IL,SEGCONT,FUN_HSP,IFRA1,IFLOAD,NP0
       my_real
-     .   NX, NY, NZ, AXI, AA, A0, VV, FX, FY, FZ, AX, DYDX, TS,
-     .   SIXTH,X_OLD, F1, F2,XSENS,FCX,FCY,FCYPINCH,FP,
-     .   FCX1,FCY1,FCX2,FCY2,VX,VY,VZ,VEL,VSEG,NORM
-      my_real FINTER, ZFx,ZFy,ZFz, ZZFx,ZZFy,ZZFz,PS, Zx,Zy,Zz,FINTER_SMOOTH
+     .   NX, NY, NZ, AA, DYDX, TS,
+     .   X_OLD, F1,XSENS,FCX,FCY,FCYPINCH,FP,
+     .   FCX1,FCY1,FCX2,FCY2,VEL,VSEG,NORM
+      my_real FINTER, FINTER_SMOOTH
 c
-      my_real COORMEAN,YMEAN,ZMEAN,PVEL,NSIGN,DNORM,
-     .        Xdet,Ydet,Zdet,Tdet,Wtnt,PMIN,Dx,Dy,Dz,NORMD, P,
-     .        FAC_M_bb, FAC_L_bb, FAC_T_bb, FAC_P_bb, FAC_I_bb, T0INF_LOC, TA_SHIFT, TT_STAR
+      my_real COORMEAN,PVEL,NSIGN,
+     .        Tdet, P
 
       INTEGER :: IFUN,IFRA,M1,M2,NDIM,NPOINT, IIOUT,SHIFT,FUNCTYPE
-       my_real :: A11,A12,A21,A22,B1,B2,DET,LEN,DIRX,DIRY,DIRZ,
-     .     BETA,GAMMA,R,S,RMAX,XFACR,XFACT,YFAC,SEGP,PRESS,DISP
+       my_real :: LEN, DIRX, DIRY, DIRZ, 
+     .     RMAX,XFACR,XFACT,YFAC,SEGP,PRESS,DISP
       my_real, DIMENSION(3) :: P0,DIR,A,B,C,D,M
      
       EXTERNAL FINTER,FINTER_SMOOTH

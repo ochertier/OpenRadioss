@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- called by ------------------------------------------------------
-      !||    recukin    ../engine/source/implicit/recudis.F
-      !||--- calls      -----------------------------------------------------
-      !||    rby_imp2   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||    rby_imp5   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||    rby_imp7   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||    rby_imrd   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||====================================================================
+!||====================================================================
+!||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- called by ------------------------------------------------------
+!||    recukin    ../engine/source/implicit/recudis.F
+!||--- calls      -----------------------------------------------------
+!||    rby_imp2   ../engine/source/constraints/general/rbody/rby_impd.F
+!||    rby_imp5   ../engine/source/constraints/general/rbody/rby_impd.F
+!||    rby_imp7   ../engine/source/constraints/general/rbody/rby_impd.F
+!||    rby_imrd   ../engine/source/constraints/general/rbody/rby_impd.F
+!||====================================================================
       SUBROUTINE RBY_IMPD(NRBYAC,IRBYAC,X  ,RBY,LPBY,
      1                   NPBY,SKEW,ISKEW,ITAB,WEIGHT,
      2                   MS ,IN   ,NDOF ,D   ,
@@ -95,11 +95,11 @@ C-----------------------------------------------
 
       RETURN
       END
-      !||====================================================================
-      !||    rby_imp2   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- called by ------------------------------------------------------
-      !||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||====================================================================
+!||====================================================================
+!||    rby_imp2   ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- called by ------------------------------------------------------
+!||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
+!||====================================================================
       SUBROUTINE RBY_IMP2(
      1                  X  ,RBY ,NOD  ,
      1                  NBY,SKEW,ISKEW,ITAB,WEIGHT,
@@ -113,25 +113,20 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NOD(*), NBY(*), ISKEW(*),ITAB(*), WEIGHT(*)
       INTEGER NDOF(*)
-C     REAL
-      my_real
-     .   X(3,*), RBY(*),SKEW(LSKEW,*),IN(*),MS(*),D(3,*),DR(3,*)
+      my_real X(3,*), RBY(*),SKEW(LSKEW,*),IN(*),MS(*),D(3,*),DR(3,*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER M, NSN,  I, N
-C     REAL
-      my_real
-     .   XS,YS,ZS
+      my_real XS,YS,ZS
 C-----------------------------------------------
       M    =NBY(1)
 C optimisation spmd
-      IF (IMACH==3.AND.M<0) RETURN
+      IF (M<0) RETURN
       NSN  =NBY(2)
 C       IF (NDOF(M)<6) WRITE(*,*)'WARNING'
        DO I=1,NSN
@@ -151,11 +146,11 @@ C       IF (NDOF(M)<6) WRITE(*,*)'WARNING'
 C
       RETURN
       END
-      !||====================================================================
-      !||    rby_imp3   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- called by ------------------------------------------------------
-      !||    fr_u2dd    ../engine/source/mpi/implicit/imp_fri.F
-      !||====================================================================
+!||====================================================================
+!||    rby_imp3   ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- called by ------------------------------------------------------
+!||    fr_u2dd    ../engine/source/mpi/implicit/imp_fri.F
+!||====================================================================
       SUBROUTINE RBY_IMP3(X   ,M   ,N   ,D   ,DR   ,
      .                    A   ,AR  )
 C-----------------------------------------------
@@ -194,17 +189,20 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    rby_imrd   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- called by ------------------------------------------------------
-      !||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- calls      -----------------------------------------------------
-      !||    rby_imp4   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||====================================================================
+!||====================================================================
+!||    rby_imrd      ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- called by ------------------------------------------------------
+!||    rby_impd      ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- calls      -----------------------------------------------------
+!||    rby_imp4      ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod   ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE RBY_IMRD(NRBYAC,IRBYAC,X  ,RBY,LPBY,
      1                   NPBY,SKEW,ISKEW,ITAB,WEIGHT,
      2                   MS ,IN  ,NDOF ,D   ,
      3                   DR ,IXR )
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -255,11 +253,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    rby_imp4   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- called by ------------------------------------------------------
-      !||    rby_imrd   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||====================================================================
+!||====================================================================
+!||    rby_imp4   ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- called by ------------------------------------------------------
+!||    rby_imrd   ../engine/source/constraints/general/rbody/rby_impd.F
+!||====================================================================
       SUBROUTINE RBY_IMP4(X  ,N1 ,N2  ,M   ,D  ,DR )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -273,7 +271,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N ,K,IT,NP
+      INTEGER  K,IT,NP
       my_real
      .   XS,YS,ZS,X1(3),X2(3),DRX,DRY,DRZ,L0,L1,S
 C-----------------------------------------------
@@ -337,11 +335,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    rby_imp5   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- called by ------------------------------------------------------
-      !||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||====================================================================
+!||====================================================================
+!||    rby_imp5   ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- called by ------------------------------------------------------
+!||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
+!||====================================================================
       SUBROUTINE RBY_IMP5(
      1                  X  ,RBY ,NOD  ,ITRMAX,
      1                  NBY,SKEW,ISKEW,ITAB,WEIGHT,
@@ -355,27 +353,21 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NOD(*), NBY(*), ISKEW(*),ITAB(*), WEIGHT(*)
       INTEGER NDOF(*),ITRMAX
-C     REAL
-      my_real
-     .   X(3,*), RBY(*),SKEW(LSKEW,*),IN(*),MS(*),D(3,*),DR(3,*)
+      my_real X(3,*), RBY(*),SKEW(LSKEW,*),IN(*),MS(*),D(3,*),DR(3,*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER M, NSN,  I, N,NP,J
-C     REAL
-      my_real
-     .   XS,YS,ZS,LMAX,RMAX,LSM1,DRX,DRY,DRZ,A,B
-      my_real,
-     .         DIMENSION(:),ALLOCATABLE :: LSM
+      my_real XS,YS,ZS,LMAX,RMAX,LSM1,DRX,DRY,DRZ,A
+      my_real,DIMENSION(:),ALLOCATABLE :: LSM
 C-----------------------------------------------
       M    =NBY(1)
 C optimisation spmd
-      IF (IMACH==3.AND.M<0) RETURN
+      IF (M<0) RETURN
       NSN  =NBY(2)
 C---determine iteration num.
       LMAX = ZERO
@@ -460,13 +452,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    rby_imp7   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- called by ------------------------------------------------------
-      !||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
-      !||--- calls      -----------------------------------------------------
-      !||    velrot     ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||====================================================================
+!||====================================================================
+!||    rby_imp7   ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- called by ------------------------------------------------------
+!||    rby_impd   ../engine/source/constraints/general/rbody/rby_impd.F
+!||--- calls      -----------------------------------------------------
+!||    velrot     ../engine/source/constraints/general/rbe2/rbe2v.F
+!||====================================================================
       SUBROUTINE RBY_IMP7(
      1                  X  ,RBY ,NOD  ,
      1                  NBY,SKEW,ISKEW,ITAB,WEIGHT,
@@ -479,14 +471,13 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NOD(*), NBY(*), ISKEW(*),ITAB(*), WEIGHT(*)
-      INTEGER NDOF(*),ITRMAX
+      INTEGER NDOF(*)
 C     REAL
       my_real
      .   X(3,*), RBY(*),SKEW(LSKEW,*),IN(*),MS(*),D(3,*),DR(3,*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C PURPOSE: calculate displacement increment of secnd node by displacement increment of main node.
@@ -494,7 +485,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER M, NSN,  I, N,NP,J,K
+      INTEGER M, NSN,  I, N,J
 C     REAL
       DOUBLE PRECISION
      . XS(3), DS(3), VRM(3)
@@ -502,7 +493,7 @@ C-----------------------------------------------
 
       M = NBY(1)
 C optimisation spmd
-      IF (IMACH==3.AND.M<0) RETURN
+      IF (M<0) RETURN
 
       DO I = 1, 3
         VRM(I) = DR(I,M)

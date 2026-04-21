@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    int18_law151_init   ../starter/source/interfaces/int18/int18_law151_init.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur              ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    int18_law151_init   ../starter/source/interfaces/int18/int18_law151_init.F
+!||--- called by ------------------------------------------------------
+!||    lectur              ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
         SUBROUTINE INT18_LAW151_INIT(S_APPEND_ARRAY,NINTER,NPARI,
      1                               NUMNOD,NUMELS,NGRBRIC,
      2                               MULTI_FVM,IGRBRIC,IPARI,IXS,
@@ -37,7 +37,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !       initialization of array for /INT18 + LAW 151
 !       
 !       INT18_LAW151_INIT organization :
-!       - x/V/MASS_append :
+!       - X/V/Mass_Append:
 !            * (1:NUMNOD) : classical x/v/mass
 !            * (NUMNOD+1:NUMNOD+NUMELS) : phantom node x/v/mass
 !       - kinet_append :
@@ -49,6 +49,7 @@ C     M o d u l e s
 C-----------------------------------------------   
         USE MULTI_FVM_MOD
         USE GROUPDEF_MOD
+        use element_mod , only :nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

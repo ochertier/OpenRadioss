@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvmesh0     ../engine/source/airbag/fvmesh0.F
-      !||--- called by ------------------------------------------------------
-      !||    resol       ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    fvbric      ../engine/source/airbag/fvbric.F
-      !||    fvmesh1     ../engine/source/airbag/fvmesh.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod   ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvmesh0       ../engine/source/airbag/fvmesh0.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    fvbric        ../engine/source/airbag/fvbric.F
+!||    fvmesh1       ../engine/source/airbag/fvmesh.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod   ../common_source/modules/elements/element_mod.F90
+!||    fvbag_mod     ../engine/share/modules/fvbag_mod.F
+!||====================================================================
       SUBROUTINE FVMESH0(MONVOL, X, VOLMON, IXS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE FVBAG_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

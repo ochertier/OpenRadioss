@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_ini_part   ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_part   ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../engine/source/output/message/message.F
+!||    arret          ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||    message_mod    ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SMS_INI_PART(IGRPART ,TAGPRT_SMS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -56,7 +56,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IP,IAD,N
+      INTEGER I, IP, N
 C-----------------------------------------------
 C
       IF(IDTGRS==0)THEN
@@ -74,7 +74,6 @@ C
             GO TO 120
           END IF
          END DO
- 100     CONTINUE
          CALL ANCMSG(MSGID=21,ANMODE=ANINFO_BLIND,
      .               I1=-IDTGRS)
          CALL ARRET(2)
@@ -90,13 +89,13 @@ C
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_rby   ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_rby   ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SMS_INI_RBY(
      1  KINET   ,NPRW      ,LPRW     ,NPBY     , LPBY    ,
      2  TAGMSR_RBY_SMS,TAGSLV_RBY_SMS)
@@ -123,12 +122,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, NG, N, JJ, KK, ITY, NEL, NFT, ISOLNOD, 
+      INTEGER I, J, K, N, ITY, 
      .        IAD, IP, ILOC4(4)
-      INTEGER SIZE, LENR, ISMS, NM, NS, IMOV, NSN, ILAGM,
+      INTEGER ISMS, IMOV, NSN, ILAGM, 
      .        N2, N3, N4, N5, N6
-      INTEGER M, MSR, NSNW, KI, NHI, NSMS(2)
-      INTEGER J1, IPERM1(6), IPERM2(6)
+      INTEGER M, MSR, NSNW, KI
+      INTEGER IPERM1(6), IPERM2(6)
       DATA ILOC4/1,3,6,5/
       DATA IPERM1/1,2,3,1,2,3/
       DATA IPERM2/2,3,1,4,4,4/
@@ -192,11 +191,15 @@ C
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_kad   ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_kad    ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_INI_KAD(
      1  IXS     ,IXQ      ,IXC     ,IXT     ,IXP       ,
      2  IXR     ,IXTG     ,IXTG1   ,IXS10   ,IXS16     ,
@@ -208,6 +211,9 @@ C-----------------------------------------------
      8  WEIGHT  ,IRBE2   ,IRBE3     ,LRBE2    ,LRBE3    ,
      9  IAD_ELEM,FR_ELEM ,NPRW      ,LPRW     ,IPART    ,
      A  IGEO    ,NATIV_SMS)
+C-----------------------------------------------
+        USE MY_ALLOC_MOD
+        use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -244,14 +250,19 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, NG, N, JJ, KK, ITY, NEL, NFT, ISOLNOD, 
-     .        IAD, IP, NAD_SMS(NUMNOD),ILOC4(4),IWORK(NUMNOD),
+      INTEGER I, J, K, NG, JJ, KK, ITY, NEL, NFT, ISOLNOD, 
+     .        IAD, IP, ILOC4(4),
      .        TAG8(8), IG, IGTYP
       INTEGER J1, IPERM1(6), IPERM2(6),IPENTA6(6)
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NAD_SMS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IWORK
       DATA ILOC4/1,3,6,5/
       DATA IPERM1/1,2,3,1,2,3/
       DATA IPERM2/2,3,1,4,4,4/
       DATA IPENTA6/1,2,3,5,6,7/
+C-----------------------------------------------
+      CALL MY_ALLOC(NAD_SMS,NUMNOD)
+      CALL MY_ALLOC(IWORK,NUMNOD)
 C-----------------------------------------------
       DO I=1,NUMNOD
         NAD_SMS(I)=0
@@ -526,14 +537,25 @@ C
         KAD_SMS(I+1)=KAD_SMS(I)+NAD_SMS(I)
       END DO
 C-----------------------------------------------
+      DEALLOCATE(NAD_SMS)
+      DEALLOCATE(IWORK)
+
+
       RETURN
       END
-      !||====================================================================
-      !||    nodnx_sms_ini   ../engine/source/ams/sms_init.F
-      !||====================================================================
+!||====================================================================
+!||    nodnx_sms_ini   ../engine/source/ams/sms_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    my_alloc_mod    ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE NODNX_SMS_INI(
      1 NUMNOD  ,NUMEL ,NIX ,MIX ,LIX ,
      2 IX      ,IPARTX,TAGPRT_SMS,NODNX_SMS)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -546,11 +568,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, TAG(NUMNOD)
+      INTEGER I, J, K
+      INTEGER,DIMENSION(:), ALLOCATABLE :: TAG
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C      
+      CALL MY_ALLOC(TAG,NUMNOD)
+C-----------------------------------------------
+ 
       DO J=1,NUMEL
         IF(TAGPRT_SMS(IPARTX(J))==0) CYCLE
 
@@ -569,17 +594,21 @@ C
         ENDDO                                    
       ENDDO                                      
 
+      DEALLOCATE(TAG)
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_kdi     ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    startimeg       ../engine/source/system/timer.F
-      !||    stoptimeg       ../engine/source/system/timer.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_kdi     ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    startimeg       ../engine/source/system/timer.F
+!||    stoptimeg       ../engine/source/system/timer.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    my_alloc_mod    ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_INI_KDI(
      2             IXC      ,IPARG   ,IXS      ,IXT      ,IXP     ,
      3             IXR      ,IXTG    ,IXS10    ,NODNX_SMS,KAD_SMS ,
@@ -595,7 +624,9 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE INTBUFDEF_MOD 
+      USE INTBUFDEF_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -635,24 +666,31 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, JJ, KK, II, IJ, M, N, IERROR, KL
-      INTEGER NG, ITY, NEL, NFT, ISOLNOD,ILOC4(4),TAGA(NUMNOD),
+      INTEGER I, J, K, JJ, KK, IJ
+      INTEGER NG, ITY, NEL, NFT, ISOLNOD,ILOC4(4),
      .        TAG8(8), IG, IGTYP
-      INTEGER MSR, NSN, KI, KJ, NAD_SMS(NUMNOD), 
-     .        NSR
-      INTEGER SIZE, LENR, IAD, L, LLT
-      INTEGER NTY, ILAGM, K10, K11, K12, K13, K14, JI, 
+      INTEGER KJ
+ 
+      INTEGER 
      .         N1, N2, N3, N4, LNEW, ILEV
       INTEGER J1, IPERM1(6), IPERM2(6),IPENTA6(6)
-      INTEGER LSMSPCG
-      INTEGER TAGK(NUMNOD), IK, NK
+ 
+      INTEGER IK
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAGA
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NAD_SMS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAGK
+
       DATA ILOC4/1,3,6,5/
       DATA IPERM1/1,2,3,1,2,3/
       DATA IPERM2/2,3,1,4,4,4/
       DATA IPENTA6/1,2,3,5,6,7/
 C-----------------------------------------------
+      CALL MY_ALLOC(TAGA,NUMNOD)
+      CALL MY_ALLOC(NAD_SMS,NUMNOD)
+      CALL MY_ALLOC(TAGK,NUMNOD)
+C-----------------------------------------------
 C
-C     Construit JDI_SMS, JADS_SMS, etc
+C     Built jdi_sms, jads_sms, etc.
 C     -----------------
       DO I=1,NUMNOD
         NAD_SMS(I)=KAD_SMS(I)
@@ -967,7 +1005,7 @@ C
  252  CONTINUE
 C-------------------------------------------------------------------------
 C     PREPARE KOMPACTION OF ELEMENTARY MATRIX
-C     NODNX_SMS(I) devient le nb de nds connectes a I
+C     Nodnx_sms (i) becomes the nb of NDS connects a i
 C-------------------------------------------------------------------------
       TAGK(1:NUMNOD)=0
       DO I=1,NUMNOD
@@ -993,16 +1031,22 @@ C
 C
       NNZ_SMS = IAD_SMS(NUMNOD+1)
 C
+      DEALLOCATE(TAGA)
+      DEALLOCATE(NAD_SMS)
+      DEALLOCATE(TAGK)
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_jad_1   ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders       ../common_source/tools/sort/my_orders.c
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_jad_1   ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders       ../common_source/tools/sort/my_orders.c
+!||--- uses       -----------------------------------------------------
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    my_alloc_mod    ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_INI_JAD_1(
      2             IXC      ,IPARG   ,IXS      ,IXT      ,IXP     ,
      3             IXR      ,IXTG    ,IXS10    ,NODNX_SMS,JADC_SMS,
@@ -1018,7 +1062,9 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE INTBUFDEF_MOD 
+      USE INTBUFDEF_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1058,17 +1104,26 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, JJ, KK, II, IJ, M, N, IERROR, KL
-      INTEGER MSR, NSN, KI, KJ, NAD_SMS(NUMNOD), 
-     .        NSR
-      INTEGER SIZE, LENR, IAD, L, LLT
-      INTEGER NTY, ILAGM, K10, K11, K12, K13, K14, JI, 
-     .         N1, N2, N3, N4, LNEW, ILEV
-      INTEGER TAGK(NUMNOD), IK, NK, IKK,
-     .        ITRI(NUMNOD),INDEX(2*NUMNOD),INDEX2(NUMNOD), WORK(70000)
+      INTEGER I, J, K, KK, II, N
+      INTEGER NSN, KJ
+      INTEGER L
+      INTEGER NTY, ILAGM, 
+     . N1, N2, N3, N4, ILEV
+      INTEGER IK, NK, IKK,WORK(70000)
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NAD_SMS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAGK
+      INTEGER,DIMENSION(:),ALLOCATABLE :: ITRI
+      INTEGER,DIMENSION(:),ALLOCATABLE :: INDEX1
+      INTEGER,DIMENSION(:),ALLOCATABLE :: INDEX2
+C-------------------------------------------------------------------------
+      CALL MY_ALLOC(NAD_SMS,NUMNOD)
+      CALL MY_ALLOC(TAGK,NUMNOD)
+      CALL MY_ALLOC(ITRI,NUMNOD)
+      CALL MY_ALLOC(INDEX1,2*NUMNOD)
+      CALL MY_ALLOC(INDEX2,NUMNOD)
 C-------------------------------------------------------------------------
 C     PREPARE KOMPACTION OF ELEMENTARY MATRIX
-C     construit IDI_SMS et pointeurs KAD_SMS vers JAD_SMS 
+C     Built Idi_sms and Pointers Kad_sms to Jad_sms 
 C     KJ = KAD_SMS(I),KAD_SMS(I+1)-1 => PK_SMS(KJ) = rang de KDI_SMS(KJ) dans IDI_SMS(I),IDI_SMS(I+1)-1
 C-------------------------------------------------------------------------
       TAGK(1:NUMNOD)=0
@@ -1088,16 +1143,16 @@ C       reordonne IDI_SMS(KJ), KJ=IAD_SMS(I),IAD_SMS(I)+LAD_SMS(I)-1
         DO IK=1,NK
           KJ=IAD_SMS(I)+IK-1
           ITRI(IK) =IDI_SMS(KJ)
-          INDEX(IK)=IK
+          INDEX1(IK)=IK
         END DO  
-        IF(NK/=0) CALL MY_ORDERS(0,WORK,ITRI,INDEX,NK,1)
+        IF(NK/=0) CALL MY_ORDERS(0,WORK,ITRI,INDEX1,NK,1)
         DO IK=1,NK
           KJ=IAD_SMS(I)+IK-1
-          IDI_SMS(KJ)=ITRI(INDEX(IK))
+          IDI_SMS(KJ)=ITRI(INDEX1(IK))
         END DO
 
         DO IK=1,NK
-          IKK        =INDEX(IK)
+          IKK        =INDEX1(IK)
           INDEX2(IKK)=IK
         END DO
 
@@ -1323,16 +1378,25 @@ C reconstruit JAD_SMS
         JAD_SMS(I+1)=JAD_SMS(I)+NODNX_SMS(I)
       END DO
 C-----------------------------------------------
+      DEALLOCATE(NAD_SMS)
+      DEALLOCATE(TAGK)
+      DEALLOCATE(ITRI)
+      DEALLOCATE(INDEX1)
+      DEALLOCATE(INDEX2)
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_jad_2   ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_mod    ../engine/share/modules/intstamp_mod.F
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_jad_2   ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    intstamp_mod    ../engine/share/modules/intstamp_mod.F
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod    ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_INI_JAD_2(
      2             IXC      ,IPARG   ,IXS      ,IXT      ,IXP     ,
      3             IXR      ,IXTG    ,IXS10    ,NODNX_SMS,JADC_SMS,
@@ -1353,6 +1417,8 @@ C-----------------------------------------------
       USE INTSTAMP_MOD
       USE INTBUFDEF_MOD 
       USE MESSAGE_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1397,21 +1463,23 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, JJ, KK, II, IJ, M, N, IERROR, KL,
+      INTEGER I, J, K, KK, II, N, 
      .        NHI, NS
-      INTEGER MSR, NSN, KI, KJ, NAD_SMS(NUMNOD),
-     .        NSR, NSMS(2)
-      INTEGER NSNW, IMOV
-      INTEGER SIZE, LENR, IAD, L, LLT
-      INTEGER NTY, ILAGM, JI, 
+      INTEGER NSN, KJ
+ 
+      INTEGER L
+      INTEGER NTY, ILAGM, 
      .         N1, N2, N3, N4, N5, N6, ISMS, 
      .         NMN, ILEV
       INTEGER IK
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NAD_SMS
+C-------------------------------------------------------------------------
+      CALL MY_ALLOC(NAD_SMS,NUMNOD)
 C-------------------------------------------------------------------------
 C     PREPARE KOMPACTION OF ELEMENTARY MATRIX
 C     KJ = KAD_SMS(I),KAD_SMS(I+1)-1 => PK_SMS(KJ) = rang de KDI_SMS(KJ) dans JDI_SMS(I),JDI_SMS(I+1)-1
 C
-C     Reconstruit JDI_SMS :: Recopie IDI_SMS (connectivite elementaire compactee et triee)
+C     Rebuilt jdi_sms :: copy idi_sms (compact and sorting elementary connectivity)
 C-------------------------------------------------------------------------
       DO I=1,NUMNOD
         DO KJ=IAD_SMS(I),IAD_SMS(I+1)-1
@@ -1620,7 +1688,7 @@ C             Penalty node
         END IF
       END DO
 C------------
-C     Recalcule NNZ_SMS de la matrice compactee
+C     Recalculate NNZ_SMS of the compressed matrix
 C------------
       NNZ_SMS=0
       DO I=1,NUMNOD
@@ -1634,21 +1702,25 @@ C reconstruit JAD_SMS
         JAD_SMS(I+1)=JAD_SMS(I)+NODNX_SMS(I)
       END DO
 C-----------------------------------------------
+      DEALLOCATE(NAD_SMS)
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_jad_3        ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg               ../engine/source/output/message/message.F
-      !||    arret                ../engine/source/system/arret.F
-      !||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
-      !||    spmd_exch_nodnx      ../engine/source/mpi/ams/spmd_exch_nodnx.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_mod         ../engine/share/modules/intstamp_mod.F
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_jad_3        ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol                ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg               ../engine/source/output/message/message.F
+!||    arret                ../engine/source/system/arret.F
+!||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
+!||    spmd_exch_nodnx      ../engine/source/mpi/ams/spmd_exch_nodnx.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod          ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod        ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    intstamp_mod         ../engine/share/modules/intstamp_mod.F
+!||    message_mod          ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod         ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_INI_JAD_3(
      2             IXC      ,IPARG   ,IXS      ,IXT      ,IXP     ,
      3             IXR      ,IXTG    ,IXS10    ,NODNX_SMS,JADC_SMS,
@@ -1667,7 +1739,9 @@ C   M o d u l e s
 C-----------------------------------------------
       USE INTSTAMP_MOD
       USE INTBUFDEF_MOD
-      USE MESSAGE_MOD  
+      USE MESSAGE_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1710,20 +1784,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, JJ, KK, II, IJ, M, N, IERROR, KL
-      INTEGER MSR, NSN, KI, KJ, NAD_SMS(NUMNOD), NAD_SMS_0(NUMNOD), 
-     .        NSR
-      INTEGER SIZE, LENR, IAD, L, LLT
+      INTEGER I, J, K, KK, II, IJ, N
+      INTEGER NSN, KJ
+      INTEGER SIZE, LENR, L
       INTEGER NTY, ILAGM, K10, K11, K12, K13, K14, JI, 
      .         N1, N2, N3, N4,
      .         NMN, ILEV, ERROR
       INTEGER LSMSPCG
       INTEGER IK, K1, K2, KM
+      INTEGER, DIMENSION(:), ALLOCATABLE :: NAD_SMS
+      INTEGER, DIMENSION(:), ALLOCATABLE :: NAD_SMS_0
+C-------------------------------------------------------------------------
+      CALL MY_ALLOC(NAD_SMS,NUMNOD)
+      CALL MY_ALLOC(NAD_SMS_0,NUMNOD)
 C-------------------------------------------------------------------------
 C     PREPARE KOMPACTION OF ELEMENTARY MATRIX
 C     KJ = KAD_SMS(I),KAD_SMS(I+1)-1 => PK_SMS(KJ) = rang de KDI_SMS(KJ) dans JDI_SMS(I),JDI_SMS(I+1)-1
 C
-C     Reconstruit JDI_SMS :: Recopie IDI_SMS (connectivite elementaire compactee et triee)
+C     Rebuilt jdi_sms :: copy idi_sms (compact and sorting elementary connectivity)
 C-------------------------------------------------------------------------
       DO I=1,NUMNOD
         DO KJ=IAD_SMS(I),IAD_SMS(I+1)-1
@@ -1740,7 +1818,7 @@ C
           J =JDI_SMS(KJ)
 cc        IF(I < J)THEN
 C
-C         dichotomie (recherche parmi les voisins ordonnes de J)
+C         dichotomy (search among the ordered neighbors of J)
           K1=JAD_SMS(J)
           K2=JAD_SMS(J)+LAD_SMS(J)-1
  100      CONTINUE
@@ -2088,18 +2166,23 @@ C
         CALL ARRET(2)
       ENDIF
 C-----------------------------------------------
+      DEALLOCATE(NAD_SMS)
+      DEALLOCATE(NAD_SMS_0)
+
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_kin_1        ../engine/source/ams/sms_init.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
-      !||    spmd_frwall_nn       ../engine/source/mpi/kinematic_conditions/spmd_frwall_nn.F
-      !||    spmd_glob_imax9      ../engine/source/mpi/generic/spmd_glob_imax9.F
-      !||    spmd_ibcast          ../engine/source/mpi/generic/spmd_ibcast.F
-      !||    spmd_sd_cj_2         ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_2.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_kin_1        ../engine/source/ams/sms_init.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
+!||    spmd_frwall_nn       ../engine/source/mpi/kinematic_conditions/spmd_frwall_nn.F
+!||    spmd_glob_imax9      ../engine/source/mpi/generic/spmd_glob_imax9.F
+!||    spmd_ibcast          ../engine/source/mpi/generic/spmd_ibcast.F
+!||    spmd_sd_cj_2         ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_2.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod        ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    my_alloc_mod         ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_INI_KIN_1(
      1  NODNX_SMS ,INDX1_SMS ,ILINK     ,RLINK    ,NNLINK    ,
      2  LNLINK    ,TAG_LNK_SMS,FR_LL    ,FR_RL    ,WEIGHT    ,
@@ -2109,7 +2192,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE INTBUFDEF_MOD 
+      USE INTBUFDEF_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2138,12 +2222,16 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER K1, K, I, N, J, IC, NSN, ISMS,
-     .        NOD2ADD(NUMNOD), ICSIZE, IMOV, ITYP, ILAGM, ICOUNT,
-     .        TAG(NUMNOD)
-      INTEGER NTY, ILEV, NMN, NRTS, NRTM,
+     .         ICSIZE, IMOV, ITYP, ILAGM, ICOUNT        
+      INTEGER 
      .        NLINS, NLINM, II, SIZE, LENR
       my_real
      .        IDMAX,ID
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NOD2ADD
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAG
+C-----------------------------------------------
+      CALL MY_ALLOC(NOD2ADD,NUMNOD)
+      CALL MY_ALLOC(TAG,NUMNOD)
 C-----------------------------------------------
 C
       NOD2ADD(1:NUMNOD)=0
@@ -2333,7 +2421,7 @@ C-----------------------------------------------
         IF(NOD2ADD(N)/=0)NODNX_SMS(N)=1
       END DO
 C-----------------------------------------------
-C liste des noeuds sms du mur dans NRWL_SMS (memoire non optimisee).
+C list of sms nodes of the wall in NRWL_SMS (non-optimized memory).
       IF(NRWALL/=0)THEN
         K = 1
         DO N=1,NRWALL
@@ -2351,7 +2439,7 @@ C liste des noeuds sms du mur dans NRWL_SMS (memoire non optimisee).
               END IF
             END DO
           END IF
-C nb de noeuds sms dans le mur.
+C number of sms nodes in the wall.
           NPRW(6*NRWALL+N)=ICOUNT-K
 C for sms_fixvel, etc
           IF(IMOV /= 0)THEN
@@ -2368,16 +2456,19 @@ C for sms_fixvel, etc
         END DO
       END IF
 C-----------------------------------------------
+      DEALLOCATE(NOD2ADD)
+      DEALLOCATE(TAG)
+C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_kin_2     ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_glob_imax9   ../engine/source/mpi/generic/spmd_glob_imax9.F
-      !||    spmd_ibcast       ../engine/source/mpi/generic/spmd_ibcast.F
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_kin_2     ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_glob_imax9   ../engine/source/mpi/generic/spmd_glob_imax9.F
+!||    spmd_ibcast       ../engine/source/mpi/generic/spmd_ibcast.F
+!||====================================================================
       SUBROUTINE SMS_INI_KIN_2(
      1  ILINK     ,RLINK    ,NNLINK    ,LNLINK    ,TAG_LNK_SMS,
      2  FR_LL    ,FR_RL     ,WEIGHT    ,ITAB      ,LJOINT     ,
@@ -2468,22 +2559,25 @@ C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_int       ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_exch_icont   ../engine/source/mpi/nodes/spmd_exch_icont.F
-      !||    spmd_exch_smst2   ../engine/source/mpi/ams/spmd_exch_smst2.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_int       ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_exch_icont   ../engine/source/mpi/nodes/spmd_exch_icont.F
+!||    spmd_exch_smst2   ../engine/source/mpi/ams/spmd_exch_smst2.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    my_alloc_mod      ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_INI_INT(
      1  IPARI    ,INTBUF_TAB     ,IAD_ELEM   ,FR_ELEM  ,INTLIST,
      2  NBINTC)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE INTBUFDEF_MOD 
+      USE INTBUFDEF_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2504,11 +2598,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K, I, N, J, TAG(NUMNOD)
+      INTEGER N, J
       INTEGER NTY, ILEV, NSN, NMN, NRTS, NRTM,
      .        NLINS, NLINM, II, SIZE, LENR
+      INTEGER,DIMENSION(:), ALLOCATABLE :: TAG
 C-----------------------------------------------
-C supprime nds d'interf type 2 des interfs a penalite
+      CALL MY_ALLOC(TAG,NUMNOD)
+C-----------------------------------------------
+C supprime nds d'interf type 2 des interfs a penalty
 C /DT/AMS or /DT/INTER/AMS
 C
       TAG(1:NUMNOD)=0
@@ -2624,19 +2721,20 @@ C
            END IF
       END DO  
 C-----------------------------------------------
+      DEALLOCATE(TAG)
       RETURN
       END
-      !||====================================================================
-      !||    sms_ini_err          ../engine/source/ams/sms_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg               ../engine/source/output/message/message.F
-      !||    arret                ../engine/source/system/arret.F
-      !||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sms_ini_err          ../engine/source/ams/sms_init.F
+!||--- called by ------------------------------------------------------
+!||    resol                ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg               ../engine/source/output/message/message.F
+!||    arret                ../engine/source/system/arret.F
+!||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod          ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SMS_INI_ERR(NPRW    ,LPRW    ,KINET   )
 C-----------------------------------------------
 C   M o d u l e s
@@ -2661,9 +2759,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, M, N, NSN,
+      INTEGER I, 
      .        N1, N2, N3, N4, N5, N6
-      INTEGER ITY, IMOV, ILAGM, ISMS, IERR
+      INTEGER ISMS, IERR
 C-----------------------------------------------
 C
       IERR=0

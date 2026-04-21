@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intvo8            ../engine/source/interfaces/inter3d/intvo8.F
-      !||--- called by ------------------------------------------------------
-      !||    intfop8           ../engine/source/interfaces/interf/intfop8.F
-      !||--- calls      -----------------------------------------------------
-      !||    i8cor3            ../engine/source/interfaces/inter3d/i8cor3.F
-      !||    i8cst3            ../engine/source/interfaces/inter3d/i8cst3.F
-      !||    i8dis3            ../engine/source/interfaces/inter3d/i8dis3.F
-      !||    i8for3            ../engine/source/interfaces/inter3d/i8for3.F
-      !||    i8gap3            ../engine/source/interfaces/inter3d/i8gap3.F
-      !||    i8loc3            ../engine/source/interfaces/inter3d/i8loc3.F
-      !||    i8msr3            ../engine/source/interfaces/inter3d/i8msr3.F
-      !||    spmd_i8_commslv   ../engine/source/mpi/interfaces/spmd_i8tool.F
-      !||    spmd_i8_iloc      ../engine/source/mpi/interfaces/spmd_i8tool.F
-      !||    spmd_i8_index     ../engine/source/mpi/interfaces/spmd_i8tool.F
-      !||    spmd_i8_irtl      ../engine/source/mpi/interfaces/spmd_i8tool.F
-      !||    spmd_i8_updbuf    ../engine/source/mpi/interfaces/spmd_i8tool.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod           ../engine/share/modules/h3d_mod.F
-      !||====================================================================
-      SUBROUTINE INTVO8(IPARI,X ,A  ,
+!||====================================================================
+!||    intvo8            ../engine/source/interfaces/inter3d/intvo8.F
+!||--- called by ------------------------------------------------------
+!||    intfop8           ../engine/source/interfaces/interf/intfop8.F
+!||--- calls      -----------------------------------------------------
+!||    i8cor3            ../engine/source/interfaces/inter3d/i8cor3.F
+!||    i8cst3            ../engine/source/interfaces/inter3d/i8cst3.F
+!||    i8dis3            ../engine/source/interfaces/inter3d/i8dis3.F
+!||    i8for3            ../engine/source/interfaces/inter3d/i8for3.F
+!||    i8gap3            ../engine/source/interfaces/inter3d/i8gap3.F
+!||    i8loc3            ../engine/source/interfaces/inter3d/i8loc3.F
+!||    i8msr3            ../engine/source/interfaces/inter3d/i8msr3.F
+!||    spmd_i8_commslv   ../engine/source/mpi/interfaces/spmd_i8tool.F
+!||    spmd_i8_iloc      ../engine/source/mpi/interfaces/spmd_i8tool.F
+!||    spmd_i8_index     ../engine/source/mpi/interfaces/spmd_i8tool.F
+!||    spmd_i8_irtl      ../engine/source/mpi/interfaces/spmd_i8tool.F
+!||    spmd_i8_updbuf    ../engine/source/mpi/interfaces/spmd_i8tool.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod           ../engine/share/modules/h3d_mod.F
+!||    int8_mod          ../common_source/modules/interfaces/int8_mod.F90
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    output_mod        ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE INTVO8(OUTPUT,IPARI,X ,A  ,
      2                  ICODT,FSAV ,V ,MS ,
      3                  FSKYI,ISKY ,FCONT,FNCONT,FTCONT,
      4                  ICONTACT,RCONTACT,
@@ -50,6 +53,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE OUTPUT_MOD
       USE INTBUFDEF_MOD 
       USE INT8_MOD
       USE H3D_MOD
@@ -67,6 +71,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(output_), intent(inout) :: output
       INTEGER IPARI(*), ICODT(*), ISKY(*),
      .        ICONTACT(*) ,NIN
       INTEGER ITAB(*),
@@ -85,7 +90,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,SIZ
+      INTEGER I
       INTEGER, DIMENSION(:,:), ALLOCATABLE  ::
      .  TAB_RMAX_UID
       INTEGER, DIMENSION(:), ALLOCATABLE  ::
@@ -262,7 +267,7 @@ C
         FACE_A(1:NSN) = 0
 
         ! Compact NSV,IRTL,XI,ZI and FACE
-        ! by keeping only secnd nodes that are 
+        ! by keeping only second nodes that are 
         ! active on this SPMD domain
         DO I = 1,NSN
            IF(INTBUF_TAB%ILOCS(I) > -1 .AND.
@@ -328,7 +333,7 @@ C
      8   H2,      H3,      H4,      FACE_A,
      9   ALP,     LFT,     LLT)
 
-        CALL I8FOR3(LFT  ,LLT  ,NFT   ,A   ,
+        CALL I8FOR3(output, LFT  ,LLT  ,NFT   ,A   ,
      2          INTBUF_TAB%MSR,NSV_A,IRTL_A,INTBUF_TAB%STFM,
      .          INTBUF_TAB%NSV,NSV2, INTBUF_TAB%ILOCS, 
      3          INTBUF_TAB%STFNS,IBC     ,ICODT      ,FSAV      ,IGIMP  , 

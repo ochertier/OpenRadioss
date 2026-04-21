@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    preinicrk4n    ../starter/source/elements/xfem/preinicrk4N.F
-      !||--- called by ------------------------------------------------------
-      !||    lslocal        ../starter/source/elements/xfem/lslocal.F
-      !||--- calls      -----------------------------------------------------
-      !||    lsintx         ../starter/source/elements/xfem/preinicrk4N.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    preinicrk4n    ../starter/source/elements/xfem/preinicrk4N.F
+!||--- called by ------------------------------------------------------
+!||    lslocal        ../starter/source/elements/xfem/lslocal.F
+!||--- calls      -----------------------------------------------------
+!||    lsintx         ../starter/source/elements/xfem/preinicrk4N.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE PREINICRK4N(ELBUF_STR,XFEM_STR,
      .               X1L     ,Y1L     ,X2L     ,Y2L      ,X3L     ,
      .               Y3L     ,X4L     ,Y4L     ,LFT      ,LLT     ,
@@ -40,6 +40,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE XFEM2DEF_MOD
       USE ELBUFDEF_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,7 +73,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,K,II,R,ELCRK,IED,p1,p2,dd(4),d1(4),d2(4),IFI(2),
-     . ICUT,IEDGE,IC1,IC2,ICRK,ILEV(NXEL),IL,ILAY,N(4),ISIGN0(4),
+     . IEDGE,ICRK,ILEV(NXEL),IL,ILAY,N(4),ISIGN0(4),
      . NOD1,NOD2,IXEL,IENR0(4),IENR(4),NTAG(4)
       my_real
      .   FIT(4,MVSIZ),XN(4),YN(4),XMI(2),YMI(2),BETA(2,MVSIZ),
@@ -86,6 +87,7 @@ C
       DATA d1/2,3,4,5/
       DATA d2/3,4,5,2/
 C=======================================================================
+      P2 = 0
       DO I=LFT,LLT
         XN(1)=X1L(I)
         YN(1)=Y1L(I)
@@ -300,12 +302,12 @@ C-----------
       RETURN
       END
 c
-      !||====================================================================
-      !||    lsintx        ../starter/source/elements/xfem/preinicrk4N.F
-      !||--- called by ------------------------------------------------------
-      !||    preinicrk3n   ../starter/source/elements/xfem/preinicrk3N.F
-      !||    preinicrk4n   ../starter/source/elements/xfem/preinicrk4N.F
-      !||====================================================================
+!||====================================================================
+!||    lsintx        ../starter/source/elements/xfem/preinicrk4N.F
+!||--- called by ------------------------------------------------------
+!||    preinicrk3n   ../starter/source/elements/xfem/preinicrk3N.F
+!||    preinicrk4n   ../starter/source/elements/xfem/preinicrk4N.F
+!||====================================================================
       my_real FUNCTION LSINTX(Y1, Z1, Y2, Z2, Y, Z)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c3derii           ../starter/source/elements/sh3n/coque3n/c3derii.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3           ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    inirig_mat        ../starter/source/elements/initia/inirig_mat.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c3derii           ../starter/source/elements/sh3n/coque3n/c3derii.F
+!||--- called by ------------------------------------------------------
+!||    c3init3           ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    inirig_mat        ../starter/source/elements/initia/inirig_mat.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE C3DERII(JFT,JLT,PM    ,GEO  ,PX1,
      .                   PY1,PY2,STIFN ,STIFR,IXTG,
      .                   THK,SH3TREE   ,ALDT ,UPARAM  ,IPM ,IGEO,
@@ -39,6 +39,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUP_PARAM_MOD            
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,7 +57,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER JFT, JLT, ILEV,ISUBSTACK,IMAT,IPROP
+      INTEGER JFT, JLT,ISUBSTACK,IMAT,IPROP
       INTEGER IXTG(NIXTG,*), SH3TREE(KSH3TREE,*),IPM(NPROPMI,*),
      .         IGEO(NPROPGI,*)
 C     REAL
@@ -73,13 +74,13 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, IADB,I1,I3,IPTHK,IPPOS,IGTYP,I2,
-     .        IPMAT,MATLY,IPGMAT,IGMAT,IPOS
+      INTEGER I, N, IADB,IGTYP,
+     .        IPGMAT,IGMAT
       my_real ALDTV(MVSIZ)
       my_real VISCMX, A11, G, STI,STIR,SHF,VISCDEF,
      .     AL1, AL2, AL3, ALMAX, SSP,YOUNG,NU,RHO,GMAX,
-     .     C1,IZ,THICKT,THKLY,POSLY,A1THK,C1THK,
-     .     GTHK,A11R,FAC,A12,E,ETHK,NUTHK,A12THK,RHOG
+     .     
+     .     A11R,FAC
 C=======================================================================
       SSP = ZERO 
       
@@ -94,7 +95,8 @@ C=======================================================================
 C
       IF(MTN==19)THEN
          VISCDEF=FOURTH
-       ELSEIF(MTN==25.OR.MTN==27)THEN
+       ELSEIF(MTN==25 .OR. MTN==27 .OR. MTN == 123 .OR. MTN == 125  
+     .                             .OR. MTN == 127 .OR. MTN == 132  )THEN
           VISCDEF=FIVEEM2
       ELSE
            VISCDEF=ZERO

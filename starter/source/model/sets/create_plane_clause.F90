@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_plane_clause_mod   ../starter/source/model/sets/create_plane_clause.F90
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                    ../starter/source/model/sets/hm_set.F
-      !||====================================================================
+!||====================================================================
+!||    create_plane_clause_mod   ../starter/source/model/sets/create_plane_clause.F90
+!||--- called by ------------------------------------------------------
+!||    hm_set                    ../starter/source/model/sets/hm_set.F
+!||====================================================================
       module create_plane_clause_mod
+        implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
@@ -34,19 +35,19 @@
 !=======================================================================================================================
 !\brief This subroutine creates a clause from a plane surface
 !=======================================================================================================================
-      !||====================================================================
-      !||    create_plane_clause    ../starter/source/model/sets/create_plane_clause.F90
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                 ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    subrotpoint            ../starter/source/model/submodel/subrot.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_plane_clause    ../starter/source/model/sets/create_plane_clause.F90
+!||--- called by ------------------------------------------------------
+!||    hm_set                 ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    subrotpoint            ../starter/source/model/submodel/subrot.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
         subroutine create_plane_clause(id,title,sub_id,clause,lsubmodel,unitab,iad,nrtrans,ntransf,rtrans)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -58,14 +59,11 @@
           use UNITAB_MOD
           use NAMES_AND_TITLES_MOD
           use CONSTANT_MOD
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -75,17 +73,17 @@
           integer,                                   intent(in) :: ntransf                           !< first dimension of transformation array
           integer,                                   intent(in) :: nrtrans                           !< second dimension of transformation array
           character(len=nchartitle),                 intent(in) :: title                             !< set title
-          my_real,                                   intent(in) :: rtrans(ntransf,nrtrans)           !< transformation storage array
+          real(kind=WP),                                   intent(in) :: rtrans(ntransf,nrtrans)           !< transformation storage array
           type(SET_),                                intent(inout) :: clause                         !< clause of set
           type(UNIT_TYPE_),                          intent(in) :: unitab                            !< unit table
           type(SUBMODEL_DATA),                       intent(in) :: lsubmodel(nsubmod)              !< submodel storage array
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          my_real :: xm,ym,zm                 !< coordinates of end of the normal vector to planar surface
-          my_real :: xm1,ym1,zm1              !< coordinates of head of the normal vector to planar surface
-          my_real :: vectx, vecty,vectz       !< components of normal vestor to planar surface
-          my_real :: vect                     !< normal to the planar surface
+          real(kind=WP) :: xm,ym,zm                 !< coordinates of end of the normal vector to planar surface
+          real(kind=WP) :: xm1,ym1,zm1              !< coordinates of head of the normal vector to planar surface
+          real(kind=WP) :: vectx, vecty,vectz       !< components of normal vestor to planar surface
+          real(kind=WP) :: vect                     !< normal to the planar surface
           logical :: is_available             !< logical syntax to check the available option
 !
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -99,14 +97,14 @@
           ym1 = ZERO
           zm1 = ZERO
 !
-          call hm_get_floatv('XM' ,xm,is_available,lsubmodel,unitab)
-          call hm_get_floatv('YM' ,ym,is_available,lsubmodel,unitab)
-          call hm_get_floatv('ZM' ,zm,is_available,lsubmodel,unitab)
+          call hm_get_floatv("XM" ,xm,is_available,lsubmodel,unitab)
+          call hm_get_floatv("YM" ,ym,is_available,lsubmodel,unitab)
+          call hm_get_floatv("ZM" ,zm,is_available,lsubmodel,unitab)
           if (sub_id /= 0) call subrotpoint(xm,ym,zm,rtrans,sub_id,lsubmodel)
 !
-          call hm_get_floatv  ('XM1' ,xm1,is_available,lsubmodel,unitab)
-          call hm_get_floatv  ('YM1' ,ym1,is_available,lsubmodel,unitab)
-          call hm_get_floatv  ('ZM1' ,zm1,is_available,lsubmodel,unitab)
+          call hm_get_floatv  ("XM1" ,xm1,is_available,lsubmodel,unitab)
+          call hm_get_floatv  ("YM1" ,ym1,is_available,lsubmodel,unitab)
+          call hm_get_floatv  ("ZM1" ,zm1,is_available,lsubmodel,unitab)
           if (sub_id /= 0) call subrotpoint(xm1,ym1,zm1,rtrans,sub_id,lsubmodel)
 !
 !         Normal Vector

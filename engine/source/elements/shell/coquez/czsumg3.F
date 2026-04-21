@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    czsumg3      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czke3        ../engine/source/elements/shell/coquez/czke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    cbatran2     ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    cbatran223   ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    cbatran23    ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    cbatran232   ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    cbatran233   ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    cbatran3     ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    cbatran32    ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    czprojk      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    cztran2      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    cztrandr     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    czsumg3      ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czke3        ../engine/source/elements/shell/coquez/czke3.F
+!||--- calls      -----------------------------------------------------
+!||    cbatran2     ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    cbatran223   ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    cbatran23    ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    cbatran232   ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    cbatran233   ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    cbatran3     ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    cbatran32    ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    czprojk      ../engine/source/elements/shell/coquez/czsumg3.F
+!||    cztran2      ../engine/source/elements/shell/coquez/czsumg3.F
+!||    cztrandr     ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE CZSUMG3(
      1                    JFT    ,JLT    ,VQN    ,VQ     ,NPLAT,   
      2                    IPLAT  ,
@@ -72,10 +72,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I, J, K,EP,IS,IAS,NF,MI,MJ,M
+      INTEGER I, J,EP,IS,IAS,NF,MI,MJ,M
       my_real 
-     .    MZ11(MVSIZ),MZ22(MVSIZ),MZ33(MVSIZ),MZ44(MVSIZ),MZ12(MVSIZ),
-     .    MZ13(MVSIZ),MZ14(MVSIZ),MZ23(MVSIZ),MZ24(MVSIZ),MZ34(MVSIZ),
+     .    
+     .    
      .     Q(3,3,MVSIZ),Q1(3,3,MVSIZ),Q2(3,3,MVSIZ),
      .     Q3(3,3,MVSIZ),Q4(3,3,MVSIZ),PP(3,3,4,MVSIZ)
       DATA IS/1/,IAS/0/
@@ -508,11 +508,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    cztran2   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czsumg3   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    cztran2   ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czsumg3   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE CZTRAN2(JFT   ,JLT  ,VQI  ,KK,VQJ,ISYM,VQ) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -573,11 +573,11 @@ C
        ENDIF
       RETURN
       END
-      !||====================================================================
-      !||    cztrandr   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czsumg3    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    cztrandr   ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czsumg3    ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE CZTRANDR(JFT   ,JLT  ,VQI  ,KK,VQJ,ISYM) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -637,16 +637,16 @@ C
        ENDIF
       RETURN
       END
-      !||====================================================================
-      !||    czprojk     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czsumg3     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- calls      -----------------------------------------------------
-      !||    set_rsj     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    set_rsj2    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    setprojk    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    setprojkz   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    czprojk     ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czsumg3     ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- calls      -----------------------------------------------------
+!||    set_rsj     ../engine/source/elements/shell/coquez/czsumg3.F
+!||    set_rsj2    ../engine/source/elements/shell/coquez/czsumg3.F
+!||    setprojk    ../engine/source/elements/shell/coquez/czsumg3.F
+!||    setprojkz   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE CZPROJK(
      1                    JFT    ,JLT    ,VQN    ,Q     ,IPLAT,   
      3                     K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
@@ -678,7 +678,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I, J, K,L,EP,IS,IAS,NF,MI,MJ,M,ND
+      INTEGER I, J, K,L,M
       my_real 
      .    DR(7,7,MVSIZ),DRZ(3,MVSIZ),
      .    R1(6,7,MVSIZ),R2(6,7,MVSIZ),R3(6,7,MVSIZ),R4(6,7,MVSIZ),
@@ -829,13 +829,13 @@ C
 C 
       RETURN
       END
-      !||====================================================================
-      !||    set_rsj     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czprojk     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- calls      -----------------------------------------------------
-      !||    set_rsj33   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    set_rsj     ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czprojk     ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- calls      -----------------------------------------------------
+!||    set_rsj33   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE SET_RSJ(R1     ,R2     ,R3     ,R4    ,Z1    ,
      .                   JFT   ,JLT    ,IPLAT  ,VQN    ,CORELV) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
@@ -851,9 +851,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
-      INTEGER I,J,EP,M,L
+      INTEGER I,J,M,L
       my_real
-     .    S,XI(MVSIZ),YI(MVSIZ),ZI(MVSIZ)
+     .    XI(MVSIZ),YI(MVSIZ),ZI(MVSIZ)
 C-------------------------------------------------------------
         DO M=JFT,JLT 
          DO L=1,6
@@ -915,13 +915,13 @@ C
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    set_rsj2   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czprojk    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- calls      -----------------------------------------------------
-      !||    set_ri33   ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||====================================================================
+!||====================================================================
+!||    set_rsj2   ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czprojk    ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- calls      -----------------------------------------------------
+!||    set_ri33   ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||====================================================================
       SUBROUTINE SET_RSJ2(R1     ,R2     ,R3     ,R4    ,Z1    ,
      .                    JFT    ,JLT    ,CORELV ,IPLAT  ) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
@@ -937,9 +937,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
-      INTEGER I,J,EP,M,L
+      INTEGER I,J,M,L
       my_real
-     .    S,XI(MVSIZ),YI(MVSIZ),ZI(MVSIZ)
+     .    XI(MVSIZ),YI(MVSIZ),ZI(MVSIZ)
 C-------------------------------------------------------------
         DO M=JFT,JLT 
          DO L=1,3
@@ -983,11 +983,11 @@ C
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    set_rsj33   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    set_rsj     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    set_rsj33   ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    set_rsj     ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE SET_RSJ33(XI ,YI, ZI  ,RI  ,JFT,JLT) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -1000,7 +1000,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
-      INTEGER I,J,L
+      INTEGER I
 C--------------RI=Q*RSI-------------------------------
 C         DO I=JFT,JLT 
 C          RI(1,1,I)=-VQ(1,2,I)*ZI(I)+VQ(1,3,I)*YI(I)
@@ -1024,17 +1024,17 @@ C         ENDDO
 C
       RETURN
       END
-      !||====================================================================
-      !||    setprojk      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czprojk       ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- calls      -----------------------------------------------------
-      !||    cztrank33     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    trankl1       ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranklq       ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranqikqj     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranqikqj67   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    setprojk      ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czprojk       ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- calls      -----------------------------------------------------
+!||    cztrank33     ../engine/source/elements/shell/coquez/czsumg3.F
+!||    trankl1       ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranklq       ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranqikqj     ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranqikqj67   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE SETPROJK(DR    ,R1     ,R2     ,R3     ,R4    ,
      3                     K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
      4                     M11,M12,M13,M14,M22,M23,M24,M33,M34,M44,
@@ -1525,12 +1525,12 @@ C-----------
         DEALLOCATE(KE)
       RETURN
       END
-      !||====================================================================
-      !||    tranqikqj67   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    setprojk      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    setprojkz     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    tranqikqj67   ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    setprojk      ../engine/source/elements/shell/coquez/czsumg3.F
+!||    setprojkz     ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE TRANQIKQJ67(JFT   ,JLT    ,VQI  ,KK , VQJ,KD ,ISYM) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -1589,15 +1589,15 @@ C
        ENDIF
       RETURN
       END
-      !||====================================================================
-      !||    tranqikqj    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    setprojk     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    setprojkba   ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    setprojks6   ../engine/source/elements/thickshell/solide6c/setprojks6.F
-      !||    setprojkz    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    setprojkz1   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    tranqikqj    ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    setprojk     ../engine/source/elements/shell/coquez/czsumg3.F
+!||    setprojkba   ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    setprojks6   ../engine/source/elements/thickshell/solide6c/setprojks6.F
+!||    setprojkz    ../engine/source/elements/shell/coquez/czsumg3.F
+!||    setprojkz1   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE TRANQIKQJ(JFT   ,JLT    ,VQI   ,KK,VQJ ,ND ,ISYM) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -1664,14 +1664,14 @@ C
         DEALLOCATE(KD)
       RETURN
       END
-      !||====================================================================
-      !||    trankl1      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    setprojk     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    setprojkba   ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    setprojkz    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    setprojkz1   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    trankl1      ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    setprojk     ../engine/source/elements/shell/coquez/czsumg3.F
+!||    setprojkba   ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    setprojkz    ../engine/source/elements/shell/coquez/czsumg3.F
+!||    setprojkz1   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE TRANKL1(JFT   ,JLT    ,KL  ,IS ) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -1684,7 +1684,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
-      INTEGER I,J,EP,K,L
+      INTEGER I,J,EP
 C--------------KL=1-KL--------------------------
         DO I=1,6 
         DO J=1,6 
@@ -1703,13 +1703,13 @@ C--------------KL=1-KL--------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    tranklq      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    setprojk     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    setprojkba   ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    setprojkz    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    tranklq      ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    setprojk     ../engine/source/elements/shell/coquez/czsumg3.F
+!||    setprojkba   ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    setprojkz    ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE TRANKLQ(JFT   ,JLT    ,VQ   ,KL  ,KD  ,IT) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -1722,7 +1722,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
-      INTEGER I,J,EP,K,L
+      INTEGER I,J,EP,K
 C--------------KQ=KL*VQ-------IT=0-> KQ=KL^t*VQ--------------------------
         DO I=1,6 
         DO J=1,6 
@@ -1761,11 +1761,11 @@ C
        END IF 
       RETURN
       END
-      !||====================================================================
-      !||    cztrank33   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    setprojk    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    cztrank33   ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    setprojk    ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE CZTRANK33(JFT   ,JLT  ,VQ  ,K33 ,KK ,ISYM) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -1818,17 +1818,17 @@ C
        ENDIF
       RETURN
       END
-      !||====================================================================
-      !||    setprojkz     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czprojk       ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- calls      -----------------------------------------------------
-      !||    trankl1       ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranklq       ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranqikqj     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranqikqj67   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranqikqjrz   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    setprojkz     ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czprojk       ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- calls      -----------------------------------------------------
+!||    trankl1       ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranklq       ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranqikqj     ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranqikqj67   ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranqikqjrz   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE SETPROJKZ(DR    ,R1     ,R2     ,R3     ,R4    ,
      3                     K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
      4                     M11,M12,M13,M14,M22,M23,M24,M33,M34,M44,
@@ -2299,9 +2299,9 @@ C-----------
         DEALLOCATE(KE)
       RETURN
       END
-      !||====================================================================
-      !||    trankl2   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    trankl2   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE TRANKL2(JFT   ,JLT    ,KL  ,QNI  ,KR  ,IT) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -2343,12 +2343,12 @@ C
        END IF !(IT == 1 )THEN
       RETURN
       END
-      !||====================================================================
-      !||    czprojkr     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- calls      -----------------------------------------------------
-      !||    set_rsj1     ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    setprojkz1   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    czprojkr     ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- calls      -----------------------------------------------------
+!||    set_rsj1     ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    setprojkz1   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE CZPROJKR(
      1                    JFT    ,JLT    ,VQN    ,VQ     ,IPLAT  ,
      3                     K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
@@ -2378,7 +2378,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I, J, K,L,EP,IS,IAS,NF,MI,MJ,M,ND
+      INTEGER I, J,EP,M
       my_real
      .    DR(3,3,MVSIZ),PP(3,3,4,MVSIZ),
      .    R1(3,3,MVSIZ),R2(3,3,MVSIZ),R3(3,3,MVSIZ),R4(3,3,MVSIZ),
@@ -2477,16 +2477,16 @@ C -----------PROJECTION---------
 C
       RETURN
       END
-      !||====================================================================
-      !||    setprojkz1    ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    czprojkr      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- calls      -----------------------------------------------------
-      !||    trankl1       ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranklqn      ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranqikqj     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||    tranqikqj33   ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||====================================================================
+!||====================================================================
+!||    setprojkz1    ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    czprojkr      ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- calls      -----------------------------------------------------
+!||    trankl1       ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranklqn      ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranqikqj     ../engine/source/elements/shell/coquez/czsumg3.F
+!||    tranqikqj33   ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||====================================================================
       SUBROUTINE SETPROJKZ1(DR    ,R1     ,R2     ,R3     ,R4    ,
      3                     K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
      4                     M11,M12,M13,M14,M22,M23,M24,M33,M34,M44,
@@ -2519,7 +2519,7 @@ C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
       INTEGER I,J,EP,IS,IAS,IT,IAT
       my_real
-     .    KL(6,6,MVSIZ),KQ(6,6,MVSIZ),KR(6,6,MVSIZ)
+     .    KL(6,6,MVSIZ),KQ(6,6,MVSIZ)
          DATA IS/1/,IAS/0/,IT/1/,IAT/0/
       my_real,
      .  DIMENSION(:,:,:), ALLOCATABLE:: P,KE
@@ -2941,11 +2941,11 @@ C-----------
         DEALLOCATE(KE)
       RETURN
       END
-      !||====================================================================
-      !||    tranklqn     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    setprojkz1   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    tranklqn     ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    setprojkz1   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE TRANKLQN(JFT   ,JLT    ,VQ   ,VQN  ,KL   ,KD   ,IT  ) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -2958,7 +2958,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
-      INTEGER I,J,EP,K,L,J1,I1
+      INTEGER I,J,EP,K
 C--------------KQ=KL*Q-- --Q=|VQ   0 |--IT=0-> KQ=KL^t*Q
 C----------------------------|0  VQN|---------------------
         DO I=1,6 
@@ -2999,9 +2999,9 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    trankl0   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    trankl0   ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE TRANKL0(JFT   ,JLT    ,KL  ,KR  ,IT) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -3014,7 +3014,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
-      INTEGER I,EP,J,K
+      INTEGER I,EP,J
 C--------------update KL(6,j)=0,j=4,6------------------------
         DO I=1,6 
         DO J=1,6 
@@ -3039,11 +3039,11 @@ C
        END IF !(IT == 1 )THEN
       RETURN
       END
-      !||====================================================================
-      !||    tranqikqjrz   ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- called by ------------------------------------------------------
-      !||    setprojkz     ../engine/source/elements/shell/coquez/czsumg3.F
-      !||====================================================================
+!||====================================================================
+!||    tranqikqjrz   ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- called by ------------------------------------------------------
+!||    setprojkz     ../engine/source/elements/shell/coquez/czsumg3.F
+!||====================================================================
       SUBROUTINE TRANQIKQJRZ(JFT   ,JLT    ,RI  ,RD  , RJ  , 
      .                       KL    ,KR     ,IT  ,IS  )
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
@@ -3057,7 +3057,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LOCAL  A R G U M E N T S
 C-----------------------------------------------
-      INTEGER I,J,EP,L,I1,J1
+      INTEGER I,J,EP,L
       my_real
      .    KIJ
 C--------------[KR]=|RI| |RD| |RJ|^t---and [KR]=I-[KD]------

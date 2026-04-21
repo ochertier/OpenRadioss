@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    open_interf_time   ../engine/source/system/timer_interf.F
-      !||--- uses       -----------------------------------------------------
-      !||    metric_mod         ../common_source/modules/interfaces/metric_mod.F
-      !||====================================================================
+!||====================================================================
+!||    open_interf_time   ../engine/source/system/timer_interf.F
+!||--- uses       -----------------------------------------------------
+!||    metric_mod         ../common_source/modules/interfaces/metric_mod.F
+!||====================================================================
       SUBROUTINE OPEN_INTERF_TIME(ISPMD)
       USE METRIC_MOD
 C-----------------------------------------------
@@ -38,7 +38,6 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER :: ISPMD
 C-----------------------------------------------
-      INTEGER I, J
       CHARACTER FILNAM*100
       CHARACTER PROCNAM*4
 C-----------------------------------------------
@@ -49,11 +48,11 @@ C-----------------------------------------------
      .         FORM='FORMATTED',STATUS='UNKNOWN')
       END SUBROUTINE
 
-      !||====================================================================
-      !||    close_interf_time   ../engine/source/system/timer_interf.F
-      !||--- uses       -----------------------------------------------------
-      !||    metric_mod          ../common_source/modules/interfaces/metric_mod.F
-      !||====================================================================
+!||====================================================================
+!||    close_interf_time   ../engine/source/system/timer_interf.F
+!||--- uses       -----------------------------------------------------
+!||    metric_mod          ../common_source/modules/interfaces/metric_mod.F
+!||====================================================================
       SUBROUTINE CLOSE_INTERF_TIME()
       USE METRIC_MOD
 C-----------------------------------------------
@@ -63,27 +62,23 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER I, J
-      CHARACTER FILNAM*100
-C-----------------------------------------------
       CLOSE(unit=FILE_ID)
       END SUBROUTINE
 
-      !||====================================================================
-      !||    int_startime   ../engine/source/system/timer_interf.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_sort     ../engine/source/interfaces/generic/inter_sort.F
-      !||    intfop2        ../engine/source/interfaces/interf/intfop2.F
-      !||    inttri         ../engine/source/interfaces/intsort/inttri.F
-      !||--- uses       -----------------------------------------------------
-      !||    metric_mod     ../common_source/modules/interfaces/metric_mod.F
-      !||====================================================================
+!||====================================================================
+!||    int_startime   ../engine/source/system/timer_interf.F
+!||--- called by ------------------------------------------------------
+!||    inter_sort     ../engine/source/interfaces/generic/inter_sort.F
+!||    intfop2        ../engine/source/interfaces/interf/intfop2.F
+!||    inttri         ../engine/source/interfaces/intsort/inttri.F
+!||--- uses       -----------------------------------------------------
+!||    metric_mod     ../common_source/modules/interfaces/metric_mod.F
+!||====================================================================
       SUBROUTINE INT_STARTIME(THIS,EVENT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE METRIC_MOD
-C     routine d'incrementation du timer event
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -110,15 +105,15 @@ C-----------------------------------------------
 #endif
       RETURN
       END SUBROUTINE
-      !||====================================================================
-      !||    int_stoptime   ../engine/source/system/timer_interf.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_sort     ../engine/source/interfaces/generic/inter_sort.F
-      !||    intfop2        ../engine/source/interfaces/interf/intfop2.F
-      !||    inttri         ../engine/source/interfaces/intsort/inttri.F
-      !||--- uses       -----------------------------------------------------
-      !||    metric_mod     ../common_source/modules/interfaces/metric_mod.F
-      !||====================================================================
+!||====================================================================
+!||    int_stoptime   ../engine/source/system/timer_interf.F
+!||--- called by ------------------------------------------------------
+!||    inter_sort     ../engine/source/interfaces/generic/inter_sort.F
+!||    intfop2        ../engine/source/interfaces/interf/intfop2.F
+!||    inttri         ../engine/source/interfaces/intsort/inttri.F
+!||--- uses       -----------------------------------------------------
+!||    metric_mod     ../common_source/modules/interfaces/metric_mod.F
+!||====================================================================
       SUBROUTINE INT_STOPTIME(THIS,EVENT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -151,15 +146,16 @@ C
 #endif
       RETURN
       END SUBROUTINE
-      !||====================================================================
-      !||    printime_interf   ../engine/source/system/timer_interf.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_dgather      ../engine/source/mpi/output/spmd_gather.F
-      !||--- uses       -----------------------------------------------------
-      !||    metric_mod        ../common_source/modules/interfaces/metric_mod.F
-      !||====================================================================
+!||====================================================================
+!||    printime_interf   ../engine/source/system/timer_interf.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_dgather      ../engine/source/mpi/output/spmd_gather.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    metric_mod        ../common_source/modules/interfaces/metric_mod.F
+!||====================================================================
       SUBROUTINE PRINTIME_INTERF(INTBUF_TAB,IPARI,INTLIST,NBINTC,TRESHOLD)
 C-----------------------------------------------
 C   M o d u l e s

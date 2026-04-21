@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25trivox1         ../starter/source/interfaces/inter3d1/i25trivox1.F
-      !||--- called by ------------------------------------------------------
-      !||    i25buc_vox1        ../starter/source/interfaces/inter3d1/i25buc_vox1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i25sto             ../starter/source/interfaces/inter3d1/i25sto.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box            ../starter/share/modules1/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25trivox1         ../starter/source/interfaces/inter3d1/i25trivox1.F
+!||--- called by ------------------------------------------------------
+!||    i25buc_vox1        ../starter/source/interfaces/inter3d1/i25buc_vox1.F
+!||--- calls      -----------------------------------------------------
+!||    i25sto             ../starter/source/interfaces/inter3d1/i25sto.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box            ../starter/share/modules1/tri7box.F
+!||====================================================================
       SUBROUTINE I25TRIVOX1(
      1      NSN    ,IRECT  ,X       ,
      2      STFN   ,XYZM    ,NSV    ,II_STOK ,
@@ -66,36 +66,35 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
-C   ROLE DE LA ROUTINE:
+C   ROLE OF THE ROUTINE:
 C   ===================
-C   CLASSE LES NOEUDS DANS DES BOITES
-C   RECHERCHE POUR CHAQUE FACETTE DES BOITES CONCERNES
-C   RECHERCHE DES CANDIDATS
+C   CLASSIFIES THE NODES INTO BOXES
+C   SEARCHES FOR EACH FACET THE RELEVANT BOXES
+C   SEARCH FOR CANDIDATES
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C
 C     NOM          DESCRIPTION                       E/S
 C
-C     IRECT(4,*)   TABLEAU DES CONEC FACETTES        E
+C     IRECT(4,*)   ARRAY OF CONEC FACETTES        E
 C     X(3,*)       COORDONNEES NODALES               E
-C     NSV          NOS SYSTEMES DES NOEUDS           E
-C     XMAX         plus grande abcisse existante     E
-C     XMAX         plus grande ordonn. existante     E
-C     XMAX         plus grande cote    existante     E
-C     I_STOK       niveau de stockage des couples
-C                                candidats impact    E/S
-C     CAND_N       boites resultats noeuds
-C     CAND_E       adresses des boites resultat elements
+C     NSV          NOS SYSTEMES DES NODES E
+C     Xmax larger abcisse existing e
+C     XMAX largest order.existing E
+C     Xmax larger existing side E
+C     I_STOK       storage level of the pairs
+C                                CANDIDATES impact    E/S
+C     CAND_N       boites resultats nodes C     CAND_E       adresses des boites resultat elements
 C
-C     PROV_N       CAND_N provisoire (variable static dans i7tri)
-C     PROV_E       CAND_E provisoire (variable static dans i7tri)
+C     Prov_n Provisional Cand_n (static variable in i7tri)
+C     PROV_E       CAND_E provisoire (variable static in i7tri)
 
-C     VOXEL(ix,iy,iz) contient le numero local du premier noeud de
-C                  la boite
-C     LOCAL_NEXT_NOD(i)  noeud suivant dans la meme boite (si /= 0)
-C     LAST_NOD(i)  dernier noeud dans la meme boite (si /= 0)
-C                  utilise uniquement pour aller directement du premier
-C                       noeud au dernier
+C     VOXEL(ix,iy,iz) contains the local number of the first node of
+C                  the box
+C     Local_next_nod (I) Next node in the same box (if /= 0)
+C     Last_nod (i) Last node in the same box (if /= 0)
+C                  used only to go directly from the first
+C                       node at the last
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -156,6 +155,11 @@ C
       integer, dimension(:), allocatable, save :: address_cand_n,address_cand_e
       type(array_type_int_1d) :: local_cand_n
       type(array_type_int_1d) :: local_cand_e
+
+      integer :: my_size,mode
+      integer, dimension(:), allocatable :: my_index
+      integer, dimension(:,:), allocatable :: sort_array,save_array
+      integer, dimension(70000) :: work
 C-----------------------------------------------
       ! allocation of local arrays 
       itask = omp_get_thread_num()
@@ -191,11 +195,11 @@ C-----------------------------------------------
       address_cand_e(1:nthreads+1) = 0
       ALLOCATE(LAST_NOD(NSN))
 C
-C Phase initiale de construction de BPE et BPN deplacee de I7BUCE => I7TRI
+C Initial phase of construction of BPE and BPN moved from I7BUCE => I7TRI
 C
 
 C=======================================================================
-C 1   mise des noeuds dans les boites
+C 1   placing the nodes into the boxes
 C=======================================================================
       DO I=1,NSN
         IIX(I)=0
@@ -203,8 +207,8 @@ C=======================================================================
         IIZ(I)=0
         IF(STFN(I) == ZERO)CYCLE
         J=NSV(I)
-C Optimisation // recherche les noeuds compris dans xmin xmax des
-C elements du processeur
+C Optimization // searches for nodes within xmin xmax of the
+C processor elements
         IF(X(1,J) < XMIN)  CYCLE
         IF(X(1,J) > XMAX)  CYCLE
         IF(X(2,J) < YMIN)  CYCLE
@@ -222,7 +226,7 @@ C elements du processeur
 
         FIRST = VOXEL(IIX(I),IIY(I),IIZ(I))
         IF(FIRST == 0)THEN
-c         empty cell
+c         Empty Cell
           VOXEL(IIX(I),IIY(I),IIZ(I)) = I ! first
           LOCAL_NEXT_NOD(I)                 = 0 ! last one
           LAST_NOD(I)                 = 0 ! no last
@@ -246,8 +250,8 @@ c         jump to the last node of the cell
 !$OMP BARRIER
 
 C=======================================================================
-C 2   recherche des boites concernant chaque facette
-C     et creation des candidats
+C 2 Searching boxes concerning each facet
+C     and creation of candidates
 C=======================================================================
       ALLOCATE( TAGNOD(NUMNOD) )
       TAGNOD(1:NUMNOD) = 0
@@ -258,8 +262,8 @@ C-----------------------------------------------
         IF(IELEM_M(2,NE) /=0) CYCLE
 
 c
-c     il est possible d'ameliorer l'algo en decoupant la facette
-c     en 2(4,3,6,9...) si la facette est grande devant AAA et inclinee
+c     It is possible to improve the algo by cutting the facet
+c     in 2 (4,3,6,9 ...) if the facet is large in front of AAA and inclinee
 
         M1 = IRECT(1,NE)
         M2 = IRECT(2,NE)
@@ -304,14 +308,14 @@ c     en 2(4,3,6,9...) si la facette est grande devant AAA et inclinee
         ZMINE=MIN(ZZ1,ZZ2,ZZ3,ZZ4)
 
 
-c        calcul de la surface (pour elimination future de candidats)
+c        calculation of the surface (for future elimination of candidates)
 
         SX = (YY3-YY1)*(ZZ4-ZZ2) - (ZZ3-ZZ1)*(YY4-YY2)
         SY = (ZZ3-ZZ1)*(XX4-XX2) - (XX3-XX1)*(ZZ4-ZZ2)
         SZ = (XX3-XX1)*(YY4-YY2) - (YY3-YY1)*(XX4-XX2)
         S2 = SX*SX + SY*SY + SZ*SZ
 
-c        indice des voxels occupes par la facette
+c        index of the voxels occupied by the facet
 
         IX1=INT(NBX*(XMINE-AAA-XMINB)/(XMAXB-XMINB))
         IY1=INT(NBY*(YMINE-AAA-YMINB)/(YMAXB-YMINB))
@@ -456,9 +460,9 @@ c NO need to communicate in SPMD
                 END IF
 c               END IF
 
-c    sousestimation de la distance**2 pour elimination de candidats
+c    underestimation of the distance**2 for candidate elimination
 
-cc             nnr0pelem = nnr0pelem + 1
+cc'nnr0pelem = nnr0pelem + 1
 
                 D1X = XS - XX1
                 D1Y = YS - YY1
@@ -513,7 +517,7 @@ cc             nnr0pelem = nnr0pelem + 1
 
 !$OMP BARRIER
 C-------------------------------------------------------------------------
-C     FIN DU TRI
+C     END OF SORTING
 C-------------------------------------------------------------------------
       IF(J_STOK/=0)CALL I25STO(
      1                  J_STOK,IRECT  ,X     ,NSV   ,local_i_stok,
@@ -523,7 +527,7 @@ C-------------------------------------------------------------------------
      5                  ILEV,MSEGTYP,IGAP ,GAP_S_L,
      6                  GAP_M_L,EDGE_L2,ICODE,ISKEW,DRAD ,
      7                  DGAPLOAD,NRTMT)
-C 4   remise a zero des noeuds dans les boites
+C 4   resetting the nodes in the boxes
 C=======================================================================
       ! save the local number of candidates
       cand_n_size(itask+1) = local_i_stok
@@ -566,6 +570,42 @@ C=======================================================================
       call dealloc_1d_array(local_cand_e)
 
 !$OMP BARRIER
+
+
+
+      
+      ! Sort the candidates to ensure the same domain decomposition
+!$OMP SINGLE
+      ! ------------
+      my_size = cand_n_size(nthreads+1)
+      allocate(my_index(2*my_size))
+      allocate(sort_array(2,my_size))
+      allocate(save_array(2,my_size))
+      
+      my_address = address_cand_n(1) ! get the address of the first pair of candidate
+      sort_array(1,1:my_size) = intbuf_tab%cand_n(my_address+1:my_address+my_size)
+      my_address = address_cand_e(1) ! get the address of the first pair of candidate
+      sort_array(2,1:my_size) = intbuf_tab%cand_e(my_address+1:my_address+my_size)
+      do i=1,my_size
+        my_index(i) = i
+      enddo
+      save_array(1:2,1:my_size) = sort_array(1:2,1:my_size)
+      mode = 0
+
+      call my_orders( mode,work,sort_array,my_index,my_size,2)
+      my_address = address_cand_n(1) ! get the address of the first pair of candidate
+      do i=1,my_size 
+        intbuf_tab%cand_n(my_address+i) = save_array(1,my_index(i))
+      enddo 
+      my_address = address_cand_e(1) ! get the address of the first pair of candidate
+      do i=1,my_size
+        intbuf_tab%cand_e(my_address+i) = save_array(2,my_index(i))
+      enddo
+      deallocate(my_index)
+      deallocate(sort_array)
+      deallocate(save_array)
+      ! ------------
+!$OMP END SINGLE    
 
 
 !$OMP DO SCHEDULE(guided)

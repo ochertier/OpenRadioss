@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8evolume   ../engine/source/elements/solid/solide8e/s8evolume.F
-      !||--- called by ------------------------------------------------------
-      !||    eloff       ../engine/source/elements/eloff.F
-      !||    fixflux     ../engine/source/constraints/thermic/fixflux.F
-      !||====================================================================
+!||====================================================================
+!||    s8evolume   ../engine/source/elements/solid/solide8e/s8evolume.F
+!||--- called by ------------------------------------------------------
+!||    eloff       ../engine/source/elements/eloff.F
+!||    fixflux     ../engine/source/constraints/thermic/fixflux.F
+!||====================================================================
       SUBROUTINE S8EVOLUME(X, VOLG, VOLP, NELA, NPTR, NPTS, NPTT,
      .                     NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8 )
 C-----------------------------------------------
@@ -46,7 +46,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
       INTEGER IR,IS,IT,IP
 C
       my_real

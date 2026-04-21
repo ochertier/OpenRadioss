@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    i1chk2                 ../starter/source/interfaces/inter2d1/i1chk2.F
-      !||--- called by ------------------------------------------------------
-      !||    inint2                 ../starter/source/interfaces/inter2d1/inint2.F
-      !||--- calls      -----------------------------------------------------
-      !||    inori2                 ../starter/source/interfaces/inter2d1/inori2.F
-      !||    inrch2                 ../starter/source/interfaces/inter2d1/inrch2.F
-      !||    local_index            ../starter/source/interfaces/interf1/local_index.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i1chk2                 ../starter/source/interfaces/inter2d1/i1chk2.F
+!||--- called by ------------------------------------------------------
+!||    inint2                 ../starter/source/interfaces/inter2d1/inint2.F
+!||--- calls      -----------------------------------------------------
+!||    inori2                 ../starter/source/interfaces/inter2d1/inori2.F
+!||    inrch2                 ../starter/source/interfaces/inter2d1/inrch2.F
+!||    local_index            ../starter/source/interfaces/interf1/local_index.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I1CHK2(X,IRECT,IXQ,NRT,NINT,NSN,NSV,NOINT,ID,TITR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -57,7 +57,7 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
 C
-      ! LOOP OVER FLUID SEGMENTS (SECND)
+      ! LOOP OVER FLUID SEGMENTS (SECOND)
       DO I=1,NRT
         II=I
         !SEARCH FOR QUAD CONNECTED TO CURRENT FLUID SEGMENT
@@ -73,7 +73,7 @@ C
 C-----------------------------------------------
 C     IRECT <- REPLACE INTERNAL IDENTIFIER 'IG' WITH LOCAL ID 'IL' FROM FLUID NODES : NSV(IL)=IG
 C-----------------------------------------------
-      ! LOOP OVER FLUID SEGMENTS (SECND)
+      ! LOOP OVER FLUID SEGMENTS (SECOND)
       DO I=1,NRT
 
         IG=IRECT(1,I)

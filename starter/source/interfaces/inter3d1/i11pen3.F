@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11pen3_vox1   ../starter/source/interfaces/inter3d1/i11pen3.F
-      !||--- called by ------------------------------------------------------
-      !||    i11sto_vox1    ../starter/source/interfaces/inter3d1/i11sto.F
-      !||====================================================================
+!||====================================================================
+!||    i11pen3_vox1   ../starter/source/interfaces/inter3d1/i11pen3.F
+!||--- called by ------------------------------------------------------
+!||    i11sto_vox1    ../starter/source/interfaces/inter3d1/i11sto.F
+!||====================================================================
       SUBROUTINE I11PEN3_VOX1(JLT   ,CAND_S ,CAND_M ,GAPMIN ,DRAD   ,
      .                        MARGE ,GAP_S  ,GAP_M  ,GAP_S_L,GAP_M_L,
      .                        IGAP  ,X      ,IRECTS ,IRECTM ,PENE   ,
@@ -51,10 +51,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IG,N1,N2,M1,M2
+      INTEGER I, N1, N2, M1, M2
       my_real
      .     XS12,YS12,ZS12,XM12,YM12,ZM12,XA,XB,
-     .     XS2,XM2,XSM,XS2M2,YS2,YM2,YSM,YS2M2,ZS2,ZM2,ZSM,ZS2M2,
+     .     XS2,XM2,XSM,XS2M2,YS2M2,ZS2M2,
      .     XX,YY,ZZ,ALS,ALM,DET,
      .     GAP2, GAPV(MVSIZ)
 C-----------------------------------------------
@@ -130,7 +130,7 @@ C
        ALM=MIN(ONE,MAX(ZERO,ALM))
 
 C !!!!!!!!!!!!!!!!!!!!!!!
-C  PENE = GAP^2 - DIST^2 UTILISE POUR TESTER SI NON NUL
+C  PENE = GAP^2 - DIST^2 USED TO TEST IF NON-NULL
 C!!!!!!!!!!!!!!!!!!!!!!!!
        XX =  ALS*X(1,N1) + (1.-ALS)*X(1,N2)
      .      - ALM*X(1,M1) - (1.-ALM)*X(1,M2)
@@ -145,11 +145,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i11pen3   ../starter/source/interfaces/inter3d1/i11pen3.F
-      !||--- called by ------------------------------------------------------
-      !||    i11sto    ../starter/source/interfaces/inter3d1/i11sto.F
-      !||====================================================================
+!||====================================================================
+!||    i11pen3   ../starter/source/interfaces/inter3d1/i11pen3.F
+!||--- called by ------------------------------------------------------
+!||    i11sto    ../starter/source/interfaces/inter3d1/i11sto.F
+!||====================================================================
       SUBROUTINE I11PEN3(JLT   ,CAND_N,CAND_E,GAP   ,X,
      .                  IRECTS  ,IRECTM ,PENE  )
 C-----------------------------------------------
@@ -172,10 +172,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IG,N1,N2,M1,M2
+      INTEGER I, N1, N2, M1, M2
       my_real
      .     XS12,YS12,ZS12,XM12,YM12,ZM12,XA,XB,
-     .     XS2,XM2,XSM,XS2M2,YS2,YM2,YSM,YS2M2,ZS2,ZM2,ZSM,ZS2M2,
+     .     XS2,XM2,XSM,XS2M2,YS2M2,ZS2M2,
      .     XX,YY,ZZ,ALS,ALM,DET,
      .     GAP2
 C-----------------------------------------------
@@ -240,7 +240,7 @@ C
        ALM=MIN(ONE,MAX(ZERO,ALM))
 
 C !!!!!!!!!!!!!!!!!!!!!!!
-C  PENE = GAP^2 - DIST^2 UTILISE POUR TESTER SI NON NUL
+C  PENE = GAP^2 - DIST^2 USED TO TEST IF NON-NULL
 C!!!!!!!!!!!!!!!!!!!!!!!!
        XX =  ALS*X(1,N1) + (1.-ALS)*X(1,N2)
      .      - ALM*X(1,M1) - (1.-ALM)*X(1,M2)

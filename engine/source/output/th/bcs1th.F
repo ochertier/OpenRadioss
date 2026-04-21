@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    bcs1th   ../engine/source/output/th/bcs1th.F
-      !||--- called by ------------------------------------------------------
-      !||    thbcs    ../engine/source/output/th/thbcs.F
-      !||====================================================================
+!||====================================================================
+!||    bcs1th   ../engine/source/output/th/bcs1th.F
+!||--- called by ------------------------------------------------------
+!||    thbcs    ../engine/source/output/th/thbcs.F
+!||====================================================================
       SUBROUTINE BCS1TH(NINDX,INDX,ISKEW,ICODT  ,
      .                  A    ,SKEW,MS   ,FTHREAC,
      .                  NODREAC,FLAG,IN)
@@ -62,7 +62,7 @@ C
 C
         IF(ISK==1) THEN
 C------------------
-C     REPERE GLOBAL
+C     GLOBAL REFERENCE FRAME
 C------------------
           IF(LCOD==1)THEN
           FTHREAC0(N+3) = - A(3,L)
@@ -160,9 +160,9 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    bcs1an   ../engine/source/output/th/bcs1th.F
-      !||====================================================================
+!||====================================================================
+!||    bcs1an   ../engine/source/output/th/bcs1th.F
+!||====================================================================
       SUBROUTINE BCS1AN(NINDX,INDX,ISKEW,ICODT  ,
      .                  A    ,SKEW,MS   ,FANREAC,
      .                  FLAG,IN)
@@ -200,7 +200,7 @@ C
 C
         IF(ISK==1) THEN
 C------------------
-C     REPERE GLOBAL
+C     GLOBAL REFERENCE FRAME
 C------------------
           IF(LCOD==1)THEN
           FANREAC0(N+3) = - A(3,L)

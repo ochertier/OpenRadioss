@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c3defo3       ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
-      !||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
-      !||====================================================================
+!||====================================================================
+!||    c3defo3       ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
+!||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod   ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE C3DEFO3(JFT,JLT,VL1,VL2,VL3,
      .                   IXTG,ISH3N,PX1  ,PY1    ,PY2   ,
      .                   EXX  ,EYY  ,EXY  ,EYZ   ,EZX   ,
      .                   VX13 ,VX23  ,VY12  ,
      .                   E1X      ,E1Y      ,E1Z     ,E2X      ,           
      .                   E2Y      ,E2Z      ,E3X     ,E3Y      ,E3Z      ) 
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,7 +62,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NC1, NC2, NC3, I, J
+      INTEGER I
       my_real
      .     VX1(MVSIZ),  VX2(MVSIZ),  VX3(MVSIZ),
      .     VY1(MVSIZ), VY2(MVSIZ), VY3(MVSIZ),
@@ -127,14 +130,14 @@ C
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    c3brz3        ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
-      !||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
-      !||--- calls      -----------------------------------------------------
-      !||    c3derirz      ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||====================================================================
+!||====================================================================
+!||    c3brz3        ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
+!||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
+!||--- calls      -----------------------------------------------------
+!||    c3derirz      ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||====================================================================
       SUBROUTINE C3BRZ3(JFT  ,JLT  ,AREA ,X2   ,X3    ,
      .                  Y3   ,BM0RZ,B0RZ ,BKRZ ,BERZ  )
 C-----------------------------------------------
@@ -166,7 +169,6 @@ c  O   BERZ(J,NEL)    - Eta terms of derivation : A*(-Nx,y+Ny,x -2Ni)
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I
       my_real Y2(MVSIZ)
 C=======================================================================
       Y2(JFT:JLT)=ZERO
@@ -176,12 +178,12 @@ C=======================================================================
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    c3defrz       ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
-      !||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
-      !||====================================================================
+!||====================================================================
+!||    c3defrz       ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
+!||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
+!||====================================================================
         SUBROUTINE C3DEFRZ(JFT  ,JLT  ,RLZ   ,BM0RZ ,B0RZ ,
      1                     BKRZ ,BERZ ,E3X   ,E3Y   ,E3Z  ,
      2                     VRL1 ,VRL2 ,VRL3  ,EXX   ,EYY  ,
@@ -253,14 +255,14 @@ C--------NxI,x *A------pay attention Bi*A--- RLZ: VRZ--
 C
       RETURN
       END
-      !||====================================================================
-      !||    c3derirz   ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3brz3     ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||    c3ke3      ../engine/source/elements/sh3n/coque3n/c3ke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    c3bm0rz    ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||====================================================================
+!||====================================================================
+!||    c3derirz   ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||--- called by ------------------------------------------------------
+!||    c3brz3     ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||    c3ke3      ../engine/source/elements/sh3n/coque3n/c3ke3.F
+!||--- calls      -----------------------------------------------------
+!||    c3bm0rz    ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||====================================================================
         SUBROUTINE C3DERIRZ(JFT ,JLT  ,AREA ,X2    ,X3    ,
      2                      Y2  ,Y3   ,BMRZ ,B0RZ  ,BKRZ  ,
      3                      BERZ )
@@ -284,7 +286,7 @@ c
 c TYPE NAME                FUNCTION
 c  I   JFT,JLT           - element id limit
 c  I   AREA(NEL)         - element area A
-c  I   X2,X3,Y2,Y3(NEL)  - relative local nodal co-ordinates: X2->X21
+c  I   X2,X3,Y2,Y3(NEL)  - relative local nodal coordinates: X2->X21
 c  O   BM0RZ(I,J,NEL)   - constant terms of derivations for membrane
 C                       I=1:A*Nx,x;I=2:A*Ny,y;I=3:A*(Nx,y+Ny,x); J=1,2(node)
 C                        only store J=1,2 as f(j=3)=-f(j=1)-f(j=2)
@@ -296,7 +298,7 @@ C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
       INTEGER I,J
       my_real
-     .   A2,BXV2,BYV1,A05,NXY,NYX,
+     . A2,NXY,NYX,
      .   X2L(MVSIZ),X3L(MVSIZ),Y2L(MVSIZ),Y3L(MVSIZ),BM0RZ(MVSIZ,4,2),
      .   BMKRZ(MVSIZ,4,3),BMERZ(MVSIZ,4,3),Y31_2,Y21_2,X31_2,X21_2,
      .   Y21Y31,X21X31,X21Y31,X31Y21,X21Y21,X31Y31
@@ -400,11 +402,11 @@ C-----------necessary for stabilization (explicit)
 C
       RETURN
       END
-      !||====================================================================
-      !||    c3bm0rz    ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3derirz   ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||====================================================================
+!||====================================================================
+!||    c3bm0rz    ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||--- called by ------------------------------------------------------
+!||    c3derirz   ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||====================================================================
         SUBROUTINE C3BM0RZ(JFT ,JLT  ,BMRZ ,BM0RZ,BMKRZ ,BMERZ )
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -419,7 +421,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-        INTEGER I ,J,K
+        INTEGER I ,J
       my_real
      .   SCAL
 C-------crrection to pass patch test   
@@ -439,11 +441,11 @@ C------- moyen volume (analytical integration)
 C
       RETURN
       END
-      !||====================================================================
-      !||    c3deft3   ../engine/source/elements/sh3n/coque3n/c3defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3   ../engine/source/elements/sh3n/coque3n/c3forc3.F
-      !||====================================================================
+!||====================================================================
+!||    c3deft3   ../engine/source/elements/sh3n/coque3n/c3defo3.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3   ../engine/source/elements/sh3n/coque3n/c3forc3.F
+!||====================================================================
       SUBROUTINE C3DEFT3(JFT,JLT,X2,Y2,X3,Y3,V21X,V21Y,V31X,V31Y,
      2                   BM0RZ,RZ13,RZ23,AREA,VDEF,IDRIL )
 C-----------------------------------------------
@@ -464,7 +466,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NC1, NC2, NC3, I, J
+      INTEGER I
 C     REAL
       my_real
      .   PX2(MVSIZ), PY2(MVSIZ), PX3(MVSIZ), PY3(MVSIZ) ,AREAI

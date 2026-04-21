@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alloc_group_str   ../engine/source/groups/alloc_group_str.F
-      !||--- called by ------------------------------------------------------
-      !||    group_ini         ../engine/source/groups/group_ini.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl2          ../engine/source/input/freform.F
-      !||    read_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod      ../common_source/modules/groupdef_mod.F
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alloc_group_str   ../engine/source/groups/alloc_group_str.F
+!||--- called by ------------------------------------------------------
+!||    group_ini         ../engine/source/groups/group_ini.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl2          ../engine/source/input/freform.F
+!||    read_i_c          ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod      ../common_source/modules/groupdef_mod.F
+!||    message_mod       ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ALLOC_GROUP_STR(IGR,NGR,LENIGR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -54,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,IGU,GRTYPE,SORTED,GRPGRP,
+      INTEGER J,ID,IGU,GRTYPE,SORTED,GRPGRP,
      .        LEVEL,R2R_ALL,R2R_SHARE,ENTITY,NENTITY,L_GROUP,
      .        ITITLE(LTITR),ERR,LEN
       CHARACTER(LEN=LTITR) ::  TITR,NEW_TITLE(NGR)

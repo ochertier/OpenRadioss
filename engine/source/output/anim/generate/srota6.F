@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    srota6               ../engine/source/output/anim/generate/srota6.F
-      !||--- called by ------------------------------------------------------
-      !||    forint               ../engine/source/elements/forint.F
-      !||    gpsstrain_skin       ../engine/source/output/anim/generate/tensgpstrain.F
-      !||    h3d_solid_tensor_1   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||    stat_s_straf         ../engine/source/output/sta/stat_s_straf.F
-      !||    stat_s_strsf         ../engine/source/output/sta/stat_s_strsf.F
-      !||    strn_tenscor3        ../engine/source/output/h3d/h3d_results/h3d_strn_tenscor3.F
-      !||    strs_tenscor3        ../engine/source/output/h3d/h3d_results/strs_tenscor3.F
-      !||    tensgps1             ../engine/source/output/anim/generate/tensor6.F
-      !||    tensgps2             ../engine/source/output/anim/generate/tensor6.F
-      !||    tensgps3             ../engine/source/output/anim/generate/tensor6.F
-      !||    tensgps_skin         ../engine/source/output/anim/generate/tensor6.F
-      !||    tensgpstrain         ../engine/source/output/anim/generate/tensgpstrain.F
-      !||    tensors              ../engine/source/output/anim/generate/tensor6.F
-      !||    thsol                ../engine/source/output/th/thsol.F
-      !||--- calls      -----------------------------------------------------
-      !||    scoor431             ../engine/source/elements/solid/sconnect/scoor431.F
-      !||    scortho31            ../engine/source/elements/thickshell/solidec/scortho31.F
-      !||    sortho31             ../engine/source/elements/solid/solide/sortho31.F
-      !||====================================================================
+!||====================================================================
+!||    srota6               ../engine/source/output/anim/generate/srota6.F
+!||--- called by ------------------------------------------------------
+!||    forint               ../engine/source/elements/forint.F
+!||    gpsstrain_skin       ../engine/source/output/anim/generate/tensgpstrain.F
+!||    h3d_solid_tensor_1   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||    stat_s_straf         ../engine/source/output/sta/stat_s_straf.F
+!||    stat_s_strsf         ../engine/source/output/sta/stat_s_strsf.F
+!||    strn_tenscor3        ../engine/source/output/h3d/h3d_results/h3d_strn_tenscor3.F
+!||    strs_tenscor3        ../engine/source/output/h3d/h3d_results/strs_tenscor3.F
+!||    tensgps1             ../engine/source/output/anim/generate/tensor6.F
+!||    tensgps2             ../engine/source/output/anim/generate/tensor6.F
+!||    tensgps3             ../engine/source/output/anim/generate/tensor6.F
+!||    tensgps_skin         ../engine/source/output/anim/generate/tensor6.F
+!||    tensgpstrain         ../engine/source/output/anim/generate/tensgpstrain.F
+!||    tensors              ../engine/source/output/anim/generate/tensor6.F
+!||    thsol                ../engine/source/output/th/thsol.F
+!||--- calls      -----------------------------------------------------
+!||    scoor431             ../engine/source/elements/solid/sconnect/scoor431.F
+!||    scortho31            ../engine/source/elements/thickshell/solidec/scortho31.F
+!||    sortho31             ../engine/source/elements/solid/solide/sortho31.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod          ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE SROTA6(
      1   X,       IXS,     KCVT,    TENS,
      2   GAMA,    KHBE,    ITYP,    ISORTH)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -125,7 +128,7 @@ C        Corotational frame - hexa spotwelds
      .     Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,                       
      .     R11, R12, R13, R21, R22, R23, R31, R32, R33)          
        ELSEIF(KHBE/=15)THEN
-C        REPERE CONVECTE
+C        convected frame
          IF (KHBE==24.OR.KHBE==14) THEN
            CALL SORTHO31(
      .          X1, X2, X3, X4, X5, X6, X7, X8,               

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ebcvit5    ../engine/source/boundary_conditions/ebcs/ebcvit5.F
-      !||--- called by ------------------------------------------------------
-      !||    ebcclap    ../engine/source/boundary_conditions/ebcs/ebcclap.F
-      !||--- uses       -----------------------------------------------------
-      !||    ebcs_mod   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ebcvit5    ../engine/source/boundary_conditions/ebcs/ebcvit5.F
+!||--- called by ------------------------------------------------------
+!||    ebcclap    ../engine/source/boundary_conditions/ebcs/ebcclap.F
+!||--- uses       -----------------------------------------------------
+!||    ebcs_mod   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
       SUBROUTINE EBCVIT5(V, A, LISTE, NOD, FV, RESO, LA, EBCS)
       USE EBCS_MOD
 C-----------------------------------------------
@@ -79,7 +79,7 @@ c          write(6,*)'ebcvit5 N',N,' RESO',RESO(3,I),'A',A(3,N)
           AX=RESO(1,I)+ALPDT*(A(1,N)-RESO(1,I))
           AY=RESO(2,I)+ALPDT*(A(2,N)-RESO(2,I))
           AZ=RESO(3,I)+ALPDT*(A(3,N)-RESO(3,I))
-C memorisation de la reaction
+C saving of the reaction
           RESO(1,I)=AX
           RESO(2,I)=AY
           RESO(3,I)=AZ

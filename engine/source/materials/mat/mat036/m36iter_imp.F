@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m36iter_imp   ../engine/source/materials/mat/mat036/m36iter_imp.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps36      ../engine/source/materials/mat/mat036/sigeps36.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter2       ../engine/source/tools/curve/vinter.F
-      !||    imp_stop      ../engine/source/implicit/imp_solv.F
-      !||    vinter2       ../engine/source/tools/curve/vinter.F
-      !||    vinter2dp     ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    m36iter_imp   ../engine/source/materials/mat/mat036/m36iter_imp.F
+!||--- called by ------------------------------------------------------
+!||    sigeps36      ../engine/source/materials/mat/mat036/sigeps36.F
+!||--- calls      -----------------------------------------------------
+!||    finter2       ../engine/source/tools/curve/vinter.F
+!||    imp_stop      ../engine/source/implicit/imp_solv.F
+!||    vinter2       ../engine/source/tools/curve/vinter.F
+!||    vinter2dp     ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE M36ITER_IMP( SIGNXX,  SIGNYY,  SIGNZZ,
      $                        SIGNXY,  SIGNYZ,  SIGNZX,
      $                        PLA,        YLD,      G3,
@@ -68,7 +68,7 @@ c    YFAC    = scaling factor of sigma-eps_plast relation
 c
 c    TF      = array containing discrete sigma-eps_plast relation
 c    IAD1,  ILEN1 = pre-computed data required by interpolation
-c                         routine "VINTER"
+c                         "VINTER" routine
 c    NEL     = size of the element group being processed
 c    FISOKIN = indicator for isotropic/kinematic/moixed hardening
 c    UVAR    = array containing various state variables 
@@ -177,7 +177,7 @@ c
           PFAC(I)  =  ONE
         ENDDO
 c
-        IF (IPFLAG == NEL.AND.(IMACH/=3.OR.IPARIT == 0)) THEN
+        IF (IPFLAG == NEL.AND.(IPARIT == 0)) THEN
           DO I=1,NEL
             IPOSP(I) = VARTMP(I,2)
             IADP(I)  = NPF(IPFUN) / 2 + 1

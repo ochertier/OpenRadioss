@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_r2r_nl   ../engine/source/mpi/r2r/spmd_exch_r2r_nl.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_getdata        ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    nlocal_reg_mod     ../common_source/modules/nlocal_reg_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_r2r_nl      ../engine/source/mpi/r2r/spmd_exch_r2r_nl.F
+!||--- called by ------------------------------------------------------
+!||    r2r_getdata           ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    nlocal_reg_mod        ../common_source/modules/nlocal_reg_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_R2R_NL(
      1    A ,AR, V, VR     ,MS  ,
      2    IN,IAD_ELEM ,FR_ELEM, SIZE,
@@ -40,6 +41,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "r4r8_p.inc"
 C-----------------------------------------------------------------
@@ -74,7 +76,7 @@ C-----------------------------------------------
      .        SIZ,J,K,L,NB_NOD,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
-     .        REQ_R(NSPMD),REQ_S(NSPMD),OFFSET,MSGOFF,NN,
+     .        REQ_R(NSPMD),REQ_S(NSPMD),OFFSET,MSGOFF,
      .        OFFSET_S_NL,OFFSET_R_NL
       my_real
      .        RBUF(RBUF_SIZE),SBUF(SBUF_SIZE),
@@ -165,7 +167,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
        IF(DD_R2R(I+1,1)-DD_R2R(I,1)>0)THEN
           MSGTYP = MSGOFF
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -180,7 +182,7 @@ C
 C decompactage
 C
       DO I = 1, NSPMD
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
         NB_NOD = DD_R2R(I+1,2)-DD_R2R(I,2)
         IF(NB_NOD>0)THEN
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -209,7 +211,7 @@ C   test si msg necessaire a envoyer a completer par test interface
                   IN(NOD)= RBUF(L+7)            
                 ENDIF
                 L = L + SIZE                               
-C calcul du travail localement                
+C local computation of work
                 IF(WEIGHT(NOD)==1)THEN
                   WF = WF + (DF1*V(1,NOD)+DF2*V(2,NOD)+
      .                 DF3*V(3,NOD))/TWO
@@ -237,7 +239,7 @@ C calcul du travail localement
                    MS(NOD)= RBUF(L+3)           
                  ENDIF                 
                  L = L + SIZE 
-C calcul du travail localement                
+C local computation of work
                  IF(WEIGHT(NOD)==1)THEN
                    WF = WF + (DF1*V(1,NOD)+DF2*V(2,NOD)+
      .                 DF3*V(3,NOD))/TWO

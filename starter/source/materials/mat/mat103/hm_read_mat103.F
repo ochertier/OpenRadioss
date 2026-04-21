@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat103           ../starter/source/materials/mat/mat103/hm_read_mat103.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat103           ../starter/source/materials/mat/mat103/hm_read_mat103.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT103(UPARAM ,MAXUPARAM,NUPARAM  ,FSMOOTH   , IMATVIS  ,
      .                          NUVAR  ,IFUNC    ,MAXFUNC  ,NFUNC    , PARMAT   , 
      .                          UNITAB ,MAT_ID   ,TITR     ,MTAG     , LSUBMODEL,
@@ -170,7 +170,7 @@ C-----------------------------------------------
       UPARAM(13) = 273.15
       UPARAM(14) = EPS0
 C    
-      NUVAR     = 1  ! temperature
+      NUVAR     = 1
       NFUNC     = 0 
       BULK   = E/THREE/(ONE-TWO*NU)
       PARMAT(1) = BULK 
@@ -183,7 +183,6 @@ C
       PM(69) = RCP
       PM(100)= BULK
 C   flag activation   
-      MTAG%G_TEMP = 1  ! 
       MTAG%L_TEMP = 1
       MTAG%G_EPSD = 1
       MTAG%L_EPSD = 1
@@ -195,7 +194,7 @@ C   flag activation
       MATPARAM%IEOS = 18  ! Linear EOS is used by default 
       
 !---------------------------------------------------------   
-
+!
       ! Material compatibility with /EOS option
       CALL INIT_MAT_KEYWORD(MATPARAM,"EOS")
 

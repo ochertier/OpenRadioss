@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    elegror                ../starter/source/groups/elegror.F
-      !||--- called by ------------------------------------------------------
-      !||    lecsec42               ../starter/source/tools/sect/hm_read_sect.F
-      !||    lecsec4bolt            ../starter/source/tools/sect/lecsec4bolt.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    elegror                ../starter/source/groups/elegror.F
+!||--- called by ------------------------------------------------------
+!||    lecsec42               ../starter/source/tools/sect/hm_read_sect.F
+!||    lecsec4bolt            ../starter/source/tools/sect/lecsec4bolt.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       INTEGER FUNCTION ELEGROR(IGU,IGRELE,NGRELE,MOT,
      .                  IBUF,NIB,MESS,NFRAM,TAGELEMS,ISTYP,
      .                  ID,TITR)
@@ -56,7 +56,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       CHARACTER MESS*40,MOT*4
-      INTEGER I,J,K,IG,L,IE,IADV
+      INTEGER I, J, IG, L, IE
       CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
       ELEGROR=0

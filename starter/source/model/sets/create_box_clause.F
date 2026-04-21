@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_box_clause             ../starter/source/model/sets/create_box_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                        ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    create_elt_box                ../starter/source/model/sets/create_elt_box.F
-      !||    create_line_from_element      ../starter/source/model/sets/create_line_from_element.F
-      !||    create_line_from_surface      ../starter/source/model/sets/create_line_from_surface.F
-      !||    create_node_box               ../starter/source/model/sets/create_node_box.F
-      !||    create_rbody_box              ../starter/source/model/sets/create_rbody_box.F
-      !||    create_surface_from_element   ../starter/source/model/sets/create_surface_from_element.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod            ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_box_clause             ../starter/source/model/sets/create_box_clause.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                        ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    create_elt_box                ../starter/source/model/sets/create_elt_box.F
+!||    create_line_from_element      ../starter/source/model/sets/create_line_from_element.F
+!||    create_line_from_surface      ../starter/source/model/sets/create_line_from_surface.F
+!||    create_node_box               ../starter/source/model/sets/create_node_box.F
+!||    create_rbody_box              ../starter/source/model/sets/create_rbody_box.F
+!||    create_surface_from_element   ../starter/source/model/sets/create_surface_from_element.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod            ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_BOX_CLAUSE( 
      *                  CLAUSE   ,JCLAUSE  ,IS_AVAILABLE,LSUBMODEL ,KEYSET   ,
      *                  ITABM1   ,IBOX     ,X           ,SKEW      ,IXS10    ,
@@ -72,6 +72,7 @@ C-----------------------------------------------
       USE OPTIONDEF_MOD
       USE SET_SCRATCH_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -92,7 +93,7 @@ C-----------------------------------------------
      .  IPARTQ(*),IPARTC(*),IPARTG(*),IPARTT(*),IPARTP(*),IPARTR(*),
      .  KNOD2ELS(*),KNOD2ELC(*),KNOD2ELTG(*),NOD2ELS(*),NOD2ELC(*),
      .  NOD2ELTG(*),NOD2ELQ(*),KNOD2ELQ(*)
-      INTEGER  ELTYP,JCLAUSE,OPT_A,OPT_O,OPT_E
+      INTEGER  JCLAUSE, OPT_A, OPT_O, OPT_E
 !
       INTEGER, INTENT(IN), DIMENSION(NUMNOD,2) :: ITABM1
       INTEGER, INTENT(IN), DIMENSION(NRBODY,2) :: IRBODYM
@@ -113,7 +114,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER BOXTYPE,SURF_LIST,LINE_LIST_1D,ELTYP_ALL
+      INTEGER BOXTYPE, SURF_LIST, LINE_LIST_1D
 !
       INTEGER ADMBID
       DATA ADMBID/0/
@@ -222,7 +223,7 @@ C-----------------------------------------------
      *                KNOD2ELTG ,NOD2ELTG ,IPARTC    ,IPARTG    ,IPARTS    ,
      *                IPART     ,CLAUSE   ,OPT_A     ,OPT_O     ,IXQ       ,
      *                KNOD2ELQ  ,NOD2ELQ  ,X         ,KEYSET    ,DELBUF    ,
-     *                .FALSE.   )
+     *                .FALSE.   ,IPARTQ   ,OPT_E     )
 !
           ! Line from SURFACE
           CALL CREATE_LINE_FROM_SURFACE(CLAUSE ,KEYSET,OPT_A,OPT_E,DELBUF,

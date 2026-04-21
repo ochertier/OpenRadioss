@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spmd_fvb_amon   ../engine/source/mpi/anim/spmd_fvb_amon.F
-      !||--- called by ------------------------------------------------------
-      !||    genani          ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod       ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_fvb_amon         ../engine/source/mpi/anim/spmd_fvb_amon.F
+!||--- called by ------------------------------------------------------
+!||    genani                ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod             ../engine/share/modules/fvbag_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_FVB_AMON(MONVOL, VOLMON)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -37,6 +38,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -60,7 +62,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER K1, KK1, KIBALE, KRBALE, IFV, N, ITYP, PMAIN, NN, NTG,
-     .        ITAG, MSGOFF, LEN, IERR, STAT(MPI_STATUS_SIZE), IAD,
+     .         MSGOFF, LEN, IERR, STAT(MPI_STATUS_SIZE), IAD,
      .        I,MSGTAG
       my_real
      .       , DIMENSION(:), ALLOCATABLE :: RBUF
@@ -97,7 +99,7 @@ C
                   VOLMON(IAD+I-1)=RBUF(6*NN+I)
                ENDDO
             ELSEIF (ISPMD==PMAIN-1) THEN
-C Proc main envoie
+C main price sends
                IAD=KRBALE+MONVOL(K1-1+34)
                DO I=1,6*NN
                   RBUF(I)=VOLMON(IAD+I-1)

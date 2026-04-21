@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r1def3             ../engine/source/elements/spring/r1def3.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3             ../engine/source/elements/spring/rforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod   ../common_source/modules/python_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    r1def3             ../engine/source/elements/spring/r1def3.F
+!||--- called by ------------------------------------------------------
+!||    rforc3             ../engine/source/elements/spring/rforc3.F
+!||--- calls      -----------------------------------------------------
+!||    redef3             ../engine/source/elements/spring/redef3.F90
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    redef3_mod         ../engine/source/elements/spring/redef3.F90
+!||====================================================================
       SUBROUTINE R1DEF3(PYTHON,
      1   GEO,     F,       AL0,     E,
      2   DL,      NPF,     TF,      OFF,
@@ -160,7 +162,7 @@ C
       IF (SCODVER >= 101) THEN
         IF (TT == ZERO) THEN
           DO I=1,NEL
-            AL0_ERR(I)=ALDP(I)-AL0(I)        ! difference entre double et My_real
+            AL0_ERR(I)=ALDP(I)-AL0(I)        ! difference between double and my_real
           ENDDO
         ENDIF
       ENDIF
@@ -177,7 +179,7 @@ C
 !
       IF (SCODVER >= 101) THEN
         DO I=1,NEL
-          AL0DP(I) = AL0DP(I) + AL0_ERR(I)   ! AL_DP doit   tre recalcul   ainsi afin de garantir la coh  rence absolue entre AL0_DP et AL_DP
+          AL0DP(I) = AL0DP(I) + AL0_ERR(I)   ! Al_dp must be recalculated as well in order to guarantee the absolute coh rence between al0_dp and al_dp
         ENDDO
       ENDIF
 C
@@ -258,7 +260,7 @@ C       XC(I)=(XC(I)+GEO(141,MGN(I)))/XL0(I)
           XC(I)=(XC(I)+MAX_SLOPE(I))/XL0(I)
 
 
-! sinon derivée au point courrant 
+! otherwise derivative at current point
       ENDDO
 C
  1000 FORMAT(1X,'-- RUPTURE OF SPRING ELEMENT NUMBER ',I10)

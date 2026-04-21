@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_state_inimap_exch_siz   ../engine/source/output/sta/spmd_state_inimap_exch_siz.F
-      !||--- called by ------------------------------------------------------
-      !||    stat_inimap1d_file_spmd      ../engine/source/output/sta/stat_inimap1d_file_spmd.F
-      !||    stat_inimap1d_spmd           ../engine/source/output/sta/stat_inimap1d_spmd.F
-      !||    stat_inimap2d_file_spmd      ../engine/source/output/sta/stat_inimap2d_file_spmd.F
-      !||    stat_inimap2d_spmd           ../engine/source/output/sta/stat_inimap2d_spmd.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    state_inimap_mod             ../engine/share/modules/state_inimap_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_state_inimap_exch_siz   ../engine/source/output/sta/spmd_state_inimap_exch_siz.F
+!||--- called by ------------------------------------------------------
+!||    stat_inimap1d_file_spmd      ../engine/source/output/sta/stat_inimap1d_file_spmd.F
+!||    stat_inimap1d_spmd           ../engine/source/output/sta/stat_inimap1d_spmd.F
+!||    stat_inimap2d_file_spmd      ../engine/source/output/sta/stat_inimap2d_file_spmd.F
+!||    stat_inimap2d_spmd           ../engine/source/output/sta/stat_inimap2d_spmd.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod          ../engine/source/mpi/spmd_comm_world.F90
+!||    state_inimap_mod             ../engine/share/modules/state_inimap_mod.F
+!||====================================================================
        SUBROUTINE SPMD_STATE_INIMAP_EXCH_SIZ()
 C-----------------------------------------------
 C   M o d u l e s
@@ -39,6 +40,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -55,7 +57,7 @@ C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR,MSGOFF
-      INTEGER SIZ,MSGTYP,I,K,NG,NREC,MSGOFF2
+      INTEGER SIZ,MSGTYP,I,MSGOFF2
 
       DATA MSGOFF/10002/
       DATA MSGOFF2/10002/
@@ -84,13 +86,13 @@ C-----------------------------------------------
 
           DO I=2,NSPMD
 
-           !Reception du buffer entier des adresses DATA_I
+           !reception of the integer buffer of data_i addresses
             MSGTYP = MSGOFF2 
             CALL MPI_PROBE(IT_SPMD(I),MSGTYP,SPMD_COMM_WORLD,STATUS,ierror)
             CALL MPI_GET_COUNT(STATUS,MPI_INTEGER,SIZ,ierror)
             CALL MPI_RECV(BUFF_I,4,MPI_INTEGER,IT_SPMD(I),MSGTYP,SPMD_COMM_WORLD,STATUS,ierror)
             
-            ! Reception du buffer flottant double des adresses DATA_I
+            ! reception of the double-precision floating buffer of data_i addresses
             MSGTYP = MSGOFF 
             CALL MPI_RECV(BUFF_R,5,REAL,IT_SPMD(I),MSGTYP,SPMD_COMM_WORLD,STATUS,ierror)
             

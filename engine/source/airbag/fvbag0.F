@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvbag0                   ../engine/source/airbag/fvbag0.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                    ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    fv_up_switch             ../engine/source/airbag/fv_up_switch.F
-      !||    fvbag1                   ../engine/source/airbag/fvbag1.F
-      !||    fvbag2                   ../engine/source/airbag/fvbag2.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod             ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
-      !||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
-      !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
-      !||    sensor_mod               ../common_source/modules/sensor_mod.F90
-      !||====================================================================
-      SUBROUTINE FVBAG0(MONVOL,  VOLMON  , X        , SENSOR_TAB, V      ,
+!||====================================================================
+!||    fvbag0                   ../engine/source/airbag/fvbag0.F
+!||--- called by ------------------------------------------------------
+!||    resol                    ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    fv_up_switch             ../engine/source/airbag/fv_up_switch.F
+!||    fvbag1                   ../engine/source/airbag/fvbag1.F
+!||    fvbag2                   ../engine/source/airbag/fvbag2.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod             ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
+!||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
+!||    h3d_mod                  ../engine/share/modules/h3d_mod.F
+!||    output_mod               ../common_source/modules/output/output_mod.F90
+!||    python_funct_mod         ../common_source/modules/python_mod.F90
+!||    sensor_mod               ../common_source/modules/sensor_mod.F90
+!||====================================================================
+      SUBROUTINE FVBAG0(OUTPUT,MONVOL,  VOLMON  , X        , SENSOR_TAB, V      ,
      .                  A     ,  NPC     , TF       , NSENSOR   ,  
      .                  FSAV  ,  IFVMESH , ICONTACT , LGAUGE    ,
      .                  GAUGE ,  IGEO    , GEO      , PM        , IPM,
      .                  IPARG ,  IGROUPTG, IGROUPC  , ELBUF_TAB , FEXT,
-     .                  FLAG  ,  H3D_DATA, ITAB     ,WEIGHT     ,WFEXT)
+     .                  FLAG  ,  H3D_DATA, ITAB     ,WEIGHT     ,WFEXT, PYTHON)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -52,11 +54,13 @@ C  FLAG = 2 : Scatter information from PMAIN (inc. switch to UP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE OUTPUT_MOD, only : output_
       USE FVBAG_MOD
       USE ELBUFDEF_MOD
       USE FVMBAG_MESHCONTROL_MOD
       USE H3D_MOD
       USE SENSOR_MOD
+      USE python_funct_mod, only : python_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,6 +77,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(output_), intent(inout) :: output
       INTEGER,INTENT(IN) :: NSENSOR
       INTEGER, INTENT(IN) :: FLAG ! 1: gather + computations
                    ! 2: scatter      
@@ -87,13 +92,14 @@ C-----------------------------------------------
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB 
       INTEGER,INTENT(IN) :: ITAB(NUMNOD), WEIGHT(NUMNOD)
       DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
+      TYPE(PYTHON_) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IADPOLH, N, ITYP, NNFV, NTRFV, NPOLH, IFV, INFO, IDONE
+      INTEGER N, ITYP, NNFV, NTRFV, NPOLH, IFV, INFO, IDONE
       INTEGER NJET, IADJET, RADJET, NVENT, IADHOL, RADHOL
       INTEGER K1,  K2,  KIBJET, KIBHOL, KIBALE
-      INTEGER KK1, KK2, KRBJET, KRBHOL, KRBALE,IERR
+      INTEGER KK1, KK2, KRBJET, KRBHOL, KRBALE
       INTEGER NNS, NTG, NBA, NTGA, NNA, NNI, NTGI, NNT, NTGT
       INTEGER KI1, KI2, KI3, KI4, KI5
       INTEGER KR1, KR2, KR3, KR4, KR5, KR6, KR7, KR8, KR9
@@ -119,7 +125,7 @@ c 6:               XSAV (SPH sorting)
 c 7:               YSAV (SPH sorting)
 c 8:               ZSAV (SPH sorting)
 c 9:               FF (sph only)
-c 10:              intantaneous Pressure
+c 10: Intantaneous Pressure
 c 11:              intantaneous PA
 c 12:              intantaneous Rho
 c 13:              intantaneous E
@@ -243,7 +249,7 @@ C
             ENDIF
             IF(FLAG == 1 .AND. NSKIP < 1) THEN
               IF (MONVOL(K1+74-1) >= 0) THEN
-                CALL FVBAG1(
+                CALL FVBAG1(output,
      1            NNS                   ,NTG                ,MONVOL(KI1)         , MONVOL(KI2)              ,NJET                  ,
      2            MONVOL(IADJET)        ,VOLMON(RADJET)     ,NVENT,MONVOL(IADHOL), VOLMON(RADHOL)           ,
      3            VOLMON(KR1)           ,VOLMON(KR2)        ,VOLMON(KR3)         , VOLMON(KR4)              ,VOLMON(KR9)           ,
@@ -266,9 +272,9 @@ C
      K            FVDATA(IFV)%CPDPOLH   ,FVDATA(IFV)%CPEPOLH,FVDATA(IFV)%CPFPOLH ,
      L            MONVOL(KI4)           ,IPARG              ,MONVOL(KI5)         ,
      M            IGROUPTG              ,IGROUPC            ,ELBUF_TAB           , FEXT                     , CFL_COEF             ,
-     N            FVDATA(IFV)%PDISP_OLD ,FVDATA(IFV)%PDISP  ,H3D_DATA            , ITAB                     , WFEXT)
+     N            FVDATA(IFV)%PDISP_OLD ,FVDATA(IFV)%PDISP  ,H3D_DATA            , ITAB                     , WFEXT, PYTHON)
               ELSE
-                CALL FV_UP_SWITCH(
+                CALL FV_UP_SWITCH(output,
      1            NNS                   ,NTG, MONVOL(KI2)   ,NJET                , FVDATA(IFV)%NPOLY        , FVDATA(IFV)%LENH ,NBA,
      2            MONVOL(IADJET)        ,VOLMON(RADJET)     ,NVENT,MONVOL(IADHOL), VOLMON(RADHOL),
      3            VOLMON(KR1)           ,VOLMON(KR2)        ,VOLMON(KR3)         , VOLMON(KR4)              , VOLMON(KR9)       ,
@@ -291,7 +297,7 @@ C
      K            FVDATA(IFV)%CPDPOLH   ,FVDATA(IFV)%CPEPOLH,FVDATA(IFV)%CPFPOLH ,
      L            MONVOL(KI4)           ,IPARG              ,MONVOL(KI5)         ,
      M            IGROUPTG              ,IGROUPC            ,ELBUF_TAB, CFL_COEF ,
-     N            FVDATA(IFV)%PDISP_OLD ,FVDATA(IFV)%PDISP  ,WFEXT)
+     N            FVDATA(IFV)%PDISP_OLD ,FVDATA(IFV)%PDISP  ,WFEXT, PYTHON)
               ENDIF
             ELSEIF (FLAG == 2) THEN
               CALL FVBAG2(IFV       , ITYP          , NNA           , NVENT       , NJET          , 

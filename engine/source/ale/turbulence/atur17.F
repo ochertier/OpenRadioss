@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    atur17   ../engine/source/ale/turbulence/atur17.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain    ../engine/source/materials/mat_share/mmain.F90
-      !||--- calls      -----------------------------------------------------
-      !||    a17yl2   ../engine/source/ale/turbulence/a17yl2.F
-      !||    a17yl3   ../engine/source/ale/turbulence/a17yl3.F
-      !||====================================================================
+!||====================================================================
+!||    atur17   ../engine/source/ale/turbulence/atur17.F
+!||--- called by ------------------------------------------------------
+!||    mmain    ../engine/source/materials/mat_share/mmain.F90
+!||--- calls      -----------------------------------------------------
+!||    a17yl2   ../engine/source/ale/turbulence/a17yl2.F
+!||    a17yl3   ../engine/source/ale/turbulence/a17yl3.F
+!||====================================================================
       SUBROUTINE ATUR17(
      1   PM,      OFF,     RHO,     RK,
      2   RE,      GEO,     VOLN,    MAT,
-     3   DELTAX,  NGEO,    VIS,     VNEW,
+     3   DELTAX,  NGEO,
      4   VD2,     DVOL,    AIRE,    EINC,
-     5   PNEW,    TMU,     ALOGEY,  NEL,
+     5   PTURB,    ALOGEY,  NEL,
      6   LFT,     LLT,     JPOR)
 
 C-----------------------------------------------
@@ -56,8 +56,8 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: NEL, LFT,     LLT,     JPOR
       my_real PM(NPROPM,NUMMAT), OFF(*), RHO(*), RK(*), RE(*),GEO(NPROPG,NUMGEO),VOLN(MVSIZ),
-     .        DELTAX(*), VIS(*), VNEW(*), VD2(*), DVOL(*), AIRE(*), EINC(*), PNEW(*),
-     .        TMU(*), ALOGEY(*)
+     .        DELTAX(*), VD2(*), DVOL(*), AIRE(*), EINC(*), ALOGEY(*)
+      my_real,INTENT(INOUT) :: PTURB(1:LLT)
       INTEGER MAT(*),NGEO(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -84,8 +84,8 @@ C-----------------
           AX=PM(47,MAT(I))
           A=PM(49,MAT(I))
           GM=ONE -GF+GF*ALOGEY(I)
-          PNEW(I)=TWO*RK(I)/(VOLN(I)*THREE)
-          EI(I)=GM*EINC(I)/ALOGEY(I)-DVOL(I)*PNEW(I)
+          PTURB(I)=TWO*RK(I)/(VOLN(I)*THREE)
+          EI(I)=GM*EINC(I)/ALOGEY(I)-DVOL(I)*PTURB(I)
           EI(I)=MAX(ZERO,EI(I))
           RK(I)=RK(I)+(EI(I)-RE(I)*DT1)*OFF(I)
           RK(I)= MAX(EM15,RK(I)/VOLN(I))

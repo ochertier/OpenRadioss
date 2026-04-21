@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps86c   ../engine/source/materials/mat/mat086/sigeps86c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter      ../engine/source/tools/curve/finter.F
-      !||    vinter      ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps86c   ../engine/source/materials/mat/mat086/sigeps86c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    finter      ../engine/source/tools/curve/finter.F
+!||    vinter      ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE SIGEPS86C(
      1     NEL0    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC  ,
      2     NPF    ,NPT0    ,IPT     ,IFLAG   ,
      2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0   ,
-     3     AREA   ,EINT   ,THKLY   ,
+     3     AREA   ,EINT   ,THKLY   ,ISRATE  ,ASRATE ,
      4     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
      5     DEPSXX ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
      6     EPSXX  ,EPSYY  ,EPSXY   ,EPSYZ   ,EPSZX  ,
@@ -41,7 +41,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9     SIGVXX ,SIGVYY ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
      A     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
      B     OFF    ,NGL    ,IPM     ,MAT     ,ETSE   ,
-     C     GS     ,YLD    ,EPSP    ,ISRATE  ,DPLA_I)
+     C     GS     ,YLD    ,EPSD_PG ,EPSP    ,DPLA_I)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -109,6 +109,9 @@ C-----------------------------------------------
 C
       INTEGER NEL0, NUPARAM, NUVAR, NPT0, IPT,IFLAG(*),
      .   NGL(NEL0),MAT(NEL0),ISRATE,IPM(NPROPMI,*)
+      my_real ,INTENT(IN) :: ASRATE
+      my_real ,DIMENSION(NEL0) ,INTENT(IN)    :: EPSD_PG !< global element strain rate in Gauss pt
+      my_real ,DIMENSION(NEL0) ,INTENT(INOUT) :: EPSP    !< local strain rate used in equations
       my_real
      .   TIME,TIMESTEP,
      .   AREA(NEL0),RHO0(NEL0),EINT(NEL0,2),
@@ -120,8 +123,7 @@ C
      .   EPSXX(NEL0) ,EPSYY(NEL0) ,
      .   EPSXY(NEL0) ,EPSYZ(NEL0) ,EPSZX(NEL0) ,
      .   SIGOXX(NEL0),SIGOYY(NEL0),
-     .   SIGOXY(NEL0),SIGOYZ(NEL0),SIGOZX(NEL0),
-     .   GS(*),EPSP(NEL0)
+     .   SIGOXY(NEL0),SIGOYZ(NEL0),SIGOZX(NEL0),GS(*)
       my_real ,DIMENSION(NUPARAM) :: UPARAM
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
@@ -246,10 +248,13 @@ C-------------------
 C     STRAIN RATE
 C-------------------
 C
-         IF (ISRATE == 0) EPSP(I) = 
-     .     HALF*( ABS(EPSPXX(I)+EPSPYY(I))
-     .   + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
-     .                 + EPSPXY(I)*EPSPXY(I) ) )
+         IF (ISRATE == 0) THEN
+           EPSP(I) = HALF*( ABS(EPSPXX(I)+EPSPYY(I))
+     .             + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
+     .             + EPSPXY(I)*EPSPXY(I) ) )
+         ELSE
+           EPSP(I) = ASRATE*EPSD_PG(I) + (ONE-ASRATE)*EPSP(I)
+         END IF
 C-------------------
 C     STRAIN 
 C-------------------
@@ -358,7 +363,7 @@ C     PROJECTION
 C-------------------
        IF(IFLAG(1)==0)THEN
          NU31 = ONE-NNU11
-C projection radiale 
+C radial projection 
          DO I=1,NEL0
            SVM(I)=SQRT(SIGNXX(I)*SIGNXX(I)
      .             +SIGNYY(I)*SIGNYY(I)
@@ -380,7 +385,7 @@ C projection radiale
 C
        ELSEIF(IFLAG(1)==1)THEN
 C-------------------------
-C     CRITERE DE VON MISES
+C     von mises criterion
 C-------------------------
          DO I=1,NEL0
            H(I) = MAX(ZERO,H(I))
@@ -464,7 +469,7 @@ C------------------------------------------
 C-------------------------------------------
        ELSEIF(IFLAG(1)==2)THEN
 C-------------------------
-C     CRITERE DE VON MISES
+C     von mises criterion
 C-------------------------
          DO I=1,NEL0
            H(I) = MAX(ZERO,H(I))
@@ -490,7 +495,7 @@ C-------------------------
 C
          IF(NINDX/=0) THEN
 C-------------
-C   PROJ NORMALE AU CRITERE AVEC CALCUL APPROCHE DE LA NORMALE + RETOUR RADIAL
+C   normal projection to the criterion with approximate calculation of the normal + radial return
 C-------------
           NU31 = ONE-NNU11
           DO J=1,NINDX

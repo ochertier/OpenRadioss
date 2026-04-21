@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stackgroup             ../starter/source/stack/stackgroup.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    stack_mod              ../starter/share/modules1/stack_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    stackgroup             ../starter/source/stack/stackgroup.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    stack_mod              ../starter/share/modules1/stack_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE STACKGROUP( 
      .                     IGRSH3N    ,IGRSH4N  ,IXC        ,IXTG ,
      .                     IGEO       ,GEO      ,IWORKSH    ,THK  ,
@@ -45,6 +45,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -469,7 +470,7 @@ C
          ENDDO  ! iply                       
 !!###########################################################"
 C 
-C   mise en groupe des stack
+C   Group stack
 C           
          NSH = 0
          INDX_SH = 0
@@ -650,7 +651,7 @@ C to be  clarified later IPOS > 0
                ENDDO
 C                
                IF(IPOS == 2 )ZSHIFT = ZSHIFT /MAX(THICKT,EM20)                  
-C---             calcul automatique de position des couches             
+C--- Automatic calculation of layer positions
                  IWORKS%GEO(IPPOS+1,IS) = ZSHIFT + HALF*IWORKS%GEO(IPTHK+1,IS)
                  DO J=2,NPT                                               
                    IWORKS%GEO(IPPOS+J,IS) = IWORKS%GEO(IPPOS+J-1,IS)            
@@ -662,7 +663,7 @@ C calcul du thk by shell
             IWORKS%GEO(1,IS) = THICKT
 C============================================================================
 C---
-C  update the shell thickness   NDRAPE =0         
+C  update the shell thickness  without drape  
 C---
               DO I= NFIRST(IS) , NLAST(IS)
                 ID = INDX(I)
@@ -676,7 +677,7 @@ C---
 C   - various nb of integration points through each layer
 C---
 C
-C---  TEST de calcul automatique de position des NPTT dans les couches
+C--- TEST of automatic calculation of NPTT positions in the layers
 C
 cc            IPPID = 2
 cc            DO ILAY=1,NLAY
@@ -774,7 +775,7 @@ C
 C tag of ply element        
           ALLOCATE(ICSH_STACK(NUMELC + NUMELTG) )
           IF(NUMELC + NUMELTG > 0)ICSH_STACK = 0
-C   compteur by element               
+C   counter by element               
             DO I= 1,NPLY
               J   = IDGR4N(I)
               J4N = J
@@ -796,7 +797,7 @@ C element type Q4
                       ELSEIF(ICSH_STACK(IDSHEL) == IDS) THEN
                           IWORKSH (1,IDSHEL) = IWORKSH(1,IDSHEL) + 1
                       ELSE
-C  message d'erreur      
+C  error message      
                         IPID_1=IGEO_STACK(1,ICSH_STACK(IDSHEL))
                         NGL =IXC(NIXC,IDSHEL)
                         CALL ANCMSG(MSGID=1152,
@@ -830,7 +831,7 @@ C element type T3
                       ELSEIF(ICSH_STACK(IDSHEL) == IDS) THEN
                           IWORKSH(1,IDSHEL) =   IWORKSH(1,IDSHEL ) + 1
                       ELSE
-C  message d'erreur
+C  error message
                         IPID_1=IGEO_STACK(1,ICSH_STACK(IDSHEL))
                         NGL =IXTG(NIXTG,IDSHEL)
                         CALL ANCMSG(MSGID=1152,
@@ -905,7 +906,7 @@ C element type Q4
                           NPT = IWORKSH (1,IDSHEL)
                           IWORK_T(IDSHEL)%IPT(NPT) = IDPLY
                           ACTIV_PLY(IDSHEL,IKEY) = IBSET(ACTIV_PLY(IDSHEL,IKEY),IBIT)
-C  message d'erreur      
+C  error message      
                       ELSE
                         IPID_1=IGEO_STACK(1,ICSH_STACK(IDSHEL))
                         NGL =IXC(NIXC,IDSHEL)
@@ -946,7 +947,7 @@ C element type T3
                            IWORK_T(IDSHEL)%IPT(NPT) = IDPLY
                            ACTIV_PLY(IDSHEL,IKEY) = IBSET(ACTIV_PLY(IDSHEL,IKEY),IBIT)
                       ELSE
-C  message d'erreur
+C  error message
                         IPID_1=IGEO_STACK(1,ICSH_STACK(IDSHEL))
                         NGL =IXTG(NIXTG,IDSHEL)
                         CALL ANCMSG(MSGID=1152,
@@ -963,7 +964,7 @@ C  message d'erreur
            ENDDO !  I   ply groupe
 !!!------------------------------------------
 C 
-C   mise en groupe des stack
+C   Group stack
 C            
           NSH = 0
           INDX_SH = 0
@@ -1171,7 +1172,7 @@ C to be  clarified later IPOS > 0
                ENDDO
 C                
               IF (IPOS == 2 ) ZSHIFT = ZSHIFT /MAX(THICKT,EM20)     
-C---             calcul automatique de position des couches             
+C--- Automatic calculation of layer positions
                  STACK%GEO(IPPOS+1,IIS) = ZSHIFT +
      .                          HALF*STACK%GEO(IPTHK+1,IIS)
                  DO J=2,NPT                                               
@@ -1186,9 +1187,8 @@ C calcul du thk by shell
               STACK%GEO(1,IIS) = THICKT
 C============================================================================
 C---
-C  update the shell thickness if /DRAPE defined          
+C  update the shell thickness   without drape     
 C---
-!!  (NDRAPE == 0) 
               DO I= NFIRST(IS) , NLAST(IS)
                 ID = INDX(I)
                 II = INDX_SH(ID)
@@ -1201,7 +1201,7 @@ C---
 C   - various nb of integration points through each layer
 C---
 C
-C---  TEST de calcul automatique de position des NPTT dans les couches
+C--- TEST of automatic calculation of NPTT positions in the layers
 C
 cc            IPPID = 2
 cc            DO ILAY=1,NLAY

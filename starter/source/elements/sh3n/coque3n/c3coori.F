@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c3coori       ../starter/source/elements/sh3n/coque3n/c3coori.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3       ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cdkinit3      ../starter/source/elements/sh3n/coquedk/cdkinit3.F
-      !||    inirig_mat    ../starter/source/elements/initia/inirig_mat.F
-      !||    inivoid       ../starter/source/elements/initia/inivoid.F
-      !||    lslocal       ../starter/source/elements/xfem/lslocal.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    c3coori       ../starter/source/elements/sh3n/coque3n/c3coori.F
+!||--- called by ------------------------------------------------------
+!||    c3init3       ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cdkinit3      ../starter/source/elements/sh3n/coquedk/cdkinit3.F
+!||    inirig_mat    ../starter/source/elements/initia/inirig_mat.F
+!||    inivoid       ../starter/source/elements/initia/inivoid.F
+!||    lslocal       ../starter/source/elements/xfem/lslocal.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE C3COORI(X ,XREFTG,IXP ,NGL ,         
      .                   X1  ,X2  ,X3  ,Y1  ,Y2  ,Y3  , 
      .                   Z1  ,Z2  ,Z3  ,IX1 ,IX2 ,IX3 )
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,7 +68,7 @@ C-----------------------------------------------
       my_real E3X, E3Y, E3Z, SURF,
      .    XN13, XN23, XN12, X13, Y13, Z13, X12, Y12, Z12
 C=======================================================================
-C     CONNECTIVITES ET MATERIEL                  
+C     CONNECTIVITIES AND MATERIAL
 C--------------------------------------------------
       DO I=LFT,LLT                                                     
         NGL(I)=IXP(6,I)                                                  

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intanl_tg       ../starter/source/fluid/intanl_tg.F
-      !||--- called by ------------------------------------------------------
-      !||    mass_fluid_qd   ../starter/source/fluid/mass-fluid_qd.F
-      !||    mass_fluid_tg   ../starter/source/fluid/mass-fluid_tg.F
-      !||====================================================================
+!||====================================================================
+!||    intanl_tg       ../starter/source/fluid/intanl_tg.F
+!||--- called by ------------------------------------------------------
+!||    mass_fluid_qd   ../starter/source/fluid/mass-fluid_qd.F
+!||    mass_fluid_tg   ../starter/source/fluid/mass-fluid_tg.F
+!||====================================================================
       SUBROUTINE INTANL_TG(X1  , Y1  , Z1  , X2 , Y2 ,
      .                     Z2  , X3  , Y3  , Z3 , XP ,
      .                     YP  , ZP  , NRX , NRY, NRZ,
@@ -69,7 +69,7 @@ C SIMPLIFICATION SI SOURCE LOIN DE L'ELEMENT
         RVLH=AREA*(NRX*(X0-XP)+NRY*(Y0-YP)+NRZ*(Z0-ZP))/(D2**THREE_HALF)    
       ELSE
 C
-C COORDONNEES LOCALES
+C local contact details
         VX1=X2-X1
         VY1=Y2-Y1
         VZ1=Z2-Z1

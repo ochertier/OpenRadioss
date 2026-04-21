@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24sti3                 ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||    i24bord                 ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    i24gapm                 ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    i24normns               ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    insol3et                ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i24sti3                 ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- called by ------------------------------------------------------
+!||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
+!||    i24bord                 ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    i24gapm                 ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    i24normns               ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    insol3et                ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I24STI3(
      1 X     ,IRECT ,STF   ,IXS   ,PM    ,
      2 GEO   ,NRT   ,IXC   ,NINT  ,STFAC ,
@@ -51,7 +51,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      G IPARTFRICM,INTBUF_FRIC_TAB ,INTNITSCHE,NRTS,IRECTS,
      I IELNRTS ,ADRECTS ,FACNRTS  ,NMN       ,MSR ,
      J IPARTT ,IPARTP   ,IPARTR   ,ELEM_LINKED_TO_SEGMENT,
-     K IGSTI  )
+     K IGSTI  ,FLAG_ELEM_INTER25  ) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -59,6 +59,7 @@ C-----------------------------------------------
       USE INTBUF_FRIC_MOD  
       USE GROUPDEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs,nixc,nixtg,nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -105,22 +106,23 @@ C     REAL
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       TYPE (SURF_) :: IGRSURF
       TYPE (SURF_) :: IGRSURF2
+      INTEGER, INTENT(IN) :: FLAG_ELEM_INTER25(NINTER25,NUMELS)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NDX, I, J, INRT, NELS, MT, JJ, JJJ, NELC,
      .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
-     .   IP, NLEV, MYLEV, K, P, R, T,IAD,NRT1,NRT2,NSHIF,
-     .   TAGB(NUMNOD),NS,IGTYP,NRTT,ISUBSTACK,IPL,IPFMAX,
+     .   IP, NLEV, MYLEV, K, P, R, T,NRT1,NRT2,NSHIF,
+     .   NS,IGTYP,NRTT,IPL,IPFMAX,
      .   IPFLMAX,NM,NEL,FC,PERM,NSHIFF,N,IPG
      
-      INTEGER JPERM(4) ,FACES(4,6),TAB1(4),TAB2(4),FACES10(3,16),FACES20(4,24)
+      INTEGER JPERM(4) ,FACES(4,6),TAB1(4),TAB2(4),FACES10(3,16)
 C     REAL
       my_real
      .   DXM, GAPMX, GAPMN, AREA, VOL, DX,GAPS1,GAPS2, GAPM, DDX, 
      .   GAPTMP, GAPSCALE,SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
      .   SLSFAC,XL,GAPS_MN
-      INTEGER, DIMENSION(:),ALLOCATABLE ::TAGNOD
+      INTEGER, DIMENSION(:),ALLOCATABLE ::TAGNOD,TAGB
       DATA JPERM/2,3,4,1/
       DATA FACES/1,2,3,4,
      .           1,2,6,5,
@@ -145,10 +147,10 @@ C     REAL
      .             5,15,16,
      .             12,15,16/
 C--------------------------------------------------------------
-C     CALCUL DES RIGIDITES DES SEGMENTS 
-C     V16 : DANS LE CAS OU ONE SEGMENT APPARTIENT A LA FOIS
-C           A UNE BRIQUE ET A UNE COQUE ON CHOISIT LA RIGIDITE
-C           DE LA COQUE SAUF SI LE MATERIAU COQUE EST NUL.
+C     CALCULATION OF THE STIFFNESSES OF THE SEGMENTS
+C     V16: IN CASE A SEGMENT BELONGS TO BOTH
+C           A BRICK AND A SHELL, THE STIFFNESS OF THE SHELL IS CHOSEN
+C           OF THE SHELL UNLESS THE SHELL MATERIAL IS NULL.
 C---------------------------------------------------------------
 C      NRT->NRT0
 C---  MVOISN is used temporarily for Pen_ini MVOISN(1,*) -> MTYPE(solid),MVOISN(2,*) -> E_id
@@ -167,8 +169,9 @@ C-----NRTT:NRTM
 C     NRT_SH nb of shells before symetrization, NRT nb of MAIN segments before symetrization (symetrization in i24surfi)
       NRTT =NRT+NRT_SH
 C------------------------------------
-C     GAP NOEUDS SECONDS
+C     GAP NODES SECONDS
 C------------------------------------
+      ALLOCATE(TAGB(NUMNOD))
       DO I=1,NUMNOD
         WA(I)=ZERO
       ENDDO
@@ -284,7 +287,7 @@ C
         GAPS1=MAX(GAPS1,GAP_S(I))
         GAPS_MN=MIN(GAPS_MN,GAP_S(I))
       ENDDO
-C calcul du surface second. ---
+C calculation of the second surface. ---
       IF(INTTH > 0 ) THEN
         IF(NADMESH==0)THEN
           DO I = 1,NSN    
@@ -381,7 +384,7 @@ C overwrite
         END IF
       END IF
 
-C -----Friction model  SECONDARY nodes parts------
+C ---- FRUCTION Model Secondary Nodes Parts ------
 C-----------if node connects to both shell and solid -> takes shell    
 
       IF(INTFRIC > 0) THEN
@@ -504,7 +507,7 @@ C IELENRTS tab : Element number for each SECONDARY segment
              ENDDO
           ENDIF
 
-C ADRECTS tab : Adress of each SECONDARY node in element connectivity for PARITH/ON computation
+C ADRECTS tab : address of each SECONDARY node in element connectivity for PARITH/ON computation
           ADRECTS (1:4,1:NRT) = 0
           DO I=1,NRT
             IE = IELNRTS(I)
@@ -714,7 +717,7 @@ C FACNRTS tab : Facet number in element connectuvty for each SECONDARY segment f
                 ENDDO
 
             ELSEIF(IE <= NUMELS8+NUMELS10+NUMELS20 ) THEN
-!          Not available yet
+!          Not Available Yet
             ENDIF
 
            ENDIF ! IE >0
@@ -745,7 +748,8 @@ C------------ISU1 first
      F GAPMX  , GAPMN  ,GAPSCALE  ,NSHIF   ,GAPMAX_M,
      G ID     ,TITR    ,IGEO      ,FILLSOL ,NRTT    ,
      H PM_STACK, IWORKSH,INTFRIC ,TAGPRT_FRIC,IPARTFRICS,
-     I IPARTFRICM,IPARTS,INTBUF_FRIC_TAB ,ELEM_LINKED_TO_SEGMENT,IGSTI)
+     I IPARTFRICM,IPARTS,INTBUF_FRIC_TAB ,ELEM_LINKED_TO_SEGMENT,
+     J IGSTI  , FLAG_ELEM_INTER25)
        NRT2=IGRSURF%NSEG
        NSHIF = NRT1
        CALL I24GAPM(
@@ -764,7 +768,8 @@ C------------ISU1 first
      F GAPMX  , GAPMN  ,GAPSCALE  ,NSHIF   ,GAPMAX_M,
      G ID     ,TITR    ,IGEO      ,FILLSOL ,NRTT  ,
      H PM_STACK , IWORKSH,INTFRIC,TAGPRT_FRIC,IPARTFRICS,
-     I IPARTFRICM,IPARTS,INTBUF_FRIC_TAB ,ELEM_LINKED_TO_SEGMENT,IGSTI)
+     I IPARTFRICM,IPARTS,INTBUF_FRIC_TAB ,ELEM_LINKED_TO_SEGMENT,
+     J IGSTI  , FLAG_ELEM_INTER25)
       ELSE
        CALL I24GAPM(
      1 X     ,IRECT ,STF   ,IXS   ,PM    ,
@@ -781,7 +786,8 @@ C------------ISU1 first
      F GAPMX  , GAPMN  ,GAPSCALE  ,NSHIF   ,GAPMAX_M,
      G ID     ,TITR    ,IGEO      ,FILLSOL ,NRTT ,
      H PM_STACK , IWORKSH,INTFRIC,TAGPRT_FRIC,IPARTFRICS,
-     I IPARTFRICM,IPARTS,INTBUF_FRIC_TAB ,ELEM_LINKED_TO_SEGMENT,IGSTI)
+     I IPARTFRICM,IPARTS,INTBUF_FRIC_TAB ,ELEM_LINKED_TO_SEGMENT,
+     J IGSTI  , FLAG_ELEM_INTER25)
       END IF
 
 
@@ -818,16 +824,16 @@ C------recalculate GAP_MIN,MAX
         WRITE(IOUT,1500)GAPMN,GAPMX
       END IF
       END IF!(IPRI>=1) THEN
-C SUP DES GAPS VARIABLES
+C REMOVAL OF VARIABLE GAPS
       GAP = GAPS1+GAPS2
 C---------------------------------------------
-C     MISE A ONE DU MULTIPLICATEUR NODALE DES RIGIDITES 
+C     SETTING TO ONE OF THE NODE STIFFNESS MULTIPLIER
 C---------------------------------------------
       DO 610 L=1,NSN
          STFN(L) = ONE
  610  CONTINUE
 C
-C Calcul du gap reel a utiliser lors du critere de retri
+C Calculation of the real gap to use during the retri criterion
 C
       BGAPSMX = ZERO
       GAPINF=EP30
@@ -936,21 +942,24 @@ C-------shell elements
        END DO
       END IF
 
+      DEALLOCATE(TAGB)
       RETURN
- 1300 FORMAT(2X,'GAP MIN = ',1PG20.13)
+
  1400 FORMAT(2X,'MIN,MAX OF SECONDARY GAP: ',2(1PG20.13))
  1500 FORMAT(2X,'MIN,MAX OF MAIN GAP: ',2(1PG20.13)/)
       END
-      !||====================================================================
-      !||    insol3et      ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24sti3       ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    i25sti3       ../starter/source/interfaces/inter3d1/i25sti3.F
-      !||    remn_self24   ../starter/source/interfaces/inter3d1/remn_self24.F
-      !||====================================================================
+!||====================================================================
+!||    insol3et      ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- called by ------------------------------------------------------
+!||    i24sti3       ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    i25sti3       ../starter/source/interfaces/inter3d1/i25sti3.F
+!||    remn_self24   ../starter/source/interfaces/inter3d1/remn_self24.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INSOL3ET(X   ,IRECT ,IXS     ,NINT   ,NEL,I ,
      .                  AREA ,NOINT ,KNOD2ELS,NOD2ELS,IXS10 ,
      .                  IXS16,IXS20 ,NNOD    )
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -972,11 +981,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IY(4), N, JJ, II, K, NN, KK, IC, IAD,
+      INTEGER N, JJ, II, K, IC, IAD,
      .        NUSER, NUSERM
 C     REAL
-      my_real
-     .   N1, N2, N3, DDS
+
+
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -1064,22 +1073,22 @@ C
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    i24gapm                 ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24sti3                 ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||    i4gmx3                  ../starter/source/interfaces/inter3d1/i4gmx3.F
-      !||    incoq3                  ../starter/source/interfaces/inter3d1/incoq3.F
-      !||    ineltc                  ../starter/source/interfaces/inter3d1/inelt.F
-      !||    inelts_np               ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    insol3d                 ../starter/source/interfaces/inter3d1/insol3.F
-      !||    volint                  ../starter/source/interfaces/inter3d1/volint.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i24gapm                 ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- called by ------------------------------------------------------
+!||    i24sti3                 ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
+!||    i4gmx3                  ../starter/source/interfaces/inter3d1/i4gmx3.F
+!||    incoq3                  ../starter/source/interfaces/inter3d1/incoq3.F
+!||    ineltc                  ../starter/source/interfaces/inter3d1/inelt.F
+!||    inelts_np               ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    insol3d                 ../starter/source/interfaces/inter3d1/insol3.F
+!||    volint                  ../starter/source/interfaces/inter3d1/volint.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I24GAPM(
      1 X     ,IRECT ,STF   ,IXS   ,PM    ,
      2 GEO   ,NRT   ,IXC   ,NINT  ,STFAC ,
@@ -1095,7 +1104,8 @@ C-----------------------------------------------
      F GAPMX  , GAPMN  ,GAPSCALE  ,NSHIFT  ,GAPMAX_M,
      G ID     ,TITR    ,IGEO      ,FILLSOL ,NRTT    ,
      H PM_STACK , IWORKSH ,INTFRIC,TAGPRT_FRIC,IPARTFRICS,
-     I IPARTFRICM,IPARTS,INTBUF_FRIC_TAB,ELEM_LINKED_TO_SEGMENT,IGSTI)
+     I IPARTFRICM,IPARTS,INTBUF_FRIC_TAB,ELEM_LINKED_TO_SEGMENT,IGSTI,
+     J FLAG_ELEM_INTER25 ) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -1103,6 +1113,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE INTBUF_FRIC_MOD  
       USE GROUPDEF_MOD
+       use element_mod , only : nixs,nixc,nixtg,nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1115,7 +1126,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "scr08_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1143,19 +1153,20 @@ C     REAL
       CHARACTER(LEN=NCHARTITLE) :: TITR
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*) 
       TYPE (SURF_) :: IGRSURF
+      INTEGER, INTENT(IN) :: FLAG_ELEM_INTER25(NINTER25,NUMELS)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, INRT, NELS, MT, JJ, JJJ, NELC,
-     .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
-     .   IP, NLEV, MYLEV, K, P, R, T,IAD,NREV,IGTYP,IPGMAT,IGMAT,
-     .   ISUBSTACK,IPL,IPG,NINV,ICONTR
+     .   MG,  NELTG,
+     .   IP, NREV,IGTYP,IPGMAT,IGMAT,
+     .   ISUBSTACK,IPL,IPG,NINV,ICONTR,NIN25
       INTEGER, DIMENSION(:),ALLOCATABLE  :: TAGELEMS,INDEXE
 C     REAL
       my_real
      .   AREA, VOL, DX, GAPM, DDX, 
-     .   GAPTMP, SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
-     .   XL,STIFC,ST,IELEM(2),BULK
+     .   ST,BULK
+      INTEGER :: IELEM(2)
       LOGICAL :: PRINT_ERROR
       INTEGER, DIMENSION(4) :: NODE_ID
 C----------------------
@@ -1315,10 +1326,12 @@ C ----Friction model ------
 C-------coating shell  stif=max(sol,shell)         
           IF (MSEGTYP(I)>NRTT) THEN
              PRINT_ERROR = .FALSE.
+             NIN25 = 0
              CALL INSOL3D(X,IRECT,IXS,NINT,NELS,I   ,
      .            AREA,NOINT,KNOD2ELS ,NOD2ELS ,0,
      .            IXS10,IXS16,IXS20,TAGELEMS,INDEXE,
-     .            NINV,IELEM,ELEM_LINKED_TO_SEGMENT,PRINT_ERROR)
+     .            NINV,IELEM,ELEM_LINKED_TO_SEGMENT,PRINT_ERROR,
+     .            NIN25,NTY, FLAG_ELEM_INTER25 )
              IF(PRINT_ERROR) THEN
                 NODE_ID(1:4) = ITAB(IRECT(1:4,I))
           
@@ -1440,10 +1453,12 @@ C------------------------------------
 C-------coating shell  stif=max(sol,shell)         
           IF (MSEGTYP(I)>NRTT) THEN
              PRINT_ERROR = .FALSE.
+             NIN25 = 0
              CALL INSOL3D(X,IRECT,IXS,NINT,NELS,I   ,
      .            AREA,NOINT,KNOD2ELS ,NOD2ELS ,0,
      .            IXS10,IXS16,IXS20,TAGELEMS,INDEXE ,
-     .            NINV,IELEM,ELEM_LINKED_TO_SEGMENT,PRINT_ERROR)
+     .            NINV,IELEM,ELEM_LINKED_TO_SEGMENT,PRINT_ERROR,
+     .            NIN25,NTY, FLAG_ELEM_INTER25)
              IF(PRINT_ERROR) THEN
                 NODE_ID(1:4) = ITAB(IRECT(1:4,I))
           
@@ -1492,10 +1507,12 @@ C----------------------
 C     ELEMENTS SOLIDES
 C----------------------
        PRINT_ERROR = .FALSE.
+       NIN25 = 0
        CALL INSOL3D(X,IRECT,IXS,NINT,NELS,I   ,
      .            AREA,NOINT,KNOD2ELS ,NOD2ELS ,0,
      .            IXS10,IXS16,IXS20,TAGELEMS,INDEXE,
-     .            NINV ,IELEM,ELEM_LINKED_TO_SEGMENT,PRINT_ERROR)
+     .            NINV ,IELEM,ELEM_LINKED_TO_SEGMENT,PRINT_ERROR,
+     .            NIN25,NTY, FLAG_ELEM_INTER25)
        IF(PRINT_ERROR) THEN
             NODE_ID(1:4) = ITAB(IRECT(1:4,I))
           
@@ -1721,25 +1738,8 @@ C------------------------------------
        ENDIF
 C
        IF(NELS+NELC+NELTG==0)THEN
-        IF (IMACH/=3) THEN
-         IF(NINT>0) THEN
-            CALL ANCMSG(MSGID=92,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-         IF(NINT<0) THEN
-            CALL ANCMSG(MSGID=93,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-        ELSE
-C      en SPMD il faut un element associe a l'arrete sinon erreur
+
+C      In SPMD you need an element associated with the edge otherwise error
          IF(NINT>0) THEN
             CALL ANCMSG(MSGID=481,
      .                  MSGTYPE=MSGERROR,
@@ -1756,7 +1756,7 @@ C      en SPMD il faut un element associe a l'arrete sinon erreur
      .                  C1=TITR,
      .                  I2=I)
          ENDIF
-        ENDIF
+
        ENDIF
       END DO
 C
@@ -1791,21 +1791,21 @@ C
      .             I2=NINV)
 C         
 C      IF (IPRI>=5.AND.NREV>0) WRITE (IOUT,1400) NREV,NOINT
-C----due to Cycle       ------- 
+C---- due to cycle ------- 
       DO I=1+NSHIFT,NRT+NSHIFT
        GAP_M(I)=MIN(GAP_M(I),GAPMAX_M)
       END DO
 C-----------------------------------------------
       RETURN
- 1400 FORMAT(I10,' MAIN SEGMENTS',' OF INTERFACE',I10,
-     +                      ' ARE REVERSED THE NORMAL DIRECTION')
+ !1400 FORMAT(I10,' MAIN SEGMENTS',' OF INTERFACE',I10,
+ !    +                      ' ARE REVERSED THE NORMAL DIRECTION')
       END
-      !||====================================================================
-      !||    i24bord     ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24sti3     ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i24bord     ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- called by ------------------------------------------------------
+!||    i24sti3     ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I24BORD(NSEG,SURF_NODES ,TAGB)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1830,7 +1830,7 @@ C=======================================================================
       ALLOCATE (LINEIX(2,NLMAX)    ,STAT=stat)
       ALLOCATE (INDEX(2*NLMAX)     ,STAT=stat)
 c---------------------------------------
-c       recherche de toutes les lignes dans la surface
+c       search for all lines on the surface
 c---------------------------------------
         IS = 0
         LL = 0
@@ -1857,7 +1857,7 @@ C
         CALL MY_ORDERS(0,IWORK,LINEIX,INDEX,LL,2)
 
 c---------------------------------------
-c       suppression des lignes doubles
+c       removal of duplicate lines
 c---------------------------------------
         I1M = LINEIX(1,INDEX(1))
         I2M = LINEIX(2,INDEX(1))
@@ -1867,13 +1867,13 @@ c---------------------------------------
           I1 = LINEIX(1,INDEX(L))
           I2 = LINEIX(2,INDEX(L))
           IF(I1M == I2M)THEN
-c triangle on ne fait rien
+c triangle we do nothing
             BOLD=1
           ELSEIF(BOLD == 0)THEN
-c idem precedent on ne fait rien
+c ditto previous we do nothing
             BOLD=1
           ELSEIF(I2 == I2M .and. I1 == I1M)THEN
-c idem suivant pas de bord
+c idem according to pas de bord
             BORD=0
             BOLD=0
           ELSE
@@ -1887,7 +1887,7 @@ c idem suivant pas de bord
         ENDDO
 
         IF(BORD==1)THEN
-c         derniere arrete est un bord
+c         last edge is a border
           TAGB(I1) = 1
           TAGB(I2) = 1
         ENDIF
@@ -1898,15 +1898,15 @@ c         derniere arrete est un bord
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    i24normns   ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24sti3     ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    i25sti3     ../starter/source/interfaces/inter3d1/i25sti3.F
-      !||--- calls      -----------------------------------------------------
-      !||    normv3      ../starter/source/interfaces/inter3d1/i24tools.F
-      !||    normvec     ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||====================================================================
+!||====================================================================
+!||    i24normns   ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- called by ------------------------------------------------------
+!||    i24sti3     ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    i25sti3     ../starter/source/interfaces/inter3d1/i25sti3.F
+!||--- calls      -----------------------------------------------------
+!||    normv3      ../starter/source/interfaces/inter3d1/i24tools.F
+!||    normvec     ../starter/source/interfaces/inter3d1/i24sti3.F
+!||====================================================================
       SUBROUTINE I24NORMNS(
      1 X     ,IRECT ,NRT   ,NSN   ,NSV   ,PEN_OLD, STF)
 C============================================================================
@@ -1928,7 +1928,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,NN(4),NJ,NS
+      INTEGER I, J,NN(4),NS
 C     REAL
       my_real
      .   R(3),S(3),T(3),DET
@@ -2008,14 +2008,14 @@ C-----------
        DEALLOCATE(NORM,ITAG)
       RETURN
       END
-      !||====================================================================
-      !||    normvec           ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24normns         ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    sh_offset_nproj   ../starter/source/elements/shell/shell_offset/shell_offset_nproj.F90
-      !||--- calls      -----------------------------------------------------
-      !||    normv3            ../starter/source/interfaces/inter3d1/i24tools.F
-      !||====================================================================
+!||====================================================================
+!||    normvec           ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- called by ------------------------------------------------------
+!||    i24normns         ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    sh_offset_nproj   ../starter/source/elements/shell/shell_offset/shell_offset_nproj.F90
+!||--- calls      -----------------------------------------------------
+!||    normv3            ../starter/source/interfaces/inter3d1/i24tools.F
+!||====================================================================
       SUBROUTINE NORMVEC(R,S,T)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2029,7 +2029,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I
+
       my_real
      .   DET
 C~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2041,15 +2041,15 @@ C~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        CALL NORMV3(T,DET)
       RETURN
       END
-      !||====================================================================
-      !||    i24ll_kg      ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3        ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    volint        ../starter/source/interfaces/inter3d1/volint.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i24ll_kg      ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- called by ------------------------------------------------------
+!||    inint3        ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    volint        ../starter/source/interfaces/inter3d1/volint.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I24LL_KG(
      1 X     ,IRECT ,IXS   ,PM    ,WA    ,
      2 GEO   ,NRT   ,IXC   ,NINT  ,NTY   ,
@@ -2060,6 +2060,7 @@ C~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      J IPARTT,IPARTP,IPARTR,IGEO  )
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixs,nixc,nixtg,nixt,nixp,nixr
 C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2092,12 +2093,12 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, MT, JJ, JJJ, NELC,
-     .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
-     .   IP, NLEV, MYLEV, K, P, R, T,IAD,IGTYP
+      INTEGER I, N, JJ, JJJ, 
+     .   MG, IE,
+     .   IP,  K, IGTYP
 C     REAL
       my_real
-     .   AREA, VOL, DX, GAPM, DDX
+     .   VOL, DX
 C----------------------
       DO I=1,NUMNOD
         WA(I)=EP10
@@ -2220,16 +2221,18 @@ C
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    inelts_np   ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24gapm     ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||--- calls      -----------------------------------------------------
-      !||    norma1      ../starter/source/interfaces/inter3d1/norma1.F
-      !||====================================================================
+!||====================================================================
+!||    inelts_np     ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- called by ------------------------------------------------------
+!||    i24gapm       ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- calls      -----------------------------------------------------
+!||    norma1        ../starter/source/interfaces/inter3d1/norma1.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INELTS_NP(X        ,IRECT ,IXS   ,NREV ,NEL       ,
      .                     I        ,AREA  ,NOINT ,IR   ,SURF_ELTYP,
      .                     SURF_ELEM)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2264,7 +2267,7 @@ C---Remove print-out in 0.out file (could be too much)
 C
       NEL=SURF_ELEM(I)
 C-----------------------------------------------
-C     VERIFICATION DE L'ORIENTATION DES SEGMENTS
+C     VERIFICATION OF THE ORIENTATION OF THE SEGMENTS
 C-----------------------------------------------
        XS1=0.
        YS1=0.
@@ -2307,12 +2310,14 @@ C
 C          
        RETURN
       END
-      !||====================================================================
-      !||    insolbox   ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||====================================================================
+!||====================================================================
+!||    insolbox      ../starter/source/interfaces/inter3d1/i24sti3.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INSOLBOX(X    ,S_TYPE  ,S_EL   ,NOINT ,IXS   ,
      .                   IXS10 ,IXS16   ,IXS20  ,NS    ,GAP   ,
      .                   IPART_E,IPART_NS,IPEN0 ,INS     )
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2331,7 +2336,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,NC4(4),NC8(8)
+      INTEGER J,N,NC4(4),NC8(8)
 C     REAL
       my_real
      .   XI,YI,ZI,XMIN,YMIN,ZMIN,XMAX,YMAX,ZMAX

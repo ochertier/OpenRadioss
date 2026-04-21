@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_type18   ../starter/source/interfaces/int18/hm_read_inter_type18.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_type18   ../starter/source/interfaces/int18/hm_read_inter_type18.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE18(
      1          IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,
      3          IGRNOD     ,IGRSURF    ,IGRBRIC    ,XFILTR    ,FRIC_P   ,
@@ -84,10 +84,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER GRBRIC_ID,GRQUAD_ID,GRTRIA_ID,IBAG,IDEL7N,IGAP,IGAP0,IDUM,NTYP,INACTI,
+      INTEGER GRBRIC_ID,IDEL7N,IGAP,IGAP0,NTYP,INACTI,
      .        IDELKEEP,ISU1_user,ISU2_user,ISU3_user,ISTIFF
       my_real GAP,STARTT,STOPT,BUMULT,VISC,FRIC,VREF,SCALE
-      CHARACTER(LEN=40)::MESS
       CHARACTER(LEN=NCHARTITLE)::MSGTITL
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       INTEGER,EXTERNAL :: NGR2USR
@@ -121,14 +120,13 @@ C Initializations
 C------------------------------------------------------------
 C  Line1
 C------------------------------------------------------------
-      CALL HM_GET_INTV('tempsecondaryentityids', ISU1, IS_AVAILABLE, LSUBMODEL)
+      CALL HM_GET_INTV('ALEnodesEntityids', ISU1, IS_AVAILABLE, LSUBMODEL)
       IF (.NOT. IS_AVAILABLE) THEN
         ISU1 = 0
       ENDIF
       CALL HM_GET_INTV('mainentityids', ISU2, IS_AVAILABLE, LSUBMODEL)
-      CALL HM_GET_INTV('secondaryentityids', GRBRIC_ID, IS_AVAILABLE, LSUBMODEL)
+      CALL HM_GET_INTV('ALEelemsEntityids', GRBRIC_ID, IS_AVAILABLE, LSUBMODEL)
       CALL HM_GET_INTV('Igap', IGAP, IS_AVAILABLE, LSUBMODEL)
-      CALL HM_GET_INTV('Ipres', IBAG, IS_AVAILABLE, LSUBMODEL)
       CALL HM_GET_INTV('Idel', IDEL7N, IS_AVAILABLE, LSUBMODEL)
       CALL HM_GET_INTV('Iauto', ISTIFF, IS_AVAILABLE, LSUBMODEL)
 C------------------------------------------------------------
@@ -242,7 +240,6 @@ c          ENDIF
       ENDIF
       
 !===DEFAULT
-        IF(IBAG <= -1 .OR. IBAG >= 4)IBAG=1
         IF(IDEL7N <= -1 .OR. IDEL7N >= 3)IDEL7N=0
         IF(STFAC == ZERO)STFAC=ONE
         STFAC=-STFAC 
@@ -285,7 +282,7 @@ c          ENDIF
         IPARI(29) = ISTIFF
         IPARI(30) = 0       !MFROT
         IPARI(31) = 0       !IFQ
-        IPARI(32) = IBAG
+        IPARI(32) = 0       !IBAG
         IPARI(34) = 0       !ILAGM   
         IPARI(39) = 0       !ICURV
         IPARI(40) = 0       !NA1
@@ -308,7 +305,7 @@ C------------------------------------------------------------
         ENDIF
         WRITE(IOUT,6003) ISU2_user   !MAIN side from surf_id     
 
-        WRITE(IOUT,3018)IGAP0,ISTIFF,IBAG 
+        WRITE(IOUT,3018)IGAP0,ISTIFF
                 
         !stiffness output
         ! USER          INTERNAL
@@ -328,7 +325,7 @@ C------------------------------------------------------------
         !gap output 
         WRITE(IOUT,3014)  
         ! USER          INTERNAL
-        ! IGAP=0,1000 ->  0      (constant gap : defaut = auto)
+        ! IGAP = 0.1000 -> 0 (Constant Gap: DEFAUT = AUTO)
         ! IGAP=1      ->  1      (variable gap)      
         IF(IGAP == 0)THEN                                  
           !CONSTANT GAP  
@@ -370,8 +367,7 @@ C------------
  3017 FORMAT('    TYPE == 18 ALE-LAGRANGE COUPLING' /)
  3018 FORMAT(
      .    '    IGAP FLAG FORMULATION . . . . . . . . . . . ',I10/,
-     .    '    ISTF FLAG FORMULATION . . . . . . . . . . . ',I10/,
-     .    '    PRESSURE CORRECTION FLAG . . . . . . . . . .',I10/)
+     .    '    ISTF FLAG FORMULATION . . . . . . . . . . . ',I10/)
           
  3020 FORMAT(
      .    '    SCALE FACTOR. . . . . . . . . . . . . . . . ',1PG20.13) 

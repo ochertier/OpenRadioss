@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_n_vel         ../engine/source/output/sta/state_n_vel.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat            ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_dstat_vgath   ../engine/source/mpi/output/spmd_stat.F
-      !||    strs_txt50         ../engine/source/output/sta/sta_txt.F
-      !||====================================================================
+!||====================================================================
+!||    stat_n_vel         ../engine/source/output/sta/state_n_vel.F
+!||--- called by ------------------------------------------------------
+!||    genstat            ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_dstat_vgath   ../engine/source/mpi/output/spmd_stat.F
+!||    strs_txt50         ../engine/source/output/sta/sta_txt.F
+!||--- uses       -----------------------------------------------------
+!||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE STAT_N_VEL(NUMNOD ,ITAB   ,ITABG ,LENG ,NODGLOB,
      .                      WEIGHT ,NODTAG ,V     ,VR   )
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,11 +59,15 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J
-      INTEGER NODTAGLOB(LENG)
-      my_real
-     . VG(3,LENG),VRG(3,LENG)
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NODTAGLOB
+      my_real,DIMENSION(:,:),ALLOCATABLE :: VG
+      my_real,DIMENSION(:,:),ALLOCATABLE :: VRG
       CHARACTER(LEN=100) :: LINE
       INTEGER LEN_LINE
+C-----------------------------------------------
+      CALL MY_ALLOC(NODTAGLOB,LENG)
+      CALL MY_ALLOC(VG,3,LENG)
+      CALL MY_ALLOC(VRG,3,LENG)
 C-----------------------------------------------
 !
       IF (NSPMD > 1) THEN
@@ -142,5 +152,8 @@ C-----------------------------------------------
         END DO
       ENDIF
 C-----------------------------------------------
+      DEALLOCATE(NODTAGLOB)
+      DEALLOCATE(VG)
+      DEALLOCATE(VRG)
       RETURN
       END

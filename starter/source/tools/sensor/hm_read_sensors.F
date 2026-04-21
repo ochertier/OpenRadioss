@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,50 +20,49 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_sensors          ../starter/source/tools/sensor/hm_read_sensors.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_option_count          ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    read_sensor_acc          ../starter/source/tools/sensor/read_sensor_acc.F
-      !||    read_sensor_and          ../starter/source/tools/sensor/read_sensor_and.F
-      !||    read_sensor_contact      ../starter/source/tools/sensor/read_sensor_contact.F
-      !||    read_sensor_disp         ../starter/source/tools/sensor/read_sensor_disp.F
-      !||    read_sensor_dist_surf    ../starter/source/tools/sensor/read_sensor_dist_surf.F
-      !||    read_sensor_energy       ../starter/source/tools/sensor/read_sensor_energy.F
-      !||    read_sensor_gauge        ../starter/source/tools/sensor/read_sensor_gauge.F
-      !||    read_sensor_hic          ../starter/source/tools/sensor/read_sensor_hic.F
-      !||    read_sensor_nic          ../starter/source/tools/sensor/read_sensor_nic.F
-      !||    read_sensor_not          ../starter/source/tools/sensor/read_sensor_not.F
-      !||    read_sensor_or           ../starter/source/tools/sensor/read_sensor_or.F
-      !||    read_sensor_python       ../starter/source/tools/sensor/hm_read_sensor_python.F90
-      !||    read_sensor_rbody        ../starter/source/tools/sensor/read_sensor_rbody.F
-      !||    read_sensor_rwall        ../starter/source/tools/sensor/read_sensor_rwall.F
-      !||    read_sensor_sect         ../starter/source/tools/sensor/read_sensor_sect.F
-      !||    read_sensor_sens         ../starter/source/tools/sensor/read_sensor_sens.F
-      !||    read_sensor_temp         ../starter/source/tools/sensor/read_sensor_temp.F
-      !||    read_sensor_time         ../starter/source/tools/sensor/read_sensor_time.F
-      !||    read_sensor_user         ../starter/source/tools/sensor/read_sensor_user.F
-      !||    read_sensor_vel          ../starter/source/tools/sensor/read_sensor_vel.F
-      !||    read_sensor_work         ../starter/source/tools/sensor/read_sensor_work.F
-      !||    sensor_tab_init          ../starter/source/tools/sensor/sensor_tab_init.F
-      !||    udouble                  ../starter/source/system/sysfus.F
-      !||    usr2sys                  ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    read_sensor_python_mod   ../starter/source/tools/sensor/hm_read_sensor_python.F90
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||    surf_mod                 ../starter/share/modules1/surf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_sensors          ../starter/source/tools/sensor/hm_read_sensors.F
+!||--- called by ------------------------------------------------------
+!||    lectur                   ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_option_count          ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    read_sensor_acc          ../starter/source/tools/sensor/read_sensor_acc.F
+!||    read_sensor_and          ../starter/source/tools/sensor/read_sensor_and.F
+!||    read_sensor_contact      ../starter/source/tools/sensor/read_sensor_contact.F
+!||    read_sensor_disp         ../starter/source/tools/sensor/read_sensor_disp.F
+!||    read_sensor_dist_surf    ../starter/source/tools/sensor/read_sensor_dist_surf.F
+!||    read_sensor_energy       ../starter/source/tools/sensor/read_sensor_energy.F
+!||    read_sensor_gauge        ../starter/source/tools/sensor/read_sensor_gauge.F
+!||    read_sensor_hic          ../starter/source/tools/sensor/read_sensor_hic.F
+!||    read_sensor_nic          ../starter/source/tools/sensor/read_sensor_nic.F
+!||    read_sensor_not          ../starter/source/tools/sensor/read_sensor_not.F
+!||    read_sensor_or           ../starter/source/tools/sensor/read_sensor_or.F
+!||    read_sensor_python       ../starter/source/tools/sensor/hm_read_sensor_python.F90
+!||    read_sensor_rbody        ../starter/source/tools/sensor/read_sensor_rbody.F
+!||    read_sensor_rwall        ../starter/source/tools/sensor/read_sensor_rwall.F
+!||    read_sensor_sect         ../starter/source/tools/sensor/read_sensor_sect.F
+!||    read_sensor_sens         ../starter/source/tools/sensor/read_sensor_sens.F
+!||    read_sensor_temp         ../starter/source/tools/sensor/read_sensor_temp.F
+!||    read_sensor_time         ../starter/source/tools/sensor/read_sensor_time.F
+!||    read_sensor_user         ../starter/source/tools/sensor/read_sensor_user.F
+!||    read_sensor_vel          ../starter/source/tools/sensor/read_sensor_vel.F
+!||    read_sensor_work         ../starter/source/tools/sensor/read_sensor_work.F
+!||    sensor_tab_init          ../starter/source/tools/sensor/sensor_tab_init.F
+!||    udouble                  ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    read_sensor_python_mod   ../starter/source/tools/sensor/hm_read_sensor_python.F90
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||    surf_mod                 ../starter/share/modules1/surf_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_SENSORS(PYTHON,
      .           SENSORS   ,LACCELM   ,ITABM1    ,IPART     ,LGAUGE    ,
-     .           SUBSET    ,NSETS     ,IGRSURF   ,IGRNOD    ,BUFSF     ,
-     .           SKEW      ,ISKWN     ,UNITAB    ,LSUBMODEL ,HM_NSENS  ,
+     .           SUBSET    ,NSETS     ,IGRNOD    ,
+     .           ISKWN     ,UNITAB    ,LSUBMODEL ,HM_NSENS  ,
      .           SENSOR_USER_STRUCT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -101,23 +100,16 @@ C-----------------------------------------------
       INTEGER ,DIMENSION(3,*) ,INTENT(IN) :: LACCELM,LGAUGE
       INTEGER ,DIMENSION(LISKN,*)   ,INTENT(IN) :: ISKWN
       INTEGER ,DIMENSION(LIPART1,*) ,INTENT(IN) :: IPART
-      my_real ,DIMENSION(LSKEW,*) :: SKEW
-      my_real ,DIMENSION(*)       :: BUFSF
       TYPE (SENSORS_) ,INTENT(INOUT) ,TARGET   :: SENSORS
-      TYPE (SURF_)       ,DIMENSION(NSURF+NSETS)     :: IGRSURF
       TYPE (GROUP_)      ,DIMENSION(NGRNOD)    :: IGRNOD
       TYPE (SUBSET_)     ,DIMENSION(NSUBS)     :: SUBSET
       TYPE (SUBMODEL_DATA) ,DIMENSION(NSUBMOD) :: LSUBMODEL
       TYPE (UNIT_TYPE_)  ,INTENT(IN) ::UNITAB 
       TYPE(SENSOR_USER_STRUCT_) ,INTENT(INOUT) :: SENSOR_USER_STRUCT
 C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-      INTEGER USR2SYS
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ISEN,IUNIT,IFLAGUNIT,NS,TYP,UNIT_ID,SENS_ID
+      INTEGER ISEN,IUNIT,IFLAGUNIT,NS,UNIT_ID,SENS_ID
       my_real :: BID
       CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER KEY*40,MESS*40

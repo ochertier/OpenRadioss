@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop02         ../starter/source/properties/truss/hm_read_prop02.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties     ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop02         ../starter/source/properties/truss/hm_read_prop02.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties     ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP02(IGTYP ,IG  , IGEO   ,  GEO   ,PROP_TAG  ,
      .                   UNITAB ,IDTITL,LSUBMODEL )
 C============================================================================
@@ -66,11 +66,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IG, J
+      INTEGER IG
      
       my_real
      .    PUN,GAP
-      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

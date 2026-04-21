@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_s_ortho        ../engine/source/output/sta/stat_s_ortho.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat             ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf             ../engine/share/resol/initbuf.F
-      !||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
-      !||    srotorth            ../engine/source/elements/solid/srotorth.F
-      !||    strs_txt50          ../engine/source/output/sta/sta_txt.F
-      !||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod         ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    stat_s_ortho        ../engine/source/output/sta/stat_s_ortho.F
+!||--- called by ------------------------------------------------------
+!||    genstat             ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf             ../engine/share/resol/initbuf.F
+!||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
+!||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
+!||    srotorth            ../engine/source/elements/solid/srotorth.F
+!||    strs_txt50          ../engine/source/output/sta/sta_txt.F
+!||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod         ../engine/share/resol/initbuf.F
+!||    my_alloc_mod        ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE STAT_S_ORTHO(ELBUF_TAB,IPARG ,IPM ,IGEO ,IXS ,
      2                        WA,WAP0 ,IPARTS, IPART_STATE,
      3                        STAT_INDXS ,X,IGLOB ,IPART,IDEL ,SIZP0)
@@ -43,6 +45,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,7 +65,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SIZLOC,SIZP0,IGLOB,IDEL
+      INTEGER SIZP0,IGLOB,IDEL
       INTEGER IXS(NIXS,*),
      .        IPARG(NPARG,*),IPM(NPROPMI,*),IGEO(NPROPGI,*),
      .        IPARTS(*), IPART_STATE(*), STAT_INDXS(*),IPART(LIPART1,*)
@@ -72,10 +76,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,N,J,K,II(6),JJ,LEN,ISOLNOD,IUS, NPTR, NPTS, NPTT, NPTG,
-     .        NG, NEL, MLW,ID, IPRT0, IPRT, NPG,IPG,IPT, NUVAR,IE,
-     .        NLAY,IP,IL,IR,IS,IT,PID,ICSIG,IOFF
-      INTEGER PTWA(STAT_NUMELS), PTWA_P0(0:MAX(1,STAT_NUMELS_G))
+      INTEGER I,N,J,K,II(6),JJ,LEN,ISOLNOD, NPTR, NPTS, NPTT,
+     .        NG, NEL, MLW,ID, IPRT0, IPRT,IE,
+     .        NLAY,PID,ICSIG,IOFF
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA_P0
       my_real
      .   GAMA(6)
       CHARACTER*100 DELIMIT,LINE
@@ -89,6 +94,9 @@ C----
 C-----------------------------------------------
 C     8 NODES BRICK
 C======================================================================|
+      CALL MY_ALLOC(PTWA,STAT_NUMELS)
+      ALLOCATE(PTWA_P0(0:MAX(1,STAT_NUMELS_G)))
+C-----------------------------------------------
       JJ = 0
       IF(STAT_NUMELS==0) GOTO 200
 
@@ -226,7 +234,7 @@ c
               JJ = JJ + 6
             ENDDO
             IE=IE+1
-C         pointeur de fin de zone dans WA
+C         end-of-zone pointer in wa
               PTWA(IE)=JJ
           ENDDO
         ENDIF 
@@ -234,7 +242,7 @@ C         pointeur de fin de zone dans WA
  200  CONTINUE
 c-----------------------
       IF(NSPMD == 1)THEN
-C       recopies inutiles pour simplification du code.
+C       unnecessary copies for code simplification
         PTWA_P0(0)=0
         DO N=1,STAT_NUMELS
           PTWA_P0(N)=PTWA(N)
@@ -244,7 +252,7 @@ C       recopies inutiles pour simplification du code.
           WAP0(J)=WA(J)
         END DO
       ELSE
-C       construit les pointeurs dans le tableau global WAP0
+C       builds the pointers in the global wap0 array
         CALL SPMD_STAT_PGATHER(PTWA,STAT_NUMELS,PTWA_P0,STAT_NUMELS_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
@@ -252,9 +260,9 @@ C       construit les pointeurs dans le tableau global WAP0
       IF(ISPMD==0.AND.LEN>0) THEN
         IPRT0=0
         DO N=1,STAT_NUMELS_G
-C         retrouve le nieme elt dans l'ordre d'id croissant
+C         find the nieme elt in the order of an increasing id
           K=STAT_INDXS(N)
-C         retrouve l'adresse dans WAP0
+C         Find the address in WAP0
           J=PTWA_P0(K-1)
 c
           IPRT  = NINT(WAP0(J + 1))
@@ -365,6 +373,9 @@ c
           ENDIF !IOFF
         ENDDO        
       ENDIF
+c-----------
+      DEALLOCATE(PTWA)
+      DEALLOCATE(PTWA_P0)
 c-----------
       RETURN
       END

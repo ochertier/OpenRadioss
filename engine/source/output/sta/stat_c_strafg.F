@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_c_strafg       ../engine/source/output/sta/stat_c_strafg.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat             ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_q4l             ../engine/source/output/sta/stat_c_strafg.F
-      !||    get_t3l             ../engine/source/output/sta/stat_c_strafg.F
-      !||    layini              ../engine/source/elements/shell/coque/layini.F
-      !||    shell2g             ../engine/source/output/sta/stat_c_strafg.F
-      !||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
-      !||    strs_txt50          ../engine/source/output/sta/sta_txt.F
-      !||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod           ../engine/share/modules/drape_mod.F
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    stack_mod           ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    stat_c_strafg       ../engine/source/output/sta/stat_c_strafg.F
+!||--- called by ------------------------------------------------------
+!||    genstat             ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    get_q4l             ../engine/source/output/sta/stat_c_strafg.F
+!||    get_t3l             ../engine/source/output/sta/stat_c_strafg.F
+!||    layini              ../engine/source/elements/shell/coque/layini.F
+!||    shell2g             ../engine/source/output/sta/stat_c_strafg.F
+!||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
+!||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
+!||    strs_txt50          ../engine/source/output/sta/sta_txt.F
+!||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod           ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod        ../common_source/tools/memory/my_alloc.F90
+!||    stack_mod           ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE STAT_C_STRAFG(ELBUF_TAB,
      1                        X    ,IPARG ,IPM ,IGEO ,IXC ,
      2                        IXTG  ,WA,WAP0 ,IPARTC, IPARTTG,
@@ -49,6 +51,8 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD         
       USE STACK_MOD
       USE DRAPE_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,7 +71,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SIZLOC,SIZP0
+      INTEGER SIZP0
       INTEGER IXC(NIXC,*),IXTG(NIXTG,*),
      .        IPARG(NPARG,*),IPM(NPROPMI,*),IGEO(NPROPGI,*),
      .        IPARTC(*), IPARTTG(*), IPART_STATE(*),
@@ -82,17 +86,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,II,JJ,LEN, IOFF, NG, NEL, NFT, ITY, LFT, NPT,
-     .    LLT, MLW, ISTRAIN,ID, IPRT0, IPRT,NPG,IPG,IE,NPTR,NPTS,G_STRA,
+      INTEGER I, J, K, N, JJ, LEN, IOFF, NG, NEL, NFT, ITY, LFT, NPT, 
+     .    LLT, MLW, ID, IPRT0, IPRT,NPG,IPG,IE,NPTR,NPTS,G_STRA,
      .    ITHK,KK(8),NF1,IGTYP,IREL,IHBE,NLAY,IBID0,MAT_1,PID_1,ILAY,NF3,
      .    SEDRAPE,NUMEL_DRAPE
-      INTEGER PTWA(MAX(STAT_NUMELC ,STAT_NUMELTG)),
-     .        PTWA_P0(0:MAX(1,STAT_NUMELC_G,STAT_NUMELTG_G))
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA_P0
       double precision   
-     .   THK, EM, EB, H1, H2, H3
+     .   THK
       CHARACTER*100 DELIMIT,LINE
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
-      TYPE(L_BUFEL_)  ,POINTER :: LBUF     
+ 
       TYPE(BUF_LAY_)  ,POINTER :: BUFLY     
       INTEGER LAYNPT_MAX,NLAY_MAX,ISUBSTACK,IPT_ALL,NPTT,IT,IPT,NPT_ALL,MPT
       my_real, 
@@ -110,6 +114,9 @@ C-----------------------------------------------
      ./'----7----|----8----|----9----|----10---|'/
 C-----------------------------------------------
 C     4-NODE SHELLS
+C-----------------------------------------------
+      CALL MY_ALLOC(PTWA,MAX(STAT_NUMELC ,STAT_NUMELTG))
+      ALLOCATE(PTWA_P0(0:MAX(1,STAT_NUMELC_G,STAT_NUMELTG_G)))
 C-----------------------------------------------
       JJ = 0
       IF(STAT_NUMELC==0) GOTO 200
@@ -292,7 +299,7 @@ C
           END IF
 
           IE=IE+1
-C         pointeur de fin de zone dans WA
+C         end-of-zone pointer in wa
           PTWA(IE)=JJ
 c
          ENDDO  ! I=LFT,LLT
@@ -312,7 +319,7 @@ c
           WAP0(J)=WA(J)
         END DO
       ELSE
-C       construit les pointeurs dans le tableau global WAP0
+C       builds the pointers in the global wap0 array
         CALL SPMD_STAT_PGATHER(PTWA,STAT_NUMELC,PTWA_P0,STAT_NUMELC_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
@@ -323,9 +330,9 @@ C       construit les pointeurs dans le tableau global WAP0
         IPRT0=0
         DO N=1,STAT_NUMELC_G
 
-C         retrouve le nieme elt dans l'ordre d'id croissant
+C         find the nieme elt in the order of an increasing id
           K=STAT_INDXC(N)
-C         retrouve l'adresse dans WAP0
+C         Find the address in WAP0
           J=PTWA_P0(K-1)
 
           IOFF  = NINT(WAP0(J + 1))
@@ -605,7 +612,7 @@ C
           END IF  ! IF (MLW == 0 .or. MLW == 13)
 
           IE=IE+1
-C         pointeur de fin de zone
+C         end-of-zone pointer
           PTWA(IE)=JJ
 c
          ENDDO  ! I=LFT,LLT
@@ -625,7 +632,7 @@ c
           PTWA_P0(N)=PTWA(N)
         END DO
       ELSE
-C       construit les pointeurs dans le tableau global WAP0
+C       builds the pointers in the global wap0 array
         CALL SPMD_STAT_PGATHER(PTWA,STAT_NUMELTG,PTWA_P0,STAT_NUMELTG_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
@@ -636,9 +643,9 @@ C       construit les pointeurs dans le tableau global WAP0
         IPRT0=0
         DO N=1,STAT_NUMELTG_G
 
-C         retrouve le nieme elt dans l'ordre d'id croissant
+C         find the nieme elt in the order of an increasing id
           K=STAT_INDXTG(N)
-C         retrouve l'adresse dans WAP0
+C         Find the address in WAP0
           J=PTWA_P0(K-1)
 
           IOFF  = NINT(WAP0(J + 1))
@@ -736,18 +743,25 @@ C----- 2nd point
         ENDDO        
       ENDIF
 
+c----------
+      DEALLOCATE(PTWA)
+      DEALLOCATE(PTWA_P0)
+c-----------
       RETURN
       END
-      !||====================================================================
-      !||    get_q4l          ../engine/source/output/sta/stat_c_strafg.F
-      !||--- called by ------------------------------------------------------
-      !||    dynain_c_strag   ../engine/source/output/dynain/dynain_c_strag.F
-      !||    stat_c_strafg    ../engine/source/output/sta/stat_c_strafg.F
-      !||--- calls      -----------------------------------------------------
-      !||    clskew3          ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
-      !||====================================================================
+!||====================================================================
+!||    get_q4l          ../engine/source/output/sta/stat_c_strafg.F
+!||--- called by ------------------------------------------------------
+!||    dynain_c_strag   ../engine/source/output/dynain/dynain_c_strag.F
+!||    stat_c_strafg    ../engine/source/output/sta/stat_c_strafg.F
+!||--- calls      -----------------------------------------------------
+!||    clskew3          ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||====================================================================
         SUBROUTINE GET_Q4L(JFT    ,JLT    ,IXC    ,X    ,OFFG   ,
      .                     IREL   ,VQ     )
+        use element_mod , only : nixc
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
 c-----------------------------------------------
@@ -763,7 +777,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I,J,K,L
+      INTEGER I
       INTEGER IXCTMP2,IXCTMP3,IXCTMP4,IXCTMP5
       my_real 
      .   RX(MVSIZ),RY(MVSIZ),RZ(MVSIZ),SX(MVSIZ),SY(MVSIZ),
@@ -805,16 +819,19 @@ C----------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_t3l          ../engine/source/output/sta/stat_c_strafg.F
-      !||--- called by ------------------------------------------------------
-      !||    dynain_c_strag   ../engine/source/output/dynain/dynain_c_strag.F
-      !||    stat_c_strafg    ../engine/source/output/sta/stat_c_strafg.F
-      !||--- calls      -----------------------------------------------------
-      !||    clskew3          ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
-      !||====================================================================
+!||====================================================================
+!||    get_t3l          ../engine/source/output/sta/stat_c_strafg.F
+!||--- called by ------------------------------------------------------
+!||    dynain_c_strag   ../engine/source/output/dynain/dynain_c_strag.F
+!||    stat_c_strafg    ../engine/source/output/sta/stat_c_strafg.F
+!||--- calls      -----------------------------------------------------
+!||    clskew3          ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||====================================================================
         SUBROUTINE GET_T3L(JFT    ,JLT    ,IXTG    ,X    ,OFFG   ,
      .                     IREL   ,VQ     )
+        use element_mod , only : nixtg
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
 c-----------------------------------------------
@@ -830,7 +847,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I,J,K,L
+      INTEGER I
       INTEGER I2,I3,I1
       my_real 
      .   RX(MVSIZ),RY(MVSIZ),RZ(MVSIZ),SX(MVSIZ),SY(MVSIZ),
@@ -871,13 +888,13 @@ C----------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    shell2g          ../engine/source/output/sta/stat_c_strafg.F
-      !||--- called by ------------------------------------------------------
-      !||    dynain_c_strag   ../engine/source/output/dynain/dynain_c_strag.F
-      !||    stat_c_strafg    ../engine/source/output/sta/stat_c_strafg.F
-      !||    stat_c_strsfg    ../engine/source/output/sta/stat_c_strsfg.F
-      !||====================================================================
+!||====================================================================
+!||    shell2g          ../engine/source/output/sta/stat_c_strafg.F
+!||--- called by ------------------------------------------------------
+!||    dynain_c_strag   ../engine/source/output/dynain/dynain_c_strag.F
+!||    stat_c_strafg    ../engine/source/output/sta/stat_c_strafg.F
+!||    stat_c_strsfg    ../engine/source/output/sta/stat_c_strsfg.F
+!||====================================================================
       SUBROUTINE SHELL2G(EPS,QT)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -890,10 +907,10 @@ C-----------------------------------------------
 C------------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I
+ 
       my_real 
      .       TXX,TYY,TZZ,TXY,TYZ,TZX,UXX,UYY,UZZ,UXY,UYZ,UZX,A,B,C
-C--convention input EPS : exx,eyy,exy,eyz,ezx,0; output exx,eyy,ezz,exy,eyz,ezx
+C-Input EPS convention: Exx, Eyy, Exy, Eyz, Ezx, 0;Output Exx, Eyy, Ezz, Exy, Eyz, Ezx
              TXX = EPS(1)
              TYY = EPS(2)
              TZZ = ZERO

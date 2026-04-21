@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prethgrou      ../starter/source/output/th/hm_read_prethgrou.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
-      SUBROUTINE HM_READ_PRETHGROU(IFI,NVARTOT,LSUBMODEL,IFLAG)
+!||====================================================================
+!||    hm_read_prethgrou             ../starter/source/output/th/hm_read_prethgrou.F
+!||--- called by ------------------------------------------------------
+!||    lectur                        ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count               ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key            ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start               ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    checksum_starter_option_mod   ../starter/source/output/checksum/checksum_option.F90
+!||    hm_option_read_mod            ../starter/share/modules1/hm_option_read_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||====================================================================
+      SUBROUTINE HM_READ_PRETHGROU(IFI,NVARTOT,LSUBMODEL,IFLAG,OUTPUT)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -46,6 +47,8 @@ C-----------------------------------------------
        USE SUBMODEL_MOD
        USE GROUPDEF_MOD
        USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE
+       USE output_mod
+       USE checksum_starter_option_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,12 +63,12 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IFI,NVARTOT,IFLAG
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
+      TYPE(output_) OUTPUT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 
-      INTEGER I,IG,IGS,ID
-      INTEGER IFIX_TMP
+      INTEGER I, IGS, ID
       CHARACTER(LEN=NCHARLINE) :: KEY
       CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
@@ -76,9 +79,9 @@ C-----------------------------------------------
       INTEGER NVARIN,NVARRW,NVARRB,NVARAC,NVARSE,NVARJO,NVARFX,NVARFXM,NVARGAU
       INTEGER NVARAB,NVARMV4,NVARMV,NVARPA
       INTEGER NVARF1,NVARFR
-      INTEGER NVARRIV,NVARRIVG,NSELRT
+      INTEGER NVARRIV, NVARRIVG
       INTEGER NVARNG,NVARSG,NVARCG,NVARTG,NVARPG,NVARRG,NVARURG
-      INTEGER NVARNSG,NVARSPG,NVARSENS
+      INTEGER NVARNSG,NVARSPG,NVARSENS,NVARCHECKSUM
       INTEGER NVARING,NVARRWG, NVARRBG,NVARACG,NVARSEG,NVARJOG
       INTEGER NVARABG,NVARMG4,NVARMVG,NVARPAG,NVARFXG,NVARFXMG
       INTEGER NVARF1G,NVARFRG,NVARGAUG,NVARCLUS,NVARCLUSG,NVARFLOW
@@ -87,7 +90,7 @@ C-----------------------------------------------
       INTEGER NTHBEAM,NTHTRUS,NTHBRIC,NTHNODE,NTHSHEL,NTHSH3N,NTHSPRING,NTHRBODY
       INTEGER NTHMONVOL,HM_NTHPART,HM_NTHSUBS,HM_NTHSPHCEL, HM_NTHQUAD, HM_NTHSPHFLOW
       INTEGER HM_NTHGAUGE, HM_NTHFXBODY, HM_NTHFRAME, HM_NTHCYLJO, HM_NTHNSTRAND,HM_NTHSURF
-      INTEGER HM_NTHTRIA,HM_NTHSLIPRING,HM_NTHRETRACTOR,HM_NTHSENS
+      INTEGER HM_NTHTRIA,HM_NTHSLIPRING,HM_NTHRETRACTOR,HM_NTHSENS,HM_NTHCHECKSUM
       LOGICAL IS_AVAILABLE
 C
       PARAMETER (NVARRIV = 10,NVARRIVG = 1)
@@ -98,7 +101,7 @@ C
       PARAMETER (NVARFXM = 3)
       PARAMETER (NVARAC = 3,NVARSE =39,NVARJO = 6,NVARGAU = 8)
       PARAMETER (NVARAB = 7,NVARMV4= 9,NVARMV = 150)
-      PARAMETER (NVARPA = 31)
+      PARAMETER (NVARPA = 32)
       PARAMETER (NVARF1 = 18,NVARFR = 24,NVARCLUS=11)
       PARAMETER (NVARNG = 7,NVARSG = 39766,NVARCG =574 ,NVARTG = 1)
       PARAMETER (NVARPG = 1,NVARRG = 1,NVARURG = 1)
@@ -113,10 +116,10 @@ C
       PARAMETER (NVARSURF = 6)
       PARAMETER (NVARSLIP = 6,NVARSLIPG = 6,NVARRET = 3,NVARRETG = 3)
       PARAMETER (NVARSENS = 1)
+      PARAMETER (NVARCHECKSUM = 1)
 C-----------------------------------------------
 C   E x t e r n a l
 C-----------------------------------------------
-      INTEGER  PRETHGRNE,PRETHGRKI,PRETHGRPA,PRETHGRNS,PRETHGRVAR
       CHARACTER THFILE*4
 C=======================================================================
       IGS=0
@@ -547,6 +550,16 @@ C
           NVARTOT   = NVARTOT + 180
           IFI       = IFI     + NVARSENS + 43*IDSMAX
         ENDDO
+      ENDIF
+      !-------------------------------------------
+      ! /TH/CHECKSUM ( activated automaticaly if /CHECKSUM is used )
+      !-------------------------------------------
+      
+      HM_NTHCHECKSUM = OUTPUT%CHECKSUM%checksum_count
+      IF (HM_NTHCHECKSUM > 0) THEN
+        HM_NTHGRP = HM_NTHGRP + 1
+        NVARTOT   = NVARTOT + 180
+        IFI       = IFI     + NVARCHECKSUM + 40 * HM_NTHCHECKSUM
       ENDIF
 c-----------
       RETURN

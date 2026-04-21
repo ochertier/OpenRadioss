@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21xsave      ../engine/source/interfaces/int21/i21xsave.F
-      !||--- called by ------------------------------------------------------
-      !||    i21main_tri   ../engine/source/interfaces/intsort/i21main_tri.F
-      !||====================================================================
+!||====================================================================
+!||    i21xsave      ../engine/source/interfaces/int21/i21xsave.F
+!||--- called by ------------------------------------------------------
+!||    i21main_tri   ../engine/source/interfaces/intsort/i21main_tri.F
+!||====================================================================
        SUBROUTINE I21XSAVE(
      1       X     ,NSV  ,NSN   ,ITASK ,XSAV ,
      2       DD    ,IROT ,ROT   ,BRACKET)
-C sauvegarde des XSAV
+C saving the XSAV
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,7 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSNF,NSNL,I, J, II
+      INTEGER NSNF,NSNL,I, J
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------

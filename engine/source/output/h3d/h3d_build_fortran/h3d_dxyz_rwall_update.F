@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_dxyz_rwall_update    ../engine/source/output/h3d/h3d_build_fortran/h3d_dxyz_rwall_update.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                   ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_h3d_getmsr_update   ../engine/source/output/h3d/spmd/spmd_h3d_getmsr_update.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_dxyz_rwall_update    ../engine/source/output/h3d/h3d_build_fortran/h3d_dxyz_rwall_update.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                   ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_h3d_getmsr_update   ../engine/source/output/h3d/spmd/spmd_h3d_getmsr_update.F
+!||====================================================================
       SUBROUTINE H3D_DXYZ_RWALL_UPDATE (NSTRF,RWBUF,NPRW  ,DISP     ,XMIN ,
      2                     YMIN ,ZMIN  ,XMAX ,YMAX  , ZMAX,
      3                      FR_SEC,FR_WALL,WEIGHT,ITAB,
@@ -57,16 +57,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J, I, K, K0, K1, N, NSEG, N1, N2, N3, N4,MSR, ITYP
+      INTEGER K, N, N2, N3, N4, MSR, ITYP
       my_real
-     .   XX1, YY1, ZZ1, XX2, YY2, ZZ2, XX3, YY3, ZZ3,
-     .   XX4, YY4, ZZ4, D13, XXC, YYC, ZZC, AL4,
-     .   PMAIN,LOC_PROC, V1, V2, V3, VV1, VV2,
-     .   VV3, R, XN,YN,ZN,D,DX,DY,DZ, VV
-
-      my_real
-     .   XSEC(3,3,NSECT)
-      REAL R4,SBUF(3*NSECT)
+     .   LOC_PROC
+ 
 CC-----------------------------------------------
       LOC_PROC=ISPMD+1
 C
@@ -83,7 +77,7 @@ C
             YWL(N)= ZERO
             ZWL(N)= ZERO
           ELSE
-C verifier que ce noeud est sur proc0 !
+C check that this node is on processor 0!
             XWL(N)=DISP(1,MSR)
             YWL(N)=DISP(2,MSR)
             ZWL(N)=DISP(3,MSR)

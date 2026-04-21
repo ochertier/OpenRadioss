@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C-------------------------
-      !||====================================================================
-      !||    crit_stop   ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pcg1    ../engine/source/implicit/imp_fsa_inv.F
-      !||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh   ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    crit_stop   ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_pcg1    ../engine/source/implicit/imp_fsa_inv.F
+!||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
+!||    imp_ppcgh   ../engine/source/implicit/imp_pcg.F
+!||====================================================================
       INTEGER FUNCTION CRIT_STOP(IT,R2,IT_MAX,TOL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -55,11 +55,11 @@ C-----------------------------
 C--------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    imp_isave   ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    imp_isave   ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
+!||====================================================================
       SUBROUTINE IMP_ISAVE(
      1   NDDL,X,R,DIAG_K,DIAG_M,
      2   NNZ,LT_K,LT_K0,LT_M,LT_M0,
@@ -105,11 +105,11 @@ C-----------------------------------------------
       RETURN
       END
       
-      !||====================================================================
-      !||    imp_isave2   ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pcgh     ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    imp_isave2   ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_pcgh     ../engine/source/implicit/imp_pcg.F
+!||====================================================================
       SUBROUTINE IMP_ISAVE2(
      1   NDDL,X,DIAG_K,NNZ,LT_K,
      3   IADK,JDIK,LT_K0,IADK0,JDIK0)
@@ -160,11 +160,11 @@ C-----------------------------------------------
       RETURN
       END
       
-      !||====================================================================
-      !||    imp_rsave   ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    imp_rsave   ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
+!||====================================================================
       SUBROUTINE IMP_RSAVE(
      1   NDDL,X,R)
 C-----------------------------------------------
@@ -189,40 +189,41 @@ C-----------------------------------------------
 
 
 
-      !||====================================================================
-      !||    imp_pcgh              ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solvh0            ../engine/source/implicit/lin_solv.F
-      !||    lin_solvh1            ../engine/source/implicit/lin_solv.F
-      !||    lin_solvhm            ../engine/source/implicit/lin_solv.F
-      !||    lin_solvih2           ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                ../engine/source/output/message/message.F
-      !||    arret                 ../engine/source/system/arret.F
-      !||    crit_stop             ../engine/source/implicit/imp_pcg.F
-      !||    imp_isave             ../engine/source/implicit/imp_pcg.F
-      !||    imp_isave2            ../engine/source/implicit/imp_pcg.F
-      !||    imp_rsave             ../engine/source/implicit/imp_pcg.F
-      !||    mav_lth               ../engine/source/implicit/produt_v.F
-      !||    mixedsol              ../engine/source/implicit/imp_pcg.F
-      !||    my_barrier            ../engine/source/system/machine.F
-      !||    nlim_mix              ../engine/source/implicit/imp_pcg.F
-      !||    omp_get_num_threads   ../engine/source/engine/openmp_stub.F90
-      !||    prec_solvh            ../engine/source/implicit/prec_solv.F
-      !||    produt_h              ../engine/source/implicit/produt_v.F
-      !||    pupd                  ../engine/source/implicit/imp_pcg.F
-      !||    spmd_sum_s            ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sumfc_v          ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime              ../engine/source/system/timer_mod.F90
-      !||    stoptime              ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod           ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod          ../common_source/modules/groupdef_mod.F
-      !||    imp_frk               ../engine/share/modules/impbufdef_mod.F
-      !||    imp_intm              ../engine/share/modules/imp_intm.F
-      !||    imp_workh             ../engine/share/modules/impbufdef_mod.F
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_pcgh              ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    lin_solvh0            ../engine/source/implicit/lin_solv.F
+!||    lin_solvh1            ../engine/source/implicit/lin_solv.F
+!||    lin_solvhm            ../engine/source/implicit/lin_solv.F
+!||    lin_solvih2           ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||    crit_stop             ../engine/source/implicit/imp_pcg.F
+!||    imp_isave             ../engine/source/implicit/imp_pcg.F
+!||    imp_isave2            ../engine/source/implicit/imp_pcg.F
+!||    imp_rsave             ../engine/source/implicit/imp_pcg.F
+!||    mav_lth               ../engine/source/implicit/produt_v.F
+!||    mixedsol              ../engine/source/implicit/imp_pcg.F
+!||    my_barrier            ../engine/source/system/machine.F
+!||    nlim_mix              ../engine/source/implicit/imp_pcg.F
+!||    omp_get_num_threads   ../engine/source/engine/openmp_stub.F90
+!||    prec_solvh            ../engine/source/implicit/prec_solv.F
+!||    produt_h              ../engine/source/implicit/produt_v.F
+!||    pupd                  ../engine/source/implicit/imp_pcg.F
+!||    spmd_sum_s            ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_sumfc_v          ../engine/source/mpi/implicit/imp_spmd.F
+!||    startime              ../engine/source/system/timer_mod.F90
+!||    stoptime              ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod           ../engine/share/modules/dsgraph_mod.F
+!||    groupdef_mod          ../common_source/modules/groupdef_mod.F
+!||    imp_frk               ../engine/share/modules/impbufdef_mod.F
+!||    imp_intm              ../engine/share/modules/imp_intm.F
+!||    imp_workh             ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod         ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE IMP_PCGH( IPREC ,
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,NDDLI ,ITOK  ,IADI  ,JDII   ,
@@ -448,7 +449,7 @@ C
       IPRI = IPRINT
       IF (ISPMD/=0) IPRI = 0
 C--------
-C routine speciale pour sauvegarder les input
+C special routine to save inputs
       IF(ISAVE==1)CALL IMP_ISAVE(
      1   NDDL,X,R,DIAG_K,DIAG_M,
      2   NNZ,LT_K,LT_K0,LT_M,LT_M0,
@@ -564,7 +565,7 @@ C        L_B2=R02
         IF(IPRI<0) WRITE(ISTDO,1000)IT,RR
         WRITE(IOUT,1000)IT,RR
        ENDIF
-C-------pour etre coherent avec lanzos for linear
+C-------to be consistent with Lanczos for linear
 C----------------------
        CALL MY_BARRIER
 C---------------------
@@ -819,7 +820,7 @@ C Code MIC simple precision
 C debut code specifique MIC double precision
 CAD
 CAD
-CAD  DIRECTIVES POUR MIC
+CAD DIRECTIVES FOR MIC
 CAD
 C init MIC
         CALL MIC_INIT(
@@ -941,7 +942,7 @@ cc        call kmp_set_blocktime_target (TARGET_MIC, MICID,INFINITE)
            ALLOCATE(TABLE(NDDL),STAT=IERR)
            IERROR=IERROR+IERR
            IF(IERROR /= 0)THEN
-C code erreur
+C Error code
            END IF
 
            DO I = 1, NDDL
@@ -1072,7 +1073,7 @@ C
           CALL MIC_DDOT(NDDL, R, Z, G0)
 !$OMP END PARALLEL
          ELSE
-C si spmd penser a faire avant D_Y = D_Z*W pour les poids
+C If SPMD think to do before d_y = d_z*w for weights
 C D_Y = D_Z * D_W
 !dir$ omp offload target(mic:MICID)
      & nocopy(z,y,w,r)
@@ -1093,7 +1094,7 @@ C D_Y = D_Z * D_W
 C---------------------
 C       CALL MAV_LTGH(
 C     1            NDDL  ,IADK  ,JDIK  ,DIAG_K,LT_K  ,   
-C     2            P     ,Y     ,F_DDL ,L_DDL ,ITASK )
+C     2 p, y, f_ddl, l_ddl, Itask)
 
 C D_Y = D_P * DIAG_K
          CALL MIC_MV(NDDL,P,DIAG_K,Y)
@@ -1137,7 +1138,7 @@ C---------------------
           CALL MIC_DDOT(NDDL, P, Y, S)
 !$OMP END PARALLEL
          ELSE
-C si spmd penser a faire avant D_Z = D_Y*D_W pour les poids
+C If SPMD think to do before d_z = d_y*d_w for weights
 !dir$ omp offload target(mic:MICID)
      & nocopy(y,w,p,z)
      & inout(S)
@@ -1171,7 +1172,7 @@ C---------------------
             CALL MIC_DDOT(NDDL, R, R, R02)
 !$OMP END PARALLEL
            ELSE
-C si spmd penser a faire avant D_Z = D_R*W pour les poids
+C If SPMD think to do before d_z = d_r*w for weights
 !dir$ omp offload target(mic:MICID)
      & nocopy(r,w,z)
      & inout(r02)
@@ -1216,7 +1217,7 @@ C          L_B2=R02
            IF(IPRI<0) WRITE(ISTDO,1000)IT,RR
            WRITE(IOUT,1000)IT,RR
          ENDIF
-C-------pour etre coherent avec lanzos for linear
+C-------to be consistent with Lanczos for linear
 C----------------------
 c       CALL MY_BARRIER
 C---------------------
@@ -1284,7 +1285,7 @@ C---------------------
           CALL MIC_DDOT(NDDL, R, Z, G1)
 !$OMP END PARALLEL
          ELSE
-C si spmd penser a faire avant D_Y = D_Z*D_W pour les poids
+C If SPMD think to do before d_y = d_z*d_w for weights
 !dir$ omp offload target(mic:MICID)
      & nocopy(z,w,r,y)
      & inout(G1)
@@ -1307,7 +1308,7 @@ C---------------------
              CALL MIC_DDOT(NDDL, R, R, R2)
 !$OMP END PARALLEL
            ELSE
-C si spmd penser a faire avant D_Y = D_R*W pour les poids
+C If SPMD think to do before d_y = d_r*w for weights
 !dir$ omp offload target(mic:MICID)
      & nocopy(r,w,y)
      & inout(R2)
@@ -1366,7 +1367,7 @@ c        CALL MY_BARRIER
 C---------------------
 C        CALL MAV_LTGH(
 C     1            NDDL  ,IADK  ,JDIK  ,DIAG_K,LT_K  ,   
-C     2            P     ,Y     ,F_DDL ,L_DDL ,ITASK )
+C     2 p, y, f_ddl, l_ddl, Itask)
 C D_Y = D_P * DIAG_K
           CALL MIC_MV(NDDL,P,DIAG_K,Y)
 C D_Y = D_Y + LT_K * D_P
@@ -1408,7 +1409,7 @@ C---------------------
             CALL MIC_DDOT(NDDL, P, Y, S)
 !$OMP END PARALLEL
           ELSE
-C si spmd penser a faire avant D_Y = D_Y*W pour les poids
+C If SPMD think about doing before d_y = d_y*w for weights
 !dir$ omp offload target(mic:MICID)
      & nocopy(y,w,p,z)
      & inout(S)
@@ -1482,7 +1483,7 @@ C---------------------
             CALL MIC_DDOT(NDDL, R, Z, G1)
 !$OMP END PARALLEL
           ELSE
-C si spmd penser a faire avant D_Y = D_Z*W pour les poids
+C If SPMD think to do before d_y = d_z*w for weights
 !dir$ omp offload target(mic:MICID)
      & nocopy(z,w,r,y)
      & inout(G1)
@@ -1508,7 +1509,7 @@ cc!$OMP end single
               CALL MIC_DDOT(NDDL, R, R, R2)
 !$OMP END PARALLEL
             ELSE
-C si spmd penser a faire avant D_Y = D_R*W pour les poids
+C If SPMD think to do before d_y = d_r*w for weights
 !dir$ omp offload target(mic:MICID)
      & nocopy(r,w,y)
      & inout(R2)
@@ -1603,7 +1604,7 @@ C!dec$ omp offload target(mic:MICID) out(X,R:alloc_if(.false.))
       DEALLOCATE(INDEX) 
 c+1 tempo
       ELSE  ! CODE NSPMD = 1
-C debut code provisoire
+C Debut provisional code
 !dec$ attributes offload: mic :: ONE,ZERO,ISTDO,IOUT
 
 !dir$ omp offload target(mic:MICID)
@@ -1702,7 +1703,7 @@ c!$OMP PARALLEL default(shared) shared(g0)
           CALL MIC_DDOT(NDDL, R, Z, G0)
 c!$OMP END PARALLEL
 c         ELSE
-C si spmd penser a faire avant D_Y = D_Z*W pour les poids
+C If SPMD think to do before d_y = d_z*w for weights
 C D_Y = D_Z * D_W
 c!dir$ omp offload target(mic:MICID)
 c     & nocopy(z,y,w,r)
@@ -1723,7 +1724,7 @@ c!$OMP PARALLEL default(shared)
 C---------------------
 C       CALL MAV_LTGH(
 C     1            NDDL  ,IADK  ,JDIK  ,DIAG_K,LT_K  ,   
-C     2            P     ,Y     ,F_DDL ,L_DDL ,ITASK )
+C     2 p, y, f_ddl, l_ddl, Itask)
 
 C D_Y = D_P * DIAG_K
          CALL MIC_MV(NDDL,P,DIAG_K,Y)
@@ -1767,7 +1768,7 @@ c!$OMP PARALLEL default(shared) shared(s)
           CALL MIC_DDOT(NDDL, P, Y, S)
 c!$OMP END PARALLEL
 c         ELSE
-C si spmd penser a faire avant D_Z = D_Y*D_W pour les poids
+C If SPMD think to do before d_z = d_y*d_w for weights
 c!dir$ omp offload target(mic:MICID)
 c     & nocopy(y,w,p,z)
 c     & inout(S)
@@ -1801,7 +1802,7 @@ c!$OMP PARALLEL default(shared) shared(r02)
             CALL MIC_DDOT(NDDL, R, R, R02)
 c!$OMP END PARALLEL
 c           ELSE
-C si spmd penser a faire avant D_Z = D_R*W pour les poids
+C If SPMD think to do before d_z = d_r*w for weights
 c!dir$ omp offload target(mic:MICID)
 c     & nocopy(r,w,z)
 c     & inout(r02)
@@ -1854,7 +1855,7 @@ c+1
          ENDIF
 c+1
 !$OMP END SINGLE
-C-------pour etre coherent avec lanzos for linear
+C-------to be consistent with Lanczos for linear
 C----------------------
 c       CALL MY_BARRIER
 C---------------------
@@ -1922,7 +1923,7 @@ c!$OMP PARALLEL default(shared) shared(G1)
           CALL MIC_DDOT(NDDL, R, Z, G1)
 c!$OMP END PARALLEL
 c         ELSE
-C si spmd penser a faire avant D_Y = D_Z*D_W pour les poids
+C If SPMD think to do before d_y = d_z*d_w for weights
 c!dir$ omp offload target(mic:MICID)
 c     & nocopy(z,w,r,y)
 c     & inout(G1)
@@ -1945,7 +1946,7 @@ c!$OMP PARALLEL default(shared) shared(R2)
              CALL MIC_DDOT(NDDL, R, R, R2)
 c!$OMP END PARALLEL
 c           ELSE
-C si spmd penser a faire avant D_Y = D_R*W pour les poids
+C If SPMD think to do before d_y = d_r*w for weights
 c!dir$ omp offload target(mic:MICID)
 c     & nocopy(r,w,y)
 c     & inout(R2)
@@ -2022,7 +2023,7 @@ c        CALL MY_BARRIER
 C---------------------
 C        CALL MAV_LTGH(
 C     1            NDDL  ,IADK  ,JDIK  ,DIAG_K,LT_K  ,   
-C     2            P     ,Y     ,F_DDL ,L_DDL ,ITASK )
+C     2 p, y, f_ddl, l_ddl, Itask)
 C D_Y = D_P * DIAG_K
           CALL MIC_MV(NDDL,P,DIAG_K,Y)
 C D_Y = D_Y + LT_K * D_P
@@ -2064,7 +2065,7 @@ c!$OMP PARALLEL default(shared) shared(S)
             CALL MIC_DDOT(NDDL, P, Y, S)
 c!$OMP END PARALLEL
 c          ELSE
-C si spmd penser a faire avant D_Y = D_Y*W pour les poids
+C If SPMD think about doing before d_y = d_y*w for weights
 c!dir$ omp offload target(mic:MICID)
 c     & nocopy(y,w,p,z)
 c     & inout(S)
@@ -2138,7 +2139,7 @@ c!$OMP PARALLEL default(shared) shared(G1)
             CALL MIC_DDOT(NDDL, R, Z, G1)
 c!$OMP END PARALLEL
 c          ELSE
-C si spmd penser a faire avant D_Y = D_Z*W pour les poids
+C If SPMD think to do before d_y = d_z*w for weights
 c!dir$ omp offload target(mic:MICID)
 c     & nocopy(z,w,r,y)
 c     & inout(G1)
@@ -2166,7 +2167,7 @@ c!$OMP PARALLEL default(shared) shared(R2)
               CALL MIC_DDOT(NDDL, R, R, R2)
 c!$OMP END PARALLEL
 c            ELSE
-C si spmd penser a faire avant D_Y = D_R*W pour les poids
+C If SPMD think to do before d_y = d_r*w for weights
 c!dir$ omp offload target(mic:MICID)
 c     & nocopy(r,w,y)
 c     & inout(R2)
@@ -2288,7 +2289,7 @@ c!$OMP END single
       print *,'Transfer Rate MIC=>CPU (MB/s)=',
      .        ((2*NDDL/(1024*1024))*8)/TF
 c      END IF ! fin NSPMD ==1
-C fin code provisoire
+C End Provisional Code
 
 c      IF(NSPMD > 1) THEN
 c        DEALLOCATE(W)
@@ -2302,8 +2303,8 @@ c      END IF
       END IF   !only task0
 C fin code specifique MIC double precision
 #endif
-C fin code specifique GPU
-C routine speciale pour sauvegarder les resultats
+C End SPECIFIC GPU code
+C special routine to save results
       IF(ISAVE==1)CALL IMP_RSAVE(NDDL,X,R)
       
 C
@@ -2400,12 +2401,12 @@ C--------------------------------------------
 #endif
       END
 
-      !||====================================================================
-      !||    pupd        ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh   ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    pupd        ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
+!||    imp_ppcgh   ../engine/source/implicit/imp_pcg.F
+!||====================================================================
       SUBROUTINE PUPD(NDDL,NDDLI,ITN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2440,12 +2441,12 @@ c         WRITE(IOUT,*) '****RE-FRACTO. DUE TO ITN=',ITN
 C--------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    nlim_mix    ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh   ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    nlim_mix    ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_pcgh    ../engine/source/implicit/imp_pcg.F
+!||    imp_ppcgh   ../engine/source/implicit/imp_pcg.F
+!||====================================================================
       SUBROUTINE NLIM_MIX(NDDL,NDDLI,NLIM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2474,11 +2475,11 @@ C-----------------------------
 C--------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    mixedsol   ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pcgh   ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    mixedsol   ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_pcgh   ../engine/source/implicit/imp_pcg.F
+!||====================================================================
       LOGICAL FUNCTION MIXEDSOL()
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2499,17 +2500,17 @@ C-----------------------------------------------
       RETURN
       END
       
-      !||====================================================================
-      !||    imp_inix       ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_ppcgh      ../engine/source/implicit/imp_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    mav_mn         ../engine/source/implicit/produt_v.F
-      !||    mav_nm         ../engine/source/implicit/produt_v.F
-      !||    my_barrier     ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_pcg_proj   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_inix       ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_ppcgh      ../engine/source/implicit/imp_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    mav_mn         ../engine/source/implicit/produt_v.F
+!||    mav_nm         ../engine/source/implicit/produt_v.F
+!||    my_barrier     ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    imp_pcg_proj   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE IMP_INIX(F_DDL,L_DDL,NDDL,X  ,R ,W_DDL,ITASK )
 C-----------------------------------------------
 C   M o d u l e s
@@ -2572,17 +2573,17 @@ C----------------------
 C----------------------
       RETURN
       END
-      !||====================================================================
-      !||    imp_pro_p      ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_ppcgh      ../engine/source/implicit/imp_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    mav_mn         ../engine/source/implicit/produt_v.F
-      !||    mav_nm         ../engine/source/implicit/produt_v.F
-      !||    my_barrier     ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_pcg_proj   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_pro_p      ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_ppcgh      ../engine/source/implicit/imp_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    mav_mn         ../engine/source/implicit/produt_v.F
+!||    mav_nm         ../engine/source/implicit/produt_v.F
+!||    my_barrier     ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    imp_pcg_proj   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE IMP_PRO_P(F_DDL,L_DDL,NDDL ,P  ,W_DDL,ITASK )
 C-----------------------------------------------
 C   M o d u l e s
@@ -2648,11 +2649,11 @@ C---------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_inis    ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_inisi   ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    imp_inis    ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_inisi   ../engine/source/implicit/imp_pcg.F
+!||====================================================================
       SUBROUTINE IMP_INIS(ND ,F_ND ,L_ND,   NPF,   NPL,   S   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2689,18 +2690,19 @@ C---------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_updv2       ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret           ../engine/source/system/arret.F
-      !||    mmav_lth        ../engine/source/implicit/produt_v.F
-      !||    produt_h        ../engine/source/implicit/produt_v.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_updv2       ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    arret           ../engine/source/system/arret.F
+!||    mmav_lth        ../engine/source/implicit/produt_v.F
+!||    produt_h        ../engine/source/implicit/produt_v.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
        SUBROUTINE IMP_UPDV2( 
      1                    NDDL  ,NDDLI ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,ITOK  ,IADI  ,JDII  ,LT_I   ,
@@ -2827,11 +2829,11 @@ C-------checking V(U_TMP)
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_updv1   ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_ppcgh   ../engine/source/implicit/imp_pcg.F
-      !||====================================================================
+!||====================================================================
+!||    imp_updv1   ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_ppcgh   ../engine/source/implicit/imp_pcg.F
+!||====================================================================
        SUBROUTINE IMP_UPDV1( 
      1                    R2  ,R2_OLD  ,RMAX  ,PROJ_U,P      ,   
      2                    IT   ,F_DDL,L_DDL )
@@ -2873,34 +2875,35 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solvh0      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvh1      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvih2     ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    crit_stop       ../engine/source/implicit/imp_pcg.F
-      !||    imp_inisi       ../engine/source/implicit/imp_pcg.F
-      !||    imp_inist       ../engine/source/implicit/imp_pcg.F
-      !||    imp_inix        ../engine/source/implicit/imp_pcg.F
-      !||    imp_pro_p       ../engine/source/implicit/imp_pcg.F
-      !||    imp_updst       ../engine/source/implicit/imp_pcg.F
-      !||    imp_updv1       ../engine/source/implicit/imp_pcg.F
-      !||    imp_updv2       ../engine/source/implicit/imp_pcg.F
-      !||    mmav_lth        ../engine/source/implicit/produt_v.F
-      !||    mmv_lh          ../engine/source/implicit/produt_v.F
-      !||    mmv_lth         ../engine/source/implicit/produt_v.F
-      !||    my_barrier      ../engine/source/system/machine.F
-      !||    nlim_mix        ../engine/source/implicit/imp_pcg.F
-      !||    produt_h        ../engine/source/implicit/produt_v.F
-      !||    pupd            ../engine/source/implicit/imp_pcg.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod     ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
-      !||    imp_workh       ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    lin_solvh0      ../engine/source/implicit/lin_solv.F
+!||    lin_solvh1      ../engine/source/implicit/lin_solv.F
+!||    lin_solvih2     ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    crit_stop       ../engine/source/implicit/imp_pcg.F
+!||    imp_inisi       ../engine/source/implicit/imp_pcg.F
+!||    imp_inist       ../engine/source/implicit/imp_pcg.F
+!||    imp_inix        ../engine/source/implicit/imp_pcg.F
+!||    imp_pro_p       ../engine/source/implicit/imp_pcg.F
+!||    imp_updst       ../engine/source/implicit/imp_pcg.F
+!||    imp_updv1       ../engine/source/implicit/imp_pcg.F
+!||    imp_updv2       ../engine/source/implicit/imp_pcg.F
+!||    mmav_lth        ../engine/source/implicit/produt_v.F
+!||    mmv_lh          ../engine/source/implicit/produt_v.F
+!||    mmv_lth         ../engine/source/implicit/produt_v.F
+!||    my_barrier      ../engine/source/system/machine.F
+!||    nlim_mix        ../engine/source/implicit/imp_pcg.F
+!||    produt_h        ../engine/source/implicit/produt_v.F
+!||    pupd            ../engine/source/implicit/imp_pcg.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod     ../engine/share/modules/dsgraph_mod.F
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
+!||    imp_workh       ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE IMP_PPCGH( IPREC ,
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,NDDLI ,ITOK  ,IADI  ,JDII   ,
@@ -3199,7 +3202,7 @@ C        L_B2=R02
         IF(IPRI<0) WRITE(ISTDO,1000)IT,RR
         WRITE(IOUT,1000)IT,RR
        ENDIF
-C-------pour etre coherent avec lanzos for linear
+C-------to be consistent with Lanczos for linear
 C----------------------
        CALL MY_BARRIER
 C---------------------
@@ -3596,20 +3599,21 @@ C--------------------------------------------
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    imp_inist       ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret           ../engine/source/system/arret.F
-      !||    mam_nm          ../engine/source/implicit/produt_v.F
-      !||    mav_mm          ../engine/source/implicit/produt_v.F
-      !||    mmav_lth        ../engine/source/implicit/produt_v.F
-      !||    my_barrier      ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_inist       ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    arret           ../engine/source/system/arret.F
+!||    mam_nm          ../engine/source/implicit/produt_v.F
+!||    mav_mm          ../engine/source/implicit/produt_v.F
+!||    mmav_lth        ../engine/source/implicit/produt_v.F
+!||    my_barrier      ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
        SUBROUTINE IMP_INIST( 
      1                    NDDL  ,NDDLI ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,ITOK  ,IADI  ,JDII  ,LT_I   ,
@@ -3753,17 +3757,18 @@ C---------------------
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    imp_updst       ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    mortho_gs       ../engine/source/implicit/produt_v.F
-      !||    my_barrier      ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_updst       ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    mortho_gs       ../engine/source/implicit/produt_v.F
+!||    my_barrier      ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
        SUBROUTINE IMP_UPDST( 
      1                    NDDL  ,NDDLI ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,ITOK  ,IADI  ,JDII  ,LT_I   ,
@@ -3838,7 +3843,7 @@ C----------------------
       CALL MY_BARRIER
 C---------------------
         M_VS1 = NPCGPV+ 1
-C------add previous solution U ; default : IPRO_S0=2
+C------- Add previous solution u;Default: ipro_s0 = 2
 C---IPRO_S0=1 : alertory updated w/ 1 vector x
 C---IPRO_S0=2 : ini S w/ first p vectors updated w/ 2 vectors p,x
 C---IPRO_S0=3 : ini S w/ first p vectors updated w/ 2 vectors p,x (p<-RR_max)
@@ -3879,20 +3884,21 @@ C-------will do (T=[K]S ...) in IMP_INIST
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_inisi       ../engine/source/implicit/imp_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_inis        ../engine/source/implicit/imp_pcg.F
-      !||    mmav_lth        ../engine/source/implicit/produt_v.F
-      !||    mortho_gs       ../engine/source/implicit/produt_v.F
-      !||    my_barrier      ../engine/source/system/machine.F
-      !||    produt_h        ../engine/source/implicit/produt_v.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_inisi       ../engine/source/implicit/imp_pcg.F
+!||--- called by ------------------------------------------------------
+!||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    imp_inis        ../engine/source/implicit/imp_pcg.F
+!||    mmav_lth        ../engine/source/implicit/produt_v.F
+!||    mortho_gs       ../engine/source/implicit/produt_v.F
+!||    my_barrier      ../engine/source/system/machine.F
+!||    produt_h        ../engine/source/implicit/produt_v.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    imp_pcg_proj    ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE IMP_INISI( 
      1                    NDDL  ,IADK  ,JDIK  ,DIAG_K ,LT_K  ,   
      2                    NDDLI ,ITOK  ,IADI  ,JDII   ,LT_I  ,

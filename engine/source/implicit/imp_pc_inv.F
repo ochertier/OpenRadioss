@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  ------approximate inverse (minimisation:least squares by colonne)------ 
-      !||====================================================================
-      !||    imp_pc_inv   ../engine/source/implicit/imp_pc_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret        ../engine/source/system/arret.F
-      !||    get_suba     ../engine/source/implicit/imp_pc_inv.F
-      !||    imp_saic     ../engine/source/implicit/imp_pc_inv.F
-      !||    sp_static    ../engine/source/implicit/imp_fsa_inv.F
-      !||====================================================================
+!||====================================================================
+!||    imp_pc_inv   ../engine/source/implicit/imp_pc_inv.F
+!||--- calls      -----------------------------------------------------
+!||    arret        ../engine/source/system/arret.F
+!||    get_suba     ../engine/source/implicit/imp_pc_inv.F
+!||    imp_saic     ../engine/source/implicit/imp_pc_inv.F
+!||    sp_static    ../engine/source/implicit/imp_fsa_inv.F
+!||====================================================================
       SUBROUTINE IMP_PC_INV(
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,IADM  ,JDIM  ,DIAG_M, LT_M  ,
@@ -91,20 +91,20 @@ C------------post-filtrage----
         ENDDO
        IADM(I+1)=NNZM+1
       ENDDO 
-C------------eventuellement deuxieme niveau----
+C---------- Own second level ----
 C
       RETURN
       END
 C-------------resol A(M,N).MJ-I=0  ----
-      !||====================================================================
-      !||    imp_saic     ../engine/source/implicit/imp_pc_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pc_inv   ../engine/source/implicit/imp_pc_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_qrf      ../engine/source/implicit/imp_pc_inv.F
-      !||    lt_solv      ../engine/source/implicit/imp_pc_inv.F
-      !||    mav_qt       ../engine/source/implicit/imp_pc_inv.F
-      !||====================================================================
+!||====================================================================
+!||    imp_saic     ../engine/source/implicit/imp_pc_inv.F
+!||--- called by ------------------------------------------------------
+!||    imp_pc_inv   ../engine/source/implicit/imp_pc_inv.F
+!||--- calls      -----------------------------------------------------
+!||    imp_qrf      ../engine/source/implicit/imp_pc_inv.F
+!||    lt_solv      ../engine/source/implicit/imp_pc_inv.F
+!||    mav_qt       ../engine/source/implicit/imp_pc_inv.F
+!||====================================================================
       SUBROUTINE IMP_SAIC(M     ,N     ,A     ,MJ     ,MAXC )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -135,14 +135,14 @@ C--------------------------------------------
       RETURN
       END
 C-------------set submatrix A(M,N) for SAI ----
-      !||====================================================================
-      !||    get_suba     ../engine/source/implicit/imp_pc_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pc_inv   ../engine/source/implicit/imp_pc_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_kijs     ../engine/source/implicit/imp_pc_inv.F
-      !||    intab2       ../engine/source/implicit/imp_fsa_inv.F
-      !||====================================================================
+!||====================================================================
+!||    get_suba     ../engine/source/implicit/imp_pc_inv.F
+!||--- called by ------------------------------------------------------
+!||    imp_pc_inv   ../engine/source/implicit/imp_pc_inv.F
+!||--- calls      -----------------------------------------------------
+!||    get_kijs     ../engine/source/implicit/imp_pc_inv.F
+!||    intab2       ../engine/source/implicit/imp_fsa_inv.F
+!||====================================================================
       SUBROUTINE GET_SUBA(NDDL  ,IADK  ,JDIK  ,DIAG_K ,LT_K  ,
      .                    NC    ,JM    ,A     ,MAXC   ,MAXA  ,
      .                    IM    ,M     ,MJ    )
@@ -208,7 +208,7 @@ C------A(M,N)=DIAG_K(I)------
          ENDDO
        ENDIF 
       ENDDO
-C------ajoute autres lignes-----------
+C----- Add other lines ----------
       DO I=1,NDDL
        IF (EXTN(I)) THEN
         N=INTAB2(NC(IM),JM(1,IM),NC(I),JM(1,I))
@@ -240,13 +240,13 @@ C
       RETURN
       END
 C-------------QR factorisation ----
-      !||====================================================================
-      !||    imp_qrf    ../engine/source/implicit/imp_pc_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_saic   ../engine/source/implicit/imp_pc_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    produt_v   ../engine/source/implicit/produt_v.F
-      !||====================================================================
+!||====================================================================
+!||    imp_qrf    ../engine/source/implicit/imp_pc_inv.F
+!||--- called by ------------------------------------------------------
+!||    imp_saic   ../engine/source/implicit/imp_pc_inv.F
+!||--- calls      -----------------------------------------------------
+!||    produt_v   ../engine/source/implicit/produt_v.F
+!||====================================================================
       SUBROUTINE IMP_QRF(M     ,N     ,A      ,MAXC   ,D_R   ,
      .                   TAU    )
 C-----------------------------------------------
@@ -263,8 +263,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C--A(M,N), a la sortie,Qi=1-uu^t/tau est stocke dans triag inf de A
-C----------R est stoke dans triag sup,+ diag dans D-------
+C--A(M,N), at the output, Qi=1-uu^t/tau is stored in the lower triangular part of A
+C----------R is stored in the upper triangular part, + diagonal in D-------
       INTEGER I,J,K,L
       my_real
      .  S,NORM2,SCAL
@@ -304,13 +304,13 @@ C
       RETURN
       END
 C-------------b=Q^tb ---------------------------------
-      !||====================================================================
-      !||    mav_qt     ../engine/source/implicit/imp_pc_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_saic   ../engine/source/implicit/imp_pc_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    produt_v   ../engine/source/implicit/produt_v.F
-      !||====================================================================
+!||====================================================================
+!||    mav_qt     ../engine/source/implicit/imp_pc_inv.F
+!||--- called by ------------------------------------------------------
+!||    imp_saic   ../engine/source/implicit/imp_pc_inv.F
+!||--- calls      -----------------------------------------------------
+!||    produt_v   ../engine/source/implicit/produt_v.F
+!||====================================================================
       SUBROUTINE MAV_QT(M     ,N     ,A      ,MAXC   ,TAU   ,
      .                  B     )
 C-----------------------------------------------
@@ -343,14 +343,14 @@ C
       RETURN
       END
 C-------------Rx=b ---------------------------------
-      !||====================================================================
-      !||    lt_solv    ../engine/source/implicit/imp_pc_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_saic   ../engine/source/implicit/imp_pc_inv.F
-      !||====================================================================
+!||====================================================================
+!||    lt_solv    ../engine/source/implicit/imp_pc_inv.F
+!||--- called by ------------------------------------------------------
+!||    imp_saic   ../engine/source/implicit/imp_pc_inv.F
+!||====================================================================
       SUBROUTINE LT_SOLV(N     ,A      ,MAXC   ,D_R   ,B      )
-C----------R est stoke dans triag_sup de A,+ diag dans D_R-------
-C----------X est sortie dans B-------
+C----------R is stored in the upper triangular part of A, + diagonal in D_R-------
+C----------X is output in B-------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -380,13 +380,13 @@ C--------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_kijs   ../engine/source/implicit/imp_pc_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    get_suba   ../engine/source/implicit/imp_pc_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    intab0     ../engine/source/implicit/imp_fsa_inv.F
-      !||====================================================================
+!||====================================================================
+!||    get_kijs   ../engine/source/implicit/imp_pc_inv.F
+!||--- called by ------------------------------------------------------
+!||    get_suba   ../engine/source/implicit/imp_pc_inv.F
+!||--- calls      -----------------------------------------------------
+!||    intab0     ../engine/source/implicit/imp_fsa_inv.F
+!||====================================================================
       SUBROUTINE GET_KIJS(I  ,J ,IADK,JDIK,K_LT ,KIJ)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

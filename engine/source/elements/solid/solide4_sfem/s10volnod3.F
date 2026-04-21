@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10volnod3        ../engine/source/elements/solid/solide4_sfem/s10volnod3.F
-      !||--- called by ------------------------------------------------------
-      !||    s4lagsfem         ../engine/source/elements/solid/solide4_sfem/s4lagsfem.F
-      !||--- calls      -----------------------------------------------------
-      !||    foat_to_6_float   ../engine/source/system/parit.F
-      !||    s10volj           ../engine/source/elements/solid/solide4_sfem/s10volj.F
-      !||====================================================================
+!||====================================================================
+!||    s10volnod3        ../engine/source/elements/solid/solide4_sfem/s10volnod3.F
+!||--- called by ------------------------------------------------------
+!||    s4lagsfem         ../engine/source/elements/solid/solide4_sfem/s4lagsfem.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float   ../engine/source/system/parit.F
+!||    s10volj           ../engine/source/elements/solid/solide4_sfem/s10volj.F
+!||====================================================================
       SUBROUTINE S10VOLNOD3(
      1   VOLNOD6, X,       NC,      OFFG,
      2   VOLG,    XDP,     NEL,     NPT,
@@ -76,7 +76,7 @@ C-----------------------------------------------
      .   XX(MVSIZ,10), YY(MVSIZ,10), ZZ(MVSIZ,10), 
      .   XA(MVSIZ,10),YA(MVSIZ,10),ZA(MVSIZ,10),
      .   XB(MVSIZ,10),YB(MVSIZ,10),ZB(MVSIZ,10),
-     .   A4,B4,A4M1,B4M1,AA,DET6(6,MVSIZ),VOLDP(MVSIZ)
+     .   A4,B4,A4M1,B4M1,DET6(6,MVSIZ),VOLDP(MVSIZ)
       my_real
      .   VOLG(MVSIZ),ALPH,BETA,W
 C----------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_emc        ../engine/source/materials/fail/emc/fail_emc.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain           ../engine/source/materials/mat_share/mmain.F90
-      !||    mmain8          ../engine/source/materials/mat_share/mmain8.F
-      !||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8          ../engine/source/materials/mat_share/mulaw8.F90
-      !||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
-      !||====================================================================
+!||====================================================================
+!||    fail_emc        ../engine/source/materials/fail/emc/fail_emc.F
+!||--- called by ------------------------------------------------------
+!||    mmain           ../engine/source/materials/mat_share/mmain.F90
+!||    mmain8          ../engine/source/materials/mat_share/mmain8.F
+!||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8          ../engine/source/materials/mat_share/mulaw8.F90
+!||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
+!||====================================================================
       SUBROUTINE FAIL_EMC(
      1     NEL     ,NUVAR   ,TIME    ,TIMESTEP,
      2     UPARAM  ,NGL     ,
@@ -87,7 +87,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,JJ,K,IR,IADBUF,NINDX,IFAIL
+      INTEGER I,J,NINDX
       INTEGER, DIMENSION(NEL) :: 
      .   INDX
 C
@@ -135,7 +135,7 @@ C---      failure strain interpolation
      .                       +SIGNYZ(I)*SIGNYZ(I)
      .                       +SIGNZX(I)*SIGNZX(I))))
 
-            ! determinant du deviateur des contraintes
+            ! determinant of the stress deviator
           INV2 = DEVXX * DEVYY * DEVZZ 
      .         + TWO*SIGNXY(I)*SIGNZX(I)*SIGNYZ(I)
      .         - DEVXX*SIGNYZ(I)**2 - DEVYY*SIGNZX(I)**2

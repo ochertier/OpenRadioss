@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_clause_box             ../starter/source/model/sets/read_clause_box.F
-      !||--- called by ------------------------------------------------------
-      !||    create_elt_box              ../starter/source/model/sets/create_elt_box.F
-      !||    create_node_box             ../starter/source/model/sets/create_node_box.F
-      !||    create_rbody_box            ../starter/source/model/sets/create_rbody_box.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_clause_box             ../starter/source/model/sets/read_clause_box.F
+!||--- called by ------------------------------------------------------
+!||    create_elt_box              ../starter/source/model/sets/create_elt_box.F
+!||    create_node_box             ../starter/source/model/sets/create_node_box.F
+!||    create_rbody_box            ../starter/source/model/sets/create_rbody_box.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE READ_CLAUSE_BOX(IBOX, IS_AVAILABLE, LSUBMODEL, JCLAUSE , IDS_MAX,
      .                           BOXLIST, BOXLIST_SIZE)
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    simple_elt_box   ../starter/source/model/sets/simpl_elt_box.F
-      !||--- called by ------------------------------------------------------
-      !||    elt_box          ../starter/source/model/sets/fill_clause_elt_box.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkcyl         ../starter/source/model/box/rdbox.F
-      !||    checkpara        ../starter/source/model/box/rdbox.F
-      !||    checksphere      ../starter/source/model/box/rdbox.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    simple_elt_box   ../starter/source/model/sets/simpl_elt_box.F
+!||--- called by ------------------------------------------------------
+!||    elt_box          ../starter/source/model/sets/fill_clause_elt_box.F
+!||--- calls      -----------------------------------------------------
+!||    checkcyl         ../starter/source/model/box/rdbox.F
+!||    checkpara        ../starter/source/model/box/rdbox.F
+!||    checksphere      ../starter/source/model/box/rdbox.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SIMPLE_ELT_BOX(
      .                    IBOX    ,X      ,SKEW     ,IB      ,ELT_ARRAY,
      .                    ELT_SIZE,NIX    ,IX       ,NIX1    ,IPARTE   ,
@@ -46,7 +46,7 @@ C
 C     NAME          DESCRIPTION                         
 C
 C     IBOX          BOX structure
-C     X             Node position 
+C     X node position 
 C     SKEW          SKEW array
 C     ELT_ARRAY     Result list of elems
 C     ELT_SIZE      number of stacked elems
@@ -79,7 +79,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,INSIDE,ISK,BOX_TYPE,NBOXBOX,IBX,COUNT,IP,
+      INTEGER I,J,K,INSIDE,ISK,BOX_TYPE,IBX,COUNT,IP,
      .    NLEV,MY_LEV
       my_real
      .    XP1,YP1,ZP1,XP2,YP2,ZP2,DIAM,NODINB(3)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    in12r    ../starter/source/interfaces/inter3d1/in12r.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3   ../starter/source/interfaces/inter3d1/inint3.F
-      !||====================================================================
+!||====================================================================
+!||    in12r    ../starter/source/interfaces/inter3d1/in12r.F
+!||--- called by ------------------------------------------------------
+!||    inint3   ../starter/source/interfaces/inter3d1/inint3.F
+!||====================================================================
       SUBROUTINE IN12R(X,FRIGAP,NSV,NSN,FLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -111,7 +111,7 @@ C
          S23=S23/BN
          S33=S33/BN
 C
-C TRANSFORMATION TEMPORAIRE POUR TROUVER LES RELATIONS main SECND
+C Temporary transformation to find main-secondary relationships
         DO II=1,NSN
          I=NSV(II)
          XX=X(1,I)-XC

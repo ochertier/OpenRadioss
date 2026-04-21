@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    prelecig3d       ../starter/source/elements/ige3d/prelecig3d.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod       ../starter/share/modules1/format_mod.F90
-      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    prelecig3d       ../starter/source/elements/ige3d/prelecig3d.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod       ../starter/share/modules1/format_mod.F90
+!||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+!||====================================================================
       SUBROUTINE PRELECIG3D(NUM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -50,7 +50,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ID,IDX,IDY,IDZ,NCTRL 
+      INTEGER ID,IDX,IDY,IDZ,NCTRL
 C=======================================================================
         NUM  = 0
         KCUR = KIGE3D

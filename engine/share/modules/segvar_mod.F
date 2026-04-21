@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,43 +20,46 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    segvar_mod                       ../engine/share/modules/segvar_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    aconve                           ../engine/source/ale/aconve.F
-      !||    afluxt                           ../engine/source/ale/ale51/afluxt.F
-      !||    ale51_antidiff2                  ../engine/source/ale/ale51/ale51_antidiff2.F
-      !||    ale51_antidiff3                  ../engine/source/ale/ale51/ale51_antidiff3.F
-      !||    ale51_gradient_reconstruction    ../engine/source/ale/alemuscl/ale51_gradient_reconstruction.F
-      !||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
-      !||    alefvm_main                      ../engine/source/ale/alefvm/alefvm_main.F
-      !||    alemain                          ../engine/source/ale/alemain.F
-      !||    alemuscl_upwind                  ../engine/source/ale/alemuscl/alemuscl_upwind.F
-      !||    alemuscl_upwind2                 ../engine/source/ale/alemuscl/alemuscl_upwind2.F
-      !||    alethe                           ../engine/source/ale/alethe.F
-      !||    ebcs0                            ../engine/source/boundary_conditions/ebcs/ebcs0.F
-      !||    ebcs1                            ../engine/source/boundary_conditions/ebcs/ebcs1.F
-      !||    ebcs10                           ../engine/source/boundary_conditions/ebcs/ebcs10.F
-      !||    ebcs11                           ../engine/source/boundary_conditions/ebcs/ebcs11.F90
-      !||    ebcs4                            ../engine/source/boundary_conditions/ebcs/ebcs4.F
-      !||    ebcs5                            ../engine/source/boundary_conditions/ebcs/ebcs5.F
-      !||    ebcs6                            ../engine/source/boundary_conditions/ebcs/ebcs6.F
-      !||    ebcs7                            ../engine/source/boundary_conditions/ebcs/ebcs7.F
-      !||    ebcs_vol2seg                     ../engine/source/boundary_conditions/ebcs/ebcs_vol2seg.F
-      !||    gradient_reconstruction          ../engine/source/ale/alemuscl/gradient_reconstruction.F
-      !||    gradient_reconstruction2         ../engine/source/ale/alemuscl/gradient_reconstruction2.F
-      !||    i12m2s                           ../engine/source/interfaces/interf/i12m2s.F
-      !||    i12nod3                          ../engine/source/interfaces/interf/i12nod3.F
-      !||    i12s2m                           ../engine/source/interfaces/interf/i12s2m.F
-      !||    intti0                           ../engine/source/interfaces/interf/intti0.F
-      !||    intti12a                         ../engine/source/interfaces/interf/intti12.F
-      !||    radioss2                         ../engine/source/engine/radioss2.F
-      !||    resol                            ../engine/source/engine/resol.F
-      !||    resol_head                       ../engine/source/engine/resol_head.F
-      !||    restalloc                        ../engine/source/output/restart/arralloc.F
-      !||    seggetv                          ../engine/source/interfaces/interf/seggetv.F
-      !||    spmd_segcom                      ../engine/source/mpi/fluid/spmd_cfd.F
-      !||====================================================================
+!||====================================================================
+!||    segvar_mod                       ../engine/share/modules/segvar_mod.F
+!||--- called by ------------------------------------------------------
+!||    aconve                           ../engine/source/ale/aconve.F90
+!||    afluxt                           ../engine/source/ale/ale51/afluxt.F
+!||    ale51_antidiff2                  ../engine/source/ale/ale51/ale51_antidiff2.F
+!||    ale51_antidiff3                  ../engine/source/ale/ale51/ale51_antidiff3.F
+!||    ale51_gradient_reconstruction    ../engine/source/ale/alemuscl/ale51_gradient_reconstruction.F
+!||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
+!||    alefvm_main                      ../engine/source/ale/alefvm/alefvm_main.F
+!||    alemain                          ../engine/source/ale/alemain.F
+!||    alemuscl_upwind                  ../engine/source/ale/alemuscl/alemuscl_upwind.F
+!||    alemuscl_upwind2                 ../engine/source/ale/alemuscl/alemuscl_upwind2.F
+!||    alethe                           ../engine/source/ale/alethe.F
+!||    ebcs0_gradp0                     ../engine/source/boundary_conditions/ebcs/ebcs0_gradp0.F
+!||    ebcs10_nrf                       ../engine/source/boundary_conditions/ebcs/ebcs10_nrf.F
+!||    ebcs11_propellant                ../engine/source/boundary_conditions/ebcs/ebcs11_propellant.F90
+!||    ebcs123_pres                     ../engine/source/boundary_conditions/ebcs/ebcs123_pres.F
+!||    ebcs12_cyclic                    ../engine/source/boundary_conditions/ebcs/ebcs12_cyclic.F90
+!||    ebcs4_vel                        ../engine/source/boundary_conditions/ebcs/ebcs4_vel.F
+!||    ebcs5_normv                      ../engine/source/boundary_conditions/ebcs/ebcs5_normv.F
+!||    ebcs6_inip                       ../engine/source/boundary_conditions/ebcs/ebcs6_inip.F
+!||    ebcs7_iniv                       ../engine/source/boundary_conditions/ebcs/ebcs7_iniv.F
+!||    ebcs8_inlet                      ../engine/source/boundary_conditions/ebcs/ebcs8_inlet.F90
+!||    ebcs_main                        ../engine/source/boundary_conditions/ebcs/ebcs_main.F
+!||    ebcs_vol2seg                     ../engine/source/boundary_conditions/ebcs/ebcs_vol2seg.F
+!||    gradient_reconstruction2         ../engine/source/ale/alemuscl/gradient_reconstruction2.F
+!||    gradient_reconstruction_new      ../engine/source/ale/alemuscl/gradient_reconstruction.F90
+!||    i12m2s                           ../engine/source/interfaces/interf/i12m2s.F
+!||    i12nod3                          ../engine/source/interfaces/interf/i12nod3.F
+!||    i12s2m                           ../engine/source/interfaces/interf/i12s2m.F
+!||    intti0                           ../engine/source/interfaces/interf/intti0.F
+!||    intti12a                         ../engine/source/interfaces/interf/intti12.F
+!||    radioss2                         ../engine/source/engine/radioss2.F
+!||    resol                            ../engine/source/engine/resol.F
+!||    resol_head                       ../engine/source/engine/resol_head.F
+!||    restalloc                        ../engine/source/output/restart/arralloc.F
+!||    seggetv                          ../engine/source/interfaces/interf/seggetv.F
+!||    spmd_segcom                      ../engine/source/mpi/fluid/spmd_cfd.F
+!||====================================================================
       MODULE SEGVAR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -91,9 +94,9 @@ C-----------------------------------------------
       
       CONTAINS
       
-      !||====================================================================
-      !||    segvar_destroy   ../engine/share/modules/segvar_mod.F
-      !||====================================================================
+!||====================================================================
+!||    segvar_destroy   ../engine/share/modules/segvar_mod.F
+!||====================================================================
       SUBROUTINE SEGVAR_DESTROY(this)
       IMPLICIT NONE
       CLASS(T_SEGVAR), INTENT(INOUT) :: this
@@ -107,15 +110,16 @@ C-----------------------------------------------
         IF(ALLOCATED(this%PHASE_ALPHA)) DEALLOCATE(this%PHASE_EINT)                 
       END SUBROUTINE SEGVAR_DESTROY
       
-      !||====================================================================
-      !||    segvar_create   ../engine/share/modules/segvar_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod         ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    segvar_create   ../engine/share/modules/segvar_mod.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod         ../common_source/modules/ale/ale_mod.F
+!||    constant_mod    ../common_source/modules/constant_mod.F
+!||====================================================================
       SUBROUTINE SEGVAR_CREATE(this,NBMAT)
       USE ALE_MOD      
+      USE constant_mod, ONLY: ZERO
       IMPLICIT NONE
-#include "constant.inc"       
 #include "../includes/com04_c.inc" 
       CLASS(T_SEGVAR), INTENT(INOUT) :: this
        INTEGER,INTENT(IN) :: NBMAT

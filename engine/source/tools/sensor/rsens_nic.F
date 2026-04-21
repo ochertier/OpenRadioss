@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rsens_nic    ../engine/source/tools/sensor/rsens_nic.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3       ../engine/source/elements/spring/rforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod   ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    rsens_nic     ../engine/source/tools/sensor/rsens_nic.F
+!||--- called by ------------------------------------------------------
+!||    rforc3        ../engine/source/elements/spring/rforc3.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod   ../common_source/modules/elements/element_mod.F90
+!||    sensor_mod    ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE RSENS_NIC(NEL    ,IXR   ,FOR   ,MOM    ,SKEW     ,
      .                     NSENSOR,SENSOR_TAB)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE SENSOR_MOD
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

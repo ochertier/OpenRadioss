@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11sto_vox    ../engine/source/interfaces/intsort/i11sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i11trivox     ../engine/source/interfaces/intsort/i11trivox.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11pen3_vox   ../engine/source/interfaces/intsort/i11pen3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box       ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i11sto_vox    ../engine/source/interfaces/intsort/i11sto.F
+!||--- called by ------------------------------------------------------
+!||    i11trivox     ../engine/source/interfaces/intsort/i11trivox.F
+!||--- calls      -----------------------------------------------------
+!||    i11pen3_vox   ../engine/source/interfaces/intsort/i11pen3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box       ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I11STO_VOX(
      1      J_STOK,IRECTS,IRECTM,X     ,II_STOK,
      2      CAND_S,CAND_M,NSN4  ,NOINT ,MARGE,
@@ -54,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER I_MEM, NRTS, NIN, ITAB(*)
+      INTEGER I_MEM, NRTS, ITAB(*)
       INTEGER J_STOK,NSN4,NOINT,IFORM,IGAP
       INTEGER IRECTS(2,*),IRECTM(2,*),CAND_S(*),CAND_M(*),ADDCM(*),
      .        CHAINE(2,*),IFPEN(*),II_STOK
@@ -83,13 +83,13 @@ c    .               IRECTS ,IRECTM,PENE  ,NRTS    )
      .                    NRTS   ,DGAPLOAD)
 
 C-----------------------------------------------
-C il faut un lock sur toute la boucle (modification de chaine)
+C need a lock on the entire loop (chain modification)
 #include "lockon.inc"
 C-----------------------------------------------
-C elimination des couples deja trouves : une edge
-C escclave peut occuper plusieurs voxels. enbalyant les voxels
-C de l'edge main pour trouver les seconds correspondantes
-C on peut donc trouver plusieurs occurence de l'edge second.
+C elimination of already found pairs: one edge
+C Escclave can occupy several voxels.denying the Voxels
+C from the main edge to find corresponding seconds
+C We can therefore find several occurrence of the second edge.
 C-----------------------------------------------
         I_STOK = II_STOK
         DO I=1,J_STOK
@@ -150,16 +150,16 @@ C-----------------------------------------------
 
 
 
-C            OLD ROUTINE 
-      !||====================================================================
-      !||    i11sto    ../engine/source/interfaces/intsort/i11sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i11tri    ../engine/source/interfaces/intsort/i11tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11pen3   ../engine/source/interfaces/intsort/i11pen3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box   ../engine/share/modules/tri7box.F
-      !||====================================================================
+C            OLD ROUTINE !||====================================================================
+!||====================================================================
+!||    i11sto    ../engine/source/interfaces/intsort/i11sto.F
+!||--- called by ------------------------------------------------------
+!||    i11tri    ../engine/source/interfaces/intsort/i11tri.F
+!||--- calls      -----------------------------------------------------
+!||    i11pen3   ../engine/source/interfaces/intsort/i11pen3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box   ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE  I11STO(
      1     J_STOK,IRECTS,IRECTM,X     ,II_STOK,
      2     CAND_S,CAND_M,NSN4  ,NOINT ,TZINF ,
@@ -182,7 +182,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER I_MEM, NRTS, NIN, ITAB(*)
+      INTEGER I_MEM, NRTS, ITAB(*)
       INTEGER J_STOK,NSN4,NOINT,IFORM
       INTEGER IRECTS(2,*),IRECTM(2,*),CAND_S(*),CAND_M(*),ADDCM(*),
      .        CHAINE(2,*),IFPEN(*),II_STOK
@@ -204,13 +204,13 @@ C-----------------------------------------------
         CALL I11PEN3(J_STOK ,PROV_S,PROV_M,TZINF ,X     ,
      .               IRECTS ,IRECTM,PENE  ,NRTS    )
 C-----------------------------------------------
-C il faut un lock sur toute la boucle (modification de chaine)
+C need a lock on the entire loop (chain modification)
 #include "lockon.inc"
 C-----------------------------------------------
-C elimination des couples deja trouves : une edge
-C escclave peut occuper plusieurs voxels. enbalyant les voxels
-C de l'edge main pour trouver les seconds correspondantes
-C on peut donc trouver plusieurs occurence de l'edge second.
+C elimination of already found pairs: one edge
+C Escclave can occupy several voxels.denying the Voxels
+C from the main edge to find corresponding seconds
+C We can therefore find several occurrence of the second edge.
 C-----------------------------------------------
         I_STOK = II_STOK
         DO I=1,J_STOK

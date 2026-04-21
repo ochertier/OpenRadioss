@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    frontplus_rm   ../starter/source/spmd/node/frontplus.F
-      !||--- called by ------------------------------------------------------
-      !||    domdec2        ../starter/source/spmd/domdec2.F
-      !||====================================================================
+!||====================================================================
+!||    frontplus_rm   ../starter/source/spmd/node/frontplus.F
+!||--- called by ------------------------------------------------------
+!||    domdec2        ../starter/source/spmd/domdec2.F
+!||====================================================================
       SUBROUTINE FRONTPLUS_RM(FRONT,INDEX)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -55,47 +55,49 @@ C-----------------------------------------------------
   
       RETURN
       END
-      !||====================================================================
-      !||    ifrontplus                  ../starter/source/spmd/node/frontplus.F
-      !||--- called by ------------------------------------------------------
-      !||    c_doms10                    ../starter/source/spmd/domdec2.F
-      !||    check_skew                  ../starter/source/spmd/domain_decomposition/check_skew.F
-      !||    dd_fr                       ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||    dd_fr_2                     ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||    dd_frx                      ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||    domain_decomposition_pcyl   ../starter/source/loads/general/load_pcyl/domain_decomposition_pcyl.F
-      !||    domdec2                     ../starter/source/spmd/domdec2.F
-      !||    hm_read_cyljoint            ../starter/source/constraints/general/cyl_joint/hm_read_cyljoint.F
-      !||    hm_read_frm                 ../starter/source/tools/skew/hm_read_frm.F
-      !||    hm_read_interfaces          ../starter/source/interfaces/reader/hm_read_interfaces.F
-      !||    hm_read_mpc                 ../starter/source/constraints/general/mpc/hm_read_mpc.F
-      !||    hm_read_rbe2                ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
-      !||    hm_read_rivet               ../starter/source/elements/reader/hm_read_rivet.F
-      !||    i24setnodes                 ../starter/source/interfaces/inter3d1/i24setnodes.F
-      !||    igrsurf_split               ../starter/source/spmd/igrsurf_split.F
-      !||    ini_seatbelt                ../starter/source/tools/seatbelts/ini_seatbelt.F
-      !||    iniend                      ../starter/source/interfaces/inter3d1/iniend.F
-      !||    iniend2d                    ../starter/source/interfaces/inter3d1/iniend.F
-      !||    inirbe3                     ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||    lecstamp                    ../starter/source/interfaces/interf1/lecstamp.F
-      !||    lectur                      ../starter/source/starter/lectur.F
-      !||    pornod                      ../starter/source/ale/pornod.F
-      !||    python_duplicate_nodes      ../starter/source/spmd/domain_decomposition/python_duplicate_nodes.F90
-      !||    r2r_domdec                  ../starter/source/coupling/rad2rad/r2r_domdec.F
-      !||    read_dfs_detcord            ../starter/source/initial_conditions/detonation/read_dfs_detcord.F
-      !||    read_dfs_wave_shaper        ../starter/source/initial_conditions/detonation/read_dfs_wave_shaper.F
-      !||    read_ebcs                   ../starter/source/boundary_conditions/ebcs/read_ebcs.F
-      !||    read_sensor_disp            ../starter/source/tools/sensor/read_sensor_disp.F
-      !||    set_ibufssg_io              ../starter/source/starter/lectur.F
-      !||    split_joint                 ../starter/source/constraints/general/cyl_joint/split_joint.F
-      !||    spmdset                     ../starter/source/constraints/general/rbody/spmdset.F
-      !||    uelt_spmd_additional_node   ../starter/source/user_interface/uaccess.F
-      !||    userwis_front               ../starter/source/user_interface/user_windows_tools.F
-      !||--- calls      -----------------------------------------------------
-      !||    realloc_ifront              ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    front_mod                   ../starter/share/modules1/front_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ifrontplus                  ../starter/source/spmd/node/frontplus.F
+!||--- called by ------------------------------------------------------
+!||    c_doms10                    ../starter/source/spmd/domdec2.F
+!||    check_skew                  ../starter/source/spmd/domain_decomposition/check_skew.F
+!||    dd_fr                       ../starter/source/spmd/domain_decomposition/domdec1.F
+!||    dd_fr_2                     ../starter/source/spmd/domain_decomposition/domdec1.F
+!||    dd_frx                      ../starter/source/spmd/domain_decomposition/domdec1.F
+!||    domain_decomposition_pcyl   ../starter/source/loads/general/load_pcyl/domain_decomposition_pcyl.F
+!||    domdec2                     ../starter/source/spmd/domdec2.F
+!||    hierarchy_rbody_ddm         ../starter/source/constraints/general/rbody/hierarchy_rbody.F90
+!||    hm_read_cyljoint            ../starter/source/constraints/general/cyl_joint/hm_read_cyljoint.F
+!||    hm_read_frm                 ../starter/source/tools/skew/hm_read_frm.F
+!||    hm_read_interfaces          ../starter/source/interfaces/reader/hm_read_interfaces.F
+!||    hm_read_mpc                 ../starter/source/constraints/general/mpc/hm_read_mpc.F
+!||    hm_read_rbe2                ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
+!||    hm_read_rivet               ../starter/source/elements/reader/hm_read_rivet.F
+!||    i24setnodes                 ../starter/source/interfaces/inter3d1/i24setnodes.F
+!||    igrsurf_split               ../starter/source/spmd/igrsurf_split.F
+!||    ini_guided_cable            ../starter/source/tools/seatbelts/ini_guided_cable.F90
+!||    ini_seatbelt                ../starter/source/tools/seatbelts/ini_seatbelt.F
+!||    iniend                      ../starter/source/interfaces/inter3d1/iniend.F
+!||    iniend2d                    ../starter/source/interfaces/inter3d1/iniend.F
+!||    inirbe3                     ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||    lecstamp                    ../starter/source/interfaces/interf1/lecstamp.F
+!||    lectur                      ../starter/source/starter/lectur.F
+!||    pornod                      ../starter/source/ale/pornod.F
+!||    python_duplicate_nodes      ../starter/source/spmd/domain_decomposition/python_duplicate_nodes.F90
+!||    r2r_domdec                  ../starter/source/coupling/rad2rad/r2r_domdec.F
+!||    read_dfs_detcord            ../starter/source/initial_conditions/detonation/read_dfs_detcord.F
+!||    read_dfs_wave_shaper        ../starter/source/initial_conditions/detonation/read_dfs_wave_shaper.F
+!||    read_ebcs                   ../starter/source/boundary_conditions/ebcs/read_ebcs.F
+!||    read_sensor_disp            ../starter/source/tools/sensor/read_sensor_disp.F
+!||    set_ibufssg_io              ../starter/source/starter/lectur.F
+!||    split_joint                 ../starter/source/constraints/general/cyl_joint/split_joint.F
+!||    spmdset                     ../starter/source/constraints/general/rbody/spmdset.F
+!||    uelt_spmd_additional_node   ../starter/source/user_interface/uaccess.F
+!||    userwis_front               ../starter/source/user_interface/user_windows_tools.F
+!||--- calls      -----------------------------------------------------
+!||    realloc_ifront              ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    front_mod                   ../starter/share/modules1/front_mod.F
+!||====================================================================
       SUBROUTINE IFRONTPLUS(N,P)
 C sort insert in chained-list IFRONT node N on SPMD domain P
 C IFRONT%IENTRY : entry in IFRONT for node N
@@ -112,12 +114,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER N,P,P_FOUND
+      INTEGER N, P
       LOGICAL SEARCH
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IAD,CURR,NEXT
+      INTEGER CURR, NEXT
 C-----------------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------------       
@@ -197,15 +199,15 @@ c one or more SPMD domain(s) already attributed for this node
   
       RETURN
       END
-      !||====================================================================
-      !||    iddconnectplus       ../starter/source/spmd/node/frontplus.F
-      !||--- called by ------------------------------------------------------
-      !||    dometis              ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||--- calls      -----------------------------------------------------
-      !||    realloc_iddconnect   ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    front_mod            ../starter/share/modules1/front_mod.F
-      !||====================================================================
+!||====================================================================
+!||    iddconnectplus       ../starter/source/spmd/node/frontplus.F
+!||--- called by ------------------------------------------------------
+!||    dometis              ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||--- calls      -----------------------------------------------------
+!||    realloc_iddconnect   ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    front_mod            ../starter/share/modules1/front_mod.F
+!||====================================================================
       SUBROUTINE IDDCONNECTPLUS(N,P,NUMEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -222,7 +224,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IAD,CURR,NEXT
+      INTEGER CURR, NEXT
       LOGICAL SEARCH
 C-----------------------------------------------------
 C   S o u r c e  L i n e s

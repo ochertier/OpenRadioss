@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    func_inters            ../starter/source/tools/curve/func_inters.F
-      !||--- called by ------------------------------------------------------
-      !||    law36_upd              ../starter/source/materials/mat/mat036/law36_upd.F
-      !||    law58_upd              ../starter/source/materials/mat/mat058/law58_upd.F
-      !||    law88_upd              ../starter/source/materials/mat/mat088/law88_upd.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    func_inters            ../starter/source/tools/curve/func_inters.F
+!||--- called by ------------------------------------------------------
+!||    law36_upd              ../starter/source/materials/mat/mat036/law36_upd.F
+!||    law58_upd              ../starter/source/materials/mat/mat058/law58_upd.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE FUNC_INTERS(TITR,MAT_ID,FUNC1,FUNC2,FAC1,FAC2,NPC,PLD,XINT,YINT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -55,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,J,ID,NP1,NP2,J1,K,K1,FOUND
+      INTEGER :: J,NP1,NP2,J1,K,K1,FOUND
       my_real :: S1,S2,T1,T2,X1,X2,Y1,Y2,AX,BX,AY,BY,CX,CY,DM,ALPHA,BETA
 C=======================================================================
 c     Check common points between 2 curves => intersection
@@ -121,14 +120,14 @@ c     Check intersection of curve segments
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    func_inters_shear      ../starter/source/tools/curve/func_inters.F
-      !||--- called by ------------------------------------------------------
-      !||    law58_upd              ../starter/source/materials/mat/mat058/law58_upd.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    func_inters_shear      ../starter/source/tools/curve/func_inters.F
+!||--- called by ------------------------------------------------------
+!||    law58_upd              ../starter/source/materials/mat/mat058/law58_upd.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE FUNC_INTERS_SHEAR(TITR,MAT_ID  ,FUNC   ,FUND,  FAC1  ,FAC2,
      .                            NPC,PLD,XINT1 ,YINT1  ,XINT2 ,YINT2  )
 C-----------------------------------------------
@@ -157,7 +156,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,NP1,NP2,J1,K,K1
+      INTEGER J,NP1,NP2,J1,K,K1
       my_real 
      .      S1,S2,T1,T2,X1,X2,Y1,Y2,SX,TY,DYDX,DTDS
 C=======================================================================
@@ -267,14 +266,12 @@ C=======================================================================
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    func_inters_c          ../starter/source/tools/curve/func_inters.F
-      !||--- called by ------------------------------------------------------
-      !||    law88_upd              ../starter/source/materials/mat/mat088/law88_upd.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    func_inters_c          ../starter/source/tools/curve/func_inters.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE FUNC_INTERS_C(TITR,MAT_ID  ,FUNC,FUND,FAC1,FAC2,NPC,PLD,XINC,YINC  )
 C-----------------------------------------------
 C   M o d u l e s
@@ -299,9 +296,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,NP1,NP2,J1,K,K1
+      INTEGER J,NP1,NP2,J1,K,K1
       my_real 
-     .      S1,S2,T1,T2,X1,X2,Y1,Y2,SX,TY,DYDX,DTDS,DET,B1,B2,X,Y
+     .      S1,S2,T1,T2,X1,X2,Y1,Y2,DYDX,DTDS,DET,B1,B2,X,Y
 C=======================================================================
         !NFUNC =  IPM(10,IMAT)+IPM(6,IMAT)in updmat.f
         !IFUNC => IPM(10+1:10+NFUNC,IMAT) in updmat.f
@@ -362,13 +359,13 @@ C=======================================================================
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    table_inters   ../starter/source/tools/curve/func_inters.F
-      !||--- called by ------------------------------------------------------
-      !||    law119_upd     ../starter/source/materials/mat/mat119/law119_upd.F
-      !||--- uses       -----------------------------------------------------
-      !||    table_mod      ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    table_inters   ../starter/source/tools/curve/func_inters.F
+!||--- called by ------------------------------------------------------
+!||    law119_upd     ../starter/source/materials/mat/mat119/law119_upd.F
+!||--- uses       -----------------------------------------------------
+!||    table_mod      ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE TABLE_INTERS(TABLE,FUNC1,FUNC2,FAC1,FAC2,XINT,YINT)
 C-----------------------------------------------
 C   M o d u l e s

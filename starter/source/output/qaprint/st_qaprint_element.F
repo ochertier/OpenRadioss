@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    st_qaprint_element     ../starter/source/output/qaprint/st_qaprint_element.F
-      !||--- called by ------------------------------------------------------
-      !||    st_qaprint_driver      ../starter/source/output/qaprint/st_qaprint_driver.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    st_qaprint_element     ../starter/source/output/qaprint/st_qaprint_element.F
+!||--- called by ------------------------------------------------------
+!||    st_qaprint_driver      ../starter/source/output/qaprint/st_qaprint_driver.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ST_QAPRINT_ELEMENT(IXS , IXS10, IPM   , IGEO, ITAB, 
      1                              ISOLNOD,IXR, R_SKEW,ISKWN, IXP ,
      2                              IXT    ,X  , IXC   ,IXTG ,THKE ,
      3                              SH4ANG ,THKEC,SH3ANG,KXSP ,IPARTSP,
      4                              IPART  ,IXR_KJ,KXX ,IXX  , IPARTX ,
-     5                              IXRI   ,IXS16 ,IXQ )
+     5                              IXRI   ,IXS16 ,IXQ ,IBEAM_VECTOR,RBEAM_VECTOR)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -41,6 +41,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE MY_ALLOC_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,9 +62,11 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IXR(NIXR,*), R_SKEW(*), ISKWN(LISKN,*), IXP(NIXP,*), IXT(NIXT,*),
      .                       IXC(NIXC,*),IXTG(NIXTG,*),KXSP(NISP,*),IPARTSP(*),IPART(LIPART1,*),
      .                       KXX(NIXX,*),IXX(*),IPARTX(*),IXRI(4,*),IXS16(8,*),IXQ(NIXQ,*)
+      INTEGER, INTENT(IN) :: IBEAM_VECTOR(NUMELP)
       my_real, INTENT(IN) ::
      .                       X(3,NUMNOD),
      .                        THKE(*),THKEC(*),SH4ANG(*),SH3ANG(*)
+      my_real, INTENT(IN) :: RBEAM_VECTOR(3,NUMELP)
 C--------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -348,7 +351,14 @@ C
             END IF
           END DO
 C
-          IF(IXP(4,NS)/=0)THEN
+          IF (IBEAM_VECTOR(NS) == 1) THEN
+            TEMP_DOUBLE = RBEAM_VECTOR(1,NS)
+            CALL QAPRINT('--> INPUT_VEC_X', 0,TEMP_DOUBLE)
+            TEMP_DOUBLE = RBEAM_VECTOR(2,NS)
+            CALL QAPRINT('--> INPUT_VEC_Y', 0,TEMP_DOUBLE)
+            TEMP_DOUBLE = RBEAM_VECTOR(3,NS)
+            CALL QAPRINT('--> INPUT_VEC_Z', 0,TEMP_DOUBLE)
+          ELSEIF(IXP(4,NS)/=0)THEN
             MY_NOD = ITAB(IXP(4,NS))
             WRITE(VARNAME,'(A,I0)') 'NODE_',J-1
             CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)), MY_NOD,0.0_8)

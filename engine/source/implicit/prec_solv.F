@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,17 +22,17 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C---------------------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
 C---------------------or  {z}=[Z][D]^-1[Z]^t{v}-----for inverse option IPREC>=6
-      !||====================================================================
-      !||    prec_solv     ../engine/source/implicit/prec_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret         ../engine/source/system/arret.F
-      !||    lin_solv2     ../engine/source/implicit/lin_solv.F
-      !||    mav_lt1       ../engine/source/implicit/produt_v.F
-      !||    prec0_solv    ../engine/source/implicit/prec_solv.F
-      !||    precic_solv   ../engine/source/implicit/prec_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    prec_solv     ../engine/source/implicit/prec_solv.F
+!||--- calls      -----------------------------------------------------
+!||    arret         ../engine/source/system/arret.F
+!||    lin_solv2     ../engine/source/implicit/lin_solv.F
+!||    mav_lt1       ../engine/source/implicit/produt_v.F
+!||    prec0_solv    ../engine/source/implicit/prec_solv.F
+!||    precic_solv   ../engine/source/implicit/prec_solv.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE PREC_SOLV(IPREC,
      1                    IADK  ,JDIK  ,DIAG_K,LT_K  ,ITASK  ,
      2                    GRAPHE,ITAB  ,INSOLV,IT    ,FAC_K  ,
@@ -65,7 +65,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 c     iprec=1 => [I] 
 c     iprec=2 => jacobien NNZ=0
-c     iprec=3 => I.C.(0) :[LT_M]-->strict upper triangle [L]^t en c.r.s.
+c     IPREC = 3 => I.C. (0): [LT_M]-> Strict upper triangle [l]^t'a c.r.s.
 c     iprec=4 => I.C.(0)_Stab :item
 c     iprec=5 => fsai .r same indice than [K]
 c     iprec=12 => I.C.(J) :[LT_M]-->strict upper triangle [L]^t en c.r.s.
@@ -125,18 +125,18 @@ C--------------------------------------------
 #endif
       END
 C-----------spmd----------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
-      !||====================================================================
-      !||    prec_solvp    ../engine/source/implicit/prec_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_lanzp     ../engine/source/implicit/imp_lanz.F
-      !||--- calls      -----------------------------------------------------
-      !||    lin_solvp2    ../engine/source/implicit/lin_solv.F
-      !||    prec0_solv    ../engine/source/implicit/prec_solv.F
-      !||    precic_solv   ../engine/source/implicit/prec_solv.F
-      !||    spmd_sumf_v   ../engine/source/mpi/implicit/imp_spmd.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    prec_solvp    ../engine/source/implicit/prec_solv.F
+!||--- called by ------------------------------------------------------
+!||    imp_lanzp     ../engine/source/implicit/imp_lanz.F
+!||--- calls      -----------------------------------------------------
+!||    lin_solvp2    ../engine/source/implicit/lin_solv.F
+!||    prec0_solv    ../engine/source/implicit/prec_solv.F
+!||    precic_solv   ../engine/source/implicit/prec_solv.F
+!||    spmd_sumf_v   ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE PREC_SOLVP(IPREC, ITASK   ,
      1                      GRAPHE,IAD_ELEM,FR_ELEM,DIAG_K,LT_K   , 
      2                      IADK  ,JDIK    ,ITAB   ,IPRINT,INSOLV , 
@@ -225,14 +225,14 @@ C--------------------------------------------
 #endif
       END
 C---------------------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
-      !||====================================================================
-      !||    prec0_solv   ../engine/source/implicit/prec_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_fsai     ../engine/source/implicit/imp_fsa_inv.F
-      !||    prec_solv    ../engine/source/implicit/prec_solv.F
-      !||    prec_solvh   ../engine/source/implicit/prec_solv.F
-      !||    prec_solvp   ../engine/source/implicit/prec_solv.F
-      !||====================================================================
+!||====================================================================
+!||    prec0_solv   ../engine/source/implicit/prec_solv.F
+!||--- called by ------------------------------------------------------
+!||    imp_fsai     ../engine/source/implicit/imp_fsa_inv.F
+!||    prec_solv    ../engine/source/implicit/prec_solv.F
+!||    prec_solvh   ../engine/source/implicit/prec_solv.F
+!||    prec_solvp   ../engine/source/implicit/prec_solv.F
+!||====================================================================
       SUBROUTINE PREC0_SOLV(
      1                    NDDL  ,NNZ   ,IADM  ,JDIM  ,DIAG_M ,   
      2                    LT_M  ,V     ,Z     )
@@ -283,9 +283,9 @@ C--------------------------------------------
 #endif
       END
 C-------------solves  {z}=[Z][D]^-1[Z]^t{v}-----
-      !||====================================================================
-      !||    precir_solv   ../engine/source/implicit/prec_solv.F
-      !||====================================================================
+!||====================================================================
+!||    precir_solv   ../engine/source/implicit/prec_solv.F
+!||====================================================================
       SUBROUTINE PRECIR_SOLV(
      1                    NDDL  ,NNZ   ,IADM  ,JDIM  ,DIAG_M ,   
      2                    LT_M  ,V     ,Z     )
@@ -308,7 +308,7 @@ C-----------------------------------------------
       my_real
      .  TMP(NDDL) 
 C--[LT_M]-->[Z]^t strict lower triangle c.c.s.(= transpose of strict upper tria c.r.s.)--- 
-C--------- tmp est utilisee pour la raison //-------- 
+C--------- tmp is used for the reason //--------
        DO I=1,NDDL
         Z(I) = V(I)
        ENDDO
@@ -336,12 +336,12 @@ C--------------------------------------------
 #endif
       END
 C-------------solves  {z}=[Z][D]^-1[Z]^t{v}----[Z] en colonne-
-      !||====================================================================
-      !||    precic_solv   ../engine/source/implicit/prec_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    prec_solv     ../engine/source/implicit/prec_solv.F
-      !||    prec_solvp    ../engine/source/implicit/prec_solv.F
-      !||====================================================================
+!||====================================================================
+!||    precic_solv   ../engine/source/implicit/prec_solv.F
+!||--- called by ------------------------------------------------------
+!||    prec_solv     ../engine/source/implicit/prec_solv.F
+!||    prec_solvp    ../engine/source/implicit/prec_solv.F
+!||====================================================================
       SUBROUTINE PRECIC_SOLV(
      1                    NDDL  ,NNZ   ,IADM  ,JDIM  ,DIAG_M ,   
      2                    LT_M  ,V     ,Z     )
@@ -364,7 +364,7 @@ C-----------------------------------------------
       my_real
      .  TMP(NDDL) 
 C--[LT_M]-->[Z]^t strict lower triangle c.r.s.(= transpose of strict upper tria c.c.s.)--- 
-C--------- tmp est utilisee pour la raison //-------- 
+C--------- tmp is used for the reason //--------
 C-----------------------------
        DO I=1,NDDL
         Z(I) = V(I)
@@ -393,11 +393,11 @@ C--------------------------------------------
 #endif
       END
 C------------hibrid version-solves  {z}=[Z][D]^-1[Z]^t{v}----[Z] en colonne-
-      !||====================================================================
-      !||    prec5h_solv   ../engine/source/implicit/prec_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier    ../engine/source/system/machine.F
-      !||====================================================================
+!||====================================================================
+!||    prec5h_solv   ../engine/source/implicit/prec_solv.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier    ../engine/source/system/machine.F
+!||====================================================================
       SUBROUTINE PREC5H_SOLV(
      1                    NDDL  ,NNZ   ,IADM  ,JDIM  ,DIAG_M ,   
      2                    LT_M  ,V     ,Z     ,F_DDL ,L_DDL  )
@@ -421,7 +421,7 @@ C-----------------------------------------------
       my_real
      .  TMP(NDDL) 
 C--[LT_M]-->[Z]^t strict lower triangle c.r.s.(= transpose of strict upper tria c.c.s.)--- 
-C--------- tmp est utilisee pour la raison //-------- 
+C--------- tmp is used for the reason //--------
 C-----------------------------
        DO I=F_DDL ,L_DDL
         Z(I) = V(I)
@@ -461,16 +461,16 @@ C--------------------------------------------
 #endif
       END
 C------------hibrid version-solves  {z}=[Z][D]^-1[Z]^t{v}----[Z] en colonne-
-      !||====================================================================
-      !||    prec5hc_solv   ../engine/source/implicit/prec_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    prec_solvgh    ../engine/source/implicit/prec_solv.F
-      !||    prec_solvh     ../engine/source/implicit/prec_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier     ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_workh      ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    prec5hc_solv   ../engine/source/implicit/prec_solv.F
+!||--- called by ------------------------------------------------------
+!||    prec_solvgh    ../engine/source/implicit/prec_solv.F
+!||    prec_solvh     ../engine/source/implicit/prec_solv.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier     ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    imp_workh      ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE PREC5HC_SOLV(
      1                    NDDL  ,NNZ   ,IADM  ,JDIM  ,DIAG_M ,   
      2                    LT_M  ,V     ,Z     ,F_DDL ,L_DDL  )
@@ -532,12 +532,12 @@ C--------------------------------------------
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    prec2h_solv   ../engine/source/implicit/prec_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    prec_solvgh   ../engine/source/implicit/prec_solv.F
-      !||    prec_solvh    ../engine/source/implicit/prec_solv.F
-      !||====================================================================
+!||====================================================================
+!||    prec2h_solv   ../engine/source/implicit/prec_solv.F
+!||--- called by ------------------------------------------------------
+!||    prec_solvgh   ../engine/source/implicit/prec_solv.F
+!||    prec_solvh    ../engine/source/implicit/prec_solv.F
+!||====================================================================
       SUBROUTINE PREC2H_SOLV(
      1                      F_DDL ,L_DDL ,DIAG_M ,V     ,Z    )
 C-----------------------------------------------
@@ -564,21 +564,21 @@ C--------------------------------------------
 #endif
       END
 C-----------spmd----------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
-      !||====================================================================
-      !||    prec_solvh     ../engine/source/implicit/prec_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_pcgh       ../engine/source/implicit/imp_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    lin_solv2      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvp2     ../engine/source/implicit/lin_solv.F
-      !||    my_barrier     ../engine/source/system/machine.F
-      !||    prec0_solv     ../engine/source/implicit/prec_solv.F
-      !||    prec2h_solv    ../engine/source/implicit/prec_solv.F
-      !||    prec5hc_solv   ../engine/source/implicit/prec_solv.F
-      !||    spmd_sumf_v    ../engine/source/mpi/implicit/imp_spmd.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod    ../engine/share/modules/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    prec_solvh     ../engine/source/implicit/prec_solv.F
+!||--- called by ------------------------------------------------------
+!||    imp_pcgh       ../engine/source/implicit/imp_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    lin_solv2      ../engine/source/implicit/lin_solv.F
+!||    lin_solvp2     ../engine/source/implicit/lin_solv.F
+!||    my_barrier     ../engine/source/system/machine.F
+!||    prec0_solv     ../engine/source/implicit/prec_solv.F
+!||    prec2h_solv    ../engine/source/implicit/prec_solv.F
+!||    prec5hc_solv   ../engine/source/implicit/prec_solv.F
+!||    spmd_sumf_v    ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod    ../engine/share/modules/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE PREC_SOLVH(IPREC, ITASK   ,
      1                      GRAPHE,IAD_ELEM,FR_ELEM,DIAG_K,LT_K   , 
      2                      IADK  ,JDIK    ,ITAB   ,IPRINT,INSOLV , 
@@ -696,14 +696,14 @@ C--------------------------------------------
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    prec_solvgh    ../engine/source/implicit/prec_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier     ../engine/source/system/machine.F
-      !||    prec2h_solv    ../engine/source/implicit/prec_solv.F
-      !||    prec5hc_solv   ../engine/source/implicit/prec_solv.F
-      !||    spmd_sumf_v    ../engine/source/mpi/implicit/imp_spmd.F
-      !||====================================================================
+!||====================================================================
+!||    prec_solvgh    ../engine/source/implicit/prec_solv.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier     ../engine/source/system/machine.F
+!||    prec2h_solv    ../engine/source/implicit/prec_solv.F
+!||    prec5hc_solv   ../engine/source/implicit/prec_solv.F
+!||    spmd_sumf_v    ../engine/source/mpi/implicit/imp_spmd.F
+!||====================================================================
       SUBROUTINE PREC_SOLVGH(IPREC, ITASK   ,NDDL  ,IADM  ,JDIM   ,
      6                      DIAG_M , LT_M  ,V     ,Z      ,F_DDL  ,
      7                      L_DDL  )

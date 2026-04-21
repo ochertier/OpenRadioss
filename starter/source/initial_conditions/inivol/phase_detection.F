@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    phase_detection     ../starter/source/initial_conditions/inivol/phase_detection.F
-      !||--- called by ------------------------------------------------------
-      !||    getphase            ../starter/source/initial_conditions/inivol/getphase.F
-      !||--- calls      -----------------------------------------------------
-      !||    find_closest_node   ../starter/source/initial_conditions/inivol/find_closest_node.F
-      !||    in_out_side         ../starter/source/initial_conditions/inivol/in_out_side.F
-      !||    phase_propagation   ../starter/source/initial_conditions/inivol/phase_propagation.F
-      !||====================================================================
+!||====================================================================
+!||    phase_detection     ../starter/source/initial_conditions/inivol/phase_detection.F
+!||--- called by ------------------------------------------------------
+!||    getphase            ../starter/source/initial_conditions/inivol/getphase.F
+!||--- calls      -----------------------------------------------------
+!||    find_closest_node   ../starter/source/initial_conditions/inivol/find_closest_node.F
+!||    in_out_side         ../starter/source/initial_conditions/inivol/in_out_side.F
+!||    phase_propagation   ../starter/source/initial_conditions/inivol/phase_propagation.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
         SUBROUTINE PHASE_DETECTION(
      .                             NPARG,NGROUP,NUMELS,NUMELQ,NUMELTG,NUMNOD,NSURF,N2D,
      .                             LEADING_DIMENSION,NB_CELL_X,NB_CELL_Y,NB_CELL_Z,NB_BOX_LIMIT,
@@ -57,6 +58,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !                                                                            apply it to the other nodes   
 !                   * if at least one node is near a surface --> need to compute the real distance
 !$ENDCOMMENT
+        use element_mod , only :nixs,nixq,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -111,6 +113,7 @@ C-----------------------------------------------
         my_real, DIMENSION(:,:), ALLOCATABLE :: LOCAL_X
         INTEGER, DIMENSION(:), ALLOCATABLE:: LIST_NODE ! list of node close to the surface
         INTEGER, DIMENSION(32) :: ID_NODE_SAVE
+        integer, target :: nothing(1,1) !< dummy for indirection
 C-----------------------------------------------
         ALLOCATE( TAG_ARRAY(NUMNOD) )   
         ALLOCATE( SURF_NODE_LIST(NUMNOD) )
@@ -182,7 +185,7 @@ C-----------------------------------------------
             ELSE
                 FIRST = -HUGE(FIRST)
                 NODE_NUMBER = -HUGE(NODE_NUMBER)
-                IXP => NULL()
+                IXP => nothing
             ENDIF
             ! ---------------
 

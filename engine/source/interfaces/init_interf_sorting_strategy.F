@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    init_interf_sorting_strategy   ../engine/source/interfaces/init_interf_sorting_strategy.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                          ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    metric_mod                     ../common_source/modules/interfaces/metric_mod.F
-      !||====================================================================
+!||====================================================================
+!||    init_interf_sorting_strategy   ../engine/source/interfaces/init_interf_sorting_strategy.F
+!||--- called by ------------------------------------------------------
+!||    resol                          ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod                  ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    metric_mod                     ../common_source/modules/interfaces/metric_mod.F
+!||====================================================================
       SUBROUTINE INIT_INTERF_SORTING_STRATEGY(INTBUF_TAB,NINTER)
 C Bucket or voxel, depending on /PERF/ in 1.rad
 C By default, both will be tried, the best will be kept

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_pch_file          ../starter/source/constraints/fxbody/read_pch_file.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_fxb1           ../starter/source/constraints/fxbody/hm_read_fxb.F
-      !||    hm_setfxrbyon          ../starter/source/constraints/fxbody/hm_setfxrbyon.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fxrline                ../starter/source/constraints/fxbody/hm_read_fxb.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_pch_file          ../starter/source/constraints/fxbody/read_pch_file.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_fxb1           ../starter/source/constraints/fxbody/hm_read_fxb.F
+!||    hm_setfxrbyon          ../starter/source/constraints/fxbody/hm_setfxrbyon.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fxrline                ../starter/source/constraints/fxbody/hm_read_fxb.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE READ_PCH_FILE(FLAG,MATRIX,ITAG,MATRIX_ADD,CPT_STIFF,
      .                         CPT_MASS,ITABM1,PCH_FILE,ID,TITR)
 C-----------------------------------------------
@@ -54,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,NFX,REF,IFO,TIN,TOUT,POLAR,NCOL,DUM,DUM2,SIZE,TRIANGLE,ID_NOD1,ID_NOD2,J,K,ISTOP
+      INTEGER I,REF,IFO,TIN,TOUT,POLAR,NCOL,DUM,ID_NOD1,ID_NOD2,J,ISTOP
       my_real RELL
       CHARACTER DEBUT*8,NAME*8,MATRIX_TYPE*16,NWLINE*100,MESS*40
 

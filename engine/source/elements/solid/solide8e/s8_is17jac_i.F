@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8_is17jac_i   ../engine/source/elements/solid/solide8e/s8_is17jac_i.F
-      !||--- called by ------------------------------------------------------
-      !||    s8fupd11t12    ../engine/source/elements/solid/solide8e/s8fupd11t12.F
-      !||--- calls      -----------------------------------------------------
-      !||    s8zjac_i3      ../engine/source/elements/solid/solide8e/s8zjac_i3.F
-      !||    s8zjac_ic      ../engine/source/elements/solid/solide8e/s8zjac_ic.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s8_is17jac_i   ../engine/source/elements/solid/solide8e/s8_is17jac_i.F
+!||--- called by ------------------------------------------------------
+!||    s8fupd11t12    ../engine/source/elements/solid/solide8e/s8fupd11t12.F
+!||--- calls      -----------------------------------------------------
+!||    s8zjac_i3      ../engine/source/elements/solid/solide8e/s8zjac_i3.F
+!||    s8zjac_ic      ../engine/source/elements/solid/solide8e/s8zjac_ic.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE S8_IS17JAC_I(ELBUF_TAB,
      .              X1   ,X2   ,X3   ,X4   ,X5   ,X6   ,X7   ,X8   ,
      .              Y1   ,Y2   ,Y3   ,Y4   ,Y5   ,Y6   ,Y7   ,Y8   ,
@@ -59,9 +59,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J ,N   
-      INTEGER IP,IR, IS, IT,JHBE,IREP,MPT,NLAY,NPTR,NPTS,NPTT,NUVAR,
-     .       L_PLA,L_SIGB,NSPHDIR, NCELF, NCELL,LLPIJ,L_JAC,NNPT
+      INTEGER IP,IR, IS, IT,NPTR,NPTS,NPTT,
+     . LLPIJ
 C     REAL
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
@@ -74,7 +73,7 @@ C     REAL
      .   PYC1(MVSIZ),PYC2(MVSIZ),PYC3(MVSIZ),PYC4(MVSIZ),
      .   PZC1(MVSIZ),PZC2(MVSIZ),PZC3(MVSIZ),PZC4(MVSIZ)
       my_real
-     .   WT,ZR,ZS,ZT,ZZ,WI
+     . WT,ZR,ZS,ZT,WI
 C-----------------------------------------------
       my_real
      .  W_GAUSS(9,9),A_GAUSS(9,9)

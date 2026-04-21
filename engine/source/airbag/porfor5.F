@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    porfor5        ../engine/source/airbag/porfor5.F
-      !||--- called by ------------------------------------------------------
-      !||    airbagb1       ../engine/source/airbag/airbagb1.F
-      !||--- calls      -----------------------------------------------------
-      !||    roto           ../engine/source/airbag/roto.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    porfor5        ../engine/source/airbag/porfor5.F
+!||--- called by ------------------------------------------------------
+!||    airbagb1       ../engine/source/airbag/airbagb1.F
+!||--- calls      -----------------------------------------------------
+!||    roto           ../engine/source/airbag/roto.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE PORFOR5(SVTFAC,IM,IPM,PM,ELBUF_STR,P,PEXT,IEL,NEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -56,7 +56,7 @@ C      INTEGER I,J,MTN,NEL,NFT,IAD,NPT,ISTRA,JHBE,IEXPAN,IPT,MIDPT(5)
 C      DATA MIDPT/1,1,2,2,3/
       INTEGER I,J,MTN
       my_real
-     .   LR1,FTHK,C1,C2,C3,LBD1,LBD2,EPSXX,EPSYY,DELTAP,COS_PHI,TAN_PHI,
+     .   LR1,FTHK,C1,C2,C3,LBD1,LBD2,DELTAP,COS_PHI,TAN_PHI,
      .   APOR0,APOR1,RS,DELTAA,EPS(5,1),DIR(1,2)
       my_real,
      .  DIMENSION(:), POINTER :: UVAR
@@ -110,15 +110,15 @@ C
       ENDIF
       RETURN
       END
-      !||====================================================================
-      !||    porform5       ../engine/source/airbag/porfor5.F
-      !||--- called by ------------------------------------------------------
-      !||    fvvent0        ../engine/source/airbag/fvvent0.F
-      !||--- calls      -----------------------------------------------------
-      !||    roto           ../engine/source/airbag/roto.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    porform5       ../engine/source/airbag/porfor5.F
+!||--- called by ------------------------------------------------------
+!||    fvvent0        ../engine/source/airbag/fvvent0.F
+!||--- calls      -----------------------------------------------------
+!||    roto           ../engine/source/airbag/roto.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE PORFORM5(SVTFAC,IM,IPM,PM,ELBUF_STR,P,PEXT,IEL,NEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -144,7 +144,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,MTN
       my_real
-     .   LR1,FTHK,C1,C2,C3,LBD1,LBD2,EPSXX,EPSYY,DELTAP,COS_PHI,TAN_PHI,
+     .   LR1,FTHK,C1,C2,C3,LBD1,LBD2,DELTAP,COS_PHI,TAN_PHI,
      .   APOR0,APOR1,RS,DELTAA,EPS(5,1),DIR(1,2)
       my_real,
      .  DIMENSION(:), POINTER :: UVAR

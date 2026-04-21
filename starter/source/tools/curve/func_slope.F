@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    func_slope    ../starter/source/tools/curve/func_slope.F
-      !||--- called by ------------------------------------------------------
-      !||    law111_upd    ../starter/source/materials/mat/mat111/law111_upd.F
-      !||    law158_upd    ../starter/source/materials/mat/mat158/law158_upd.F
-      !||    law58_upd     ../starter/source/materials/mat/mat058/law58_upd.F
-      !||    law77_upd     ../starter/source/materials/mat/mat077/law77_upd.F
-      !||    law88_upd     ../starter/source/materials/mat/mat088/law88_upd.F
-      !||    law90_upd     ../starter/source/materials/mat/mat090/law90_upd.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||    table_mod     ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    func_slope    ../starter/source/tools/curve/func_slope.F
+!||--- called by ------------------------------------------------------
+!||    law111_upd    ../starter/source/materials/mat/mat111/law111_upd.F
+!||    law158_upd    ../starter/source/materials/mat/mat158/law158_upd.F
+!||    law58_upd     ../starter/source/materials/mat/mat058/law58_upd.F
+!||    law77_upd     ../starter/source/materials/mat/mat077/law77_upd.F
+!||    law90_upd     ../starter/source/materials/mat/mat090/law90_upd.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||    table_mod     ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE FUNC_SLOPE(IDN,FAC,NPC,PLD,STIFFMIN,STIFFMAX,STIFFINI,STIFFAVG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -54,7 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,ID,NP1,NP2,K1,PN1,PN2,COUNT
+      INTEGER J,PN1,PN2,COUNT
       my_real DYDX,DX,DY
 C=======================================================================
           ! COMPUTE MAXIMUM SLOPE AND INITIAL SLOPE OF FUNCTION
@@ -93,12 +92,12 @@ c-----------
       RETURN
       END
 C=======================================================================
-      !||====================================================================
-      !||    unify_x       ../starter/source/tools/curve/func_slope.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||    table_mod     ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    unify_x       ../starter/source/tools/curve/func_slope.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||    table_mod     ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE UNIFY_X(IDN1,IDN2,NPC,PLD,NPOINT,LEN1,LEN2,XUNI,NPTNEW)
 C-----------------------------------------------
 C   M o d u l e s
@@ -112,7 +111,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER     IDN1,IDN2,IDN,NPOINT,LEN1,LEN2,
+      INTEGER     IDN1,IDN2,NPOINT,LEN1,LEN2,
      .        NPTNEW,NPC(*) 
       my_real 
      .        PLD(*),XUNI(NPOINT) 
@@ -121,7 +120,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,ID,NP1,NP2,K1,PN1,PN2
+      INTEGER I,J,K
       my_real 
      .      EC , ET  
 c=======================================================================

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dynain_node        ../engine/source/output/dynain/dynain_node.F
-      !||--- called by ------------------------------------------------------
-      !||    gendynain          ../engine/source/output/dynain/gendynain.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_dstat_vgath   ../engine/source/mpi/output/spmd_stat.F
-      !||    strs_txt50         ../engine/source/output/sta/sta_txt.F
-      !||--- uses       -----------------------------------------------------
-      !||    state_mod          ../common_source/modules/state_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dynain_node        ../engine/source/output/dynain/dynain_node.F
+!||--- called by ------------------------------------------------------
+!||    gendynain          ../engine/source/output/dynain/gendynain.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_dstat_vgath   ../engine/source/mpi/output/spmd_stat.F
+!||    strs_txt50         ../engine/source/output/sta/sta_txt.F
+!||--- uses       -----------------------------------------------------
+!||    state_mod          ../common_source/modules/state_mod.F
+!||====================================================================
       SUBROUTINE DYNAIN_NODE(X   ,NUMNOD  ,ITAB  ,ITABG  ,LENG  ,
      .                    NODGLOB,WEIGHT  ,NODTAG,DYNAIN_DATA)
 C-----------------------------------------------

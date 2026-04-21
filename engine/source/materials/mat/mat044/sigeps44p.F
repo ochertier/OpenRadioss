@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps44p    ../engine/source/materials/mat/mat044/sigeps44p.F
-      !||--- called by ------------------------------------------------------
-      !||    main_beam3   ../engine/source/elements/beam/main_beam3.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter       ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps44p    ../engine/source/materials/mat/mat044/sigeps44p.F
+!||--- called by ------------------------------------------------------
+!||    main_beam3   ../engine/source/elements/beam/main_beam3.F
+!||--- calls      -----------------------------------------------------
+!||    finter       ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE SIGEPS44P(
      .    NEL     ,NGL     ,MAT     ,PID     ,NUPARAM ,UPARAM  ,
      .    GEO     ,OFF     ,PLA     ,AL      ,
      .    EXX     ,EXY     ,EXZ     ,KXX     ,KYY     ,KZZ     ,
      .    FA1     ,FA2     ,FA3     ,MA1     ,MA2     ,MA3     ,
      .    FOR     ,MOM     ,PM      ,NUVAR   ,UVAR    ,NFUNC   , 
-     .    IFUNC   ,TF      ,NPF     )
+     .    IFUNC   ,TF      ,NPF     ,SIGY)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,15 +64,16 @@ C-----------------------------------------------
       my_real
      .   TF(*),FINTER
       EXTERNAL FINTER
+      my_real ,DIMENSION(NEL)        ,INTENT(INOUT) :: SIGY
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ,DIMENSION(NEL) :: INDX,ICC,ISRATE,VFLAG,IPOS,IAD,ILEN
+      INTEGER ,DIMENSION(NEL) :: INDX,ICC,ISRATE,VFLAG
       INTEGER :: I,J,IPID,NINDX
       my_real :: DMG,FACT,EPIF,FRATE,ALPHA,EPSDOT
       my_real ,DIMENSION(NEL) :: E,G,G3,CA,CB,CN,CP,A1,B1,B2,B3,SHF,
      .   DEGMB,DEGFX,DMPM,DMPF,F1,M1,M2,M3,DEGSH,YEQ,YLD,YMA2,YLDMAX,
-     .   DWPLA,EPMAX,EPST,EPSR1,EPSR2,EPDR,EPSP,RHO,EPMX,DWELM,DWELF,RR,
+     .   DWPLA,EPMAX,EPST,EPSR1,EPSR2,EPDR,EPSP,RHO,DWELM,DWELF,RR,
      .   SH,SH10,SH20,SH0,SH1,SH2,ASRATE,YSCALE,DPLA,DFDPLA
 C=======================================================================
       EPIF = ZERO
@@ -230,6 +231,7 @@ c     PROJECTION
 c-------------------
       DO I=1,NEL
         YLD(I) = MIN(YLD(I),YLDMAX(I))    
+        SIGY(I) = YLD(I)
         RR(I)  = MIN(ONE, YLD(I) / YEQ(I))
         F1(I)  = F1(I)*RR(I)
         DWELM(I) =(F1(I) + FOR(I,1))*(F1(I)-FOR(I,1)) / E(I)/A1(I)
@@ -263,8 +265,8 @@ c--------------------------------
 c     DUCTILE RUPTURE
 c--------------------------------
       DO I=1,NEL
-        IF (OFF(I) < EM01) OFF(I) = ZERO
-        IF (OFF(I) < ONE)   OFF(I) = OFF(I)*FOUR_OVER_5
+          IF (OFF(I) < EM01)  OFF(I) = ZERO
+          IF (OFF(I) < ONE )  OFF(I) = OFF(I)*FOUR_OVER_5
       ENDDO
 c--------------------------------
 c     AXIAL TENSION OR PLASTIC STRAIN FAILURE 

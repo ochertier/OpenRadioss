@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,49 +21,49 @@
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    state_file_mod   ../common_source/modules/output/state_file_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    output_mod       ../common_source/modules/output/output_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    state_file_mod   ../common_source/modules/output/state_file_mod.F90
+!||--- called by ------------------------------------------------------
+!||    output_mod       ../common_source/modules/output/output_mod.F90
+!||====================================================================
       module state_file_mod
 
 ! ======================================================================================================================
 !! \brief data structure for state files output
 !! \details
 ! ======================================================================================================================
-         implicit none
+        implicit none
 
-         type state_
-            integer  stat_numelsph,stat_numelsph_g
-            logical is_stat_sph
+        type state_
+          integer  :: stat_numelsph,stat_numelsph_g
+          logical :: is_stat_sph
 
-            integer, dimension(:), allocatable :: stat_sph
-         end type state_
+          integer, dimension(:), allocatable :: stat_sph
+        end type state_
 
 
-         contains
+      contains
 
-         
-      !||====================================================================
-      !||    state_init   ../common_source/modules/output/state_file_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    frestat      ../engine/source/input/frestat.F
-      !||====================================================================
-         subroutine state_init(state,mx_stat)
-            
 
-           type(state_),intent(inout)  :: state
-           integer, intent(in) :: mx_stat
+!||====================================================================
+!||    state_init   ../common_source/modules/output/state_file_mod.F90
+!||--- called by ------------------------------------------------------
+!||    frestat      ../engine/source/input/frestat.F
+!||====================================================================
+        subroutine state_init(state,mx_stat)
 
-           state%stat_numelsph = 0
-           state%stat_numelsph_g = 0
-           state%is_stat_sph = .false.
 
-           allocate(state%stat_sph(mx_stat))
-           state%stat_sph(1:mx_stat) = 0
-           
-         end subroutine state_init
+          type(state_),intent(inout)  :: state
+          integer, intent(in) :: mx_stat
+
+          state%stat_numelsph = 0
+          state%stat_numelsph_g = 0
+          state%is_stat_sph = .false.
+
+          allocate(state%stat_sph(mx_stat))
+          state%stat_sph(1:mx_stat) = 0
+
+        end subroutine state_init
 
 
       end module state_file_mod

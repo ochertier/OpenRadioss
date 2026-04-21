@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,27 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    init_seatbelt_rbodies_mod   ../starter/source/tools/seatbelts/init_seatbelt_rbodies.F90
-      !||--- called by ------------------------------------------------------
-      !||    initia                      ../starter/source/elements/initia/initia.F
-      !||====================================================================
+!||====================================================================
+!||    init_seatbelt_rbodies_mod   ../starter/source/tools/seatbelts/init_seatbelt_rbodies.F90
+!||--- called by ------------------------------------------------------
+!||    initia                      ../starter/source/elements/initia/initia.F
+!||====================================================================
       module init_seatbelt_rbodies_mod
+        implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \routine to search for rbodies that are referenced by slipring and fill slipring data_structure with
-      !||====================================================================
-      !||    init_seatbelt_rbodies   ../starter/source/tools/seatbelts/init_seatbelt_rbodies.F90
-      !||--- called by ------------------------------------------------------
-      !||    initia                  ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    init_seatbelt_rbodies   ../starter/source/tools/seatbelts/init_seatbelt_rbodies.F90
+!||--- called by ------------------------------------------------------
+!||    initia                  ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||====================================================================
         subroutine init_seatbelt_rbodies(nnpby,nrbody,npby,slrbody,lpby,sicode,icode,nslipring)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -52,10 +53,6 @@
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -104,10 +101,10 @@
                     if ((lpby(k+l)==nod).and.((idrb==0).or.(idrb == n))) then
                       nfound_rby  = nfound_rby  + 1
                       idrb = n
-                    endif
-                  enddo
+                    end if
+                  end do
                   l = l+nsl
-                enddo
+                end do
 !---          check of bcs ---
                 ic = icode(nod)
                 ic1=ic/512
@@ -116,17 +113,17 @@
                 bcs_y = (ic1-4*bcs_x)/2
                 bcs_z = ic1-4*bcs_x-2*bcs_y
                 if (bcs_x*bcs_y*bcs_z > 0) nfound_bcs = nfound_bcs + 1
-              enddo
+              end do
               if (nfound_rby ==slipring(i)%nfram) then
                 slipring(i)%rbody = idrb
-              elseif (nfound_bcs /= slipring(i)%nfram) then
+              else if (nfound_bcs /= slipring(i)%nfram) then
                 call ancmsg(msgid=2081,              &
                   msgtype=msgerror,        &
                   anmode=aninfo_blind_1,   &
                   i1=slipring(i)%id)
-              endif
-            endif
-          enddo
+              end if
+            end if
+          end do
 ! ----------------------------------------------------------------------------------------------------------------------
         end subroutine init_seatbelt_rbodies
       end module init_seatbelt_rbodies_mod

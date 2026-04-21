@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,11 +23,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C Non linear viscous model based on HYPERBOLIC SINE
 C output: the creep strain increment DGAMMA
 C-----------------------------------------------
-      !||====================================================================
-      !||    viscsinh    ../engine/source/materials/mat/mat100/viscsinh.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps100   ../engine/source/materials/mat/mat100/sigeps100.F90
-      !||====================================================================
+!||====================================================================
+!||    viscsinh    ../engine/source/materials/mat/mat100/viscsinh.F
+!||--- called by ------------------------------------------------------
+!||    sigeps100   ../engine/source/materials/mat/mat100/sigeps100.F90
+!||====================================================================
         SUBROUTINE VISCSINH ( NEL, TBNORM,  A1, B0 ,EXPN, DGAMMA ) !HYPERBOLIC SINE
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -54,7 +54,7 @@ C----------------------------------------------------------------
       INTEGER    I
 
       my_real     
-     .   TEMP,  IP1(NEL)
+     .   TEMP
 C----------------------------------------------------------------
 
 

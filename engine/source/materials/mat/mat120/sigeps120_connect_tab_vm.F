@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps120_connect_tab_vm   ../engine/source/materials/mat/mat120/sigeps120_connect_tab_vm.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps120_connect_main     ../engine/source/materials/mat/mat120/sigeps120_connect_main.F
-      !||--- calls      -----------------------------------------------------
-      !||    table_vinterp              ../engine/source/tools/curve/table_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod        ../engine/share/modules/table_mod.F
-      !||    table_mod                  ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps120_connect_tab_vm   ../engine/source/materials/mat/mat120/sigeps120_connect_tab_vm.F
+!||--- called by ------------------------------------------------------
+!||    sigeps120_connect_main     ../engine/source/materials/mat/mat120/sigeps120_connect_main.F
+!||--- calls      -----------------------------------------------------
+!||    table_vinterp              ../engine/source/tools/curve/table_tools.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod        ../engine/share/modules/table_mod.F
+!||    table_mod                  ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE SIGEPS120_CONNECT_TAB_VM(
      1     NEL     ,NGL     ,TIME    ,TIMESTEP,UPARAM  ,OFF     ,
      2     EPSD    ,STIFM   ,THICK   ,JTHE    ,
@@ -82,17 +82,17 @@ C----------------------------------------------------------------
       my_real :: XVEC1(NEL,1), XVEC2(NEL,2), XVEC3(NEL,3)
       INTEGER  ,DIMENSION(NEL) :: INDX,INDF
 c     material parameters
-      my_real :: YOUNG,NU,G,G2,BULK,YLD0,QQ,BETA,HH,C11,C12,
-     .   A1F,A2F,AS,D1C,D2C,D1F,D2F,D_TRX,D_JC,DM,EXPN
+      my_real :: YOUNG,NU,G,G2,BULK,YLD0,QQ,BETA,HH,
+     .   A1F,A2F,AS,D1C,D2C,D1F,D2F,D_TRX,D_JC,EXPN
 c     Johnson & Cook rate-dependency
-      my_real CC,EPSDREF,EPSDMAX,FRATE,FCUT,ALPHA,ALPHAI,EPSDOT
+      my_real CC,EPSDREF,EPSDMAX,FCUT,ALPHA,ALPHAI,EPSDOT
 c     Local variables
-      my_real FACR,TRIAX,RVOCE,I1P,IP,JP,TP,FACT,FACD,DFAC,DTINV,
-     .   DLAM,DDEP,DFDLAM,DYLD_DPLA,DPLA_DLAM,DPHI_DLAM,DTB,
-     .   GAMC,GAMF,NP_XX,NP_YY,NP_ZZ,NP_XY,NP_YZ,NP_ZX,
-     .   NF_XX,NF_YY,NF_ZZ,NF_XY,NF_YZ,NF_ZX,DPXX,DPYY,DPZZ,DPXY,DPYZ,DPZX
+      my_real FACR,TRIAX,I1P,IP,JP,TP,FACT,FACD,DFAC,DTINV,
+     .   DLAM,DDEP,DFDLAM,DPLA_DLAM,DPHI_DLAM,DTB,
+     .   GAMC,GAMF,NP_XX,NP_YY,NP_ZZ,NP_YZ,NP_ZX,
+     .   NF_XX,NF_YY,NF_ZZ,NF_YZ,NF_ZX,DPZZ,DPYZ,DPZX
       my_real ,DIMENSION(NEL) :: I1,J2,YLD,PHI,DAM,FDAM,JCRATE,STF,HARDP,HARDP_I,FVM,
-     .   SXX,SYY,SZZ,SXY,SYZ,SZX,DPLA,JCR_LOG,GAMMA,DGAMM,PLA_NL,DPDT_NL,YLD_I
+     .   SXX,SYY,SZZ,SYZ,SZX,DPLA,JCR_LOG,GAMMA,DGAMM,YLD_I
 C---------------------------------------------
 
       YOUNG = UPARAM(1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    scdefo3    ../engine/source/elements/thickshell/solidec/scdefo3.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cforc3   ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||    scforc3    ../engine/source/elements/thickshell/solidec/scforc3.F
-      !||====================================================================
+!||====================================================================
+!||    scdefo3    ../engine/source/elements/thickshell/solidec/scdefo3.F
+!||--- called by ------------------------------------------------------
+!||    s6cforc3   ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||    scforc3    ../engine/source/elements/thickshell/solidec/scforc3.F
+!||====================================================================
       SUBROUTINE SCDEFO3(
      1   DXX,     DXY,     DXZ,     DYX,
      2   DYY,     DYZ,     DZX,     DZY,
@@ -117,7 +117,7 @@ C
           DVC(I) = ZERO
         ENDDO
       END IF
-C   +++ -----partie non constante------
+C   +++ ---- Non-constant part ------
       DO I=1,NEL
         DXX(I)=DCXX(I)+ZI*DHXX(I)
         DYY(I)=DCYY(I)+ZI*DHYY(I)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sordeftb   ../engine/source/elements/solid/solide8e/sordeftb.F
-      !||--- called by ------------------------------------------------------
-      !||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||====================================================================
+!||====================================================================
+!||    sordeftb   ../engine/source/elements/solid/solide8e/sordeftb.F
+!||--- called by ------------------------------------------------------
+!||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||====================================================================
       SUBROUTINE SORDEFTB(JFT,JLT,MXX, MYY, MZZ,  
      .                   G1X,G1Y,G1Z,G2X,G2Y,G2Z,G3X,G3Y,G3Z)
 C-----------------------------------------------
@@ -45,7 +45,7 @@ C-----------------------------------------------
       INTEGER I
 C     REAL
       my_real
-     .   SX,SY,SZ,FXX,FXY,FXZ,FYX,FYY,FYZ,FZX,FZY,FZZ
+     .   FXX,FYY,FZZ
 C-----------------------------------------------
       DO I=JFT,JLT
          FXX = MXX(I)*G1X(I)*G1X(I)+MYY(I)*G1Y(I)*G1Y(I)+MZZ(I)*G1Z(I)*G1Z(I)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ie_bound         ../starter/source/materials/mat/mat051/ie_bound.F
-      !||--- called by ------------------------------------------------------
-      !||    fill_buffer_51   ../starter/source/materials/mat/mat051/fill_buffer_51.F
-      !||    hm_read_mat51    ../starter/source/materials/mat/mat051/hm_read_mat51.F
-      !||====================================================================
+!||====================================================================
+!||    ie_bound         ../starter/source/materials/mat/mat051/ie_bound.F
+!||--- called by ------------------------------------------------------
+!||    fill_buffer_51   ../starter/source/materials/mat/mat051/fill_buffer_51.F
+!||    hm_read_mat51    ../starter/source/materials/mat/mat051/hm_read_mat51.F
+!||====================================================================
       FUNCTION IE_BOUND(PEXT,PM,C0,C1,C2,C3,C4,C5,E0)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -38,7 +38,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real  PCRIT, P0, MU, C45,TMP, MU0, x, E0_ref, P0_ref, C1_ref
+      my_real  PCRIT, P0, C45, MU0, x, E0_ref, P0_ref, C1_ref
 C
 C----------+------+----------------------------------------------------C
 C VAR      | SIZE | DEFINITION                                         C
@@ -162,12 +162,12 @@ C-----------------------------------------------
           IE_BOUND=-INFINITY
           GOTO 100
         END IF
-        !expansion extremum
+        !Extremum expansion
         IF(P0 >= ZERO)THEN
           IF (C1 == P0)THEN
             IE_BOUND=-C1/C4   !limite en mu=-1
             GOTO 100
-          ELSE !extremum in  ] -1 et 0 [
+          ELSE !extremum in] -1 and 0 [
             x=(C4*P0+C1)/(C1-P0)  !necessarily positive
             x=exp(-LOG(x)/(1+C4))-1
             IE_BOUND=(-(1+x)**(-1-C4)*(C4*P0+C1+C1*x+C4*C1*x) / C4/(1+C4)+(C4*P0+C1)/C4/(1+C4))*(1+x)**C4
@@ -176,7 +176,7 @@ C-----------------------------------------------
           END IF !(P0>=ZERO)
         !extremum in compression
         IF(P0 < ZERO)THEN
-        !extremum estimation in compression (C2,C3 needed) :
+        !extremum estimate in compression (C2, C3 Needed):
         IE_BOUND=-INFINITY ! ameliorer
           !find an estimator
           !fixed point method ?
@@ -203,7 +203,7 @@ C-----------------------------------------------
           END IF
         END IF
         ! otherwise extremum does exist
-        ! expansion if P0>0
+        ! IF expansion P0> 0
         IF(P0 >= ZERO)THEN
            !C1**2-P0^2 is here necessarily positive because C1-P0>0 C1>0 P0>0
           x=-(C1+P0-SQRT(C1**2-P0**2))/(C1+P0)
@@ -212,14 +212,14 @@ C-----------------------------------------------
         END IF
         ! compression
         IF(P0 < ZERO)THEN
-        !extremum estimation in compression (C2,C3 needed) :
+        !extremum estimate in compression (C2, C3 Needed):
         IE_BOUND=-INFINITY ! to improve
           !find an estimator
           !fixed point method ?
           GOTO 100
         END IF
       END IF !condition for C4 (1 or 2)
-      END IF !mie gruneisen gamma constant
+      END IF !Mie Gruneisen Gamma Constant
       
   100 IF (E0_ref /= ZERO)THEN
         IF(IE_BOUND /= -INFINITY)IE_BOUND=IE_BOUND+E0_ref

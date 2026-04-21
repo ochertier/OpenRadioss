@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbaforipinch   ../engine/source/elements/shell/coqueba/cbaforipinch.F
-      !||--- called by ------------------------------------------------------
-      !||    cbaforc3       ../engine/source/elements/shell/coqueba/cbaforc3.F
-      !||====================================================================
+!||====================================================================
+!||    cbaforipinch   ../engine/source/elements/shell/coqueba/cbaforipinch.F
+!||--- called by ------------------------------------------------------
+!||    cbaforc3       ../engine/source/elements/shell/coqueba/cbaforc3.F
+!||====================================================================
           SUBROUTINE CBAFORIPINCH(    
      1                          JFT   ,JLT   ,NG    ,NEL   ,NPLAT ,IPLAT ,
      2                          CDET  ,THK0  ,TH12  ,VOL,
@@ -52,7 +52,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER EP,I,J
+      INTEGER EP,I
       my_real C1,C2
 C-----------------------------------------------
 #include "vectorize.inc"

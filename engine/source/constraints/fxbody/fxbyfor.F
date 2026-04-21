@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fxbyfor            ../engine/source/constraints/fxbody/fxbyfor.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    fxbodfp1           ../engine/source/constraints/fxbody/fxbodfp.F
-      !||    fxbodfp2           ../engine/source/constraints/fxbody/fxbodfp.F
-      !||    spmd_fxb_for       ../engine/source/mpi/kinematic_conditions/spmd_fxb_for.F
-      !||    spmd_fxb_for_pon   ../engine/source/mpi/kinematic_conditions/spmd_fxb_for_pon.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod           ../common_source/modules/output/anim_mod.F
-      !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
-      !||====================================================================
-      SUBROUTINE FXBYFOR(FXBIPM, FXBRPM,  FXBNOD , FXBMOD  , FXBGLM ,
+!||====================================================================
+!||    fxbyfor            ../engine/source/constraints/fxbody/fxbyfor.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    fxbodfp1           ../engine/source/constraints/fxbody/fxbodfp.F
+!||    fxbodfp2           ../engine/source/constraints/fxbody/fxbodfp.F
+!||    spmd_fxb_for       ../engine/source/mpi/kinematic_conditions/spmd_fxb_for.F
+!||    spmd_fxb_for_pon   ../engine/source/mpi/kinematic_conditions/spmd_fxb_for_pon.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    output_mod         ../common_source/modules/output/output_mod.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||====================================================================
+      SUBROUTINE FXBYFOR(OUTPUT,FXBIPM, FXBRPM,  FXBNOD , FXBMOD  , FXBGLM ,
      .                   FXBCPM, FXBCPS,  FXBLM  , FXBFLS  , FXBDLS ,
      .                   FXBDEP, FXBVIT,  FXBACC , A       , AR     ,
      .                   X     , FXBMVN,  FXBMCD , FXBSE   , FXBSV  ,
@@ -43,13 +44,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                   DT2T  , ITYPTST, NELTST , FXBGRVI , FXBGRVR,
      .                   IGRV  , NPC    , TF     , FXBGRP  , FXBGRW ,
      .                   IPARG , NSENSOR,SENSOR_TAB, IAD_ELEM, FR_ELEM,
-     .                   AGRV  )
+     .                   AGRV  , PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE python_funct_mod, ONLY : python_
       USE ELBUFDEF_MOD            
       USE SENSOR_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,6 +72,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER FXBIPM(NBIPM,*), FXBNOD(*), FXBELM(*), ITYPTST, NELTST,
      .        FXBGRVI(*), IGRV(NIGRV,*), NPC(*), IPARG(NPARG,*),
@@ -84,6 +87,7 @@ C-----------------------------------------------
      .   FXBGRW(*), AGRV(LFACGRV,*)
       TYPE (ELBUF_STRUCT_), DIMENSION (NGROUP) :: ELBUF_TAB
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE(python_) :: python
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -96,7 +100,7 @@ C-----------------------------------------------
 C=======================================================================
       N2=NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU
       ITN=0
-      IF(TT<TANIM) ITN=1
+      IF(TT<OUTPUT%TANIM) ITN=1
       NCYCLP1=NCYCLE+1
       IF((NCYCLP1/NCRST)*NCRST==NCYCLP1.OR.MREST/=0) ITN=0
       DO I=1,LENVAR
@@ -180,7 +184,7 @@ C
      .FXBSV(ALM)   ,FSAV(1,NN2) ,FXBFP(AVAR) ,FXBEFW(NFX) ,FXBFC(ALM)  ,
      .FXBGRVI(AGRVI),FXBGRVR(AGRVR),NLGRAV   ,IGRV        ,NPC         ,
      .TF           ,FXBGRP(AVAR),FXBGRW(NFX) ,SENSOR_TAB  ,NSENSOR     ,  
-     .MFEXTP(AVAR) ,AGRV        )
+     .MFEXTP(AVAR) ,AGRV    ,PYTHON    )
          ENDIF
       ENDDO
 C

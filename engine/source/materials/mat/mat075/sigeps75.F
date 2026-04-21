@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps75           ../engine/source/materials/mat/mat075/sigeps75.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw              ../engine/source/materials/mat_share/mulaw.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../engine/source/output/message/message.F
-      !||    arret              ../engine/source/system/arret.F
-      !||    eosmain            ../common_source/eos/eosmain.F
-      !||    finter             ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps75           ../engine/source/materials/mat/mat075/sigeps75.F
+!||--- called by ------------------------------------------------------
+!||    mulaw              ../engine/source/materials/mat_share/mulaw.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg             ../engine/source/output/message/message.F
+!||    arret              ../engine/source/system/arret.F
+!||    eosmain            ../common_source/eos/eosmain.F
+!||    finter             ../engine/source/tools/curve/finter.F
+!||--- uses       -----------------------------------------------------
+!||    eosmain_mod        ../common_source/eos/eosmain.F
+!||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    message_mod        ../engine/share/message_module/message_mod.F
+!||====================================================================
        SUBROUTINE SIGEPS75(
      1      NEL    , NUPARAM, NUVAR   , NFUNC , IFUNC , NPF   ,
      2      TF     , TIME   , TIMESTEP, UPARAM, RHO0  , RHO   ,
@@ -45,7 +46,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9      SIGVXX , SIGVYY , SIGVZZ  , SIGVXY, SIGVYZ, SIGVZX,
      A      SOUNDSP, VISCMAX, UVAR    , OFF   , DVOL  , VOL0  ,
      B      PM     , IPM    , MAT     , PSH   , BUFMAT,
-     C      VAREOS ,NVAREOS ,MAT_PARAM)
+     C      VAREOS ,NVAREOS ,MAT_PARAM,NVARTMP_EOS, VARTMP_EOS)
 C
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
@@ -98,6 +99,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE MATPARAM_DEF_MOD
+      USE EOSMAIN_MOD , ONLY : EOSMAIN
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -112,7 +114,6 @@ C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------
       INTEGER NEL, NUPARAM, NUVAR, IPM(NPROPMI,NUMGEO), MAT(NEL)
       INTEGER,INTENT(IN) ::NVAREOS
-C
       my_real
      .      TIME       , TIMESTEP   , UPARAM(NUPARAM),
      .      RHO   (NEL), RHO0  (NEL), VNEW(NEL), EINT(NEL),
@@ -129,6 +130,8 @@ C
      
       my_real,INTENT(INOUT) :: VAREOS(NVAREOS*NEL)
       TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
+      INTEGER,INTENT(IN) :: NVARTMP_EOS
+      INTEGER,INTENT(INOUT) :: VARTMP_EOS(NEL,NVARTMP_EOS)
 C----------------------------------------------------------------
 C  O U T P U T   A R G U M E N T S
 C----------------------------------------------------------------
@@ -146,23 +149,23 @@ C----------------------------------------------------------------
 C  VARIABLES FOR FUNCTION INTERPOLATION 
 C----------------------------------------------------------------
       INTEGER NPF(*), NFUNC, IFUNC(NFUNC)
-      my_real FINTER,FINTTE,TF(*),FINT2V
+      my_real FINTER,FINTTE,TF(*)
       EXTERNAL FINTER,FINTTE
 C----------------------------------------------------------------
 C  L o c a l   V a r i a b l e s
 C----------------------------------------------------------------
       INTEGER I, ITER, MATS(NEL),IPLA(NEL), MXS, IFLAG1,
      .        IFLAG2, ITEMAX, IMAX, IPLAS, EOSTYP
-      INTEGER IBID(1) !bfrac not used in this context
+      my_real :: BID(1) !bfrac not used in this context
       my_real
-     .   DFS(NEL), MUS(NEL), MU2S(NEL), DPDM(NEL), ECOLD(NEL),
+     .   DFS(NEL), MUS(NEL), MU2S(NEL), DPDM(NEL),
      .   THETA(NEL), DPDE(NEL)
       my_real
      .   MU(NEL)
       my_real
      .   PS,PE,ALPHAE,ALPHAP,EN,BETA,ETA,XI,UNSURN,
-     .   BULK0,C0,DALPDPE,AA,HH,HH2,G,G2,DAV,
-     .   BULK1, CRIT, TOL, PNEW1, DFDA, DGDA,
+     .   BULK0,AA,HH,HH2,G,G2,DAV,
+     .   BULK1, CRIT, TOL, DFDA, DGDA,
      .   GS, DGDALPHA, BULK
       my_real
      .   RHOS(NEL),RHOS0(NEL),ESPES(NEL),
@@ -197,6 +200,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       XI    =UPARAM(15)
       ETA   =UPARAM(16)
       EOSTYP = MAT_PARAM(MXS)%IEOS  ! LAW 75 uses /EOS defined in another law !!!
+      IPLA(1:NEL)=0
 C
       DO I=1,NEL
          ALPHAOLD(I)= UVAR(I,3)
@@ -262,21 +266,20 @@ C------------------
 C--------------
 C EOS FOR SOLID
 C--------------
-      PNEW(1:NEL) = ZERO
       CALL EOSMAIN(0      ,NEL    ,EOSTYP  ,PM     ,OFF    ,EINTN ,
      .             RHOS   ,RHOS0  ,MUS     ,MU2S   ,ESPES  ,
      .             DVOLS  ,DFS    ,VNEWS   ,MATS   ,PSH    ,
-     .             PNEW   ,DPDM   ,DPDE    ,THETA  ,ECOLD  ,
-     .             BUFMAT ,SIGOLD ,MUOLD   ,75     ,POLD   ,
-     .             NPF    ,TF     ,VAREOS  ,NVAREOS,MAT_PARAM,
-     .             IBID)
+     .             PNEW   ,DPDM   ,DPDE    ,THETA  ,
+     .             BUFMAT ,SIGOLD ,MUOLD   ,75     ,
+     .             NPF    ,TF     ,VAREOS  ,NVAREOS,MAT_PARAM(MXS),
+     .             BID    ,NVARTMP_EOS, VARTMP_EOS)
       CALL EOSMAIN(1      ,NEL    ,EOSTYP  ,PM     ,OFF    ,EINTN ,
      .             RHOS   ,RHOS0  ,MUS     ,MU2S   ,ESPES  ,
      .             DVOLS  ,DFS    ,VNEWS   ,MATS   ,PSH    ,
-     .             PNEW   ,DPDM   ,DPDE    ,THETA  ,ECOLD  ,
-     .             BUFMAT ,SIGOLD ,MUOLD   ,75     ,POLD   ,
-     .             NPF    ,TF     ,VAREOS  ,NVAREOS,MAT_PARAM,
-     .             IBID)
+     .             PNEW   ,DPDM   ,DPDE    ,THETA  ,
+     .             BUFMAT ,SIGOLD ,MUOLD   ,75     ,
+     .             NPF    ,TF     ,VAREOS  ,NVAREOS,MAT_PARAM(MXS),
+     .             BID   ,NVARTMP_EOS, VARTMP_EOS)
       IF(IFLAG1 == 2) THEN
         DO I=1,NEL
            PNEW(I)=PNEW(I)/ALPHA(I)
@@ -368,21 +371,20 @@ C------------------
 C--------------
 C EOS FOR SOLID
 C--------------
-      PNEW(1:NEL) = ZERO
       CALL EOSMAIN(0     ,NEL   ,EOSTYP ,PM    ,OFF   ,EINTN ,
      .             RHOS  ,RHOS0 ,MUS    ,MU2S  ,ESPES ,
      .             DVOLS ,DFS   ,VNEWS  ,MATS  ,PSH   ,
-     .             PNEW  ,DPDM  ,DPDE   ,THETA ,ECOLD ,
-     .             BUFMAT,SIGOLD,MUOLD  ,75    ,POLD  ,
-     .             NPF   ,TF    ,VAREOS ,NVAREOS,MAT_PARAM,
-     .             IBID)
+     .             PNEW  ,DPDM  ,DPDE   ,THETA ,
+     .             BUFMAT,SIGOLD,MUOLD  ,75    ,
+     .             NPF   ,TF    ,VAREOS ,NVAREOS,MAT_PARAM(MXS),
+     .             BID,   NVARTMP_EOS, VARTMP_EOS)
       CALL EOSMAIN(1     ,NEL   ,EOSTYP ,PM    ,OFF   ,EINTN ,
      .             RHOS  ,RHOS0 ,MUS    ,MU2S  ,ESPES ,
      .             DVOLS ,DFS   ,VNEWS  ,MATS  ,PSH   ,
-     .             PNEW  ,DPDM  ,DPDE   ,THETA ,ECOLD ,
-     .             BUFMAT,SIGOLD,MUOLD  ,75    ,POLD  ,
-     .             NPF   ,TF    ,VAREOS ,NVAREOS,MAT_PARAM,
-     .             IBID)
+     .             PNEW  ,DPDM  ,DPDE   ,THETA ,
+     .             BUFMAT,SIGOLD,MUOLD  ,75    ,
+     .             NPF   ,TF    ,VAREOS ,NVAREOS,MAT_PARAM(MXS),
+     .             BID,   NVARTMP_EOS, VARTMP_EOS)
       IF(IFLAG1 == 2) THEN
         DO I=1,NEL
            PNEW(I)=PNEW(I)/ALPHA(I)
@@ -398,8 +400,8 @@ C-----------------
         DO I=1,NEL
             IF(IPLA(I)/=1)CYCLE
             DFDA=DPDM(I)*(ONE+MU(I))/ALPHAE + DPDE(I)*EINT(I)/VOL0(I)
-            DGDA=-XI*UNSURN*(ALPHA(I)-ONE)**(UNSURN-ONE)
-            PNEWG(I)=PS-XI*(ALPHA(I)-ONE)**UNSURN
+            DGDA=-XI*UNSURN*(MAX(ALPHA(I)-ONE,EM20))**(UNSURN-ONE)
+            PNEWG(I)=PS-XI*(MAX(ALPHA(I)-ONE,EM20))**UNSURN
 C
             IF(IFLAG1 == 1) THEN
               DALPHA=(PNEW(I)-PNEWG(I))/(DFDA-DGDA)

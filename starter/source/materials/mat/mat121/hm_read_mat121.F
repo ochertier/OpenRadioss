@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat121           ../starter/source/materials/mat/mat121/hm_read_mat121.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat121           ../starter/source/materials/mat/mat121/hm_read_mat121.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT121(
      .           UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR    ,MAXFUNC  ,
      .           NFUNC    ,IFUNC    ,MTAG     ,PARMAT   ,UNITAB   ,
@@ -76,11 +76,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,ILAW,Ires,Ivisc,Ifail,Fct_SIG0,
+      INTEGER ILAW,Ires,Ivisc,Ifail,Fct_SIG0,
      .        Fct_YOUN,Fct_TANG,Fct_FAIL
 C     REAL
       my_real
-     .   RHO0,YOUNG,NU,A,G,G2,LAM,BULK,NNU,NNU1,Fcut,DTMIN,
+     .   RHO0,YOUNG,NU,G,G2,LAM,BULK,NNU,NNU1,Fcut,DTMIN,
      .   Xscale_SIG0,Yscale_SIG0,Xscale_YOUN,Yscale_YOUN,
      .   Xscale_TANG,Xscale_FAIL,Yscale_FAIL,
      .   XSCALE_UNIT,YSCALE_UNIT,A11,A12,TANG
@@ -172,7 +172,7 @@ c-----------------------------
       ! Failure criterion flag
       Ifail = MIN(MAX(Ifail,0),3)
       ! Check initial yield stress function is defined 
-      IF (Fct_SIG0 == 0) THEN 
+      IF ((Fct_SIG0 == 0).AND.(Yscale_SIG0 == ZERO)) THEN 
         CALL ANCMSG(MSGID=2060,
      .              MSGTYPE=MSGERROR,
      .              ANMODE=ANINFO_BLIND_2,
@@ -215,12 +215,12 @@ c--------------------------
       ! Number of user variables 
       IF (Ires == 1) THEN 
         IF (Ivisc == 0) THEN 
-          NUVAR = 1
+          NUVAR = 2
         ELSE
           NUVAR = 3
         ENDIF
       ELSE
-        NUVAR = 0
+        NUVAR = 1
       ENDIF
 c      
       ! Material parameters
@@ -300,7 +300,11 @@ c--------------------------
         IF (Ivisc == 0) THEN 
           WRITE(IOUT,1380) Fcut
         ENDIF
-        WRITE(IOUT,1400) Fct_SIG0,Xscale_SIG0,Yscale_SIG0
+        IF (Fct_SIG0 > 0) THEN 
+          WRITE(IOUT,1400) Fct_SIG0,Xscale_SIG0,Yscale_SIG0
+        ELSE
+          WRITE(IOUT,1450) Yscale_SIG0
+        ENDIF
         IF (Fct_YOUN > 0) THEN 
           WRITE(IOUT,1500) Fct_YOUN,Xscale_YOUN,Yscale_YOUN
         ENDIF
@@ -349,6 +353,8 @@ c-----------------------------------------------------------------------
      & 5X,'INITIAL YIELD STRESS FUNCTION ID. . . .=',I10/
      & 5X,'STRAIN-RATE SCALE FACTOR. . . . . . . .=',1PG20.13/
      & 5X,'YIELD STRESS SCALE FACTOR . . . . . . .=',1PG20.13/)
+ 1450 FORMAT(
+     & 5X,'CONSTANT INITIAL YIELD STRESS . . . . .=',1PG20.13/)
  1500 FORMAT(
      & 5X,'YOUNG MODULUS FUNCTION ID . . . . . . .=',I10/
      & 5X,'STRAIN-RATE SCALE FACTOR. . . . . . . .=',1PG20.13/

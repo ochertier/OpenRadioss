@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    csmall3    ../engine/source/elements/solid/solide/csmall3.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cforc3   ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
-      !||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8sforc3   ../engine/source/elements/solid/solide8s/s8sforc3.F
-      !||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||    scforc3    ../engine/source/elements/thickshell/solidec/scforc3.F
-      !||====================================================================
+!||====================================================================
+!||    csmall3    ../engine/source/elements/solid/solide/csmall3.F
+!||--- called by ------------------------------------------------------
+!||    s6cforc3   ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
+!||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8sforc3   ../engine/source/elements/solid/solide8s/s8sforc3.F
+!||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||    scforc3    ../engine/source/elements/thickshell/solidec/scforc3.F
+!||====================================================================
       SUBROUTINE CSMALL3(SIG, S1, S2, S3, S4, S5, S6,
      .                   OFFG ,OFF  ,NEL) 
 C-----------------------------------------------
@@ -47,12 +47,6 @@ C-----------------------------------------------
      .   SIG(NEL,6),
      .   S1(*), S2(*), S3(*), S4(*), S5(*), S6(*),
      .   OFFG(*),OFF(*)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER  I
-      my_real
-     .   DV,DV1
 C-----------------------------------------------
 C     STRESSES EXTRACTION.
 C-----------------------------------------------

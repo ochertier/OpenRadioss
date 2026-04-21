@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    airbagb         ../engine/source/airbag/airbag2.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol0         ../engine/source/airbag/monvol0.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_u_func      ../engine/source/user_interface/ufunc.F
-      !||    spmd_exch_fr6   ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
-      !||    sum_6_float     ../engine/source/system/parit.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    airbagb         ../engine/source/airbag/airbag2.F
+!||--- called by ------------------------------------------------------
+!||    monvol0         ../engine/source/airbag/monvol0.F
+!||--- calls      -----------------------------------------------------
+!||    get_u_func      ../engine/source/user_interface/ufunc.F
+!||    spmd_exch_fr6   ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
+!||    sum_6_float     ../engine/source/system/parit.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE AIRBAGB(
      1                 IVOLU   ,ICBAG   ,NJET    ,IBAGJET ,NVENT   ,
      2                 IBAGHOL ,RVOLU   ,RVOLUV  ,RCBAG   ,RBAGJET ,
@@ -55,7 +55,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -71,20 +70,20 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II, NAV, K, IDEF, KK, IPVENT, NNC, IAD,
+      INTEGER I,II, NAV, K, IDEF, KK, IPVENT, NNC,
      .   IPORT,IPORP,IPORA,IPORT1,IPORP1,IPORA1,IVDP,
      .   IJ ,IV, RADVOIS,PMAIN,
-     .   IN1,IN2,IN3,IN4,ITTF,IDTPDEF
+     .   ITTF,IDTPDEF
 C     REAL
       my_real
      .   GAMA, CV, CP, PEXT, PDEF, DTPDEFI, DTPDEFC, TVENT, TSTOPE,
      .   APVENT, AVENT, BVENT, 
      .   AMTOT, P, RO, VOL, HSPEC, 
      .   GMTOT, CPA, CPB, CPC, GMI, CPAI, CPBI, CPCI, TBAG,
-     .   U, DEOUT, DMOUT, AREA, PCRIT, PVOIS, TVOIS, AA, VEPS,
+     .   U, DMOUT, AREA, PCRIT, PVOIS, AA, VEPS,
      .   AOUT, AOUT1, AOUTOT, FLOUT, DE, VVOIS, 
      .   DGEOUT, DGMOUT, RNM, RMWI, RNMI, RMWG, RNMG, 
-     .   DERI, TEMP(4),AISENT,ACHEMK,FCHEMK,VMAX,
+     .   DERI, AISENT,ACHEMK,FCHEMK,VMAX,
      .   FPORT,FPORP,FPORA,FPORT1,FPORP1,FPORA1,SCALT,SCALP,SCALS,
      .   FVDP, ROEX, UISENT,TT1,
      .   F1(NN), F2(NN),TTF
@@ -128,7 +127,7 @@ C
        ENDDO
        HSPEC=HSPEC/MAX(EM20,AMTOT)
 C--------------------------------
-C      FLUX SORTANT PAR LES TROUS
+C      outgoing flux through the holes
 C--------------------------------
        AISENT=ZERO
        ACHEMK=ZERO
@@ -186,7 +185,7 @@ C
         ENDIF
         IF(IDEF==1 .AND. TT>=TSTOPE+TTF) THEN
          IDEF=0
-         IF(IMACH/=3.OR.ISPMD+1==PMAIN) THEN
+         IF(ISPMD+1==PMAIN) THEN
           WRITE(IOUT,*) ' *** AIRBAG VENTING STOPS ***'
           WRITE(IOUT,*) ' *** MONITORED VOLUME ',IVOLU(1),
      .                ' VENT HOLES MEMBRANE NUMBER ',IV,' ***'
@@ -228,7 +227,7 @@ C
         ENDIF
         IF(IDEF==1 .AND. TT>=TSTOPE) THEN
          IDEF=0
-         IF(IMACH/=3.OR.ISPMD+1==PMAIN) THEN
+         IF(ISPMD+1==PMAIN) THEN
           WRITE(IOUT,*) ' *** AIRBAG VENTING STOPS ***'
           WRITE(IOUT,*) ' *** MONITORED VOLUME ',IVOLU(1),
      .                ' VENT HOLES MEMBRANE NUMBER ',IV,' ***'
@@ -337,8 +336,7 @@ C
           FVDP=RBAGHOL(13,IV)
           U=FVDP*GET_U_FUNC(IVDP,(P-PEXT)*SCALP,DERI)
           FCHEMK= FCHEMK+(AOUT+AOUT1)*U
-          IF(IMACH/=3.OR.ISPMD+1==PMAIN)
-     .      RBAGHOL(18,IV)=U
+          IF(ISPMD+1==PMAIN) RBAGHOL(18,IV)=U
          ENDIF
         ENDIF
         IBAGHOL(1,IV)=IDEF
@@ -413,7 +411,7 @@ C---------------------------------------------
          ENDDO
        ENDIF
 C---------------------------------------------
-C      MASSE et TRAVAIL par GAZ
+C      mass and work by gas
 C---------------------------------------------
        RMWI=RVOLU(10)
        RNMI=GMI*RMWI
@@ -525,7 +523,7 @@ C
          ENDIF
          ICBAG(3,I) = IDEF
 C---------------------------------------------
-C        MASSE et TRAVAIL par GAZ
+C        mass and work by gas
 C---------------------------------------------
 C        VOLG/VOL=fraction molaire=RNMG/RNM
          DGMOUT=RNMI/MAX(EM20,RNM)*DMOUT

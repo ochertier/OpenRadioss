@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,32 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop_generic   ../starter/source/properties/hm_read_prop_generic.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties     ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    hm_read_prop28         ../starter/source/properties/xelem/hm_read_prop28.F
-      !||    hm_read_prop32         ../starter/source/properties/spring/hm_read_prop32.F
-      !||    hm_read_prop33         ../starter/source/properties/spring/hm_read_prop33.F
-      !||    hm_read_prop34         ../starter/source/properties/sph/hm_read_prop34.F
-      !||    hm_read_prop35         ../starter/source/properties/spring/hm_read_prop35.F
-      !||    hm_read_prop36         ../starter/source/properties/spring/hm_read_prop36.F
-      !||    hm_read_prop43         ../starter/source/properties/solid/hm_read_prop43.F
-      !||    hm_read_prop44         ../starter/source/properties/spring/hm_read_prop44.F
-      !||    hm_read_prop45         ../starter/source/properties/spring/hm_read_prop45.F
-      !||    hm_read_prop46         ../starter/source/properties/spring/hm_read_prop46.F
-      !||    hm_read_prop_user      ../starter/source/properties/user_spring_solid/hm_read_prop_user.F
-      !||    hm_read_prop_user4     ../starter/source/properties/user_spring_solid/hm_read_prop_user4.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
-      !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop_generic   ../starter/source/properties/hm_read_prop_generic.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties     ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    hm_read_prop28         ../starter/source/properties/xelem/hm_read_prop28.F
+!||    hm_read_prop32         ../starter/source/properties/spring/hm_read_prop32.F
+!||    hm_read_prop33         ../starter/source/properties/spring/hm_read_prop33.F
+!||    hm_read_prop34         ../starter/source/properties/sph/hm_read_prop34.F
+!||    hm_read_prop35         ../starter/source/properties/spring/hm_read_prop35.F
+!||    hm_read_prop36         ../starter/source/properties/spring/hm_read_prop36.F
+!||    hm_read_prop43         ../starter/source/properties/solid/hm_read_prop43.F
+!||    hm_read_prop44         ../starter/source/properties/spring/hm_read_prop44.F
+!||    hm_read_prop45         ../starter/source/properties/spring/hm_read_prop45.F
+!||    hm_read_prop46         ../starter/source/properties/spring/hm_read_prop46.F
+!||    hm_read_prop_user      ../starter/source/properties/user_spring_solid/hm_read_prop_user.F
+!||    hm_read_prop_user4     ../starter/source/properties/user_spring_solid/hm_read_prop_user4.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+!||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP_GENERIC(
      1                    IGTYP  ,IG      ,IDTITL  ,KEYTYPE  ,GEO      ,
      2                    IGEO   ,LBUFGEO ,BUFGEO  ,IADBUF   ,UNITAB   ,
@@ -98,11 +98,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ISKW,IADFUN,IADMAT,IADPID,IADTAB
-      INTEGER I, ILAW,NPG,JCVT,NUVAR(2)
-      my_real PARGEO(100),STIF,TTHICK
+      INTEGER I, NPG, JCVT, NUVAR(2)
+      my_real PARGEO(100), STIF
       my_real QA,QB
       CHARACTER FILNAM*512,CLAW*4
-      INTEGER LEN_FILNAM
       CHARACTER(LEN=NCHARTITLE) :: TITR
 C=======================================================================
 c------------------------------
@@ -167,7 +166,7 @@ C     rupture property for interface type 2
 C          ( not a true user property )
 C--------------------------------------------------
           IGTYP=37
-          CALL HM_READ_PROP_USER4(IOUT  ,NUVAR ,PARGEO ,UNITAB ,LSUBMODEL)
+          CALL HM_READ_PROP_USER4(IOUT  ,NUVAR ,UNITAB ,LSUBMODEL)
 
              
         CASE ('TYPE43','CONNECT')
@@ -180,7 +179,7 @@ C--------------------------------------------------
           IGTYP=44
           CALL HM_READ_PROP44(IOUT  ,IG   ,NUVAR ,PARGEO,
      .                        UNITAB,ISKN  ,IGEO ,TITR  ,IGTYP ,
-     .                        PROP_TAG,LSUBMODEL ,SUB_INDEX,IUNIT)
+     .                        PROP_TAG,LSUBMODEL ,SUB_INDEX)
 
         CASE ('TYPE45','KJOINT2')              
           IGTYP     =45
@@ -190,7 +189,7 @@ C--------------------------------------------------
         CASE ('TYPE46','SPR_MUSCLE')              
           IGTYP     =46
           CALL HM_READ_PROP46(IOUT , NUVAR ,PARGEO,UNITAB,IGTYP,
-     .                        IG,PROP_TAG,TITR,LSUBMODEL,IUNIT)
+     .                        IG,PROP_TAG,LSUBMODEL,IUNIT)
 
         CASE ('TYPE29','TYPE30','TYPE31',
      .        'USER1' ,'USER2' ,'USER3')

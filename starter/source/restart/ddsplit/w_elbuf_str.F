@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    w_elbuf_str    ../starter/source/restart/ddsplit/w_elbuf_str.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    w_elbuf_str    ../starter/source/restart/ddsplit/w_elbuf_str.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE W_ELBUF_STR(PROC,IPARG,ELBUF_TAB,LEN_AM,FLAG_XFEM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -49,12 +49,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,IL,IR,IS,IT,NG,NEL,NPT,P,L_REL,BUFLEN,NUVAR,NVARTMP,
+      INTEGER I,J,K,IL,IR,IS,IT,NG,NEL,NPT,P,L_REL,BUFLEN,NUVAR,
      .   ITY,IGTYP,ERR,IFAIL,IDFAIL,DEBUG_PRINT,IAD,
-     .   NFAIL,IXFEM,IVISC,II,NINTLAY,NPG,IPT,NPTT,NPTTOT,INLOC,NONL
+     .   NFAIL,IXFEM,NPG,NPTT,NPTTOT,INLOC,NONL,
+     .   IDAMP_FREQ_RANGE
       INTEGER ! global variables
      .   G_GAMA,G_SIG,G_OFF,G_NOFF,G_EINT,G_EINS,G_TEMP,
-     .   G_RHO,G_PLA,G_VOL,G_EPSD,G_QVIS,G_DELTAX,G_TB,G_RK,G_RE,
+     .   G_RHO,G_PLA,G_VOL,G_EPSD,G_QVIS,G_DELTAX,G_TB,G_RK,G_RE,G_WPLA,
      .   G_SMSTR,G_HOURG,G_BFRAC,G_THK,G_FOR,G_MOM,G_TAG22,G_STRA,G_SIGI,
      .   G_DMG,G_FORPG,G_MOMPG,G_STRPG,G_UELR,G_UELR1,G_EPSQ,G_IERR,
      .   G_DAMDL,G_FORTH,G_EINTTH,G_FILL,G_SEQ,G_STRW,G_STRWPG,G_THK_I,
@@ -69,17 +70,17 @@ C-----------------------------------------------
      .   G_SKEW_ID,G_GAMA_R,G_SLIPRING_ID,G_SLIPRING_STRAND,G_RETRACTOR_ID,G_RINGSLIP,
      .   G_ADD_NODE,G_UPDATE,G_INTVAR,G_BETAORTH,G_AMU,G_SLIPRING_FRAM_ID,G_FRAM_FACTOR,
      .   G_TM_YIELD,G_TM_SEQ,G_TM_EINT,G_TM_DMG,G_TM_SIG,G_TM_STRA,G_TSAIWU,G_DMGSCL,
-     .   G_SH_IOFFSET,G_EINT_DISTOR
+     .   G_SH_IOFFSET,G_EINT_DISTOR,G_FOR_G,G_FORPG_G,G_YIELD_IN_COMP,G_XXOLD_IN_COMP
 
       INTEGER  ! layer variables
-     .   LY_DMG,LY_GAMA,LY_DIRA,LY_DIRB,LY_CRKDIR,LY_PLAPT,LY_SIGPT,LY_SMSTR,
+     .   LY_DMG,LY_GAMA,LY_DIRA,LY_DIRB,LY_CRKDIR,LY_PLAPT,LY_SIGPT,
      .   LY_HOURG,LY_UELR,LY_UELR1,Ly_OFFPG,LY_OFF,LEN_PLAPT,LEN_SIGPT
       INTEGER  ! interlayer variables
      .   LY_EINT,LY_COUNT
       INTEGER  ! local variables
      .   L_OFF,L_EINT,L_EINS,L_RHO,L_DP_DRHO,L_VOL,L_PLA,L_TB,L_TEMP,
      .   L_RK,L_RE,L_VK,L_ROB,L_SIG,L_SIGV,L_SIGL,L_SIGA,L_SIGD,L_SIGB,
-     .   L_SIGC,L_SIGF,L_STRA,L_EPSA,L_EPSD,L_EPSQ,L_EPSF,L_CRAK,
+     .   L_SIGC,L_SIGF,L_STRA,L_EPSA,L_EPSD,L_EPSQ,L_EPSF,L_CRAK,L_WPLA,
      .   L_ANG,L_SF,L_QVIS,L_DELTAX,L_GAMA,
      .   L_DAM,L_DSUM,L_DGLO,L_EPE,L_EPC,L_XST,L_SSP,L_Z,L_FRAC,L_VISC,
      .   L_THK,L_FOR,L_MOM,L_EPS,L_SMSTR,L_BFRAC,L_DMG,L_FORTH,L_EINTTH,
@@ -112,6 +113,7 @@ c
       DO NG=1,NGROUP
         P      = IPARG(32,NG)
         INLOC  = IPARG(78,NG) ! Flag for non-local regularization
+        IDAMP_FREQ_RANGE = IPARG(93,NG) ! Flag for damping frequency range
 c----
         IF (P == PROC) THEN
 c----
@@ -129,7 +131,7 @@ c
           IXFEM = ELBUF%IXFEM                                  
           NEL   = ELBUF%NEL
           IDRAPE = ELBUF%IDRAPE
-cc          NPT   = IPARG(6,NG)                                                   
+cc          NPT   = IPARG(6,NG)                                             
           NPT  = ELBUF%NLAY*ELBUF%NPTR*ELBUF%NPTS*ELBUF%NPTT
 C
 c---------------------------------------------------    
@@ -209,7 +211,15 @@ c---------  write top structure parameters: NPAR_TAB = 9
           RBUF_L(L_REL+1) = ELBUF%NXEL       
                  L_REL = L_REL+1         
           RBUF_L(L_REL+1) = ELBUF%IDRAPE       
-                 L_REL = L_REL+1                        
+                 L_REL = L_REL+1        
+c---------------------------------------------------          
+c         Damping parameters for frequency range 
+c--------------------------------------------------- 
+          IF  (IDAMP_FREQ_RANGE > 0) THEN
+            RBUF_L(L_REL+1:L_REL+3) = ELBUF%DAMP_RANGE%ALPHA(1:3)
+            RBUF_L(L_REL+4:L_REL+6) = ELBUF%DAMP_RANGE%TAU(1:3)
+            L_REL = L_REL + 6
+          ENDIF                              
 c---------------------------------------------------          
 c         LAYERS : write buffer at layer level 
 c---------------------------------------------------
@@ -238,9 +248,11 @@ c
                    L_REL = L_REL+1                                    
               RBUF_L(L_REL+1) = BUFLY%NVAR_MAT           
                    L_REL = L_REL+1                                    
-              RBUF_L(L_REL+1) = BUFLY%NVARTMP           
-                   L_REL = L_REL+1 
-              RBUF_L(L_REL+1) = BUFLY%NVAR_EOS           
+              RBUF_L(L_REL+1) = BUFLY%NVAR_EOS                         
+                   L_REL = L_REL+1                                    
+              RBUF_L(L_REL+1) = BUFLY%NVARTMP 
+                   L_REL = L_REL+1                                    
+              RBUF_L(L_REL+1) = BUFLY%NVARTMP_EOS
                    L_REL = L_REL+1                                    
               RBUF_L(L_REL+1) = BUFLY%NVAR_VISC           
                    L_REL = L_REL+1                                    
@@ -324,6 +336,7 @@ c
               L_EPSQ    = BUFLY%L_EPSQ   
               L_EPSF    = BUFLY%L_EPSF   
               L_PLA     = BUFLY%L_PLA    
+              L_WPLA    = BUFLY%L_WPLA    
               L_TEMP    = BUFLY%L_TEMP   
               L_TB      = BUFLY%L_TB     
               L_RK      = BUFLY%L_RK     
@@ -405,7 +418,9 @@ c---
               RBUF_L(L_REL+1) = L_EPSF       
                 L_REL = L_REL + 1                            
               RBUF_L(L_REL+1) = L_PLA        
-                L_REL = L_REL + 1                        
+                L_REL = L_REL + 1          
+              RBUF_L(L_REL+1) = L_WPLA        
+                L_REL = L_REL + 1                   
               RBUF_L(L_REL+1) = L_TEMP       
                 L_REL = L_REL + 1                            
               RBUF_L(L_REL+1) = L_TB         
@@ -619,6 +634,8 @@ c
                 L_REL = L_REL+NEL*L_EPSF
               RBUF_L(L_REL+1:L_REL+NEL*L_PLA)  = LBUF%PLA(1:NEL*L_PLA)       
                 L_REL = L_REL+NEL*L_PLA              
+              RBUF_L(L_REL+1:L_REL+NEL*L_WPLA)  = LBUF%WPLA(1:NEL*L_WPLA)       
+                L_REL = L_REL+NEL*L_WPLA   
               RBUF_L(L_REL+1:L_REL+NEL*L_TEMP) = LBUF%TEMP(1:NEL*L_TEMP)     
                 L_REL = L_REL+NEL*L_TEMP                                        
               RBUF_L(L_REL+1:L_REL+NEL*L_TB)   = LBUF%TB(1:NEL*L_TB)         
@@ -928,7 +945,7 @@ c-----    EoS
 c
           DO IL = 1,ELBUF%NLAY 
             BUFLY => ELBUF_TAB(NG)%BUFLY(IL)              
-            NUVAR = BUFLY%NVAR_EOS 
+            NUVAR = BUFLY%NVAR_EOS
             IF(ASSOCIATED(BUFLY%EOS))THEN
               IF (IGTYP == 51 .OR. IGTYP == 52) THEN
                 NPTT = ELBUF_TAB(NG)%BUFLY(IL)%NPTT
@@ -973,9 +990,9 @@ c
             RBUF_L(L_REL+1) = INTLAY%NFAIL             
                  L_REL = L_REL+1                                      
             RBUF_L(L_REL+1) = INTLAY%NVAR_MAT             
-                 L_REL = L_REL+1                                      
+                 L_REL = L_REL+1
             RBUF_L(L_REL+1) = INTLAY%NVARTMP             
-                 L_REL = L_REL+1                                      
+                 L_REL = L_REL+1
 c
 c          ! write inter layer variables for each layer
            RBUF_L(L_REL+1:L_REL+NEL*LY_EINT)  = INTLAY%EINT(1:NEL*LY_EINT)          
@@ -1061,6 +1078,7 @@ c
           G_EPSD  = GBUF%G_EPSD  
           G_EPSQ  = GBUF%G_EPSQ
           G_PLA   = GBUF%G_PLA   
+          G_WPLA  = GBUF%G_WPLA             
           G_TEMP  = GBUF%G_TEMP  
           G_TB    = GBUF%G_TB    
           G_RK    = GBUF%G_RK    
@@ -1112,6 +1130,8 @@ C
           G_COR_XR = GBUF%G_COR_XR
           G_SH_IOFFSET  = GBUF%G_SH_IOFFSET
           G_EINT_DISTOR  = GBUF%G_EINT_DISTOR
+          G_FOR_G    = GBUF%G_FOR_G
+          G_FORPG_G  = GBUF%G_FORPG_G
           
 c---
 c 1-D elements (TRUSS, BEAM, SPRING)
@@ -1154,6 +1174,8 @@ c---
           G_TEMPG       = GBUF%G_TEMPG
           G_SKEW_ID     = GBUF%G_SKEW_ID
           G_IDT_TSH     = GBUF%G_IDT_TSH
+          G_YIELD_IN_COMP = GBUF%G_YIELD_IN_COMP
+          G_XXOLD_IN_COMP = GBUF%G_XXOLD_IN_COMP
 c---
 c seatbelts elements
 c---
@@ -1216,7 +1238,9 @@ c
            RBUF_L(L_REL+1) =  G_EPSQ
              L_REL = L_REL + 1                                  
            RBUF_L(L_REL+1) =  G_PLA         
-             L_REL = L_REL + 1                               
+             L_REL = L_REL + 1  
+           RBUF_L(L_REL+1) =  G_WPLA         
+             L_REL = L_REL + 1                                            
            RBUF_L(L_REL+1) =  G_TEMP        
              L_REL = L_REL + 1                             
            RBUF_L(L_REL+1) =  G_TB          
@@ -1318,7 +1342,11 @@ C
              L_REL = L_REL + 1   
            RBUF_L(L_REL+1) =  G_SH_IOFFSET     
              L_REL = L_REL + 1   
-             RBUF_L(L_REL+1) =  G_EINT_DISTOR     
+           RBUF_L(L_REL+1) =  G_EINT_DISTOR     
+             L_REL = L_REL + 1   
+           RBUF_L(L_REL+1) =  G_FOR_G     
+             L_REL = L_REL + 1   
+           RBUF_L(L_REL+1) =  G_FORPG_G     
              L_REL = L_REL + 1   
 c---
 c 1-D elements (TRUSS, BEAM, SPRING)
@@ -1397,6 +1425,10 @@ c---
              L_REL = L_REL + 1
            RBUF_L(L_REL+1) =  G_GAMA_R      
              L_REL = L_REL + 1
+           RBUF_L(L_REL+1) =  G_YIELD_IN_COMP
+             L_REL = L_REL + 1
+           RBUF_L(L_REL+1) =  G_XXOLD_IN_COMP
+             L_REL = L_REL + 1
 c---
 c seatbelts elements
 c---
@@ -1463,7 +1495,7 @@ c
           RBUF_L(L_REL+1:L_REL+NEL*G_STRA) = GBUF%STRA(1:NEL*G_STRA) 
             L_REL = L_REL+NEL*G_STRA 
           RBUF_L(L_REL+1:L_REL+NEL*G_SIGI) = GBUF%SIGI(1:NEL*G_SIGI) 
-            L_REL = L_REL+NEL*G_SIGI 
+            L_REL = L_REL+NEL*G_SIGI
           RBUF_L(L_REL+1:L_REL+NEL*G_DMG) = GBUF%DMG(1:NEL*G_DMG) 
             L_REL = L_REL+NEL*G_DMG 
           RBUF_L(L_REL+1:L_REL+NEL*G_UELR) = GBUF%UELR(1:NEL*G_UELR)
@@ -1509,6 +1541,10 @@ C
             L_REL = L_REL + NEL*G_SH_IOFFSET  
           RBUF_L(L_REL+1:L_REL+NEL*G_EINT_DISTOR) = GBUF%EINT_DISTOR(1:NEL*G_EINT_DISTOR)                
             L_REL = L_REL + NEL*G_EINT_DISTOR  
+          RBUF_L(L_REL+1:L_REL+NEL*G_FOR_G) = GBUF%FOR_G(1:NEL*G_FOR_G)                
+            L_REL = L_REL + NEL*G_FOR_G  
+          RBUF_L(L_REL+1:L_REL+NEL*G_WPLA) = GBUF%WPLA(1:NEL*G_WPLA)
+            L_REL = L_REL+NEL*G_WPLA     
 c---------------------------------------------------
               IF (DEBUG_PRINT == 1) THEN
                  print*,'      COMMON GLOB=', L_REL-SUM
@@ -1542,6 +1578,8 @@ C
              L_REL = L_REL+NEL*G_STRPG                                   
            RBUF_L(L_REL+1:L_REL+NEL*G_STRWPG)= GBUF%STRWPG(1:NEL*G_STRWPG) 
             L_REL = L_REL+NEL*G_STRWPG
+           RBUF_L(L_REL+1:L_REL+NEL*G_FORPG_G)= GBUF%FORPG_G(1:NEL*G_FORPG_G) 
+            L_REL = L_REL+NEL*G_FORPG_G
          ENDIF                                                           
 c---------------------------------------------------
               IF (DEBUG_PRINT == 1) THEN
@@ -1601,6 +1639,10 @@ C---------
 c---
 c 1-D elements (TRUSS, BEAM, SPRING)
 c---
+          IF(IGTYP == 3 .and. ITY == 5) THEN 
+            RBUF_L(L_REL+1:L_REL+NEL*G_DMGSCL)  = GBUF%DMGSCL(1:NEL*G_DMGSCL)
+              L_REL = L_REL+NEL*G_DMGSCL
+          ENDIF 
           RBUF_L(L_REL+1:L_REL+NEL*G_AREA)        = GBUF%AREA(1:NEL*G_AREA)
             L_REL = L_REL +NEL*G_AREA
           RBUF_L(L_REL+1:L_REL+NEL*G_SKEW)        = GBUF%SKEW(1:NEL*G_SKEW)
@@ -1671,6 +1713,10 @@ c---
             L_REL = L_REL +NEL*G_DT_PITER
           RBUF_L(L_REL+1:L_REL+NEL*G_SKEW_ID)     = GBUF%SKEW_ID(1:NEL*G_SKEW_ID)
             L_REL = L_REL +NEL*G_SKEW_ID
+          RBUF_L(L_REL+1:L_REL+NEL*G_YIELD_IN_COMP) = GBUF%YIELD_IN_COMP(1:NEL*G_YIELD_IN_COMP)
+            L_REL = L_REL +NEL*G_YIELD_IN_COMP
+          RBUF_L(L_REL+1:L_REL+NEL*G_XXOLD_IN_COMP) = GBUF%XXOLD_IN_COMP(1:NEL*G_XXOLD_IN_COMP)
+            L_REL = L_REL +NEL*G_XXOLD_IN_COMP
 c            
 c         failure model for beams type 3
           IF (IGTYP == 3 .and. G_NOFF == 1) THEN
@@ -1766,10 +1812,10 @@ c---
           RBUF_L(L_REL+1:L_REL+NEL*G_TM_STRA) = GBUF%TM_STRA3(1:NEL*G_TM_STRA)
             L_REL = L_REL +NEL*G_TM_STRA
 c---------------------------------------------------
-              IF (DEBUG_PRINT == 1) THEN
-                 print*,'      TOTAL GLOB VARS =', L_REL-SUM
-                 IAD = L_REL
-              ENDIF
+          IF (DEBUG_PRINT == 1) THEN
+            print*,'      TOTAL GLOB VARS =', L_REL-SUM
+            IAD = L_REL
+          ENDIF
 c---------------------------------------------------
 C---------
           CALL WRITE_DB (RBUF_L,L_REL)

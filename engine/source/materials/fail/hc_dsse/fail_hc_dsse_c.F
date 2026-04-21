@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_hc_dsse_c   ../engine/source/materials/fail/hc_dsse/fail_hc_dsse_c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
-      !||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
-      !||====================================================================
+!||====================================================================
+!||    fail_hc_dsse_c   ../engine/source/materials/fail/hc_dsse/fail_hc_dsse_c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
+!||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
+!||====================================================================
       SUBROUTINE FAIL_HC_DSSE_C(
      1           NEL      ,NUPARAM  ,NUVAR    ,UPARAM   ,UVAR     ,
      2           TIME     ,NGL      ,IPT      ,ILAY     ,IPTT     ,
@@ -103,10 +103,10 @@ C VARIABLES FOR FUNCTION INTERPOLATION
 C-----------------------------------------------
 C L o c a l V a r i a b l e s
 C-----------------------------------------------
-       INTEGER :: I,J,K,N,NINDX,IFAIL_SH
+       INTEGER :: I,J,NINDX,IFAIL_SH
        INTEGER, DIMENSION(NEL) :: INDX , CONDITION1, CONDITION2,CONDITION3
 C-----------------------------------------------
-       my_real AFRAC,BFRAC,CFRAC,NFRAC,INST,P_THICKFAIL
+       my_real AFRAC,BFRAC,CFRAC,NFRAC,INST
        my_real SIGM,SIGVM,ETA,XI
        my_real LODE,DAM1,DAM2,F1,F2,F3,EPSF
        my_real GHC, G1, G2, G3, DSSE

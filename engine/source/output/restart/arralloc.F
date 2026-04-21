@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,60 +20,64 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    restalloc               ../engine/source/output/restart/arralloc.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2                ../engine/source/engine/radioss2.F
-      !||--- calls      -----------------------------------------------------
-      !||    alefvm_init             ../engine/source/ale/alefvm/alefvm_init.F
-      !||    allocate_rbe3           ../common_source/modules/constraints/rbe3_mod.F90
-      !||    ancmsg                  ../engine/source/output/message/message.F
-      !||    arret                   ../engine/source/system/arret.F
-      !||    intstamp_zero           ../engine/share/modules/intstamp_mod.F
-      !||    multi_allocate          ../engine/source/multifluid/multi_allocate.F
-      !||    sz_print                ../engine/source/output/restart/arralloc.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod    ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    ale_mod                 ../common_source/modules/ale/ale_mod.F
-      !||    aleanim_mod             ../engine/share/modules/aleanim_mod.F
-      !||    alefvm_mod              ../common_source/modules/ale/alefvm_mod.F
-      !||    alemuscl_mod            ../common_source/modules/ale/alemuscl_mod.F
-      !||    cluster_mod             ../engine/share/modules/cluster_mod.F
-      !||    connectivity_mod        ../common_source/modules/connectivity.F90
-      !||    damp_mod                ../engine/share/modules/damp_mod.F
-      !||    drape_mod               ../engine/share/modules/drape_mod.F
-      !||    ecnd_mod                ../engine/share/modules/ecdn_mod.F
-      !||    eig_mod                 ../engine/share/modules/eig_mod.F
-      !||    fskyi_mod               ../engine/share/modules/restart_mod.F
-      !||    fxb_mod                 ../engine/share/modules/fxb_mod.F
-      !||    glob_therm_mod          ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    h3d_mod                 ../engine/share/modules/h3d_mod.F
-      !||    intstamp_glob_mod       ../engine/share/modules/intstamp_glob_mod.F
-      !||    message_mod             ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    my_alloc_mod            ../common_source/tools/memory/my_alloc.F90
-      !||    nodal_arrays_mod        ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||    outmax_mod              ../common_source/modules/outmax_mod.F
-      !||    outputs_mod             ../common_source/modules/outputs_mod.F
-      !||    pinchtype_mod           ../common_source/modules/pinchtype_mod.F
-      !||    rbe3_mod                ../common_source/modules/constraints/rbe3_mod.F90
-      !||    rbody_mod               ../engine/share/modules/rbody_mod.F
-      !||    restmod                 ../engine/share/modules/restart_mod.F
-      !||    seatbelt_mod            ../common_source/modules/seatbelt_mod.F
-      !||    segvar_mod              ../engine/share/modules/segvar_mod.F
-      !||    skew_mod                ../common_source/modules/skew_mod.F90
-      !||    sph_mod                 ../engine/share/modules/sph_mod.F
-      !||    stack_mod               ../engine/share/modules/stack_mod.F
-      !||    trimat_mod              ../engine/share/modules/trimat.F
-      !||====================================================================
-      SUBROUTINE RESTALLOC(ELEMENT, NODES,MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS,
-     .                     GLOB_THERM,RBE3)
+!||====================================================================
+!||    restalloc               ../engine/source/output/restart/arralloc.F
+!||--- called by ------------------------------------------------------
+!||    radioss2                ../engine/source/engine/radioss2.F
+!||--- calls      -----------------------------------------------------
+!||    alefvm_init             ../engine/source/ale/alefvm/alefvm_init.F
+!||    allocate_nodal_arrays   ../common_source/modules/nodal_arrays.F90
+!||    allocate_rbe3           ../common_source/modules/constraints/rbe3_mod.F90
+!||    allocate_rwall          ../common_source/modules/constraints/rwall_mod.F90
+!||    allocate_sfem           ../common_source/modules/elements/sfem_mod.F90
+!||    ancmsg                  ../engine/source/output/message/message.F
+!||    arret                   ../engine/source/system/arret.F
+!||    intstamp_zero           ../engine/share/modules/intstamp_mod.F
+!||    multi_allocate          ../engine/source/multifluid/multi_allocate.F
+!||    sz_print                ../engine/source/output/restart/arralloc.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod    ../common_source/modules/ale/ale_connectivity_mod.F
+!||    ale_mod                 ../common_source/modules/ale/ale_mod.F
+!||    aleanim_mod             ../common_source/modules/aleanim_mod.F
+!||    alefvm_mod              ../common_source/modules/ale/alefvm_mod.F
+!||    alemuscl_mod            ../common_source/modules/ale/alemuscl_mod.F
+!||    cluster_mod             ../engine/share/modules/cluster_mod.F
+!||    connectivity_mod        ../common_source/modules/connectivity.F90
+!||    damp_mod                ../engine/share/modules/damp_mod.F
+!||    drape_mod               ../engine/share/modules/drape_mod.F
+!||    ecnd_mod                ../engine/share/modules/ecdn_mod.F
+!||    eig_mod                 ../engine/share/modules/eig_mod.F
+!||    element_mod             ../common_source/modules/elements/element_mod.F90
+!||    fxb_mod                 ../engine/share/modules/fxb_mod.F
+!||    glob_therm_mod          ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    h3d_mod                 ../engine/share/modules/h3d_mod.F
+!||    interfaces_mod          ../common_source/modules/interfaces/interfaces_mod.F90
+!||    intstamp_glob_mod       ../engine/share/modules/intstamp_glob_mod.F
+!||    message_mod             ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
+!||    my_alloc_mod            ../common_source/tools/memory/my_alloc.F90
+!||    nodal_arrays_mod        ../common_source/modules/nodal_arrays.F90
+!||    outmax_mod              ../common_source/modules/outmax_mod.F
+!||    output_mod              ../common_source/modules/output/output_mod.F90
+!||    pinchtype_mod           ../common_source/modules/pinchtype_mod.F
+!||    rbe3_mod                ../common_source/modules/constraints/rbe3_mod.F90
+!||    restmod                 ../engine/share/modules/restart_mod.F
+!||    rwall_mod               ../common_source/modules/constraints/rwall_mod.F90
+!||    seatbelt_mod            ../common_source/modules/seatbelt_mod.F
+!||    segvar_mod              ../engine/share/modules/segvar_mod.F
+!||    sfem_mod                ../common_source/modules/elements/sfem_mod.F90
+!||    skew_mod                ../common_source/modules/skew_mod.F90
+!||    sph_mod                 ../engine/share/modules/sph_mod.F
+!||    stack_mod               ../engine/share/modules/stack_mod.F
+!||    trimat_mod              ../engine/share/modules/trimat.F
+!||====================================================================
+      SUBROUTINE RESTALLOC(OUTPUT,ELEMENT, NODES,MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS,
+     .                     GLOB_THERM,RBE3,RWALL,SFEM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE RESTMOD
       USE INTSTAMP_GLOB_MOD
-      USE FSKYI_MOD
       USE MESSAGE_MOD
       USE SPH_MOD
       USE CLUSTER_MOD
@@ -89,12 +93,11 @@ C-----------------------------------------------
       USE DRAPE_MOD
       USE FXB_MOD
       USE EIG_MOD               
-      USE RBODY_MOD               
       USE ALE_CONNECTIVITY_MOD
       USE SEATBELT_MOD    
       USE SEGVAR_MOD 
       USE OUTMAX_MOD
-      USE OUTPUTS_MOD
+      USE OUTPUT_MOD
       USE ALE_MOD
       USE DAMP_MOD
       USE INTERFACES_MOD
@@ -104,6 +107,9 @@ C-----------------------------------------------
       USE connectivity_mod
       USE nodal_arrays_mod
       use rbe3_mod
+      use rwall_mod
+      use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
+      use sfem_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -134,6 +140,7 @@ C-----------------------------------------------
 #include      "inter18.inc"
 #include      "stati_c.inc"
 C-----------------------------------------------
+      type(output_), INTENT(INOUT) :: OUTPUT
       TYPE(connectivity_) :: ELEMENT
       TYPE(NODAL_ARRAYS_) :: NODES
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
@@ -145,29 +152,32 @@ C-----------------------------------------------
       TYPE(SKEW_) , INTENT(INOUT)       :: SKEWS
       type(glob_therm_) ,intent(inout) :: GLOB_THERM
       type(rbe3_) ,intent(inout) :: RBE3
+      type(rwall_),intent(inout) :: RWALL
+      type(sfem_), intent(inout) :: SFEM
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IERR0,IERROR, NBMAT,I,NPT,ISIZ1,ISIZ2
+      INTEGER IERR0,IERROR, NBMAT,ISIZ1,ISIZ2
 C-----------------------------------------------
       IERROR = 0
-C pour eviter conflit avec IERR dans commun
+C to avoid conflict with IERR in common
       IERR0 = IERR
 C   -----------------------------------------------
-C             allocations entieres 
+C             Entirere Allowances 
 C   -----------------------------------------------
 
+        NODES%N2D = N2D
         CALL ALLOCATE_NODAL_ARRAYS(NODES, NUMNOD, NTHREAD, IRODDL, IPARIT, 
-     .      ISECUT, IISROTS, IMPOSE_DR, IDROT, NRCVVOIS, SICODT)
+     .      ISECUT, IISROTS, IMPOSE_DR, IDROT, NRCVVOIS, SICODT, GLOB_THERM%ITHERM_FE)
 
 C       
-c       ALLOCATE (ICODE(SICODE),STAT=IERR)
-c       IF (IERR/=0) GOTO 1000
-c       ICODE = 0
+C       ALLOCATE (ICODE(SICODE),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       ICODE = 0
 
-c       ALLOCATE (ISKEW(SISKEW),STAT=IERR)
-c       IF (IERR/=0) GOTO 1000
-c       ISKEW = e
+C       ALLOCATE (ISKEW(SISKEW),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       ISKEW = e
 
         ALLOCATE (ISKWN(SISKWN),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -234,13 +244,13 @@ c       ISKEW = e
         IF (IERR/=0) GOTO 1000
         IXR = 0  
 
-c       ALLOCATE (ITAB(SITAB),STAT=IERR)
-c       IF (IERR/=0) GOTO 1000
-c       ITAB = 0  
+C       ALLOCATE (ITAB(SITAB),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       ITAB = 0  
 
-c       ALLOCATE (ITABM1(SITABM1),STAT=IERR)
-c       IF (IERR/=0) GOTO 1000
-c       ITABM1 = 0
+C       ALLOCATE (ITABM1(SITABM1),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       ITABM1 = 0
 
         ALLOCATE (GJBUFI(SGJBUFI),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -384,10 +394,6 @@ c       ITABM1 = 0
         IF (IERR/=0) GOTO 1000
         IBMPC = 0  
 
-        ALLOCATE (KINET(SKINET),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        KINET = 0  
-
         ALLOCATE (FASOLFR(SFASOLFR),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         FASOLFR = 0
@@ -400,10 +406,10 @@ c       ITABM1 = 0
         IF (IERR/=0) GOTO 1000
         IPARI = 0  
 
-c        ALLOCATE (INBUF(SINBUF),STAT=IERR)
-c        ALLOCATE (INBUF(0),STAT=IERR)
-c        IF (IERR/=0) GOTO 1000
-c        INBUF = 0  
+C        ALLOCATE (INBUF(SINBUF),STAT=IERR)
+C        ALLOCATE (INBUF(0),STAT=IERR)
+C        IF (IERR/=0) GOTO 1000
+C        INBUF = 0  
 
         ALLOCATE (INTERFACES%INTBUF_TAB(NINTER),STAT=IERR)
 
@@ -412,17 +418,11 @@ C     allocations structures Interface friction
         ALLOCATE(INTERFACES%INTBUF_FRIC_TAB(NINTERFRIC),STAT=IERR)
         IF (IERR/=0) GOTO 1000
 
-c        ALLOCATE (T8(NINTER),STAT=IERR)
-c        IF (IERR/=0) GOTO 1000
+C        ALLOCATE (T8(NINTER),STAT=IERR)
+C        IF (IERR/=0) GOTO 1000
 
+        call allocate_rwall(RWALL, NSPMD)
 
-        ALLOCATE (NPRW(SNPRW),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        NPRW = 0  
-
-        ALLOCATE (LPRW(SLPRW),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        LPRW = 0  
 
         ALLOCATE (ICONX(SICONX),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -508,9 +508,9 @@ c        IF (IERR/=0) GOTO 1000
         IF (IERR/=0) GOTO 1000
         RTHBUF = ZERO
 
-        ALLOCATE (IAD_ELEM(SIAD_ELEM),STAT=IERR)
+        ALLOCATE (NODES%BOUNDARY_ADD(2,SIAD_ELEM/2),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        IAD_ELEM = 0
+        NODES%BOUNDARY_ADD = 0
 
         ALLOCATE (IAD_RBY(SIAD_RBY),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -581,18 +581,14 @@ C
         ALLOCATE (PROCNOR(NBCCNOR),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         PROCNOR = 0
-
-        ALLOCATE (FR_ELEM(SFR_ELEM),STAT=IERR)
+        NODES%BOUNDARY_SIZE = SFR_ELEM
+        ALLOCATE (NODES%BOUNDARY(SFR_ELEM),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        FR_ELEM = 0 
+        NODES%BOUNDARY = 0 
 
         ALLOCATE (FR_RBY(SFR_RBY),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         FR_RBY = 0  
-
-        ALLOCATE (FR_WALL(SFR_WALL),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        FR_WALL = 0 
 
         ALLOCATE (FR_RBY2(SFR_RBY2),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -701,25 +697,25 @@ C
         IF (IERR/=0) GOTO 1000
         FR_LAGF = 0
 
-        ALLOCATE (MAIN_PROC(SWEIGHT),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        MAIN_PROC = 0 
+C       ALLOCATE (MAIN_PROC(SWEIGHT),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       MAIN_PROC = 0 
 
-c       ALLOCATE (WEIGHT(SWEIGHT),STAT=IERR)
-c       IF (IERR/=0) GOTO 1000
-c       WEIGHT = 0 
+C       ALLOCATE (WEIGHT(SWEIGHT),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       WEIGHT = 0 
 
-c       ALLOCATE (WEIGHT_MD(SWEIGHT),STAT=IERR)
-c       IF (IERR/=0) GOTO 1000
-c       WEIGHT_MD = 0 
+C       ALLOCATE (WEIGHT_MD(SWEIGHT),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       WEIGHT_MD = 0 
 
         ALLOCATE (NEWFRONT(SNEWFRONT),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         NEWFRONT = 0
 
-        ALLOCATE (NODGLOB(SNODGLOB),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        NODGLOB = 0 
+C       ALLOCATE (NODES%NODGLOB(SNODGLOB),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       NODES%NODGLOB = 0 
 
         ALLOCATE (NBRCVOIS(SNBRCVOIS),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -794,18 +790,19 @@ c       WEIGHT_MD = 0
 !       IF (IERR/=0) GOTO 1000
 !       ICODR = 0 
 
-        ALLOCATE (ISKY(SISKY),STAT=IERR)
+
+        ALLOCATE (INTERFACES%PON%ISKY(SISKY),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        ISKY = 0  
+        INTERFACES%PON%ISKY = 0  
 
         ALLOCATE (ELEMENT%PON%ADSKY(SADSKY),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         ELEMENT%PON%ADSKY = 0 
         ELEMENT%PON%SADSKY = SADSKY
 
-        ALLOCATE (PROCNE(SPROCNE),STAT=IERR)
+        ALLOCATE (ELEMENT%PON%PROCNE(SPROCNE),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        PROCNE = 0
+        ELEMENT%PON%PROCNE = 0
 
         ALLOCATE (ADDCNI2(SADDCNI2),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -823,28 +820,28 @@ c       WEIGHT_MD = 0
         IF (IERR/=0) GOTO 1000
         ELEMENT%PON%IADRCP = 0  
 
-        CALL MY_ALLOC(ELEMENT%PON%IADS,8,NUMELS,MSG="IADS")
-        CALL MY_ALLOC(ELEMENT%PON%IADS10,6,NUMELS10,MSG="IADS10")
-        CALL MY_ALLOC(ELEMENT%PON%IADS20,12,NUMELS20,MSG="IADS20")
-        CALL MY_ALLOC(ELEMENT%PON%IADS16,8,NUMELS16,MSG="IADS16")
-        CALL MY_ALLOC(ELEMENT%PON%IADQ,4,NUMELQ,MSG="IADQ")
-        CALL MY_ALLOC(ELEMENT%PON%IADC,4,NUMELC,MSG="IADC")                             
-        CALL MY_ALLOC(ELEMENT%PON%IAD_TRUSS,2,NUMELT,MSG="IAD_TRUSS")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_BEAM,2,NUMELP,MSG="IAD_BEAM")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_SPRING,3,NUMELR,MSG="IAD_SPRING")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_TG,3,NUMELTG,MSG="IAD_TG")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_TG6,3,NUMELTG6,MSG="IAD_TG6")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_MV,4,NSKYMV0,MSG="IAD_MV")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_CONLD,4,NCONLD,MSG="IAD_CONLD")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_CONV,4,GLOB_THERM%NUMCONV,MSG="IAD_CONV")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_RADIA,4,GLOB_THERM%NUMRADIA,MSG="IAD_RADIA")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_LOADP,SLLOADP,MSG="IAD_LOADP")
-        CALL MY_ALLOC(ELEMENT%PON%IAD_FXFLUX,4,GLOB_THERM%NFXFLUX,MSG="IAD_FXFLUX")
+        CALL MY_ALLOC(ELEMENT%PON%IADS,8,NUMELS)
+        CALL MY_ALLOC(ELEMENT%PON%IADS10,6,NUMELS10)
+        CALL MY_ALLOC(ELEMENT%PON%IADS20,12,NUMELS20)
+        CALL MY_ALLOC(ELEMENT%PON%IADS16,8,NUMELS16)
+        CALL MY_ALLOC(ELEMENT%PON%IADQ,4,NUMELQ)
+        CALL MY_ALLOC(ELEMENT%PON%IADC,4,NUMELC)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_TRUSS,2,NUMELT)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_BEAM,2,NUMELP)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_SPRING,3,NUMELR)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_TG,3,NUMELTG)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_TG6,3,NUMELTG6)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_MV,4,NSKYMV0)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_CONLD,4,NCONLD)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_CONV,4,GLOB_THERM%NUMCONV)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_RADIA,4,GLOB_THERM%NUMRADIA)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_LOADP,SLLOADP)
+        CALL MY_ALLOC(ELEMENT%PON%IAD_FXFLUX,4,GLOB_THERM%NFXFLUX)
 
 
-c       ALLOCATE (IADS(SIADS),STAT=IERR)
-c       IF (IERR/=0) GOTO 1000
-c       IADS = 0 
+C       ALLOCATE (IADS(SIADS),STAT=IERR)
+C       IF (IERR/=0) GOTO 1000
+C       IADS = 0 
 
         ALLOCATE (IADWAL(SIADWAL),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1221,13 +1218,6 @@ C
         IF (IERR/=0) GOTO 1000
         ELBUF = 0   
 
-        ALLOCATE (RWBUF(SRWBUF),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        RWBUF = 0 
-
-        ALLOCATE (RWSAV(SRWSAV),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        RWSAV = 0 
 
         ALLOCATE (RBY(SRBY),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1304,15 +1294,17 @@ C
         ALLOCATE (ELEMENT%PON%FSKY(8,SFSKY/8),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         ELEMENT%PON%FSKY = 0 
+        ELEMENT%PON%SFSKY = SFSKY
+        ELEMENT%PON%MAX_SFSKY = SFSKY
 
 
         ALLOCATE (ELEMENT%PON%FSKYM(SFSKYM),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         ELEMENT%PON%FSKYM = 0 
 
-        ALLOCATE (FSKYI(LSKYI,NFSKYI),STAT=IERR)
+        ALLOCATE (INTERFACES%PON%FSKYI(LSKYI,NFSKYI),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        FSKYI = 0 
+        INTERFACES%PON%FSKYI = 0
 
         ALLOCATE (UWA(SUWA),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1349,9 +1341,9 @@ C
         IF (IERR/=0) GOTO 1000
         FLSW = 0  
 
-        ALLOCATE (FANI(SFANI),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        FANI = 0  
+!       ALLOCATE (FANI(SFANI),STAT=IERR)
+!       IF (IERR/=0) GOTO 1000
+!       FANI = 0  
 
         ISIZ1=2
         ISIZ2=NUMELQ+NUMELTG
@@ -1360,35 +1352,35 @@ C
           ISIZ2=NUMELS
         ENDIF
         !
-        IF(FANI_CELL%IS_VORT_X_REQUESTED)THEN
-          ALLOCATE (FANI_CELL%VORT_X(ISIZ2),STAT=IERR)
+        IF(OUTPUT%DATA%FANI_CELL%IS_VORT_X_REQUESTED)THEN
+          ALLOCATE (OUTPUT%DATA%FANI_CELL%VORT_X(ISIZ2),STAT=IERR)
           IF (IERR/=0) GOTO 1000
-          FANI_CELL%VORT_X(:) = ZERO
+          OUTPUT%DATA%FANI_CELL%VORT_X(:) = ZERO
         ENDIF
-        IF(FANI_CELL%IS_VORT_Y_REQUESTED)THEN
-          ALLOCATE (FANI_CELL%VORT_Y(ISIZ2),STAT=IERR)
+        IF(OUTPUT%DATA%FANI_CELL%IS_VORT_Y_REQUESTED)THEN
+          ALLOCATE (OUTPUT%DATA%FANI_CELL%VORT_Y(ISIZ2),STAT=IERR)
           IF (IERR/=0) GOTO 1000
-          FANI_CELL%VORT_Y(:) = ZERO
+          OUTPUT%DATA%FANI_CELL%VORT_Y(:) = ZERO
         ENDIF
-        IF(FANI_CELL%IS_VORT_Z_REQUESTED)THEN
-          ALLOCATE (FANI_CELL%VORT_Z(ISIZ2),STAT=IERR)
+        IF(OUTPUT%DATA%FANI_CELL%IS_VORT_Z_REQUESTED)THEN
+          ALLOCATE (OUTPUT%DATA%FANI_CELL%VORT_Z(ISIZ2),STAT=IERR)
           IF (IERR/=0) GOTO 1000
-          FANI_CELL%VORT_Z(:) = ZERO
+          OUTPUT%DATA%FANI_CELL%VORT_Z(:) = ZERO
         ENDIF
         !
-        IF(FANI_CELL%IS_F18_FVM_REQUESTED)THEN
-          ALLOCATE (FANI_CELL%F18(ISIZ1,ISIZ2),STAT=IERR)
+        IF(OUTPUT%DATA%FANI_CELL%IS_F18_FVM_REQUESTED)THEN
+          ALLOCATE (OUTPUT%DATA%FANI_CELL%F18(ISIZ1,ISIZ2),STAT=IERR)
           IF (IERR/=0) GOTO 1000
-          FANI_CELL%F18(:,:) = ZERO
+          OUTPUT%DATA%FANI_CELL%F18(:,:) = ZERO
         ENDIF
 
         ALLOCATE (XCUT(SXCUT),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         XCUT = 0  
 
-        ALLOCATE (ANIN(SANIN),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ANIN = 0  
+!       ALLOCATE (ANIN(SANIN),STAT=IERR)
+!       IF (IERR/=0) GOTO 1000
+!       ANIN = 0  
 
         ALLOCATE (TANI(STANI),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1636,8 +1628,8 @@ C
            ALLOCATE(WAGAP(0),STAT=IERR)
          ENDIF   
 C--------------------------------------------
-c        ALLOCATE(MS0(NUMNOD),STAT=IERR)
-c        ALLOCATE(IN0(SIN),STAT=IERR)
+C        ALLOCATE(MS0(NUMNOD),STAT=IERR)
+C        ALLOCATE(IN0(SIN),STAT=IERR)
          IF(IDTMINS_OLD==1) THEN
            ALLOCATE(ADMSMS(NUMNOD),STAT=IERR)
            IF (IERR/=0) GOTO 1000
@@ -1793,29 +1785,29 @@ C
 C        
 C----Frictional energy output  when it is coming from restart
 C
-         IF(S_EFRICINT > 0)THEN
-           IF(NINEFRIC > 0) THEN 
-            ALLOCATE(EFRIC(NINEFRIC,NUMNOD))
+         IF(OUTPUT%DATA%S_EFRICINT > 0)THEN
+           IF(OUTPUT%DATA%NINEFRIC > 0) THEN 
+            ALLOCATE(OUTPUT%DATA%EFRIC(OUTPUT%DATA%NINEFRIC,NUMNOD))
            ELSE 
-            ALLOCATE(EFRIC(0,0))
+            ALLOCATE(OUTPUT%DATA%EFRIC(0,0))
            ENDIF
-           IF(NINEFRIC_STAMP > 0) THEN
-             ALLOCATE(EFRIC_STAMP(NINEFRIC_STAMP,NUMNODG))
+           IF(OUTPUT%DATA%NINEFRIC_STAMP > 0) THEN
+             ALLOCATE(OUTPUT%DATA%EFRIC_STAMP(OUTPUT%DATA%NINEFRIC_STAMP,NUMNODG))
            ELSE
-             ALLOCATE(EFRIC_STAMP(0,0))
+             ALLOCATE(OUTPUT%DATA%EFRIC_STAMP(0,0))
            ENDIF
          END IF 
 C
-         IF(S_EFRIC > 0)THEN
-            ALLOCATE(EFRICG(NUMNOD))
+         IF(OUTPUT%DATA%S_EFRIC > 0)THEN
+            ALLOCATE(OUTPUT%DATA%EFRICG(NUMNOD))
             IF(NINTSTAMP/=0) THEN
-              ALLOCATE(EFRICG_STAMP(NUMNODG))
+              ALLOCATE(OUTPUT%DATA%EFRICG_STAMP(NUMNODG))
             ELSE
-              ALLOCATE(EFRICG_STAMP(0))
+              ALLOCATE(OUTPUT%DATA%EFRICG_STAMP(0))
             ENDIF
-c         ELSE
-c            ALLOCATE(EFRICG(0))
-c            ALLOCATE(EFRICG_STAMP(0))
+C         ELSE
+C            ALLOCATE(EFRICG(0))
+C            ALLOCATE(EFRICG_STAMP(0))
          ENDIF
 C
          IF(NINTSTAMP/=0.AND.(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.OR.
@@ -2112,7 +2104,7 @@ C
 
 C
         IF (NUMPLY > 0) THEN
-          ALLOCATE (PLY_INFO(2,NUMPLY),STAT=IERR)
+          ALLOCATE (PLY_INFO(3,NUMPLY),STAT=IERR)
           IF (IERR /= 0) GOTO 1000
           PLY_INFO = 0
         ELSE
@@ -2263,15 +2255,14 @@ C-------EIGEN MODES (moved from radioss2.F) -----
         ALLOCATE (EIGIBUF(LEIBUF),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         EIGIBUF = 0
-C-------TAGSLV_RBY -----
-        ALLOCATE (TAGSLV_RBY(NUMNOD),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        TAGSLV_RBY = 0
 C-------Seatbelt structures -----
         ALLOCATE (SLIPRING(NSLIPRING),STAT=IERR)
         IF (IERR/=0) GOTO 1000
 C
         ALLOCATE (RETRACTOR(NRETRACTOR),STAT=IERR)
+        IF (IERR/=0) GOTO 1000
+C
+        ALLOCATE (GUIDE(NGUIDED_CABLE),STAT=IERR)
         IF (IERR/=0) GOTO 1000
 C
         IF (N_ANCHOR_REMOTE > 0) THEN
@@ -2337,7 +2328,8 @@ C-------/DAMP/VREL----------------------
 
         ! Skew
         CALL MY_ALLOC(SKEWS%SKEW,SKEWS%N_SKEW_VAR,SKEWS%TOTAL_SKEW_NUMBER)
-        
+        ! SFEM allocation
+        CALL allocate_sfem(sfem,numnod)
 C  DEBUG MEMORY ALLOCATIONS
 C
         IF(DEBUG(6)==1)THEN
@@ -2356,19 +2348,19 @@ C
       END
 
 
-      !||====================================================================
-      !||    sz_print          ../engine/source/output/restart/arralloc.F
-      !||--- called by ------------------------------------------------------
-      !||    restalloc         ../engine/source/output/restart/arralloc.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_chkw         ../engine/source/mpi/generic/spmd_chkw.F
-      !||    spmd_glob_isum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_ibcast       ../engine/source/mpi/generic/spmd_ibcast.F
-      !||    spmd_wiout        ../engine/source/mpi/generic/spmd_wiout.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod           ../common_source/modules/ale/ale_mod.F
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sz_print          ../engine/source/output/restart/arralloc.F
+!||--- called by ------------------------------------------------------
+!||    restalloc         ../engine/source/output/restart/arralloc.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_chkw         ../engine/source/mpi/generic/spmd_chkw.F
+!||    spmd_glob_isum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_ibcast       ../engine/source/mpi/generic/spmd_ibcast.F
+!||    spmd_wiout        ../engine/source/mpi/generic/spmd_wiout.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod           ../common_source/modules/ale/ale_mod.F
+!||    message_mod       ../engine/share/message_module/message_mod.F
+!||====================================================================
         SUBROUTINE SZ_PRINT()
 C-----------------------------------------------
 C   M o d u l e s
@@ -2521,7 +2513,6 @@ C   I56
 C   I57
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIBMPC :  ',SIBMPC
 C   I58
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SKINET :  ',SKINET
 C   I59
 C
 C   I60
@@ -2529,7 +2520,7 @@ C
 C   I61
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIPARI :  ',SIPARI
 C   I62
-c        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SINBUF :  ',SINBUF
+C        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SINBUF :  ',SINBUF
 C   I64
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SNPRW :   ',SNPRW
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SLPRW :   ',SLPRW
@@ -2719,7 +2710,7 @@ C   ICONTACT
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SICONTACT : ',SICONTACT
 C
        IF(NSPMD>1) THEN
-C traitement necessaire pour recuperer les output dans l'ordre
+C necessary processing to retrieve the outputs in order
          IWIOUT = 0
          IF (ISPMD/=0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)
@@ -2836,7 +2827,7 @@ C   M52
 C   M53
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SFR_WAVE : ',SFR_WAVE
 c
-c        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' FAILWAVE : ',IFAILWAVE*NUMNOD
+C        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' FAILWAVE : ',IFAILWAVE*NUMNOD
 C   M54
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SPARTS0 : ',SPARTS0
 C   M55
@@ -2875,7 +2866,7 @@ C   RCONTACT
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SRCONTACT : ',SRCONTACT
 
        IF(NSPMD>1) THEN
-C traitement necessaire pour recuperer les output dans l'ordre
+C necessary processing to retrieve the outputs in order
          IWIOUT = 0
          IF (ISPMD/=0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)

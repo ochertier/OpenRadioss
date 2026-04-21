@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    facnor    ../engine/source/output/anim/generate/facnor.F
-      !||--- called by ------------------------------------------------------
-      !||    parsorc   ../engine/source/output/anim/generate/parsorc.F
-      !||====================================================================
+!||====================================================================
+!||    facnor    ../engine/source/output/anim/generate/facnor.F
+!||--- called by ------------------------------------------------------
+!||    parsorc   ../engine/source/output/anim/generate/parsorc.F
+!||====================================================================
       SUBROUTINE FACNOR(X,D,II,XNORM,CDG,INVERT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -36,11 +36,11 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   X(3,*),D(3,*),XNORM(3,*),CDG(*)
-      INTEGER II(*),INVERT
+      INTEGER II(4),INVERT
 C     REAL
       my_real
      .   X0(4),Y0(4),Z0(4),NX,NY,NZ,XC,YC,ZC,S
-      INTEGER I,I1,I2,I3,I4
+      INTEGER I
 C-----------------------------------------------
 C       FACE NORMAL
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    qgrhead                ../starter/source/elements/solid_2d/quad/qgrhead.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    qgrhead                ../starter/source/elements/solid_2d/quad/qgrhead.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE QGRHEAD(
      1       IXQ     ,PM      ,GEO     ,INUM    ,ISEL    ,
      2       ITR1    ,EADD    ,INDEX   ,ITRI    ,IPARTQ  ,     
      3       ND      ,IGRSURF ,IGRQUAD ,CEP     ,MAT_PARAM,
-     5       XEP     ,IGEO    ,IPM     ,IQUAOFF )     
+     5       XEP     ,IGEO    ,IPM     ,IQUAOFF ,TRIMAT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,8 +46,8 @@ C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
 C     IXQ(7,NUMELQ)     TABLEAU CONECS+PID+MID+NOS SOLIDES 4N      E
-C     PM(NPROPM,NUMMAT) TABLEAU DES CARACS DES MATERIAUX           E
-C     GEO(NPROPG,NUMGEO)TABLEAU DES CARACS DES PID                 E
+C     PM(NPROPM,NUMMAT) ARRAY OF MATERIAL PROPERTIES           E
+C     GEO(NPROPG,NUMGEO) ARRAY OF PID CHARACTERISTICS                 E
 C     INUM(8,NUMELQ)    TABLEAU DE TRAVAIL                         E/S
 C     ISEL(NSELQ)       TABLEAU DES SOLIDES 4N CHOISIS POUR TH     E/S
 C     ITR1(NSELQ)       TABLEAU DE TRAVAIL                         E/S
@@ -68,7 +68,6 @@ C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
@@ -82,16 +81,17 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRQUAD)  :: IGRQUAD
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT),INTENT(IN) :: MAT_PARAM
+      INTEGER,INTENT(INOUT) :: TRIMAT
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
       INTEGER 
-     .        I,J,K,L, NG, NN, N, MLN, MID, PID ,
+     .        I,J,K, NN, MLN, MID, PID ,
      .        II,JJ, II1,JJ1,II2,JJ2,II3,JJ3,II4,JJ4,
      .        MODE, ML1, ML2, MT1, MT2,IGT, 
      .        MSKMLN,MSKJAL,MSKMID,MSKPID,IEOS,
      .        MSKJEU,MSKJTU,MSKJTH,MSKJPO,
-     .        IPLAST, IALEL, MT,IREP,IINT,ISSN,NGTVX,IFAIL,IRB,
+     .        IPLAST,IREP,IFAIL,IRB,
      .        JALE_FROM_MAT,JALE_FROM_PROP
       INTEGER ID
       CHARACTER(LEN=NCHARTITLE)::TITR
@@ -111,7 +111,7 @@ C
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
  
 C----------------------------------------------------------
-C   TRI GLOBAL SUR TOUS LES CRITERES POUR TOUS LES ELEMENTS
+C   GLOBAL SORT ON ALL CRITERIA FOR ALL ELEMENTS
 C----------------------------------------------------------
 C
       DO I=1,NUMELQ
@@ -152,6 +152,7 @@ C
           JCVT = IGEO(16,PID)
         ENDIF
         MLN = NINT(PM(19,ABS(MID)))
+         IF(MLN == 51)TRIMAT=4
         IF(MID<0)THEN
           IF(MLN==6.AND.JPOR/=2)MLN=17
           IF(MLN==46)MLN=47
@@ -196,14 +197,14 @@ C
           JCVT=0
         END IF
         IEOS = IPM(4,MID)
-C tri sur elem delete des rigidbody
+C sort on elem deletes rigidbody
 C IRB = 0 : elem actif
-C IRB = 1 : elem inactif et optimise pour en SPMD
-C IRB = 2 : elem inactif mais optimise pour etre actif en SPMD
+C IRB = 1 : inactive elem and optimized for SPMD
+C IRB = 2: Elem inactive but optimized to be active in SPMD
         IRB = IQUAOFF(I)       
 C
-C NPT = 1 ; JHBE = 0 ; JIVF = 0 et JLAG non utilise
-Clef 1---------------------------------
+C Npt = 1;Jhbe = 0;Jivf = 0 and jlag not used
+C Key 1---------------------------------
         JPOR=MY_SHIFTL(JPOR,0)
         JTHE=MY_SHIFTL(JTHE,3)
         JTUR=MY_SHIFTL(JTUR,6)
@@ -212,7 +213,7 @@ Clef 1---------------------------------
         MLN=MY_SHIFTL(MLN,21)
 c        IRB=MY_SHIFTL(IRB,0)
         ITRI(1,I)=MLN+JALE+JEUL+JTUR+JTHE+JPOR+IRB 
-Clef 2---------------------------------
+C Key 2---------------------------------
         IPLAST=MY_SHIFTL(IPLAST,0)
         IFAIL = MY_SHIFTL(IFAIL,3)
         ML1=MY_SHIFTL(ML1,5)
@@ -220,11 +221,11 @@ Clef 2---------------------------------
         IGT=MY_SHIFTL(IGT,21)
         JCVT=MY_SHIFTL(JCVT,28)
         ITRI(2,I)=IPLAST+ML1+ML2+IGT+JCVT + IFAIL
-Clef 3---------------------------------
+C Key 3---------------------------------
         ITRI(3,I)=MID
-Clef 4---------------------------------
+C Key 4---------------------------------
         ITRI(4,I)=PID
-Clef 5---------------------------------
+C Key 5---------------------------------
         IEOS = MY_SHIFTL(IEOS,0) 
 C       next = MY_SHIFTL(next,4) 
         ITRI(5,I)=IEOS
@@ -238,11 +239,9 @@ C
         IPARTQ(I) =INUM(1,INDEX(I))
         IQUAOFF(I) = INUM(9,INDEX(I))
       ENDDO
-      IF (IMACH==3) THEN
-        DO I=1,NUMELQ
-          CEP(I)=XEP(INDEX(I))
-        ENDDO
-      ENDIF
+      DO I=1,NUMELQ
+        CEP(I)=XEP(INDEX(I))
+      ENDDO
       DO  K=1,7
         DO  I=1,NUMELQ
           IXQ(K,I)=INUM(K+1,INDEX(I))
@@ -250,7 +249,7 @@ C
       ENDDO
 
 C
-C INVERSION DE INDEX (DANS ITR1)
+C INVERSE OF INDEX (ITR1)
 C
       DO I=1,NUMELQ
         ITR1(INDEX(I))=I
@@ -258,17 +257,16 @@ C
 
 
 C
-C RENUMEROTATION POUR SURFACES
+C SURFACE RENUMBERING
 C
       DO I=1,NSURF
         NN=IGRSURF(I)%NSEG
         DO J=1,NN
-          IF(IGRSURF(I)%ELTYP(J) == 2)
-     .       IGRSURF(I)%ELEM(J) = ITR1(IGRSURF(I)%ELEM(J))
+          IF(IGRSURF(I)%ELTYP(J) == 2) IGRSURF(I)%ELEM(J) = ITR1(IGRSURF(I)%ELEM(J))
         ENDDO
       ENDDO
 C
-C RENUMEROTATION POUR GROUPES DE SOLIDES
+C RSOLID GROUPS RENUMBERING
 C
       DO I=1,NGRQUAD
         NN=IGRQUAD(I)%NENTITY
@@ -278,7 +276,7 @@ C
       ENDDO
 C
 C--------------------------------------------------------------
-C         DETERMINATION DES SUPER_GROUPES
+C         BUILDING SUPER GROUPS
 C--------------------------------------------------------------
       ND=1
       DO I=2,NUMELQ

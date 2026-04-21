@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_skin_pre_map   ../engine/source/output/h3d/h3d_results/h3d_skin_pre_map.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d             ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_inc_mod        ../engine/share/modules/h3d_inc_mod.F
-      !||    pinchtype_mod      ../common_source/modules/pinchtype_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_skin_pre_map   ../engine/source/output/h3d/h3d_results/h3d_skin_pre_map.F
+!||--- called by ------------------------------------------------------
+!||    genh3d             ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_inc_mod        ../engine/share/modules/h3d_inc_mod.F
+!||    loads_mod          ../common_source/modules/loads/loads_mod.F90
+!||    pblast_mod         ../common_source/modules/loads/pblast_mod.F90
+!||    pinchtype_mod      ../common_source/modules/pinchtype_mod.F
+!||====================================================================
       SUBROUTINE H3D_SKIN_PRE_MAP(IB     ,ILOADP    ,LLOADP ,IMAPSKP,LOADS,PBLAST)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -61,8 +63,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5, J,IXST,
-     .        IAD ,NP ,NP0 ,NPRES ,N,NSKIN_I,NSKINP0,SHIFT
+      INTEGER NL, N1, N2, N3, N4, J,IXST,
+     .        IAD ,NP ,NP0  ,N,SHIFT
       INTEGER, DIMENSION(:,:), ALLOCATABLE  :: IRECT
       INTEGER, DIMENSION(:), ALLOCATABLE  :: ITAGN
 C=======================================================================

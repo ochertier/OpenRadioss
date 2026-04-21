@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_surface_from_element   ../starter/source/model/sets/create_surface_from_element.F
-      !||--- called by ------------------------------------------------------
-      !||    create_box_clause             ../starter/source/model/sets/create_box_clause.F
-      !||    hm_set                        ../starter/source/model/sets/hm_set.F
-      !||    insert_clause_in_set          ../starter/source/model/sets/insert_clause_in_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    surface_buffer                ../starter/source/model/sets/surface_buffer.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||    surf_mod                      ../starter/share/modules1/surf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_surface_from_element   ../starter/source/model/sets/create_surface_from_element.F
+!||--- called by ------------------------------------------------------
+!||    create_box_clause             ../starter/source/model/sets/create_box_clause.F
+!||    hm_set                        ../starter/source/model/sets/hm_set.F
+!||    insert_clause_in_set          ../starter/source/model/sets/insert_clause_in_set.F
+!||--- calls      -----------------------------------------------------
+!||    surface_buffer                ../starter/source/model/sets/surface_buffer.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    surf_mod                      ../starter/share/modules1/surf_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SURFACE_FROM_ELEMENT(
      .                       IXS       ,IXS10    ,SH4TREE   ,SH3TREE   ,IXC       ,
      .                       IXTG      ,KNOD2ELS ,NOD2ELS   ,KNOD2ELC  ,NOD2ELC   ,
      .                       KNOD2ELTG ,NOD2ELTG ,IPARTC    ,IPARTG    ,IPARTS    ,
      .                       IPART     ,CLAUSE   ,OPT_A     ,OPT_O     ,IXQ       ,
      .                       KNOD2ELQ  ,NOD2ELQ  ,X         ,KEYSET    ,DELBUF    ,
-     .                       GO_IN_ARRAY)
+     .                       GO_IN_ARRAY,IPARTQ  ,OPT_E     )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -48,6 +48,7 @@ C-----------------------------------------------
       USE SET_SCRATCH_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
       USE SURF_MOD , ONLY : EXT_SURF,ALL_SURF
+      use element_mod , only : nixs,nixq,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,11 +58,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER  OPT_A,OPT_O
+      INTEGER, INTENT(IN) :: OPT_A,OPT_O,OPT_E
       INTEGER, INTENT(IN) :: IXS(NIXS,*),IXS10(6,*),IXC(NIXC,*),IXTG(NIXTG,*),
      .  KNOD2ELS(*),KNOD2ELC(*),KNOD2ELTG(*),NOD2ELS(*),NOD2ELC(*),
      .  NOD2ELTG(*),IPARTS(*),IPARTC(*),IPARTG(*),SH4TREE(*),SH3TREE(*),
-     .  IPART(LIPART1,*),KNOD2ELQ(*),NOD2ELQ(*),IXQ(NIXQ,*)
+     .  IPART(LIPART1,*),KNOD2ELQ(*),NOD2ELQ(*),IXQ(NIXQ,*),IPARTQ(NUMELQ)
       my_real X(3,*)
       CHARACTER(LEN=NCHARFIELD) :: KEYSET
 !
@@ -71,7 +72,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IEXT,J,L,NIX,SZELMAX,IAD_SURF,NSEG,NFACES
+      INTEGER IEXT, L, NIX, SZELMAX, IAD_SURF, NSEG, NFACES
       INTEGER IWORK(70000)
 !
       INTEGER, ALLOCATABLE, DIMENSION(:,:) :: ITRI
@@ -93,12 +94,14 @@ C=======================================================================
 !
       IAD_SURF = 1
 !------------------
-      IEXT = EXT_SURF  ! par default (external surface)
-      IF ( OPT_A == 1 )  IEXT = ALL_SURF ! all surfaces (internal + external)
+      ! IEXT = 1 --> (OPT_E = 0 and OPT_A = 0) ! by default
+      ! IEXT = 2 --> (OPT_E = 1)  --> external surfaces only + only edges from shell external surfaces
+      ! IEXT = 3 --> (OPT_A = 1)  --> ALL (external + internal surfaces)
+      IEXT = EXT_SURF  ! by default ( = 1)
+      IF ( OPT_E == 1 ) IEXT = 2 ! external surfaces only + only edges from shell external surfaces
+      IF ( OPT_A == 1 ) IEXT = 3 ! all surfaces (internal + external)
       CLAUSE%EXT_ALL = IEXT
 !------------------
-
-!
 !----
 !     ! temporary surface segments got from elements
       NSEG = 0
@@ -108,7 +111,7 @@ C=======================================================================
      .             KNOD2ELTG ,NOD2ELTG ,NSEG      ,IEXT      ,IPARTC    ,
      .             IPARTS    ,IPARTG   ,CLAUSE    ,BUFTMPSURF,IAD_SURF  ,
      .             OPT_O     ,IPART    ,KNOD2ELQ  ,NOD2ELQ   ,X         ,
-     .             IXQ       ,KEYSET)
+     .             IXQ       ,KEYSET   ,IPARTQ)
 !----
 !
       NIX = 6

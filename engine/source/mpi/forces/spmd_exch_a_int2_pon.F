@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_exch_a_int2_pon   ../engine/source/mpi/forces/spmd_exch_a_int2_pon.F
-      !||--- called by ------------------------------------------------------
-      !||    intti1                 ../engine/source/interfaces/interf/intti1.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_a_int2_pon   ../engine/source/mpi/forces/spmd_exch_a_int2_pon.F
+!||--- called by ------------------------------------------------------
+!||    intti1                 ../engine/source/interfaces/interf/intti1.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                ../engine/share/modules/h3d_mod.F
+!||    spmd_comm_world_mod    ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_A_INT2_PON(
      1   FR_I2M ,IAD_I2M,ADDCNI2 ,PROCNI2 ,FR_NBCCI2,
      2   I2SIZE ,LENR   ,LENS    ,FSKYI2  ,INTTH2   ,
@@ -39,6 +40,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -68,9 +70,9 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR, INDEXI, NISKYF, N, IDEB,
+      INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR, INDEXI,
      .        SIZ, J, L, CC, NBIRECV, NBISEND, II, MSGOFF,ISIZOUT,LEN,
-     .        LENSAV,
+     .        
      .        IAD_RECV(NSPMD+1), INDEXR(NSPMD),INDEXS(NSPMD),
      .        REQ_R(NSPMD),REQ_S(NSPMD),
      .        STATUS(MPI_STATUS_SIZE)

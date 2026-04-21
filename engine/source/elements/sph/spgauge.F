@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spgauge         ../engine/source/elements/sph/spgauge.F
-      !||--- called by ------------------------------------------------------
-      !||    forintp         ../engine/source/elements/forintp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_exch_fr6   ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
-      !||    sum_6_float     ../engine/source/system/parit.F
-      !||    weight0         ../engine/source/elements/sph/weight.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod     ../engine/share/resol/initbuf.F
-      !||    sphbox          ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    spgauge         ../engine/source/elements/sph/spgauge.F
+!||--- called by ------------------------------------------------------
+!||    forintp         ../engine/source/elements/forintp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_exch_fr6   ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
+!||    sum_6_float     ../engine/source/system/parit.F
+!||    weight0         ../engine/source/elements/sph/weight.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    initbuf_mod     ../engine/share/resol/initbuf.F
+!||    sphbox          ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPGAUGE(LGAUGE  ,GAUGE ,KXSP   ,IXSP  ,
      1                   SPBUF   ,IPARG ,ELBUF_TAB,ISPSYM ,XSPSYM,
      2                   NOD2SP  ,X       ,ITASK  ,WA     ,WASIGSM,
@@ -82,7 +82,7 @@ c 6:               XSAV (SPH sorting)
 c 7:               YSAV (SPH sorting)
 c 8:               ZSAV (SPH sorting)
 c 9:               FF (sph only)
-c 10:              intantaneous Pressure
+c 10: Intantaneous Pressure
 c 11:              not yet available
 c 12:              intantaneous Rho
 c 13:              intantaneous E
@@ -113,14 +113,14 @@ c 37:              ! Butterworth !
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,N,INOD,JNOD,J,NVOIS,M,
-     .        NVOISS,SM,JS,NC,NS,NN,
-     .        IG,NEL,KAD,NG,K,KK,SFGAUGE,FR_RL(NSPMD+2)
+      INTEGER I, N, JNOD, J, NVOIS, M, 
+     . NVOISS,SM,JS,NC,
+     . IG,K,SFGAUGE,FR_RL(NSPMD+2)
       my_real
-     .       XI,YI,ZI,DI,RHOI,XJ,YJ,ZJ,DJ,RHOJ,VJ,
+     . XI,YI,ZI,XJ,YJ,ZJ,DJ,RHOJ,VJ,
      .       WGHT,ALPHAI,WCOMPI,
-     .       PP,EE,PRESS,ENER,RHO
-      TYPE(G_BUFEL_)  ,POINTER :: GBUF
+     . PP,PRESS,ENER,RHO
+ 
       my_real
      .       , DIMENSION(:), ALLOCATABLE :: FGAUGE1,FGAUGE2,FGAUGE3,FGAUGE4        
 C-----------------------------------------------
@@ -164,7 +164,7 @@ C------
             END IF
           ENDDO
 C------
-C       partie symetrique.
+C       symmetrical part.
         NVOISS=KXSP(6,N)
         K = NVOIS
         DO J=KXSP(5,N)+1,KXSP(5,N)+NVOISS
@@ -190,7 +190,7 @@ C       partie symetrique.
           END IF
         ENDDO
 C
-C Traitement Parith/ON avant echange
+C Parith treatment/We before exchange
 C
         DO K = 1, 6
           SPHG_F6(1,K,IG) = ZERO
@@ -250,11 +250,11 @@ C energy not yet available
 C
       RETURN
       END
-      !||====================================================================
-      !||    spgauge_f   ../engine/source/elements/sph/spgauge.F
-      !||--- called by ------------------------------------------------------
-      !||    resol       ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    spgauge_f   ../engine/source/elements/sph/spgauge.F
+!||--- called by ------------------------------------------------------
+!||    resol       ../engine/source/engine/resol.F
+!||====================================================================
       SUBROUTINE SPGAUGE_F(P,FF,P0,P1,P2,N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -274,7 +274,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,IFIRST
+      INTEGER J
       my_real
      . PI1,PI8,PI38,SPI8,SPI38,C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,
      , X1,X2,X3,Y1,Y2,Y3,Z1,Z2,Z3,D,DD,D2,DP,E,G,F
@@ -288,7 +288,7 @@ C
 C
       F = MIN(FF,ZEP4/DT2)
 C-----------------------------------------------
-C INITIALIALISATION DES COEFFICIENTS DU FILTRE
+C INITIALIZATION OF FILTER COEFFICIENTS
 C-----------------------------------------------
       PI1   = TWO*ATAN2(ONE,ZERO)
       PI8  = PI1*ONE_OVER_8

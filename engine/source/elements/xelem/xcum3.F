@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    xcum3    ../engine/source/elements/xelem/xcum3.F
-      !||--- called by ------------------------------------------------------
-      !||    xforc3   ../engine/source/elements/xelem/xforc3.F
-      !||====================================================================
+!||====================================================================
+!||    xcum3    ../engine/source/elements/xelem/xcum3.F
+!||--- called by ------------------------------------------------------
+!||    xforc3   ../engine/source/elements/xelem/xforc3.F
+!||====================================================================
       SUBROUTINE XCUM3(NX,KXX,IXX,UFORC,USTIFM,
      2                 UVISCM,MS,F,STIFN)
 C-----------------------------------------------
@@ -81,11 +81,11 @@ C-----
       ENDDO
       RETURN
       END
-      !||====================================================================
-      !||    xcum3p   ../engine/source/elements/xelem/xcum3.F
-      !||--- called by ------------------------------------------------------
-      !||    xforc3   ../engine/source/elements/xelem/xforc3.F
-      !||====================================================================
+!||====================================================================
+!||    xcum3p   ../engine/source/elements/xelem/xcum3.F
+!||--- called by ------------------------------------------------------
+!||    xforc3   ../engine/source/elements/xelem/xforc3.F
+!||====================================================================
       SUBROUTINE XCUM3P(NX,KXX,IXX,UFORC,USTIFM,
      2                  UVISCM,MS,NISKYL,FSKYI,ISKY)
 C-----------------------------------------------
@@ -138,7 +138,7 @@ C       XK= 0.5 *XC**2/(2.*MS(I1))
        USTIFM(K)=XK
       ENDDO
 C-----
-C     vecteur skyline necessaire pour rotations.
+C     Skyline vector required for rotations.
       DO K=1,NX
        I1=IXX(IADNOD+K-1)
        NISKYL=NISKYL+1
@@ -152,7 +152,7 @@ C     vecteur skyline necessaire pour rotations.
 C-----
 C     total of stiffnesses and viscosities applied to each node
 C          were returned by user routine.
-C     vecteur skyline necessaire pour rotations.
+C     Skyline vector required for rotations.
       DO K=1,NX
        I1=IXX(IADNOD+K-1)
        NISKYL=NISKYL+1
@@ -160,7 +160,7 @@ C     vecteur skyline necessaire pour rotations.
        FSKYI(NISKYL,2)=UFORC(2,K)
        FSKYI(NISKYL,3)=UFORC(3,K)
 C      A = XC/SQRT(2.*XK*XM), XK= XK/(SQRT(A**2+1)-A)**2  
-C                          ou XK= 0.5*XC**2/MS(I1)
+C                          or xK = 0.5*xc ** 2/ms (I1)
        FSKYI(NISKYL,4)=USTIFM(K)
        FSKYI(NISKYL,5)=TWO*UVISCM(K)
        ISKY(NISKYL)   =I1

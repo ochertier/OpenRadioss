@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rmatacce   ../engine/source/materials/mat/mat013/rmatacce.F
-      !||--- called by ------------------------------------------------------
-      !||    resol      ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    rmatacce   ../engine/source/materials/mat/mat013/rmatacce.F
+!||--- called by ------------------------------------------------------
+!||    resol      ../engine/source/engine/resol.F
+!||====================================================================
       SUBROUTINE RMATACCE(RBYM ,ARBYM ,ARRBYM ,VRBYM,VRRBYM,
      2                    IRBYM,LNRBYM,X      ,A    ,AR    ,
      3                    V    ,VR    ,KIND   )
@@ -49,9 +49,9 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, M, NSL, NSLT
+      INTEGER I, N, M, NSL, NSLT
 C     REAL
-      my_real RX, RY, RZ, MSX, MSY, MSZ, FSX, FSY, FSZ,
+      my_real RX, RY, RZ,
      .        XG,YG,ZG,USDT,V1X2,V2X1,V2X3,V3X2,V3X1,V1X3,
      .        VX2,VX1,VX3,VG(3)
 
@@ -100,7 +100,6 @@ C
      .      VRBYM(2,M) + VX2+HALF*DT2*(VG(3)*VX1-VG(1)*VX3)-V(2,N))
           A(3,N)= ARBYM(3,M) + USDT*(
      .      VRBYM(3,M)+VX3+HALF*DT2*(VG(1)*VX2-VG(2)*VX1)-V(3,N))
-C compute rotational velocity
 C
         ENDDO
         

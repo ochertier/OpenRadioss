@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_johnson_c   ../engine/source/materials/fail/johnson_cook/fail_johnson_c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
-      !||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod    ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fail_johnson_c   ../engine/source/materials/fail/johnson_cook/fail_johnson_c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
+!||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod    ../engine/share/modules/crackxfem_mod.F
+!||====================================================================
       SUBROUTINE FAIL_JOHNSON_C(
      1           NEL      ,NUPARAM  ,NUVAR    ,UPARAM   ,UVAR     ,
      2           TIME     ,NGL      ,IPG      ,ILAY     ,IPTT     ,
@@ -49,6 +49,7 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include  "units_c.inc"
 #include  "comlock.inc"
+#include  "vect01_c.inc"
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
 C---------+---------+---+---+--------------------------------------------

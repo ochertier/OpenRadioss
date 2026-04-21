@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    eng_qaprint_generalcontrolsinput   ../engine/source/output/qaprint/eng_qaprint_generalcontrolsinput.F
-      !||--- called by ------------------------------------------------------
-      !||    eng_qaprint_driver                 ../engine/source/output/qaprint/eng_qaprint_driver.F
-      !||--- calls      -----------------------------------------------------
-      !||    qaprint                            ../common_source/qa/qa_out_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                        ../engine/share/message_module/message_mod.F
-      !||    output_mod                         ../common_source/modules/output/output_mod.F90
-      !||    qa_out_mod                         ../common_source/qa/qa_out_mod.F
-      !||    sensor_mod                         ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    eng_qaprint_generalcontrolsinput   ../engine/source/output/qaprint/eng_qaprint_generalcontrolsinput.F
+!||--- called by ------------------------------------------------------
+!||    eng_qaprint_driver                 ../engine/source/output/qaprint/eng_qaprint_driver.F
+!||--- calls      -----------------------------------------------------
+!||    qaprint                            ../common_source/qa/qa_out_mod.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                        ../engine/share/message_module/message_mod.F
+!||    output_mod                         ../common_source/modules/output/output_mod.F90
+!||    qa_out_mod                         ../common_source/qa/qa_out_mod.F
+!||    sensor_mod                         ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE ENG_QAPRINT_GENERALCONTROLSINPUT(IRUNN,OUTPUT,IPARIT,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -79,7 +79,7 @@ C-----------------------------------------------
       IF (MYQAKEY('/RUN')) THEN
         CALL QAPRINT(ROOTNAM(1:ROOTLEN),IRUNN,0.0_8)
 
-C       Le restart letter du run sert de nom de la variable dans le ref.extract , suivi de l'ID du run
+C       the restart letter of the run is used as the variable name in ref.extract, followed by the run ID
         IF(LEN_TRIM(CHRUN0)/=0)THEN
           CALL QAPRINT(CHRUN0(1:LEN_TRIM(CHRUN0)),IRUNN,0.0_8)
         ELSE

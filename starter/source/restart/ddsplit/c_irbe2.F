@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    c_irbe2        ../starter/source/restart/ddsplit/c_irbe2.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal         ../starter/source/spmd/node/ddtools.F
-      !||    plist_ifront   ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    c_irbe2        ../starter/source/restart/ddsplit/c_irbe2.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal         ../starter/source/spmd/node/ddtools.F
+!||    plist_ifront   ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE C_IRBE2(IRBE2,LRBE2,PROC  ,NRBE2_L,
      .                   SLMN_L ,NBDDRBE2)
 C-----------------------------------------------
@@ -57,7 +57,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, NSN, ILP, N,P,M,NS,PROC1,SPLIST,SLMN_L0
+      INTEGER I, J, K, NSN, P, M, NS, PROC1, SPLIST
       INTEGER,DIMENSION(:), ALLOCATABLE :: MAIN_NODES,TAG,PLIST
 
 C-----------------------------------------------

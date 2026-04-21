@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,36 +20,36 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_rgwal_0          ../engine/source/ams/sms_rgwal0.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_pcg              ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier           ../engine/source/system/machine.F
-      !||    sms_rgwalc_bcs_0     ../engine/source/ams/sms_rgwalc.F
-      !||    sms_rgwalc_bcs_1     ../engine/source/ams/sms_rgwalc.F
-      !||    sms_rgwalc_bilan     ../engine/source/ams/sms_rgwalc.F
-      !||    sms_rgwalc_fric      ../engine/source/ams/sms_rgwalc.F
-      !||    sms_rgwalc_impact    ../engine/source/ams/sms_rgwalc.F
-      !||    sms_rgwall_bcs_0     ../engine/source/ams/sms_rgwall.F
-      !||    sms_rgwall_bcs_1     ../engine/source/ams/sms_rgwall.F
-      !||    sms_rgwall_bilan     ../engine/source/ams/sms_rgwall.F
-      !||    sms_rgwall_fric      ../engine/source/ams/sms_rgwall.F
-      !||    sms_rgwall_impact    ../engine/source/ams/sms_rgwall.F
-      !||    sms_rgwalp_bcs_0     ../engine/source/ams/sms_rgwalp.F
-      !||    sms_rgwalp_bcs_1     ../engine/source/ams/sms_rgwalp.F
-      !||    sms_rgwalp_bilan     ../engine/source/ams/sms_rgwalp.F
-      !||    sms_rgwalp_fric      ../engine/source/ams/sms_rgwalp.F
-      !||    sms_rgwalp_impact    ../engine/source/ams/sms_rgwalp.F
-      !||    sms_rgwals_bcs_0     ../engine/source/ams/sms_rgwals.F
-      !||    sms_rgwals_bcs_1     ../engine/source/ams/sms_rgwals.F
-      !||    sms_rgwals_bilan     ../engine/source/ams/sms_rgwals.F
-      !||    sms_rgwals_fric      ../engine/source/ams/sms_rgwals.F
-      !||    sms_rgwals_impact    ../engine/source/ams/sms_rgwals.F
-      !||    sms_rgwalt           ../engine/source/ams/sms_rgwal0.F
-      !||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
-      !||    spmd_exch_fr6        ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rgwal_0          ../engine/source/ams/sms_rgwal0.F
+!||--- called by ------------------------------------------------------
+!||    sms_pcg              ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier           ../engine/source/system/machine.F
+!||    sms_rgwalc_bcs_0     ../engine/source/ams/sms_rgwalc.F
+!||    sms_rgwalc_bcs_1     ../engine/source/ams/sms_rgwalc.F
+!||    sms_rgwalc_bilan     ../engine/source/ams/sms_rgwalc.F
+!||    sms_rgwalc_fric      ../engine/source/ams/sms_rgwalc.F
+!||    sms_rgwalc_impact    ../engine/source/ams/sms_rgwalc.F
+!||    sms_rgwall_bcs_0     ../engine/source/ams/sms_rgwall.F
+!||    sms_rgwall_bcs_1     ../engine/source/ams/sms_rgwall.F
+!||    sms_rgwall_bilan     ../engine/source/ams/sms_rgwall.F
+!||    sms_rgwall_fric      ../engine/source/ams/sms_rgwall.F
+!||    sms_rgwall_impact    ../engine/source/ams/sms_rgwall.F
+!||    sms_rgwalp_bcs_0     ../engine/source/ams/sms_rgwalp.F
+!||    sms_rgwalp_bcs_1     ../engine/source/ams/sms_rgwalp.F
+!||    sms_rgwalp_bilan     ../engine/source/ams/sms_rgwalp.F
+!||    sms_rgwalp_fric      ../engine/source/ams/sms_rgwalp.F
+!||    sms_rgwalp_impact    ../engine/source/ams/sms_rgwalp.F
+!||    sms_rgwals_bcs_0     ../engine/source/ams/sms_rgwals.F
+!||    sms_rgwals_bcs_1     ../engine/source/ams/sms_rgwals.F
+!||    sms_rgwals_bilan     ../engine/source/ams/sms_rgwals.F
+!||    sms_rgwals_fric      ../engine/source/ams/sms_rgwals.F
+!||    sms_rgwals_impact    ../engine/source/ams/sms_rgwals.F
+!||    sms_rgwalt           ../engine/source/ams/sms_rgwal0.F
+!||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
+!||    spmd_exch_fr6        ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
+!||====================================================================
       SUBROUTINE SMS_RGWAL_0(IFLAG  ,X      ,V      ,RWBUF   ,LPRW    ,   
      2                       NPRW   ,MS     ,FSAV   ,FR_WALL ,FOPT    ,
      3                       RWSAV  ,WEIGHT ,IRWL_WORK, NRWL_SMS,FRWL6,
@@ -336,8 +336,7 @@ C
 
 !$OMP SINGLE
 C
-C Traitements Speciaux : Communications SPMD si moving present
-C + Sauvegarde Force et Impultion main
+C Special treatments: SPMD communications Si Moving Present
 C
           IF(IMCONV == 1) THEN
             DO N=1,NRWALL
@@ -348,7 +347,7 @@ C
               N6=N5+NRWALL
               IF(NPRW(N3) /= 0) THEN
                 IF(NSPMD > 1) THEN
-C   si proc concerne par le rgwall
+C   if proc concerned by the rgwall
                   IF(FR_WALL(ISPMD+1,N)/=0) THEN
                     CALL SPMD_EXCH_FR6(FR_WALL(1,N),FRWL6(1,1,N),7*6)
                   ENDIF
@@ -372,11 +371,11 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    sms_rgwalt    ../engine/source/ams/sms_rgwal0.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rgwal_0   ../engine/source/ams/sms_rgwal0.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rgwalt    ../engine/source/ams/sms_rgwal0.F
+!||--- called by ------------------------------------------------------
+!||    sms_rgwal_0   ../engine/source/ams/sms_rgwal0.F
+!||====================================================================
       SUBROUTINE SMS_RGWALT(MSR ,RWL,FRWL6,PMAIN,FSAV,
      2                  FOPT)
 C-----------------------------------------------
@@ -419,12 +418,12 @@ C-----------------------------------------------
      .      FRWL6(6,4)+FRWL6(6,5)+FRWL6(6,6)
       FZT = FRWL6(7,1)+FRWL6(7,2)+FRWL6(7,3)+
      .      FRWL6(7,4)+FRWL6(7,5)+FRWL6(7,6)
-C F et XMT stockoques dans RWL et appliques debut cycle suivant
+C F and XMT stored in RWL and applied at the beginning of the following cycle
       RWL(17)=FXN+FXT
       RWL(18)=FYN+FYT
       RWL(19)=FZN+FZT
       RWL(20)=XMT
-C test pour ne cummuler qu'une fois en multiprocessors dans le cas moving
+C test to accumulate only once in multiprocessors in the moving case
       IF(ISPMD+1 == PMAIN.OR. MSR == 0) THEN
         DT15=HALF*DT1
         DT25=HALF*DT2

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thsol           ../engine/source/output/th/thsol.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2           ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf         ../engine/share/resol/initbuf.F
-      !||    nvar            ../engine/source/input/nvar.F
-      !||    scoor431        ../engine/source/elements/solid/sconnect/scoor431.F
-      !||    scortho31       ../engine/source/elements/thickshell/solidec/scortho31.F
-      !||    sortho31        ../engine/source/elements/solid/solide/sortho31.F
-      !||    srota6          ../engine/source/output/anim/generate/srota6.F
-      !||--- uses       -----------------------------------------------------
-      !||    alefvm_mod      ../common_source/modules/ale/alefvm_mod.F
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod     ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    thsol           ../engine/source/output/th/thsol.F
+!||--- called by ------------------------------------------------------
+!||    hist2           ../engine/source/output/th/hist2.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf         ../engine/share/resol/initbuf.F
+!||    scoor431        ../engine/source/elements/solid/sconnect/scoor431.F
+!||    scortho31       ../engine/source/elements/thickshell/solidec/scortho31.F
+!||    sortho31        ../engine/source/elements/solid/solide/sortho31.F
+!||    srota6          ../engine/source/output/anim/generate/srota6.F
+!||--- uses       -----------------------------------------------------
+!||    alefvm_mod      ../common_source/modules/ale/alefvm_mod.F
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod     ../engine/share/resol/initbuf.F
+!||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
+!||====================================================================
       SUBROUTINE THSOL(ELBUF_TAB, NTHGRP2, ITHGRP ,
      .                 IPARG    , ITHBUF , WA     ,
      .                 IXS      , X      , IPM    , PM    , IGEO,
@@ -112,6 +112,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD 
       USE MULTI_FVM_MOD
       USE ALEFVM_MOD , only:ALEFVM_Param
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -121,7 +122,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 #include      "mvsiz_p.inc"
@@ -242,6 +242,8 @@ c
          NPTR = ELBUF_TAB(NG)%NPTR
          NPTS = ELBUF_TAB(NG)%NPTS
          NPTT = ELBUF_TAB(NG)%NPTT
+         NPTG = NPTR * NPTS * NPTT
+
 C------
          CALL INITBUF( IPARG    ,NG      ,
      2          MTE     ,NEL     ,NFT     ,IAD     ,ITY     ,
@@ -313,13 +315,11 @@ C
             IF (K == N)THEN
               IH=IH+1
 C             spmd treatment
-              IF (IMACH == 3) THEN
-C               get related 'ii'
-                II = ((IH-1) - IADB)*NVAR
-                DO WHILE((ITHBUF(IH+NN) /= ISPMD) .AND. (IH < IADB+NN))
-                  IH = IH + 1
-                ENDDO
-              ENDIF
+C             get related 'ii'
+              II = ((IH-1) - IADB)*NVAR
+              DO WHILE((ITHBUF(IH+NN) /= ISPMD) .AND. (IH < IADB+NN))
+                IH = IH + 1
+              ENDDO
 c-----------
              IF (IH > IADB+NN) GOTO 666
 c-----------
@@ -494,7 +494,7 @@ c                  KHBE=15 : mean values already in co-rot system
 c
                  IF (KCVT == 2) THEN
                    IF (ISORTH > 0) THEN
-c                     REPERE ORTHOTROPE.
+c                     ORTHOTROPIC FRAME.
                       IF (KHBE /= 15) THEN
                        G11=GBUF%GAMA(KK(1)+I)
                        G21=GBUF%GAMA(KK(2)+I)
@@ -692,32 +692,49 @@ C--------------------------------------------------------------------------
 C--------------------------------------------------
 c             LOOP NEL, Filling TH Buffer
 C-----------------------------------------------------
+              ! output of element temperature
+              IF (JTHE /= 0 .and. JLAG > 0) THEN
+                WWA(13) = GBUF%TEMP(I)
+              ELSE
+                WWA(13) = ZERO
+                DO IL=1,NLAY
+                  IF (ELBUF_TAB(NG)%BUFLY(IL)%L_TEMP > 0) THEN
+                    DO IT=1,ELBUF_TAB(NG)%BUFLY(IL)%NPTT
+                      DO IS=1,NPTS
+                        DO IR=1,NPTR
+                          WWA(13) = WWA(13)+ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)%TEMP(I)/NPTG
+                        ENDDO
+                      ENDDO
+                    ENDDO
+                  ENDIF
+                ENDDO
+              ENDIF
+!--------------------------------------
+              WWA(14)=GBUF%EPSD(I)
               IF (MTE == 2) THEN
                 WWA(12) = GBUF%PLA(I)
-                WWA(13) = GBUF%TEMP(I)
+!                WWA(13) = GBUF%TEMP(I)
               ELSEIF (MTE == 3) THEN
                 WWA(12)=GBUF%PLA(I)
-                WWA(13)=GBUF%TEMP(I)
+!                WWA(13)=GBUF%TEMP(I)
               ELSEIF (MTE == 4) THEN
                 WWA(12)=GBUF%PLA(I)
-                WWA(13)=GBUF%TEMP(I)
-                WWA(14)=GBUF%EPSD(I)
+!                WWA(13)=GBUF%TEMP(I)
               ELSEIF (MTE == 5 .OR. MTE == 41 .OR. MTE == 97) THEN
-                WWA(13)=GBUF%TEMP(I)
+!                WWA(13)=GBUF%TEMP(I)
                 WWA(31)=GBUF%BFRAC(I)
               ELSEIF (MTE == 6) THEN
-                WWA(13)=GBUF%TEMP(I)
+!                WWA(13)=GBUF%TEMP(I)
                 WWA(26)=LBUF%RK(I)
                 WWA(27)=LBUF%RE(I)
               ELSEIF (MTE == 7.OR.MTE == 8.OR.MTE == 9) THEN
                 WWA(12)=ZERO
                 WWA(13)=ZERO
-                WWA(14)=ZERO
               ELSEIF (MTE == 10) THEN
-                WWA(12)=GBUF%EPSQ(I)     !/TH (EPSP)
-                WWA(30)=GBUF%PLA(I)      !/TH (VPLA)
+                WWA(12)=GBUF%PLA(I)        !/TH (EPSP)
+                WWA(30)=GBUF%EPSQ(I)      !/TH (VPLA)
               ELSEIF (MTE == 11) THEN
-                WWA(13)=LBUF%TEMP(I)
+!                WWA(13)=LBUF%TEMP(I)
                 WWA(26)=LBUF%RK(I)
                 WWA(27)=LBUF%RE(I)
               ELSEIF (MTE == 14) THEN
@@ -731,20 +748,19 @@ C-----------------------------------------------------
                 WWA(34)=LBUF%DAM(KK(5)+I)
              ELSEIF (MTE == 16) THEN
                 WWA(12)=LBUF%PLA(I)   !N1
-                WWA(13)=LBUF%TEMP(I)  !N2
-                WWA(14)=LBUF%EPSD(I)
+!                WWA(13)=LBUF%TEMP(I)  !N2
               ELSEIF (MTE == 17) THEN
-                IF (ITHERM > 0) WWA(13)=LBUF%TEMP(I)
+!                IF (ITHERM > 0) WWA(13)=LBUF%TEMP(I)
                 WWA(26)=LBUF%RK(I)
                 WWA(27)=LBUF%RE(I)
               ELSEIF (MTE == 18) THEN
-                WWA(13)=LBUF%TEMP(I)
+!                WWA(13)=LBUF%TEMP(I)
               ELSEIF (MTE == 20) THEN
                 WWA(12)=ZERO
                 WWA(13)=ZERO
               ELSEIF (MTE == 21) THEN
-                WWA(12)=LBUF%EPSQ(I) ! NB11
-                WWA(30)=GBUF%PLA(I)  ! NB10
+                WWA(12)=GBUF%PLA(I)
+                WWA(30)=GBUF%EPSQ(I)
               ELSEIF (MTE == 22.OR.MTE == 23) THEN
                 WWA(12)=LBUF%PLA(I)
               ELSEIF (MTE == 24) THEN
@@ -765,19 +781,16 @@ C-----------------------------------------------------
                 WWA(32)=LBUF%PLA(I)      !WPLA
               ELSEIF (MTE == 26) THEN
                 WWA(12)=LBUF%PLA(I)
-                WWA(13)=LBUF%TEMP(I)
+!                WWA(13)=LBUF%TEMP(I)
                 WWA(14)=LBUF%Z(I)
               ELSEIF (MTE == 32.OR.MTE == 43) THEN   ! not solid compatible !!
                 WWA(12)=ZERO
                 WWA(13)=ZERO
-                WWA(14)=ZERO
               ELSEIF (MTE == 46.OR.MTE == 47) THEN
                 WWA(12)=MBUF%VAR(I)
-                WWA(13)=MBUF%VAR(I+NEL)
-c                WWA(14)=MBUF%VAR(I+NEL*2)
               ELSEIF (MTE == 49) THEN
                 WWA(12)=LBUF%PLA(I)
-                WWA(13)=LBUF%TEMP(I)
+!                WWA(13)=LBUF%TEMP(I)
                 WWA(14)=LBUF%EPSD(I)
               ELSEIF (MTE == 28) THEN
               ELSEIF (MTE == 33) THEN
@@ -785,11 +798,8 @@ c                WWA(14)=MBUF%VAR(I+NEL*2)
                IF(GBUF%G_PLA>0)  WWA(12)=GBUF%PLA(I)
                                  WWA(13)=GBUF%TEMP(I)
                IF(GBUF%G_EPSD>0) WWA(14)=GBUF%EPSD(I)
-               IF(GBUF%G_BFRAC>0)WWA(31)=GBUF%BFRAC(I) !Means Explosive submaterial is used
-               IF(GBUF%G_EPSQ>0) THEN                  !Means Drucker-Prager criteria is used
-                                 WWA(12)=GBUF%EPSQ(I)
-                                 WWA(30)=GBUF%PLA(I)
-               ENDIF
+               IF(GBUF%G_BFRAC>0)WWA(31)=GBUF%BFRAC(I)
+               IF(GBUF%G_EPSQ>0) WWA(30)=GBUF%EPSQ(I)
               ELSEIF (MTE == 59) THEN
 C               Solid spotwelds : damage  DAMA1 ...DAMA4
                 NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL
@@ -807,11 +817,9 @@ C               Solid spotwelds : damage  DAMA1 ...DAMA4
                 VAR = MAX(WWA(17),VAR)
                 VAR = MAX(WWA(18),VAR)
                 WWA(19) = VAR    ! DAMA = max(dama1,dama2,dama3,dama4)
-                WWA(14) = GBUF%EPSD(I)
 
               ELSEIF (MTE == 83) THEN
                 WWA(12)=GBUF%PLA(I)
-                WWA(14)=GBUF%EPSD(I)
                 NUVAR = ELBUF_TAB(NG)%BUFLY(1)%NVAR_MAT
                 DO J=1,NPTR
                   MBUF  => ELBUF_TAB(NG)%BUFLY(1)%MAT(J,1,1)
@@ -833,12 +841,11 @@ C               Solid spotwelds : damage  DAMA1 ...DAMA4
               ELSEIF (MTE == 67) THEN
 C               Temperature
                 WWA(12)=ZERO
-                WWA(13)=MBUF%VAR(I)
-                WWA(14)=ZERO
+!                WWA(13)=MBUF%VAR(I)
               ELSEIF (MTE == 103) THEN
 C             Hensel Spittel
                 WWA(12)=LBUF%PLA(I)
-                WWA(13)=MBUF%VAR(I)
+!                WWA(13)=MBUF%VAR(I)
                 WWA(14)=LBUF%EPSD(I)
               ELSEIF (MTE > 28) THEN
                 IF (ELBUF_TAB(NG)%BUFLY(1)%L_PLA > 0)THEN
@@ -846,20 +853,15 @@ C             Hensel Spittel
                 ELSE
                   WWA(12)=ZERO
                 ENDIF
-                IF (ELBUF_TAB(NG)%BUFLY(1)%L_TEMP > 0)THEN
-                  WWA(13)=LBUF%TEMP(I)
-                ELSE
-                  WWA(13)=ZERO
-                ENDIF
-                IF (ELBUF_TAB(NG)%BUFLY(1)%L_EPSD > 0)THEN
-                  WWA(14)=LBUF%EPSD(I)
-                ELSE
-                  WWA(14)=ZERO
-                ENDIF
+!                IF (ELBUF_TAB(NG)%BUFLY(1)%L_TEMP > 0)THEN
+!                  WWA(13)=LBUF%TEMP(I)
+!                ELSE
+!                  WWA(13)=ZERO
+!                ENDIF
+!                IF (ELBUF_TAB(NG)%BUFLY(1)%L_EPSD > 0)THEN
+!                  WWA(14)=LBUF%EPSD(I)
+!                ENDIF
 C               User laws for solids
-c                WWA(12)=BUFEL(N1)
-c                WWA(13)=BUFEL(N2)
-c                WWA(14)=BUFEL(N3)
 C               User laws for solids - max 60 user variables.
                 NUVARTH = MIN(60,NUVAR)
                 DO J=1,NUVARTH
@@ -1002,12 +1004,12 @@ c---------------
                         LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(IPT,1,1)
 C-----------------------------------
 c                     CO-ROTATIONAL FORMULATION ONLY:
-c                      88+I     LSX at Gauss point I
-c                      96+I     LSY at Gauss point I
-c                     104+I     LSZ at Gauss point I
-c                     112+I     LSXY at Gauss point I
-c                     120+I     LSYZ at Gauss point I
-c                     128+I     LSXZ at Gauss point I
+c                      88+I LSX AT GAUSS Point I
+c                      96+I LSY AT GAUSS Point I
+c                     104+I LSZ AT GAUSS Point I
+c                     112+i lsxy at gauss point I
+c                     120+I LSYZ AT GAUSS Point I
+c                     128+I LSXZ AT GAUSS Point I
 C-----------------------------------
                         WWA( 88+IPT) = LBUF%SIGL(KK(1)+I)
                         WWA( 96+IPT) = LBUF%SIGL(KK(2)+I)
@@ -1348,7 +1350,7 @@ C------------------------Output SIJK---------------------
                            ENDDO
                          ENDIF
 
-C                       Deformation plastique
+C                       Plastic deformation
                         IF (MTE >= 28) THEN
                           IF (NUVAR > 0) THEN
                             PLAG = MBUF%VAR(I)
@@ -1434,9 +1436,9 @@ c
                         LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(IR,IS,IT)
                         MBUF => ELBUF_TAB(NG)%BUFLY(1)%MAT(IR,IS,IT)
 c
-C                       IPWWA calcule sur la base de 3*9*3 points d'integration (r*s*t)
+C                       IPWWA calculated using 3*9*3 integration points (r*s*t)
                         IPT = IR + ( (IS-1) + (IT-1)*NPTS )*NPTR
-C                       IPWWA calcule sur la base de 3*9*3 points d'integration (s*t*r)
+C                       IPWWA calculated using 3*9*3 integration points (s*t*r)
                         IPWWA = (IR-1)*3*9*7 + (IT-1)*3*7 + (IS-1)*7
                         IUWWA = (IR-1)*3*9*9 + (IT-1)*3*9 + (IS-1)*9
 c
@@ -1453,7 +1455,7 @@ c                          WWA(196+IPWWA+ITENS)=LBUF%SIG(KK(ITENS)+I)
                          ENDDO
                         ENDIF
 c
-C                       Deformation plastique
+C                       Plastic deformation
                         IF (MTE >= 28) THEN
                           IF (NUVAR > 0) THEN
                             SIGP(7,ISPAU,IS)   = MBUF%VAR(I)
@@ -1631,12 +1633,12 @@ C-----------------------------------
               ELSE  ! KCVT = 0
 C-----------------------------------
 C                        GLOBAL FORMULATION ONLY :
-C               40+I     SX at Gauss point I
-C               48+I     SY at Gauss point I
-C               56+I     SZ at Gauss point I
-C               64+I     SXY at Gauss point I
-C               72+I     SYZ at Gauss point I
-C               80+I     SXZ at Gauss point I
+C               40+i sx at gauss point I
+C               48+I Sy at Gauss Point I
+C               56+I Sz at Gauss Point I
+C               64+I SXY AT GAUSS Point I
+C               72+I Syz at Gauss Point I
+C               80+I SXZ AT GAUSS Point I
 C-----------------------------------
                 IF (ISOLNOD == 4) THEN
 c----------------------------------------------------------------------------
@@ -1833,7 +1835,7 @@ c
                         LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)
                         MBUF => ELBUF_TAB(NG)%BUFLY(IL)%MAT(IR,IS,IT)
 c
-C                       IPWWA calcule sur la base de 3*9*3 points d'integration (r*s*t)
+C                       IPWWA calculated using 3*9*3 integration points (r*s*t)
                          CPT=(IT-1)*99*6+((IR-1)*9+IS-1)*6
 
                         IPT   = IR + ( (IS-1) + (IT-1)*NPTS )*NPTR
@@ -1853,7 +1855,7 @@ c
                            WWA(196+IPWWA+ITENS) = LBUF%SIG(KK(ITENS)+I)
                            SIGP(ITENS,ISPAU,IS) = LBUF%SIG(KK(ITENS)+I)
                         ENDDO
-C                       Deformation plastique
+C                       Plastic deformation
                         IF (MTE >= 28) THEN
                           IF (NUVAR > 0) THEN
                             WWA(196+IPWWA+7) = MBUF%VAR(I)
@@ -2167,7 +2169,7 @@ c
                          WWA(72+IPT)=WWA(72+IPT) + LBUF%VISC(KK(5)+I)
                          WWA(80+IPT)=WWA(80+IPT) + LBUF%VISC(KK(6)+I)
                         ENDIF
-                        !tenseur de contrainte sur chaque points de gauss
+                        !stress tensor on each gauss point
                         IPWWA = (IT-1)*3*9*7 + (IS-1)*3*7 + (IR-1)*7
                         IUWWA = (IT-1)*3*9*9 + (IS-1)*3*9 + (IR-1)*9
                         DO ITENS = 1,6

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thsph          ../engine/source/output/th/thsph.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2          ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf        ../engine/share/resol/initbuf.F
-      !||    nvar           ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod    ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    thsph          ../engine/source/output/th/thsph.F
+!||--- called by ------------------------------------------------------
+!||    hist2          ../engine/source/output/th/hist2.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf        ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    initbuf_mod    ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE THSPH(ELBUF_TAB, NTHGRP2, ITHGRP, IPARG, ITHBUF,
      1                 SPBUF    ,    KXSP, NOD2SP,    PM,  WA    )
 C-----------------------------------------------
@@ -48,7 +47,6 @@ C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
 #include      "sphcom.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -66,8 +64,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER II,JJ, I, J, N, IH, NG, MTE, 
-     .        K, IST, IP, L, LWA, NEL,KK(6)
+      INTEGER II,JJ, I, N, IH, NG, MTE, 
+     .        K, IP, L, NEL,KK(6)
       INTEGER :: NITER,IADR,NN,IADV,NVAR,ITYP,IJK
 
       my_real
@@ -171,14 +169,11 @@ C======================================================================|
                             IF (K==N)THEN
                                 IH=IH+1
                                 !---spmd specific treatment---!
-                                IF (IMACH==3) THEN
-                                    !---search for ii---!
-                                    II = ((IH-1) - IADR)*NVAR
-                                    DO WHILE((ITHBUF(IH+NN)/=ISPMD).AND.(IH<IADR+NN))
-                                        IH = IH + 1
-                                    ENDDO
-                                ENDIF
-
+                                !---search for ii---!
+                                II = ((IH-1) - IADR)*NVAR
+                                DO WHILE((ITHBUF(IH+NN)/=ISPMD).AND.(IH<IADR+NN))
+                                    IH = IH + 1
+                                ENDDO
                                 IF(IH>IADR+NN) GOTO 666
                                 !---PROP type VOID ---!
                                 DO L=1,100

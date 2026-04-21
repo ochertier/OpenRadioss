@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alefvm_sfint3_int22   ../engine/source/ale/alefvm/alefvm_sfint3_int22.F
-      !||--- called by ------------------------------------------------------
-      !||    alefvm_main           ../engine/source/ale/alefvm/alefvm_main.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier            ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    alefvm_mod            ../common_source/modules/ale/alefvm_mod.F
-      !||    i22bufbric_mod        ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22tri_mod            ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||====================================================================
-      SUBROUTINE ALEFVM_SFINT3_INT22
-     .                         (
-     1                          IXS ,  NV46 ,  IALEFVM_FLG, ITASK,
-     2                          IPM ,  IPARG,  NG   , NALE       , A    ,
-     3                          X   ,  V    ,  BID1 , BID2       , MS   ,
-     4                          BID3,  BID4 ,  W    , NBF        , NBL  ,
-     5                          tNB ,  NIN
-     .                          )
+!||====================================================================
+!||    alefvm_sfint3_int22   ../engine/source/ale/alefvm/alefvm_sfint3_int22.F
+!||--- called by ------------------------------------------------------
+!||    alefvm_main           ../engine/source/ale/alefvm/alefvm_main.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier            ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    alefvm_mod            ../common_source/modules/ale/alefvm_mod.F
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    i22bufbric_mod        ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22tri_mod            ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||====================================================================
+      SUBROUTINE ALEFVM_SFINT3_INT22(IXS,  NV46,  ITASK, NBF ,NBL  ,NIN)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -54,6 +48,7 @@ C-----------------------------------------------
       USE ALEFVM_MOD
       USE I22BUFBRIC_MOD
       USE I22TRI_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -80,19 +75,17 @@ C subroutine is unplugged
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER :: IXS(NIXS,NUMELS),NV46,IALEFVM_FLG, ITASK,IPM(NPROPMI,NUMMAT),IPARG(NPARG,NGROUP),NG ,NALE(*)
-      INTEGER :: NBF, NBL, tNB, NIN
-      my_real :: A(3,NUMNOD),X(3,NUMNOD),V(3,NUMNOd),MS(*),W(3,NUMNOD),BID1,BID2,BID3,BID4
+      INTEGER :: IXS(NIXS,NUMELS),NV46, ITASK
+      INTEGER :: NBF, NBL, NIN
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      LOGICAL :: debug_outp
-      INTEGER :: idebug, idbf,idbl, IB, IBm, IBs, IADJ, MCELL, NumSECND, NADJ, ISECND
+      INTEGER :: IB, IBm, IBs, IADJ, MCELL, NumSECND, NADJ, ISECND
       INTEGER :: I, II, J, IBv, NBCUT, NBCUTv, K, IV
       INTEGER :: ICELLv, JV, ICELLs, ClosedSurface, IPRES_MOM, ISGN_NORM
       my_real :: F0(3), SURF, Pf
-      my_real :: NORM, FN,FNX,FNY,FNZ, Z1,Z2, P1,P2, UN1,UN2, DENOM
-      my_real :: N(3), AREA, AREAv, AREAmin, Js, SumAREAv, AREA_trunc, COEF1, COEF2
+      my_real :: NORM, Z1,Z2, P1,P2, UN1,UN2, DENOM
+      my_real :: N(3), AREA, AREAv, Js, COEF1, COEF2
       my_real :: THETA, M1, M2, Mf
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
@@ -104,7 +97,7 @@ C   S o u r c e   L i n e s
 C-----------------------------------------------
 
 c      0. Domaine d'integration : supercell = main u (U secnd)
-c      1. Calcul de Pf
+c      1. Calculation of Pf
 c      2. Calcul de Ff(1:3) = -Pf.S.n
 c      3. Assemblge de FINT(1:3) = Sum Ff(1:3)
 
@@ -187,6 +180,7 @@ c      3. Assemblge de FINT(1:3) = Sum Ff(1:3)
         
         !--Face-1:6
         !-----------------------------------
+        ClosedSurface = 0 
         DO J=1,NV46
           NADJ              =  BRICK_LIST(NIN,IB)%POLY(MCELL)%FACE(J)%NAdjCell
           ClosedSurface     =  BRICK_LIST(NIN,IB)%ClosedSurf(J)
@@ -277,7 +271,7 @@ c      3. Assemblge de FINT(1:3) = Sum Ff(1:3)
           !---Face-0                                                                                                               
           !----------------------------------- 
           
-          !non ne pas sommer sur les plans de coupes il ne sont pas forcemment tous voisins :
+          !no, do not sum over the cutting planes, they are not necessarily all neighbors:
           !example : inter22/1D_EXPANSION/9ELEMS/LAW51/PerfectGas/EULER/SMALL_MAIN/0.FVM/MAT51
           !print *, "pause" ; pause
           

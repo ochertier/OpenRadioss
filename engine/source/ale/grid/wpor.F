@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    wpor     ../engine/source/ale/grid/wpor.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx   ../engine/source/ale/grid/alewdx.F
-      !||====================================================================
+!||====================================================================
+!||    wpor     ../engine/source/ale/grid/wpor.F
+!||--- called by ------------------------------------------------------
+!||    alewdx   ../engine/source/ale/grid/alewdx.F
+!||====================================================================
        SUBROUTINE WPOR(
      1    GEO,NODPOR,X   ,V      ,VR     ,
-     2    W  ,RBY   ,NALE,NPORGEO        )
+     2    W  ,NALE,NPORGEO        )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -47,7 +47,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NODPOR(*), NALE(*), NPORGEO(*)
-      my_real GEO(NPROPG,NUMGEO),X(3,NUMNOD),V(3,NUMNOD),VR(3,NUMNOD),W(3,NUMNOD),RBY(NRBY,*)
+      my_real GEO(NPROPG,NUMGEO),X(3,NUMNOD),V(3,NUMNOD),VR(3,NUMNOD),W(3,NUMNOD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

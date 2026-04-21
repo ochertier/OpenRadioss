@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_ini   ../engine/source/output/h3d/h3d_build_fortran/h3d_ini.F
-      !||--- called by ------------------------------------------------------
-      !||    freform   ../engine/source/input/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod   ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_ini   ../engine/source/output/h3d/h3d_build_fortran/h3d_ini.F
+!||--- called by ------------------------------------------------------
+!||    freform   ../engine/source/input/freform.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod   ../engine/share/modules/h3d_mod.F
+!||====================================================================
       SUBROUTINE H3D_INI(H3D_DATA,KH3D,NSLASH)
 C-----------------------------------------------
 C   M o d u l e s
@@ -44,7 +44,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,NH3D,KCUR
+      INTEGER NH3D,KCUR
      
 C=========================================================================
       KCUR           = KH3D
@@ -56,14 +56,11 @@ c
 c
         ALLOCATE(H3D_DATA%PARTS(1))
 c
-        ALLOCATE(H3D_DATA%OUTPUT_LIST(10000))
-        H3D_DATA%OUTPUT_LIST(1:10000)%OK = 0
       ELSE
         ALLOCATE(H3D_DATA%INPUT_LIST(1))
 c
         ALLOCATE(H3D_DATA%PARTS(1))
 c
-        ALLOCATE(H3D_DATA%OUTPUT_LIST(1))
       ENDIF
 c
       H3D_DATA%IH3D = 0
@@ -112,7 +109,7 @@ c
 c 
       H3D_DATA%TH3D = EP30
       H3D_DATA%DTH3D = ZERO
-      H3D_DATA%TH3D_STOP = ZERO
+      H3D_DATA%TH3D_STOP = EP20
       H3D_DATA%TH3D0 = ZERO
       H3D_DATA%DTH3D0 = ZERO
       H3D_DATA%TH3D_STOP0 = EP30

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,17 +26,17 @@ Cbm|-- called by -----------
 Cbm|        R2R_GROUP                       src/rad2r/r2r_group.F          
 Cbm|-- calls ---------------
 Cbm|====================================================================
-      !||====================================================================
-      !||    r2r_speedup      ../starter/source/coupling/rad2rad/r2r_speedup.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../starter/source/output/message/message.F
-      !||    find_dt_engine   ../starter/source/coupling/rad2rad/r2r_speedup.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||    r2r_mod          ../starter/share/modules1/r2r_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_speedup      ../starter/source/coupling/rad2rad/r2r_speedup.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../starter/source/output/message/message.F
+!||    find_dt_engine   ../starter/source/coupling/rad2rad/r2r_speedup.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||    r2r_mod          ../starter/share/modules1/r2r_mod.F
+!||====================================================================
       SUBROUTINE R2R_SPEEDUP(DTELEM,DTNODA,DT_R2R,COST_R2R,ISOLOFF,
      .                       ISHEOFF,ITRUOFF ,IPOUOFF ,IRESOFF ,ITRIOFF,
      .                       IQUAOFF)
@@ -67,21 +67,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,FLG_CHK,FLG_CTL,DOMLEN,NUM,FLG_CHK_SUB,FLG_CTL_SUB
-      my_real
-     .   DT,DT_SUB,SPEEDUP,COST_SUB
+      INTEGER :: I,FLG_CHK,FLG_CTL,DOMLEN,FLG_CHK_SUB,FLG_CTL_SUB
+      my_real :: DT,DT_SUB,SPEEDUP,COST_SUB
       CHARACTER NAM*150
 C-----------------------------------------------
-C      
-      CALL FIND_DT_ENGINE(DTELEM,DTNODA,DT,FLG_CHK,FLG_CTL,
-     .                   ISOLOFF,ISHEOFF,ITRUOFF ,IPOUOFF ,IRESOFF ,
-     .                   ITRIOFF,IQUAOFF)
-C
+      CALL FIND_DT_ENGINE(DTELEM,DTNODA,DT,FLG_CHK,FLG_CTL,ISOLOFF,ISHEOFF,ITRUOFF ,IPOUOFF ,IRESOFF ,ITRIOFF,IQUAOFF)
+
       DO I=1,NUMSPH-NSPHRES
         COST_R2R = COST_R2R + 12.0
       END DO
-C
-      IF (IDDOM/=0) THEN
+
+      IF (IDDOM /= 0) THEN
 C
         DT_R2R(1,1) = DT
         DT_R2R(2,1) = COST_R2R
@@ -94,16 +90,13 @@ C
         WRITE(IOUT,1001)
 C
         IF (FLG_CHK==0) THEN 
-          CALL ANCMSG(MSGID=1095,
-     .                 MSGTYPE=MSGWARNING,
-     .                 ANMODE=ANINFO_BLIND_2,
-     .                 C1=ROOTNAM(1:ROOTLEN)//'_0001.rad')
+          CALL ANCMSG(MSGID=1095, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_2, C1=ROOTNAM(1:ROOTLEN)//'_0001.rad')
         ENDIF
 C
         DT_SUB = DT_R2R(1,1)
         COST_SUB = DT_R2R(2,1)
 C
-        IF (FLG_SWALE==1) THEN
+        IF (FLG_SWALE == 1) THEN
           DT_SUB = DT
           DT = DT_R2R(1,1)
           COST_SUB = COST_R2R
@@ -119,10 +112,7 @@ C
         DOMLEN = ISUBDOM(7,1)
 C
         IF (FLG_CHK_SUB==0) THEN 
-          CALL ANCMSG(MSGID=1095,
-     .                 MSGTYPE=MSGWARNING,
-     .                 ANMODE=ANINFO_BLIND_2,
-     .                 C1=NAM(1:DOMLEN)//'_0001.rad')
+          CALL ANCMSG(MSGID=1095, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_2, C1=NAM(1:DOMLEN)//'_0001.rad')
         ENDIF
 C
         SPEEDUP = 0.9*((COST_R2R+COST_SUB)/((COST_R2R*DT_SUB/DT)+COST_SUB))
@@ -150,15 +140,15 @@ Cbm|-- called by -----------
 Cbm|        R2R_GROUP                       src/rad2r/r2r_group.F          
 Cbm|-- calls ---------------
 Cbm|====================================================================
-      !||====================================================================
-      !||    find_dt_engine   ../starter/source/coupling/rad2rad/r2r_speedup.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_speedup      ../starter/source/coupling/rad2rad/r2r_speedup.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||    r2r_mod          ../starter/share/modules1/r2r_mod.F
-      !||====================================================================
+!||====================================================================
+!||    find_dt_engine   ../starter/source/coupling/rad2rad/r2r_speedup.F
+!||--- called by ------------------------------------------------------
+!||    r2r_speedup      ../starter/source/coupling/rad2rad/r2r_speedup.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||    r2r_mod          ../starter/share/modules1/r2r_mod.F
+!||====================================================================
       SUBROUTINE FIND_DT_ENGINE(DTELEM,DTNODA,DT,FLG_CHK,FLG_CTL,
      .                         ISOLOFF,ISHEOFF,ITRUOFF ,IPOUOFF ,IRESOFF ,
      .                         ITRIOFF,IQUAOFF)
@@ -381,7 +371,7 @@ C--     beam element time step --
               ENDIF
             END DO
           ENDIF
-C--     truss element time step --
+C-Truss Time Step element-
         ELSEIF (KEYA(1:9)=='/DT/TRUSS') THEN
           READ(71,*,END=20) DTSCA,DTMINI
           DTFAC1(5) = DTSCA 

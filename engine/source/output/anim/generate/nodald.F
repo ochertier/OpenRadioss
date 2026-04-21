@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    nodald                       ../engine/source/output/anim/generate/nodald.F
-      !||--- called by ------------------------------------------------------
-      !||    genani                       ../engine/source/output/anim/generate/genani.F
-      !||    h3d_nodal_scalar             ../engine/source/output/h3d/h3d_results/h3d_nodal_scalar.F
-      !||--- calls      -----------------------------------------------------
-      !||    anim_nodal_contour_fvmbags   ../engine/source/output/anim/generate/anim_nodal_contour_fvmbags.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    fvbag_mod                    ../engine/share/modules/fvbag_mod.F
-      !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
-      !||    i22bufbric_mod               ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22edge_mod                  ../common_source/modules/interfaces/cut-cell-buffer_mod.F
-      !||    i22tri_mod                   ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    initbuf_mod                  ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    nodald                       ../engine/source/output/anim/generate/nodald.F
+!||--- called by ------------------------------------------------------
+!||    genani                       ../engine/source/output/anim/generate/genani.F
+!||    h3d_nodal_scalar             ../engine/source/output/h3d/h3d_results/h3d_nodal_scalar.F
+!||--- calls      -----------------------------------------------------
+!||    anim_nodal_contour_fvmbags   ../engine/source/output/anim/generate/anim_nodal_contour_fvmbags.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    fvbag_mod                    ../engine/share/modules/fvbag_mod.F
+!||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
+!||    i22bufbric_mod               ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22edge_mod                  ../common_source/modules/interfaces/cut-cell-buffer_mod.F
+!||    i22tri_mod                   ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    initbuf_mod                  ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE NODALD(IFUNC    , WA4      , WA4_FVM, IFLOW  , RFLOW,  
      .                  IPARG    , ELBUF_TAB, IX     , NIX    , NUMEL, 
      .                  ITAB     , NV46     , MONVOL , VOLMON , AIRBAGS_TOTAL_FVM_IN_H3D,
@@ -47,7 +47,7 @@ C-----------------------------------------------
 C   This subroutine defines & writes nodal Density requested by Engine keywords /ANIM/NODA/DENS or /H3D/NODA/DENS
 C   /INTER/TYPE22   (nodal Density from polyhedra, specific buffer).
 C   /MONVOL/FVMBAG* (nodal Density from polyhedra, specific buffer).
-C   DEFAULT         (nodal PresDensitysure from adjacent elems)
+C   DEFAULT         (nodal Density from adjacent elems)
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------
@@ -87,14 +87,15 @@ C-----------------------------------------------
       INTEGER,INTENT(IN) :: MONVOL(SMONVOL)
       my_real,INTENT(IN) :: VOLMON(SVOLMON)
       INTEGER,INTENT(INOUT) :: IS_WRITTEN_NODE_FVM(AIRBAGS_TOTAL_FVM_IN_H3D),IS_WRITTEN_NODE(NUMNOD)
-      TYPE(FVBAG_DATA),INTENT(IN) :: FVDATA_P
+      TYPE(FVBAG_DATA), INTENT(IN) :: FVDATA_P(NFVBAG) 
+
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IADI, IADR, I, ITYP, NINOUT, NNO, NEL, II1, II2,
-     .        IR1, IR2, J, JJ, NNO_L, NNI_L, II3, II4, JJJ, NNI,
+      INTEGER   I, ITYP, NEL,
+     .          J, JJ,
      .        IALEL,NNOD,IPOS,IV,NGv,IDLOCv,J1,J2,IBV
-      INTEGER MLW, NG, KCVT, II, NBF, NBL, IB, ICELL, NIN, MCELL
+      INTEGER  NG, NBF, NBL, IB, ICELL, NIN, MCELL
       INTEGER G_VOL
       TYPE(G_BUFEL_)  ,POINTER :: GBUF,GBUFv     
       my_real, ALLOCATABLE, DIMENSION(:) :: COUNT_VOL    

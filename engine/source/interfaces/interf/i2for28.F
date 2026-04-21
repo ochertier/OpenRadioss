@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2for28       ../engine/source/interfaces/interf/i2for28.F
-      !||--- called by ------------------------------------------------------
-      !||    intti2f       ../engine/source/interfaces/interf/intti2f.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2for28_cin   ../engine/source/interfaces/interf/i2for28_cin.F
-      !||    i2for28_pen   ../engine/source/interfaces/interf/i2for28_pen.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod       ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i2for28       ../engine/source/interfaces/interf/i2for28.F
+!||--- called by ------------------------------------------------------
+!||    intti2f       ../engine/source/interfaces/interf/intti2f.F
+!||--- calls      -----------------------------------------------------
+!||    i2for28_cin   ../engine/source/interfaces/interf/i2for28_cin.F
+!||    i2for28_pen   ../engine/source/interfaces/interf/i2for28_pen.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod       ../engine/share/modules/h3d_mod.F
+!||====================================================================
       SUBROUTINE I2FOR28(
      .           X           ,V           ,VR          ,A           ,AR          ,
      .           MS          ,IN          ,STIFN       ,STIFR       ,WEIGHT      ,
@@ -71,7 +71,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,NI,NINDXC,NINDXP
+      INTEGER I,NINDXC,NINDXP
       INTEGER INDXC(NSN),INDXP(NSN)
 C=======================================================================
       INDXC(1:NSN) = 0      

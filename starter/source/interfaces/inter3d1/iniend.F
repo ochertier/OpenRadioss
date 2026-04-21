@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    iniend                 ../starter/source/interfaces/inter3d1/iniend.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    i6pen3                 ../starter/source/interfaces/inter3d1/i6pen3.F
-      !||    i6sti3                 ../starter/source/interfaces/inter3d1/i6sti3.F
-      !||    ifrontplus             ../starter/source/spmd/node/frontplus.F
-      !||    inint0                 ../starter/source/interfaces/interf1/inint0.F
-      !||    invoi3                 ../starter/source/interfaces/inter3d1/invoi3.F
-      !||    nlocal                 ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    front_mod              ../starter/share/modules1/front_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    iniend                 ../starter/source/interfaces/inter3d1/iniend.F
+!||--- called by ------------------------------------------------------
+!||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    i6pen3                 ../starter/source/interfaces/inter3d1/i6pen3.F
+!||    i6sti3                 ../starter/source/interfaces/inter3d1/i6sti3.F
+!||    ifrontplus             ../starter/source/spmd/node/frontplus.F
+!||    inint0                 ../starter/source/interfaces/interf1/inint0.F
+!||    invoi3                 ../starter/source/interfaces/inter3d1/invoi3.F
+!||    nlocal                 ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    front_mod              ../starter/share/modules1/front_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INIEND(INSCR,X    ,IXS       ,
      .                  IXC  ,PM   ,GEO       ,IPARI    ,NOIN ,
      .                  INTC ,ITAB ,MS        ,NPBY     ,LPBY ,
@@ -100,9 +100,9 @@ C=======================================================================
       ICOR  =IPARI(58)
 C
       IF (NSPMD > 1) THEN
-C      les interfaces type 7 sont distribuees, les autres centralisees sur P0
+C      interfaces of type 7 are distributed, the others centralized on P0
        INCREM = 1
-C pas de NSN defini en type 16 et interface non spmd compatible
+C No NSN Defini in type 16 and non -SPMD interface compatible
        IF(NTY==16.OR.NTY==17) RETURN
 C
        IF(NTY==7.OR.NTY==10.OR.NTY==11.OR.
@@ -112,7 +112,7 @@ C
        IF(NTY==8) THEN
          DO P=1,NSPMD
            DO I=1,NSN
-         !Comment ne donner les SECONDARYs qu'aux procs
+         !How to give the secondarys only to the procs
          
              CALL IFRONTPLUS(INTBUF_TAB%NSV(I),P)
            END DO
@@ -152,12 +152,12 @@ C  interface ALE -> c. c. traitees par P0
              IF (NLOCAL(N,P)==0) THEN
                GO TO 200
              ENDIF
-c            pas d optimisation possible
+c            No optimization possible
  100         DO JJ=1,NIR
                K = INTBUF_TAB%IRECTM((L-1)*4+JJ)
                CALL IFRONTPLUS(K,P)
              ENDDO
-c            optimisation possible
+c            possible optimization
  200         CONTINUE
            ENDDO
          ENDDO
@@ -344,16 +344,16 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       END
 
-      !||====================================================================
-      !||    iniend2d        ../starter/source/interfaces/inter3d1/iniend.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus      ../starter/source/spmd/node/frontplus.F
-      !||    nlocal          ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    front_mod       ../starter/share/modules1/front_mod.F
-      !||====================================================================
+!||====================================================================
+!||    iniend2d        ../starter/source/interfaces/inter3d1/iniend.F
+!||--- called by ------------------------------------------------------
+!||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus      ../starter/source/spmd/node/frontplus.F
+!||    nlocal          ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    front_mod       ../starter/share/modules1/front_mod.F
+!||====================================================================
       SUBROUTINE INIEND2D(IPARI,NOIN,MS,INTBUF_TAB )
 C-----------------------------------------------
 C   M o d u l e s
@@ -368,14 +368,12 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NOIN
-      INTEGER IPARI(*)
-      my_real
-     .   MS(*)
+      INTEGER :: NOIN
+      INTEGER :: IPARI(*)
+      my_real :: MS(*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
 C-----------------------------------------------
@@ -386,8 +384,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NRTS, NRTM, NSN, NMN, NTY, NOINT,
-     .   I, INCREM, P, II,JJ,NIR,K,N,L
+      INTEGER NRTS, NRTM, NSN, NMN, NTY, NOINT, I, INCREM, P, II,JJ,NIR,K,N,L
 C=======================================================================
       NRTS  =IPARI(3)
       NRTM  =IPARI(4)
@@ -396,8 +393,8 @@ C=======================================================================
       NTY   =IPARI(7)
       NOINT =IPARI(15)
 C
-      IF(IMACH==3.AND.NSPMD>1) THEN
-C      les interfaces type 7 sont distribuees, les autres centralisees sur P0
+      IF(NSPMD>1) THEN
+C      interfaces of type 7 are distributed, the others centralized on P0
        INCREM = 1
        IF(NTY==7.OR.NTY==10.OR.NTY==11.OR.NTY==22) INCREM = 100
 C
@@ -435,12 +432,12 @@ C interface ALE -> c. c. traitees par P0
              IF (NLOCAL(N,P)==0) THEN
                GO TO 200
              ENDIF
-C pas d optimisation possible
+C No optimization possible
  100         DO JJ=1,NIR
                K = INTBUF_TAB%IRECTM((L-1)*4+JJ)
                      CALL IFRONTPLUS(K,P)
              ENDDO
-C optimisation possible
+C possible optimization
  200         CONTINUE
            ENDDO
          ENDDO

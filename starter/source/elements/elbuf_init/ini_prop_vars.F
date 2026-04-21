@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ini_prop_vars        ../starter/source/elements/elbuf_init/ini_prop_vars.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties   ../starter/source/properties/hm_read_properties.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod         ../starter/share/modules1/elbuftag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ini_prop_vars        ../starter/source/elements/elbuf_init/ini_prop_vars.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties   ../starter/source/properties/hm_read_properties.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod         ../starter/share/modules1/elbuftag_mod.F
+!||====================================================================
       SUBROUTINE INI_PROP_VARS(PROP_TAG)
 C-----------------------------------------------
 C   M o d u l e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m25law                ../engine/source/materials/mat/mat025/m25law.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain                 ../engine/source/materials/mat_share/mmain.F90
-      !||--- calls      -----------------------------------------------------
-      !||    mat25_crasurv_s       ../engine/source/materials/mat/mat025/mat25_crasurv_s.F90
-      !||    mat25_tsaiwu_s        ../engine/source/materials/mat/mat025/mat25_tsaiwu_s.F90
-      !||    mreploc               ../engine/source/materials/mat_share/mreploc.F
-      !||    mrotens               ../engine/source/materials/mat_share/mrotens.F
-      !||--- uses       -----------------------------------------------------
-      !||    mat25_crasurv_s_mod   ../engine/source/materials/mat/mat025/mat25_crasurv_s.F90
-      !||    mat25_tsaiwu_s_mod    ../engine/source/materials/mat/mat025/mat25_tsaiwu_s.F90
-      !||    matparam_def_mod      ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    m25law                ../engine/source/materials/mat/mat025/m25law.F
+!||--- called by ------------------------------------------------------
+!||    mmain                 ../engine/source/materials/mat_share/mmain.F90
+!||--- calls      -----------------------------------------------------
+!||    mat25_crasurv_s       ../engine/source/materials/mat/mat025/mat25_crasurv_s.F90
+!||    mat25_tsaiwu_s        ../engine/source/materials/mat/mat025/mat25_tsaiwu_s.F90
+!||    mreploc               ../engine/source/materials/mat_share/mreploc.F
+!||    mrotens               ../engine/source/materials/mat_share/mrotens.F
+!||--- uses       -----------------------------------------------------
+!||    mat25_crasurv_s_mod   ../engine/source/materials/mat/mat025/mat25_crasurv_s.F90
+!||    mat25_tsaiwu_s_mod    ../engine/source/materials/mat/mat025/mat25_tsaiwu_s.F90
+!||    matparam_def_mod      ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||====================================================================
       SUBROUTINE M25LAW(MAT_PARAM,
      1   PM,        OFF,       SIG,
      2   EINT,      S01,       S02,       S03,
@@ -42,7 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5   D6,        RX,        RY,        RZ,
      6   SX,        SY,        SZ,        TX,
      7   TY,        TZ,        GAMA,      VNEW,
-     8   SSP,       VOL,       EPSP,      WPLA,
+     8   SSP,       VOL,       EPSD,      WPLA,
      9   EPST,      SIGL,      TSAIWU,          
      A   FLAY,      NGL,       NEL,       NFT,             
      B   ILAY,      NPT,       IPG,
@@ -82,12 +82,10 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: L_DMG
       INTEGER NGL(MVSIZ),ILAY,NEL,IPG
       INTEGER, INTENT(INOUT) :: OUTV(NEL)
-C     REAL
+      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: EPSD ! local equivalent strain rate
       my_real
      .   PM(NPROPM),OFF(*), SIG(NEL,6), WPLA(*), GAMA(MVSIZ,6), 
-     .   EINT(*), EPSP(*),
-     .   RX(*) ,RY(*),RZ(*) ,SX(*),SY(*),SZ(*),
-     .   TX(*) ,TY(*) ,TZ(*)
+     .   EINT(*),RX(*) ,RY(*),RZ(*) ,SX(*),SY(*),SZ(*),TX(*) ,TY(*) ,TZ(*)
       my_real
      .   D1(*), D2(*), D3(*), D4(*),
      .   D5(*), D6(*),
@@ -100,22 +98,22 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NFIS1(MVSIZ), NFIS2(MVSIZ), NFIS3(MVSIZ), INDX(MVSIZ)
-      INTEGER I, J, JADR, J1, J2, J3, JJ, II, I2, NINDX, I1,
+      INTEGER I, J, II, NINDX,
      .   IOFF,JOFF,IDIR,IFLAG
 C     REAL
       my_real
-     .   DEGMB(MVSIZ),DEGFX(MVSIZ),
-     .   WPLAR(MVSIZ),STRN1(MVSIZ),STRN2(MVSIZ),STRN3(MVSIZ),
-     .   DAMCR(MVSIZ,2), DMAXT(MVSIZ),STRP1(MVSIZ) ,STRP2(MVSIZ),
-     .   EPSPL(MVSIZ),S1(MVSIZ),S2(MVSIZ),S3(MVSIZ),
+     .   
+     .   WPLAR(MVSIZ),
+     .    DMAXT(MVSIZ) ,
+     .   S1(MVSIZ),S2(MVSIZ),S3(MVSIZ),
      .   S4(MVSIZ),S5(MVSIZ),S6(MVSIZ),
      .   EP1(MVSIZ),EP2(MVSIZ),EP3(MVSIZ),EP4(MVSIZ),EP5(MVSIZ),
      .   EP6(MVSIZ),EPST1(MVSIZ),EPST2(MVSIZ),EPSM1(MVSIZ),EPSM2(MVSIZ),
      .   DMAX(MVSIZ),R11(MVSIZ),R12(MVSIZ),R13(MVSIZ),R21(MVSIZ),
      .   R22(MVSIZ),R23(MVSIZ),R31(MVSIZ),R32(MVSIZ),R33(MVSIZ)
        my_real 
-     .   ASRATE,EPS_K2, EPS_M2, SIGT1, SIGT2, 
-     .   ZT, WMC, VISC, DTINV ,EPD,DAV,DAM1,DAM2,DT5,
+     .   ASRATE, 
+     .   EPD,DAV,DAM1,DAM2,DT5,
      .   EPST1_1,EPST2_1,EPSM1_1,EPSM2_1,DMAX_1,SSP_1
 C=======================================================================
 C     Formulation flag
@@ -139,16 +137,15 @@ C-----------------------------------------------------------
         DMAXT(I) = ZERO
       ENDDO  
 C-----------------------------------------------------------
-C     STRAIN RATE FILTERING (EQUIVALENT EPSP)
+C     STRAIN RATE FILTERING (EQUIVALENT EPSD)
 C-----------------------------------------------------------
       ASRATE = ASRATE / (ASRATE + ONE)   
       DO I=1,NEL                                                                                                    
         DAV = -THIRD*(D1(I)+D2(I)+D3(I))                         
-        EPD = HALF*((D1(I)+DAV )**2+(D2(I)+DAV)**2          
-     .                                +(D3(I)+DAV)**2)           
-     .         + FOURTH*(D4(I)**2+D5(I)**2+D6(I)**2)              
+        EPD = HALF*((D1(I)+DAV )**2 + (D2(I)+DAV)**2 + (D3(I)+DAV)**2)           
+     .      + FOURTH*(D4(I)**2 + D5(I)**2 + D6(I)**2)
         EPD = SQRT(THREE*EPD)/THREE_HALF                        
-        EPSP(I) = ASRATE*EPD + (ONE - ASRATE)*EPSP(I)     
+        EPSD(I) = ASRATE*EPD + (ONE - ASRATE)*EPSD(I)   
       ENDDO                                                        
 C--------------------------------------------
 C     STRESS TRANSFORMATION (GLOBAL -> FIBER)
@@ -196,7 +193,7 @@ C stress
      .               R31,R32,R33) 
        ENDIF  
 C-----------------------------------------------------------
-C     CONTRAINTES PLASTIQUEMENT ADMISSIBLES
+C     PLASTICALLY ADMISSIBLE STRESSES
 C-----------------------------------------------------------
       IF (IFLAG == 0) THEN    ! Tsai-Wu
         CALL MAT25_TSAIWU_S(MAT_PARAM,
@@ -204,7 +201,7 @@ C-----------------------------------------------------------
      2                    S1     ,S2   ,S3    ,S4   ,S5   ,S6   ,
      3                    EP1    ,EP2  ,EP3   ,EP4  , EP5 ,EP6  ,
      4                    EPST   ,NFIS1,NFIS2 ,NFIS3,
-     5                    WPLAR  ,EPSP ,WPLA  ,SIGL ,ILAY ,IPG  ,
+     5                    WPLAR  ,EPSD ,WPLA  ,SIGL ,ILAY ,IPG  ,
      6                    TSAIWU ,TT   ,IMCONV,MVSIZ,IOUT ,DMG  ,
      7                    L_DMG  ,OUTV)
       
@@ -215,7 +212,7 @@ C-----------------------------------------------------------
      2             S1   ,S2   ,S3  ,S4   ,S5   ,S6    ,
      3             EP1  ,EP2  ,EP3 ,EP4  , EP5 ,EP6,
      4             EPST ,NFIS1,NFIS2,NFIS3,
-     5             WPLAR,EPSP, WPLA, SIGL, ILAY,
+     5             WPLAR,EPSD, WPLA, SIGL, ILAY,
      6             IPG  ,TSAIWU,TT,IMCONV  ,MVSIZ   ,IOUT,
      7             DMG  ,L_DMG ,OUTV)
 
@@ -323,7 +320,7 @@ C---------------------------
         ENDDO
       ENDIF       
 C----------------------------
-C     TEST DE RUPTURE 
+C     rupture test
 C----------------------------
       DO  I=1,NEL
         IF(OFF(I) < EM01) OFF(I)=ZERO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    srepiso3     ../engine/source/elements/solid/solide/srepiso3.F
-      !||--- called by ------------------------------------------------------
-      !||    scoor3       ../engine/source/elements/solid/solide/scoor3.F
-      !||    scoor3_fvm   ../engine/source/ale/alefvm/scoor3_fvm.F
-      !||    srcoor3      ../engine/source/elements/solid/solide/srcoor3.F
-      !||====================================================================
+!||====================================================================
+!||    srepiso3     ../engine/source/elements/solid/solide/srepiso3.F
+!||--- called by ------------------------------------------------------
+!||    s6zrcoor3    ../engine/source/elements/solid/solide6z/s6zrcoor3.F90
+!||    scoor3       ../engine/source/elements/solid/solide/scoor3.F
+!||    scoor3_fvm   ../engine/source/ale/alefvm/scoor3_fvm.F
+!||    srcoor3      ../engine/source/elements/solid/solide/srcoor3.F
+!||====================================================================
       SUBROUTINE SREPISO3(
      1   X1,      X2,      X3,      X4,
      2   X5,      X6,      X7,      X8,

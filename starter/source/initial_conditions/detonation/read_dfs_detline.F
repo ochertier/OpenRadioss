@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_dfs_detline         ../starter/source/initial_conditions/detonation/read_dfs_detline.F
-      !||--- called by ------------------------------------------------------
-      !||    read_detonators          ../starter/source/initial_conditions/detonation/read_detonators.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    nintri                   ../starter/source/system/nintrr.F
-      !||    nodgrnr5                 ../starter/source/starter/freform.F
-      !||    unused_mat_detonator     ../starter/source/initial_conditions/detonation/unused_mat_detonator.F
-      !||    usr2sys                  ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod           ../starter/share/modules1/detonators_mod.F
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_dfs_detline         ../starter/source/initial_conditions/detonation/read_dfs_detline.F
+!||--- called by ------------------------------------------------------
+!||    read_detonators          ../starter/source/initial_conditions/detonation/read_detonators.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    nintri                   ../starter/source/system/nintrr.F
+!||    nodgrnr5                 ../starter/source/starter/freform.F
+!||    unused_mat_detonator     ../starter/source/initial_conditions/detonation/unused_mat_detonator.F
+!||    usr2sys                  ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod           ../starter/share/modules1/detonators_mod.F
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE READ_DFS_DETLINE(DETONATORS,X,IPM,ITABM1,UNITAB,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -207,10 +207,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   O u t p u t   F o r m a t
 C-----------------------------------------------      
- 1001 FORMAT(///'DETONATION LINE           ',I10,/5X,
+ 1001 FORMAT(///5X,
+     &          'DETONATION LINE           ',I10,/5X,
      &          '---------------           ',/5X,
      &          'CONFIDENTIAL DATA')    
- 1500 FORMAT(///'DETONATION LINE            ',I10,/5X,
+ 1500 FORMAT(///5X,
+     &          'DETONATION LINE            ',I10,/5X,
      &          '---------------            ',/5X,
      &          'X-COORDINATE FIRST POINT  =',1PG20.13,/5X,
      &          'Y-COORDINATE FIRST POINT  =',1PG20.13,/5X,
@@ -220,7 +222,8 @@ C-----------------------------------------------
      &          'Z-COORDINATE SECOND POINT =',1PG20.13,/5X,
      &          'LIGHTING TIME             =',1PG20.13,/5X,
      &          'EXPLOSIVE MATERIAL NUMBER =',I10 )
- 1501 FORMAT(///'DETONATION LINE            ',I10,/5X,
+ 1501 FORMAT(///5X,
+     &          'DETONATION LINE            ',I10,/5X,
      &          '---------------            ',/5X,
      &          'FIRST NODE ID             =',I10     ,/5X,     
      &          ' X-COORDINATE FIRST POINT =',1PG20.13,/5X,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
-      !||--- called by ------------------------------------------------------
-      !||    q4ke2          ../engine/source/elements/solid_2d/quad4/q4ke2.F
-      !||    s10ke3         ../engine/source/elements/solid/solide10/s10ke3.F
-      !||    s20ke3         ../engine/source/elements/solid/solide20/s20ke3.F
-      !||    s4ke3          ../engine/source/elements/solid/solide4/s4ke3.F
-      !||    s6cke3         ../engine/source/elements/thickshell/solide6c/s6cke3.F
-      !||    s8cke3         ../engine/source/elements/thickshell/solide8c/s8cke3.F
-      !||    s8zke3         ../engine/source/elements/solid/solide8z/s8zke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_etfac_s    ../engine/source/elements/solid/solide8z/get_etfac_s.F
-      !||    gettrans       ../engine/source/elements/solid/solide8z/gettrans.F
-      !||    mstiforth      ../engine/source/elements/solid/solide8z/mstiforth.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_ktan       ../engine/share/modules/impbufdef_mod.F
-      !||    imp_ktan_def   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
+!||--- called by ------------------------------------------------------
+!||    q4ke2          ../engine/source/elements/solid_2d/quad4/q4ke2.F
+!||    s10ke3         ../engine/source/elements/solid/solide10/s10ke3.F
+!||    s20ke3         ../engine/source/elements/solid/solide20/s20ke3.F
+!||    s4ke3          ../engine/source/elements/solid/solide4/s4ke3.F
+!||    s6cke3         ../engine/source/elements/thickshell/solide6c/s6cke3.F
+!||    s8cke3         ../engine/source/elements/thickshell/solide8c/s8cke3.F
+!||    s8zke3         ../engine/source/elements/solid/solide8z/s8zke3.F
+!||--- calls      -----------------------------------------------------
+!||    get_etfac_s    ../engine/source/elements/solid/solide8z/get_etfac_s.F
+!||    gettrans       ../engine/source/elements/solid/solide8z/gettrans.F
+!||    mstiforth      ../engine/source/elements/solid/solide8z/mstiforth.F
+!||--- uses       -----------------------------------------------------
+!||    imp_ktan       ../engine/share/modules/impbufdef_mod.F
+!||    imp_ktan_def   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE MMATS(JFT     ,JLT     ,PM    ,MAT    ,HH    ,
      .                  MTN    ,IORTH   ,IPM   ,IGEO   ,GAMA  ,
      .                  UPARAM ,CC      ,CG    ,G33    ,JHBE  ,
@@ -72,12 +72,12 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,MX,IAD,J,K,IPLAST
+      INTEGER I,MX,IPLAST
 C     REAL
       my_real
      .   NU,LAMDA,GG,C1,QC(9,MVSIZ),QCG(9,MVSIZ),QG(9,MVSIZ),
-     .   QGC(9,MVSIZ),G3(3,MVSIZ),TT,TV,CA,CB,CN,G(MVSIZ),QH(MVSIZ),
-     .   FAC(MVSIZ),SMIN,S1,NU12,NU21,EFAC
+     .   QGC(9,MVSIZ),G3(3,MVSIZ),
+     .   FAC(MVSIZ),S1,NU12,NU21,EFAC
 C-----------------------------------------------
       CALL GET_ETFAC_S(NEL,FAC,MTN)
       IF (IORTH>0) THEN

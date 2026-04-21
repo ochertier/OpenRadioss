@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    anim_dcod_key_0        ../engine/source/output/anim/reader/anim_dcod_key_0.F
-      !||--- called by ------------------------------------------------------
-      !||    freanim                ../engine/source/output/anim/reader/freanim.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../engine/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    stack_mod              ../engine/share/modules/stack_mod.F
-      !||====================================================================
-      SUBROUTINE ANIM_DCOD_KEY_0(KEY2,KEY3,KEY4,KEY5,KEY6,JERR,IXITKEY)
+!||====================================================================
+!||    anim_dcod_key_0        ../engine/source/output/anim/reader/anim_dcod_key_0.F
+!||--- called by ------------------------------------------------------
+!||    freanim                ../engine/source/output/anim/reader/freanim.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../engine/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    stack_mod              ../engine/share/modules/stack_mod.F
+!||====================================================================
+      SUBROUTINE ANIM_DCOD_KEY_0(OUTPUT,KEY2,KEY3,KEY4,KEY5,KEY6,JERR,IXITKEY)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE STACK_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARKEY
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,6 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout) :: OUTPUT
       INTEGER JERR, IXITKEY
       CHARACTER(LEN=NCHARKEY) :: KEY2
       CHARACTER(LEN=NCHARKEY) :: KEY3
@@ -61,7 +64,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IDX, N1, N2, N3, ITYP,IADG, J,NTITLE,IUS,ILAY,IPT
+      INTEGER I, IDX,IDX0,IDX1,IDX2, N1, N2, N3, ITYP,IADG, J,NTITLE,IUS,ILAY,IPT
       my_real X0,Y0,Z0,VNX,VNY,VNZ,V0
       LOGICAL :: LAW51_PHASE1, LAW51_PHASE2, LAW51_PHASE3, LAW51_PHASE4
 C-----------------------------------------------
@@ -97,7 +100,6 @@ C--------------------------
           ANIM_V(3) = 1
         ELSEIF(KEY3(1:4)=='CONT' .AND. KEY3(1:5)/='CONT2'.AND.KEY4(1:3)/='MAX')THEN
           ANIM_V(4) = 1
-          ANIMCONT = ANIM_V(4)  
         ELSEIF(KEY3(1:4)=='FINT')THEN
           ANIM_V(5) = 1
         ELSEIF(KEY3(1:4)=='FEXT')THEN
@@ -105,12 +107,12 @@ C--------------------------
         ELSEIF(KEY3(1:4)=='FOPT')THEN
           ANIM_V(7) = 1
           ANIM_V(8) = 1
-C         vitesses de rotations
+C         rotation velocities
         ELSEIF(KEY3(1:4)=='VROT')THEN
           ANIM_V(9) = 1
-C         vitesses fluides pour alebag et /bem/flow
+C         fluid velocities for alebag and /bem/flow
         ELSEIF(KEY3(1:4)=='FVEL'.OR.KEY3(1:4)=='VFLU')THEN
-C         vitesses fluides pour alebag et /bem/flow
+C         fluid velocities for alebag and /bem/flow
           ANIM_V(10) = 1
         ELSEIF(KEY3(1:5)=='FRES')THEN
           IF ((ANIM_V(5)/=1.OR.ANIM_V(6)/=1).AND.IDTMINS==0.AND.IDTMINS_INT==0)THEN
@@ -150,8 +152,7 @@ C         vitesses fluides pour alebag et /bem/flow
         ELSEIF (KEY3(1:5)=='ZFINT')THEN !inter22
           ANIM_V(25) = 1    
         ELSEIF (KEY3(1:4)=='CONT'.AND.KEY4(1:3)=='MAX')THEN 
-          ANIM_V(26) = 1    
-          ANIMCONT = ANIM_V(4)  
+          ANIM_V(26) = 1
           ANIM_V(4) = 1     
         ELSEIF(KEY3(1:6)=='PCONT2')THEN
          ANIM_V(27) = 1
@@ -282,7 +283,7 @@ C---------------------------------------
              ENDIF           
         ELSE IF(KEY3(1:3)=='CRK') THEN
           ! XFEM for layered shell (real crack path visualisation)
-c          ANIM_CRK = 1
+C          ANIM_CRK = 1
 C--------------------------
 C        SHELL:TENSOR
 C--------------------------
@@ -1163,7 +1164,7 @@ C-----
         ELSEIF(KEY3(1:5)=='SIGEQ')THEN
            ANIM_CE(10677) = 1
         ELSEIF(KEY3(1:4)=='BULK' .OR. KEY3(1:4)=='QVIS')THEN
-           ANIM_CE(11888) = 1   !PID15 uses ANIM_CE(10678:11887)
+           ANIM_CE(11888) = 1   !PID15 UNIM_CE (10678: 11887)
         ELSEIF(KEY3(1:4)=='TDET')THEN
            ANIM_CE(11889) = 1
         ELSEIF(KEY3(1:5)=='LAW20')THEN
@@ -1499,7 +1500,7 @@ c
         ELSEIF(KEY3(1:7) == 'VSTRAIN')THEN
           IDX = 15898 + 4*MX_PLY_ANIM
           read(KEY4, '(I2)') ILAY
-          if(ILAY >= 1 .and. ILAY <= 21)then
+          if(ILAY >= 1 .and. ILAY <= 10)then
             ANIM_CE(IDX+ILAY) = 1
           else
             ANIM_CE(IDX) = 1
@@ -1557,8 +1558,8 @@ C--------------------------
               ENDIF
             ENDIF
           ELSEIF(KEY4(1:5)=='EPSDO')THEN
-c             IEPSDOT = 1
-c             ANIM_ST(3) = 1
+C             IEPSDOT = 1
+C             ANIM_ST(3) = 1
           ELSEIF(KEY4(1:4)=='DAMA')THEN
              ANIM_ST(4) = 1
           ELSEIF(KEY4(1:4)=='EPSP')THEN
@@ -1617,7 +1618,7 @@ C--------------------------
          IF (LAW51_PHASE2) ANIM_SE(4898) = 1 !DENS_law51-phase2
          IF (LAW51_PHASE3) ANIM_SE(4899) = 1 !DENS_law51-phase3
          IF (LAW51_PHASE4) ANIM_SE(4900) = 1 !DENS_law51-phase4             
-           !ANIM_SE(4935) = 1  !law37 -rho_liquid
+           !Anim_se (4935) = 1! Law37 -rho_liquid
            !ANIM_SE(4936) = 1  !law37 - rho_gas             
       ELSEIF(KEY3(1:4)=='ENER')THEN
          ANIM_SE(3) = 1
@@ -1877,7 +1878,7 @@ C--------------------------
          IF (LAW51_PHASE3) ANIM_SE(4933) = 1
          IF (LAW51_PHASE4) ANIM_SE(4934) = 1                                 
 
-CTTENTION : NUMEROS RESERVES ANIM_SE pour SOUS-MATERIAUX LOI51
+CTentation: numeros reserves anim_save for sub-materiaux law 51
 C         ANIM_SE(4897) ==> !DENS_law51-phase1
 C         ANIM_SE(4898) ==> !           phase2
 C         ANIM_SE(4899) ==> !           phase3
@@ -1910,7 +1911,7 @@ C         ANIM_SE(4920) ==> !           phase4
           ANIM_SE(4924) = 1
           ANIM_SE(4925) = 1                                        
 
-CTTENTION : NUMEROS RESERVES ANIM_SE pour SOUS-MATERIAUX LOI51
+CTentation: numeros reserves anim_save for sub-materiaux law 51
 C         ANIM_SE(4926) ==> !MASS_law51-phase1
 C         ANIM_SE(4927) ==> !           phase2
 C         ANIM_SE(4928) ==> !           phase3
@@ -1919,12 +1920,12 @@ C         ANIM_SE(4929) ==> !           phase4
       ELSEIF(KEY3(1:4)=='TDET')THEN
         ANIM_SE(4930) = 1
 
-CTTENTION : NUMEROS RESERVES ANIM_SE pour SOUS-MATERIAUX LOI51
+CTentation: numeros reserves anim_save for sub-materiaux law 51
 C         ANIM_SE(4931) ==> !QVIS_law51-phase1
 C         ANIM_SE(4932) ==> !           phase2
 C         ANIM_SE(4933) ==> !           phase3
 C         ANIM_SE(4934) ==> !           phase4
-C         ANIM_SE(4935) ==> !   law37 - liquid
+C         Anim_se (4935) ==>!Law37 - Liquid
 C         ANIM_SE(4936) ==> !   law37 -    gas
 
       ELSEIF(KEY3(1:5)=='DT   ')THEN
@@ -2040,7 +2041,7 @@ C         ANIM_SE(4936) ==> !   law37 -    gas
       ELSEIF(KEY3(1:7)=='VSTRAIN')THEN
           read(KEY4, '(I2)',ERR=2206) ILAY
 2206      CONTINUE
-          if(ILAY >= 1 .and. ILAY <= 21)then
+          if(ILAY >= 1 .and. ILAY <= 10)then
             ANIM_SE(5173+ILAY) = 1
           else
             ANIM_SE(5173) = 1
@@ -2169,7 +2170,7 @@ C--------------------------
             ANIM_SE(4900) = 1 !DENS_law51-phase4
             ANIM_CE(11893) = 1
          ENDIF
-           !ANIM_SE(4935) = 1  !law37 -rho_liquid
+           !Anim_se (4935) = 1! Law37 -rho_liquid
            !ANIM_SE(4936) = 1  !law37 - rho_gas
        ELSEIF(KEY3(1:4)=='ENER')THEN
          ANIM_E(3) = 1
@@ -2472,10 +2473,10 @@ C--------------------------
          ANIM_SE(284)   = 1 !vfrac phase2 USR4 (law51 & 37)
          ANIM_SE(285)   = 1 !vfrac phase3 USR22 (law51)
          ANIM_SE(286)   = 1 !vfrac phase4 USR48 (law51)
-         ANIM_CE(10248) = 1 !vfrac phase1 (law20/51)
-         ANIM_CE(10249) = 1 !vfrac phase2 (law20/51)
-         ANIM_CE(10250) = 1 !vfrac phase3 (law20/51)
-         ANIM_CE(10251) = 1 !vfrac phase4 (law20/51)           
+         ANIM_CE(10248) = 1 !VFRAC Phase1 (Law20/51)
+         ANIM_CE(10249) = 1 !VFRAC Phase2 (Law20/51)
+         ANIM_CE(10250) = 1 !VFRAC Phase3 (Law20/51)
+         ANIM_CE(10251) = 1 !VFRAC Phase4 (Law20/51)           
       ELSEIF(KEY3(1:5)=='BFRAC')THEN
          ANIM_SE(887)   = 1
          ANIM_CE(10252) = 1
@@ -2572,7 +2573,7 @@ C--------------------------
          IF (LAW51_PHASE2) ANIM_SE(4932)  = 1
          IF (LAW51_PHASE3) ANIM_SE(4933)  = 1
          IF (LAW51_PHASE4) ANIM_SE(4934)  = 1                                            
-         ANIM_CE(11888) = 1   !PID15 uses ANIM_CE(10678:11887)  
+         ANIM_CE(11888) = 1   !PID15 UNIM_CE (10678: 11887)  
        ELSEIF(KEY3(1:5)=='DT   ')THEN
          IDX            = 13242 + 4*MX_PLY_ANIM  
          ANIM_SE(4937)  = 1 
@@ -2604,19 +2605,63 @@ C--------------------------
          ENDIF
        ELSEIF(KEY3(1:3) == 'VEL' .OR. KEY3(2:4) == 'VEL' )THEN
          IF(KEY3(1:5) == 'VEL  ')THEN
+           ! 3d
            ANIM_SE(4945) =1
            ANIM_SE(4946) =1
            ANIM_SE(4947) =1
            ANIM_SE(4948) =1
            ANIM_SE(4949) =1
            ANIM_SE(4950) =1 
-           ANIM_SE(4951) =1                         
+           ANIM_SE(4951) =1
+           ! 2d
+           IDX0 = 15921 + 4*MX_PLY_ANIM  ! VEL-Y 0:10
+           IDX1 = IDX0+10+1              ! VEL-Z 0:10
+           IDX2 = IDX1+10+1              ! VEL   0:10
+           ANIM_CE(IDX0) = 1
+           ANIM_CE(IDX1) = 1
+           ANIM_CE(IDX2) = 1
+           IF(KEY4(1:2) == '10')THEN
+             ANIM_CE(IDX2+10) = 1
+             ANIM_CE(IDX2+10) = 1
+             ANIM_CE(IDX2+10) = 1
+           ELSEIF(KEY4(1:1) >= '1' .AND. KEY4(1:1) <= '9') THEN
+             ILAY = ICHAR(KEY4(1:1)) - ICHAR('0')
+             ANIM_CE(IDX2+ILAY) = 1
+             ANIM_CE(IDX2+ILAY) = 1
+             ANIM_CE(IDX2+ILAY) = 1
+           ENDIF
          ELSEIF(KEY3(1:5) == 'VELX ')THEN
            ANIM_SE(4945) =1
          ELSEIF(KEY3(1:5) == 'VELY ')THEN
            ANIM_SE(4946) =1
+           IDX0 = 15921 + 4*MX_PLY_ANIM  ! VEL-Y 0:10
+           IDX1 = IDX0+10+1              ! VEL-Z 0:10
+           IDX2 = IDX1+10+1              ! VEL   0:10
+           IF(KEY4(1:2) == '10')THEN
+             ANIM_CE(IDX0+10) = 1
+             ANIM_CE(IDX0+10) = 1
+             ANIM_CE(IDX0+10) = 1
+           ELSEIF(KEY4(1:1) >= '1' .AND. KEY4(1:1) <= '9') THEN
+             ILAY = ICHAR(KEY4(1:1)) - ICHAR('0')
+             ANIM_CE(IDX0+ILAY) = 1
+             ANIM_CE(IDX0+ILAY) = 1
+             ANIM_CE(IDX0+ILAY) = 1
+           ENDIF
          ELSEIF(KEY3(1:5) == 'VELZ ')THEN
            ANIM_SE(4947) =1
+           IDX0 = 15921 + 4*MX_PLY_ANIM  ! VEL-Y 0:10
+           IDX1 = IDX0+10+1              ! VEL-Z 0:10
+           IDX2 = IDX1+10+1              ! VEL   0:10
+           IF(KEY4(1:2) == '10')THEN
+             ANIM_CE(IDX1+10) = 1
+             ANIM_CE(IDX1+10) = 1
+             ANIM_CE(IDX1+10) = 1
+           ELSEIF(KEY4(1:1) >= '1' .AND. KEY4(1:1) <= '9') THEN
+             ILAY = ICHAR(KEY4(1:1)) - ICHAR('0')
+             ANIM_CE(IDX1+ILAY) = 1
+             ANIM_CE(IDX1+ILAY) = 1
+             ANIM_CE(IDX1+ILAY) = 1
+           ENDIF
          ELSEIF(KEY3(1:5) == 'VELXY')THEN
            ANIM_SE(4948) =1
          ELSEIF(KEY3(1:5) == 'VELYZ')THEN
@@ -2711,7 +2756,7 @@ C--------------------------
          ILAY = 0
          read(KEY4, '(I2)', ERR=2205) ILAY
 2205     CONTINUE
-         if(ILAY >= 1 .and. ILAY <= 21)then
+         if(ILAY >= 1 .and. ILAY <= 10)then
            ANIM_CE(IDX+ILAY) = 1
            ANIM_SE(5173+ILAY) = 1
          else
@@ -2719,7 +2764,9 @@ C--------------------------
            ANIM_SE(5173) = 1
          endif
         !ELSEIF()
-        !  IDX = 15899 + 4*MX_PLY_ANIM +22 + 1
+        ! last used index in ANIM_CE   : IDX =  4*MX_PLY_ANIM + 15943
+        ! next availability in ANIM_CE : IDX =  4*MX_PLY_ANIM + 15944
+        ! last introduction            : VEL,VELy and VELZ for ANIM_CE (2d)
        ELSE
          IXITKEY=IXITKEY+1
        ENDIF
@@ -2924,7 +2971,7 @@ C-----------------------------
          ANIM_N(1) = 1
        ELSEIF(KEY3(1:4)=='DMAS')THEN
          ANIM_N(2) = 1
-       ELSEIF(KEY3(1:1)=='P')THEN
+       ELSEIF(KEY3(1:2)=='P ')THEN
          ANIM_N(3) = 1
        ELSEIF(KEY3(1:4)=='DENS')THEN
          ANIM_N(4) = 1
@@ -2944,7 +2991,7 @@ C-----------------------------
          ANIM_N(11) = 1
        ELSEIF(KEY3(1:5)=='DINER')THEN
          ANIM_N(12) = 1
-       ELSEIF(KEY3(1:4)=='FPOT')THEN
+       ELSEIF(KEY3(1:4)=='FPOT')THEN !potential
          ANIM_N(13) = 1
        ELSEIF(KEY3(1:5)=='NDMAS')THEN
          ANIM_N(14) = 1
@@ -2971,7 +3018,10 @@ C-----------------------------
          ANIM_N(28) = 1     
          ANIM_N(29) = 1  
        ELSEIF(KEY3(1:3)=='SSP')THEN
-         ANIM_N(30) = 1                                                                            
+         ANIM_N(30) = 1
+       ELSEIF(KEY3(1:4)=='PEXT ')THEN
+         ANIM_N(31) = 1
+         OUTPUT%DATA%ANIM_HAS_NODA_PEXT = 1
        ELSE
          IXITKEY=IXITKEY+1
        ENDIF

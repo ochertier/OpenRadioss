@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    scumualpha6   ../engine/source/elements/thickshell/solidec/scumualpha6.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cforc3      ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    dtdc_mod      ../engine/share/modules/dtdc_mod.F
-      !||====================================================================
+!||====================================================================
+!||    scumualpha6   ../engine/source/elements/thickshell/solidec/scumualpha6.F
+!||--- called by ------------------------------------------------------
+!||    s6cforc3      ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||--- uses       -----------------------------------------------------
+!||    dtdc_mod      ../engine/share/modules/dtdc_mod.F
+!||====================================================================
       SUBROUTINE SCUMUALPHA6(
      1   OFFG,    ALPHA_E, NC1,     NC2,
      2   NC3,     NC4,     NC5,     NC6,
@@ -54,7 +54,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I, J,N
+      INTEGER  I,N
 C-----------------------------------------------
 #include "lockon.inc"
       DO I=1,NEL

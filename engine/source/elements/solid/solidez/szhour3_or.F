@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    szhour3_or         ../engine/source/elements/solid/solidez/szhour3_or.F
-      !||--- called by ------------------------------------------------------
-      !||    szforc3            ../engine/source/elements/solid/solidez/szforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    gfhour_or          ../engine/source/elements/solid/solidez/gfhour_or.F
-      !||    mdama24            ../engine/source/elements/solid/solidez/mdama24.F
-      !||    mmod_norm          ../engine/source/elements/solid/solidez/mmod_norm.F
-      !||    mmodul             ../engine/source/elements/solid/solidez/mmodul.F
-      !||    szetfac            ../engine/source/elements/solid/solidez/szetfac.F
-      !||    szstrainhg         ../engine/source/elements/solid/solidez/szstrainhg.F
-      !||    szsvm_or           ../engine/source/elements/solid/solidez/szsvm_or.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    szhour3_or         ../engine/source/elements/solid/solidez/szhour3_or.F
+!||--- called by ------------------------------------------------------
+!||    szforc3            ../engine/source/elements/solid/solidez/szforc3.F
+!||--- calls      -----------------------------------------------------
+!||    gfhour_or          ../engine/source/elements/solid/solidez/gfhour_or.F
+!||    mdama24            ../engine/source/elements/solid/solidez/mdama24.F
+!||    mmod_norm          ../engine/source/elements/solid/solidez/mmod_norm.F
+!||    mmodul             ../engine/source/elements/solid/solidez/mmodul.F
+!||    szetfac            ../engine/source/elements/solid/solidez/szetfac.F
+!||    szstrainhg         ../engine/source/elements/solid/solidez/szstrainhg.F
+!||    szsvm_or           ../engine/source/elements/solid/solidez/szsvm_or.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||====================================================================
       SUBROUTINE SZHOUR3_OR(
      1   ELBUF_STR,PM,       RHO,      OFF,
      2   VX1,      VX2,      VX3,      VX4,
@@ -120,9 +120,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, MX, J,K,IET, MT,IPLAST
+      INTEGER I, MX, J, IET, MT, IPLAST
       my_real
-     .   CAQ(MVSIZ), FCL(MVSIZ), FCQ(MVSIZ),DEINT(MVSIZ),
+     . CAQ(MVSIZ), FCL(MVSIZ),DEINT(MVSIZ),
      .   H11(MVSIZ), H22(MVSIZ), H33(MVSIZ),
      .   H12(MVSIZ), H13(MVSIZ), H23(MVSIZ),
      .   HGX1(MVSIZ), HGX2(MVSIZ), HGX3(MVSIZ), HGX4(MVSIZ),
@@ -138,17 +138,16 @@ C-----------------------------------------------
      .   G_3DT(MVSIZ),NU,GG(MVSIZ),DE,DS,DSIG(6),
      .   SM1(MVSIZ),SM2(MVSIZ),SMO1(MVSIZ),SMO2(MVSIZ),SMO,
      .   JR_1(MVSIZ),JS_1(MVSIZ),JT_1(MVSIZ),NFHOUR(MVSIZ,3,4),
-     .   DFHOUR(MVSIZ,3,4),FHOURT(3,4),DT05,RHO0,ETMAX,
-     .   NUS(MVSIZ),NU2(MVSIZ),NU4(MVSIZ),NEP,E0(MVSIZ),
-     .   E_R,E_S,E_T,FAC,FAC1,FAC2,COEFH,HQ13P,HQ13N,HQ24P,HQ24N,FF,
-     .   SIG0V(MVSIZ,6)
+     . DFHOUR(MVSIZ,3,4),DT05,RHO0,
+     . NUS(MVSIZ),NU2(MVSIZ),NU4(MVSIZ),E0(MVSIZ),
+     .   E_R,E_S,E_T,FAC,FAC1,FAC2,COEFH,HQ13P,HQ13N,HQ24P,HQ24N,FF
       my_real
      .   CC(MVSIZ,3,3),CG(MVSIZ,3,3),G33(MVSIZ,3,3),GM,GMIN,DAMA_G(MVSIZ,3)
 C-----------------------------------------------
        IET =IINT
        COEFH = ZEP9999   
        IPLAST = ELBUF_STR%GBUF%G_PLA
-C---- attention : r->eta; s->zeta; t->ksi------------
+C---- note: r->eta; s->zeta; t->ksi------------
 
 C +++ MAT Visco-----
 !      DO I=1,NEL

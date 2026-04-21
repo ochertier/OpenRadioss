@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,20 +25,20 @@ C IDEBUG=1 -> output debug information into .out file
 C IOCSV=1 -> output fitting to curv.csv
 #define IOCSV 0
 !>    @param[in]   IFUNCS     SUBROUTINE handle/ID for evaluation : 1=OGDEN0/OGDEN1
-!>    @param[out]  A          updated coeeficients
+!>    @param[out]  A          updated coefficients
 !>    @param[out]  IRET       return code 
 !>                            0 : optimization succeeded;
 !>                            1 : optimization failed;
-      !||====================================================================
-      !||    mrqmin             ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_nlsqf        ../starter/source/materials/tools/nlsqf.F
-      !||    law69_nlsqf_auto   ../starter/source/materials/tools/law69_nlsqf_auto.F
-      !||--- calls      -----------------------------------------------------
-      !||    covsrt             ../starter/source/materials/tools/nlsqf.F
-      !||    inversion          ../starter/source/materials/tools/nlsqf.F
-      !||    mrqcof             ../starter/source/materials/tools/nlsqf.F
-      !||====================================================================
+!||====================================================================
+!||    mrqmin             ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    law69_nlsqf        ../starter/source/materials/tools/nlsqf.F
+!||    law69_nlsqf_auto   ../starter/source/materials/tools/law69_nlsqf_auto.F
+!||--- calls      -----------------------------------------------------
+!||    covsrt             ../starter/source/materials/tools/nlsqf.F
+!||    inversion          ../starter/source/materials/tools/nlsqf.F
+!||    mrqcof             ../starter/source/materials/tools/nlsqf.F
+!||====================================================================
       SUBROUTINE MRQMIN(X,Y,SIG,NDATA,A,IA,
      .                 MA,COVAR,ALPHA,NCA, ERRNOW, 
      .                 IFUNCS,GAMMA,IRET,ICOMP,MMAX,ATRY )  
@@ -47,7 +47,7 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
+C   C o m m o n   B l o c  s
 C-----------------------------------------------
 #include      "units_c.inc"
 C-----------------------------------------------
@@ -173,15 +173,15 @@ C-----------
 C-----------
 C
 C
-      !||====================================================================
-      !||    mrqcof    ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    mrqmin    ../starter/source/materials/tools/nlsqf.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_exit   ../starter/source/output/analyse/analyse.c
-      !||    ogden0    ../starter/source/materials/tools/nlsqf.F
-      !||    ogden1    ../starter/source/materials/tools/nlsqf.F
-      !||====================================================================
+!||====================================================================
+!||    mrqcof    ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    mrqmin    ../starter/source/materials/tools/nlsqf.F
+!||--- calls      -----------------------------------------------------
+!||    my_exit   ../starter/source/output/analyse/analyse.c
+!||    ogden0    ../starter/source/materials/tools/nlsqf.F
+!||    ogden1    ../starter/source/materials/tools/nlsqf.F
+!||====================================================================
       SUBROUTINE MRQCOF(X,Y,SIG, NDATA,
      * A,IA,MA,ALPHA,BETA,NALP,
      * ERRNOW,IFUNCS,ICOMP)  
@@ -294,12 +294,12 @@ c           IF (Y(I)<EM5) DY=EM5
       END SUBROUTINE MRQCOF
 C
       
-      !||====================================================================
-      !||    inversion      ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    mrqmin         ../starter/source/materials/tools/nlsqf.F
-      !||    mrqmin_law92   ../starter/source/materials/mat/mat092/law92_nlsqf.F
-      !||====================================================================
+!||====================================================================
+!||    inversion      ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    mrqmin         ../starter/source/materials/tools/nlsqf.F
+!||    mrqmin_law92   ../starter/source/materials/mat/mat092/law92_nlsqf.F90
+!||====================================================================
       SUBROUTINE INVERSION(A,N,NP,B,M,MP,IRET)  
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -411,11 +411,11 @@ C-----------
       END SUBROUTINE INVERSION
 C
 C
-      !||====================================================================
-      !||    covsrt   ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    mrqmin   ../starter/source/materials/tools/nlsqf.F
-      !||====================================================================
+!||====================================================================
+!||    covsrt   ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    mrqmin   ../starter/source/materials/tools/nlsqf.F
+!||====================================================================
       SUBROUTINE COVSRT(COVAR,SIZCOVAR,MA,IA,MFIT)  
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -462,13 +462,13 @@ C-----------
 !>    @param[in]    X      stretch
 !>    @param[in]    A(NA)  material parameters [mu_1, alpha_1,mu_2, alpha_2,...]
 !>    @param[out]   Y      stress 
-      !||====================================================================
-      !||    ogden0             ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_nlsqf        ../starter/source/materials/tools/nlsqf.F
-      !||    law69_nlsqf_auto   ../starter/source/materials/tools/law69_nlsqf_auto.F
-      !||    mrqcof             ../starter/source/materials/tools/nlsqf.F
-      !||====================================================================
+!||====================================================================
+!||    ogden0             ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    law69_nlsqf        ../starter/source/materials/tools/nlsqf.F
+!||    law69_nlsqf_auto   ../starter/source/materials/tools/law69_nlsqf_auto.F
+!||    mrqcof             ../starter/source/materials/tools/nlsqf.F
+!||====================================================================
       SUBROUTINE OGDEN0(X,A,Y,NA)  
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -499,11 +499,11 @@ C-----------
 !>    @param[in]    IA(NA)        flags if derivative needs to be calculated
 !>                                1=yes, 0=no
 !>    @param[out]   DYDA(NA)      derivatives d(stress)/d(A)
-      !||====================================================================
-      !||    ogden1   ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    mrqcof   ../starter/source/materials/tools/nlsqf.F
-      !||====================================================================
+!||====================================================================
+!||    ogden1   ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    mrqcof   ../starter/source/materials/tools/nlsqf.F
+!||====================================================================
       SUBROUTINE OGDEN1(X,A,DYDA,IA,NA)  
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -545,23 +545,23 @@ C=======================================================================
 !>    @param[in]   ERRTOL      If ERRAVE < ERRTOL, data fitting converges.
 !>                                 ERRAVE = ( SUM [ ABS ( ( Y_inp-Y_fit) / Y_inp )  ) / NPT
 !>    @param[out]  MUAL(1:NMUAL)   optimized material properties 
-      !||====================================================================
-      !||    law69_nlsqf            ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_upd              ../starter/source/materials/mat/mat069/law69_upd.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    law69_check            ../starter/source/materials/tools/nlsqf.F
-      !||    law69_guess1           ../starter/source/materials/tools/nlsqf.F
-      !||    law69_guess_bounds     ../starter/source/materials/tools/nlsqf.F
-      !||    mrqmin                 ../starter/source/materials/tools/nlsqf.F
-      !||    my_exit                ../starter/source/output/analyse/analyse.c
-      !||    ogden0                 ../starter/source/materials/tools/nlsqf.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    law69_nlsqf            ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    law69_upd              ../starter/source/materials/mat/mat069/law69_upd.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    law69_check            ../starter/source/materials/tools/nlsqf.F
+!||    law69_guess1           ../starter/source/materials/tools/nlsqf.F
+!||    law69_guess_bounds     ../starter/source/materials/tools/nlsqf.F
+!||    mrqmin                 ../starter/source/materials/tools/nlsqf.F
+!||    my_exit                ../starter/source/output/analyse/analyse.c
+!||    ogden0                 ../starter/source/materials/tools/nlsqf.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LAW69_NLSQF(LAWID,STRETCH,Y,MA,NMUAL,NPT,MUAL,
-     $                       ICHECK, NSTART, ERRTOL,ID,TITR)
+     $                       ICHECK, NSTART, ERRTOL,ID,TITR,IS_ENCRYPTED)
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
@@ -577,13 +577,14 @@ C-----------------------------------------------
       PARAMETER (MAXA=20)
 
       INTEGER LAWID, NPT, MA, ICHECK, NSTART
+      INTEGER , INTENT(IN) :: IS_ENCRYPTED
       my_real ERRTOL
-      INTEGER I,NONZERO(MAXA),IDUM,ITER,ICOUNT,J,K,NMUAL  
-      my_real GAMMA,ERRNOW,GASDEV,ERRPRE,
+      INTEGER I,NONZERO(MAXA),ITER,J,NMUAL  
+      my_real GAMMA,ERRNOW,ERRPRE,
      .        STRETCH(NPT),MUAL(10)
       my_real A(MAXA),COVAR(MAXA,MAXA),ALPHA(MAXA,MAXA),Y(NPT)
       my_real MCOF_MIN(MAXA), MCOF_MAX(MAXA)
-      my_real YOGD,XOGD
+      my_real YOGD
 
       INTEGER ID
       CHARACTER(LEN=NCHARTITLE) :: TITR
@@ -611,7 +612,7 @@ C-----------------------------------------------
 
       INTEGER NGUESS
       my_real A0(MAXA)
-      my_real ERRMIN, ERRMAX, ERRAVE, ERRAVE_MIN, ERR
+      my_real  ERRAVE, ERRAVE_MIN, ERR
 
       INTEGER ISTART, NPSAVED, IVALID,ICOMP, MMAX
       PARAMETER (MMAX =20)
@@ -649,9 +650,11 @@ c     the combinations
       my_real  SPREADY
       INTEGER IRET
       INTEGER IRND1
-
+! ------------------------------------------------------------------------------       
       ALLOCATE (SIG(1:NPT))
-
+      ERRAVE_MIN = ZERO
+!
+      !
       IF ( MAXA < MA ) THEN
         WRITE(*,*) 'ERROR, MAXA < MA'
         WRITE(*,*) __FILE__,__LINE__
@@ -753,7 +756,7 @@ c     initialize random number generator in LAW69_GUESS1
       IRND1 = 205
       ATRY(1:MMAX) = ZERO ! Initialization of ATRY
       DO 111 WHILE ( ISTART < NSTART )
-c       get one guess point A0(1:NMUAL)        
+c       Get One Guess Point A0 (1: Nmual)        
         CALL LAW69_GUESS1(
      $       LAWID, NMUAL, ICHECK_GUESS, MU_INCR_GUESS,IRND1,
      $       A0, NONZERO, MCOF_MIN, MCOF_MAX, NGUESS)
@@ -1021,11 +1024,12 @@ C
           MUAL(I) = ZERO
         ENDDO
       ENDIF
-
-      WRITE(IOUT,'(//6X,A,/)')'FITTING RESULT COMPARISON:'
-      WRITE(IOUT,'(6X,A,/)')'UNIAXIAL TEST DATA'
-      WRITE(IOUT,'(A20,5X,A20,A30)') 'NOMINAL STRAIN',
+       IF(IS_ENCRYPTED == 0)THEN
+        WRITE(IOUT,'(//6X,A,/)')'FITTING RESULT COMPARISON:'
+        WRITE(IOUT,'(6X,A,/)')'UNIAXIAL TEST DATA'
+         WRITE(IOUT,'(A20,5X,A20,A30)') 'NOMINAL STRAIN',
      *      'NOMINAL STRESS(TEST)', 'NOMINAL STRESS(RADIOSS)'
+       ENDIF  
     
 c     output curcves to .csv format to simplify visualization    
       ICURV = 0
@@ -1039,17 +1043,18 @@ c     output curcves to .csv format to simplify visualization
         WRITE(ICURV,'(A)') 'NOMINAL STRAIN, NOMINAL STRESS(TEST), '//
      $                     'NOMINAL STRESS(RADIOSS)'
       ENDIF
-
-      DO I=1,NPT
-        CALL OGDEN0(STRETCH(I), A, YOGD, NMUAL)
+       IF(IS_ENCRYPTED == 0)THEN
+        DO I=1,NPT
+           CALL OGDEN0(STRETCH(I), A, YOGD, NMUAL)
 !!        WRITE(IOUT,'(F18.4,F20.4,F28.4)') 
-        WRITE(IOUT, '(1F18.6, 3X,1F20.13, 6X, 1F20.13)')
-     *   STRETCH(I)-ONE,Y(I),YOGD
-        IF (ICURV > 0) THEN
+          WRITE(IOUT, '(1F18.6, 3X,1F20.13, 6X, 1F20.13)')
+     *     STRETCH(I)-ONE,Y(I),YOGD
+          IF (ICURV > 0) THEN
            WRITE(ICURV, '(F18.4, A, F18.4, A, F18.4)') 
      $            STRETCH(I)-ONE,',',Y(I),',',YOGD
-        ENDIF
-      ENDDO      
+          ENDIF
+        ENDDO    
+      ENDIF    
 
       WRITE(IOUT, *) ''
       WRITE(IOUT, '(A)') '-------------------------------------------'
@@ -1066,11 +1071,11 @@ C-----------
 
 c     if abs(value) < small, it means value is very close to zero,
 c     reset it to be small or -small to avoid potential numerical issue
-      !||====================================================================
-      !||    zero2small     ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_guess1   ../starter/source/materials/tools/nlsqf.F
-      !||====================================================================
+!||====================================================================
+!||    zero2small     ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    law69_guess1   ../starter/source/materials/tools/nlsqf.F
+!||====================================================================
       SUBROUTINE ZERO2SMALL(value, small)
 #include      "implicit_f.inc"
       my_real value, small
@@ -1091,16 +1096,16 @@ c     reset it to be small or -small to avoid potential numerical issue
 !>                                      0 = no return,already go through all combinations, 
 !>                                      1 = return one guess point successfully
 !>    @param[out]  A0(NMUAL)             returned guess 
-      !||====================================================================
-      !||    law69_guess1       ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_nlsqf        ../starter/source/materials/tools/nlsqf.F
-      !||    law69_nlsqf_auto   ../starter/source/materials/tools/law69_nlsqf_auto.F
-      !||--- calls      -----------------------------------------------------
-      !||    law69_check        ../starter/source/materials/tools/nlsqf.F
-      !||    rand1              ../starter/source/materials/tools/nlsqf.F
-      !||    zero2small         ../starter/source/materials/tools/nlsqf.F
-      !||====================================================================
+!||====================================================================
+!||    law69_guess1       ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    law69_nlsqf        ../starter/source/materials/tools/nlsqf.F
+!||    law69_nlsqf_auto   ../starter/source/materials/tools/law69_nlsqf_auto.F
+!||--- calls      -----------------------------------------------------
+!||    law69_check        ../starter/source/materials/tools/nlsqf.F
+!||    rand1              ../starter/source/materials/tools/nlsqf.F
+!||    zero2small         ../starter/source/materials/tools/nlsqf.F
+!||====================================================================
       SUBROUTINE LAW69_GUESS1(
      $   LAWID, NMUAL, ICHECK, MU_INCR, IRND1,
      $   A0, IA, MCOF_MIN, MCOF_MAX, NGUESS)
@@ -1164,13 +1169,13 @@ C-----------------------------------------------
 !>    @param[in]  MU_INCR  if condition mu(i) <= mu(i+1) is checked              
 !>                         0=no, 1=yes
 !>    @param[out] IVALID   0=not valid, 1=valid
-      !||====================================================================
-      !||    law69_check        ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_guess1       ../starter/source/materials/tools/nlsqf.F
-      !||    law69_nlsqf        ../starter/source/materials/tools/nlsqf.F
-      !||    law69_nlsqf_auto   ../starter/source/materials/tools/law69_nlsqf_auto.F
-      !||====================================================================
+!||====================================================================
+!||    law69_check        ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    law69_guess1       ../starter/source/materials/tools/nlsqf.F
+!||    law69_nlsqf        ../starter/source/materials/tools/nlsqf.F
+!||    law69_nlsqf_auto   ../starter/source/materials/tools/law69_nlsqf_auto.F
+!||====================================================================
       SUBROUTINE LAW69_CHECK(LAWID, A, NMUAL, 
      $                       ICHECK, MU_INCR, IVALID)
 #include      "implicit_f.inc"
@@ -1260,12 +1265,12 @@ C       CHECK IF SUM(MU_I * ALPHA_I) > 0.0
 
 !>    @param[out]  MCOF_MIN(NMUAL)     estimated lower bounds of A(1:NMUAL)
 !>    @param[out]  MCOF_MAX(NMUAL)     estimated upper bounds of A(1:NMUAL)
-      !||====================================================================
-      !||    law69_guess_bounds   ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_nlsqf          ../starter/source/materials/tools/nlsqf.F
-      !||    law69_nlsqf_auto     ../starter/source/materials/tools/law69_nlsqf_auto.F
-      !||====================================================================
+!||====================================================================
+!||    law69_guess_bounds   ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    law69_nlsqf          ../starter/source/materials/tools/nlsqf.F
+!||    law69_nlsqf_auto     ../starter/source/materials/tools/law69_nlsqf_auto.F
+!||====================================================================
       SUBROUTINE LAW69_GUESS_BOUNDS(LAWID, ICHECK, X, Y, NPT, 
      $         NMUAL, MCOF_MIN, MCOF_MAX,ICOMP)
 #include      "implicit_f.inc"
@@ -1278,7 +1283,7 @@ C       CHECK IF SUM(MU_I * ALPHA_I) > 0.0
 
        INTEGER I
 
-       my_real AVE_SLOPE, mu_max, dx,DY
+       my_real AVE_SLOPE, mu_max, dx
 
        AVE_SLOPE = ZERO
        DO I = 1, NPT
@@ -1349,13 +1354,13 @@ c        avolid dx to be too small
 !>    @note
 !>       - random number generator of Park and Miller.  
 !>       - Schrage's modification is used to avoid 'a*(m-1)' overflows for 32-bit. 
-      !||====================================================================
-      !||    rand1          ../starter/source/materials/tools/nlsqf.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_guess1   ../starter/source/materials/tools/nlsqf.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_exit        ../starter/source/output/analyse/analyse.c
-      !||====================================================================
+!||====================================================================
+!||    rand1          ../starter/source/materials/tools/nlsqf.F
+!||--- called by ------------------------------------------------------
+!||    law69_guess1   ../starter/source/materials/tools/nlsqf.F
+!||--- calls      -----------------------------------------------------
+!||    my_exit        ../starter/source/output/analyse/analyse.c
+!||====================================================================
       REAL FUNCTION RAND1(IVAL)
 #include      "implicit_f.inc"
       INTEGER IVAL

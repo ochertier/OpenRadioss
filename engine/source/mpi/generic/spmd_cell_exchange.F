@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_cell_exchange         ../engine/source/mpi/generic/spmd_cell_exchange.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_sort_07              ../engine/source/interfaces/int07/inter_sort_07.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../engine/source/output/message/message.F
-      !||    arret                      ../engine/source/system/arret.F
-      !||    fill_voxel_local_partial   ../engine/source/interfaces/intsort/fill_voxel.F90
-      !||    fill_voxel_remote          ../engine/source/interfaces/intsort/fill_voxel.F90
-      !||    startime                   ../engine/source/system/timer_mod.F90
-      !||    stoptime                   ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    fill_voxel_mod             ../engine/source/interfaces/intsort/fill_voxel.F90
-      !||    inter_sorting_mod          ../engine/share/modules/inter_sorting_mod.F
-      !||    inter_struct_mod           ../engine/share/modules/inter_struct_mod.F
-      !||    message_mod                ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    timer_mod                  ../engine/source/system/timer_mod.F90
-      !||    tri7box                    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_cell_exchange         ../engine/source/mpi/generic/spmd_cell_exchange.F
+!||--- called by ------------------------------------------------------
+!||    inter_sort_07              ../engine/source/interfaces/int07/inter_sort_07.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../engine/source/output/message/message.F
+!||    arret                      ../engine/source/system/arret.F
+!||    fill_voxel_local_partial   ../engine/source/interfaces/intsort/fill_voxel.F90
+!||    fill_voxel_remote          ../engine/source/interfaces/intsort/fill_voxel.F90
+!||    startime                   ../engine/source/system/timer_mod.F90
+!||    stoptime                   ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    fill_voxel_mod             ../engine/source/interfaces/intsort/fill_voxel.F90
+!||    inter_sorting_mod          ../engine/share/modules/inter_sorting_mod.F
+!||    inter_struct_mod           ../engine/share/modules/inter_struct_mod.F
+!||    message_mod                ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F90
+!||    spmd_comm_world_mod        ../engine/source/mpi/spmd_comm_world.F90
+!||    timer_mod                  ../engine/source/system/timer_mod.F90
+!||    tri7box                    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_CELL_EXCHANGE(TIMERS, NIN,ISENDTO,IRCVFROM,NSN,NSNR,IGAP,
      1                               IFQ,INACTI,NSNFIOLD,INTTH,ITYP,STFNS, NSV,
      2                               NRTM, X,
@@ -65,6 +66,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -98,29 +100,16 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,INFO,I,NOD, DT_CST, LOC_PROC,P,IDEB,
-     .        SIZ,J, L, BUFSIZ, LEN, NB, IERROR1, IAD,
-     .        STATUS(MPI_STATUS_SIZE),IERROR,REQ_SB(NSPMD),
-     .        REQ_RB(NSPMD),KK,NBIRECV,IRINDEXI(NSPMD),
-     .        REQ_RD(NSPMD),REQ_SD(NSPMD),
-     .        REQ_RC(NSPMD),REQ_SC(NSPMD),
-     .        INDEXI,ISINDEXI(NSPMD),
-     .        MSGOFF, MSGOFF2, MSGOFF3, MSGOFF4, MSGOFF5,
-     .        RSIZ, ISIZ, L2, REQ_RD2(NSPMD),
-     .        LEN2, RSHIFT, ISHIFT, ND, JDEB, Q, NBB
-
-      INTEGER :: P_LOC
-      INTEGER :: KEY,CODE
-     
+      INTEGER MSGTYP, LOC_PROC, P, IDEB, 
+     . L, LEN,
+     . STATUS(MPI_STATUS_SIZE),IERROR,
+     . REQ_RD(NSPMD),
+     . INDEXI,
+     . MSGOFF4,MSGOFF5,
+     . RSIZ, ISIZ, REQ_RD2(NSPMD),
+     . LEN2
       DATA MSGOFF4/6026/ 
       DATA MSGOFF5/6027/ 
-        
-      my_real
-     .        XMAXB,YMAXB,ZMAXB,XMINB,YMINB,ZMINB
-      
-      INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGNSNFI  
-      my_real, DIMENSION(:,:), ALLOCATABLE :: XTMP
-      INTEGER :: ADRESS, LOCAL_RANK
       INTEGER :: SIZE_S
       INTEGER :: OFFSET(NSPMD)
       INTEGER :: DUMMY(1)
@@ -129,8 +118,8 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
 C================================================================
-C     tag des boites contenant des facettes
-C     et creation des candidats
+C     tag of the boxes containing facets
+C     and creation of candidates
 C================================================================
       LOC_PROC = ISPMD + 1
       ! save the old NSNFI values

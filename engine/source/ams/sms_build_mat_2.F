@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_build_mat_2   ../engine/source/ams/sms_build_mat_2.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../engine/source/output/message/message.F
-      !||    arret             ../engine/source/system/arret.F
-      !||    my_barrier        ../engine/source/system/machine.F
-      !||    sms_build_diag    ../engine/source/ams/sms_build_diag.F
-      !||    spmd_list_sms     ../engine/source/mpi/ams/spmd_sms.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    intstamp_mod      ../engine/share/modules/intstamp_mod.F
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sms_build_mat_2   ../engine/source/ams/sms_build_mat_2.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg            ../engine/source/output/message/message.F
+!||    arret             ../engine/source/system/arret.F
+!||    my_barrier        ../engine/source/system/machine.F
+!||    sms_build_diag    ../engine/source/ams/sms_build_diag.F
+!||    spmd_list_sms     ../engine/source/mpi/ams/spmd_sms.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod       ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    intstamp_mod      ../engine/share/modules/intstamp_mod.F
+!||    message_mod       ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod      ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_BUILD_MAT_2(
      1             ITASK    ,NODFT   ,NODLT  ,
      2             IXC      ,IPARG   ,IXS      ,IXT      ,IXP     ,
@@ -65,7 +68,9 @@ C-----------------------------------------------
       USE INTSTAMP_MOD
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD 
-      USE INTBUFDEF_MOD 
+      USE INTBUFDEF_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -132,21 +137,26 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, KN, IKN, JJ, KK, II, IJ, IK, N, M, NN, P, LOC_PROC
+      INTEGER I, J, K, JJ, KK, II, IJ, IK, N, M, NN, P, LOC_PROC
       INTEGER NG, ITY, NEL, NFT, ISOLNOD,MLW,LFT, LLT,
      .        KAD, NPT, IHBE, ICNOD, ISTRA, IEXPAN, IE, J1,
      .        ILOC4(4), IG, IGTYP, IERROR, IPERM1(6), IPERM2(6),IPENTA6(6)
-      INTEGER MSR, NSN, KI, KJ, KL, NSR
-      INTEGER SIZE, LENR, IAD, L, JI,TAGA(NUMNOD),NAD_SMS(NUMNOD),
-     .        KADI_SMS(NUMNOD+1), NADI_SMS(NUMNOD), TAG8(NUMNOD), 
-     .        NAD_SMS_0(NUMNOD)
+      INTEGER MSR, NSN, KI, KJ
+      INTEGER  IAD, L, JI
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAGA
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NAD_SMS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: KADI_SMS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NADI_SMS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAG8
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NAD_SMS_0
       INTEGER NTY, ILAGM, N1, N2, N3, N4,
-     .        NMN,ILEV, KSN, KMULT
+     .        ILEV, KSN, KMULT
       my_real
-     .        MELE4, MELE12, XN, LTIJ, MSLV,
-     .        IXX, IYY, IZZ, XX, YY, ZZ, MAS, AWORK(3,NUMNOD),
-     .        VRX, VRY, VRZ, V1, V2, V3, GX, GY, GZ, XNOD,
+     .        MELE4, MELE12, LTIJ,
+     .              
+     .           XNOD,
      .        FAC_SCAL_I,FAC_SCAL_J
+      my_real, dimension(:,:),ALLOCATABLE ::  AWORK
 C-----
       INTEGER, DIMENSION(:), ALLOCATABLE :: IMV
       my_real
@@ -160,6 +170,14 @@ C-----
       DATA IPERM1/1,2,3,1,2,3/
       DATA IPERM2/2,3,1,4,4,4/
       DATA IPENTA6/1,2,3,5,6,7/
+C-----------------------------------------------
+      CALL MY_ALLOC(TAGA,NUMNOD)
+      CALL MY_ALLOC(NAD_SMS,NUMNOD)
+      CALL MY_ALLOC(KADI_SMS,NUMNOD+1)
+      CALL MY_ALLOC(NADI_SMS,NUMNOD)
+      CALL MY_ALLOC(TAG8,NUMNOD)
+      CALL MY_ALLOC(NAD_SMS_0,NUMNOD)
+      CALL MY_ALLOC(AWORK,3,NUMNOD)
 C-----------------------------------------------
 C reset enforcement of contact sorting
 !$OMP SINGLE
@@ -188,7 +206,7 @@ C
 C
       CALL MY_BARRIER()
 C
-C     si /DT/INTER/AMS sans /DT/AMS
+C     if /DT/INTER/AMS without /DT/AMS
       IF(IDTMINS/=2)GO TO 100
 C
 !$OMP DO SCHEDULE(DYNAMIC,1)
@@ -302,7 +320,7 @@ C                                     <=> mele12=dmels(mqviscb)/2/4
               TAGA(I)=TAGA(I)+1
               KMULT=MAX(KMULT,TAGA(I))
             END DO
-C peut etre instable pour les prismes
+C may be unstable for prisms
 C           MELE4 =HALF*DMELS(IE)
             MELE4 =KMULT*HALF*DMELS(IE)
 C
@@ -313,7 +331,7 @@ C  w^2 < 2k / (m+8*dmels)
 C  but dt = 2/w =sqrt( 2*(m+dmels) /k) => 8*dmels=dmels(mqviscb)/2
 C                                     <=> mele12=dmels=dmels(mqviscb)/2/8
 C
-C  Pentas (note : 2 x plus de masse que necessaire sur les nds non doubles)
+C  Pentas (note: 2x more mass than necessary on non-double nodes)
 C  Me=[ 5*dmels    -dmels   ...        -dmels ]
 C     [  -dmels   5*dmels   ...        -dmels ]
 C     [  -dmels    -dmels  5*dmels     -dmels ]
@@ -374,7 +392,7 @@ C void elements may be into contact
             IF (OFFG(J) > ZERO) THEN
              MELE4 = HALF*DMELS(IE)
 C
-C             Q : Quelles VP pour M-1K ?  M=[ Mvettex+9dm, -dm      ,.....    ]
+C             Q: What VP for M-1K?M = [mvettex+9dm, -dm, .....]
 C                     [  -dm   , Medge+9dm, -dm, ....]
 C                      .........
 C             Mvertex = Mass/32, Medge=7*Mass/48
@@ -437,7 +455,7 @@ C
 
            END DO
 
-C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...)
+C          nd nonexistent midfielder, transfer to the summits (symmetry in jsm_sms ...)
            DO K=1,6
 
              I =IXS10(K,J1)
@@ -497,14 +515,14 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
             IF (OFFG(J) > ZERO) THEN
              MELE4 = HALF*DMELS(IE)
 C
-C             Q : Quelles VP pour M-1K ?  M=[ Mvettex+9dm, -dm      ,.....    ]
+C             Q: What VP for M-1K?M = [mvettex+9dm, -dm, .....]
 C                     [  -dm   , Medge+9dm, -dm, ....]
 C                      .........
 C             Mvertex = Mass/32, Medge=7*Mass/48
 C
 C             A: Supposed lambda(M) > Mvertex+10dm
 C
-             MELE4 = MELE4*SEVEN/FOURTY8
+             MELE4 = MELE4*SEVEN/FORTY8
             END IF
            END IF
 
@@ -1408,7 +1426,7 @@ C
 C
         IF(TAGMSR_RBY_SMS(MSR) /= 0) THEN
 C
-C ce noeud ne sera jamais supprime des rwalls ... probleme ou pas ?
+C this node will never be removed from the rwalls ... problem or not?
          NODXI_SMS(MSR)=1
 C
          NSN=NPBY(2,M)

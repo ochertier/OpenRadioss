@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cgrtails               ../starter/source/elements/shell/coque/cgrtails.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    arret                  ../starter/source/system/arret.F
-      !||    cpp_reorder_elements   ../starter/source/spmd/cpp_reorder_elements.cpp
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    zeroin                 ../starter/source/system/zeroin.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod              ../starter/share/modules1/drape_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
-      !||    stack_mod              ../starter/share/modules1/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cgrtails               ../starter/source/elements/shell/coque/cgrtails.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||    cpp_reorder_elements   ../starter/source/spmd/cpp_reorder_elements.cpp
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    zeroin                 ../starter/source/system/zeroin.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod              ../starter/share/modules1/drape_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+!||    stack_mod              ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE CGRTAILS(
      1       IXC    ,PM      ,IPARG     ,GEO     ,
      2       EADD   ,ND      ,IPARTC  ,DD_IAD,
@@ -46,7 +46,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6       IPART  ,SH4TREE ,NOD2ELC   ,ISHEOFF ,
      7       SH4TRIM ,TAGPRT_SMS,LGAUGE  ,IWORKSH ,
      8       STACK   ,DRAPE    ,RNOISE  ,MAT_PARAM,
-     9       SH4ANG, IDDLEVEL , DRAPEG,PRINT_FLAG,PTSHEL)
+     9       SH4ANG, IDDLEVEL , DRAPEG,PRINT_FLAG,PTSHEL,DAMP_RANGE_PART)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -60,23 +60,24 @@ C-----------------------------------------------
       USE DRAPE_MOD
       USE QA_OUT_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixc
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
-C     IXC(NIXC,NUMELC)   TABLEAU MID(1)+CONECS(2-5)+PID(6)+         E
+C     IXC(NIXC,NUMELC)   ARRAY MID(1)+CONECS(2-5)+PID(6)+           E
 C                        N GLOBAL(7)                               E
-C     PM(NPROPM,NUMMAT)  TABLEAU DES CARACS DES MATERIAUX           E
-C     IPARG(NPARG,NGROUP)TABLEAU DES CARACTERISTIQUES DES GROUPES   E/S
-C     GEO(NPROPG,NUMGEO) TABLEAU DES CARACS DES PID                 E
-C     EADD(NUMELC)       TABLEAU DES ADRESEES DANS IDAM CHGT DAMIER E 
-C     DD_IAD             TABLEAU DE LA DD EN SUPER GROUPES          S
+C     PM(NPROPM,NUMMAT)  ARRAY MATERIAL CHARACTERISTICS             E
+C     IPARG(NPARG,NGROUP)ARRAY GROUP CHARACTERISTICS                E/S
+C     GEO(NPROPG,NUMGEO) ARRAY PID CHARACTERISTICS                  E
+C     EADD(NUMELC)       ARRAY ADDRESSES IN IDAM CHECKBOARD        E 
+C     DD_IAD             ARRAY FROM DD IN SUPER GROUPS              S
 C     IPARTC                                                        E/S
-C     INUM(9,NUMELC)     TABLEAU DE TRAVAIL                         E/S
-C     ITR1(NSELC)        TABLEAU DE TRAVAIL                         E/S
-C     INDEX(NUMELC)      TABLEAU DE TRAVAIL                         E/S
-C     THK(NUMELC)        TABLEAU EPAISSEUR                          E/S
-C     XNUM(NUMELC)       TABLEAU DE TRAVAIL                         E/S
-C     CEP(NUMELC)        TABLEAU DE TRAVAIL                         E/S
+C     INUM(9,NUMELC)     WORKING ARRAY                              E/S
+C     ITR1(NSELC)        WORKING ARRAY                              E/S
+C     INDEX(NUMELC)      WORKING ARRAY                              E/S
+C     THK(NUMELC)        THICKNESS ARRAY                            E/S
+C     XNUM(NUMELC)       WORKING ARRAY                              E/S
+C     CEP(NUMELC)        WORKING ARRAY                              E/S
 C     ISHEOFF(NUMELC)   FLAG ELEM RBY ON/OFF                        E/S
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -109,6 +110,7 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IDDLEVEL
       INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
       INTEGER , DIMENSION(NUMELC) , INTENT(INOUT):: PTSHEL
+      INTEGER , INTENT(IN) :: DAMP_RANGE_PART(NPART)     !< flag to compute the damping range
       MY_REAL
      .    PM(NPROPM,*), GEO(NPROPG,*), XNUM(*),THK(*),RNOISE(NPERTURB,*),
      .    SH4ANG(*)
@@ -134,14 +136,14 @@ C-----------------------------------------------
      .   NGP(NSPMD+1),N1,NVARV,IVISC,IFWV,IXFEM,IPTUN,IREP,
      .   ISUBSTACK,IPMAT, IPPID,
      .   IPARTR2R,NB_LAW58,IPERT,STAT,IGMAT,IPINCH,ISM0,ISEATBELT,
-     .   NSLICE,KK,NPT_DRP, IDRAPE, JJ,IEL,IEL0,ISHEL
+     .   NSLICE,KK,NPT_DRP, IDRAPE, JJ,IEL,IEL0,ISHEL,IDAMP_FREQ_RANGE
       INTEGER, DIMENSION(:), ALLOCATABLE :: INUM_R2R
       my_real, DIMENSION(:), ALLOCATABLE :: ANGLE
       INTEGER, DIMENSION(:), ALLOCATABLE :: INDEXS2,INUM_PTSHEL
 
       INTEGER MODE,WORK(70000)
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: ISTOR,INUM_WORKSH
-C     REAL OU REAL*8
+C     real or real*8
       INTEGER ID
       CHARACTER(LEN=NCHARTITLE)::TITR,TITR1,TITR2
       my_real, DIMENSION(:,:), ALLOCATABLE :: XNUM_RNOISE
@@ -173,17 +175,16 @@ C
       IPTUN = 1
       IXFEM_ERR = 0
 C--------------------------------------------------------------
-C         BORNAGE DES GROUPES DE MVSIZ
+C         GROUPING BY MVSIZ GROUPS
 C--------------------------------------------------------------
       NGR1 = NGROUP + 1
 C
-C phase 1 : domain decomposition
+C Phase 1: Domain Decomposition
 C
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
-C     NSPGROUP = NSPGROUP + ND
       NFT = 0
-C initialisation dd_iad
+C initialization dd_iad
       DO N=1,ND
        DO P=1,NSPMD+1
          DD_IAD(P,NSPGROUP+N) = 0
@@ -250,7 +251,8 @@ C
             XNUM_DRAPE(I)%NPLY = NPT                          
             XNUM_DRAPE(I)%INDX_PLY(1:NPT) = DRAPE(IEL0)%INDX_PLY(1:NPT)
             NPT = DRAPE(IEL0)%NPLY_DRAPE                                      
-            XNUM_DRAPE(I)%NPLY_DRAPE = NPT 
+            XNUM_DRAPE(I)%NPLY_DRAPE = NPT                                    
+            XNUM_DRAPE(I)%THICK = DRAPE(IEL0)%THICK 
             DO JJ = 1, NPT                                                  
               DRAPE_PLY => DRAPE(IEL0)%DRAPE_PLY(JJ)
               NSLICE =  DRAPE_PLY%NSLICE                                        
@@ -358,7 +360,8 @@ C
                DRAPE(IEL)%INDX_PLY(1:NPT) =  XNUM_DRAPE(INDEX(I))%INDX_PLY(1:NPT)
                DRAPE(IEL)%NPLY = NPT
                NPT = XNUM_DRAPE(INDEX(I))%NPLY_DRAPE       ! NPT_DRP                                
-               DRAPE(IEL)%NPLY_DRAPE= NPT
+               DRAPE(IEL)%NPLY_DRAPE= NPT   
+               DRAPE(IEL)%THICK = XNUM_DRAPE(INDEX(I))%THICK 
                ALLOCATE(DRAPE(IEL)%DRAPE_PLY(NPT))
                DO JJ = 1, NPT         
                  DRAPE_PLY => DRAPE(IEL)%DRAPE_PLY(JJ)                                  
@@ -394,14 +397,11 @@ C
               IWORKSH(1, NFT + I)=INUM_WORKSH(1,INDEX(I))
               IWORKSH(2, NFT + I)=INUM_WORKSH(2,INDEX(I))
               IWORKSH(3, NFT + I)=INUM_WORKSH(3,INDEX(I))
-C             
-!!              IWORKSH(1,NFT+I) = NPTEL(INDEX(I))
               IF (NPERTURB > 0) THEN
                 DO IPERT = 1, NPERTURB
                   RNOISE(IPERT,I+NFT) = XNUM_RNOISE(IPERT,INDEX(I)) 
                 ENDDO
               ENDIF
-              !!
                SH4ANG(NFT+I) = ANGLE(INDEX(I))
             ENDDO
         ENDIF   ! NDRAPE  
@@ -447,7 +447,7 @@ C dd-iad
         ENDDO
         DD_IAD(1,NSPGROUP+N) = 1
 C          
-C maj CEP
+C update CEP
 C
         DO I = 1, NEL
           INDEX(I) = CEP(NFT+INDEX(I))          
@@ -476,7 +476,7 @@ C
         DEALLOCATE(INUM_WORKSH)
       ENDDO   ! ND       
 C
-C RENUMEROTATION DE L ARBRE
+C TREE RENUMBERING
 C
       IF(NADMESH/=0)THEN
         DO  I=1,NUMELC
@@ -487,7 +487,7 @@ C
         ENDDO
       END IF
 C
-C RENUMEROTATION POUR SURFACES
+C RENUMBERING FOR SURFACES
 C
       DO I=1,NSURF
         NN=IGRSURF(I)%NSEG
@@ -497,7 +497,7 @@ C
         ENDDO
       ENDDO
 C
-C RENUMEROTATION POUR shell in Accel (gauge)
+C RENUMBERING FOR shell in Accel (gauge)
 C
       DO I=1,NBGAUGE
          N1 = LGAUGE(1,I)
@@ -507,7 +507,7 @@ C
          ENDIF
       ENDDO
 C
-C RENUMEROTATION POUR GROUPES DE SHELL
+C RENUMBERING FOR SHELL GROUPS
 C
       DO I=1,NGRSHEL
         NN=IGRSH4N(I)%NENTITY
@@ -516,15 +516,15 @@ C
         ENDDO
       ENDDO
 C
-C renumerotation CONNECTIVITE INVERSE
+C renumbering INVERSE CONNECTIVITY
 C
       DO I=1,4*NUMELC
         IF(NOD2ELC(I) /= 0)NOD2ELC(I)=ITR1(NOD2ELC(I))
       END DO
 C              
 C-------------------------------------------------------------------------
-C phase 2 : bornage en groupe de mvsiz
-C ngroup est global, iparg est global mais organise en fonction de dd
+C phase 2 : grouping by MVSIZ groups
+C ngroup is global, iparg is global but organized according to dd
 C
       DO 300 N=1,ND
        NFT = 0
@@ -543,13 +543,11 @@ C ngroup global
           PID = IXC(6,II)
           IPARTR2R = 0
           IF (NSUBDOM>0) IPARTR2R = TAG_MAT(MID)
-c          NPN = NINT(GEO(6,PID))
           NPN   = IGEO(4,PID)
           ISMST = IGEO(5,PID)
           IGTYP = IGEO(11,PID)
           ISROT = IGEO(20,PID)
           IPINCH= IGEO(51,PID)
-C          IGTYP=NINT(GEO(12,PID))
           ISHXFEM_PLY = IGEO(19,PID)
           IREP = IGEO(6,PID)
           IHBE = NINT(GEO(171,PID))
@@ -647,7 +645,7 @@ C----- fixed to 1 excepting small strain case
            IF (ITHK<0) THEN
             ITHK = 1 
             IF (MAT_PARAM(MID)%SMSTR==1 .OR. MLN == 1) ITHK = 0
-C--------message out       
+C------- Out message       
             ISM0 = ITHK
             IF (ITHK == 0) ISM0=2
                 CALL ANCMSG(MSGID=1770,
@@ -658,10 +656,10 @@ C--------message out
      .                      I2=ISM0,
      .                      PRMOD=MSG_CUMU)
            END IF
-C----- fixed to iterative, but can be changed in fonction of law           
+C----- fixed to iterative, but can be changed according to law           
            IF (IPLA<0) THEN
              IPLA = 1
-C--------message out       
+C------- Out message       
                 CALL ANCMSG(MSGID=1771,
      .                      MSGTYPE=MSGINFO,
      .                      ANMODE=ANINFO_BLIND_2,
@@ -684,7 +682,7 @@ C----certain laws to use 4 to see one by one
                 IF (MLN == 19 .AND. NPN==1) ISMST =11
               END IF
               GEO(3,PID) = ISMST
-C--------message out       
+C------- Out message       
                 CALL ANCMSG(MSGID=1772,
      .                      MSGTYPE=MSGINFO,
      .                      ANMODE=ANINFO_BLIND_2,
@@ -729,15 +727,6 @@ C-----
      .                   C1=TITR,
      .                   I2=MLN)
           ENDIF
-c          IF (MLN == 71 .and. ISMST /= 10 ) THEN
-           ! ISMST = 10
-c                CALL ANCMSG(MSGID=1200,
-c     .                      MSGTYPE=MSGWARNING,
-c     .                      ANMODE=ANINFO_BLIND_2,
-c     .                      I1=ID,
-c     .                      C1=TITR,
-c     .                      I2=MLN)
-c          ENDIF
           IF (IGTYP == 1 .and. ISMST == 11 ) THEN
            ! ISMST = 11 compatibility
             ISMST = 2
@@ -968,6 +957,9 @@ C
           ISEATBELT = 0
           IF(MLN == 119) ISEATBELT = 1
           IPARG(91,NGROUP) = ISEATBELT
+C         damping frequency range apply to group
+          IDAMP_FREQ_RANGE = DAMP_RANGE_PART(IPARTC(II))
+          IPARG(93,NGROUP) = IDAMP_FREQ_RANGE
 C
           NSG = 1
           KFTS= 0
@@ -1023,8 +1015,7 @@ C
             NPG=1
           END IF
           IPARG(48,NGROUP)=NPG
-C          IPARG(49,NGROUP) = ICXFEM
-C reperage groupe/processeur
+C group/processor identification
           IPARG(32,NGROUP) = P-1
           IPARG(50,NGROUP) = ISHXFEM_PLY  
 C for stack         
@@ -1041,7 +1032,7 @@ C
          NGP(P)=NGROUP-NGP(P)
         ENDIF
        ENDDO
-C DD_IAD => nb groupes par sous domaine
+C Dd_iad => nb groups per sub domain
        NGP(NSPMD+1)=0
        DO P = 1, NSPMD
          NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)

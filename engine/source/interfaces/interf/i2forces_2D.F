@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2forces_2d   ../engine/source/interfaces/interf/i2forces_2D.F
-      !||--- called by ------------------------------------------------------
-      !||    i2for3n       ../engine/source/interfaces/interf/i2for3.F
-      !||    i2for3pn      ../engine/source/interfaces/interf/i2for3p.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod       ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i2forces_2d   ../engine/source/interfaces/interf/i2forces_2D.F
+!||--- called by ------------------------------------------------------
+!||    i2for3n       ../engine/source/interfaces/interf/i2for3.F
+!||    i2for3pn      ../engine/source/interfaces/interf/i2for3p.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod       ../engine/share/modules/h3d_mod.F
+!||====================================================================
       SUBROUTINE I2FORCES_2D(X      ,FS      ,FX      ,FY      ,FZ      ,
      .                       IRECT  ,NIR     ,FSAV    ,FNCONT  ,FNCONTP ,
      .                       FTCONTP,WEIGHT  ,H3D_DATA,NSL     ,H)
@@ -55,11 +55,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N1,N2,N3,N4,J,JJ
+      INTEGER N1,N2,J,JJ
 C     REAL
       my_real
-     .   XC0,YC0,ZC0,XC,YC,ZC,X0,X1,X2,Y0,Y1,Y2,
-     .   Z0,Z1,Z2,XCDG,YCDG,ZCDG,MCDG,
+     .   X0,X1,X2,Y0,Y1,Y2,
+     .   Z0,Z1,Z2,
      .   SUM,FNORM,VX,VY,VZ,DT12M,FN(3),FT(3)
 C=======================================================================
       IF (TT == ZERO) THEN   
@@ -93,7 +93,7 @@ C------------------------------------------------
         VY = VY * SUM
         VZ = VZ * SUM
 C   
-C       composantes N/T de la forces nodale
+C       n/t components of the nodal forces
 C
         FNORM = VX*FS(1) + VY*FS(2) + VZ*FS(3)
         FT(1) = VX*FNORM

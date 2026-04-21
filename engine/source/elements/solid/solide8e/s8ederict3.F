@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8ederict3    ../engine/source/elements/solid/solide8e/s8ederict3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8eforc3      ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    schkjab3      ../engine/source/elements/solid/solide/schkjab3.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s8ederict3    ../engine/source/elements/solid/solide8e/s8ederict3.F
+!||--- called by ------------------------------------------------------
+!||    s8eforc3      ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||    schkjab3      ../engine/source/elements/solid/solide/schkjab3.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S8EDERICT3(
      1   OFF,     DET,     NGL,     X1,
      2   X2,      X3,      X4,      X5,
@@ -80,7 +80,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NGL(*), I, J ,ICOR
+      INTEGER NGL(*), I 
 C                                                                     12
       my_real  DETT(MVSIZ) ,
      .         AJI1(MVSIZ), AJI2(MVSIZ), AJI3(MVSIZ),
@@ -156,7 +156,7 @@ C
         DETT(I)=ONE_OVER_64/DET(I)
       ENDDO
 C
-C     INVERSE DE LA MATRICE JACOBIENNE
+C     INVERSE OF THE JACOBIAN MATRIX
 C
       DO I=1,NEL
         AJI1(I)=DETT(I)*JAC_59_68(I)
@@ -244,6 +244,4 @@ C----surface max mediane-- *16
        ENDDO
       RETURN
 C
- 1000 FORMAT(/' ZERO OR NEGATIVE VOLUME : 3D-ELEMENT NB',I10/)
- 2000 FORMAT(/' ZERO OR NEGATIVE VOLUME : DELETE 3D-ELEMENT NB',I10/)
       END 

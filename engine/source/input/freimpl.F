@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    freimpl                ../engine/source/input/freimpl.F
-      !||--- called by ------------------------------------------------------
-      !||    freform                ../engine/source/input/freform.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../engine/source/output/message/message.F
-      !||    arret                  ../engine/source/system/arret.F
-      !||    nvar                   ../engine/source/input/nvar.F
-      !||    order_dtf              ../engine/source/input/freimpl.F
-      !||    wriusc2                ../engine/source/input/wriusc2.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_dyna               ../engine/share/modules/impbufdef_mod.F
-      !||    imp_kbcs               ../engine/share/modules/impbufdef_mod.F
-      !||    imp_pcg_proj           ../engine/share/modules/impbufdef_mod.F
-      !||    imp_spbrm              ../engine/share/modules/impbufdef_mod.F
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    freimpl                ../engine/source/input/freimpl.F
+!||--- called by ------------------------------------------------------
+!||    freform                ../engine/source/input/freform.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../engine/source/output/message/message.F
+!||    arret                  ../engine/source/system/arret.F
+!||    order_dtf              ../engine/source/input/freimpl.F
+!||    wriusc2                ../engine/source/input/wriusc2.F
+!||--- uses       -----------------------------------------------------
+!||    imp_dyna               ../engine/share/modules/impbufdef_mod.F
+!||    imp_kbcs               ../engine/share/modules/impbufdef_mod.F
+!||    imp_pcg_proj           ../engine/share/modules/impbufdef_mod.F
+!||    imp_spbrm              ../engine/share/modules/impbufdef_mod.F
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE FREIMPL(IKAD,KEY0,KIMPL) 
 C-----------------------------------------------
 C   M o d u l e s
@@ -61,7 +60,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "impl1_c.inc"
 #include      "impl2_c.inc"
 #include      "parit_c.inc"
@@ -76,11 +74,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, NBC, K, IKEY,IM,J,NJ,KK, IOERR,E_ID
+      INTEGER I, NBC, K, IKEY,IM,J,NJ,KK
       CHARACTER  TITLE*72, KEY2*5, KEY3*5, KEY4*5
       CHARACTER(LEN=NCHARLINE100)::CARTE
-      my_real
-     .   TMP
 C----------------------------------------
       IKEY=KIMPL
       IMPL_S=0
@@ -270,7 +266,7 @@ C----------------------------
         READ(KEY3,'(I2)')ISOLV
         CALL WRIUSC2(IKAD(IKEY)+K,1,KEY0(IKEY))
         READ(IUSC2,*)IPREC,L_LIM,ITOL,L_TOL
-        IF (IMACH==3.AND.ISOLV==3) IMUMPSD=L_LIM
+        IF (ISOLV==3) IMUMPSD=L_LIM
 C----------------------------
 C      BCS parameters
 C----------------------------
@@ -435,7 +431,7 @@ C----------------------------
          IF(KEY3(1:3)=='OFF') THEN
           IRREF = 0
          ELSEIF(KEY3(1:5)=='INTER')THEN
-C-----0 agressive, 1: moyen ----2--faible  3  non--4 non sauf 1er---
+C----- 0 Aggressive, 1: Middle ---- 2--FAIBLE 3 NON-4 NO except 1st ---
           READ(KEY4,'(I2)')IM
           IREFI = IM
          ELSEIF(KEY3(1:5)=='LIMIT')THEN
@@ -588,11 +584,11 @@ C
      .            C1=KEY0(IKEY))
       CALL ARRET(0)
       END
-      !||====================================================================
-      !||    order_dtf   ../engine/source/input/freimpl.F
-      !||--- called by ------------------------------------------------------
-      !||    freimpl     ../engine/source/input/freimpl.F
-      !||====================================================================
+!||====================================================================
+!||    order_dtf   ../engine/source/input/freimpl.F
+!||--- called by ------------------------------------------------------
+!||    freimpl     ../engine/source/input/freimpl.F
+!||====================================================================
       SUBROUTINE ORDER_DTF(N,RC)
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
@@ -612,7 +608,7 @@ C-----------------------------------------------
      .        S(N),SMIN
 C
       IF (N==0) RETURN
-C-----en ordre croisante-----
+C----- In increasing order -----
       NN =0
       DO I =1,N
        IF (RC(I)>ZERO) THEN

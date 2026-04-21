@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,19 +21,28 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C last SPH structures only (see RESTMOD for other SPH structures)
-      !||====================================================================
-      !||    sph_mod      ../engine/share/modules/sph_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb       ../engine/source/output/restart/rdresb.F
-      !||    resol_head   ../engine/source/engine/resol_head.F
-      !||    restalloc    ../engine/source/output/restart/arralloc.F
-      !||    wrrestp      ../engine/source/output/restart/wrrestp.F
-      !||====================================================================
+!||====================================================================
+!||    sph_mod      ../engine/share/modules/sph_mod.F
+!||--- called by ------------------------------------------------------
+!||    rdcomr       ../engine/source/output/restart/rdcomm.F
+!||    rdresb       ../engine/source/output/restart/rdresb.F
+!||    resol_head   ../engine/source/engine/resol_head.F
+!||    restalloc    ../engine/source/output/restart/arralloc.F
+!||    sponof1      ../engine/source/elements/sph/sponof1.F
+!||    wrcomr       ../engine/source/output/restart/wrcomm.F
+!||    wrrestp      ../engine/source/output/restart/wrrestp.F
+!||====================================================================
       MODULE SPH_MOD
 #include "my_real.inc"
 
         INTEGER , DIMENSION(:), ALLOCATABLE :: 
      .      SPH2SOL,SOL2SPH,IRST,SOL2SPH_TYP
+
+        my_real :: XI_RES = 0. 
+        my_real :: YI_RES = 0.
+        my_real :: ZI_RES = 0.
+
+
 
         TYPE SPSYM_STRUCT
             my_real, DIMENSION(:)  , POINTER :: BUF 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_analy        ../starter/source/general_controls/computation/hm_read_analy.F
-      !||--- called by ------------------------------------------------------
-      !||    contrl               ../starter/source/starter/contrl.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv          ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count      ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key   ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start      ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod   ../starter/share/modules1/hm_option_read_mod.F
-      !||    submodel_mod         ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_analy        ../starter/source/general_controls/computation/hm_read_analy.F
+!||--- called by ------------------------------------------------------
+!||    contrl               ../starter/source/starter/contrl.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv          ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count      ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key   ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start      ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod   ../starter/share/modules1/hm_option_read_mod.F
+!||    submodel_mod         ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_ANALY(NANALY,IPARITH,IPARI0,LSUBMODEL)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -49,7 +49,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE HM_OPTION_READ_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : SUBMODEL_DATA
+      USE EOS_PARAM_MOD , ONLY : ANALY_TEMP
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,8 +65,9 @@ C OUTPUT ARGUMENTS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NB_ANALY
-      LOGICAL IS_AVAILABLE
+      INTEGER :: NB_ANALY
+      INTEGER :: ITEMP
+      LOGICAL :: IS_AVAILABLE
 C============================================================================
       IS_AVAILABLE = .FALSE.
 C----------------------------------------------
@@ -75,19 +77,25 @@ C----------------------------------------------
         CALL HM_OPTION_READ_KEY(LSUBMODEL)
         CALL HM_GET_INTV('N2D3D',NANALY,IS_AVAILABLE,LSUBMODEL)      
         CALL HM_GET_INTV('IPARITH',IPARITH,IS_AVAILABLE,LSUBMODEL)
-        IF(IPARITH==0)THEN
+        CALL HM_GET_INTV('ANALY_TEMP',ITEMP,IS_AVAILABLE,LSUBMODEL)
+        IF(IPARITH == 0)THEN
           IPARI0  = 1
           IPARITH = 1
-        ELSEIF(IPARITH==1)THEN
+        ELSEIF(IPARITH == 1)THEN
           IPARI0 = 1
-        ELSEIF(IPARITH==2)THEN
+        ELSEIF(IPARITH == 2)THEN
           IPARI0 = 0
         ELSE
           IPARI0=IPARITH-1
         ENDIF
+        ! ANALY_TEMP : 0 No temperature evolution in expansion for solid EoS
+        ! ANALY_TEMP : 1 Temperature evolution also in expansion for solid EoS (cutoff removed)
+        ANALY_TEMP = 0
+        IF(ITEMP == 1)ANALY_TEMP = 1
       ELSE
         NANALY  = 0
         IPARITH = 1
+        ANALY_TEMP = 0
       ENDIF
 
 C--------------------------------------------------------------

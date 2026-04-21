@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_impvel_lagmul     ../starter/source/constraints/general/impvel/read_impvel_lagmul.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_impvel         ../starter/source/constraints/general/impvel/hm_read_impvel.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    kinset                 ../starter/source/constraints/general/kinset.F
-      !||    nodgrnr5               ../starter/source/starter/freform.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_impvel_lagmul     ../starter/source/constraints/general/impvel/read_impvel_lagmul.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_impvel         ../starter/source/constraints/general/impvel/hm_read_impvel.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl                ../starter/source/starter/freform.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    kinset                 ../starter/source/constraints/general/kinset.F
+!||    nodgrnr5               ../starter/source/starter/freform.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE READ_IMPVEL_LAGMUL(
      .           NLAGMUL  ,INUM     ,IOPT     ,FBFVEL   ,IBFVEL   ,
      .           ITAB     ,ITABM1   ,IGRNOD   ,NOM_OPT  ,X0       ,
@@ -55,6 +55,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARFIELD
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -87,13 +88,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,N1,N2,NOD,NUM0,ILAGMUL,IUN,JPART,NNOD,NOFRAME,INOD,NOSKEW,
-     .   SENS_ID,PART_ID,OPTID,UID,FCT1_ID,FCT2_ID,ILAGM,GRNOD_ID,IGS,LEN,
-     .   LAGMUL,IDIS,ICOOR,DISTRIBUTION,SKEW_ID
-      INTEGER ,DIMENSION(NUMNOD)   :: NOD1,NOD2,NWORK 
+      INTEGER J,NOD,NUM0,ILAGMUL,IUN,NNOD,NOFRAME,INOD,NOSKEW,
+     .   SENS_ID,OPTID,UID,FCT1_ID,ILAGM,GRNOD_ID,IGS,LEN,
+     .   IDIS,ICOOR,SKEW_ID
+      INTEGER ,DIMENSION(NUMNOD)   :: NWORK 
       INTEGER ,DIMENSION(3*NUMNOD) :: IKINE1
-      my_real :: XSCALE,YSCALE,FSCAL_T,FSCAL_V,T0,DMIN,DIST,
-     .   XI,YI,ZI,XF,YF,ZF,TSTART,TSTOP
+      my_real :: XSCALE,YSCALE,FSCAL_T,FSCAL_V,
+     .   TSTART,TSTOP
       CHARACTER(LEN=NCHARKEY)    :: KEY
       CHARACTER(LEN=NCHARFIELD)  :: XYZ
       CHARACTER(LEN=NCHARTITLE)  :: TITR,MESS

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_h3d_arg_keyword   ../engine/source/output/h3d/h3d_build_fortran/create_h3d_arg_keyword.F
-      !||--- called by ------------------------------------------------------
-      !||    lech3d                   ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../engine/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
-      !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||    names_and_titles_mod     ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_h3d_arg_keyword   ../engine/source/output/h3d/h3d_build_fortran/create_h3d_arg_keyword.F
+!||--- called by ------------------------------------------------------
+!||    lech3d                   ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
+!||    prelech3d                ../engine/source/output/h3d/h3d_build_fortran/prelech3d.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../engine/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                  ../engine/share/modules/h3d_mod.F
+!||    message_mod              ../engine/share/message_module/message_mod.F
+!||    names_and_titles_mod     ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE CREATE_H3D_ARG_KEYWORD(KEY2, KEY3 , KEY4  , KEY5 , KEY6 ,
      .                                  KEY7, KEY8 , IS_ALL,IS_LOWER, IS_UPPER ,
      .                                   ARG , S_ARG, IS_ARG, VALUE, 
      .                                   IS_ARG_ALL,IS_ARG_LOWER,IS_ARG_UPPER, IS_DEF,
-     .                                   IS_ARG_DEF)
+     .                                   IS_ARG_DEF,IS_MEMB,IS_ARG_MEMB)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -50,13 +51,13 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IS_ALL, IS_UPPER, IS_LOWER, S_ARG, VALUE, IS_ARG, IS_ARG_ALL, IS_ARG_LOWER, IS_ARG_UPPER,
-     .        IS_DEF, IS_ARG_DEF
+     .        IS_DEF, IS_ARG_DEF, IS_MEMB, IS_ARG_MEMB
       CHARACTER(LEN=NCHARKEY) ::  KEY2, KEY3, KEY4,KEY5,KEY6,KEY7,KEY8
       CHARACTER(LEN=S_ARG) ::  ARG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IS_ARG_KEY(5),I
+      INTEGER IS_ARG_KEY(5)
 C-----------------------------------------------
          IS_ARG_KEY(1:5) = 0
          VALUE = 0
@@ -65,6 +66,7 @@ C-----------------------------------------------
          IS_ARG_LOWER = 0
          IS_ARG_UPPER = 0
          IS_ARG_DEF = 0
+         IS_ARG_MEMB = 0
 
          IF ( KEY4(1:S_ARG) == ARG(1:S_ARG)) IS_ARG_KEY(1) = 1
          IF ( KEY5(1:S_ARG) == ARG(1:S_ARG)) IS_ARG_KEY(2) = 1
@@ -104,6 +106,13 @@ C-----------------------------------------------
      .          (KEY7(S_ARG+1:S_ARG+4) == '=DEF' .AND. IS_ARG_KEY(4) == 1)  .OR. 
      .          (KEY8(S_ARG+1:S_ARG+4) == '=ALL' .AND. IS_ARG_KEY(5) == 1)) )THEN
              IS_ARG_DEF = 1
+           ELSEIF ( IS_MEMB == 1 .AND.
+     .          ((KEY4(S_ARG+1:S_ARG+5) == '=MEMB' .AND. IS_ARG_KEY(1) == 1) .OR. 
+     .           (KEY5(S_ARG+1:S_ARG+5) == '=MEMB' .AND. IS_ARG_KEY(2) == 1) .OR. 
+     .           (KEY6(S_ARG+1:S_ARG+5) == '=MEMB' .AND. IS_ARG_KEY(3) == 1)  .OR. 
+     .           (KEY7(S_ARG+1:S_ARG+5) == '=MEMB' .AND. IS_ARG_KEY(4) == 1)  .OR. 
+     .           (KEY8(S_ARG+1:S_ARG+5) == '=MEMB' .AND. IS_ARG_KEY(5) == 1)) )THEN
+             IS_ARG_MEMB = 1
            ELSE
              IF (IS_ARG_KEY(1) == 1) READ (KEY4(S_ARG+2:S_ARG+11),'(I10)',ERR=100) VALUE
              IF (IS_ARG_KEY(2) == 1) READ (KEY5(S_ARG+2:S_ARG+11),'(I10)',ERR=100) VALUE

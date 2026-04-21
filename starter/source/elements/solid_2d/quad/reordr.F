@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    reordr         ../starter/source/elements/solid_2d/quad/reordr.F
-      !||--- called by ------------------------------------------------------
-      !||    lce16q3        ../starter/source/elements/solid_2d/quad/lce16q.F
-      !||    lce16s3        ../starter/source/elements/reader/hm_read_solid.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    reordr         ../starter/source/elements/solid_2d/quad/reordr.F
+!||--- called by ------------------------------------------------------
+!||    lce16q3        ../starter/source/elements/solid_2d/quad/lce16q.F
+!||    lce16s3        ../starter/source/elements/reader/hm_read_solid.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE REORDR(IX, NX, NEL, PM, IPOINT, IPARTS, NGRELE, IGRELEM, NUMMAT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -53,7 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IADR(0:MAXLAW+1), NL, M, I, MLAWP1, MT, MLAW, J,K,N,IAD
+      INTEGER IADR(0:MAXLAW+1), NL, M, I, MLAWP1, MT, MLAW, J,K,N
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------

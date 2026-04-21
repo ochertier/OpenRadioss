@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,15 +24,15 @@ C-----------------------------------------------
 C   Hyperelastic model: polynomial strain energy potential
 C   compute stresses using MATB which is the 
 C   left cauchy green tensor [b]=[F][FT]
-      !||====================================================================
-      !||    polystress2   ../engine/source/materials/mat/mat100/sigpoly.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps100     ../engine/source/materials/mat/mat100/sigeps100.F90
-      !||    sigeps95      ../engine/source/materials/mat/mat095/sigeps95.F
-      !||--- calls      -----------------------------------------------------
-      !||    mullins_or    ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
-      !||    prodmat       ../engine/source/materials/tools/prodmat.F
-      !||====================================================================
+!||====================================================================
+!||    polystress2   ../engine/source/materials/mat/mat100/sigpoly.F
+!||--- called by ------------------------------------------------------
+!||    sigeps100     ../engine/source/materials/mat/mat100/sigeps100.F90
+!||    sigeps95      ../engine/source/materials/mat/mat095/sigeps95.F
+!||--- calls      -----------------------------------------------------
+!||    mullins_or    ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
+!||    prodmat       ../engine/source/materials/tools/prodmat.F
+!||====================================================================
        SUBROUTINE POLYSTRESS2(
      1                NEL , MATB, C10, C01, C20, 
      2                C11 ,C02, C30, C21, C12,
@@ -68,8 +68,8 @@ C----------------------------------------------------------------
       INTEGER    I
 
       my_real     
-     .   Wmax,LPCHAIN(NEL), TRACE(NEL),TRACEB(NEL),J2THIRD(NEL),
-     .   SB1(NEL), SB2(NEL),SB3(NEL),TBNORM(NEL),DGAMMA(NEL),I1(NEL),
+     .   Wmax,J2THIRD(NEL),
+     .    I1(NEL),
      .   AA,BB,CC,TRB2,TRB22,RBULK,
      .   I2(NEL),JTHIRD(NEL),J4THIRD(NEL),ETA(NEL),WW(NEL) ,
      .   DPHIDI1(NEL) ,DPHIDI2(NEL) , DPHIDJ(NEL) ,INV2J(NEL), 
@@ -186,14 +186,14 @@ C----------------------------------------------------------------
 C   
       RETURN
       END
-      !||====================================================================
-      !||    polystrest2   ../engine/source/materials/mat/mat100/sigpoly.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps95      ../engine/source/materials/mat/mat095/sigeps95.F
-      !||--- calls      -----------------------------------------------------
-      !||    mullins_or    ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
-      !||    prodmat       ../engine/source/materials/tools/prodmat.F
-      !||====================================================================
+!||====================================================================
+!||    polystrest2   ../engine/source/materials/mat/mat100/sigpoly.F
+!||--- called by ------------------------------------------------------
+!||    sigeps95      ../engine/source/materials/mat/mat095/sigeps95.F
+!||--- calls      -----------------------------------------------------
+!||    mullins_or    ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
+!||    prodmat       ../engine/source/materials/tools/prodmat.F
+!||====================================================================
        SUBROUTINE POLYSTREST2(
      1                NEL , MATB, C10, C01, C20, 
      2                C11 ,C02, C30, C21, C12,
@@ -230,8 +230,8 @@ C----------------------------------------------------------------
       INTEGER    I
 
       my_real     
-     .   Wmax,LPCHAIN(NEL), TRACE(NEL),TRACEB(NEL),J2THIRD(NEL),MATB2(NEL,3,3),
-     .   SB1(NEL), SB2(NEL),SB3(NEL),TBNORM(NEL),DGAMMA(NEL),I1(NEL),
+     .   Wmax,J2THIRD(NEL),MATB2(NEL,3,3),
+     .    I1(NEL),
      .   AA,BB,CC,TRB2,TRB22,
      .   I2(NEL),JTHIRD(NEL),J4THIRD(NEL),ETA(NEL),WW(NEL) ,
      .   DPHIDI1(NEL) ,DPHIDI2(NEL) , DPHIDJ(NEL) ,INV2J(NEL), 
@@ -378,9 +378,9 @@ c------------------------------------------------------------------------
 C   Hyperelastic model: polynomial strain energy potential
 C   compute stresses using EV(NEL,3) which are the 
 C   stretches (using principal direction)
-      !||====================================================================
-      !||    polystress   ../engine/source/materials/mat/mat100/sigpoly.F
-      !||====================================================================
+!||====================================================================
+!||    polystress   ../engine/source/materials/mat/mat100/sigpoly.F
+!||====================================================================
        SUBROUTINE POLYSTRESS(
      1                NEL ,EV,NUPARAM, UPARAM,T1,T2,T3,STIFF,
      2                BI1,BI2,JDET,EVB)
@@ -408,9 +408,9 @@ C----------------------------------------------------------------
       INTEGER    I
 
       my_real     
-     .   LPCHAIN(NEL), TRACE(NEL),TRACEB(NEL),JDET(NEL),STIFF(NEL),
-     .   SB1(NEL), SB2(NEL),SB3(NEL),TBNORM(NEL),DGAMMA(NEL),
-     .   EVPN(NEL,3),EVEL(NEL,3),EVB(NEL,3),
+     .    JDET(NEL),STIFF(NEL),
+     .    
+     .   EVB(NEL,3),
      .   AA,BB,CC,C10,C01,C20,C11,C02,C30,C21,C12,C03,D1,D2,D3,
      .   I2(NEL),JTHIRD(NEL),J4THIRD(NEL),BI1(NEL),
      .   BI2(NEL),DPHIDI1(NEL) ,DPHIDI2(NEL) , DPHIDJ(NEL) ,INV2J(NEL) 

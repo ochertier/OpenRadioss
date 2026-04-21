@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    binit2                 ../starter/source/ale/bimat/binit2.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    aturi2                 ../starter/source/ale/ale2d/aturi2.F
-      !||    bimat2                 ../starter/source/ale/bimat/bimat2.F
-      !||    edlen2                 ../starter/source/ale/ale2d/edlen2.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    qcoor2                 ../starter/source/elements/solid_2d/quad/qcoor2.F
-      !||    qdlen2                 ../starter/source/elements/solid_2d/quad/qdlen2.F
-      !||    qmasi2                 ../starter/source/elements/solid_2d/quad/qmasi2.F
-      !||    qmasi2b                ../starter/source/elements/solid_2d/quad/qmasi2b.F
-      !||    qvoli2                 ../starter/source/elements/solid_2d/quad/qvoli2.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||====================================================================
+!||====================================================================
+!||    binit2                 ../starter/source/ale/bimat/binit2.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    aturi2                 ../starter/source/ale/ale2d/aturi2.F
+!||    bimat2                 ../starter/source/ale/bimat/bimat2.F
+!||    edlen2                 ../starter/source/ale/ale2d/edlen2.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    qcoor2                 ../starter/source/elements/solid_2d/quad/qcoor2.F
+!||    qdlen2                 ../starter/source/elements/solid_2d/quad/qdlen2.F
+!||    qmasi2                 ../starter/source/elements/solid_2d/quad/qmasi2.F
+!||    qmasi2b                ../starter/source/elements/solid_2d/quad/qmasi2b.F
+!||    qvoli2                 ../starter/source/elements/solid_2d/quad/qvoli2.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||====================================================================
       SUBROUTINE BINIT2(ELBUF_STR ,MS       ,IXQ              ,PM        ,X       ,
      .                  DETONATORS,VEUL     ,ALE_CONNECTIVITY ,IPARG     ,FILL    ,
      .                  SIGI      ,BUFMAT   ,NEL              ,MAT_PARAM ,
@@ -52,6 +52,7 @@ C-----------------------------------------------
       USE DETONATORS_MOD          
       USE ALE_CONNECTIVITY_MOD
       USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
+      use element_mod , only : nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -88,14 +89,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, NF1, IMULT, MLW, IGTYP, IP,IBID
-      INTEGER MAT(MVSIZ), NGL(MVSIZ), GAMA(6,MVSIZ)
+      INTEGER I, NF1, IMULT, IGTYP, IP,IBID
+      INTEGER MAT(MVSIZ), NGL(MVSIZ)
       my_real
-     .     X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ),
      .     Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
      .     Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
      .     AIRE(MVSIZ), DELTAX(MVSIZ),
      .     SY(MVSIZ), SZ(MVSIZ), TY(MVSIZ), TZ(MVSIZ)
+      my_real :: TEMPEL(NEL)
       INTEGER PID(MVSIZ), IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ)
 C-----------------------------------------------
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -109,6 +110,7 @@ C-----------------------------------------------
       IGTYP= IPARG(38)
       NF1  = NFT+1
       IBID = 0
+      TEMPEL(:) = ZERO
 c
       CALL QCOOR2(X,IXQ(1,NF1),NGL,MAT, 
      .     PID, IX1, IX2, IX3, IX4, 
@@ -141,7 +143,7 @@ C---------------------------------------
       ENDDO
 
       !------------------------------------------
-      !     MULTIMATERIAUX POUCENTAGE DE REMPLISSAGE
+      ! multimaterials filling percentage
       !------------------------------------------
       CALL BIMAT2(GBUF%VOL, LBUF%FRAC, FILL(1,1), LBUF%VOL, LBUF%OFF, IXQ(1,NF1))
       !----------------------------------------
@@ -155,15 +157,15 @@ C---------------------------------------
      .            MAT    ,IPM    ,NSIGS  ,NUMQUAD   ,PTQUAD ,
      .            IP     ,NGL    ,NPF    ,TF        ,BUFMAT ,
      .            GBUF   ,LBUF   ,MBUF   ,ELBUF_STR ,ILOADP ,
-     .            FACLOAD, DELTAX)
+     .            FACLOAD, DELTAX,TEMPEL ,MAT_PARAM )
       !----------------------------------------
-      !     INITIALISATION DE LA THERMIQUE ET TURBULENCE
+      ! initialization of thermal and turbulence
       !----------------------------------------
       IF(JTHE/=0) CALL ATHERI(MAT,PM,LBUF%TEMP)
       IF(JTUR/=0) CALL ATURI2(IPARGG ,LBUF%RHO,PM,IXQ,X,
      .                          LBUF%RK,LBUF%RE, AIRE)
       !------------------------------------------
-      !     INITIALISATION DE LA MATRICE DE MASSE
+      ! initialization of the mass matrix
       !------------------------------------------
       IF(JLAG+JALE+JEUL/=0)
      .  CALL QMASI2(PM,MAT,MS,LBUF%VOL,MSQ(NF1),WMA,IPARTQ(NFT+1),PARTSAV, 
@@ -182,7 +184,7 @@ C---------------------------------------
         MAT(I)=MAT_PARAM(IABS(IXQ(1,NFT+I)))%MULTIMAT%MID(JMULT)
       ENDDO
       !------------------------------------------
-      !     MULTIMATERIAUX POUCENTAGE DE REMPLISSAGE
+      ! multimaterials filling percentage
       !------------------------------------------
       CALL BIMAT2( GBUF%VOL, LBUF%FRAC, FILL(1,2), LBUF%VOL, LBUF%OFF, IXQ(1,NF1) )
       !----------------------------------------
@@ -196,15 +198,15 @@ C---------------------------------------
      .            MAT    , IPM               ,NSIGS     ,NUMQUAD   ,PTQUAD ,
      .            IP     , NGL               ,NPF       ,TF        ,BUFMAT ,
      .            GBUF   , LBUF              ,MBUF      ,ELBUF_STR ,ILOADP ,
-     .            FACLOAD, DELTAX)
+     .            FACLOAD, DELTAX,TEMPEL     ,MAT_PARAM )
       !----------------------------------------
-      !     INITIALISATION DE LA THERMIQUE ET TURBULENCE
+      ! initialization of thermal and turbulence
       !----------------------------------------
       IF (JTHE/=0) CALL ATHERI(MAT,PM, LBUF%TEMP)
       IF (JTUR/=0) CALL ATURI2(IPARGG ,LBUF%RHO,PM,IXQ,X,
      .                          LBUF%RK,LBUF%RE, AIRE)
       !------------------------------------------
-      !     INITIALISATION DE LA MATRICE DE MASSE
+      ! initialization of the mass matrix
       !------------------------------------------
       IF(JLAG+JALE+JEUL/=0)
      .  CALL QMASI2B(PM,MAT,MS,LBUF%VOL,MSQ(NF1),WMA,IPARTQ(NFT+1),PARTSAV,

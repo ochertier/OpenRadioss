@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    update_weight_inter_type7   ../starter/source/spmd/domain_decomposition/update_weight_inter_type7.F
-      !||--- called by ------------------------------------------------------
-      !||    i20ini3                     ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||    inint3                      ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_cand_mod              ../starter/share/modules1/inter_cand_mod.F
-      !||====================================================================
+!||====================================================================
+!||    update_weight_inter_type7   ../starter/source/spmd/domain_decomposition/update_weight_inter_type7.F
+!||--- called by ------------------------------------------------------
+!||    i20ini3                     ../starter/source/interfaces/inter3d1/i20ini3.F
+!||    inint3                      ../starter/source/interfaces/inter3d1/inint3.F
+!||--- uses       -----------------------------------------------------
+!||    inter_cand_mod              ../starter/share/modules1/inter_cand_mod.F
+!||====================================================================
         SUBROUTINE UPDATE_WEIGHT_INTER_TYPE7(NELEMINT,INTERFACE_ID,NSN,NRTM,IFIEND,
      .                                       IRECT,NSV,I_STOK,CAND_E,CAND_N,
      .                                       IGAP,GAP,GAPMAX,GAPMIN,DGAPLOAD,
@@ -76,7 +76,7 @@ C-----------------------------------------------
         INTEGER :: S_NODE_ID
         INTEGER :: SEGMENT_ID
 
-        INTEGER :: N,I
+        INTEGER :: I
         INTEGER :: IX1,IX2,IX3,IX4
         my_real
      .   XMIN,XMAX,YMIN,YMAX,ZMIN,ZMAX,THRESHOLD,

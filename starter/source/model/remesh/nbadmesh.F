@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    nbadmesh                 ../starter/source/model/remesh/nbadmesh.F
-      !||--- called by ------------------------------------------------------
-      !||    contrl                   ../starter/source/starter/contrl.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    constit                  ../starter/source/elements/nodes/constit.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    usr2sys                  ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod           ../starter/share/modules1/reader_old_mod.F90
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    nbadmesh                 ../starter/source/model/remesh/nbadmesh.F
+!||--- called by ------------------------------------------------------
+!||    contrl                   ../starter/source/starter/contrl.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    constit                  ../starter/source/elements/nodes/constit.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    usr2sys                  ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    reader_old_mod           ../starter/share/modules1/reader_old_mod.F90
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE NBADMESH(LSUBMODEL,NUMNUSR,UNITAB)
 C----------------------------------------------------------
 C   M o d u l e s
@@ -50,6 +50,7 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
       USE READER_OLD_MOD , ONLY : LINE, IREC
       USE USER_ID_MOD , ONLY : ID_LIMIT
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,14 +73,14 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAB,ITABM1,KNOD2SH,NOD2SH
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: IXC,IXTG,TAG
       INTEGER IPART(4,NPART),
-     .        N,IP,ID,I,J,NLEV,NMUL,STAT,INDEX_PART,NPART_ADM
-      INTEGER USR2SYS,NUMNUSR1,IDS,NI,NJ,NK,NL,K,L,P,Q,QQ,
-     .        NN,UID,IP0,ID_IP
+     .        N,IP,ID,I,J,NLEV,STAT,INDEX_PART,NPART_ADM
+      INTEGER USR2SYS,NUMNUSR1,NI,NJ,NK,NL,K,L,P,Q,QQ,
+     .        UID,IP0,ID_IP
       CHARACTER MESS*40
       CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER(LEN=NCHARKEY) :: KEY
-      INTEGER , DIMENSION(:), ALLOCATABLE :: IPARTC, SHELL_ID
-      INTEGER , DIMENSION(:), ALLOCATABLE :: IPARTTG, SH3N_ID
+      INTEGER , DIMENSION(:), ALLOCATABLE :: IPARTC
+      INTEGER , DIMENSION(:), ALLOCATABLE :: IPARTTG
       REAL*8 , DIMENSION(:), ALLOCATABLE :: SH_ANGLE, SH_THK
       REAL*8 , DIMENSION(:), ALLOCATABLE :: SH3_ANGLE, SH3_THK
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUBID_SHELL,UID_SHELL
@@ -95,10 +96,7 @@ C------
       ALLOCATE(ITAB(NUMNUSR),ITABM1(2*NUMNUSR),
      .         IXC(NIXC,NUMELC0),IXTG(NIXTG,NUMELTG0),
      .        KNOD2SH(0:NUMNUSR),NOD2SH(4*NUMELC0+3*NUMELTG0),
-     .        TAG(4,NUMELC0+NUMELTG0),STAT=stat)
-      IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                          MSGTYPE=MSGERROR,
-     .                         C1='ITAB')     
+     .        TAG(4,NUMELC0+NUMELTG0))
       TAG=0
 C------
 C--------------------------------------------------
@@ -340,7 +338,7 @@ C--------------------------------------------------
       ENDDO
       IF(ALLOCATED(SUBID_NODES)) DEALLOCATE(SUBID_NODES)
 C------
-C     CONSTITUTION DU TABLEAU INVERSE DES NOEUDS
+C     building the inverse node table
 C------
 C     NUMNUSR=NUMNUSR1+NUMCNOD !
       CALL CONSTIT(ITAB,ITABM1,NUMNUSR)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_xelem    ../starter/source/elements/reader/hm_read_xelem.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../starter/source/output/message/message.F
-      !||    anodset          ../starter/source/output/analyse/analyse_node.c
-      !||    nodgrnr5         ../starter/source/starter/freform.F
-      !||    udouble          ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||    submodel_mod     ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_xelem    ../starter/source/elements/reader/hm_read_xelem.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../starter/source/output/message/message.F
+!||    anodset          ../starter/source/output/analyse/analyse_node.c
+!||    nodgrnr5         ../starter/source/starter/freform.F
+!||    udouble          ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||    submodel_mod     ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_XELEM(IGRNOD   ,ITAB ,ITABM1,IPART,IPARTX,
      .                  IPM,IGEO ,KXX ,IXX, LSUBMODEL)
 C-----------------------------------------------
@@ -98,7 +98,7 @@ C OUTPUT ARGUMENTS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I1, I2,PID,N,ID,IDS,J,STAT,MID,IAD,NNOD,IGS
+      INTEGER I, I1, I2,PID,N,J,STAT,MID,IAD,NNOD,IGS
       INTEGER INDEX_PART
       INTEGER TABIDS(NUMELX)
       CHARACTER MESS*40
@@ -199,7 +199,7 @@ C-----------
      .            ANMODE=ANINFO_BLIND_1,    
      .            PRMOD=MSG_PRINT)
 C-------------------------------------
-C Recherche des ID doubles
+C Search for double IDs
 C-------------------------------------
       DO I=1,NUMELX
          TABIDS(I)= KXX(NIXX,I)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_nodal_tensor       ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                 ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_tm_gps             ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
-      !||    h3d_write_tensor       ../engine/source/output/h3d/h3d_results/h3d_write_tensor.F
-      !||    spmd_exch_nodarea2     ../engine/source/mpi/anim/spmd_exch_nodarea2.F
-      !||    spmd_exch_nodareai     ../engine/source/mpi/anim/spmd_exch_nodareai.F
-      !||    tensgps1               ../engine/source/output/anim/generate/tensor6.F
-      !||    tensgps2               ../engine/source/output/anim/generate/tensor6.F
-      !||    tensgps3               ../engine/source/output/anim/generate/tensor6.F
-      !||    tensgpstrain           ../engine/source/output/anim/generate/tensgpstrain.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    outmax_mod             ../common_source/modules/outmax_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_nodal_tensor       ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                 ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    get_tm_gps             ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
+!||    h3d_write_tensor       ../engine/source/output/h3d/h3d_results/h3d_write_tensor.F
+!||    spmd_exch_nodarea2     ../engine/source/mpi/anim/spmd_exch_nodarea2.F
+!||    spmd_exch_nodareai     ../engine/source/mpi/anim/spmd_exch_nodareai.F
+!||    tensgps1               ../engine/source/output/anim/generate/tensor6.F
+!||    tensgps2               ../engine/source/output/anim/generate/tensor6.F
+!||    tensgps3               ../engine/source/output/anim/generate/tensor6.F
+!||    tensgpstrain           ../engine/source/output/anim/generate/tensgpstrain.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||    outmax_mod             ../common_source/modules/outmax_mod.F
+!||====================================================================
       SUBROUTINE H3D_NODAL_TENSOR(
      .                  ELBUF_TAB, NODAL_TENSOR, IFUNC          , IPARG      , GEO      ,
-     .                  MASS     , PM          , ANIN           , ITAB       , NODE_ID  ,
+     .                  MASS     , PM          ,  ITAB       , NODE_ID  ,
      .                  INFO1    , INFO2       , IS_WRITTEN_NODE, H3D_PART   , IPARTC   ,
      .                  IPARTTG  , IXC         , IXTG           , TEMP       , IFLOW    ,
      .                  RFLOW    , IXS         , IXQ            , NV46,MONVOL, VOLMON   ,
@@ -57,6 +58,7 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE ELBUFDEF_MOD 
       USE OUTMAX_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,7 +76,7 @@ C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       my_real
      .   NODAL_TENSOR(*),MASS(*),GEO(NPROPG,*),
-     .   PM(NPROPM,*),ANIN(*),TEMP(*),RFLOW(*),VOLMON(*), DIAG_SMS(*),MS(*),
+     .   PM(NPROPM,*),TEMP(*),RFLOW(*),VOLMON(*), DIAG_SMS(*),MS(*),
      .   PDAMA2(2,*),X(*),STIFR(*),STIFN(*),A(3,*),D(3,*),V(3,*), 
      .   CONT(3,*),FCONTG(3,*), FINT(3,*), FEXT(3,*),BUFMAT(*)
       INTEGER IPARG(NPARG,*),IFUNC,NODE_ID(*),
@@ -91,7 +93,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,LENR
+      INTEGER I, J, N, LENR
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGPS, IOK_PART 
       my_real
      .       , DIMENSION(:,:), ALLOCATABLE :: AFLU, VFLU,VALUES
@@ -359,11 +361,11 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    get_tm_gps         ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_nodal_tensor   ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
-      !||====================================================================
+!||====================================================================
+!||    get_tm_gps         ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
+!||--- called by ------------------------------------------------------
+!||    h3d_nodal_tensor   ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
+!||====================================================================
       SUBROUTINE GET_TM_GPS(VALUES,TM_NSIG,NNOD,IOK_PART,IGPSTAG)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -380,9 +382,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
-      my_real
-     .   S(3),NORM2
+      INTEGER I
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------     

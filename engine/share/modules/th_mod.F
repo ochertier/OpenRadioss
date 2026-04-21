@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    th_mod     ../engine/share/modules/th_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    freform    ../engine/source/input/freform.F
-      !||    hist1      ../engine/source/output/th/hist1.F
-      !||    hist2      ../engine/source/output/th/hist2.F
-      !||    init_th    ../engine/source/output/th/init_th.F
-      !||    init_th0   ../engine/source/output/th/init_th0.F
-      !||    write_th   ../engine/source/output/th/write_th.F
-      !||====================================================================
+!||====================================================================
+!||    th_mod                       ../engine/share/modules/th_mod.F
+!||--- called by ------------------------------------------------------
+!||    freform                      ../engine/source/input/freform.F
+!||    hist1                        ../engine/source/output/th/hist1.F
+!||    hist2                        ../engine/source/output/th/hist2.F
+!||    init_th                      ../engine/source/output/th/init_th.F
+!||    init_th0                     ../engine/source/output/th/init_th0.F
+!||    output_allocate_noda_pext    ../common_source/modules/output/output_mod.F90
+!||    pblast_1                     ../engine/source/loads/pblast/pblast_1.F
+!||    pblast_2                     ../engine/source/loads/pblast/pblast_2.F
+!||    pblast_3                     ../engine/source/loads/pblast/pblast_3.F
+!||    rdcomi                       ../engine/source/output/restart/rdcomm.F
+!||    sortie_main                  ../engine/source/output/sortie_main.F
+!||    spmd_exch_output_noda_pext   ../engine/source/mpi/output/spmd_exch_output_noda_pext.F
+!||    thnod                        ../engine/source/output/th/thnod.F
+!||    wrcomi                       ../engine/source/output/restart/wrcomm.F
+!||    write_th                     ../engine/source/output/th/write_th.F
+!||====================================================================
         MODULE TH_MOD
 C-----------------------------------------------
 C   m y _ r e a l
@@ -108,5 +117,7 @@ C-----------------------------------------------
         TYPE(TH_PROC_TYPE), DIMENSION(10), TARGET :: NST_STRUCT       
         TYPE(TH_COMM), DIMENSION(10), TARGET :: WA_NST_COMM
         TYPE(TH_WA_REAL), DIMENSION(10), TARGET :: WA_NST_P0,WA_NST
+
+        INTEGER :: TH_HAS_NODA_PEXT
 C
         END MODULE TH_MOD

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    invoi2    ../engine/source/interfaces/inter2d/invoi2.F
-      !||--- called by ------------------------------------------------------
-      !||    i9main2   ../engine/source/interfaces/int09/i9main2.F
-      !||    intvo2    ../engine/source/interfaces/inter2d/intvo2.F
-      !||====================================================================
+!||====================================================================
+!||    invoi2    ../engine/source/interfaces/inter2d/invoi2.F
+!||--- called by ------------------------------------------------------
+!||    i9main2   ../engine/source/interfaces/int09/i9main2.F
+!||    intvo2    ../engine/source/interfaces/inter2d/intvo2.F
+!||====================================================================
       SUBROUTINE INVOI2(X,IRECT,LMSR,MSR,NSV,ILOC,IRTL,NSEG,NSN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -56,7 +56,7 @@ C-----------------------------------------------
       NUM=NSEG(J+1)-NSEG(J)
       NPT=NSEG(J)-1
 C---------------------------------------------
-C     RECHERCHE DU NOEUD main LE PLUS PROCHE
+C     search for the closest main node
 C---------------------------------------------
       DO 100 JJ=1,NUM
       LL=LMSR(NPT+JJ)
@@ -71,7 +71,7 @@ C---------------------------------------------
       ENDIF
   100 CONTINUE
 C------------------------------------------------
-C     RECHERCHE DU SEGMENT main LE PLUS PROCHE
+C     search for the closest main segment
 C------------------------------------------------
       ILOC(II)=J
       RESULT=EP30

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_type09   ../starter/source/interfaces/int09/hm_read_inter_type09.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_type09   ../starter/source/interfaces/int09/hm_read_inter_type09.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE09(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,
      2        IGRSURF    ,UNITAB     ,LSUBMODEL  ,NPARI     ,
@@ -69,13 +69,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,L, NTYP,IS1, IS2,IEULT,IGSTI,ILEV,IBUC,
+      INTEGER NTYP,IS1, IS2,IEULT,IGSTI,ILEV,IBUC,
      .   IBC1, IBC2, IBC3,IBC1M, IBC2M, IBC3M,INTKG
       my_real
      .   FRIC,GAP,STARTT,STOPT,FHEAT,STENS,VISC
-      CHARACTER(LEN=40)::MESS
-      CHARACTER(LEN=NCHARTITLE)::MSGTITL
-      CHARACTER(LEN=NCHARKEY) ::  OPT,KEY,KEY1
+
 !
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       LOGICAL :: IS_AVAILABLE
@@ -116,9 +114,9 @@ C=======================================================================
 C=======================================================================
 C     CARD 1 : Surfaces ids
 C=======================================================================
-      ! Main surface
+      ! Lagrangian surface
       CALL HM_GET_INTV('surf_IDA', ISU1, IS_AVAILABLE, LSUBMODEL)
-      ! Secnd surface
+      ! ALE surface
       CALL HM_GET_INTV('surf_IDL', ISU2, IS_AVAILABLE, LSUBMODEL)
       ! Checks
       IS1=1
@@ -175,33 +173,32 @@ C
       WRITE(IOUT,1509) IBUC,IPARI(14),STFAC,FRIC,GAP,VISC,STENS
 C
       IF(IS1==0)THEN
-        WRITE(IOUT,'(6X,A)')'NO SECONDARY SURFACE INPUT'
+        WRITE(IOUT,'(6X,A)')'NO ALE SURFACE INPUT'
       ELSEIF(IS1==1)THEN
-        WRITE(IOUT,'(6X,A)')'SECONDARY SURFACE INPUT BY SEGMENTS'
+        WRITE(IOUT,'(6X,A)')'ALE SURFACE INPUT BY SEGMENTS'
       ELSEIF(IS1==2)THEN
-        WRITE(IOUT,'(6X,A)')'SECONDARY SURFACE INPUT BY NODES'
+        WRITE(IOUT,'(6X,A)')'ALE SURFACE INPUT BY NODES'
       ELSEIF(IS1==3)THEN
-        WRITE(IOUT,'(6X,A)')'SECONDARY SURFACE INPUT BY SEGMENTS'
+        WRITE(IOUT,'(6X,A)')'ALE SURFACE INPUT BY SEGMENTS'
       ELSEIF(IS1==4 )THEN
-        WRITE(IOUT,'(6X,A)')'SECONDARY SIDE INPUT BY BRICKS'
+        WRITE(IOUT,'(6X,A)')'ALE SIDE INPUT BY BRICKS'
       ELSEIF(IS1==5 )THEN
-        WRITE(IOUT,'(6X,A)')'SECONDARY SIDE INPUT BY SOLID ELEMENTS'        
+        WRITE(IOUT,'(6X,A)')'ALE SIDE INPUT BY SOLID ELEMENTS'
       ENDIF
       IF(IS2==0)THEN
-        WRITE(IOUT,'(6X,A)')'NO MAIN SURFACE INPUT'
+        WRITE(IOUT,'(6X,A)')'NO LAGRANGIAN SURFACE INPUT'
       ELSEIF(IS2==1)THEN
-        WRITE(IOUT,'(6X,A)')'MAIN SURFACE INPUT BY SEGMENTS'
+        WRITE(IOUT,'(6X,A)')'LAGRANGIAN SURFACE INPUT BY SEGMENTS'
       ELSEIF(IS2==2)THEN
-        WRITE(IOUT,'(6X,A)')'MAIN SURFACE INPUT BY NODES'
+        WRITE(IOUT,'(6X,A)')'LAGRANGIAN SURFACE INPUT BY NODES'
       ELSEIF(IS2==3)THEN
-        WRITE(IOUT,'(6X,A)')'MAIN SURFACE INPUT BY SEGMENTS'
+        WRITE(IOUT,'(6X,A)')'LAGRANGIAN SURFACE INPUT BY SEGMENTS'
       ELSEIF(IS2==4)THEN
-        WRITE(IOUT,'(6X,A)')'MAIN SURFACE REFERS ',
+        WRITE(IOUT,'(6X,A)')'LAGRANGIAN SURFACE REFERS ',
      .                      'TO HYPER-ELLIPSOIDAL SURFACE'
       ENDIF
 C
 C--------------------------------------------------------------
- 1000 FORMAT(/1X,'  INTERFACE NUMBER :',I10,1X,A)
 C------------
  1509 FORMAT(//
      .    '    TYPE==9  ALE-THERMAL SLIDING AND VOIDS  ' //,

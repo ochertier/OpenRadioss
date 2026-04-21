@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i5keg3   ../engine/source/interfaces/inter3d/i5keg3.F
-      !||--- called by ------------------------------------------------------
-      !||    i5ke3    ../engine/source/interfaces/inter3d/i5ke3.F
-      !||====================================================================
+!||====================================================================
+!||    i5keg3   ../engine/source/interfaces/inter3d/i5keg3.F
+!||--- called by ------------------------------------------------------
+!||    i5ke3    ../engine/source/interfaces/inter3d/i5ke3.F
+!||====================================================================
       SUBROUTINE I5KEG3(LFT    ,LLT   ,FRIC   ,SCALK  ,
      3                  TNJ    ,KI11  ,KI12   ,KJ11   ,KJ12  ,
      4                  KK11   ,KK12   ,KL11  ,KL12   ,OFF   ,
@@ -61,7 +61,7 @@ C-----------------------------------------------
      .   PREC,Q11,Q12,Q13,Q22,Q23,Q33,H00,VTX,VTY,VTZ,VT,
      .   KT1,KT2,KT3,KT4,Q1,Q2
 C-----------------------------------------------
-C    ----sans frottement d'abord--- 
+C    ---- Without friction first --- 
       DO I=LFT,LLT
         FAC=STIF(I)*SCALK
         KN(1,I)=FAC*H1(I)
@@ -102,7 +102,7 @@ C
        KL11(2,3,I)=KN(4,I)*Q23
        KL11(3,3,I)=KN(4,I)*Q33
       ENDDO
-C    ----avec frottement --- 
+C    with friction
       IF (FRIC>ZERO) THEN
 C    ----tangent vector --- 
        FAC= FRIC*SCALK
@@ -165,11 +165,11 @@ C
 C
        RETURN
       END
-      !||====================================================================
-      !||    i5frik3   ../engine/source/interfaces/inter3d/i5keg3.F
-      !||--- called by ------------------------------------------------------
-      !||    i5ke3     ../engine/source/interfaces/inter3d/i5ke3.F
-      !||====================================================================
+!||====================================================================
+!||    i5frik3   ../engine/source/interfaces/inter3d/i5keg3.F
+!||--- called by ------------------------------------------------------
+!||    i5ke3     ../engine/source/interfaces/inter3d/i5ke3.F
+!||====================================================================
       SUBROUTINE I5FRIK3(LFT   ,LLT   ,I_N  ,I_E   ,IPARI  ,
      2                  X     ,IRECT ,MSR   ,NSV   ,IRTL   ,
      3                  CST   ,IRTLO ,FRIC0 ,FRIC  ,FREQ   ,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alew6                  ../engine/source/ale/grid/alew6.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx                 ../engine/source/ale/grid/alewdx.F
-      !||--- calls      -----------------------------------------------------
-      !||    centroid2              ../engine/source/multifluid/centroid.F
-      !||    centroid3              ../engine/source/multifluid/centroid.F
-      !||    centroid3t             ../engine/source/multifluid/centroid.F
-      !||    my_barrier             ../engine/source/system/machine.F
-      !||    spmd_e1vois            ../engine/source/mpi/fluid/spmd_cfd.F
-      !||    spmd_envois            ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    alew6                  ../engine/source/ale/grid/alew6.F
+!||--- called by ------------------------------------------------------
+!||    alewdx                 ../engine/source/ale/grid/alewdx.F
+!||--- calls      -----------------------------------------------------
+!||    centroid2              ../engine/source/multifluid/centroid.F
+!||    centroid3              ../engine/source/multifluid/centroid.F
+!||    centroid3t             ../engine/source/multifluid/centroid.F
+!||    my_barrier             ../engine/source/system/machine.F
+!||    spmd_e1vois            ../engine/source/mpi/fluid/spmd_cfd.F
+!||    spmd_envois            ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE ALEW6( 
-     1     X             ,D             , V       ,W       ,WA      ,
-     .     XCELL         , XFACE        ,
-     2     ALE_NN_CONNECT,ALE_NE_CONNECT, NALE    ,NODFT   ,NODLT   ,ITASK   ,
-     3     NBRCVOIS      ,NBSDVOIS      , LNRCVOIS,LNSDVOIS,ITAB    ,NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS,
-     4     ELBUF_TAB     , IPARG        , IXS     , IXQ)
+     1     X             , V        ,W       ,WA       ,
+     .     XCELL         ,XFACE     ,
+     2     ALE_NE_CONNECT,NALE      ,NODFT   ,NODLT    ,ITASK   ,
+     3     NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS,
+     4     ELBUF_TAB     ,IPARG     ,IXS     ,IXQ)
 C-----------------------------------------------
 C     D e s c r i p t i o n
 C-----------------------------------------------
@@ -56,6 +57,7 @@ C     M o d u l e s
 C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE ELBUFDEF_MOD            
+      use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -79,16 +81,15 @@ C-----------------------------------------------
 !      idem with D(SD), and V(SV)
 C-----------------------------------------------
       INTEGER NALE(NUMNOD), NODFT, NODLT, ITASK,
-     .        NBRCVOIS(*),NBSDVOIS(*),
-     .        LNRCVOIS(*),LNSDVOIS(*),ITAB(NUMNOD),IPARG(NPARG,NGROUP),IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ)
-      my_real X(3,SX/3), D(3,SD/3), V(3,SV/3), W(3,SW/3), WA(3,*), XCELL(3, *), XFACE(3,6,*)  
-      TYPE(t_connectivity), INTENT(IN) :: ALE_NN_CONNECT, ALE_NE_CONNECT
+     .        IPARG(NPARG,NGROUP),IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ)
+      my_real X(3,SX/3), V(3,SV/3), W(3,SW/3), WA(3,*), XCELL(3, *), XFACE(3,6,*)
+      TYPE(t_connectivity), INTENT(IN) :: ALE_NE_CONNECT
       INTEGER, INTENT(IN) :: NERCVOIS(*), NESDVOIS(*), LERCVOIS(*), LESDVOIS(*)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IA(6), LENCOM
+      INTEGER I, LENCOM
       INTEGER :: IAD1, IAD2, NG, NEL, NFT, ITY, ISOLNOD, IEL, ELT_ID
       my_real :: SUM_VOL, Y1, Y2, Y3, Y4, Z1, Z2, Z3, Z4, A1, A2
 C     ---------------------------------------------

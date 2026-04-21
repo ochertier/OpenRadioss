@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_solid      ../starter/source/elements/reader/hm_read_solid.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur             ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../starter/source/output/message/message.F
-      !||    anodset            ../starter/source/output/analyse/analyse_node.c
-      !||    checkvolume_4n     ../starter/source/elements/solid/solide/checksvolume.F
-      !||    udouble            ../starter/source/system/sysfus.F
-      !||    usr2sys            ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../starter/share/message_module/message_mod.F
-      !||    submodel_mod       ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_solid      ../starter/source/elements/reader/hm_read_solid.F
+!||--- called by ------------------------------------------------------
+!||    lectur             ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg             ../starter/source/output/message/message.F
+!||    anodset            ../starter/source/output/analyse/analyse_node.c
+!||    checkvolume_4n     ../starter/source/elements/solid/solide/checksvolume.F
+!||    checkvolume_6n     ../starter/source/elements/solid/solide/checksvolume.F
+!||    checkvolume_8n     ../starter/source/elements/solid/solide/checksvolume.F
+!||    udouble            ../starter/source/system/sysfus.F
+!||    usr2sys            ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod        ../starter/share/message_module/message_mod.F
+!||    submodel_mod       ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_SOLID(IXS   ,PM     ,ITAB ,ITABM1,
      .                  IPART,IPARTS,ISOLNOD,IXS10 ,IXS20,IXS16 ,
      .                  IGEO ,LSUBMODEL,IS_DYNA,X  )
@@ -64,6 +66,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -100,10 +103,10 @@ C OUTPUT ARGUMENTS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, MT, MLAW, JTUR, I1, I2, INEW,I10,I20,I16
-      INTEGER IC,IC1,IC2,IC3,IC4,IPID,ID,IDS,N,JC,NSPHDIR,STAT
-      INTEGER FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,NUMELS_READ,
-     .        IOUTN, IERROR, INDEX_PART,IXS10_SAV(6)
+      INTEGER I, J, MT, I10,I20,I16
+      INTEGER IC1,IC2,IC3,IC4,IPID,N,STAT
+      INTEGER INDEX_PART,IXS10_SAV(6),IC5,IC6,
+     .        IC7,IC8
       my_real BID
       CHARACTER MESS*40, MESS2*40
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_SOL
@@ -111,7 +114,7 @@ C-----------------------------------------------
 C   E x t e r n a l  F u n c t i o n s
 C-----------------------------------------------
       my_real
-     .   CHECKVOLUME_4N
+     .   CHECKVOLUME_4N,CHECKVOLUME_6N,CHECKVOLUME_8N
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -140,6 +143,10 @@ C--------------------------------------------------
       DO N=1,NUMBRICK
         I = I + 1
         IF(IXS(6,I)+IXS(7,I)+IXS(8,I)+IXS(9,I)==0)THEN
+          DO J=2,5  
+            IXS(J,I)=USR2SYS(IXS(J,I),ITABM1,MESS,IXS(11,I))
+            CALL ANODSET(IXS(J,I), CHECK_VOLU)
+          ENDDO  
           IXS(9,I)=IXS(5,I)
           IXS(8,I)=IXS(4,I)
           IXS(7,I)=IXS(4,I)
@@ -157,14 +164,56 @@ C--------------------------------------------------
             IXS(9,I)=IC4
           END IF
         ELSEIF(IXS(8,I)+IXS(9,I)==0)THEN
+          DO J=2,7  
+            IXS(J,I)=USR2SYS(IXS(J,I),ITABM1,MESS,IXS(11,I))
+            CALL ANODSET(IXS(J,I), CHECK_VOLU)
+          ENDDO  
           IXS(9,I)=IXS(5,I)
           IXS(8,I)=IXS(7,I)
           IXS(7,I)=IXS(6,I)
           IXS(6,I)=IXS(5,I)
           IXS(5,I)=IXS(2,I)
           ISOLNOD(I)=6
+          IF (CHECKVOLUME_6N(X ,IXS(1,I)) < ZERO) THEN
+C           renumber connectivity
+            IC1 = IXS(6,I)
+            IC2 = IXS(7,I)
+            IC3 = IXS(8,I)
+            IC4 = IXS(2,I)
+            IC5 = IXS(3,I)
+            IC6 = IXS(4,I)
+            IXS(2,I) = IC1
+            IXS(3,I) = IC2
+            IXS(4,I) = IC3
+            IXS(6,I) = IC4
+            IXS(7,I) = IC5
+            IXS(8,I) = IC6
+          ENDIF 
         ELSE
+          DO J=2,9  
+            IXS(J,I)=USR2SYS(IXS(J,I),ITABM1,MESS,IXS(11,I))
+            CALL ANODSET(IXS(J,I), CHECK_VOLU)
+          ENDDO  
           ISOLNOD(I)=8
+          IF (CHECKVOLUME_8N(X ,IXS(1,I)) < ZERO) THEN
+C         renumber connectivity
+            IC1 = IXS(6,I)
+            IC2 = IXS(7,I)
+            IC3 = IXS(8,I)
+            IC4 = IXS(9,I)
+            IC5 = IXS(2,I)
+            IC6 = IXS(3,I)
+            IC7 = IXS(4,I)
+            IC8 = IXS(5,I)
+            IXS(2,I) = IC1
+            IXS(3,I) = IC2
+            IXS(4,I) = IC3
+            IXS(5,I) = IC4
+            IXS(6,I) = IC5
+            IXS(7,I) = IC6
+            IXS(8,I) = IC7
+            IXS(9,I) = IC8
+          ENDIF
         ENDIF
 C--------------------------------------------------
 C      INTERNAL PART ID
@@ -188,11 +237,6 @@ C--------------------------------------------------
         IPID=IPART(2,INDEX_PART)               
         IXS(1,I)=MT                                
         IXS(10,I)=IPID 
-C--------------------------------------------------
-        DO J=2,9  
-          IXS(J,I)=USR2SYS(IXS(J,I),ITABM1,MESS,IXS(11,I))
-          CALL ANODSET(IXS(J,I), CHECK_VOLU)
-        ENDDO  
       ENDDO            
 C--------------------------------------------------
 C      READING TETRA4 INPUTS IN HM STRUCTURE
@@ -465,21 +509,20 @@ C-----------
 C-------------------------------------
       IF (ALLOCATED(SUB_SOL)) DEALLOCATE(SUB_SOL)
 C-------------------------------------
-C Recherche des ID doubles
+C Search for double IDs
 C-------------------------------------
       CALL UDOUBLE(IXS(NIXS,1),NIXS,NUMELS,MESS,0,BID)
       RETURN
       END
 C
-      !||====================================================================
-      !||    lce16s3        ../starter/source/elements/reader/hm_read_solid.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    reordr         ../starter/source/elements/solid_2d/quad/reordr.F
-      !||    usr2sys        ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    lce16s3        ../starter/source/elements/reader/hm_read_solid.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    reordr         ../starter/source/elements/solid_2d/quad/reordr.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE LCE16S3(IXS    ,ISEL    ,PM      ,IPOINT  ,ITAB     ,ITABM1 ,
      .                   ICODE  ,IPARTS  ,IGRBRIC ,GEO     ,ISOLNOD  ,
      .                   IXS10  ,IPART   ,IXS20   ,IXS16   ,KNOD2ELS ,NOD2ELS,
@@ -488,6 +531,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -516,13 +560,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, MT, MLAW, JTUR, I1, I2, INEW, K, N, IAD, NN
-      INTEGER IC,IC1,IC2,IC3,IC4,MID,PID
+      INTEGER I, J, MT, MLAW, JTUR, I1, I2, INEW, K, N, NN
+      INTEGER IC,IC1,IC2,IC3,IC4
       CHARACTER MESS*40, MESS2*40
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER USR2SYS
 C
       DATA MESS/'3D SOLID ELEMENTS DEFINITION            '/
       DATA MESS2/'3D SOLID ELEMENTS SELECTION FOR TH PLOT '/
@@ -530,7 +573,7 @@ C
 C----------------------------------------------------
 C     DETECTION DES ELEMENTS LOIS 6 PAROI---->LOI 17
 C----------------------------------------------------
-C      LOI 17 SI LA BCS EST  111 (3D)
+C      LAW 17 IF THE BCS IS  111 (3D)
       DO I=1,NUMELS8
         MT=IXS(1,I)
         MLAW=NINT(PM(19,MT))
@@ -547,12 +590,12 @@ C      LOI 17 SI LA BCS EST  111 (3D)
         ENDDO
       ENDDO
 C----------------------------------------------------
-C     CLASSEMENT DES ELEMENTS PAR LOI DE MATERIAU
+C     CLASSIFICATION OF ELEMENTS BY MATERIAL LAW
 C----------------------------------------------------
       CALL REORDR(IXS   ,NIXS   ,NUMELS8,PM      ,IPOINT ,
      .            IPARTS,NGRBRIC,IGRBRIC,NUMMAT)
 C------------------------------------------
-C RENUMEROTATION POUR SURFACES
+C RENAMING FOR SURFACES
 C------------------------------------------
       DO I=1,NSURF
         NN =IGRSURF(I)%NSEG
@@ -564,7 +607,7 @@ C------------------------------------------
         ENDDO
       ENDDO
 C------------------------------------------
-C     RENUMEROTATION DES PARTICULES SPH 
+C     RENAMING OF SPH PARTICLES
 C------------------------------------------
       IF(NSPHSOL/=0)THEN
         DO I=1,NUMSPH
@@ -590,7 +633,7 @@ C Rebuild SOL2SPH, SOL2SPH(1,N)+1<=I<=SOLSPH(2,N) <=> N==SPH2SOL(I)
         END DO          
       END IF
 C------------------------------------------
-C     PERMUTATION DE ISOLNOD
+C     PERMUTATION OF ISOLNOD
 C------------------------------------------
       DO I=1,NUMELS8
         IPOINT(2,I)=ISOLNOD(I)
@@ -599,7 +642,7 @@ C------------------------------------------
         ISOLNOD(IPOINT(1,I))=IPOINT(2,I)
       ENDDO
 C------------------------------------------
-C Reconstruction de la matrice Nod -> Solid elt
+C Reconstruction of the matrix Nod -> Solid elt
 C------------------------------------------
       DO  K=2,9
         DO  I=1,NUMELS
@@ -763,12 +806,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    lce16s4   ../starter/source/elements/reader/hm_read_solid.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur    ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    lce16s4       ../starter/source/elements/reader/hm_read_solid.F
+!||--- called by ------------------------------------------------------
+!||    lectur        ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE LCE16S4(IXS,PM,ICODE)
+      use element_mod , only : nixs
 C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -794,7 +839,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     DETECTION DES ELEMENTS LOIS 6 PAROI---->LOI 17
 C----------------------------------------------------
-C     LOI 17 SI LA BCS EST  111 (3D)
+C     LAW 17 IF THE BCS IS  111 (3D)
       DO I=1,NUMELS8
         MT=IXS(1,I)
         IF(MT < 1)CYCLE
@@ -815,18 +860,17 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    hm_prelce16s      ../starter/source/elements/reader/hm_read_solid.F
-      !||--- called by ------------------------------------------------------
-      !||    contrl            ../starter/source/starter/contrl.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../starter/source/output/message/message.F
-      !||    usr2sys           ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod    ../starter/share/modules1/reader_old_mod.F90
-      !||    submodel_mod      ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_prelce16s      ../starter/source/elements/reader/hm_read_solid.F
+!||--- called by ------------------------------------------------------
+!||    contrl            ../starter/source/starter/contrl.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg            ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod       ../starter/share/message_module/message_mod.F
+!||    reader_old_mod    ../starter/share/modules1/reader_old_mod.F90
+!||    submodel_mod      ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_PRELCE16S(IPART, IGEO, IXS, NSPHSOL ,LSUBMODEL, IS_DYNA )
 C-----------------------------------------------
 C   M o d u l e s
@@ -835,6 +879,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE READER_OLD_MOD , ONLY : LINE
       USE USER_ID_MOD , ONLY : ID_LIMIT
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -854,17 +899,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, IT, NT
-      INTEGER IPID,ID,IDS,N,NSPHDIR,STAT
-      INTEGER FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,INDEX_PART
-      my_real BID
+      INTEGER I, J, IT, NT
+      INTEGER NSPHDIR,STAT
+      INTEGER FLAG_FMT,INDEX_PART
       CHARACTER MESS*40
       INTEGER, DIMENSION(:), ALLOCATABLE :: IPARTS
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_SOL
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER USR2SYS
 C
       DATA MESS/'3D SOLID ELEMENTS DEFINITION            '/
 C=======================================================================

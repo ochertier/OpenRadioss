@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tensorc        ../starter/source/output/anim/tensorc.F
-      !||--- called by ------------------------------------------------------
-      !||    genani1        ../starter/source/output/anim/genani1.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    tensorc        ../starter/source/output/anim/tensorc.F
+!||--- called by ------------------------------------------------------
+!||    genani1        ../starter/source/output/anim/genani1.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TENSORC(ELBUF_TAB,IPARG,ITENS,                            
      2                  INVERT,NELCUT,EL2FA,NBF  ,TENS  ,               
      3                  IADP ,NBF_L,NBPART,                             
@@ -35,6 +35,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------                        
 C   I m p l i c i t   T y p e s                                         
 C-----------------------------------------------                        
@@ -166,7 +167,7 @@ c
           ENDIF ! IF (ITENS == 5)
         ENDIF ! IF(ITY == 2)
 C------------------------                                               
-C         STRAIN RATE (ne fonctionne pas : pas d'EPSDOT)                 
+C         Strain Rate (does not work: no epsdot)                 
 C------------------------                                               
         IF (ITY == 3) THEN                                              
           N0 = 0                                                    

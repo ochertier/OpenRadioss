@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_friction           ../starter/source/interfaces/friction/reader/hm_read_friction.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_friction_models    ../starter/source/interfaces/friction/reader/hm_read_friction_models.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    fretitl                    ../starter/source/starter/freform.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_friction           ../starter/source/interfaces/friction/reader/hm_read_friction.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_friction_models    ../starter/source/interfaces/friction/reader/hm_read_friction_models.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    fretitl                    ../starter/source/starter/freform.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_FRICTION(
      1        NIF     ,NOM_OPT   ,TITR       ,UNITAB    ,IGRPART       ,
      2        IPART   ,NSET      ,TAGPRT_FRIC,TABCOUPLEPARTS_FRIC_TMP  ,
@@ -85,9 +85,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J ,L ,IP ,IP1 ,IP2 ,N ,N1 ,N2 ,KK ,NL ,
+      INTEGER I ,J ,IP ,N ,N1 ,N2 ,KK ,NL ,
      .    GRPART1 ,GRPART2 ,IPART1 ,IPART2 ,FLAGP1 ,FLAGP2,FLAGGRP1, 
-     .    FLAGGRP2  ,IDTGRS1 ,IGRPART1 ,IDTGRS2 ,IGRPART2 ,NCOUPLE ,
+     .    FLAGGRP2  ,IDTGRS1 ,IDTGRS2 ,NCOUPLE ,
      .    IPP ,IPP1 ,IPP2  ,IDIR ,NTAB ,LENF ,GRPN ,GRPN1 ,GRPN2 ,
      .    NP0 ,NGR0 ,K ,NGR ,J1 ,J2 ,STAT ,WORK(70000),NINPUT
        INTEGER, DIMENSION(:),   ALLOCATABLE :: 
@@ -100,6 +100,9 @@ C-----------------------------------------------
 C=======================================================================
 C     READING FRICTION Model /FRICTION
 C=======================================================================
+       IP = -HUGE(IP)
+       IDTGRS1 = -HUGE(IDTGRS1)
+       IDTGRS2 = -HUGE(IDTGRS2)
 
        IS_AVAILABLE = .FALSE.
 
@@ -324,7 +327,7 @@ C
              ENDIF
           ENDIF
 C
-C----CHECK PARTS group
+C--- CHECK PARTS Group
 C
           IF(GRPART1/=0)THEN
             FLAGGRP1 = 0
@@ -343,7 +346,7 @@ C
      .                      ANMODE=ANINFO_BLIND_1,
      .                      I1=NOINTF,
      .                      C1=TITR,
-     .                      I2=IGRPART1)
+     .                      I2=GRPART1)
             ENDIF
           ENDIF
 C
@@ -364,7 +367,7 @@ C
      .                      ANMODE=ANINFO_BLIND_1,
      .                      I1=NOINTF,
      .                      C1=TITR,
-     .                      I2=IGRPART2)
+     .                      I2=GRPART2)
              ENDIF
           ENDIF
 

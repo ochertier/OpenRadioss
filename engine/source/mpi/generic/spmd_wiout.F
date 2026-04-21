@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,27 +21,29 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_wiout    ../engine/source/mpi/generic/spmd_wiout.F
-      !||--- called by ------------------------------------------------------
-      !||    fvstats       ../engine/source/airbag/fvstats.F
-      !||    fxbypid       ../engine/source/constraints/fxbody/fxbypid.F
-      !||    lectur        ../engine/source/input/lectur.F
-      !||    rbypid        ../engine/source/constraints/general/rbody/rbypid.F
-      !||    resol         ../engine/source/engine/resol.F
-      !||    sz_print      ../engine/source/output/restart/arralloc.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    io_mod        ../engine/share/modules/io_mod.F
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_wiout            ../engine/source/mpi/generic/spmd_wiout.F
+!||--- called by ------------------------------------------------------
+!||    fvstats               ../engine/source/airbag/fvstats.F
+!||    fxbypid               ../engine/source/constraints/fxbody/fxbypid.F
+!||    lectur                ../engine/source/input/lectur.F
+!||    rbypid                ../engine/source/constraints/general/rbody/rbypid.F
+!||    resol                 ../engine/source/engine/resol.F
+!||    sz_print              ../engine/source/output/restart/arralloc.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    io_mod                ../engine/share/modules/io_mod.F
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_WIOUT(IOUT,IWIOUT)
-C ecrit le buffer L01 sur p0
+C writes the buffer L01 on p0
       USE MESSAGE_MOD 
       USE IO_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -60,8 +62,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,INFO,LOC_PROC,
-     .        BUFSIZ,MSGOFF,SIZ,I,P,LEN,N,II,
+      INTEGER MSGTYP,LOC_PROC,
+     .        MSGOFF,SIZ,I,P,LEN,N,II,
      .        IOS,STATUS(MPI_STATUS_SIZE),IERROR,IBLANC,LNEW
       INTEGER, DIMENSION(:),ALLOCATABLE :: IWA
 
@@ -77,7 +79,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C IWIOUT est utilise pour connaitre le nb max de characteres a echanger
+C IWIOUT is used to know the max number of characters to exchange
       ! MPI comm : every proc sends its IWIOUT_SAVE to the main proc
       IWIOUT_SPMD(1:NSPMD) = 0
       CALL MPI_GATHER( IWIOUT_SAVE,1,MPI_INTEGER,
@@ -119,7 +121,7 @@ C IWIOUT est utilise pour connaitre le nb max de characteres a echanger
             P = PROC_RCV(INDX)
             SIZ = IWIOUT_SPMD(P)
             DO N = 1, SIZ, LEN
-C   traitement special pour eliminer les blancs de fin de chaine
+C   special treatment to eliminate trailing spaces
                 I = LEN
                 IBLANC = ICHAR(' ')
                 DO WHILE (IWA(DISPLACEMENT(INDX)+N+I)==IBLANC.AND.I>1)

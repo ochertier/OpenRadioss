@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,37 +20,42 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    funct_python_update_elements_mod   ../engine/source/tools/curve/funct_python_update_elements.F90
-      !||--- called by ------------------------------------------------------
-      !||    resol                              ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    funct_python_update_elements_mod   ../engine/source/tools/curve/funct_python_update_elements.F90
+!||--- called by ------------------------------------------------------
+!||    resol                              ../engine/source/engine/resol.F
+!||    resol_alloc_python                 ../engine/source/engine/resol_alloc.F90
+!||====================================================================
       module funct_python_update_elements_mod
+        implicit none
       contains
 !! \brief initialize the python elemental variables found in the python function
-      !||====================================================================
-      !||    funct_python_update_elements   ../engine/source/tools/curve/funct_python_update_elements.F90
-      !||--- called by ------------------------------------------------------
-      !||    resol                          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_quad_scalar_1              ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
-      !||    h3d_shell_scalar_1             ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
-      !||    h3d_solid_scalar_1             ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||    python_element_sync            ../engine/source/mpi/python_spmd_mod.F90
-      !||    schlieren_buffer_gathering     ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod           ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    aleanim_mod                    ../engine/share/modules/aleanim_mod.F
-      !||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_quad_scalar_1_mod          ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
-      !||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
-      !||    nodal_arrays_mod               ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||    python_funct_mod               ../common_source/modules/python_mod.F90
-      !||    python_spmd_mod                ../engine/source/mpi/python_spmd_mod.F90
-      !||    stack_mod                      ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    funct_python_update_elements   ../engine/source/tools/curve/funct_python_update_elements.F90
+!||--- called by ------------------------------------------------------
+!||    resol                          ../engine/source/engine/resol.F
+!||    resol_alloc_python             ../engine/source/engine/resol_alloc.F90
+!||--- calls      -----------------------------------------------------
+!||    h3d_quad_scalar_1              ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
+!||    h3d_shell_scalar_1             ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
+!||    h3d_solid_scalar_1             ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||    python_element_sync            ../engine/source/mpi/python_spmd_mod.F90
+!||    schlieren_buffer_gathering     ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod           ../common_source/modules/ale/ale_connectivity_mod.F
+!||    aleanim_mod                    ../common_source/modules/aleanim_mod.F
+!||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    h3d_quad_scalar_1_mod          ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
+!||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F90
+!||    mvsiz_mod                      ../engine/share/spe_inc/mvsiz_mod.F90
+!||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
+!||    nodal_arrays_mod               ../common_source/modules/nodal_arrays.F90
+!||    precision_mod                  ../common_source/modules/precision_mod.F90
+!||    python_funct_mod               ../common_source/modules/python_mod.F90
+!||    python_spmd_mod                ../engine/source/mpi/python_spmd_mod.F90
+!||    stack_mod                      ../engine/share/modules/stack_mod.F
+!||====================================================================
         subroutine funct_python_update_elements(py, ispmd, &
         &   n2d,  ngroup,  nixc, nixtg, nixs, nixq, &
         &   numgeo, numelc, numeltg, numels,numelq, nummat, numnod, &
@@ -71,6 +76,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Module
 ! ----------------------------------------------------------------------------------------------------------------------
+          use precision_mod, only : WP
           use python_funct_mod, only : python_
           use python_spmd_mod, only : python_element_sync
           use elbufdef_mod, only : ELBUF_STRUCT_
@@ -82,16 +88,11 @@
           use aleanim_mod  , only : fani_cell_
           use h3d_quad_scalar_1_mod, only : h3d_quad_scalar_1
           use nodal_arrays_mod, only : nodal_arrays_
-
+          use mvsiz_mod, only : MVSIZ
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                     include
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
-#include "mvsiz_p.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -125,14 +126,14 @@
           integer, intent(in) :: n0phas !< law 51 phases
           integer, intent(in) :: nvphas !< law 51 phases
           integer, intent(in) :: itherm
-          TYPE(nodal_arrays_) :: nodes
-          my_real, intent(inout) :: w(3,numnod) !< for ALE?
-          my_real, intent(inout) :: thke(sthke) !< thickness of shell elements ?
-          my_real, intent(inout) :: ehour(seani) !< working array ?
-          my_real, intent(inout) :: geo(npropg,numgeo) !< property array
-          my_real, intent(inout) :: pm(npropm,nummat) !< property array
-          my_real, intent(inout) :: err_thk_sh4(numelc) !< ?
-          my_real, intent(inout) :: err_thk_sh3(numeltg) !< ?
+          TYPE(nodal_arrays_), intent(inout) :: nodes
+          real(kind=WP), intent(inout) :: w(3,numnod) !< for ALE?
+          real(kind=WP), intent(inout) :: thke(sthke) !< thickness of shell elements ?
+          real(kind=WP), intent(inout) :: ehour(seani) !< working array ?
+          real(kind=WP), intent(inout) :: geo(npropg,numgeo) !< property array
+          real(kind=WP), intent(inout) :: pm(npropm,nummat) !< property array
+          real(kind=WP), intent(inout) :: err_thk_sh4(numelc) !< ?
+          real(kind=WP), intent(inout) :: err_thk_sh3(numeltg) !< ?
           integer, intent(inout) :: iparg(nparg,ngroup) !< element group properties
           integer, intent(inout) :: ixc(nixc,numelc) !< shell connectivity array
           integer, intent(inout) :: ixtg(nixtg,numeltg) !< triangle connectivity array
@@ -151,15 +152,15 @@
           type(ELBUF_STRUCT_), dimension(ngroup), intent(inout), target :: elbuf_tab !< element buffer structure
           type(STACK_PLY), intent(inout) :: stack !< tack structure
           type(MULTI_FVM_STRUCT), intent(in) :: multi_fvm !< finite volume structure
-          my_real, intent(in) :: bufmat(*) !< buffer material ?
+          real(kind=WP), intent(in) :: bufmat(*) !< buffer material ?
           type(T_ALE_CONNECTIVITY), intent(in) :: ale_connect !< ALE connectivity structure
           type(MATPARAM_STRUCT_), dimension(nummat), intent(in) :: mat_param !< material parameters
           type(FANI_CELL_), intent(in) :: fani_cell !< ALE cell animation structure
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer ii,j,ng,i
-          my_real, dimension(:), allocatable :: scalar_results
+          integer :: ii,j,ng,i
+          real(kind=WP), dimension(:), allocatable :: scalar_results
           integer, dimension(:), allocatable :: id_elem
           integer, dimension(:), allocatable :: ity_elem
           integer, dimension(:), allocatable :: is_written
@@ -175,9 +176,14 @@
           integer :: mode
           integer :: ity
           character(len=ncharline100) :: keyword
+          real(kind=4),dimension(1) :: shell_stack !< shell scalar stack // Need for H3D Only
+          integer :: max_shell_stacksize !< dimension of shell_stack     // Need for H3D Only
+          integer :: shell_stakcksize !< number of shell scalar to write // Need for H3D Only
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                      Body
 ! ----------------------------------------------------------------------------------------------------------------------
+          max_shell_stacksize = 1
+          shell_stakcksize = 0
           if(py%elements%global%n > 0) then
             !-----------------------------------------------------------!
             ! stubs for h3d keywords not available from Python functions
@@ -207,8 +213,8 @@
               ity = iparg(5,ng)
               do i = 1,ncharline100
                 keyword(i:i) = py%elements%local%keyword(ii)%h3d(i:i)
-                if(ichar(keyword(i:i)) == 0) keyword(i:i) = ' '
-              enddo
+                if(ichar(keyword(i:i)) == 0) keyword(i:i) = " "
+              end do
               if(ity == 3 .or. ity == 7 ) then
                 ! shell or triangle
                 !-------------------------------------------------------!
@@ -216,9 +222,9 @@
                 !       DENSITY FOR ALL TRIA ARE STORED IN WA_L         !
                 !-------------------------------------------------------!
                 ! /TRIA are 2d solid elements (new entity type derived from SH3N buffer, it is currently managed from h3d_shell_* subroutines. It will change in the future.
-                if(keyword == 'SCHLIEREN' .and. n2d > 0)then
+                if(keyword == "SCHLIEREN" .and. n2d > 0)then
                   call schlieren_buffer_gathering(nercvois ,nesdvois ,lercvois ,lesdvois, iparg, elbuf_tab, multi_fvm,itherm)
-                endif
+                end if
 
                 call h3d_shell_scalar_1(.true.,                                                     &
                 &       elbuf_tab   ,scalar_results,iparg       ,geo        ,                &
@@ -230,8 +236,9 @@
                 &       is_written,ipartc,iparttg   ,layer_input ,ipt_input  ,       &
                 &       ply_input   ,iuvar_input,h3d_part  ,keyword    ,                   &
                 &       nodes%d     ,ng         ,multi_fvm,idmds       ,imdsvar    ,       &
-                &       mds_matid   ,id         ,mode     ,mat_param   )
-              elseif (ity == 1) then ! solid
+                &       mds_matid   ,id         ,mode     ,mat_param   ,                   &
+                &       0           ,shell_stack, max_shell_stacksize, shell_stakcksize)
+              else if (ity == 1) then ! solid
                 call h3d_solid_scalar_1(.true.,                                              &
                 &         elbuf_tab       ,scalar_results ,iparg       ,                      &
                 &         ixs          ,pm          ,bufmat      ,                            &
@@ -244,7 +251,7 @@
                 &         multi_fvm       , ng        ,idmds       ,imdsvar     ,             &
                 &         id           ,mat_param ,mode     )
 
-              elseif (ity == 2) then ! quad
+              else if (ity == 2) then ! quad
                 call h3d_quad_scalar_1(.true.,ng,                                               &
                 &       n0phas        ,nvphas        ,ngroup, n2d, numelq, nummat, numnod, nparg, npropm, npropmi, ispmd,&
                 &       elbuf_tab     ,scalar_results, MVSIZ, iparg       ,                             &
@@ -258,11 +265,11 @@
                 &       bufmat        ,multi_fvm     ,                                              &
                 &       id            ,mat_param)
 
-              endif
+              end if
               py%elements%local%values(ii) = scalar_results(j)
               !write(6,*) "keyword",keyword(1:10),"value",scalar_results(j)
 
-            enddo
+            end do
 
             deallocate(scalar_results)
             deallocate(id_elem)
@@ -274,10 +281,10 @@
 
 
             deallocate(h3d_part)
-          endif
+          end if
           return
-        end subroutine
-      end module
+        end subroutine funct_python_update_elements
+      end module funct_python_update_elements_mod
 
 
 

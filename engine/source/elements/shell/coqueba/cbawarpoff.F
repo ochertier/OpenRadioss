@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbal58warp     ../engine/source/elements/shell/coqueba/cbawarpoff.F
-      !||--- called by ------------------------------------------------------
-      !||    cbaforc3       ../engine/source/elements/shell/coqueba/cbaforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    setuvarw       ../engine/source/elements/shell/coqueba/cbawarpoff.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    cbal58warp     ../engine/source/elements/shell/coqueba/cbawarpoff.F
+!||--- called by ------------------------------------------------------
+!||    cbaforc3       ../engine/source/elements/shell/coqueba/cbaforc3.F
+!||--- calls      -----------------------------------------------------
+!||    setuvarw       ../engine/source/elements/shell/coqueba/cbawarpoff.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
        SUBROUTINE CBAL58WARP(ELBUF_STR,NEL,
      1                       X,IXC,E3X   ,E3Y   ,E3Z  ,OFFG ,ZLLC2 )
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE ELBUFDEF_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -54,19 +56,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I,NG,ILAY,J,K,L,M,IR,IS,IT,NPTR,NPTS,JJ,ie,ipr
+      INTEGER I, NG, ILAY, IR, IS, IT, NPTR, NPTS
       MY_REAL 
      .   XX(4),YY(4),ZZ(4),HIX(MVSIZ),HIY(MVSIZ),HIZ(MVSIZ)
       my_real 
-     .   R11(MVSIZ),R12(MVSIZ),R13(MVSIZ),
-     .   R21(MVSIZ),R22(MVSIZ),R23(MVSIZ),
-     .   R31(MVSIZ),R32(MVSIZ),R33(MVSIZ),
+     . R13(MVSIZ),
+     . R23(MVSIZ),
+     . R33(MVSIZ),
      .   DETA1(MVSIZ),RX0(MVSIZ), RY0(MVSIZ), RZ0(MVSIZ),
      .   SX0(MVSIZ),SY0(MVSIZ),SZ0(MVSIZ),PG,PG1,VPG(2,4),
      .   RX(MVSIZ), RY(MVSIZ), RZ(MVSIZ),
      .   SX(MVSIZ),SY(MVSIZ),SZ(MVSIZ),CC,PMAX(MVSIZ),PCOS(MVSIZ,4)
       my_real, DIMENSION(:) ,POINTER  :: UVAR
-      TYPE(BUF_LAY_) ,POINTER :: BUFLY
+ 
 C
        PARAMETER (PG=.577350269189626)
        PARAMETER (PG1=-.577350269189626)
@@ -143,11 +145,11 @@ C----------------------------
 C----------------------------
       RETURN
       END
-      !||====================================================================
-      !||    setuvarw     ../engine/source/elements/shell/coqueba/cbawarpoff.F
-      !||--- called by ------------------------------------------------------
-      !||    cbal58warp   ../engine/source/elements/shell/coqueba/cbawarpoff.F
-      !||====================================================================
+!||====================================================================
+!||    setuvarw     ../engine/source/elements/shell/coqueba/cbawarpoff.F
+!||--- called by ------------------------------------------------------
+!||    cbal58warp   ../engine/source/elements/shell/coqueba/cbawarpoff.F
+!||====================================================================
        SUBROUTINE SETUVARW(NEL,PCOS,UVAR )
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -164,7 +166,7 @@ C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
       INTEGER I
       my_real 
-     .   U_MAX,EFAC
+     . U_MAX
 C=======================================================================
 C-----put cc and recovering more rapide
       DO I=1,NEL

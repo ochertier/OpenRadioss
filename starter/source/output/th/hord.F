@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    hord                   ../starter/source/output/th/hord.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_thgrki         ../starter/source/output/th/hm_read_thgrki.F
-      !||    hm_read_thgrki_rbody   ../starter/source/output/th/hm_read_thgrki_rbody.F
-      !||    hm_read_thgrsens       ../starter/source/output/th/hm_read_thgrsens.F
-      !||    hm_read_thgrsurf       ../starter/source/output/th/hm_read_thgrsurf.F
-      !||    hm_thgrki_vent         ../starter/source/output/th/hm_thgrki_vent.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    hord                   ../starter/source/output/th/hord.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_thgrki         ../starter/source/output/th/hm_read_thgrki.F
+!||    hm_read_thgrki_rbody   ../starter/source/output/th/hm_read_thgrki_rbody.F
+!||    hm_read_thgrsens       ../starter/source/output/th/hm_read_thgrsens.F
+!||    hm_read_thgrsurf       ../starter/source/output/th/hm_read_thgrsurf.F
+!||    hm_thgrki_vent         ../starter/source/output/th/hm_thgrki_vent.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
         SUBROUTINE HORD(NEL,NSEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -44,7 +44,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: J2, I2, I, NEL1, MODE
+        INTEGER I, MODE
         INTEGER, DIMENSION(:), ALLOCATABLE :: ITRI,INDX
         INTEGER, DIMENSION(70000) :: WORK
 !   ---------------------------------------------

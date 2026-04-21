@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_a_sol2sph   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    splissv               ../engine/source/elements/sph/splissv.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait             ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_a_sol2sph   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    splissv               ../engine/source/elements/sph/splissv.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait             ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_A_SOL2SPH(
      1   A6       ,ITAG   ,IAD_ELEM ,FR_ELEM,SIZE,
      2   LENR     )
@@ -125,7 +125,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
        IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN
           MSGTYP = MSGOFF 
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -140,7 +140,7 @@ C
 C decompactage
 C
       DO I = 1, NSPMD
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
         NB_NOD = IAD_ELEM(1,I+1)-IAD_ELEM(1,I)
         IF(NB_NOD>0)THEN
           CALL SPMD_WAIT(REQ_R(I),STATUS)
@@ -190,17 +190,17 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    spmd_sphgetdk   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    sptrivox        ../engine/source/elements/sph/sptrivox.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait       ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    sphbox          ../engine/share/modules/sphbox.F
-      !||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetdk   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    sptrivox        ../engine/source/elements/sph/sptrivox.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait       ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||    sphbox          ../engine/share/modules/sphbox.F
+!||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETDK(TAB_DK,ACT,REQ_RECV)
 C  Send the maximum distance of particules kept after a reduction
 C  to the remote versions of these particles.
@@ -235,7 +235,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP, LOC_PROC, P,
-     .        IERROR,N,IDEB, 
+     .        N,IDEB, 
      .        REQ_SD(NSPMD), MSGOFF
 
        DATA MSGOFF/2028/
@@ -288,16 +288,16 @@ C-----------------------------------------------
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetisph   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep           ../engine/source/elements/sph/sphprep.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait         ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox            ../engine/share/modules/sphbox.F
-      !||    spmd_mod          ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetisph   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    sphprep           ../engine/source/elements/sph/sphprep.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait         ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox            ../engine/share/modules/sphbox.F
+!||    spmd_mod          ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETISPH()
 C-----------------------------------------------
 C   M o d u l e s
@@ -321,15 +321,15 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, MSGTYP, LOC_PROC, IERROR,
-     .        IDEB,REQ_SD(NSPMD),MSGOFF,MSGOFF2
+      INTEGER P, MSGTYP, LOC_PROC,
+     .        IDEB,REQ_SD(NSPMD),MSGOFF
       DATA MSGOFF/2006/
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi flag cellules actives
+C FLAG sending active cells
 C      
       IDEB = 1
       DO P = 1, NSPMD
@@ -365,16 +365,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetx   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep        ../engine/source/elements/sph/sphprep.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetx   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    sphprep        ../engine/source/elements/sph/sphprep.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETX(KXSP ,SPBUF, X, IPARTSP)
 C-----------------------------------------------
 C   M o d u l e s
@@ -405,8 +405,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL, INOD,
+      INTEGER P, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL, INOD,
      .        REQ_SD(NSPMD), MSGOFF
        my_real
      .        BUFS(6,NSPHS), BUFR(6,NSPHR)
@@ -416,7 +416,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi X, H sur cellules actives
+C Shipping X, H on active cells
 C
       IDEB = 0
       DO P = 1, NSPMD
@@ -473,16 +473,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetw   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    forintp        ../engine/source/elements/forintp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetw   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    forintp        ../engine/source/elements/forintp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETW(SPBUF,WACOMP,WA,WAR,SPH_IORD1)
 C-----------------------------------------------
 C   M o d u l e s
@@ -514,8 +514,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL,
+      INTEGER P, NN, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL,
      .        REQ_SD(NSPMD), MSGOFF
        my_real
      .        BUFS(15+6*SPH_IORD1,NSPHS),BUFR(15+6*SPH_IORD1,NSPHR)
@@ -525,7 +525,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi WACOMP, WA, RHO sur cellules actives
+C WACCOP, WA, RHO sending on active cells
 C
       IF (SPH_IORD1 == 0) THEN
         IDEB = 0
@@ -705,16 +705,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetstb   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    forintp          ../engine/source/elements/forintp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait        ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox           ../engine/share/modules/sphbox.F
-      !||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetstb   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    forintp          ../engine/source/elements/forintp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait        ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox           ../engine/share/modules/sphbox.F
+!||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETSTB(STAB,STABR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -743,8 +743,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL,
+      INTEGER P, NN, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL,
      .        REQ_SD(NSPMD), MSGOFF
        my_real
      .        BUFS(NSPHS), BUFR(NSPHR)
@@ -754,7 +754,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi STAB sur cellules actives
+C STAB sending on active cells
 C
       IDEB = 0
       DO P = 1, NSPMD
@@ -808,16 +808,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgeta   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    sponfv         ../engine/source/elements/sph/sponfv.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgeta   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    sponfv         ../engine/source/elements/sph/sponfv.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETA(KXSP,SPBUF,A,ASPHR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -848,8 +848,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL, INOD,MSGOFF,
+      INTEGER P, NN, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL, INOD,MSGOFF,
      .        REQ_SD(NSPMD)
        my_real
      .        BUFS(4,NSPHS), BUFR(4,NSPHR)
@@ -859,7 +859,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi A, H sur cellules actives
+C Send A, H on active cells
 C
       IDEB = 0
       DO P = 1, NSPMD
@@ -921,16 +921,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetf   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    splissv        ../engine/source/elements/sph/splissv.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetf   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    splissv        ../engine/source/elements/sph/splissv.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETF(KXSP,SPBUF,A,MS,ASPHR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -961,8 +961,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL, INOD,
+      INTEGER P, NN, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL, INOD,
      .        REQ_SD(NSPMD), MSGOFF
        my_real
      .        BUFS(5,NSPHS), BUFR(5,NSPHR)
@@ -972,7 +972,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi A, H sur cellules actives
+C Send A, H on active cells
 C
       IDEB = 0
       DO P = 1, NSPMD
@@ -1037,16 +1037,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgeth   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    spclasv        ../engine/source/elements/sph/spclasv.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgeth   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    spclasv        ../engine/source/elements/sph/spclasv.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETH(KXSP ,SPBUF)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1077,8 +1077,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL, INOD,
+      INTEGER P, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL, INOD,
      .        REQ_SD(NSPMD), MSGOFF
        my_real
      .        BUFS(NSPHS), BUFR(NSPHR)
@@ -1088,7 +1088,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi H sur cellules actives
+C Send H to active cells
 C
       IDEB = 0
       DO P = 1, NSPMD
@@ -1133,17 +1133,17 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_all_dmax    ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    rbyvit           ../engine/source/constraints/general/rbody/rbyvit.F
-      !||    sphtri0          ../engine/source/elements/sph/sphtri0.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_all_dmax    ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    rbyvit           ../engine/source/constraints/general/rbody/rbyvit.F
+!||    sphtri0          ../engine/source/elements/sph/sphtri0.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_ALL_DMAX(V,LEN)
-C max tableau V de taille LEN de type my_real
+C max array V of size LEN of type my_real
       USE SPMD_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1167,7 +1167,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, IERROR
+      INTEGER I
       my_real
      .        VTMP(LEN)
 C-----------------------------------------------
@@ -1184,16 +1184,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgett   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    forintp        ../engine/source/elements/forintp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgett   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    forintp        ../engine/source/elements/forintp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETT(WT,WTR,LAMBDA,LAMBDR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1222,8 +1222,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL,
+      INTEGER P, NN, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL,
      .        REQ_SD(NSPMD), MSGOFF
        my_real
      .        BUFS(2,NSPHS), BUFR(2,NSPHR)
@@ -1233,7 +1233,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi WACOMP, WA, RHO sur cellules actives
+C WACCOP, WA, RHO sending on active cells
 C
       IDEB = 0
       DO P = 1, NSPMD
@@ -1287,16 +1287,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetg   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    forintp        ../engine/source/elements/forintp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetg   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    forintp        ../engine/source/elements/forintp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETG(WGRADT,WACOMP,WGR,SPH_IORD1)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1326,8 +1326,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL,
+      INTEGER P, NN, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL,
      .        REQ_SD(NSPMD), MSGOFF
        my_real
      .        BUFS(7+6*SPH_IORD1,NSPHS), BUFR(7+6*SPH_IORD1,NSPHR)
@@ -1337,7 +1337,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C
-C Envoi WACOMP, WA, RHO sur cellules actives
+C WACCOP, WA, RHO sending on active cells
 C
       IF (SPH_IORD1==0) THEN
         IDEB = 0
@@ -1485,16 +1485,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetwa   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    forintp         ../engine/source/elements/forintp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait       ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox          ../engine/share/modules/sphbox.F
-      !||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetwa   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    forintp         ../engine/source/elements/forintp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait       ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox          ../engine/share/modules/sphbox.F
+!||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETWA(WA,WAR2,KXSP)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1526,8 +1526,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL,
+      INTEGER P, NN, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL,
      .        REQ_SD(NSPMD), MSGOFF
        my_real
      .        BUFS(10,NSPHS), BUFR(10,NSPHR)
@@ -1539,7 +1539,7 @@ C-----------------------------------------------
 C
 c need to get all remote values of WA and "IMPOSE" value
 
-C Envoi WA sur cellules actives
+C Wa sending on active cells
 C
       IDEB = 0
       DO P = 1, NSPMD
@@ -1612,16 +1612,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetvois_off   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    sponof2               ../engine/source/elements/sph/sponof2.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait             ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox                ../engine/share/modules/sphbox.F
-      !||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetvois_off   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    sponof2               ../engine/source/elements/sph/sponof2.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait             ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox                ../engine/share/modules/sphbox.F
+!||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETVOIS_OFF(OFF_SPH, TAG_SPH,
      .                               KXSP, IXSP)
 C-----------------------------------------------
@@ -1654,8 +1654,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL, INOD,
+      INTEGER P, NN, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL,
      .        REQ_SD(NSPMD), REQ_SD2(NSPMD),
      .        J,
      .        NVOISS1, NVOISS2,KNOD,K, JK,
@@ -1818,16 +1818,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetimp   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    sponof2          ../engine/source/elements/sph/sponof2.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait        ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox           ../engine/share/modules/sphbox.F
-      !||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetimp   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    sponof2          ../engine/source/elements/sph/sponof2.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait        ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    sphbox           ../engine/share/modules/sphbox.F
+!||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETIMP(KXSP)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1857,8 +1857,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, I, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL, INOD,
+      INTEGER P, N, IDEB, MSGTYP, LOC_PROC,
+     .         ICELL,
      .        REQ_SD(NSPMD), MSGOFF
        INTEGER
      .        BUFS(NSPHS), BUFR(NSPHR)
@@ -1912,18 +1912,18 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphgetd   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    sponfv         ../engine/source/elements/sph/sponfv.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    weight0        ../engine/source/elements/sph/weight.F
-      !||    weight1        ../engine/source/elements/sph/weight.F
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgetd   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    sponfv         ../engine/source/elements/sph/sponfv.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||    weight0        ../engine/source/elements/sph/weight.F
+!||    weight1        ../engine/source/elements/sph/weight.F
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGETD(KXSP,IXSP,ISPHIO,X,WASPACT,NOD2SP,
      .                        SPBUF,V,A,ASPHR,DSPHR)
 C-----------------------------------------------
@@ -1962,7 +1962,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER P, I, NN, N, IDEB, MSGTYP, LOC_PROC,
-     .        IERROR, ICELL, INOD,
+     .         ICELL, INOD,
      .        REQ_SD(NSPMD), REQ_SD2(NSPMD),
      .        REQ_SD3(NSPMD)
 
@@ -1974,25 +1974,25 @@ C-----------------------------------------------
      .                                   REC_IPPV,SEND_IPPV,SEND_IPPV2
 
       INTEGER 
-     .        II,IPT,JJ,NPF,IFVITS,
-     .        NS,IACTIVE,
+     .        
+     .        NS,
      .        IPPV,J,M,JNOD,IMPOSE,JMPOSE,
-     .        NVOIS,IJ,NP,K,JMPOSE2,IPPVR,INDICE
+     . NP,K,JMPOSE2,IPPVR,INDICE
      .        IDEB2, C, INDICE, IDEB2,N1, SIZ,INDICE1,
      .        NBIS,MSGOFF,MSGOFF2,MSGOFF3
 
        my_real
      .        BUFS(12,NSPHS), BUFR(12,NSPHR)
        my_real
-     .       VX,VY,VZ,VN,VT,UX,UY,UZ,UN1,NX,NY,NZ,
-     .       PS,
+     .       VX,VY,VZ,
+     .       
      .       XI,YI,ZI,XJ,YJ,ZJ,DMIN,DD,
      .       DI,RHOI,DJ,RHOJ,DIJ,
-     .       VXI,VYI,VZI,VXJ,VYJ,VZJ,
+     .       VXJ,VYJ,VZJ,
      .       VJ,VJX,VJY,VJZ,
      .       WGHT,WGRAD(3),WGRDX,WGRDY,WGRDZ,
      .       DXX,DXY,DXZ,DYX,DYY,DYZ,DZX,DZY,DZZ,
-     .       EXX,EXY,EXZ,EYX,EYY,EYZ,EZX,EZY,EZZ,
+     .       
      .       ALPHAI,ALPHAXI,ALPHAYI,ALPHAZI,ALPHAI2,XP,YP,ZP  
        LOGICAL :: CONDITION
        DATA MSGOFF /2020/
@@ -2019,7 +2019,7 @@ c use in sponfv
 
       LOC_PROC = ISPMD+1
       
-c construction liste IPPV remotes
+c Construction IPPV Remotes List
       IPPVR=0
       DO NS=1,NSPHACT
        N=WASPACT(NS)
@@ -2031,7 +2031,7 @@ c construction liste IPPV remotes
           YI=X(2,INOD)
           ZI=X(3,INOD)
 C-------
-C         plus proche voisin en amont de l'outlet => IPPV.
+C         closer neighbor upstream of the outlet => IPPV.
           IPPV=0
           DMIN=1.E+20
           DO  K=1,KXSP(4,N)  
@@ -2072,25 +2072,25 @@ C         plus proche voisin en amont de l'outlet => IPPV.
                ENDIF
              ENDIF
            ENDIF
-          ENDDO !enddo boucle voisin
+          ENDDO !Enddo neighboring loop
           
           IF(IPPV<0)THEN
             !Indice IPPV negatif (global)
             IPPVR=IPPVR+1
             TMP_IPPV(1,IPPVR) = -IPPV
-            ! recherche sur quel proc il est
+            ! searching on which proc it is
             NBIS = 0
             DO P=1,NSPMD
              IF(P/=LOC_PROC) THEN
               N1 = NBIS
               NBIS = NBIS+PSPHR(P)             
                IF((-IPPV)<=NBIS)THEN
-                TMP_IPPV(2,IPPVR)=P !proc sur lequel il se situe
+                TMP_IPPV(2,IPPVR)=P !proc on which it is
                 TMP_IPPV(3,IPPVR)=(-IPPV)-N1 !Indice IPPV (local)
                 MYPSPHS(P)=MYPSPHS(P)+1
           GOTO 160
                 ELSEIF(P==NSPMD)THEN
-                   TMP_IPPV(2,IPPVR)=P !proc sur lequel il se situe
+                   TMP_IPPV(2,IPPVR)=P !proc on which it is
                    TMP_IPPV(3,IPPVR)=(-IPPV)-N1 !Indice IPPV (local)
                    MYPSPHS(P)=MYPSPHS(P)+1
           ENDIF
@@ -2173,13 +2173,13 @@ C
           END IF
         END DO
 C
-C Envoi  sur cellules 
+C Sending on cells
 C
         IDEB = 0
         IDEB2 = 0
 
       DO P = 1, NSPMD
-c traitement
+c treatment
         IF(MYPSPHR(P)/=0)THEN
           DO N = 1, MYPSPHR(P)
             C = REC_IPPV(IDEB2+N)
@@ -2410,14 +2410,14 @@ c      ENDIF !ENDIF IPPVR > 0
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sphvox0   ../engine/source/mpi/elements/spmd_sph.F
-      !||--- called by ------------------------------------------------------
-      !||    sphtri0        ../engine/source/elements/sph/sphtri0.F
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||    tri7box        ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphvox0   ../engine/source/mpi/elements/spmd_sph.F
+!||--- called by ------------------------------------------------------
+!||    sphtri0        ../engine/source/elements/sph/sphtri0.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||    tri7box        ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_SPHVOX0(KXSP ,SPBUF,WSP2SORT,BMINMAL,X,
      2                    NSP2SORTF,NSP2SORTL)
 C-----------------------------------------------
@@ -2450,15 +2450,15 @@ C-----------------------------------------------
      .        NBX,NBY,NBZ,NE,
      .        IX1,IY1,IZ1,IX2,IY2,IZ2,IX,IY,IZ,J,NN
       my_real
-     .        RATIO, AAA,ALPHA_MARGE,
+     .         AAA,ALPHA_MARGE,
      .        XMAXB,YMAXB,ZMAXB,XMINB,YMINB,ZMINB
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
 C=======================================================================
-C     tag des boites contenant des facettes
-C     et creation des candidats
+C     tag of the boxes containing facets
+C     and creation of candidates
 C=======================================================================
 
       ALPHA_MARGE = SQRT(ONE +SPASORT)
@@ -2484,7 +2484,7 @@ c      MARGE = TZINF-GAP
 c a revoir !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          AAA = SPBUF(1,J)* ALPHA_MARGE
 
-c        indice des voxels occupes par la facette
+c        index of the voxels occupied by the facet
 
          IX1=INT(NBX*(X(1,NN)-AAA-XMINB)/(XMAXB-XMINB))
          IY1=INT(NBY*(X(2,NN)-AAA-YMINB)/(YMAXB-YMINB))

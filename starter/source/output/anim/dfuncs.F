@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dfuncs         ../starter/source/output/anim/dfuncs.F
-      !||--- called by ------------------------------------------------------
-      !||    genani1        ../starter/source/output/anim/genani1.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf        ../starter/source/output/anim/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    dfuncs         ../starter/source/output/anim/dfuncs.F
+!||--- called by ------------------------------------------------------
+!||    genani1        ../starter/source/output/anim/genani1.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf        ../starter/source/output/anim/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE DFUNCS(ELBUF_TAB,FUNC    ,IFUNC   ,IPARG   ,    
      2                IXS     ,PM      ,EL2FA   ,NBF     ,ISPH3D  )                                                                                                                 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------                        
 C   I m p l i c i t   T y p e s                                         
 C-----------------------------------------------                        
@@ -70,7 +71,7 @@ C     REAL
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       REAL R4                                                           
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
-C La routine ne fonctionne que pour les IFUNC 3,6,7,14-19 (stress)      
+C La routine ne fonctionne que pour les IFUNC 3,6,7,14-19 (stress)
 C-----------------------------------------------                        
       NN1 = 1                                                           
       NN2 = 1                                                           
@@ -110,9 +111,7 @@ c
 C                                                                       
               IF (IFUNC == 1) THEN                                           
                 DO I=LFT,LLT     
-                  IF (MLW == 10 .OR. MLW == 21) THEN
-                    EVAR(I) = ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)%EPSQ(I)
-                  ELSEIF (GBUF%G_PLA > 0) THEN  
+                  IF (GBUF%G_PLA > 0) THEN
                     EVAR(I) = GBUF%PLA(I)
                   ENDIF
                 ENDDO                         
@@ -207,7 +206,7 @@ C-----------------------------------------------
 C                                                                       
           ENDIF                                                           
 C-----------------------------------------------                        
-C       FIN DE BOUCLE SUR LES OFFSET                                    
+C       END OF LOOP ON OFFSETS
 C-----------------------------------------------                        
        ENDDO                                                            
  900  CONTINUE                                                          

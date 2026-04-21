@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvinjt6        ../engine/source/airbag/fvinjt6.F
-      !||--- called by ------------------------------------------------------
-      !||    fv_up_switch   ../engine/source/airbag/fv_up_switch.F
-      !||    fvbag1         ../engine/source/airbag/fvbag1.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter         ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod     ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    fvinjt6            ../engine/source/airbag/fvinjt6.F
+!||--- called by ------------------------------------------------------
+!||    fv_up_switch       ../engine/source/airbag/fv_up_switch.F
+!||    fvbag1             ../engine/source/airbag/fvbag1.F
+!||--- uses       -----------------------------------------------------
+!||    finter_mixed_mod   ../engine/source/tools/finter_mixed.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE FVINJT6(NJET   , IBAGJET , RBAGJET , NPC    , TF      ,
-     2                   NSENSOR,SENSOR_TAB, SCALT,    DATAINJ )
+     2                   NSENSOR,SENSOR_TAB, SCALT,    DATAINJ ,PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
       USE SENSOR_MOD
+      USE PYTHON_FUNCT_MOD
+      USE FINTER_MIXED_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,18 +57,15 @@ C     REAL
       my_real
      .   RBAGJET(NRBJET,*), TF(*),SCALT,DATAINJ(6,NJET)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      type(python_) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IINJ, IMASS, IFLU, ISENS, ITEMP
       my_real
      .   TSTART, FMASS, GMASS, GMASS_OLD, GMTOT, GMTOT_OLD, DGMASS,
-     .   TSG,    DYDX,  RMWG,  FTEMP,  TEMP,  EFAC , 
+     .   TSG,  RMWG,  FTEMP,  TEMP,  EFAC , 
      .   CPA,    CPB,   CPC,   CPG,    CVG
-C
-      my_real
-     .         FINTER
-      EXTERNAL FINTER
 C-----------------------------------------------
       DO IINJ=1,NJET
          FMASS=RBAGJET(5,IINJ)
@@ -83,7 +82,7 @@ C-----------------------------------------------
          IF (TT>=TSTART.AND.DT1>ZERO)THEN
             TSG=(TT-TSTART)*SCALT
             IF (IMASS>0) THEN
-               GMASS=FMASS*FINTER(IMASS,TSG,NPC,TF,DYDX)
+               GMASS=FMASS*FINTER_MIXED(python,nfunct,IMASS,TSG,NPC,TF)
                IF(IFLU==1)GMASS = GMASS*SCALT*DT1 + GMASS_OLD
             ELSE
                GMASS=FMASS
@@ -113,7 +112,7 @@ C------------
          IF(TT>=TSTART)THEN
             TSG = (TT-TSTART)*SCALT
             IF(ITEMP>0) THEN
-              TEMP=FTEMP*FINTER(ITEMP,TSG,NPC,TF,DYDX)
+              TEMP=FTEMP*FINTER_MIXED(python,nfunct,ITEMP,TSG,NPC,TF)
             ELSE
               TEMP=FTEMP
             ENDIF

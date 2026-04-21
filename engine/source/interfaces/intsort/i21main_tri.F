@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21main_tri                  ../engine/source/interfaces/intsort/i21main_tri.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri                       ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    check_sorting_criteria       ../engine/source/interfaces/intsort/check_sorting_criteria.F90
-      !||    i21buce                      ../engine/source/interfaces/intsort/i21buce.F
-      !||    i21fpen                      ../engine/source/interfaces/int21/i21fpen.F
-      !||    i21xsave                     ../engine/source/interfaces/int21/i21xsave.F
-      !||    my_barrier                   ../engine/source/system/machine.F
-      !||    startime                     ../engine/source/system/timer_mod.F90
-      !||    stoptime                     ../engine/source/system/timer_mod.F90
-      !||    update_struct_int21          ../engine/source/interfaces/int21/update_struct_int21.F
-      !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
-      !||--- uses       -----------------------------------------------------
-      !||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
-      !||    intstamp_mod                 ../engine/share/modules/intstamp_mod.F
-      !||    timer_mod                    ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    i21main_tri                  ../engine/source/interfaces/intsort/i21main_tri.F
+!||--- called by ------------------------------------------------------
+!||    inttri                       ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    check_sorting_criteria       ../engine/source/interfaces/intsort/check_sorting_criteria.F90
+!||    i21buce                      ../engine/source/interfaces/intsort/i21buce.F
+!||    i21fpen                      ../engine/source/interfaces/int21/i21fpen.F
+!||    i21xsave                     ../engine/source/interfaces/int21/i21xsave.F
+!||    my_barrier                   ../engine/source/system/machine.F
+!||    startime                     ../engine/source/system/timer_mod.F90
+!||    stoptime                     ../engine/source/system/timer_mod.F90
+!||    update_struct_int21          ../engine/source/interfaces/int21/update_struct_int21.F
+!||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
+!||--- uses       -----------------------------------------------------
+!||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
+!||    intbufdef_mod                ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    intstamp_mod                 ../engine/share/modules/intstamp_mod.F
+!||    timer_mod                    ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE I21MAIN_TRI(TIMERS,
      1                  IPARI   ,X       ,NIN     ,
      2                  ITASK   ,WEIGHT  ,RETRI   ,NUM_IMP ,IND_IMP ,
@@ -83,8 +84,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER J17_T,
-     .        I, IP0, IP1, IP2, IP21, K11_T, I_SK_OLD, 
-     .        ADD1, NB_N_B, INIT, NOINT, INACTI, MULTIMP, IGAP, I_STOK,
+     .         IP0, IP1, K11_T, I_SK_OLD, 
+     .         NB_N_B, INIT, NOINT, INACTI, MULTIMP, I_STOK,
      .        INTTH , ADXLOC
       INTEGER 
      .       NRTM_T,ESHIFT,ILD, NCONTACT, NRTM_L,
@@ -135,7 +136,7 @@ C
        DD(1)=INTSTAMP%D(1)
        DD(2)=INTSTAMP%D(2)
        DD(3)=INTSTAMP%D(3)
-C sauvegarde de XSAV (tableau BUFIN(JD(19)))
+C Backup of XSAV (BUFIN Table (JD (19)))
        IROT=INTSTAMP%IROT
        CALL I21XSAVE(
      1       X     ,INTBUF_TAB%NSV,NSN ,ITASK ,INTBUF_TAB%XSAV,
@@ -149,7 +150,7 @@ C
 C -------------------------------------------------------------
        I_SK_OLD=0
        INTBUF_TAB%I_STOK(1)=ZERO
-C BARRIER II_STOK et RESULT
+C BARRIER II_STOK and RESULT
        RESULT21 = 0
 C      
       CAND_N_OLD = INTBUF_TAB%I_STOK(1)
@@ -159,9 +160,9 @@ C
        INACTI = IPARI(22,NIN)
 C -------------------------------------------------------------
        NRTM_T=NRTM/NTHREAD
-C eshift : decalage sur cand_e
+C eshift: shift on cand_e
        ESHIFT = ITASK*NRTM_T
-C il faut conserver K11 global
+C must conserver K11 global
 
        K11_T = 1+4*ITASK*NRTM_T
 
@@ -247,7 +248,7 @@ C--------------------------------------------------------------
           GOTO 50
          ENDIF
 C-----------------------------------------------------------
-C     Remise a 0 de IFPEN pour les nds qui ne sont plus candidats
+C     reset of IFPEN for nodes that are no longer candidates
 C--------------------------------------------------------------
          IF(ITASK==0)THEN
            IP0 = 1

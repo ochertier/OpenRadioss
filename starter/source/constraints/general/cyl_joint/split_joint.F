@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    split_joint    ../starter/source/constraints/general/cyl_joint/split_joint.F
-      !||--- called by ------------------------------------------------------
-      !||    domdec2        ../starter/source/spmd/domdec2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus     ../starter/source/spmd/node/frontplus.F
-      !||    nlocal         ../starter/source/spmd/node/ddtools.F
-      !||    plist_ifront   ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    joint_mod      ../starter/share/modules1/joint_mod.F
-      !||====================================================================
+!||====================================================================
+!||    split_joint    ../starter/source/constraints/general/cyl_joint/split_joint.F
+!||--- called by ------------------------------------------------------
+!||    domdec2        ../starter/source/spmd/domdec2.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus     ../starter/source/spmd/node/frontplus.F
+!||    nlocal         ../starter/source/spmd/node/ddtools.F
+!||    plist_ifront   ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    joint_mod      ../starter/share/modules1/joint_mod.F
+!||====================================================================
         SUBROUTINE SPLIT_JOINT( )
 !$COMMENT
 !       SPLIT_JOINT description
@@ -62,14 +62,10 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER :: I,II,NS,LJ,K
         INTEGER :: J,N,NN,IJK
-        INTEGER :: WEIGHT,M1,M2
+        INTEGER :: WEIGHT,M1
         INTEGER :: P,PROC_NUMBER,NB_NODE
         INTEGER, DIMENSION(NSPMD) :: PROC_LIST
-
-        INTEGER :: PROC,PROC_NUMBER_1,PROC_NUMBER_2
-        INTEGER, DIMENSION(NSPMD) :: PROC_LIST_1,PROC_LIST_2
-        INTEGER, EXTERNAL :: NLOCAL  
-
+        INTEGER, EXTERNAL :: NLOCAL
         LOGICAL, DIMENSION(:), ALLOCATABLE :: CHECK_MAIN
         TYPE(joint_main_node), DIMENSION(:), ALLOCATABLE :: MAIN_AND_SECONDARY
 C-----------------------------------------------
@@ -245,14 +241,14 @@ C=======================================================================
 
 
 
-      !||====================================================================
-      !||    print_joint    ../starter/source/constraints/general/cyl_joint/split_joint.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal         ../starter/source/spmd/node/ddtools.F
-      !||    plist_ifront   ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    joint_mod      ../starter/share/modules1/joint_mod.F
-      !||====================================================================
+!||====================================================================
+!||    print_joint    ../starter/source/constraints/general/cyl_joint/split_joint.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal         ../starter/source/spmd/node/ddtools.F
+!||    plist_ifront   ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    joint_mod      ../starter/share/modules1/joint_mod.F
+!||====================================================================
         SUBROUTINE print_JOINT(a)
 C-----------------------------------------------
 C   M o d u l e s
@@ -271,8 +267,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         character(len=*) :: a
-        INTEGER :: I,II,NS,LJ,K
-        INTEGER :: WEIGHT,M1,M2
+        INTEGER :: I,NS,K
+        INTEGER :: M1,M2
         INTEGER :: P,PROC_NUMBER,NB_NODE
         INTEGER, DIMENSION(NSPMD) :: PROC_LIST
       INTEGER, EXTERNAL :: NLOCAL  

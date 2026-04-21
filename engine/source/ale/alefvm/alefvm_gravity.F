@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alefvm_gravity   ../engine/source/ale/alefvm/alefvm_gravity.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3           ../engine/source/elements/solid/solide/sforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    alefvm_mod       ../common_source/modules/ale/alefvm_mod.F
-      !||====================================================================
-      SUBROUTINE ALEFVM_GRAVITY(
-     1                          AGRV, IGRV, LGRAV,
-     2                          VOLN, IXS , ITASK, NPC   , TF     ,
-     3                          SKEW, RHO 
-     .                          )
+!||====================================================================
+!||    alefvm_gravity   ../engine/source/ale/alefvm/alefvm_gravity.F
+!||--- called by ------------------------------------------------------
+!||    sforc3           ../engine/source/elements/solid/solide/sforc3.F
+!||--- uses       -----------------------------------------------------
+!||    alefvm_mod       ../common_source/modules/ale/alefvm_mod.F
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||====================================================================
+      SUBROUTINE ALEFVM_GRAVITY(VOLN, IXS, RHO)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -45,6 +42,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ALEFVM_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,15 +65,14 @@ C finite volume scheme (IALEFVM==1)
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER :: IXS(NIXS,*), IGRV(NIGRV,*), ITASK, LGRAV(*),NPC(*)
-      my_real :: VOLN(MVSIZ), AGRV(LFACGRV,*),TF(*),RHO(MVSIZ)
+      INTEGER :: IXS(NIXS,*)
+      my_real :: VOLN(MVSIZ), RHO(MVSIZ)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER          :: I, J, K
-      INTEGER          :: ISENS,NVERTEX,INOd,II
-      my_real          :: TS,A0
-      my_real          :: M_CELL(MVSIZ),ACCEL(3,MVSIZ),SKEW(LSKEW,*)
+      INTEGER          :: I, J
+      INTEGER          :: NVERTEX,INOd,II
+      my_real          :: M_CELL(MVSIZ),ACCEL(3,MVSIZ)
       LOGICAL          :: debug_outp
       INTEGER          :: idbf,idbl    
 C-----------------------------------------------

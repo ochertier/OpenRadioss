@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,20 +21,21 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    inter_dcod_friction    ../starter/source/interfaces/reader/inter_dcod_friction.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_type07   ../starter/source/interfaces/int07/hm_read_inter_type07.F
-      !||    hm_read_inter_type11   ../starter/source/interfaces/int11/hm_read_inter_type11.F
-      !||    hm_read_inter_type24   ../starter/source/interfaces/int24/hm_read_inter_type24.F
-      !||    hm_read_inter_type25   ../starter/source/interfaces/int25/hm_read_inter_type25.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_mod           ../starter/share/modules1/intstamp_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inter_dcod_friction    ../starter/source/interfaces/reader/inter_dcod_friction.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_type07   ../starter/source/interfaces/int07/hm_read_inter_type07.F
+!||    hm_read_inter_type11   ../starter/source/interfaces/int11/hm_read_inter_type11.F
+!||    hm_read_inter_type21   ../starter/source/interfaces/int21/hm_read_inter_type21.F
+!||    hm_read_inter_type24   ../starter/source/interfaces/int24/hm_read_inter_type24.F
+!||    hm_read_inter_type25   ../starter/source/interfaces/int25/hm_read_inter_type25.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    intstamp_mod           ../starter/share/modules1/intstamp_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INTER_DCOD_FRICTION(NTYP,NI,IPARI,NOM_OPT,NOM_OPTFRIC,
      .           INTBUF_FRIC_TAB)
 C-----------------------------------------------
@@ -63,7 +64,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,IERR1,IERR2,OK,IDF ,INTFRIC,IFQ
+      INTEGER J, ID, OK, IDF, INTFRIC, IFQ
       CHARACTER(LEN=NCHARTITLE) :: TITR
 C     DATA IUN/1/
 C
@@ -77,7 +78,7 @@ C     Friction model for interface
 C-------------------------------------------
 C
       OK = 0
-      IF(NTYP==7.OR.NTYP==11.OR.NTYP==19.OR.NTYP==24.OR.NTYP==25) THEN
+      IF(NTYP==7.OR.NTYP==11.OR.NTYP==19.OR.NTYP==21.OR.NTYP==24.OR.NTYP==25) THEN
           IF (IPARI(72) > 0) THEN   
             OK = 0
             DO J=1,NINTERFRIC  
@@ -110,7 +111,7 @@ C
              IPARI(30) = INTBUF_FRIC_TAB(INTFRIC)%FRICFORM  ! we put the iform  flag to the value set in friction interface
           ENDIF
 
-          IF ((NTYP==24..OR.NTYP==25).AND.IPARI(72) > 0) THEN  ! correction of filtering parameter if Iform = 0 in friction interface
+          IF ((NTYP==21.OR.NTYP==24.OR.NTYP==25).AND.IPARI(72) > 0) THEN  ! correction of filtering parameter if Iform = 0 in friction interface
              INTFRIC = IPARI(72) 
              IFQ = INTBUF_FRIC_TAB(INTFRIC)%IFFILTER
              IF (IFQ<10) IFQ = IFQ + 10
@@ -118,7 +119,7 @@ C
              IF (IFQ==10) INTBUF_FRIC_TAB(INTFRIC)%XFILTR_FRIC = ONE
           ENDIF
 
-          IF ((NTYP==7.OR.NTYP==24..OR.NTYP==25).AND.IPARI(72) > 0) THEN ! we put the MFROT ifq flag to the value set in friction interface 
+          IF ((NTYP==7.OR.NTYP==21.OR.NTYP==24..OR.NTYP==25).AND.IPARI(72) > 0) THEN ! we put the MFROT ifq flag to the value set in friction interface 
               INTFRIC = IPARI(72) 
               IPARI(30) = INTBUF_FRIC_TAB(INTFRIC)%FRICMOD 
               IPARI(31) = INTBUF_FRIC_TAB(INTFRIC)%IFFILTER

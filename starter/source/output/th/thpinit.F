@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thpinit   ../starter/source/output/th/thpinit.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur    ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal    ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    thpinit   ../starter/source/output/th/thpinit.F
+!||--- called by ------------------------------------------------------
+!||    lectur    ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal    ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE THPINIT(
      1      ITHGRP,ITHBUF,IPARG  ,DD_IAD,IXRI,
      2      IFLAG ,NTHGRP2)
@@ -43,15 +43,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ITHGRP(NITHGR,*),ITHBUF(*),IPARG(NPARG,*),
-     &        DD_IAD(NSPMD+1,*), IXRI(4,*),
-     &        IFLAG, NTHGRP2
+      INTEGER :: ITHGRP(NITHGR,*),ITHBUF(*),IPARG(NPARG,*),DD_IAD(NSPMD+1,*), IXRI(4,*),IFLAG, NTHGRP2
 C-----------------------------------------------
 C   F u n c t i o n
 C-----------------------------------------------
@@ -60,8 +57,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER
-     &        P,NT,NG,I,K,NNE,IAD,ITYP,IH,NFT,ITY,NEL,N1,N2
+      INTEGER :: P,NT,NG,K,NNE,IAD,ITYP,IH,NFT,ITY,NEL,N1,N2
 C-----------------------------------------------
       IF(IFLAG==0) THEN
 C
@@ -72,16 +68,15 @@ C
         ENDDO
       ENDIF
 C
-C Mise a jour de PROC dans ITHBUF en fonction de la domdec
+C ITHBUF update according to Domdec
 C
-      IF (IMACH==3.AND.NSPMD>1) THEN
-C traitement de p1 a pmaxporc-1 (p0 par defaut)
+      IF (NSPMD>1) THEN
+C PMAXPORC-1 P1 treatment (P0 by default)
         DO NT = 1, NTHGRP2
           ITYP=ITHGRP(2,NT)
           NNE =ITHGRP(4,NT)
           IAD =ITHGRP(5,NT)            
-          IF((ITYP>=1.AND.ITYP<=7).OR.
-     .        ITYP==50.OR.ITYP==51.OR.ITYP==100)THEN
+          IF((ITYP >= 1 .AND. ITYP <= 7) .OR. ITYP == 50 .OR. ITYP == 51 .OR. ITYP == 100)THEN
             DO IH = 1, NNE
               K = ITHBUF(IAD-1+IH)
               DO NG = 1, NGROUP

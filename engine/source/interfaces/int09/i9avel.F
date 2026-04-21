@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i9avel        ../engine/source/interfaces/int09/i9avel.F
-      !||--- called by ------------------------------------------------------
-      !||    i9main2       ../engine/source/interfaces/int09/i9main2.F
-      !||    i9main3       ../engine/source/interfaces/int09/i9main3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    bcs2          ../engine/source/constraints/general/bcs/bcs2.F
-      !||    shapeh        ../engine/source/ale/inter/shapeh.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i9avel        ../engine/source/interfaces/int09/i9avel.F
+!||--- called by ------------------------------------------------------
+!||    i9main2       ../engine/source/interfaces/int09/i9main2.F
+!||    i9main3       ../engine/source/interfaces/int09/i9main3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||    bcs2          ../engine/source/constraints/general/bcs/bcs2.F
+!||    shapeh        ../engine/source/ale/inter/shapeh.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I9AVEL(X    , SKEW, A     , FN  , FT   ,
      2                  IRECT, LMSR, CRST  , MSR , NSV  ,
      3                  ILOC , IRTL, LCODE , V   , ISKEW,
@@ -77,9 +77,9 @@ C-----------------------------------------------
       FRIC = FRIGAP(1)
       FHEAT= FRIGAP(4)
       NIR=2
-      IF(N2D==0)NIR=4
+      IF(N2D == 0)NIR=4
       !-------------------------------------
-      !     ACCELERATIONS OF MAIN NODES
+      !     ACCELERATIONS OF LAGRANGIAN NODES
       !-------------------------------------
       DO I=1,NMN
         J=MSR(I)
@@ -110,7 +110,7 @@ C-----------------------------------------------
         CALL BCS2(A(J1),SKEW(1,ISK),ISK,LCOD)
       ENDDO
       !--------------------------------------
-      !     ACCELERATIONS OF SECOND NODES
+      !     ACCELERATIONS OF ALE NODES
       !--------------------------------------
       DO II=1,NSN
         IF(ILOC(II) >= 1) THEN

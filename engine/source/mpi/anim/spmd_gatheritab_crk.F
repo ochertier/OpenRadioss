@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_gatheritab_crk   ../engine/source/mpi/anim/spmd_gatheritab_crk.F
-      !||--- called by ------------------------------------------------------
-      !||    genani                ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_i_c             ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_gatheritab_crk   ../engine/source/mpi/anim/spmd_gatheritab_crk.F
+!||--- called by ------------------------------------------------------
+!||    genani                ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    write_i_c             ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_GATHERITAB_CRK(ICRK,NUM,IDMAXNOD,NODGLOBXFE)
 C-----------------------------------------------
       USE CRACKXFEM_MOD        
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -54,7 +56,7 @@ C-----------------------------------------------
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR,MSGOFF
       INTEGER SIZ,MSGTYP,I,K,NG,NREC,STEP
 
-C   Tableau utilise par proc 0
+C   Table used by Pro 0
        INTEGER, DIMENSION(:,:),ALLOCATABLE :: IBUF
        INTEGER, DIMENSION(:),ALLOCATABLE :: XGLOB
 C-----------------------------------------------
@@ -87,7 +89,7 @@ cc          CALL WRITE_I_C(XGLOB(NG),1)
         ENDDO
 C all the rest procs
         DO I=2,NSPMD
-C   Reception du buffer entier des adresses NODGLOB
+C   reception of the entire buffer of NODGLOB addresses
           MSGTYP = MSGOFF 
           CALL MPI_PROBE(IT_SPMD(I),MSGTYP,
      .                   SPMD_COMM_WORLD,STATUS,ierror)

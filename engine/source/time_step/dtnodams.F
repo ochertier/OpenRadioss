@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dtnodams       ../engine/source/time_step/dtnodams.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod        ../engine/share/modules/h3d_mod.F
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dtnodams       ../engine/source/time_step/dtnodams.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../engine/source/output/message/message.F
+!||    arret          ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||    h3d_mod        ../engine/share/modules/h3d_mod.F
+!||    message_mod    ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE DTNODAMS(NODFT ,NODLT ,NELTST,ITYPTST,ITAB   ,
      2                    MS    ,IN    ,STIFN ,STIFR  ,DT2T   ,
      3                    DMAST ,DINERT,ADT   ,ADM    ,IMSCH  ,
@@ -45,6 +46,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
       USE GROUPDEF_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,12 +85,16 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, NN, K1, KMAX1, K2, KMAX2, ISTOP,I,J,
-     .   INDTN1(1024), INDTN2(1024), TAG(NUMNOD), TAGR(NUMNOD), IOK,
-     .   K, M, MSR, NSN, IAD
+      INTEGER N, NN, K1, KMAX1, K2, KMAX2, ISTOP,I,
+     .   INDTN1(1024), INDTN2(1024),  IOK
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAG
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAGR
       my_real DTN1(1024), DTN2(1024),
-     .   DTNOD1, DTNOD2, DT2P, MAS, INER, MAS0, DMM, MASS, STI,
-     .   DT2X, DT2S
+     .   DTNOD1, DTNOD2, DT2P, MAS, INER,
+     .    DT2S
+C----------------------------------------------------------
+      CALL MY_ALLOC(TAG,NUMNOD)
+      CALL MY_ALLOC(TAGR,NUMNOD)
 C----------------------------------------------------------
 C     TAG NODAL GROUP 
 C----------------------------------------------------------
@@ -522,5 +528,8 @@ C--------------------------------
          ENDIF
        ENDIF
 C
+      DEALLOCATE(TAG)
+      DEALLOCATE(TAGR)
+
       RETURN
       END

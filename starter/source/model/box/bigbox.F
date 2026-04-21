@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    bigbox                 ../starter/source/model/box/bigbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    boxbox                 ../starter/source/model/box/boxbox.F
-      !||    boxtagn                ../starter/source/model/box/bigbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    bigbox                 ../starter/source/model/box/bigbox.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    boxbox                 ../starter/source/model/box/boxbox.F
+!||    boxtagn                ../starter/source/model/box/bigbox.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
+!||====================================================================
       SUBROUTINE BIGBOX(X   ,FLAG,NNOD ,
      .                  SKEW,IGS    ,ISKN ,ITABM1,IBOX   ,
      .                  ID  ,IBUFBOX,IADB ,TITR,KEY,NN,
@@ -91,7 +91,7 @@ C-------
       READ(IIN,REC=JREC,ERR=999,FMT='(A)')LINE
       READ(LINE,ERR=999,FMT=FMT_I) IDB
 C-------
-C get box de box ID'S dans grnod:
+C get box from box ID'S in grnod:
 C-------
       ISU = 0
       DO I=1,NBBOX
@@ -113,7 +113,7 @@ C super box activated:
        END IF
       END IF
 C---
-C   simple box dans grnod:
+C   simple box in grnod:
 C---
       BOOL = .FALSE.
       IF(ISU>0)THEN
@@ -170,19 +170,19 @@ C--------------
  999  CALL FREERR(1)
       RETURN
       END
-      !||====================================================================
-      !||    boxtagn         ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    bigbox          ../starter/source/model/box/bigbox.F
-      !||    boxbox          ../starter/source/model/box/boxbox.F
-      !||    hm_bigbox       ../starter/source/model/box/hm_bigbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkcyl        ../starter/source/model/box/rdbox.F
-      !||    checkpara       ../starter/source/model/box/rdbox.F
-      !||    checksphere     ../starter/source/model/box/rdbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxtagn         ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    bigbox          ../starter/source/model/box/bigbox.F
+!||    boxbox          ../starter/source/model/box/boxbox.F
+!||    hm_bigbox       ../starter/source/model/box/hm_bigbox.F
+!||--- calls      -----------------------------------------------------
+!||    checkcyl        ../starter/source/model/box/rdbox.F
+!||    checkpara       ../starter/source/model/box/rdbox.F
+!||    checksphere     ../starter/source/model/box/rdbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXTAGN(X   ,IBUFBOX,SKEW,IADB,
      .                   IBOX,ISU ,FLAG,IBOXMAX)
 C-----------------------------------------------
@@ -256,7 +256,7 @@ C
             CALL CHECKSPHERE(XP1, YP1, ZP1, NODINB, DIAM, OK)
           END IF
 C
-C tag nodes dans box:
+C tag nodes in box:
 C
           IF(OK == 1)THEN
             IF(TAGN(I) == 0)THEN
@@ -293,13 +293,13 @@ C---------------
 C---------------
       RETURN
       END
-      !||====================================================================
-      !||    boxassem1       ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    boxbox          ../starter/source/model/box/boxbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxassem1       ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    boxbox          ../starter/source/model/box/boxbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXASSEM1(IBOX,IBUFBOX,IB,IADB,FLAG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -417,13 +417,13 @@ C
 C------------
       RETURN
       END
-      !||====================================================================
-      !||    boxassem2       ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    boxbox2         ../starter/source/model/box/boxbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxassem2       ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    boxbox2         ../starter/source/model/box/boxbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXASSEM2(IBOX,IBUFBOX,IB,IADB,NUMEL,FLAG,IBOXMAX)
 C-----------------------------------------------
 C   M o d u l e s
@@ -541,13 +541,13 @@ C
 C------------
       RETURN
       END
-      !||====================================================================
-      !||    boxassem3       ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    boxboxs         ../starter/source/model/box/boxbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxassem3       ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    boxboxs         ../starter/source/model/box/boxbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXASSEM3(IBOX,IBUFBOX,IB  ,IADB  ,NUMEL ,
      .                     NIX    ,IX  ,NIX1   ,NIX2,ISURF0,IELTYP,
      .                     FLAG   ,IEXT)
@@ -715,15 +715,15 @@ C
 C------------
       RETURN
       END
-      !||====================================================================
-      !||    boxassem4       ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    elstagboxbox    ../starter/source/model/box/boxbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    iface           ../starter/source/ale/ale3d/iface.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxassem4       ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    elstagboxbox    ../starter/source/model/box/boxbox.F
+!||--- calls      -----------------------------------------------------
+!||    iface           ../starter/source/ale/ale3d/iface.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXASSEM4(IBOX,IBUFBOX,IB,IADB,FLAG,IEXT_SET)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1012,19 +1012,19 @@ C---
 C---------------
       RETURN
       END
-      !||====================================================================
-      !||    boxtage         ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    bigbox2         ../starter/source/model/box/bigbox.F
-      !||    boxbox2         ../starter/source/model/box/boxbox.F
-      !||    hm_bigbox2      ../starter/source/model/box/hm_bigbox2.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkcyl        ../starter/source/model/box/rdbox.F
-      !||    checkpara       ../starter/source/model/box/rdbox.F
-      !||    checksphere     ../starter/source/model/box/rdbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxtage         ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    bigbox2         ../starter/source/model/box/bigbox.F
+!||    boxbox2         ../starter/source/model/box/boxbox.F
+!||    hm_bigbox2      ../starter/source/model/box/hm_bigbox2.F
+!||--- calls      -----------------------------------------------------
+!||    checkcyl        ../starter/source/model/box/rdbox.F
+!||    checkpara       ../starter/source/model/box/rdbox.F
+!||    checksphere     ../starter/source/model/box/rdbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXTAGE(X      ,SKEW   ,IBOX   ,
      .                   ISU    ,BOXTYPE,IX     ,NIX   ,
      .                   NIX1   ,IPARTE ,IPART  ,KLEVTREE,ELTREE,
@@ -1226,17 +1226,17 @@ C--------------------------------
 C----------------
       RETURN
       END
-      !||====================================================================
-      !||    bigbox2          ../starter/source/model/box/bigbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../starter/source/output/message/message.F
-      !||    boxbox2          ../starter/source/model/box/boxbox.F
-      !||    boxtage          ../starter/source/model/box/bigbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod       ../starter/share/modules1/format_mod.F90
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    bigbox2          ../starter/source/model/box/bigbox.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../starter/source/output/message/message.F
+!||    boxbox2          ../starter/source/model/box/boxbox.F
+!||    boxtage          ../starter/source/model/box/bigbox.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod       ../starter/share/modules1/format_mod.F90
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+!||====================================================================
       SUBROUTINE BIGBOX2(X      ,FLAG   ,NEL     ,
      .                   SKEW   ,IGS    ,ISKN    ,ITABM1,IBOX   ,
      .                   ID     ,NADMESH,NIX     ,IX    ,NIX1   ,NUMEL ,
@@ -1308,7 +1308,7 @@ C-------
         BOXTYPE = 2
       END IF
 C-------
-C get box de box ID'S dans grshel:
+C get box from box ID'S in grshel:
 C-------
       ISU = 0
       DO I=1,NBBOX
@@ -1333,7 +1333,7 @@ C super box activated:
        END IF
       END IF
 C---
-C   simple box dans grshel:
+C   simple box in grshel:
 C---
       BOOL = .FALSE.
       IF(ISU>0)THEN
@@ -1401,19 +1401,19 @@ C----------
  999  CALL FREERR(1)
       RETURN
       END
-      !||====================================================================
-      !||    box_surf_sh     ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    bigsbox         ../starter/source/model/box/bigbox.F
-      !||    boxboxs         ../starter/source/model/box/boxbox.F
-      !||    hm_bigsbox      ../starter/source/groups/hm_bigsbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkcyl        ../starter/source/model/box/rdbox.F
-      !||    checkpara       ../starter/source/model/box/rdbox.F
-      !||    checksphere     ../starter/source/model/box/rdbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    box_surf_sh     ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    bigsbox         ../starter/source/model/box/bigbox.F
+!||    boxboxs         ../starter/source/model/box/boxbox.F
+!||    hm_bigsbox      ../starter/source/groups/hm_bigsbox.F
+!||--- calls      -----------------------------------------------------
+!||    checkcyl        ../starter/source/model/box/rdbox.F
+!||    checkpara       ../starter/source/model/box/rdbox.F
+!||    checksphere     ../starter/source/model/box/rdbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOX_SURF_SH(X            ,IBUFBOX,SKEW  ,IADB   ,BOXTYPE,
      .                       IBOX         ,ISU    ,NUMEL ,NIX    ,IX     ,
      .                       NIX1         ,NIX2   ,ISURF0,IELTYP ,FLAG   ,
@@ -1595,17 +1595,17 @@ C
 C---------------
       RETURN
       END
-      !||====================================================================
-      !||    bigsbox          ../starter/source/model/box/bigbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../starter/source/output/message/message.F
-      !||    box_surf_sh      ../starter/source/model/box/bigbox.F
-      !||    boxboxs          ../starter/source/model/box/boxbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod       ../starter/share/modules1/format_mod.F90
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    bigsbox          ../starter/source/model/box/bigbox.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../starter/source/output/message/message.F
+!||    box_surf_sh      ../starter/source/model/box/bigbox.F
+!||    boxboxs          ../starter/source/model/box/boxbox.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod       ../starter/share/modules1/format_mod.F90
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+!||====================================================================
       SUBROUTINE BIGSBOX(NUMEL ,IX     ,NIX    ,NIX1 ,NIX2,IELTYP,
      .                   X     ,        NSEG ,FLAG,SKEW  ,
      .                   ISKN  ,ISURF0 ,ITABM1 ,IBOX,
@@ -1675,7 +1675,7 @@ C-------
         BOXTYPE = 2
       END IF
 C-------
-C get box de box ID'S dans LINE :
+C get box from box ID'S in LINE :
 C-------
       ISU = 0
       DO I=1,NBBOX
@@ -1706,7 +1706,7 @@ C super box activated:
        END IF
       END IF
 C---
-C   simple box dans /LINE :
+C   simple box in /LINE :
 C---
       BOOL=.FALSE.
       IF(ISU>0)THEN
@@ -1748,7 +1748,7 @@ C---
         ENDDO
       ENDIF
 C---
-C tag lines (ou surfaces) in main-box:
+C Tag Lines (or surfaces) in Main-Box:
 C---
 C---count lines within BOX
       IF(ISU > 0)THEN
@@ -1803,23 +1803,24 @@ C-----------
       RETURN
       END
 C
-      !||====================================================================
-      !||    elstagbox       ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    elstagboxbox    ../starter/source/model/box/boxbox.F
-      !||    sboxboxsurf     ../starter/source/model/box/bigbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkcyl        ../starter/source/model/box/rdbox.F
-      !||    checkpara       ../starter/source/model/box/rdbox.F
-      !||    checksphere     ../starter/source/model/box/rdbox.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    elstagbox       ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    elstagboxbox    ../starter/source/model/box/boxbox.F
+!||    sboxboxsurf     ../starter/source/model/box/bigbox.F
+!||--- calls      -----------------------------------------------------
+!||    checkcyl        ../starter/source/model/box/rdbox.F
+!||    checkpara       ../starter/source/model/box/rdbox.F
+!||    checksphere     ../starter/source/model/box/rdbox.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE ELSTAGBOX(IXS    ,ELSTAG ,X   ,SKEW ,BOXTYPE,
      .                     ISU    ,IBOX   )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE OPTIONDEF_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1928,22 +1929,22 @@ C-----------
  999  CALL FREERR(1)
       RETURN
       END
-      !||====================================================================
-      !||    sboxboxsurf              ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_surf             ../starter/source/groups/hm_read_surf.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    boxbufill                ../starter/source/model/box/bigbox.F
-      !||    elstagbox                ../starter/source/model/box/bigbox.F
-      !||    elstagboxbox             ../starter/source/model/box/boxbox.F
-      !||    facebox                  ../starter/source/model/box/bigbox.F
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sboxboxsurf              ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_surf             ../starter/source/groups/hm_read_surf.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    boxbufill                ../starter/source/model/box/bigbox.F
+!||    elstagbox                ../starter/source/model/box/bigbox.F
+!||    elstagboxbox             ../starter/source/model/box/boxbox.F
+!||    facebox                  ../starter/source/model/box/bigbox.F
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE SBOXBOXSURF(IXS     ,X      ,NSEG,
      .                       KNOD2ELS,NOD2ELS,IEXT ,FLAG,
      .                       IXS10   ,IXS16  ,IXS20,SKEW   ,IBOX,
@@ -1959,6 +1960,7 @@ C-----------------------------------------------
       USE OPTIONDEF_MOD
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD      
+      use element_mod , only : nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2011,7 +2013,7 @@ C-------
         BOXTYPE = 2
       END IF
 C-------
-C get box de box ID'S dans SURF:
+C get box from box ID'S in SURF:
 C-------
       ISU = 0
       DO I=1,NBBOX
@@ -2110,17 +2112,17 @@ C--------------------------
  999  CALL FREERR(1)
       RETURN
       END
-      !||====================================================================
-      !||    facebox                ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    elstagboxbox           ../starter/source/model/box/boxbox.F
-      !||    sboxboxsurf            ../starter/source/model/box/bigbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    ssurf10tmp             ../starter/source/model/box/bigbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    facebox                ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    elstagboxbox           ../starter/source/model/box/boxbox.F
+!||    sboxboxsurf            ../starter/source/model/box/bigbox.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    ssurf10tmp             ../starter/source/model/box/bigbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FACEBOX(IXS         ,X        ,KNOD2ELS ,NOD2ELS,IEXT        ,
      .                   FLAG        ,IXS10    ,IXS16    ,IXS20  ,SKEW        ,
      .                   IBOX        ,ELSTAG   ,IBUFBOX  ,IADB   ,ISU         ,
@@ -2133,6 +2135,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE OPTIONDEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2299,7 +2302,7 @@ C
               END IF
             END DO
                   IF(MI(1)==NI(1).AND.MI(NF)==NI(2))THEN
-C                    FACTAG(JS) moins face jj
+C                    Factag (JS) Less Face JJ
                      FASTAG(JS)=FASTAG(JS)+PWR(JJ)
                      GO TO 100
                   END IF
@@ -2584,11 +2587,11 @@ C
  999  CALL FREERR(1)
       RETURN
       END
-      !||====================================================================
-      !||    boxbufill     ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    sboxboxsurf   ../starter/source/model/box/bigbox.F
-      !||====================================================================
+!||====================================================================
+!||    boxbufill     ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    sboxboxsurf   ../starter/source/model/box/bigbox.F
+!||====================================================================
       SUBROUTINE BOXBUFILL(IADISU,IBUFBOX,SURF_NODES,NN,NSEG0,
      .                     SURF_ELTYP,SURF_ELEM)
 C-----------------------------------------------
@@ -2625,11 +2628,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    ssurf10tmp   ../starter/source/model/box/bigbox.F
-      !||--- called by ------------------------------------------------------
-      !||    facebox      ../starter/source/model/box/bigbox.F
-      !||====================================================================
+!||====================================================================
+!||    ssurf10tmp   ../starter/source/model/box/bigbox.F
+!||--- called by ------------------------------------------------------
+!||    facebox      ../starter/source/model/box/bigbox.F
+!||====================================================================
       SUBROUTINE SSURF10TMP(N1,N2,N3,N4,IAD,JS,IBUFBOX,IEXT_SET) 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

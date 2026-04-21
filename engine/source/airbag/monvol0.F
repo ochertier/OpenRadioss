@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,33 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    monvol0               ../engine/source/airbag/monvol0.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    airbaga               ../engine/source/airbag/airbag1.F
-      !||    airbaga1              ../engine/source/airbag/airbaga1.F
-      !||    airbagb               ../engine/source/airbag/airbag2.F
-      !||    airbagb1              ../engine/source/airbag/airbagb1.F
-      !||    get_volume_area       ../engine/source/airbag/get_volume_area.F90
-      !||    spmd_mv_ca            ../engine/source/mpi/airbags/spmd_mv_ca.F
-      !||    volout                ../engine/source/airbag/volout.F
-      !||    volp_lfluid           ../engine/source/airbag/volp_lfluid.F
-      !||    volpfv                ../engine/source/airbag/volpfv.F
-      !||    volpre                ../engine/source/airbag/volpres.F
-      !||    volprep               ../engine/source/airbag/volpresp.F
-      !||    volpvga               ../engine/source/airbag/volpvg.F
-      !||    volpvgb               ../engine/source/airbag/volpvg.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    get_volume_area_mod   ../engine/source/airbag/get_volume_area.F90
-      !||    groupdef_mod          ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
-      !||    monvol_struct_mod     ../engine/share/modules/monvol_struct_mod.F
-      !||    output_mod            ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    monvol0               ../engine/source/airbag/monvol0.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    airbaga               ../engine/source/airbag/airbag1.F
+!||    airbaga1              ../engine/source/airbag/airbaga1.F
+!||    airbagb               ../engine/source/airbag/airbag2.F
+!||    airbagb1              ../engine/source/airbag/airbagb1.F
+!||    get_volume_area       ../engine/source/airbag/get_volume_area.F90
+!||    spmd_mv_ca            ../engine/source/mpi/airbags/spmd_mv_ca.F
+!||    volout                ../engine/source/airbag/volout.F
+!||    volp_lfluid           ../engine/source/airbag/volp_lfluid.F
+!||    volpfv                ../engine/source/airbag/volpfv.F
+!||    volpre                ../engine/source/airbag/volpres.F
+!||    volprep               ../engine/source/airbag/volpresp.F
+!||    volpvga               ../engine/source/airbag/volpvg.F
+!||    volpvgb               ../engine/source/airbag/volpvg.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    get_volume_area_mod   ../engine/source/airbag/get_volume_area.F90
+!||    groupdef_mod          ../common_source/modules/groupdef_mod.F
+!||    h3d_mod               ../engine/share/modules/h3d_mod.F
+!||    monvol_struct_mod     ../engine/share/modules/monvol_struct_mod.F
+!||    output_mod            ../common_source/modules/output/output_mod.F90
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE MONVOL0(MONVOL   ,VOLMON  ,X       ,A      ,
      2                   NPC      ,TF      ,V       ,NORMAL ,
      3                   FSAV     ,NSENSOR ,SENSOR_TAB,IGRSURF,
@@ -56,10 +57,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      7                   PM       ,IPM     ,IPART   ,IPARTC ,
      8                   IPARTTG  ,IGROUPC ,IGROUPTG,FEXT   ,
      9                   FLAG     ,H3D_DATA ,T_MONVOL,frontier_global_mv,
-     A                   OUTPUT)
+     A                   OUTPUT, PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE PYTHON_FUNCT_MOD, only : PYTHON_
       USE ELBUFDEF_MOD
       USE H3D_MOD
       USE GROUPDEF_MOD
@@ -97,15 +99,17 @@ C-----------------------------------------------
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(INOUT) :: T_MONVOL
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR), INTENT(IN) :: SENSOR_TAB
       TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON     
 C-----------------------------------------------
-C     N(3,*)  NORMALE STOCKEE DANS WA
-C     PORO(*) STOCKE DANS WA
+C     N(3,*)  NORMAL STORED IN WA
+C     PORO(*) STORED IN WA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,ITYP,NCA,IAD,NN,IS,K1,K2,K6,KK1,KK2,PMAIN,KIBJET,KRBJET,KIBHOL,KRBHOL,NJET,IADJET,RADJET,NVENT,IADHOL,RADHOL
+      INTEGER  I,ITYP,NCA,NN,IS,K1,K2,K6,KK1,KK2,PMAIN,KIBJET,KRBJET,KIBHOL,KRBHOL,NJET,IADJET,RADJET,NVENT,IADHOL,RADHOL
       my_real, dimension(nvolu) :: vol
-C---------------------------------------------------------
+      integer :: uid
+      
 C
       K1 = 1
       KK1= 1
@@ -140,6 +144,7 @@ C
       KRBHOL = KRBJET + LRBAGJET
 
       DO I=1,NVOLU
+        UID = MONVOL(K1)
         ITYP = MONVOL(K1+1)
         NCA  = MONVOL(K1+2) 
         IS   = MONVOL(K1+3)
@@ -154,7 +159,7 @@ C
         IF(FR_MV(ISPMD+1,I)/=0 .OR. FR_MV(NSPMD+2,I)==ISPMD+1) THEN
           PMAIN = FR_MV(NSPMD+2,I)
         ELSE
-C saut partie airbag si proc non concerne
+C Airbag jumping if proc not concerned
           GO TO 100
         ENDIF
         IF(ITYP == 6 .OR. ITYP == 8) GO TO 100
@@ -173,13 +178,13 @@ C=======================================================================
 C         VOLUME P=F(V)
 C=======================================================================
           CALL VOLPFV(MONVOL(K1),VOLMON(KK1),VOL(I),FSAV(1,I),NPC,
-     2                TF        ,PMAIN   , OUTPUT%WFEXT )
+     2                TF        ,PMAIN   , OUTPUT%TH%WFEXT, PYTHON, NFUNCT) 
         ELSEIF(ITYP==3)THEN
 C=======================================================================
 C         GAS PARFAIT
 C=======================================================================
           CALL VOLPVGA(MONVOL(K1),VOLMON(KK1),VOL(I),FSAV(1,I),NVENT ,
-     2            MONVOL(IADHOL) ,VOLMON(RADHOL),PMAIN, OUTPUT%WFEXT )
+     2            MONVOL(IADHOL) ,VOLMON(RADHOL),PMAIN, OUTPUT%TH%WFEXT )
         ELSEIF(ITYP==4.OR.ITYP==5)THEN
 C=======================================================================
 C         AIRBAGS
@@ -187,7 +192,7 @@ C=======================================================================
            CALL AIRBAGA(MONVOL(K1),NJET ,MONVOL(IADJET),NVENT ,MONVOL(IADHOL),
      2 MONVOL(K2),VOLMON(KK1),VOLMON(RADJET),VOLMON(RADHOL),VOLMON(KK2),
      3 VOLMON  ,NPC     ,TF      ,NSENSOR ,SENSOR_TAB ,
-     4 VOL(I)    ,PMAIN ,OUTPUT%WFEXT)
+     4 VOL(I)    ,PMAIN ,OUTPUT%TH%WFEXT, PYTHON)
         ELSEIF(ITYP==7.OR.ITYP==9)THEN
 C=======================================================================
 C         AIRBAGS1 (NOUVEAUX INJECTEURS)
@@ -195,13 +200,13 @@ C=======================================================================
            CALL AIRBAGA1(MONVOL(K1),NJET ,MONVOL(IADJET),NVENT ,MONVOL(IADHOL),
      2 MONVOL(K2),VOLMON(KK1),VOLMON(RADJET),VOLMON(RADHOL),VOLMON(KK2),
      3 VOLMON  ,NPC     ,TF      ,NSENSOR ,SENSOR_TAB ,
-     4 VOL(I)     ,PMAIN ,GEO     ,IGEO    ,PM, OUTPUT%WFEXT)
+     4 VOL(I)     ,PMAIN ,GEO     ,IGEO    ,PM, OUTPUT%TH%WFEXT,PYTHON)
         ELSEIF(ITYP==10)THEN
 C=======================================================================
 C         LINEAIRE FLUIDE
 C=======================================================================
           CALL VOLP_LFLUID(MONVOL(K1),VOLMON(KK1),VOL(I),FSAV(1,I),NPC,
-     2                    TF        ,PMAIN, OUTPUT )
+     2                    TF        ,PMAIN, OUTPUT ,PYTHON,NFUNCT)
         ENDIF
 C=======================================================================
         IF(ITYP/=1)THEN
@@ -209,7 +214,7 @@ C=======================================================================
             CALL VOLPRE(MONVOL(K1),VOLMON(KK1),NJET ,MONVOL(IADJET),VOLMON(RADJET),
      2                 NSENSOR ,SENSOR_TAB ,X       ,V       ,A       ,
      3                 t_monvol(i)%normal  ,NPC     ,TF      ,NN  ,IGRSURF(IS)%NODES,
-     4                 FEXT    ,H3D_DATA,IGRSURF(IS)%ELTYP,IGRSURF(IS)%ELEM, OUTPUT%WFEXT)
+     4                 FEXT    ,H3D_DATA,IGRSURF(IS)%ELTYP,IGRSURF(IS)%ELEM, OUTPUT%TH%WFEXT,PYTHON)
          ELSE
             CALL VOLPREP(MONVOL(K1),VOLMON(KK1),NJET ,MONVOL(IADJET),VOLMON(RADJET),
      2                 NSENSOR ,SENSOR_TAB  ,X       ,V       ,A       ,
@@ -218,9 +223,15 @@ C=======================================================================
      5                 IGRSURF(IS)%ELTYP,IGRSURF(IS)%ELEM,
      5                 T_MONVOL(I)%OMP_OUTPUT%NODE_NUMBER,T_MONVOL(I)%OMP_OUTPUT%TOTAL_CONTRIBUTION_NUMBER, 
      6                 T_MONVOL(I)%OMP_OUTPUT%CONTRIBUTION_INDEX,T_MONVOL(I)%OMP_OUTPUT%CONTRIBUTION_NUMBER,
-     7                 T_MONVOL(I)%OMP_OUTPUT%NODE_ID,T_MONVOL(I)%OMP_OUTPUT%CONTRIBUTION,OUTPUT%WFEXT)
+     7                 T_MONVOL(I)%OMP_OUTPUT%NODE_ID,T_MONVOL(I)%OMP_OUTPUT%CONTRIBUTION,OUTPUT%TH%WFEXT,PYTHON)
          ENDIF
         ENDIF
+        T_MONVOL(I)%UID = UID ! store the uid of the monitored volume
+        T_MONVOL(I)%volume = VOL(I)
+        T_MONVOL(I)%pressure = VOLMON(KK1+12-1)
+        T_MONVOL(I)%temperature = VOLMON(KK1+13-1)
+        T_MONVOL(I)%area = VOLMON(KK1+18-1)
+
  100    CONTINUE
 c        CALL SPMD_BARRIER()
         K1 = K1 + NIMV
@@ -228,6 +239,7 @@ c        CALL SPMD_BARRIER()
         K2 = K2  + NICBAG*NCA
         KK2= KK2 + NRCBAG*NCA
         K6 = K6 + NN
+
       ENDDO
 C
 C=======================================================================

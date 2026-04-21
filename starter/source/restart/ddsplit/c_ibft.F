@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    c_ibft    ../starter/source/restart/ddsplit/c_ibft.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit   ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal    ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    c_ibft    ../starter/source/restart/ddsplit/c_ibft.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit   ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal    ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE C_IBFT(IBFT,NC,NFXTEMP_L,PROC,DD_LAGF,NIFT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -51,7 +51,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N_L, N, ISK, P
+      INTEGER I, N_L, N
 C
       N_L = 0
       DO I = 1, NC

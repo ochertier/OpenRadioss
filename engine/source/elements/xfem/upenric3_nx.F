@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    upenric3_n4     ../engine/source/elements/xfem/upenric3_nx.F
-      !||--- called by ------------------------------------------------------
-      !||    upxfem_tagxp    ../engine/source/elements/xfem/upxfem_tagxp.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    upenric3_n4     ../engine/source/elements/xfem/upenric3_nx.F
+!||--- called by ------------------------------------------------------
+!||    upxfem_tagxp    ../engine/source/elements/xfem/upxfem_tagxp.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE UPENRIC3_N4(XFEM_TAB,
      .                   IPARG  ,IXC     ,NFT    ,JFT     ,JLT  ,
      .                   ELCUTC ,IADC_CRK,IEL_CRK,INOD_CRK,IXFEM,
@@ -37,6 +38,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE CRACKXFEM_MOD
       USE ELBUFDEF_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -122,14 +124,15 @@ C
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    upenric3_n3     ../engine/source/elements/xfem/upenric3_nx.F
-      !||--- called by ------------------------------------------------------
-      !||    upxfem_tagxp    ../engine/source/elements/xfem/upxfem_tagxp.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    upenric3_n3     ../engine/source/elements/xfem/upenric3_nx.F
+!||--- called by ------------------------------------------------------
+!||    upxfem_tagxp    ../engine/source/elements/xfem/upxfem_tagxp.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE UPENRIC3_N3(XFEM_TAB,
      .                    IPARG  ,IXTG     ,NFT    ,JFT     ,JLT  ,
      .                    ELCUTC ,IAD_CRKTG,IEL_CRKTG,INOD_CRK,IXFEM,
@@ -139,6 +142,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE CRACKXFEM_MOD
       USE ELBUFDEF_MOD
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

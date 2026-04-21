@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rlink0          ../engine/source/constraints/general/rlink/rlink0.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur          ../engine/source/input/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_exch_fr6   ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
-      !||    sum_6_float     ../engine/source/system/parit.F
-      !||====================================================================
+!||====================================================================
+!||    rlink0          ../engine/source/constraints/general/rlink/rlink0.F
+!||--- called by ------------------------------------------------------
+!||    lectur          ../engine/source/input/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_exch_fr6   ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
+!||    sum_6_float     ../engine/source/system/parit.F
+!||====================================================================
       SUBROUTINE RLINK0(V    ,VR    ,MS    ,IN  ,NLIK ,
      2                  IDIR ,IDROT ,NOD   ,NSN ,IC   ,
      3                  ICR  ,ISKW  ,ISK   ,SKEW,ISKWN,
@@ -99,7 +99,7 @@ C
         ENDIF
       ENDDO
 C
-C Traitement Parith/ON avant echange
+C Parith/ON processing before exchange
 C
       DO K = 1, 6
        FRL6(1,K) = ZERO
@@ -170,7 +170,7 @@ C
         ENDIF
       ENDDO
 C
-C Traitement Parith/ON avant echange
+C Parith/ON processing before exchange
 C
       DO K = 1, 6
         FRL6(1,K) = ZERO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps110c_newton     ../engine/source/materials/mat/mat110/sigeps110c_newton.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps110c            ../engine/source/materials/mat/mat110/sigeps110c.F
-      !||--- calls      -----------------------------------------------------
-      !||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
-      !||    table_vinterp         ../engine/source/tools/curve/table_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps110c_newton     ../engine/source/materials/mat/mat110/sigeps110c_newton.F
+!||--- called by ------------------------------------------------------
+!||    sigeps110c            ../engine/source/materials/mat/mat110/sigeps110c.F
+!||--- calls      -----------------------------------------------------
+!||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
+!||    table_vinterp         ../engine/source/tools/curve/table_tools.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE SIGEPS110C_NEWTON(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,NPF     , 
      2     TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFF     ,
@@ -95,20 +95,20 @@ c
      .   DG0,DEPS0,MEXP,fBI(2),KBOLTZ,FISOKIN,TINI,XSCALE,YSCALE
       my_real 
      .   MOHR_RADIUS,MOHR_CENTER,NORMSIG,TMP,SIG_RATIO,VAR_A,VAR_B,VAR_C,
-     .   A(2),B(2),C(2),H,DPDT,DLAM,DDEP,DAV,DEVE1,DEVE2,DEVE3,DEVE4,
+     .   A(2),B(2),C(2),DPDT,DLAM,DDEP,DAV,DEVE1,DEVE2,DEVE3,DEVE4,
      .   XVEC(NEL,4)
       my_real
      .   fUN_THETA(NEL,2),fSH_THETA(NEL,2),fPS_THETA(NEL,2),
      .   HIPS_THETA(NEL,2),HIUN_THETA(NEL,2),HISH_THETA(NEL,2)
       my_real 
      .   F1,F2,DF1_DMU,DF2_DMU,NORMXX,NORMYY,NORMXY,
-     .   DENOM,SIG_DFDSIG,DFDSIG2,DPHI_DSIG1,DPHI_DSIG2,
+     .   SIG_DFDSIG,DFDSIG2,DPHI_DSIG1,DPHI_DSIG2,
      .   DSXX,DSYY,DSXY,DEXX,DEYY,DEXY,ALPHA,DA_DCOS2(2),
      .   DB_DCOS2(2),DC_DCOS2(2),DF1_DCOS2,DF2_DCOS2,
      .   DPHI_DCOS2,COS2(10,10)
 c
       my_real, DIMENSION(NEL) ::
-     .   DSIGXX,DSIGYY,DSIGXY,DSIGYZ,DSIGZX,SIGVG,YLD,HARDP,SIGHARD,SIGRATE,
+     .   SIGVG,YLD,HARDP,SIGHARD,SIGRATE,
      .   PHI,DPLA_DLAM,DEZZ,DPHI_DLAM,DPXX,DPYY,DPXY,DPYZ,DPZX,DPZZ,
      .   SIG1,SIG2,COS2THETA,SIN2THETA,DEELZZ,MU,DYLD_DPLA,YL0,SIGEXX,SIGEYY,
      .   SIGEXY,HARDR,YLD_TREF,DYDX,YLD_TEMP,TFAC

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,23 +21,23 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    i7sti3                  ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||    i4gmx3                  ../starter/source/interfaces/inter3d1/i4gmx3.F
-      !||    incoq3                  ../starter/source/interfaces/inter3d1/incoq3.F
-      !||    ineltc                  ../starter/source/interfaces/inter3d1/inelt.F
-      !||    ineltigeo               ../starter/source/interfaces/inter3d1/inelt.F
-      !||    inelts                  ../starter/source/interfaces/inter3d1/inelt.F
-      !||    insol3d                 ../starter/source/interfaces/inter3d1/insol3.F
-      !||    volint                  ../starter/source/interfaces/inter3d1/volint.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i7sti3                  ../starter/source/interfaces/inter3d1/i7sti3.F
+!||--- called by ------------------------------------------------------
+!||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
+!||    i4gmx3                  ../starter/source/interfaces/inter3d1/i4gmx3.F
+!||    incoq3                  ../starter/source/interfaces/inter3d1/incoq3.F
+!||    ineltc                  ../starter/source/interfaces/inter3d1/inelt.F
+!||    ineltigeo               ../starter/source/interfaces/inter3d1/inelt.F
+!||    inelts                  ../starter/source/interfaces/inter3d1/inelt.F
+!||    insol3d                 ../starter/source/interfaces/inter3d1/insol3.F
+!||    volint                  ../starter/source/interfaces/inter3d1/volint.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I7STI3(
      1              X          ,IRECT   ,STF          ,IXS      ,PM       ,
      2              GEO        ,NRT     ,IXC          ,NINT     ,STFAC    ,
@@ -55,7 +55,8 @@ C
      F              IT19       ,KXIG3D ,IXIG3D        ,INTFRIC  ,IPARTS   ,
      G              TAGPRT_FRIC,IPARTFRICS,IPARTFRICM ,INTBUF_FRIC_TAB,NRT_IGE,
      I              IREM_GAP   ,GAPM_MX,GAPS_MX       ,GAPM_L_MX,GAPS_L_MX,
-     J              IPARTT     ,IPARTP ,IPARTR        ,ELEM_LINKED_TO_SEGMENT)
+     J              IPARTT     ,IPARTP ,IPARTR        ,ELEM_LINKED_TO_SEGMENT,
+     K              FLAG_ELEM_INTER25     ) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -64,6 +65,7 @@ C-----------------------------------------------
       USE INTBUF_FRIC_MOD
       USE GROUPDEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only :nixs,nixc,nixtg,nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,7 +77,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "scr05_c.inc"
 #include      "scr08_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
@@ -109,24 +110,26 @@ C-----------------------------------------------
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       TYPE (SURF_) :: IGRSURF
       INTEGER, DIMENSION(NUMELS), INTENT(INOUT):: ELEM_LINKED_TO_SEGMENT !< working array, dim=numels
+      INTEGER, INTENT(IN) :: FLAG_ELEM_INTER25(NINTER25,NUMELS)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NDX, I, J, INRT, NELS, MT, JJ, JJJ, NELC,
-     .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
+     .   MG, L, NELTG,N1,N2,IE,
      .   IP, NLEV, MYLEV, K, P, R, T,IGTYP,IPGMAT,IGMAT,
-     .   ISUBSTACK,NELIG3D, COIN_IGE(8), IPID, PX, PY, PZ, IAD ,IPFMAX,IPL,
-     .   IPFLMAX,IPG,NINV,ICONTR
+     .   ISUBSTACK,NELIG3D, COIN_IGE(8), IPID, PX, PY, PZ ,IPFMAX,IPL,
+     .   IPFLMAX,IPG,NINV,ICONTR,NIN25
       INTEGER JPERM(4)
       LOGICAL TYPE18
       my_real
-     .   DXM, GAPMX, GAPMN, AREA, VOL, DX, GAPM, DDX, 
+     .   DXM, GAPMX, GAPMN, AREA, VOL, DX, GAPM, 
      .   GAPTMP, GAPSCALE,SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
-     .   SLSFAC,XL,IELEM(2),BULK
+     .   SLSFAC,XL,BULK
       my_real, dimension(:), allocatable :: GAP_S_L_TMP
       INTEGER, DIMENSION(:),ALLOCATABLE  :: TAGELEMS,INDEXE
       LOGICAL :: PRINT_ERROR
       INTEGER, DIMENSION(4) :: NODE_ID
+      INTEGER :: IELEM(2)
       DATA JPERM/2,3,4,1/
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -288,16 +291,21 @@ C------------------------------------
            IF (IGTYP==12) WA(IXR(4,I))=MAX(WA(IXR(4,I)),DX)
         END IF
        ENDDO
-       DO I=1,NSN
-         GAP_S(I)=GAPSCALE * WA(NSV(I))
-         IF(IGAP == 3 .AND. GAP_S_L_TMP(NSV(I)) /= ZERO)GAP_S_L(I)=MIN(GAP_S_L(I),GAP_S_L_TMP(NSV(I)))
-         IF(IGAP /= 3) THEN
-           GAPS_MX=MAX(GAPS_MX,GAP_S(I))
-         ELSE
-           GAPS_MX = MAX(GAPS_MX,GAP_S(I))
-           GAPS_L_MX = MAX(GAPS_L_MX,GAP_S_L(I))
-         END IF
-       ENDDO
+       IF(TYPE18)THEN
+         GAPS_MX = ZERO
+         GAP_S(1:NSN) = ZERO
+       ELSE
+         DO I=1,NSN
+           GAP_S(I)=GAPSCALE * WA(NSV(I))
+           IF(IGAP == 3)THEN
+             IF(GAP_S_L_TMP(NSV(I)) /= ZERO)GAP_S_L(I)=MIN(GAP_S_L(I),GAP_S_L_TMP(NSV(I)))
+             GAPS_MX = MAX(GAPS_MX,GAP_S(I))
+             GAPS_L_MX = MAX(GAPS_L_MX,GAP_S_L(I))
+           ELSE
+             GAPS_MX=MAX(GAPS_MX,GAP_S(I))
+           END IF
+         ENDDO
+        ENDIF
       ENDIF
 C
 C SECONDARY SIDE - SURFACE ---
@@ -651,10 +659,12 @@ C----------------------
 C       SOLID ELEMENTS
 C----------------------
         PRINT_ERROR = .FALSE.
+        NIN25 = 0
         CALL INSOL3D(X     ,IRECT ,IXS      ,NINT    ,NELS,INRT,
      .               AREA  ,NOINT ,KNOD2ELS ,NOD2ELS ,0   ,
      .               IXS10 ,IXS16 ,IXS20    ,TAGELEMS,INDEXE,NINV,IELEM,
-     .               ELEM_LINKED_TO_SEGMENT ,PRINT_ERROR)
+     .               ELEM_LINKED_TO_SEGMENT ,PRINT_ERROR,
+     .               NIN25,NTY, FLAG_ELEM_INTER25 )
         IF(PRINT_ERROR) THEN
           NODE_ID(1:4) = ITAB(IRECT(1:4,INRT))
           
@@ -902,24 +912,7 @@ C----------------------------------
         !  NELS+NELC+NELTG = 0      !
         !---------------------------!
         IF(NELS+NELC+NELTG == 0)THEN
-         IF (IMACH /= 3) THEN
-           IF(NINT > 0) THEN
-              CALL ANCMSG(MSGID=92,
-     .                    MSGTYPE=MSGWARNING,
-     .                    ANMODE=ANINFO_BLIND_2,
-     .                    I1=ID,
-     .                    C1=TITR,
-     .                    I2=I)
-           ENDIF
-           IF(NINT < 0) THEN
-              CALL ANCMSG(MSGID=93,
-     .                    MSGTYPE=MSGWARNING,
-     .                    ANMODE=ANINFO_BLIND_2,
-     .                    I1=ID,
-     .                    C1=TITR,
-     .                    I2=I)
-           ENDIF
-         ELSE
+
 C        SPMD EXCHANGE : if no element associated to the edge => error
            IF(NINT > 0) THEN
              CALL ANCMSG(MSGID=481,             
@@ -937,7 +930,7 @@ C        SPMD EXCHANGE : if no element associated to the edge => error
      .                   C1=TITR,               
      .                   I2=I)                  
            ENDIF
-         ENDIF
+
         ENDIF
 C----------------------------------        
       ENDDO!next I=1,NRT
@@ -1033,24 +1026,7 @@ C------------------------------------
            ENDIF
           ENDIF  
         ELSEIF(NELIG3D == 0)THEN
-         IF (IMACH /= 3) THEN
-           IF(NINT > 0) THEN
-              CALL ANCMSG(MSGID=92,
-     .                    MSGTYPE=MSGWARNING,
-     .                    ANMODE=ANINFO_BLIND_2,
-     .                    I1=ID,
-     .                    C1=TITR,
-     .                    I2=I)
-           ENDIF
-           IF(NINT < 0) THEN
-              CALL ANCMSG(MSGID=93,
-     .                    MSGTYPE=MSGWARNING,
-     .                    ANMODE=ANINFO_BLIND_2,
-     .                    I1=ID,
-     .                    C1=TITR,
-     .                    I2=I)
-           ENDIF
-         ELSE
+
 C        SPMD : one element must be associated to the edge
            IF(NINT > 0) THEN
               CALL ANCMSG(MSGID=481,
@@ -1068,7 +1044,7 @@ C        SPMD : one element must be associated to the edge
      .                    C1=TITR,
      .                    I2=I)
            ENDIF
-         ENDIF
+
         ENDIF
       ENDDO!next I
       
@@ -1171,7 +1147,7 @@ Ce warning for sorting algorithm (performance).
         END IF
       END IF
 
-C -----Friction model  secnd nodes parts------
+C ---- FRUCTION MODEL DRAD NODES PARTS ------
       IF(INTFRIC > 0) THEN
         IF(NUMELS  /= 0)THEN
           DO I = 1,NSN   
@@ -1274,18 +1250,20 @@ C
      .                                                    1PG20.13)
       END
 
-      !||====================================================================
-      !||    friction_parts_search           ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_friction_orientations   ../starter/source/interfaces/friction/reader/hm_read_friction_orientations.F
-      !||    i11sti3                         ../starter/source/interfaces/inter3d1/i11sti3.F
-      !||    i24gapm                         ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    i24sti3                         ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    i25gapm                         ../starter/source/interfaces/inter3d1/i25sti3.F
-      !||    i25sti3                         ../starter/source/interfaces/inter3d1/i25sti3.F
-      !||    i7sti3                          ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    friction_parts_search           ../starter/source/interfaces/inter3d1/i7sti3.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_friction_orientations   ../starter/source/interfaces/friction/reader/hm_read_friction_orientations.F
+!||    i11sti3                         ../starter/source/interfaces/inter3d1/i11sti3.F
+!||    i21els3                         ../starter/source/interfaces/inter3d1/i21els3.F
+!||    i24gapm                         ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    i24sti3                         ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    i25gapm                         ../starter/source/interfaces/inter3d1/i25sti3.F
+!||    i25sti3                         ../starter/source/interfaces/inter3d1/i25sti3.F
+!||    i25sti_edg                      ../starter/source/interfaces/inter3d1/i25sti_edg.F
+!||    i7sti3                          ../starter/source/interfaces/inter3d1/i7sti3.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE FRICTION_PARTS_SEARCH(
      .            IP     ,NPARTSFRIC  ,PARTSFRIC  ,IPL )
                           

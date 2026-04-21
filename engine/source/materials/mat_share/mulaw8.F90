@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,71 +20,74 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mulaw8_mod   ../engine/source/materials/mat_share/mulaw8.F90
-      !||--- called by ------------------------------------------------------
-      !||    mmain8       ../engine/source/materials/mat_share/mmain8.F
-      !||====================================================================
+!||====================================================================
+!||    mulaw8_mod   ../engine/source/materials/mat_share/mulaw8.F90
+!||--- called by ------------------------------------------------------
+!||    mmain8       ../engine/source/materials/mat_share/mmain8.F
+!||====================================================================
       module mulaw8_mod
       contains
 !! \brief 8 integrztion point brick element material subroutine
 !! \details Compute the material behavior for 8 integration points Brick element
-      !||====================================================================
-      !||    mulaw8              ../engine/source/materials/mat_share/mulaw8.F90
-      !||--- called by ------------------------------------------------------
-      !||    mmain8              ../engine/source/materials/mat_share/mmain8.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg              ../engine/source/output/message/message.F
-      !||    arret               ../engine/source/system/arret.F
-      !||    fail_biquad_s       ../engine/source/materials/fail/biquad/fail_biquad_s.F
-      !||    fail_emc            ../engine/source/materials/fail/emc/fail_emc.F
-      !||    fail_energy_s       ../engine/source/materials/fail/energy/fail_energy_s.F
-      !||    fail_johnson        ../engine/source/materials/fail/johnson_cook/fail_johnson.F
-      !||    fail_orthbiquad_s   ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_s.F
-      !||    fail_rtcl_s         ../engine/source/materials/fail/rtcl/fail_rtcl_s.F
-      !||    fail_sahraei_s      ../engine/source/materials/fail/sahraei/fail_sahraei_s.F
-      !||    fail_spalling_s     ../engine/source/materials/fail/spalling/fail_spalling_s.F
-      !||    fail_tab_old_s      ../engine/source/materials/fail/tabulated/fail_tab_old_s.F
-      !||    fail_tab_s          ../engine/source/materials/fail/tabulated/fail_tab_s.F
-      !||    fail_tbutcher_s     ../engine/source/materials/fail/tuler_butcher/fail_tbutcher_s.F
-      !||    fail_tensstrain_s   ../engine/source/materials/fail/tensstrain/fail_tensstrain_s.F
-      !||    fail_visual_s       ../engine/source/materials/fail/visual/fail_visual_s.F
-      !||    fail_wierzbicki_s   ../engine/source/materials/fail/wierzbicki/fail_wierzbicki_s.F
-      !||    fail_wilkins_s      ../engine/source/materials/fail/wilkins/fail_wilkins_s.F
-      !||    mqvisc8             ../engine/source/materials/mat_share/mqvisc8.F
-      !||    mreploc             ../engine/source/materials/mat_share/mreploc.F
-      !||    mrotens             ../engine/source/materials/mat_share/mrotens.F
-      !||    nvar                ../engine/source/input/nvar.F
-      !||    sigeps28            ../engine/source/materials/mat/mat028/sigeps28.F
-      !||    sigeps33            ../engine/source/materials/mat/mat033/sigeps33.F
-      !||    sigeps34            ../engine/source/materials/mat/mat034/sigeps34.F
-      !||    sigeps35            ../engine/source/materials/mat/mat035/sigeps35.F
-      !||    sigeps36            ../engine/source/materials/mat/mat036/sigeps36.F
-      !||    sigeps38            ../engine/source/materials/mat/mat038/sigeps38.F
-      !||    sigeps40            ../engine/source/materials/mat/mat040/sigeps40.F
-      !||    sigeps41            ../engine/source/materials/mat/mat041/sigeps41.F
-      !||    sigeps42            ../engine/source/materials/mat/mat042/sigeps42.F
-      !||    sigeps44            ../engine/source/materials/mat/mat044/sigeps44.F
-      !||    sigeps45            ../engine/source/materials/mat/mat045/sigeps45.F
-      !||    sigeps48            ../engine/source/materials/mat/mat048/sigeps48.F
-      !||    sigeps50s           ../engine/source/materials/mat/mat050/sigeps50s.F90
-      !||    sigeps52            ../engine/source/materials/mat/mat052/sigeps52.F
-      !||    sigeps53            ../engine/source/materials/mat/mat053/sigeps53.F
-      !||    sigeps56            ../engine/source/materials/mat/mat056/sigeps56.F
-      !||    sigeps60            ../engine/source/materials/mat/mat060/sigeps60.F
-      !||    sigeps62            ../engine/source/materials/mat/mat062/sigeps62.F
-      !||    startime            ../engine/source/system/timer_mod.F90
-      !||    stoptime            ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod        ../common_source/modules/constant_mod.F
-      !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||    sigeps50s_mod       ../engine/source/materials/mat/mat050/sigeps50s.F90
-      !||    table_mod           ../engine/share/modules/table_mod.F
-      !||    timer_mod           ../engine/source/system/timer_mod.F90
-      !||====================================================================
-        subroutine mulaw8(timers,                                    &
-        &                 lft,     llt,     mtn,              &
+!||====================================================================
+!||    mulaw8                ../engine/source/materials/mat_share/mulaw8.F90
+!||--- called by ------------------------------------------------------
+!||    mmain8                ../engine/source/materials/mat_share/mmain8.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||    fail_biquad_s         ../engine/source/materials/fail/biquad/fail_biquad_s.F
+!||    fail_emc              ../engine/source/materials/fail/emc/fail_emc.F
+!||    fail_energy_s         ../engine/source/materials/fail/energy/fail_energy_s.F
+!||    fail_johnson          ../engine/source/materials/fail/johnson_cook/fail_johnson.F
+!||    fail_orthbiquad_s     ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_s.F
+!||    fail_rtcl_s           ../engine/source/materials/fail/rtcl/fail_rtcl_s.F
+!||    fail_sahraei_s        ../engine/source/materials/fail/sahraei/fail_sahraei_s.F
+!||    fail_spalling_s       ../engine/source/materials/fail/spalling/fail_spalling_s.F90
+!||    fail_tab_old_s        ../engine/source/materials/fail/tabulated/fail_tab_old_s.F
+!||    fail_tab_s            ../engine/source/materials/fail/tabulated/fail_tab_s.F
+!||    fail_tbutcher_s       ../engine/source/materials/fail/tuler_butcher/fail_tbutcher_s.F
+!||    fail_tensstrain_s     ../engine/source/materials/fail/tensstrain/fail_tensstrain_s.F
+!||    fail_visual_s         ../engine/source/materials/fail/visual/fail_visual_s.F
+!||    fail_wierzbicki_s     ../engine/source/materials/fail/wierzbicki/fail_wierzbicki_s.F
+!||    fail_wilkins_s        ../engine/source/materials/fail/wilkins/fail_wilkins_s.F
+!||    mqvisc8               ../engine/source/materials/mat_share/mqvisc8.F
+!||    mreploc               ../engine/source/materials/mat_share/mreploc.F
+!||    mrotens               ../engine/source/materials/mat_share/mrotens.F
+!||    sigeps28              ../engine/source/materials/mat/mat028/sigeps28.F
+!||    sigeps33              ../engine/source/materials/mat/mat033/sigeps33.F
+!||    sigeps34              ../engine/source/materials/mat/mat034/sigeps34.F
+!||    sigeps35              ../engine/source/materials/mat/mat035/sigeps35.F
+!||    sigeps36              ../engine/source/materials/mat/mat036/sigeps36.F
+!||    sigeps38              ../engine/source/materials/mat/mat038/sigeps38.F
+!||    sigeps40              ../engine/source/materials/mat/mat040/sigeps40.F
+!||    sigeps41              ../engine/source/materials/mat/mat041/sigeps41.F
+!||    sigeps42              ../engine/source/materials/mat/mat042/sigeps42.F
+!||    sigeps44              ../engine/source/materials/mat/mat044/sigeps44.F
+!||    sigeps45              ../engine/source/materials/mat/mat045/sigeps45.F
+!||    sigeps48              ../engine/source/materials/mat/mat048/sigeps48.F
+!||    sigeps50s             ../engine/source/materials/mat/mat050/sigeps50s.F90
+!||    sigeps52              ../engine/source/materials/mat/mat052/sigeps52.F
+!||    sigeps53              ../engine/source/materials/mat/mat053/sigeps53.F
+!||    sigeps56              ../engine/source/materials/mat/mat056/sigeps56.F
+!||    sigeps60              ../engine/source/materials/mat/mat060/sigeps60.F
+!||    sigeps62              ../engine/source/materials/mat/mat062/sigeps62.F
+!||    startime              ../engine/source/system/timer_mod.F90
+!||    stoptime              ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    constant_mod          ../common_source/modules/constant_mod.F
+!||    fail_spalling_s_mod   ../engine/source/materials/fail/spalling/fail_spalling_s.F90
+!||    mat_elem_mod          ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    mvsiz_mod             ../engine/share/spe_inc/mvsiz_mod.F90
+!||    output_mod            ../common_source/modules/output/output_mod.F90
+!||    precision_mod         ../common_source/modules/precision_mod.F90
+!||    sigeps50s_mod         ../engine/source/materials/mat/mat050/sigeps50s.F90
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||    timer_mod             ../engine/source/system/timer_mod.F90
+!||====================================================================
+        subroutine mulaw8(timers,  output,                                  &
+        &                 llt,     mtn,              &
         &                 npt,     d1,      d2,      d3,      &
         &                 d4,      d5,      d6,      pm,      &
         &                 off,     sig,     eint,    rho,     &
@@ -109,24 +112,27 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
-      use timer_mod
-      use constant_mod
-      use table_mod
-      use mat_elem_mod
-      use message_mod
-      use sigeps50s_mod
+          use timer_mod
+          use output_mod, only : output_
+          use constant_mod
+          use table_mod
+          use mat_elem_mod
+          use message_mod
+          use sigeps50s_mod
+          use fail_spalling_s_mod
+          use precision_mod, only : WP
+          use mvsiz_mod, only : mvsiz
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-#include "my_real.inc"
-#include "mvsiz_p.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           ! integer arguments (in)
           ! --------------------------------
           type(timer_), intent(inout) :: timers
+          type(output_), intent(inout) :: output
           integer, intent(in) :: snpc
           integer, intent(in) :: nummat
           integer, intent(in) :: ity
@@ -134,7 +140,6 @@
           integer, intent(in) :: jsph
           integer, intent(in) :: jthe
           integer, intent(in) :: jtur
-          integer, intent(in) :: lft
           integer, intent(in) :: llt
           integer, intent(in) :: npt
           integer, intent(in) :: mtn
@@ -163,13 +168,13 @@
 
           ! floating point arguments (in)
           ! --------------------------------
-          my_real, dimension(npropm,nummat), intent(in) :: pm
-          my_real, dimension(npropg,numgeo), intent(in) :: geo
-          my_real, dimension(sbufmat), intent(in) :: bufmat
-          my_real, dimension(stf), intent(in) :: tf
-          my_real, intent(in) :: dt1
-          my_real, intent(in) :: tt
-          my_real, intent(in) :: dt2t
+          real(kind=WP), dimension(npropm,nummat), intent(in) :: pm
+          real(kind=WP), dimension(npropg,numgeo), intent(in) :: geo
+          real(kind=WP), dimension(sbufmat), intent(in) :: bufmat
+          real(kind=WP), dimension(stf), intent(in) :: tf
+          real(kind=WP), intent(in) :: dt1
+          real(kind=WP), intent(in) :: tt
+          real(kind=WP), intent(in) :: dt2t
 
           ! integer arguments (inout)
           ! --------------------------------
@@ -177,46 +182,46 @@
 
           ! floating point arguments (inout)
           ! --------------------------------
-          my_real, dimension(llt), intent(inout) :: rho
-          my_real, dimension(llt), intent(inout) :: qold
-          my_real, dimension(llt), intent(inout) :: vol
-          my_real, dimension(mvsiz,6), intent(inout) :: gama
-          my_real, dimension(llt), intent(inout) :: epsd
-          my_real, dimension(llt), intent(inout) :: off
-          my_real, dimension(llt), intent(inout) :: offg
-          my_real, dimension(llt), intent(inout) :: eint
-          my_real, dimension(llt), intent(inout) :: mssa
-          my_real, dimension(llt), intent(inout) :: dmels
-          my_real, dimension(nel,6), intent(inout) :: sig
-          my_real, dimension(mvsiz), intent(inout) :: voln
-          my_real, dimension(mvsiz), intent(inout) :: vis
-          my_real, dimension(mvsiz), intent(inout) :: ssp
-          my_real, dimension(mvsiz), intent(inout) :: rho0
-          my_real, dimension(mvsiz), intent(inout) :: dvol
-          my_real, dimension(mvsiz), intent(inout) :: vd2
-          my_real, dimension(mvsiz), intent(inout) :: deltax
-          my_real, dimension(mvsiz), intent(inout) :: rx
-          my_real, dimension(mvsiz), intent(inout) :: ry
-          my_real, dimension(mvsiz), intent(inout) :: rz
-          my_real, dimension(mvsiz), intent(inout) :: sx
-          my_real, dimension(mvsiz), intent(inout) :: sy
-          my_real, dimension(mvsiz), intent(inout) :: sz
-          my_real, dimension(mvsiz), intent(inout) :: tx
-          my_real, dimension(mvsiz), intent(inout) :: ty
-          my_real, dimension(mvsiz), intent(inout) :: tz
-          my_real, dimension(mvsiz), intent(inout) :: stifn
-          my_real, dimension(mvsiz), intent(inout) :: et
-          my_real, dimension(mvsiz,6), intent(inout) :: svis
-          my_real, dimension(mvsiz,npt), intent(inout) :: volgp
-          my_real, dimension(mvsiz,npt), intent(inout) :: d1
-          my_real, dimension(mvsiz,npt), intent(inout) :: d2
-          my_real, dimension(mvsiz,npt), intent(inout) :: d3
-          my_real, dimension(mvsiz,npt), intent(inout) :: d4
-          my_real, dimension(mvsiz,npt), intent(inout) :: d5
-          my_real, dimension(mvsiz,npt), intent(inout) :: d6
-          my_real, dimension(mvsiz,npt), intent(inout) :: wxx
-          my_real, dimension(mvsiz,npt), intent(inout) :: wyy
-          my_real, dimension(mvsiz,npt), intent(inout) :: wzz
+          real(kind=WP), dimension(llt), intent(inout) :: rho
+          real(kind=WP), dimension(llt), intent(inout) :: qold
+          real(kind=WP), dimension(llt), intent(inout) :: vol
+          real(kind=WP), dimension(mvsiz,6), intent(inout) :: gama
+          real(kind=WP), dimension(llt), intent(inout) :: epsd
+          real(kind=WP), dimension(llt), intent(inout) :: off
+          real(kind=WP), dimension(llt), intent(inout) :: offg
+          real(kind=WP), dimension(llt), intent(inout) :: eint
+          real(kind=WP), dimension(llt), intent(inout) :: mssa
+          real(kind=WP), dimension(llt), intent(inout) :: dmels
+          real(kind=WP), dimension(nel,6), intent(inout) :: sig
+          real(kind=WP), dimension(mvsiz), intent(inout) :: voln
+          real(kind=WP), dimension(mvsiz), intent(inout) :: vis
+          real(kind=WP), dimension(mvsiz), intent(inout) :: ssp
+          real(kind=WP), dimension(mvsiz), intent(inout) :: rho0
+          real(kind=WP), dimension(mvsiz), intent(inout) :: dvol
+          real(kind=WP), dimension(mvsiz), intent(inout) :: vd2
+          real(kind=WP), dimension(mvsiz), intent(inout) :: deltax
+          real(kind=WP), dimension(mvsiz), intent(inout) :: rx
+          real(kind=WP), dimension(mvsiz), intent(inout) :: ry
+          real(kind=WP), dimension(mvsiz), intent(inout) :: rz
+          real(kind=WP), dimension(mvsiz), intent(inout) :: sx
+          real(kind=WP), dimension(mvsiz), intent(inout) :: sy
+          real(kind=WP), dimension(mvsiz), intent(inout) :: sz
+          real(kind=WP), dimension(mvsiz), intent(inout) :: tx
+          real(kind=WP), dimension(mvsiz), intent(inout) :: ty
+          real(kind=WP), dimension(mvsiz), intent(inout) :: tz
+          real(kind=WP), dimension(mvsiz), intent(inout) :: stifn
+          real(kind=WP), dimension(mvsiz), intent(inout) :: et
+          real(kind=WP), dimension(mvsiz,6), intent(inout) :: svis
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: volgp
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: d1
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: d2
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: d3
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: d4
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: d5
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: d6
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: wxx
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: wyy
+          real(kind=WP), dimension(mvsiz,npt), intent(inout) :: wzz
 
           type(ttable),dimension(ntable),intent(in) ::  table
           type (buf_lay_),intent(inout), target :: bufly
@@ -238,57 +243,62 @@
           integer :: ipt,jpt,ir,israte
           integer :: ifunc(maxfunc)
           integer :: idum1
-          integer :: irupt,imat,ntabl_fail
+          integer :: irupt,imat,ntabl_fail,lf_dammx
           integer :: nvarf, iexpan8,jj(6),inloc,ieos,dmg_flag
+          integer :: niparf
           ! floating point variables
-          my_real, dimension(llt) :: cst1
-          my_real, dimension(mvsiz) :: c1
-          my_real, dimension(mvsiz) :: pnew
-          my_real, dimension(mvsiz) :: pp
-          my_real, dimension(mvsiz) :: defp
-          my_real, dimension(mvsiz) :: ep1,ep2,ep3,ep4,ep5,ep6
-          my_real, dimension(mvsiz) :: s1,s2,s3,s4,s5,s6
-          my_real, dimension(mvsiz) :: es1,es2,es3,es4,es5,es6
-          my_real, dimension(mvsiz) :: de1,de2,de3,de4,de5,de6
-          my_real, dimension(mvsiz) :: sv1,sv2,sv3,sv4,sv5,sv6
-          my_real, dimension(mvsiz) :: so1,so2,so3,so4,so5,so6
-          my_real, dimension(mvsiz) :: r11,r12,r13
-          my_real, dimension(mvsiz) :: r21,r22,r23
-          my_real, dimension(mvsiz) :: r31,r32,r33
-          my_real, dimension(mvsiz) :: sold1,sold2,sold3,sold4,sold5,sold6
-          my_real, dimension(mvsiz) :: sspp
-          my_real, dimension(mvsiz) :: sigy
-          my_real, dimension(mvsiz) :: dpla
-          my_real, dimension(mvsiz) :: epsp1
-          my_real, dimension(mvsiz) :: tstar
-          my_real, dimension(mvsiz) :: df
-          my_real, dimension(mvsiz) :: amu
-          my_real, dimension(mvsiz) :: bidv
+          real(kind=WP), dimension(llt) :: cst1
+          real(kind=WP), dimension(mvsiz) :: c1
+          real(kind=WP), dimension(mvsiz) :: pnew
+          real(kind=WP), dimension(mvsiz) :: pp
+          real(kind=WP), dimension(mvsiz) :: defp
+          real(kind=WP), dimension(mvsiz) :: ep1,ep2,ep3,ep4,ep5,ep6
+          real(kind=WP), dimension(mvsiz) :: s1,s2,s3,s4,s5,s6
+          real(kind=WP), dimension(mvsiz) :: es1,es2,es3,es4,es5,es6
+          real(kind=WP), dimension(mvsiz) :: de1,de2,de3,de4,de5,de6
+          real(kind=WP), dimension(mvsiz) :: sv1,sv2,sv3,sv4,sv5,sv6
+          real(kind=WP), dimension(mvsiz) :: so1,so2,so3,so4,so5,so6
+          real(kind=WP), dimension(mvsiz) :: r11,r12,r13
+          real(kind=WP), dimension(mvsiz) :: r21,r22,r23
+          real(kind=WP), dimension(mvsiz) :: r31,r32,r33
+          real(kind=WP), dimension(mvsiz) :: sold1,sold2,sold3,sold4,sold5,sold6
+          real(kind=WP), dimension(mvsiz) :: sspp
+          real(kind=WP), dimension(mvsiz) :: sigy
+          real(kind=WP), dimension(mvsiz) :: dpla
+          real(kind=WP), dimension(mvsiz) :: epsp1
+          real(kind=WP), dimension(mvsiz) :: tstar
+          real(kind=WP), dimension(mvsiz) :: df
+          real(kind=WP), dimension(mvsiz) :: amu
+          real(kind=WP), dimension(mvsiz) :: bidv
 
-          my_real :: e1,e2,e3,e4,e5,e6
-          my_real :: dav,dta
-          my_real :: ss1,ss2,ss3,ss4,ss5,ss6
-          my_real :: q1,q2,q3
-          my_real :: asrate,epsp
-          my_real :: bid,dum1,bidon,bidon1,bidon2,bidon3,bidon4,bidon5
-          my_real tt_local
+          real(kind=WP) :: e1,e2,e3,e4,e5,e6
+          real(kind=WP) :: dav,dta
+          real(kind=WP) :: ss1,ss2,ss3,ss4,ss5,ss6
+          real(kind=WP) :: q1,q2,q3
+          real(kind=WP) :: asrate,epsp
+          real(kind=WP) :: bidon,bidon1,bidon2,bidon3,bidon4,bidon5
+          real(kind=WP) tt_local
           !
-          my_real, dimension(:)  ,pointer :: sigp,siglp,strain,uvar,uvarf
-          my_real, dimension(:)  ,pointer :: dfmax,tdele,uparam0,uparam,uparamf
+          real(kind=WP), dimension(:)  ,pointer, contiguous :: sigp,siglp,strain,uvar,uvarf
+          real(kind=WP), dimension(:)  ,pointer, contiguous :: dfmax,tdele,uparam0,uparam,uparamf
           !
-          integer, dimension(:), pointer :: vartmp,itabl_fail,iparam
+          integer, dimension(:), pointer, contiguous :: vartmp,itabl_fail,iparam,iparamf
           type(l_bufel_)  ,pointer :: lbuf
           !
           character option*256
           integer size
           integer :: nrate
-          my_real :: fisokin
-          my_real, dimension(nel), target :: vecnul
-          my_real, dimension(:), pointer  :: sigbxx,sigbyy,sigbzz,sigbxy,sigbyz,sigbzx
+          real(kind=WP) :: fisokin
+          real(kind=WP), dimension(nel), target :: vecnul
+          real(kind=WP), dimension(:), pointer, contiguous  :: sigbxx,sigbyy,sigbzz,sigbxy,sigbyz,sigbzx
+          real(kind=WP), target :: nothing(1)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
-          imat = mat(lft)
+          nothing = zero
+          siglp => nothing
+          dta = -huge(dta)
+          imat = mat(1)
           inloc   = mat_param(imat)%nloc
           ieos    = mat_param(imat)%ieos
           nuparam = mat_param(imat)%nuparam
@@ -318,32 +328,32 @@
           bidon3 = zero
           bidon4 = zero
           bidon5 = zero
-          cst1(lft:llt) = one
+          cst1(1:llt) = one
 
-          do i=lft,llt
-             c1(i)  = pm(32,imat)
-             rho0(i)= pm( 1,imat)
-             vis(i) = zero
-             ssp(i) = zero
-             sv1(i) = zero
-             sv2(i) = zero
-             sv3(i) = zero
-             sv4(i) = zero
-             sv5(i) = zero
-             sv6(i) = zero
-             s1(i) = zero
-             s2(i) = zero
-             s3(i) = zero
-             s4(i) = zero
-             s5(i) = zero
-             s6(i) = zero
-             sig(i,1)=zero
-             sig(i,2)=zero
-             sig(i,3)=zero
-             sig(i,4)=zero
-             sig(i,5)=zero
-             sig(i,6)=zero
-             sspp(i)=zero
+          do i=1,llt
+            c1(i)  = pm(32,imat)
+            rho0(i)= pm( 1,imat)
+            vis(i) = zero
+            ssp(i) = zero
+            sv1(i) = zero
+            sv2(i) = zero
+            sv3(i) = zero
+            sv4(i) = zero
+            sv5(i) = zero
+            sv6(i) = zero
+            s1(i) = zero
+            s2(i) = zero
+            s3(i) = zero
+            s4(i) = zero
+            s5(i) = zero
+            s6(i) = zero
+            sig(i,1)=zero
+            sig(i,2)=zero
+            sig(i,3)=zero
+            sig(i,4)=zero
+            sig(i,5)=zero
+            sig(i,6)=zero
+            sspp(i)=zero
           enddo
 !
           if (isorth /= 0) then
@@ -380,7 +390,7 @@
               enddo
             enddo
 !
-            israte = ipm(3,mat(lft))
+            israte = ipm(3,mat(1))
             if(israte>=1)then
               do i=1,llt
                 dav = (ep1(i)+ep2(i)+ep3(i))/twenty4
@@ -399,7 +409,7 @@
             endif
           endif
 !--------------------------------------------------
-!     boucle sur les points de gauss
+!     loop over gauss points
 !--------------------------------------------------
           do ipt=1,npt
             lbuf   => bufly%lbuf(1,1,ipt)
@@ -410,7 +420,7 @@
             vartmp => bufly%mat(1,1,ipt)%vartmp(1:llt*nvartmp)
             jpt=(ipt-1)*llt
 !
-            do i=lft,llt
+            do i=1,llt
               ep1(i) = d1(i,ipt)
               ep2(i) = d2(i,ipt)
               ep3(i) = d3(i,ipt)
@@ -427,16 +437,16 @@
             enddo
 !
             if (isorth /= 0) then
-              do i=lft,llt
+              do i=1,llt
                 ep4(i) = half*ep4(i)
                 ep5(i) = half*ep5(i)
                 ep6(i) = half*ep6(i)
               enddo
-              call mrotens(lft,llt,ep1,ep2,ep3,ep4,ep5,ep6,&
+              call mrotens(1,llt,ep1,ep2,ep3,ep4,ep5,ep6,&
               &r11,r12,r13,&
               &r21,r22,r23,&
               &r31,r32,r33)
-              do i=lft,llt
+              do i=1,llt
                 j = (i-1)*6
                 ep4(i) = two*ep4(i)
                 ep5(i) = two*ep5(i)
@@ -449,7 +459,7 @@
                 so6(i) = siglp(jj(6)+i)
               enddo
             else
-              do i=lft,llt
+              do i=1,llt
                 so1(i) = sigp(jj(1)+i)
                 so2(i) = sigp(jj(2)+i)
                 so3(i) = sigp(jj(3)+i)
@@ -482,7 +492,7 @@
               enddo
             endif
 !
-            do i=lft,llt
+            do i=1,llt
               de1(i) = ep1(i)*dt1
               de2(i) = ep2(i)*dt1
               de3(i) = ep3(i)*dt1
@@ -503,15 +513,15 @@
               es6(i) = strain(jj(6)+i)
             enddo
 !------compute of amu as in mmain after thermal expansion computation ---------------
-            do i=lft,llt
+            do i=1,llt
               df(i)  =  rho0(i)/rho(i)
             enddo
             if(mtn == 45) then     ! for compatibility with qa tests
-              do i=lft,llt
+              do i=1,llt
                 amu(i) =  one/df(i)-one
               enddo
             else
-              do i=lft,llt
+              do i=1,llt
                 amu(i) =  rho(i)/rho0(i)-one
               enddo
             endif
@@ -521,7 +531,7 @@
 !     compute undamaged effective stresses
 !---------------------------------------------------------
             if (dmg_flag > 0) then
-              do i = lft,llt
+              do i = 1,llt
                 so1(i) = so1(i)/max(lbuf%dmgscl(i),em20)
                 so2(i) = so2(i)/max(lbuf%dmgscl(i),em20)
                 so3(i) = so3(i)/max(lbuf%dmgscl(i),em20)
@@ -615,7 +625,7 @@
 !     strain rate
 !-------------------
               do i=1,llt
-                israte = ipm(3,mat(lft))
+                israte = ipm(3,mat(1))
                 if(israte == 0)then
                   dav = (ep1(i)+ep2(i)+ep3(i))*third
                   e1 = ep1(i) - dav
@@ -650,17 +660,17 @@
               endif
 
               call sigeps36(&
-              &llt      ,nuvar    ,nfunc    ,ifunc    ,npf ,&
-              &tf       ,tt       ,dt1      ,uparam0   ,rho0,&
-              &de1      ,de2      ,de3      ,de4      ,de5      ,de6   ,&
-              &es1      ,es2      ,es3      ,es4      ,es5      ,es6   ,&
-              &so1      ,so2      ,so3      ,so4      ,so5      ,so6   ,&
-              &s1       ,s2       ,s3       ,s4       ,s5       ,s6    ,&
-              &sspp     ,vis      ,uvar     ,off      ,ngl      ,ieos  ,&
-              &ipm      ,mat      ,epsd     ,ipla     ,sigy     ,lbuf%pla,&
-              &dpla     ,et       ,bidon    ,bidon    ,amu      ,bidv      ,&
-              &cst1     ,nvartmp  ,vartmp   ,lbuf%dmg ,inloc    ,lbuf%planl,&
-              &sigbxx,sigbyy,sigbzz,sigbxy,sigbyz,sigbzx )
+                llt      ,nuvar    ,nfunc    ,ifunc    ,npf      ,tf       ,&
+                dt1      ,uparam0  ,rho0     ,&
+                de1      ,de2      ,de3      ,de4      ,de5      ,de6   ,&
+                es1      ,es2      ,es3      ,es4      ,es5      ,es6   ,&
+                so1      ,so2      ,so3      ,so4      ,so5      ,so6   ,&
+                s1       ,s2       ,s3       ,s4       ,s5       ,s6    ,&
+                sspp     ,vis      ,uvar     ,off      ,ngl      ,ieos  ,&
+                ipm      ,mat      ,epsd     ,ipla     ,sigy     ,lbuf%pla,&
+                dpla     ,et       ,bidon    ,bidon    ,amu      ,bidv      ,&
+                cst1     ,nvartmp  ,vartmp   ,lbuf%dmg ,inloc    ,lbuf%planl,&
+                sigbxx,sigbyy,sigbzz,sigbxy,sigbyz,sigbzx )
 !
               defp(1:llt)   =  lbuf%pla(1:llt)
 !
@@ -692,7 +702,7 @@
               &sv1      ,sv2      ,sv3      ,sv4      ,sv5      ,sv6   ,&
               &sspp     ,vis      ,uvar     ,off      )
             elseif(mtn == 41)then
-              call sigeps41(&
+              call sigeps41(output,&
               &llt      ,npar     ,nuvar    ,&
               &tt       ,dt1      ,bufmat(iadbuf),&
               &rho0     ,rho      ,voln     ,eint     ,&
@@ -718,7 +728,7 @@
 !---  strain rate
 !
 !         do i=1,llt
-!           israte = ipm(3,mat(lft))
+!           israte = ipm(3,mat(1))
 !           if(israte == 0)then
 !             dav = (ep1(i)+ep2(i)+ep3(i)) * third
 !             e1 = ep1(i) - dav
@@ -763,7 +773,7 @@
             elseif(mtn == 48)then
 !---    strain rate
               do i=1,llt
-                israte = ipm(3,mat(lft))
+                israte = ipm(3,mat(1))
                 if(israte == 0)then
                   dav = (ep1(i)+ep2(i)+ep3(i)) * third
                   e1 = ep1(i) - dav
@@ -775,37 +785,37 @@
                   epsp =half*(e1**2+e2**2+e3**2) +e4**2+e5**2+e6**2
                   epsp = sqrt(three*epsp)*two_third
                   epsd(i)=epsp
-               endif
-            enddo
-            call sigeps48(&
-            &llt      ,npar     ,nuvar    ,nfunc    ,ifunc    ,&
-            &npf      ,tf       ,tt       ,dt1      ,bufmat,&
-            &rho0     ,rho      ,voln     ,eint     ,                 &
-            &ep1      ,ep2      ,ep3      ,ep4      ,ep5      ,ep6   ,&
-            &de1      ,de2      ,de3      ,de4      ,de5      ,de6   ,&
-            &es1      ,es2      ,es3      ,es4      ,es5      ,es6   ,&
-            &so1      ,so2      ,so3      ,so4      ,so5      ,so6   ,&
-            &s1       ,s2       ,s3       ,s4       ,s5       ,s6    ,&
-            &sv1      ,sv2      ,sv3      ,sv4      ,sv5      ,sv6   ,&
-            &sspp     ,vis      ,uvar     ,off      ,ngl      ,ipt   ,&
-            &ipm      ,mat      ,epsd     ,sigy     ,defp     ,dpla  ,&
-            &amu      )
+                endif
+              enddo
+              call sigeps48(&
+              &llt      ,npar     ,nuvar    ,nfunc    ,ifunc    ,&
+              &npf      ,tf       ,tt       ,dt1      ,bufmat,&
+              &rho0     ,rho      ,voln     ,eint     ,                 &
+              &ep1      ,ep2      ,ep3      ,ep4      ,ep5      ,ep6   ,&
+              &de1      ,de2      ,de3      ,de4      ,de5      ,de6   ,&
+              &es1      ,es2      ,es3      ,es4      ,es5      ,es6   ,&
+              &so1      ,so2      ,so3      ,so4      ,so5      ,so6   ,&
+              &s1       ,s2       ,s3       ,s4       ,s5       ,s6    ,&
+              &sv1      ,sv2      ,sv3      ,sv4      ,sv5      ,sv6   ,&
+              &sspp     ,vis      ,uvar     ,off      ,ngl      ,ipt   ,&
+              &ipm      ,mat      ,epsd     ,sigy     ,defp     ,dpla  ,&
+              &amu      )
 !
-         elseif(mtn == 50)then
-            call sigeps50s(mat_param(imat),                           &
-                 nel    ,dt1    ,nuvar  ,nvartmp,uvar  ,vartmp,       &
-                 rho    ,sspp   ,off    ,amu    ,lbuf%pla     ,       &
-                 ep1    ,ep2    ,ep3    ,ep4    ,ep5   ,ep6   ,       &
-                 de1    ,de2    ,de3    ,de4    ,de5   ,de6   ,       &
-                 es1    ,es2    ,es3    ,es4    ,es5   ,es6   ,       &
-                 so1    ,so2    ,so3    ,so4    ,so5   ,so6   ,       &
-                 s1     ,s2     ,s3     ,s4     ,s5    ,s6    )
+            elseif(mtn == 50)then
+              call sigeps50s(mat_param(imat),                           &
+                nel    ,dt1    ,nuvar  ,nvartmp,uvar  ,vartmp,       &
+                rho    ,sspp   ,off    ,amu    ,lbuf%pla,epsd,       &
+                ep1    ,ep2    ,ep3    ,ep4    ,ep5   ,ep6   ,       &
+                de1    ,de2    ,de3    ,de4    ,de5   ,de6   ,       &
+                es1    ,es2    ,es3    ,es4    ,es5   ,es6   ,       &
+                so1    ,so2    ,so3    ,so4    ,so5   ,so6   ,       &
+                s1     ,s2     ,s3     ,s4     ,s5    ,s6    )
 !
-         elseif(mtn == 52)then
+            elseif(mtn == 52)then
 
 !---    strain rate
               do i=1,llt
-                israte = ipm(3,mat(lft))
+                israte = ipm(3,mat(1))
                 if(israte == 0)then
                   dav = (ep1(i)+ep2(i)+ep3(i)) * third
                   e1 = ep1(i) - dav
@@ -822,7 +832,7 @@
               call sigeps52(&
               &llt      ,npar     ,nuvar    ,nfunc    ,ifunc    ,&
               &npf      ,tf       ,tt       ,dt1      ,bufmat,&
-              &rho0     ,rho      ,voln     ,eint     ,&
+              &rho0     ,rho      ,voln     ,eint     ,bufly%l_dmg,lbuf%dmg,&
               &ep1      ,ep2      ,ep3      ,ep4      ,ep5      ,ep6   ,&
               &de1      ,de2      ,de3      ,de4      ,de5      ,de6   ,&
               &es1      ,es2      ,es3      ,es4      ,es5      ,es6   ,&
@@ -850,7 +860,7 @@
 !     strain rate
 !-------------------
               do i=1,llt
-                israte = ipm(3,mat(lft))
+                israte = ipm(3,mat(1))
                 if(israte == 0)then
                   dav = (ep1(i)+ep2(i)+ep3(i))*third
                   e1 = ep1(i) - dav
@@ -883,7 +893,7 @@
 !     strain rate
 !-------------------
               do i=1,llt
-                israte = ipm(3,mat(lft))
+                israte = ipm(3,mat(1))
                 if(israte == 0)then
                   dav = (ep1(i)+ep2(i)+ep3(i))*third
                   e1 = ep1(i) - dav
@@ -929,13 +939,18 @@
 !  ---------------------------------------------------------------
             if ((itask==0).and.(imon_mat==1))call startime(TIMERS,121)
             do ir = 1,bufly%nfail
+              lf_dammx = bufly%fail(1,1,ipt)%floc(ir)%lf_dammx
               nvarf =  bufly%fail(1,1,ipt)%floc(ir)%nvar
               uvarf => bufly%fail(1,1,ipt)%floc(ir)%var
+              vartmp => bufly%fail(1,1,ipt)%floc(ir)%vartmp
               dfmax => bufly%fail(1,1,ipt)%floc(ir)%dammx
               tdele => bufly%fail(1,1,ipt)%floc(ir)%tdel
 !
               npar    = mat_param(imat)%fail(ir)%nuparam
+              niparf  = mat_param(imat)%fail(ir)%niparam
+              nvartmp = mat_param(imat)%fail(ir)%nvartmp
               uparamf =>mat_param(imat)%fail(ir)%uparam(1:npar)
+              iparamf =>mat_param(imat)%fail(ir)%iparam(1:niparf)
               nfunc   = mat_param(imat)%fail(ir)%nfunc
               irupt   = mat_param(imat)%fail(ir)%irupt
               ifunc(1:nfunc) = mat_param(imat)%fail(ir)%ifunc(1:nfunc)
@@ -944,12 +959,12 @@
 !
               if(mtn == 36.or.mtn == 44.or.mtn == 48.or.mtn == 56.&
               &or.mtn == 60)then
-                do i=lft,llt
+                do i=1,llt
                   tstar(i) = zero
                   epsp1(i) = epsd(i)
                 enddo
               else
-                do i=lft,llt
+                do i=1,llt
                   tstar(i) = zero
                   dav = (ep1(i)+ep2(i)+ep3(i))*third
                   e1 = ep1(i) - dav
@@ -1044,11 +1059,12 @@
 !!!
               elseif(irupt == 8)then
 !----  j     ohnson cook + spalling
-                call fail_spalling_s(llt ,npar,nvarf,&
-                &tt  ,dt1  ,uparamf,ngl ,&
+                call fail_spalling_s(llt ,npar,&
+                &tt  ,uparamf,ngl ,&
                 &s1  ,s2  ,s3  ,s4   ,s5   ,s6      ,&
-                &dpla,epsp1,tstar,uvarf    ,off     ,&
-                &dfmax,tdele,offg)
+                &dpla,epsp1,tstar,off     ,&
+                &lf_dammx ,dfmax,tdele,offg,&
+                &niparf,iparamf,mvsiz)
               elseif(irupt == 9)then
 !----  wierzbicki
                 call fail_wierzbicki_s(llt ,npar,nvarf,&
@@ -1069,12 +1085,12 @@
 !
 !----        energy failure
               elseif(irupt == 11)then
-                call fail_energy_s(&
-                &llt      ,npar     ,nvarf    ,nfunc    ,ifunc    ,npf      ,&
-                &tf       ,tt       ,dt1      ,uparamf,ngl ,epsp1    ,&
-                &uvarf    ,off      ,dfmax    ,tdele    ,lbuf%dmgscl,&
-                &s1       ,s2       ,s3       ,s4       ,s5       ,s6       ,&
-                &de1      ,de2      ,de3      ,de4      ,de5      ,de6      )
+                call fail_energy_s(mat_param(imat)%fail(ir)  , &
+                 llt      ,nvarf    ,nvartmp  ,uvarf    ,vartmp   , &
+                 tt       ,dt1      ,ngl      ,epsp1    ,&
+                 off      ,dfmax    ,tdele    ,lbuf%dmgscl,&
+                 s1       ,s2       ,s3       ,s4       ,s5       ,s6       ,&
+                 de1      ,de2      ,de3      ,de4      ,de5      ,de6      )
               elseif (irupt == 23) then
 !---- tabulated failure model
                 call fail_tab_s(&
@@ -1102,9 +1118,9 @@
                 &nvarf    ,uvarf    )
               elseif (irupt == 30) then
 !  --- biquadratic failure model
-                call fail_biquad_s(&
-                &llt      ,npar     ,nvarf    ,nfunc    ,ifunc    ,deltax   ,&
-                &npf      ,tf       ,tt       ,bufmat   ,tdele    ,&
+                call fail_biquad_s(mat_param(imat)%fail(ir),&
+                &llt      ,nvarf    ,nfunc    ,ifunc    ,deltax   ,&
+                &npf      ,tf       ,tt       ,tdele    ,&
                 &ngl      ,dpla     ,uvarf    ,off      ,dfmax    ,lbuf%dmgscl,&
                 &s1       ,s2       ,s3       ,s4       ,s5       ,s6       )
               elseif (irupt == 36) then
@@ -1143,13 +1159,13 @@
 !---------
               endif ! irupt
 !---------
-            enddo ! several failur model boucle ir
+            enddo ! several failure model loop ir
 !---------
 !--------------------------------------------------------
 !     damaged stresses
 !---------------------------------------------------------
             if (dmg_flag > 0) then
-              do i = lft,llt
+              do i = 1,llt
                 s1(i) = s1(i)*lbuf%dmgscl(i)
                 s2(i) = s2(i)*lbuf%dmgscl(i)
                 s3(i) = s3(i)*lbuf%dmgscl(i)
@@ -1162,7 +1178,7 @@
             if ((itask==0).and.(imon_mat==1))call stoptime(TIMERS,121)
 !----------
             if (isorth /= 0) then
-              do i=lft,llt
+              do i=1,llt
                 siglp(jj(1)+i) = s1(i)
                 siglp(jj(2)+i) = s2(i)
                 siglp(jj(3)+i) = s3(i)
@@ -1170,20 +1186,20 @@
                 siglp(jj(5)+i) = s5(i)
                 siglp(jj(6)+i) = s6(i)
               enddo
-              call mrotens(lft,llt,&
+              call mrotens(1,llt,&
               &s1 ,s2 ,s3 ,&
               &s4 ,s5 ,s6 ,&
               &r11,r21,r31,&
               &r12,r22,r32,&
               &r13,r23,r33)
-              call mrotens(lft,llt,&
+              call mrotens(1,llt,&
               &sv1 ,sv2 ,sv3 ,&
               &sv4 ,sv5 ,sv6 ,&
               &r11,r21,r31,&
               &r12,r22,r32,&
               &r13,r23,r33)
             endif
-            do i=lft,llt
+            do i=1,llt
               sigp(jj(1)+i) = s1(i)
               sigp(jj(2)+i) = s2(i)
               sigp(jj(3)+i) = s3(i)
@@ -1206,7 +1222,7 @@
             enddo
 
             dta =half*dt1
-            do i=lft,llt
+            do i=1,llt
               dav=volgp(i,ipt)*off(i)*dta
               eint(i)=eint(i)+dav*(d1(i,ipt)*(sold1(i)+sigp(jj(1)+i))+&
               &d2(i,ipt)*(sold2(i)+sigp(jj(2)+i))+&
@@ -1218,15 +1234,15 @@
 !
           enddo  !  ipt=1,npt
 !--------------------------------------------------
-!     egalisation de la pression
+!     pressure equalization
 !--------------------------------------------------
-          do i=lft,llt
+          do i=1,llt
             pnew(i) = -(sig(i,1) + sig(i,2) + sig(i,3)) * third
           enddo
 !----
           do ipt=1,npt
             sigp => bufly%lbuf(1,1,ipt)%sig(1:llt*6)
-            do i=lft,llt
+            do i=1,llt
               pp(i)=pnew(i) + (sigp(jj(1)+i) + sigp(jj(2)+i) + sigp(jj(3)+i)) * third
               sigp(jj(1)+i) =(sigp(jj(1)+i)-pp(i))*off(i)
               sigp(jj(2)+i) =(sigp(jj(2)+i)-pp(i))*off(i)
@@ -1242,9 +1258,9 @@
 !     define sound speed  (in all case)
 !     define dynamic viscosity (for viscous law)
 !-----------------------
-      do i=lft,llt
-        if(ssp(i) == zero) ssp(i)=sqrt(c1(i)/rho0(i))
-      enddo
+          do i=1,llt
+            if(ssp(i) == zero) ssp(i)=sqrt(c1(i)/rho0(i))
+          enddo
 !-------------------------------------------
 !   bulk viscosity and time step computation
 !   this subroutine return the new bulk viscosity q
@@ -1260,7 +1276,7 @@
           &dmels,   nel,     ity,     jtur,&
           &jthe,    jsms)
 !
-          do i=lft,llt
+          do i=1,llt
             eint(i)=eint(i)/max(em15,vol(i))
           enddo
 !------------------------------------------

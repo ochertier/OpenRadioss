@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    test_support_newfct   ../starter/source/elements/ige3d/test_support_newfct.F
-      !||--- called by ------------------------------------------------------
-      !||    prerafig3d            ../starter/source/elements/ige3d/prerafig3d.F
-      !||====================================================================
+!||====================================================================
+!||    test_support_newfct   ../starter/source/elements/ige3d/test_support_newfct.F
+!||--- called by ------------------------------------------------------
+!||    prerafig3d            ../starter/source/elements/ige3d/prerafig3d.F
+!||====================================================================
       SUBROUTINE TEST_SUPPORT_NEWFCT(KNOTLOCPC, DIRDEG, DEGTANG1, DEGTANG2, 
      .                               DIR,NEWKNOT,
      .                               TAB_COINKNOT,L_TAB_COINKNOT,TAB_NEWFCT,
      .                               TAB_NEWFCTCUT,L_TAB_NEWFCTCUT,DECALGEO,TAB_REMOVE,FLAG)
 C----------------------------------------------------------------------
-C   ROUTINE QUI MET DE COTE TOUTES LES FONCTIONS QUI ONT 
-C   ETE MODIFIEES OU CREES PAR RAFIG3D.F MAIS QUI PEUVENT ENCORE ETRE
-C   MODIFIEE OU SUPPRIMEES PAR LES ANCIENNES MESHSURFS QUE LA MESHSURF
+C   routine that puts aside all the functions that have
+C   been modified or created by rafig3d.f but which can still be
+C   modified or deleted by the old meshsurfs that the meshsurf
 C   ACTUELLE CROISE
 C----------------------------------------------------------------------
 C-----------------------------------------------
@@ -53,11 +53,35 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,DIRTANG1,DIRTANG2,
-     .        IEL,INTERSEC,IDFCT,IOUT,ADD
-      my_real DET, T1, T2, XA(5),YA(5),COIN(2,2),
-     .        XB, YB, XC, YC, XD, YD, TOL
+      INTEGER :: I,J,K,DIRTANG1,DIRTANG2,INTERSEC,IDFCT,IOUT
+      my_real :: DET, T1, T2, XA(5),YA(5),COIN(2,2),XB, YB, XC, YC, XD, YD, TOL
 C-----------------------------------------------
+C   Initialize local variables
+C-----------------------------------------------
+      I = 0
+      J = 0 
+      K = 0
+      DIRTANG1 = 0
+      DIRTANG2 = 0
+      INTERSEC = 0
+      IDFCT = 0
+      IOUT = 0
+      DET = 0.0
+      T1 = 0.0
+      T2 = 0.0
+      XA = 0.0
+      YA = 0.0
+      COIN = 0.0
+      XB = 0.0
+      YB = 0.0
+      XC = 0.0
+      YC = 0.0
+      XD = 0.0
+      YD = 0.0
+      TOL = 0.0
+C-----------------------------------------------
+
+
 C
       L_TAB_NEWFCTCUT = 0
       TOL = EM06
@@ -78,11 +102,11 @@ C
       COIN(1,2) = MAXVAL(TAB_COINKNOT(1,1:(L_TAB_COINKNOT)))
       COIN(2,2) = MAXVAL(TAB_COINKNOT(2,1:(L_TAB_COINKNOT)))
 C
-      DO I=1,NEWFCT ! les nouvelles fonctions ajoutees par le dernier rafig3d.F
+      DO I=1,NEWFCT ! the new functions added by the last rafig3d.f
 
         IDFCT = TAB_NEWFCT(OFFSET_NEWFCT+I) 
-C       Fonctions stockees dans le tableau tab_newfct offsete 
-c       pour ne pas prendre les newfct des anciennes coupes terminees
+C       functions stored in the offset tab_newfct array
+c       to avoid taking the newfct from the old completed cuts
 
         DO J=1,L_TAB_REMOVE
           IF(TAB_REMOVE(J)==IDFCT) EXIT
@@ -166,8 +190,8 @@ C
         ENDDO
 C
 C----------------------------------------------------------------------
-C  DIMENSIONNEMENT ET STOCKAGE DU TABLEAU DES FONCTIONS A RETRAITER 
-C  PAR LES ANCIENNES COUPES (TAB_MESHSURFCUT)
+C  sizing and storage of the array of functions to be reprocessed
+C  ------------------------>   case of inverse 1d elements (for 3rd node) <---c
 C----------------------------------------------------------------------
 C
         IF(IOUT==0) THEN

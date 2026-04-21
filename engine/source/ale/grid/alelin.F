@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alelin            ../engine/source/ale/grid/alelin.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx            ../engine/source/ale/grid/alewdx.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_rbcast       ../engine/source/mpi/generic/spmd_rbcast.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod      ../common_source/modules/groupdef_mod.F
-      !||====================================================================
-      SUBROUTINE ALELIN(NALELK ,LINALE ,W ,WEIGHT ,IGRNOD , ITAB)
+!||====================================================================
+!||    alelin            ../engine/source/ale/grid/alelin.F
+!||--- called by ------------------------------------------------------
+!||    alewdx            ../engine/source/ale/grid/alewdx.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_rbcast       ../engine/source/mpi/generic/spmd_rbcast.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod      ../common_source/modules/groupdef_mod.F
+!||====================================================================
+      SUBROUTINE ALELIN(NALELK ,LINALE ,W ,WEIGHT ,IGRNOD)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -48,7 +48,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN)   :: NALELK
-      INTEGER,INTENT(IN)   :: LINALE(*), WEIGHT(*),ITAB(NUMNOD) 
+      INTEGER,INTENT(IN)   :: LINALE(*), WEIGHT(*)
       my_real, INTENT(INOUT) :: W(3,NUMNOD)
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
 C-----------------------------------------------
@@ -68,10 +68,10 @@ C
 C   NALELK    : number of ALE LINKS
 C   LINALE[:] : definition array
 C         [1] : user ID         (uID)
-C         [2] : main node     (M1)
-C         [3] : main node     (M2)
+C         [2]: main node (M1)
+C         [3]: main node (m2)
 C         [4] : number of nodes (N)
-C         [5] : direction XYZ   (IC)
+C         [5]: Direction XYZ (IC)
 C         [6] : formulation     (IM)
 C
 C                  |ALE LINK 1                                       |2              |NALELK
@@ -97,6 +97,7 @@ C-----------------------------------------------
 
         K=0
         N=0
+        GR_ID = -huge(GR_ID)
         DO JJ=1,NALELK
         
           WM1M2(1) = ZERO

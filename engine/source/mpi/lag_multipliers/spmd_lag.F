@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #if defined(MPI)
-      !||====================================================================
-      !||    spmd_get_mult   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp       ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_get_mult         ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_GET_MULT(
      1     LAGCOMC,LAGCOMK,N_MULT ,BLL ,IADLL,
      2     LLL    ,JLL    ,SLL    ,XLL ,COMNTAG,
@@ -33,6 +35,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -75,7 +78,7 @@ C-----------------------------------------------
          DO N = 1, N_MULT
            IADLL(N+1) = IADLL(N)+NINT(LAGCOMC(1,N))
            BLL(N)   = LAGCOMC(2,N)
-C   ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
+C   ictag and jcftag: id (no condition other than fixed for now!)
            ICFTAG(N) = N
            JCFTAG(N) = N
          END DO
@@ -84,7 +87,7 @@ C   ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
            JLL(N) = NINT(LAGCOMK(2,N))
            SLL(N) = NINT(LAGCOMK(3,N))
            XLL(N) = LAGCOMK(4,N)
-C   mise a jour du flag directement ici et non dans LTAG_FXV
+C   update of the flag directly here and not in ltag_fxv
            COMNTAG(LLL(N)) = COMNTAG(LLL(N))+1
          END DO     
 C
@@ -101,7 +104,7 @@ C
                IADLL(N_MULT+N+1) = IADLL(N_MULT+N)
      +                            +NINT(LAGCOMC(1,N_MULT+N))
                BLL(N_MULT+N)     = LAGCOMC(2,N_MULT+N)
-C   ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
+C   ictag and jcftag: id (no condition other than fixed for now!)
                ICFTAG(N_MULT+N) = N_MULT+N
                JCFTAG(N_MULT+N) = N_MULT+N
              END DO
@@ -117,7 +120,7 @@ C
                JLL(N_IK+N) = NINT(LAGCOMK(2,N_IK+N))
                SLL(N_IK+N) = NINT(LAGCOMK(3,N_IK+N))
                XLL(N_IK+N) = LAGCOMK(4,N_IK+N)
-C   mise a jour du flag directement ici et non dans LTAG_FXV
+C   update of the flag directly here and not in ltag_fxv
                COMNTAG(LLL(N_IK+N)) = COMNTAG(LLL(N_IK+N))+1
              END DO
              N_IK = N_IK + IKL
@@ -136,11 +139,13 @@ C
        RETURN
        END
 C
-      !||====================================================================
-      !||    spmd_gg_mult   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp      ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_gg_mult          ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_GG_MULT(
      1     A       ,AR      ,V      ,VR   ,MS    ,
      2     IN      ,AG      ,ARG    ,VG   ,VRG   ,
@@ -149,6 +154,7 @@ C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -215,7 +221,7 @@ C
      1     BUFCOM        ,ISIZ*NLAGF_L,REAL  ,IT_SPMD(1),MSGTYP,
      2     SPMD_COMM_WORLD,IERROR)
         END IF
-Code processeur0 
+COde processor0 
        ELSE
          IF(IRODDL/=0)THEN
            DO I = 1, NLAGF_L
@@ -303,17 +309,20 @@ C
        RETURN
        END
 C
-      !||====================================================================
-      !||    spmd_sg_mult   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp      ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sg_mult          ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_SG_MULT(
      1     A      ,AR     ,AG     ,ARG     ,FR_LAGF,
      2     ISIZ   ,NBNODL ,LLAGF  ,NLAGF_L )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "spmd.inc"
 C-----------------------------------------------
@@ -366,7 +375,7 @@ C
            END DO
          END IF
         END IF
-Code processeur0 
+COde processor0 
        ELSE
          IF(IRODDL/=0)THEN
            DO I = 1, NLAGF_L
@@ -420,16 +429,19 @@ C
        RETURN
        END
 C
-      !||====================================================================
-      !||    spmd_sg_fani   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_anithp     ../engine/source/tools/lagmul/lag_anith.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sg_fani          ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_anithp            ../engine/source/tools/lagmul/lag_anith.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_SG_FANI(
      1     FANI,FANIG,FR_LAGF,NBNODL,LLAGF,NLAGF_L)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -470,7 +482,7 @@ C
              FANI(3,N)  = BUFCOM(3,I)
            END DO
         END IF
-Code processeur0 
+COde processor0 
        ELSE
          DO I = 1, NLAGF_L
            N = LLAGF(I)
@@ -501,17 +513,20 @@ C
        RETURN
        END
 C
-      !||====================================================================
-      !||    spmd_exch_mult   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp        ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_mult        ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_MULT(
      1    A       ,AR     ,LLAGF , NLAGF_L, FR_LAGF,
      2    IAD_ELEM,FR_ELEM,LRBUF , ISIZ   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -533,8 +548,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, P, N, L, IERROR, MSGOFF, MSGOFF2, ISHIFT,
-     .        LOC_PROC, MSGTYP, BUFSIZ, SIZ, INB, NB_NOD, NOD, LSEND,
+      INTEGER I, J, N, L, IERROR, MSGOFF, MSGOFF2, ISHIFT,
+     .        LOC_PROC, MSGTYP, SIZ, INB, NB_NOD, NOD, LSEND,
      .        REQ_R(NSPMD), REQ_S(NSPMD),IAD_SEND(NSPMD+1),
      .        IAD_RECV(NSPMD+1), STATUS(MPI_STATUS_SIZE), ITAG(NUMNOD)
       my_real
@@ -554,7 +569,7 @@ C
         ITAG(N) = 1
       END DO
 C
-C Echange aux frontieres
+C Exchange at boundary
 C
       L = 1
       IAD_RECV(1) = 1
@@ -583,7 +598,7 @@ C
            NOD = FR_ELEM(J)
            IF(ITAG(NOD)==1)THEN
             RBUF(L)   = J-ISHIFT
-C J-ISHIFT donne l'adresse relative du noeud
+C J-ISHIFT gives the relating address of the node
             RBUF(L+1) = A(1,NOD)
             RBUF(L+2) = A(2,NOD)
             RBUF(L+3) = A(3,NOD)
@@ -597,7 +612,7 @@ C J-ISHIFT donne l'adresse relative du noeud
            NOD = FR_ELEM(J)
            IF(ITAG(NOD)==1)THEN
             RBUF(L)   = J-ISHIFT
-C J-ISHIFT donne l'adresse relative du noeud
+C J-ISHIFT gives the relating address of the node
             RBUF(L+1) = A(1,NOD)
             RBUF(L+2) = A(2,NOD)
             RBUF(L+3) = A(3,NOD)
@@ -641,7 +656,7 @@ C
 #include      "vectorize.inc"
            DO J=1,NB_NOD
              NOD = FR_ELEM(NINT(RBUF(L))+ISHIFT)
-C on recupere le bon noeud en fct de sa position relative dans fr_elem, liste triee
+C We recover the right node in FCT of its relative position in Fr_elem, list sorted
              A(1,NOD) = RBUF(L+1)
              A(2,NOD) = RBUF(L+2)
              A(3,NOD) = RBUF(L+3)
@@ -651,7 +666,7 @@ C on recupere le bon noeud en fct de sa position relative dans fr_elem, liste tr
 #include      "vectorize.inc"
            DO J=1,NB_NOD
              NOD = FR_ELEM(NINT(RBUF(L))+ISHIFT)
-C on recupere le bon noeud en fct de sa position relative dans fr_elem, liste triee
+C We recover the right node in FCT of its relative position in Fr_elem, list sorted
              A(1,NOD) = RBUF(L+1)
              A(2,NOD) = RBUF(L+2)
              A(3,NOD) = RBUF(L+3)
@@ -676,14 +691,17 @@ C
 #elif 1
 
 
-      !||====================================================================
-      !||    spmd_sg_fani   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_anithp     ../engine/source/tools/lagmul/lag_anith.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sg_fani          ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_anithp            ../engine/source/tools/lagmul/lag_anith.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_SG_FANI(
      1     RDUM1, RDUM2,IDUM1,IDUM2,IDUM3, IDUM4)
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include "implicit_f.inc"
 C-----------------------------------------------
       INTEGER
@@ -692,12 +710,14 @@ C-----------------------------------------------
      .        RDUM1, RDUM2, RDUM3, RDUM4, RDUM5
       RETURN
       END
-C routine simplifiee pour SMP
-      !||====================================================================
-      !||    spmd_get_mult   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp       ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+C simplified routine for smp
+!||====================================================================
+!||    spmd_get_mult         ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_GET_MULT(
      1     LAGCOMC,LAGCOMK,N_MULT ,BLL ,IADLL,
      2     LLL    ,JLL    ,SLL    ,XLL ,COMNTAG,
@@ -705,6 +725,7 @@ C routine simplifiee pour SMP
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -722,7 +743,7 @@ C-----------------------------------------------
       DO N = 1, N_MULT
         IADLL(N+1) = IADLL(N)+NINT(LAGCOMC(1,N))
         BLL(N)   = LAGCOMC(2,N)
-C   ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
+C   ictag and jcftag: id (no condition other than fixed for now!)
         ICFTAG(N) = N
         JCFTAG(N) = N
       END DO
@@ -731,18 +752,20 @@ C   ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
         JLL(N) = NINT(LAGCOMK(2,N))
         SLL(N) = NINT(LAGCOMK(3,N))
         XLL(N) = LAGCOMK(4,N)
-C   mise a jour du flag directement ici et non dans LTAG_FXV
+C   update of the flag directly here and not in ltag_fxv
         COMNTAG(LLL(N)) = COMNTAG(LLL(N))+1
       END DO     
 C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_gg_mult   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp      ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_gg_mult          ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_GG_MULT(
      1     A       ,AR      ,V      ,VR   ,MS    ,
      2     IN      ,AG      ,ARG    ,VG   ,VRG   ,
@@ -751,6 +774,7 @@ C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -805,17 +829,20 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sg_mult   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp      ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sg_mult          ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_SG_MULT(
      1     A      ,AR     ,AG     ,ARG     ,FR_LAGF,
      2     ISIZ   ,NBNODL ,LLAGF  ,NLAGF_L )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -855,17 +882,20 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_exch_mult   ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp        ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_mult        ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_MULT(
      1    A       ,AR     ,LLAGF , NLAGF_L, FR_LAGF,
      2    IAD_ELEM,FR_ELEM,LRBUF , ISIZ   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

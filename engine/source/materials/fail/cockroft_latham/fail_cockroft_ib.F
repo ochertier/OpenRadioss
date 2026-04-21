@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_cockroft_ib   ../engine/source/materials/fail/cockroft_latham/fail_cockroft_ib.F
-      !||--- called by ------------------------------------------------------
-      !||    fail_beam18        ../engine/source/elements/beam/fail_beam18.F
-      !||====================================================================
+!||====================================================================
+!||    fail_cockroft_ib   ../engine/source/materials/fail/cockroft_latham/fail_cockroft_ib.F
+!||--- called by ------------------------------------------------------
+!||    fail_beam18        ../engine/source/elements/beam/fail_beam18.F
+!||====================================================================
       SUBROUTINE FAIL_COCKROFT_IB(                                         
      .          NEL      ,NGL      ,NUPARAM  ,UPARAM  ,
      .          TIME     ,DPLA     ,OFF      ,DFMAX,  
      .          TDEL     ,IOUT     ,ISTDO    ,EPSXX    ,
      .          IPT      ,SIGNXX   ,SIGNXY   ,SIGNXZ   ,
-     .          NVARF    , UVAR    ,FOFF)   
+     .          NVARF    , UVAR    ,FOFF     ,UELR,NPG)
 !====================================================================
 ! cockroft  failure model for integrated beams
 C-----------------------------------------------
@@ -54,26 +54,28 @@ C-----------------------------------------------
       my_real                     ,INTENT(IN)    :: TIME    ! current time
       my_real ,DIMENSION(NUPARAM) ,INTENT(IN)    :: UPARAM  ! failure model parameter array
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: DPLA    ! plastic strain increment
-      my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: OFF     ! element desactivation flag
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: OFF     ! element deactivation flag
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: SIGNXX  ! stress component
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: SIGNXY  ! stress component
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: SIGNXZ  ! stress component
 
 
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: EPSXX 
-      INTEGER ,DIMENSION(NEL)     ,INTENT(INOUT) :: FOFF    ! integration point desactivation flag
+      INTEGER ,DIMENSION(NEL)     ,INTENT(INOUT) :: FOFF    ! integration point deactivation flag
       my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: DFMAX   ! maximum damage
-      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: TDEL    ! desactivation time
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: TDEL    ! deactivation time
       my_real ,DIMENSION(NEL,NVARF),INTENT(INOUT) :: UVAR  
+      my_real, DIMENSION(NEL)     ,INTENT(INOUT)  :: UELR 
+      INTEGER                      ,INTENT(IN)    :: NPG    
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NINDXF
+      INTEGER I,J,NINDXF,failip
       INTEGER ,DIMENSION(NEL) :: INDXF
       my_real
      .                            C0,EMA,EEQ,SIG_A,SIG_FILTRE,R,Q,I1,S11,
      .                            S22 , S33,R_INTER,PHI,I2 
-      my_real ,DIMENSION(NEL) ::  EPS_EQ,DAMAGE,EPSRATE,EPS11,EPSI,D_EEQ
+      my_real ,DIMENSION(NEL) ::  D_EEQ
 C=======================================================================
 C     UVAR(I,1) contains previous equivalent strain value increment
 C     UVAR(I,2) contains the Cockroft-Latham accumulated value
@@ -81,6 +83,8 @@ c     UVAR(I,3) contains the previous first principal stress
 c     UVAR(I,4) contains total strain
       C0                  = UPARAM(1)
       EMA                 = UPARAM(2)
+      FAILIP  = MIN(NINT(UPARAM(3)),NPG) ! 	Number of failed integration point prior to solid element deletion. default = 1 (integer)
+
       NINDXF              = 0                                   
 c-----------------------------   
       IF(C0 < ZERO)THEN   ! equivalent strain 
@@ -109,7 +113,7 @@ c-----------------------------
           I2 = -SIGNXY(I)*SIGNXY(I)-SIGNXZ(I)*SIGNXZ(I)
           
           Q  = (THREE*I2 - I1*I1)/NINE
-          R  = (TWO*I1*I1*I1 - NINE*I1*I2 )/CINQUANTE4     
+          R  = (TWO*I1*I1*I1 - NINE*I1*I2 )/FIFTY4     
            
           R_INTER = MIN(R/SQRT(MAX(EM20,(-Q**3))),ONE)
           PHI = ACOS(MAX(R_INTER,-ONE))
@@ -138,6 +142,10 @@ c-----------------------------
             NINDXF  = NINDXF + 1  
             INDXF(NINDXF) = I
             DFMAX(I)      = ONE
+            UELR(I)     = UELR(I) + ONE
+            IF (NINT(UELR(I)) >= FAILIP) THEN 
+              OFF(I)    = FOUR_OVER_5
+            ENDIF
           ENDIF 
         ENDIF
       ENDDO
@@ -147,12 +155,17 @@ C!
 #include "lockon.inc"
           WRITE(IOUT, 1000) NGL(I),IPT,TIME
           WRITE(ISTDO,1000) NGL(I),IPT,TIME
+          IF (OFF(I) == FOUR_OVER_5) THEN 
+            WRITE(IOUT, 1111) NGL(I),TIME
+            WRITE(ISTDO,1111) NGL(I),TIME
+          ENDIF  
 #include "lockoff.inc" 
 
        ENDDO
 c------------------
  1000 FORMAT(5X,'FAILURE (COCKROFT-LATHAM) OF BEAM ELEMENT ',I10,1X,',INTEGRATION PT',I5
      .      ,2X,'AT TIME :',1PE12.4)
+ 1111 FORMAT(1X,'DELETED BEAM ELEMENT ',I10,1X,'AT TIME :',1PE12.4)
 c------------------
 
        RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    boxbox                 ../starter/source/model/box/boxbox.F
-      !||--- called by ------------------------------------------------------
-      !||    bigbox                 ../starter/source/model/box/bigbox.F
-      !||    hm_bigbox              ../starter/source/model/box/hm_bigbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    boxassem1              ../starter/source/model/box/bigbox.F
-      !||    boxtagn                ../starter/source/model/box/bigbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxbox                 ../starter/source/model/box/boxbox.F
+!||--- called by ------------------------------------------------------
+!||    bigbox                 ../starter/source/model/box/bigbox.F
+!||    hm_bigbox              ../starter/source/model/box/hm_bigbox.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    boxassem1              ../starter/source/model/box/bigbox.F
+!||    boxtagn                ../starter/source/model/box/bigbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXBOX(IBOX  ,SKEW   ,
      .                  FLAGG  ,ICOUNT,ITER  ,IBUFBOX,
      .                  X      ,IADB  ,ID    ,TITR   ,
@@ -55,7 +55,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IBUFBOX(*),
-     .        IAD,FLAGG,ICOUNT,ITER,IADB,FLAG,IBOXMAX
+     .        FLAGG,ICOUNT,ITER,IADB,FLAG,IBOXMAX
       my_real
      .      X(3,*),SKEW(LSKEW,*)
       INTEGER ID
@@ -65,12 +65,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,K,L,J,JJ,IB,IBS,IDBS,NBOX,
-     .         SKIPFLAG,IADX,CNT
+      INTEGER  K,J,IB,IBS,IDBS,NBOX,
+     .         SKIPFLAG,CNT
 C-----------------------------------------------
       IF (FLAGG == 0) ICOUNT=0
 C---
-C     boucle sur les boxes
+C     loop over the boxes
 C---
       DO IB=1,NBBOX
         SKIPFLAG = 0
@@ -155,22 +155,19 @@ C-----------
      .            C3=TITR,
      .            I2=IBOX(IB)%ID,C4='BOXBOX')
       RETURN
- 999  CALL FREERR(1)
-C-----------
-      RETURN
       END
-      !||====================================================================
-      !||    boxbox2         ../starter/source/model/box/boxbox.F
-      !||--- called by ------------------------------------------------------
-      !||    bigbox2         ../starter/source/model/box/bigbox.F
-      !||    hm_bigbox2      ../starter/source/model/box/hm_bigbox2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||    boxassem2       ../starter/source/model/box/bigbox.F
-      !||    boxtage         ../starter/source/model/box/bigbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxbox2         ../starter/source/model/box/boxbox.F
+!||--- called by ------------------------------------------------------
+!||    bigbox2         ../starter/source/model/box/bigbox.F
+!||    hm_bigbox2      ../starter/source/model/box/hm_bigbox2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../starter/source/output/message/message.F
+!||    boxassem2       ../starter/source/model/box/bigbox.F
+!||    boxtage         ../starter/source/model/box/bigbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXBOX2(IBOX    ,SKEW  ,
      .                   FLAGG   ,ICOUNT,ITER    ,BOXTYPE,
      .                   X       ,IX    ,FLAG    ,IBOXMAX,
@@ -210,12 +207,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,K,L,J,JJ,IB,IBS,IDBS,NBOX,
+      INTEGER  K,J,IB,IBS,IDBS,NBOX,
      .         SKIPFLAG,CNT
 C-----------------------------------------------
       IF (FLAGG == 0) ICOUNT=0
 C---
-C     boucle sur les boxes
+C     loop over the boxes
 C---
       DO IB=1,NBBOX
         SKIPFLAG = 0
@@ -302,22 +299,19 @@ C-----------
      .            C3=TITR,
      .            I2=IBOX(IB)%ID,C4='BOXBOX2')
       RETURN
- 999  CALL FREERR(1)
-C-----------
-      RETURN
       END
-      !||====================================================================
-      !||    boxboxs         ../starter/source/model/box/boxbox.F
-      !||--- called by ------------------------------------------------------
-      !||    bigsbox         ../starter/source/model/box/bigbox.F
-      !||    hm_bigsbox      ../starter/source/groups/hm_bigsbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||    box_surf_sh     ../starter/source/model/box/bigbox.F
-      !||    boxassem3       ../starter/source/model/box/bigbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    boxboxs         ../starter/source/model/box/boxbox.F
+!||--- called by ------------------------------------------------------
+!||    bigsbox         ../starter/source/model/box/bigbox.F
+!||    hm_bigsbox      ../starter/source/groups/hm_bigsbox.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../starter/source/output/message/message.F
+!||    box_surf_sh     ../starter/source/model/box/bigbox.F
+!||    boxassem3       ../starter/source/model/box/bigbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BOXBOXS(IBOX       ,SKEW    ,FLAGG  ,ICOUNT  ,ITER   ,
      .                   BOXTYPE    ,IBUFBOX ,X      ,IADB    ,IX     ,
      .                   NIX        ,NIX1    ,NIX2   ,NUMEL   ,ISURF0 ,
@@ -341,7 +335,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IBUFBOX(*),
-     .        IAD,FLAGG,ICOUNT,ITER,BOXTYPE,IADB,NIX,
+     .        FLAGG,ICOUNT,ITER,BOXTYPE,IADB,NIX,
      .        IX(NIX,*),NIX1,NIX2,ISURF0,IELTYP,NUMEL,FLAG,
      .        TAGSHELLBOX(*),IEXT
       my_real
@@ -353,12 +347,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,K,L,J,JJ,IB,IBS,IDBS,NBOX,SKIPFLAG,
-     .        IADX,CNT
+      INTEGER K,J,IB,IBS,IDBS,NBOX,SKIPFLAG,
+     .        CNT
 C-----------------------------------------------
       IF (FLAGG == 0) ICOUNT=0
 C---
-C     boucle sur les boxes
+C     loop over the boxes
 C---
       DO IB=1,NBBOX
         SKIPFLAG = 0
@@ -445,22 +439,19 @@ C-----------
      .            C3=TITR,
      .            I2=IBOX(IB)%ID,C4='BOXBOX3')
       RETURN
- 999  CALL FREERR(1)
-C-----------
-      RETURN
       END
-      !||====================================================================
-      !||    elstagboxbox           ../starter/source/model/box/boxbox.F
-      !||--- called by ------------------------------------------------------
-      !||    sboxboxsurf            ../starter/source/model/box/bigbox.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    boxassem4              ../starter/source/model/box/bigbox.F
-      !||    elstagbox              ../starter/source/model/box/bigbox.F
-      !||    facebox                ../starter/source/model/box/bigbox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    elstagboxbox           ../starter/source/model/box/boxbox.F
+!||--- called by ------------------------------------------------------
+!||    sboxboxsurf            ../starter/source/model/box/bigbox.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    boxassem4              ../starter/source/model/box/bigbox.F
+!||    elstagbox              ../starter/source/model/box/bigbox.F
+!||    facebox                ../starter/source/model/box/bigbox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ELSTAGBOXBOX(IBOX   ,SKEW   ,
      .                        FLAGG  ,ICOUNT ,ITER    ,BOXTYPE,
      .                        IBUFBOX,X      ,IADB    ,IXS    ,
@@ -475,6 +466,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE OPTIONDEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -502,12 +494,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,K,L,J,JJ,IB,IBS,IDBS,NBOX,
-     .         SKIPFLAG,IADX,CNT
+      INTEGER  K,J,IB,IBS,IDBS,NBOX,
+     .         SKIPFLAG,CNT
 C-----------------------------------------------
       IF(FLAGG == 0)ICOUNT=0
 C---
-C     boucle sur les boxes
+C     loop over the boxes
 C---
       DO IB=1,NBBOX
         SKIPFLAG = 0
@@ -600,8 +592,5 @@ C-----------
      .            C2='SURFACE',
      .            C3=TITR,
      .            I2=IBOX(IB)%ID,C4='BOXBOX4')
-      RETURN
- 999  CALL FREERR(1)
-C-----------
       RETURN
       END

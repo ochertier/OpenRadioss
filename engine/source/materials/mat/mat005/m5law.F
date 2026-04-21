@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m5law   ../engine/source/materials/mat/mat005/m5law.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain   ../engine/source/materials/mat_share/mmain.F90
-      !||====================================================================
+!||====================================================================
+!||    m5law   ../engine/source/materials/mat/mat005/m5law.F
+!||--- called by ------------------------------------------------------
+!||    mmain   ../engine/source/materials/mat_share/mmain.F90
+!||====================================================================
       SUBROUTINE M5LAW(PM   ,SIG   ,EINT  ,RHO    ,PSH   ,
      1                 P0   ,TBURN ,BFRAC ,VOLN   ,DELTAX,
      2                 MAT  ,NEL   ,SSP   ,DF     ,
      3                 ER1V ,ER2V  ,WDR1V ,WDR2V  ,W1    ,
-     4                 RHO0 ,AMU   ,NUMMAT,TT)
+     4                 RHO0 ,AMU   ,NUMMAT,TT, DPDE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,6 +60,7 @@ C-----------------------------------------------
       my_real,INTENT(INOUT) :: DF(*)                 !< V/V0 (or rho0/rho or 1/(1+mu))
       my_real,INTENT(IN)    :: AMU(*)                !< volumetric strain
       my_real,INTENT(INOUT) :: ER1V(NEL), ER2V(NEL), WDR1V(NEL), WDR2V(NEL), W1(NEL), RHO0(NEL)   !< working arrays to save computation time
+      my_real,INTENT(INOUT) :: DPDE(NEL)              !< partial derivative
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -144,6 +145,11 @@ C-----------------------------------------------
       ENDIF
       DO I=1,NEL
             P(I) = MAX(ZERO, P(I)) - PSH(I)  !PMIN = 0.0 (fluid)
+      ENDDO
+
+      !partial derivative at constant volume
+      DO I=1,NEL
+        dPdE(I) = W/DF(I)
       ENDDO
 
       ! Sound Speed Calculation

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sortie_error      ../engine/source/output/sortie_error.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_vgath_err    ../engine/source/mpi/anim/spmd_vgath_err.F
-      !||====================================================================
+!||====================================================================
+!||    sortie_error      ../engine/source/output/sortie_error.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_vgath_err    ../engine/source/mpi/anim/spmd_vgath_err.F
+!||====================================================================
       SUBROUTINE SORTIE_ERROR(V,NODGLOB,WEIGHT,ITAB,MS,
      1                        MS0,PARAM,PARTSAV,IPART,PM,
      2                        IGEO)
@@ -61,8 +61,8 @@ C-----------------------------------------------
      .   I,J,K,LENG,FLAG,ISMASSCHANGE,PROPID,MATID
       my_real 
      .   MAXVEL(PARAM),VEL,
-     .   MAXENCIN(PARAM),ENCIN,VEL2,
-     .   MAXMASS(PARAM),MASS,
+     .   MAXENCIN(PARAM),ENCIN,
+     .   
      .   MAXDMASS(PARAM),DMASS,
      .   MAXENINT(PARAM),ENINT
       INTEGER 

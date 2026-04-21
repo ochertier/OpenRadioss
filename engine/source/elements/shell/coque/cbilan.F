@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbilan                ../engine/source/elements/shell/coque/cbilan.F
-      !||--- called by ------------------------------------------------------
-      !||    cbaforc3              ../engine/source/elements/shell/coqueba/cbaforc3.F
-      !||    cforc3                ../engine/source/elements/shell/coque/cforc3.F
-      !||    cforc3_crk            ../engine/source/elements/xfem/cforc3_crk.F
-      !||    czforc3               ../engine/source/elements/shell/coquez/czforc3.F
-      !||    czforc3_crk           ../engine/source/elements/xfem/czforc3_crk.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    cbilan                ../engine/source/elements/shell/coque/cbilan.F
+!||--- called by ------------------------------------------------------
+!||    cbaforc3              ../engine/source/elements/shell/coqueba/cbaforc3.F
+!||    cforc3                ../engine/source/elements/shell/coque/cforc3.F
+!||    cforc3_crk            ../engine/source/elements/xfem/cforc3_crk.F
+!||    czforc3               ../engine/source/elements/shell/coquez/czforc3.F
+!||    czforc3_crk           ../engine/source/elements/xfem/czforc3_crk.F
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE CBILAN(
      1   JFT,      JLT,      PM,       V,
      2   IXC,      THK,      EINT,     PARTSAV,
@@ -47,11 +48,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A   Y2G,      Y3G,      Y4G,      Z1G,
      B   Z2G,      Z3G,      Z4G,      IXFEM,
      C   IEXPAN,   EINTTH,   ITASK,    GVOL,
-     D   ACTIFXFEM,IGRE,SENSORS)
+     D   ACTIFXFEM,IGRE,     SENSORS,  NEL,
+     E   G_WPLA   ,WPLA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE SENSOR_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -86,14 +89,16 @@ C     REAL
      .   VRL1(MVSIZ,3),VRL2(MVSIZ,3),VRL3(MVSIZ,3),VRL4(MVSIZ,3)
       my_real, INTENT(IN) :: GVOL(MVSIZ)
       type (sensors_),INTENT(INOUT) :: SENSORS
+      INTEGER,INTENT(IN) :: NEL,G_WPLA
+      my_real, DIMENSION(NEL*G_WPLA), INTENT(IN) :: WPLA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, MX, II, J, IC, JST(MVSIZ+1),FLAG,
-     .        IXCTMP2,IXCTMP3,IXCTMP4,IXCTMP5,NEL,IJK
+     .        IXCTMP2,IXCTMP3,IXCTMP4,IXCTMP5
 C     REAL
       my_real
-     .   IN25,XX,YY,ZZ,XY,YZ,ZX,VA2, INEL,
+     .   IN25,XX,YY,ZZ,VA2, INEL,
      .   VXA(MVSIZ), VYA(MVSIZ), VZA(MVSIZ), 
      .   XMAS(MVSIZ), RHO, EI(MVSIZ),REI(MVSIZ),REK(MVSIZ),
      .   EK(MVSIZ), XM(MVSIZ), YM(MVSIZ), ZM(MVSIZ), XMAS25(MVSIZ),
@@ -102,8 +107,7 @@ C     REAL
      .   IXX(MVSIZ), IYY(MVSIZ), IZZ(MVSIZ),
      .   IXY(MVSIZ), IYZ(MVSIZ), IZX(MVSIZ),
      .   RBIDON(1)
-      INTEGER :: K,IPART,LOCAL_INDEX
-      my_real, DIMENSION(MVSIZ,2) :: FSTPARIT   
+
 C-----------------------------------------------
       FLAG = 0
       RBIDON = ZERO
@@ -183,8 +187,8 @@ C
         ZM(I)= XMAS25(I)*VZA(I)
       ENDDO
 C
-C     !!!!!!!!!! VOL0,VOL00,THK0,THK02,X,VR ne sont transmis que par
-C                CFORC3 et pas par CSUBC3 et CZFORC3 (IFLA=0) !!!!!!!
+C     !!!!!!!!!! VOL0,VOL00,THK0,THK02,X,VR are only transmitted by
+C                CFORC3 and not by CSUBC3 and CZFORC3 (IFLA=0) !!!!!!!
       IF(IFLA/=0.AND.NPSAV>=21)THEN
         DO I=JFT,JLT
          XX= X1G(I)+X2G(I)+X3G(I)+X4G(I)
@@ -255,6 +259,7 @@ C
           IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
             IF(OFF(I)/=ZERO)THEN
               PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+              IF (G_WPLA > 0) PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
               PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
               PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
               PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -262,6 +267,7 @@ C
             ENDIF
           ELSE 
             PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+            IF (G_WPLA > 0)  PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
             PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
             PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
             PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -295,6 +301,7 @@ C
                IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
                  IF(OFF(I)/=ZERO)THEN
                    PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                   IF (G_WPLA > 0) PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                    PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                    PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                    PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -302,6 +309,7 @@ C
                  ENDIF
                ELSE 
                  PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                 IF (G_WPLA > 0) PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                  PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                  PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                  PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -331,6 +339,7 @@ C                PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
                   IF (OFF(I)/=ZERO) THEN
                     PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                    IF (G_WPLA > 0)  PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                     PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                     PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                     PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -338,6 +347,7 @@ C                PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                   ENDIF
                ELSE 
                   PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                  IF (G_WPLA > 0) PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                   PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                   PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                   PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -390,6 +400,7 @@ C                PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
             IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
               IF (OFF(I)/=ZERO)THEN
                 PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                IF (G_WPLA > 0)  PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                 PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                 PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                 PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -397,6 +408,7 @@ C                PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
               ENDIF
             ELSE 
               PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+              IF (G_WPLA > 0)   PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
               PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
               PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
               PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -415,6 +427,7 @@ C             PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                  IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
                    IF(OFF(I)/=ZERO)THEN
                      PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                     IF (G_WPLA > 0)        PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                      PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                      PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                      PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -422,6 +435,7 @@ C             PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                    ENDIF
                  ELSE 
                    PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                   IF (G_WPLA > 0)   PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                    PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                    PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                    PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -437,6 +451,7 @@ C                  PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                  IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
                    IF(OFF(I)/=ZERO)THEN
                      PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                     IF (G_WPLA > 0)    PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                      PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                      PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                      PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
@@ -444,6 +459,7 @@ C                  PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                    ENDIF
                  ELSE
                    PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                   IF (G_WPLA > 0)  PARTSAV(29,MX)=PARTSAV(29,MX) + WPLA(I)
                    PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                    PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                    PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)

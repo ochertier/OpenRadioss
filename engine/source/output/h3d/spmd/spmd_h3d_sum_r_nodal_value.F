@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_h3d_sum_r_nodal_value   ../engine/source/output/h3d/spmd/spmd_h3d_sum_r_nodal_value.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                       ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_h3d_sum_r_nodal_value   ../engine/source/output/h3d/spmd/spmd_h3d_sum_r_nodal_value.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                       ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod          ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_H3D_SUM_R_NODAL_VALUE(NODGLOB,V,LEN,VP0,LENP0)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -45,11 +48,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER J,K 
+      INTEGER K 
       REAL
      .       , DIMENSION(:), ALLOCATABLE ::  V_TMP,VP0_TMP
 #ifdef MPI
-      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,I
+      INTEGER IERROR,I
 
         ALLOCATE(V_TMP(LENP0))
         ALLOCATE(VP0_TMP(LENP0))

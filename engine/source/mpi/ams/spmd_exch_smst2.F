@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,18 +22,20 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 
-      !||====================================================================
-      !||    spmd_exch_smst2   ../engine/source/mpi/ams/spmd_exch_smst2.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_ini_int       ../engine/source/ams/sms_init.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../engine/source/output/message/message.F
-      !||    arret             ../engine/source/system/arret.F
-      !||    spmd_check_tag    ../engine/source/mpi/ams/spmd_check_tag.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||    tri7box           ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_smst2       ../engine/source/mpi/ams/spmd_exch_smst2.F
+!||--- called by ------------------------------------------------------
+!||    sms_ini_int           ../engine/source/ams/sms_init.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||    spmd_check_tag        ../engine/source/mpi/ams/spmd_check_tag.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod         ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_EXCH_SMST2(IPARI,TAG,INTLIST,NBINTC,INTBUF_TAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -44,6 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -226,7 +229,7 @@ C     REAL
               ENDIF
             ENDDO
             ! -----------------
-            ! Sent MPI comm
+            ! Feels mpi comm
             L=1
             IDEBS=0
             DO P=1, NSPMD
@@ -285,7 +288,7 @@ C     REAL
             ENDDO   ! DO P=1, NSPMD
 
             ! -----------------
-            ! Fin du send
+            ! End of send
             DO P = 1, NSPMD
               IF (P==NSPMD)THEN
                 SIZ=LENSD_0-IADS(P)
@@ -356,7 +359,7 @@ C     REAL
               ENDIF
             ENDDO
             ! -----------------
-            ! Sent MPI comm
+            ! Feels mpi comm
             L=1
             IDEBS = 0
             DO P=1, NSPMD
@@ -449,7 +452,7 @@ C     REAL
               ENDIF !  IF (NB > 0)
             ENDDO ! DO P=1, NSPMD
             ! -----------------
-            ! Fin du send
+            ! End of send
             DO P = 1, NSPMD
               IF (P==NSPMD)THEN
                 SIZ=LENSD-IADS(P)

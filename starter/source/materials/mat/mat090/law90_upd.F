@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    law90_upd              ../starter/source/materials/mat/mat090/law90_upd.F
-      !||--- called by ------------------------------------------------------
-      !||    updmat                 ../starter/source/materials/updmat.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    func_slope             ../starter/source/tools/curve/func_slope.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    law90_upd              ../starter/source/materials/mat/mat090/law90_upd.F
+!||--- called by ------------------------------------------------------
+!||    updmat                 ../starter/source/materials/updmat.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    func_slope             ../starter/source/tools/curve/func_slope.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE LAW90_UPD(IOUT,TITR,MAT_ID,UPARAM,IPM, FUNC_ID,NPC,PLD,PM,
-     .                     NFUNCT)
+     .                     NFUNCT,YOUNG0)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -52,21 +52,22 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       CHARACTER(LEN=NCHARTITLE)  :: TITR
       INTEGER ,INTENT(IN) :: NFUNCT
-      INTEGER MAT_ID,IOUT,ID_F1,ID_F2
+      INTEGER MAT_ID, IOUT
       INTEGER NPC(*), FUNC_ID(NFUNCT), IPM(NPROPMI)
       my_real 
      .         UPARAM(*),PLD(*),PM(NPROPM)
 !      TYPE(TTABLE) TABLE(*)
       TARGET IPM
       INTEGER, DIMENSION(:), POINTER :: IFUNC
+      my_real ,INTENT(INOUT) :: YOUNG0
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NFUNC,I,J
+      INTEGER NFUNC, J
       INTEGER IPRINT, LP,IndexDesign0
 
       my_real 
-     .      STIFF,STIFFC,STIFFT, EMAX_CURVE, EMIN_CURVE,EINI_CURVE,
+     .       EMAX_CURVE, EMIN_CURVE,EINI_CURVE,
      .     STIFFMIN,STIFFMAX,STIFFINI,STFAVG,SCALEFAC,E0,
      .     EPSMAX,EC_MAX,EMAX,G,C1,NU
 
@@ -88,7 +89,8 @@ c
               EMIN_CURVE = MIN(EMIN_CURVE,  STIFFMIN)
               EINI_CURVE = MAX(EINI_CURVE, STIFFINI)
           ENDDO ! NFUNC 
-          E0 = UPARAM(1) 
+          E0 = UPARAM(1)
+          YOUNG0 = EINI_CURVE
           IF(E0 < EINI_CURVE) THEN
              E0 = EINI_CURVE
              UPARAM(1) = E0   

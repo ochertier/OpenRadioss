@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    check_active_elem_edge   ../engine/source/interfaces/interf/check_active_elem_edge.F
-      !||--- called by ------------------------------------------------------
-      !||    check_edge_state         ../engine/source/interfaces/interf/check_edge_state.F
-      !||    check_surface_state      ../engine/source/interfaces/interf/check_surface_state.F
-      !||====================================================================
+!||====================================================================
+!||    check_active_elem_edge   ../engine/source/interfaces/interf/check_active_elem_edge.F
+!||--- called by ------------------------------------------------------
+!||    check_edge_state         ../engine/source/interfaces/interf/check_edge_state.F
+!||    check_surface_state      ../engine/source/interfaces/interf/check_surface_state.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod              ../common_source/modules/elements/element_mod.F90
+!||====================================================================
         SUBROUTINE CHECK_ACTIVE_ELEM_EDGE( NUMBER_NODE, N1,N2,N3,N4,
      .                                     DEACTIVATION,GEO,IXS,IXC,
      .                                     IXT,IXP,IXR,IXTG,IXS10,ADDCNEL,CNEL,
@@ -38,6 +40,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !           if 1 active element contains N1 & N2, the edge must be kept (for interface 11)
 !           if 1 active element contains N1 & N2 & N3 & N4, the surface must be kept (for interface 7)
 !$ENDCOMMENT
+        use element_mod , only : nixs,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -130,7 +133,7 @@ C-----------------------------------------------
                     ENDDO
                     IF(ELEM_ID>NUMELS8.AND.ELEM_ID<=NUMELS8+NUMELS10) THEN
                       DO K=1,6
-                        NODE_ID = IXS10(K,ELEM_ID)
+                        NODE_ID = IXS10(K,ELEM_ID-NUMELS8)
                         TAG_NODE(NODE_ID) = 1
                       ENDDO
                     ENDIF
@@ -143,7 +146,7 @@ C-----------------------------------------------
                     ENDDO
                 ELSEIF(ELEM_ID>OFFSET_TRUSS.AND.ELEM_ID<=OFFSET_BEAM) THEN
                 ! -----------------
-                ! truss element
+                ! truss
                     DO K=2,3
                         NODE_ID = IXT(K,ELEM_ID-OFFSET_TRUSS)
                         TAG_NODE(NODE_ID) = 1
@@ -192,6 +195,7 @@ C-----------------------------------------------
                     STILL_ALIVE = .TRUE.
                 ENDIF
                 ! -----------------
+
             ENDIF
             NEXT = NEXT + 1
             I = ADDCNEL(N1) + NEXT

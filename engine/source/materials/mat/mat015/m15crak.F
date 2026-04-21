@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m15crak     ../engine/source/materials/mat/mat015/m15crak.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps15c   ../engine/source/materials/mat/mat015/sigeps15c.F
-      !||====================================================================
+!||====================================================================
+!||    m15crak     ../engine/source/materials/mat/mat015/m15crak.F
+!||--- called by ------------------------------------------------------
+!||    sigeps15c   ../engine/source/materials/mat/mat015/sigeps15c.F
+!||====================================================================
       SUBROUTINE M15CRAK(JFT  ,JLT   ,PM    ,DAMT ,
      1                   SIGR ,IMAT ,ILAYER ,SIG  ,NGL ,
      2                   NEL  )
@@ -46,7 +46,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NGL(MVSIZ),IMAT
-      INTEGER JFT, JLT,ILAYER,ICHA,IFLAG,NEL
+      INTEGER JFT, JLT,ILAYER,IFLAG,NEL
 C     REAL
       my_real
      .   PM(NPROPM,*),DAMT(NEL,2),
@@ -54,14 +54,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
+      INTEGER I
       INTEGER, DIMENSION(MVSIZ) :: FAILURE
        my_real
      .   EF2,EFC2,EM22,EMC2
       my_real
      .   SIGT1(MVSIZ),SIGT2(MVSIZ),SIGC1(MVSIZ),SIGC2(MVSIZ),
-     .   SIGR12(MVSIZ),BETA(MVSIZ),SCH1(MVSIZ,5),TAUX,S1,S2,S3,
-     .   S4,S5, TMAX(MVSIZ) 
+     .   SIGR12(MVSIZ),BETA(MVSIZ),SCH1(MVSIZ,5),
+     .    TMAX(MVSIZ) 
 C-----------------------------------------------
         DO  I=JFT,JLT
           IFLAG = NINT(PM(147,IMAT))
@@ -90,7 +90,7 @@ C
         ENDDO
 C
 C.....STRESS IN ORTHOTROPIC DIRECTIONS
-C.....MODELE DE CHANG_CHANG>
+C.....chang_chang model>
 C
       FAILURE(1:MVSIZ) = 0
       DO  I=JFT,JLT

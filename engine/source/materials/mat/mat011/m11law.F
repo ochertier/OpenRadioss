@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m11law                 ../engine/source/materials/mat/mat011/m11law.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain                  ../engine/source/materials/mat_share/mmain.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter                 ../engine/source/tools/curve/finter.F
-      !||    m11vs2                 ../engine/source/materials/mat/mat011/m11vs2.F
-      !||    m11vs3                 ../engine/source/materials/mat/mat011/m11vs3.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    m11law                 ../engine/source/materials/mat/mat011/m11law.F
+!||--- called by ------------------------------------------------------
+!||    mmain                  ../engine/source/materials/mat_share/mmain.F90
+!||--- calls      -----------------------------------------------------
+!||    finter                 ../engine/source/tools/curve/finter.F
+!||    m11vs2                 ../engine/source/materials/mat/mat011/m11vs2.F
+!||    m11vs3                 ../engine/source/materials/mat/mat011/m11vs3.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE M11LAW(PM   ,OFF ,SIG   ,EINT     ,RHO    ,
      2                  T    ,RK  ,RE    ,VO       ,
      3                  ALE_CONNECT,IX  ,IPARG ,ELBUF_TAB,V      ,
@@ -145,7 +145,8 @@ C=======================================================================
         Vx0(I)    = Vx_1
         Vy0(I)    = Vy_1
         Vz0(I)    = Vz_1     
-        TV(I) = ZERO
+        TV(I)     = T0      ! Consequently, if the adjacent material does not have an allocated temperature, 
+                            ! it will retain its initial value.
       ENDDO
 
       DO I=1,NEL
@@ -304,7 +305,7 @@ C=======================================================================
         IF(ITFUN>0)THEN
           T(I) = T0*FINTER(ITFUN,TSCAL,NPF,TF,DYDX)
         ELSE
-          T(I)   =TV(I)
+          T(I) = TV(I)
         ENDIF
         
       IF(ALEFVM_Param%IEnabled==1)THEN   
@@ -326,7 +327,7 @@ C=======================================================================
       ENDIF        
         
         !-------------------------------------------!
-        ! CAS   0 et 1     STAGNATION POINT         !
+        ! Case 0 and 1 stagnation point!
         !-------------------------------------------!
         !ALEFVM no yet implemented
         IF(ITYP==0)THEN

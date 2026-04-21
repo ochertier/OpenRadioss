@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,43 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_inlet_ebcs   ../engine/source/multifluid/multi_inlet_ebcs.F
-      !||--- called by ------------------------------------------------------
-      !||    multi_ebcs         ../engine/source/multifluid/multi_ebcs.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret              ../engine/source/system/arret.F
-      !||    multi_submatlaw    ../engine/source/multifluid/multi_submatlaw.F
-      !||    solve_eint         ../engine/source/multifluid/multi_inlet_ebcs.F
-      !||--- uses       -----------------------------------------------------
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod      ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    th_surf_mod        ../common_source/modules/interfaces/th_surf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    multi_inlet_ebcs_mod   ../engine/source/multifluid/multi_inlet_ebcs.F
+!||--- called by ------------------------------------------------------
+!||    multi_ebcs             ../engine/source/multifluid/multi_ebcs.F
+!||====================================================================
+      MODULE MULTI_INLET_EBCS_MOD
+      CONTAINS
+!||====================================================================
+!||    multi_inlet_ebcs       ../engine/source/multifluid/multi_inlet_ebcs.F
+!||--- called by ------------------------------------------------------
+!||    multi_ebcs             ../engine/source/multifluid/multi_ebcs.F
+!||--- calls      -----------------------------------------------------
+!||    arret                  ../engine/source/system/arret.F
+!||    multi_solve_eint       ../engine/source/multifluid/multi_solve_eint.F90
+!||    multi_submatlaw        ../engine/source/multifluid/multi_submatlaw.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    matparam_def_mod       ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    multi_solve_eint_mod   ../engine/source/multifluid/multi_solve_eint.F90
+!||    multi_submatlaw_mod    ../engine/source/multifluid/multi_submatlaw.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    th_surf_mod            ../common_source/modules/interfaces/th_surf_mod.F
+!||====================================================================
       SUBROUTINE MULTI_INLET_EBCS(ITASK, EBCS_ID, MULTI_FVM, NELEM, ELEM_LIST, FACE_LIST, 
      .                            FVM_INLET_DATA, IXS, IXQ, IXTG, XGRID, WGRID, IPM, PM,
-     .                            FUNC_VALUE, ID_SURF, NPF,TF,FSAVSURF, TIMESTEP, MATPARAM)
+     .                            FUNC_VALUE, ID_SURF, NPF,TF,FSAVSURF, TIMESTEP, MATPARAM, OUTPUT, PRED)
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
       USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
+      USE MULTI_SOLVE_EINT_MOD , ONLY : MULTI_SOLVE_EINT
+      USE MULTI_SUBMATLAW_MOD , ONLY : MULTI_SUBMATLAW
+      USE OUTPUT_MOD , ONLY : OUTPUT_
+      use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,32 +89,46 @@ C-----------------------------------------------
       my_real, INTENT(IN) :: TF(STF), TIMESTEP
       my_real, INTENT(INOUT) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
       TYPE(MATPARAM_STRUCT_), DIMENSION(NUMMAT),INTENT(IN) :: MATPARAM !material data structure
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+      LOGICAL,INTENT(IN) :: PRED
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: IELEM, ELEMID, NODE_ID
-      INTEGER :: KFACE, NB_NOD_FOUND, KNOD, KK, JJ
-      my_real :: X1(3), X2(3), X3(3), X4(3), P, NORMVEL, VX, VY, VZ, SSP, SURF, NX, NY, NZ
-      my_real :: RHO, SSTAR, PSTAR, PFAC, SL, SR, WFAC(3), VII(5), VJJ(5), VEL2, NORMALW
-      my_real :: FII(5), FJJ(5), VIISTAR(5), VJJSTAR(5), FIISTAR(5), FJJSTAR(5), PP(5)
-      INTEGER :: NODE1, NODE2, IMAT, NBMAT
+      INTEGER :: IELEM, ELEMID
+      INTEGER :: KFACE
+      my_real ::     SURF, NX, NY, NZ
+      my_real ::  SSTAR, PSTAR, SL, SR, WFAC(3), VII(5), NORMALW
+      my_real :: FII(5), VIISTAR(5), FIISTAR(5), PP(5)
+      INTEGER ::   IMAT, NBMAT
       INTEGER :: MATLAW(MULTI_FVM%NBMAT), LOCAL_MATID(MULTI_FVM%NBMAT)
       my_real :: PHASE_RHOII(MULTI_FVM%NBMAT), PHASE_PRESII(MULTI_FVM%NBMAT), 
-     .           PHASE_EINTII(MULTI_FVM%NBMAT), PHASE_SSPII(MULTI_FVM%NBMAT),
+     .           PHASE_EINTII(MULTI_FVM%NBMAT),
      .           PHASE_ALPHAII(MULTI_FVM%NBMAT), PHASE_RHOJJ(MULTI_FVM%NBMAT),
      .           PHASE_PRESJJ(MULTI_FVM%NBMAT), PHASE_EINTJJ(MULTI_FVM%NBMAT),
      .           PHASE_SSPJJ(MULTI_FVM%NBMAT), PHASE_ALPHAJJ(MULTI_FVM%NBMAT)
-      my_real :: DUMMY(6), RHOII, PII, EINTII, VXII, VYII, VZII, SSPII, NORMAL_VELII, RHOJJ, SSPJJ, 
+      my_real :: DUMMY(6), DUMMY2(1), RHOII, PII, EINTII, VXII, VYII, VZII, SSPII, NORMAL_VELII, RHOJJ, SSPJJ,
      .           PJJ, NORMAL_VELJJ, VXJJ, VYJJ, VZJJ, VELII2, ALPHAII, SUB_RHOII, SUB_RHOEINTII, SUB_VIISTAR(3),
      .           SUB_FIISTAR(3), ALPHASTAR, SUB_RHOSTAR, SUB_PII, VELJJ2, SUB_ESTAR, EINTJJ, PSURF
       INTEGER :: IFUNC, IELEM_START, IELEM_END
+      my_real :: ABURN(1) !< afterburning
+      INTEGER :: VARTMP_EOS(1,128) !nel=1
+      INTEGER :: NVARTMP_EOS !upper bound
+      my_real :: M_IN, M_OUT, E_IN, E_OUT
 C-----------------------------------------------
-C     B e g i n n i n g   o f   s u b r o u t i n e
+C     B o d y
 C-----------------------------------------------
+      NVARTMP_EOS = 128
+      VARTMP_EOS(1,:) = 1
       NBMAT = MULTI_FVM%NBMAT
       IELEM_START = 1 + ITASK * NELEM / NTHREAD 
       IELEM_END = (1 + ITASK) * NELEM / NTHREAD
-      DUMMY(1:6)=ZERO
+      DUMMY(1:6) = ZERO
+      DUMMY2(1) = ONE
+      ABURN(:) = ZERO
+      M_IN = ZERO
+      M_OUT = ZERO
+      E_IN = ZERO
+      E_OUT = ZERO
       DO IELEM = IELEM_START, IELEM_END
          ELEMID = ELEM_LIST(IELEM)
          IF (ELEMID  <=  NUMELS) THEN
@@ -161,14 +190,18 @@ C     Boundary "GHOST" element
             IFUNC = FVM_INLET_DATA%FUNC_RHO(IMAT)
             IF (IFUNC  >  0) THEN
                PHASE_RHOJJ(IMAT) = PHASE_RHOJJ(IMAT) * FUNC_VALUE(IFUNC)
-            ELSEIF (IFUNC  <= 0) THEN
+            ELSEIF (IFUNC ==  0) THEN
+               PHASE_RHOJJ(IMAT) = PHASE_RHOJJ(IMAT)
+            ELSEIF (IFUNC  == -1) THEN
                PHASE_RHOJJ(IMAT) = PHASE_RHOII(IMAT)
             ENDIF
             PHASE_ALPHAJJ(IMAT) = FVM_INLET_DATA%VAL_ALPHA(IMAT)
             IFUNC = FVM_INLET_DATA%FUNC_ALPHA(IMAT)
             IF (IFUNC  >  0) THEN
                PHASE_ALPHAJJ(IMAT) = PHASE_ALPHAJJ(IMAT) * FUNC_VALUE(IFUNC)
-            ELSEIF (IFUNC  <= 0) THEN
+            ELSEIF (IFUNC  ==  0) THEN
+               PHASE_ALPHAJJ(IMAT) = PHASE_ALPHAJJ(IMAT)
+            ELSEIF (IFUNC  == -1) THEN
                PHASE_ALPHAJJ(IMAT) = PHASE_ALPHAII(IMAT)
             ENDIF
             RHOJJ = RHOJJ + PHASE_RHOJJ(IMAT) * PHASE_ALPHAJJ(IMAT)
@@ -183,18 +216,22 @@ C     VE formulation
                IFUNC = FVM_INLET_DATA%FUNC_PRES(IMAT)
                IF (IFUNC  >  0) THEN
                   PHASE_EINTJJ(IMAT) = PHASE_EINTJJ(IMAT) * FUNC_VALUE(IFUNC)
-               ELSEIF (IFUNC <= 0) THEN
+               ELSEIF (IFUNC  == 0) THEN
+                  PHASE_EINTJJ(IMAT) = PHASE_EINTJJ(IMAT)
+               ELSEIF (IFUNC == -1) THEN
                   PHASE_EINTJJ(IMAT) = PHASE_EINTII(IMAT)
                ENDIF
                IF (PHASE_ALPHAJJ(IMAT)  >  ZERO) THEN
                   CALL MULTI_SUBMATLAW(
      1                    0,                  MATLAW(IMAT),                 LOCAL_MATID(IMAT),       1,
      2                    PHASE_EINTJJ(IMAT), PHASE_PRESJJ(IMAT),           PHASE_RHOJJ(IMAT),       PHASE_SSPJJ(IMAT),
-     3                    ONE,                DUMMY,                        PM,                      IPM,
-     4                    NPROPM,             NPROPMI,                      DUMMY,                   ONE,
-     5                    DUMMY,              MULTI_FVM%BFRAC(IMAT,ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY,
-     6                    DUMMY,              DUMMY,                        NPF,                     TF,
-     7                    DUMMY(1),           1,                            MATPARAM(LOCAL_MATID(IMAT)))
+     3                    DUMMY2,             DUMMY,                        PM,                      IPM,
+     4                    NPROPM,             NPROPMI,                      DUMMY,                   DUMMY2,
+     5                    DUMMY,              MULTI_FVM%BFRAC(IMAT,ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY ,
+     6                    DUMMY(1),           DUMMY,                        SNPC                   , STF   ,
+     7                    NPF,                TF,                           DUMMY(1)               , 1     ,
+     8                    MATPARAM(LOCAL_MATID(IMAT)),NVARTMP_EOS,         VARTMP_EOS              ,NUMMAT ,
+     9                    ABURN)
                   SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) * MAX(EM20, PHASE_SSPJJ(IMAT))
                   PJJ = PJJ + PHASE_PRESJJ(IMAT) * PHASE_ALPHAJJ(IMAT)
                   EINTJJ = EINTJJ + PHASE_ALPHAJJ(IMAT) * PHASE_EINTJJ(IMAT)
@@ -211,17 +248,20 @@ C     VP formulation
                IFUNC = FVM_INLET_DATA%FUNC_PRES(IMAT)
                IF (IFUNC  >  0) THEN
                   PHASE_PRESJJ(IMAT) = PHASE_PRESJJ(IMAT) * FUNC_VALUE(IFUNC)
-               ELSEIF (IFUNC <= 0) THEN
+               ELSEIF (IFUNC  ==  0) THEN
+                  PHASE_PRESJJ(IMAT) = PHASE_PRESJJ(IMAT)
+               ELSEIF (IFUNC == -1) THEN
                   PHASE_PRESJJ(IMAT) = PHASE_PRESII(IMAT)
                ENDIF
                PJJ = PJJ + PHASE_PRESJJ(IMAT) * PHASE_ALPHAJJ(IMAT)
 C     Need to solve p(RHO, EINT) = PHASE_PRESJJ(IMAT) for EINT
 C     INITIALIZE INTERNAL ENERGY
                PHASE_EINTJJ(IMAT) = PM(23, LOCAL_MATID(IMAT))
-               CALL SOLVE_EINT(MATLAW(IMAT), LOCAL_MATID(IMAT), PM, IPM, NPROPM, NPROPMI, 
+               CALL MULTI_SOLVE_EINT(MATLAW(IMAT), LOCAL_MATID(IMAT), PM, IPM, NPROPM, NPROPMI,
      .              PHASE_EINTJJ(IMAT), PHASE_RHOJJ(IMAT), PHASE_PRESJJ(IMAT), PHASE_SSPJJ(IMAT),
-     .              MULTI_FVM%BFRAC(IMAT, ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY(1), DUMMY,
-     .              DUMMY, ONE, NPF, TF, DUMMY, 1, MATPARAM(LOCAL_MATID(IMAT)))
+     .              MULTI_FVM%BFRAC(IMAT, ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY(1), DUMMY(1),
+     .              DUMMY, DUMMY2, SNPC, STF, NPF, TF, DUMMY, 1, MATPARAM(LOCAL_MATID(IMAT)),
+     ?              NVARTMP_EOS, VARTMP_EOS, NUMMAT, ABURN)
                
                SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) * MAX(EM20, PHASE_SSPJJ(IMAT))
                EINTJJ = EINTJJ + PHASE_ALPHAJJ(IMAT) * PHASE_EINTJJ(IMAT)
@@ -238,7 +278,9 @@ C     Normal velocity imposed
             IFUNC = FVM_INLET_DATA%FUNC_VEL(1)
             IF (IFUNC  >  0) THEN
                NORMAL_VELJJ = NORMAL_VELJJ * FUNC_VALUE(IFUNC)
-            ELSEIF (IFUNC <= 0) THEN
+            ELSEIF (IFUNC  ==  0) THEN
+               NORMAL_VELJJ = NORMAL_VELJJ
+            ELSEIF (IFUNC == -1) THEN
                NORMAL_VELJJ = NORMAL_VELII
             ENDIF
 C           NORMAL_VELJJ = NORMAL_VELII
@@ -251,21 +293,21 @@ C           NORMAL_VELJJ = NORMAL_VELII
             IFUNC = FVM_INLET_DATA%FUNC_VEL(1)
             IF (IFUNC  >  0) THEN
                VXJJ = VXJJ * FUNC_VALUE(IFUNC)
-            ELSEIF (IFUNC <= 0) THEN
+            ELSEIF (IFUNC == -1) THEN
                VXJJ = VXII
             ENDIF
             VYJJ = FVM_INLET_DATA%VAL_VEL(2)
             IFUNC = FVM_INLET_DATA%FUNC_VEL(2)
             IF (IFUNC  >  0) THEN
                VYJJ = VYJJ * FUNC_VALUE(IFUNC)
-            ELSEIF (IFUNC <= 0) THEN
+            ELSEIF (IFUNC == -1) THEN
                VYJJ = VYII
             ENDIF
             VZJJ = FVM_INLET_DATA%VAL_VEL(3)
             IFUNC = FVM_INLET_DATA%FUNC_VEL(3)
             IF (IFUNC  >  0) THEN
                VZJJ = VZJJ * FUNC_VALUE(IFUNC)
-            ELSEIF (IFUNC <= 0) THEN
+            ELSEIF (IFUNC == -1) THEN
                VZJJ = VZII
             ENDIF
             NORMAL_VELJJ = VXJJ * NX + VYJJ * NY + VZJJ * NZ
@@ -466,95 +508,35 @@ C     Submaterial fluxes
 C     
          ENDIF
 
-         ! /TH/SURF (massflow,velocity,pressure,acceleration)
-         FSAVSURF(2,ID_SURF) = FSAVSURF(2,ID_SURF) + MULTI_FVM%FLUXES(1, KFACE, ELEMID)            ! += rho.S.un
-         FSAVSURF(3,ID_SURF) = FSAVSURF(3,ID_SURF) + MULTI_FVM%FLUXES(1, KFACE, ELEMID) / VII(1)   ! += S.un
-         FSAVSURF(4,ID_SURF) = FSAVSURF(4,ID_SURF) + SURF*PSURF                                    ! += S.P
-         FSAVSURF(6,ID_SURF) = FSAVSURF(6,ID_SURF) + MULTI_FVM%FLUXES(1, KFACE, ELEMID) * TIMESTEP ! m <- m+dm (cumulative value)
+
+         IF(.NOT.PRED)THEN
+           !muscl 'off', or muscl 'on' after 2nd step of prediction/correction
+
+           ! /TH/SURF (massflow,velocity,pressure,acceleration)
+           FSAVSURF(2,ID_SURF) = FSAVSURF(2,ID_SURF) + MULTI_FVM%FLUXES(1, KFACE, ELEMID)            ! += rho.S.un
+           FSAVSURF(3,ID_SURF) = FSAVSURF(3,ID_SURF) + MULTI_FVM%FLUXES(1, KFACE, ELEMID) / VII(1)   ! += S.un
+           FSAVSURF(4,ID_SURF) = FSAVSURF(4,ID_SURF) + SURF*PSURF                                    ! += S.P
+           FSAVSURF(6,ID_SURF) = FSAVSURF(6,ID_SURF) + MULTI_FVM%FLUXES(1, KFACE, ELEMID) * TIMESTEP ! m <- m+dm (cumulative value)
+
+           ! FLUX > 0 if flow is exiting (OUTWARD NORMAL)
+           M_IN = M_IN   - TIMESTEP * Min(ZERO, MULTI_FVM%FLUXES(1, KFACE, ELEMID) )
+           M_OUT = M_OUT - TIMESTEP * Max(ZERO, MULTI_FVM%FLUXES(1, KFACE, ELEMID) )
+           E_IN = E_IN   - TIMESTEP * Min(ZERO, MULTI_FVM%FLUXES(5, KFACE, ELEMID) )
+           E_OUT = E_OUT - TIMESTEP * Max(ZERO, MULTI_FVM%FLUXES(5, KFACE, ELEMID) )
+         ENDIF
       ENDDO
+
+      IF(.NOT. PRED)THEN
+!$OMP CRITICAL
+        OUTPUT%DATA%INOUT%DM_IN  = OUTPUT%DATA%INOUT%DM_IN + M_IN
+        OUTPUT%DATA%INOUT%DM_OUT = OUTPUT%DATA%INOUT%DM_OUT + M_OUT
+        OUTPUT%DATA%INOUT%DE_IN = OUTPUT%DATA%INOUT%DE_IN + E_IN
+        OUTPUT%DATA%INOUT%DE_OUT = OUTPUT%DATA%INOUT%DE_OUT + E_OUT
+!$OMP END CRITICAL
+      ENDIF
+
 C-----------------------------------------------
 C     E n d   o f   s u b r o u t i n e 
 C-----------------------------------------------
       END SUBROUTINE MULTI_INLET_EBCS
-
-      !||====================================================================
-      !||    solve_eint         ../engine/source/multifluid/multi_inlet_ebcs.F
-      !||--- called by ------------------------------------------------------
-      !||    multi_inlet_ebcs   ../engine/source/multifluid/multi_inlet_ebcs.F
-      !||--- calls      -----------------------------------------------------
-      !||    multi_submatlaw    ../engine/source/multifluid/multi_submatlaw.F
-      !||--- uses       -----------------------------------------------------
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||====================================================================
-      SUBROUTINE SOLVE_EINT(MATLAW  , LOCAL_MATID, PM    , IPM         ,NPROPM, NPROPMI, 
-     .                      EINT    , RHO        , PRES  , SSP         , 
-     .                      BURNFRAC, BURNTIME   , DELTAX, CURRENT_TIME,
-     .                      BUFMAT  , OFF        , NPF   , TF          ,VAREOS, NVAREOS,
-     .                      MAT_PARAM)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
-C-----------------------------------------------
-C     I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-#include      "tabsiz_c.inc"
-      INTEGER, INTENT(IN) :: MATLAW, LOCAL_MATID, NPROPM, NPROPMI
-      my_real, INTENT(IN) :: PM(NPROPM, *)
-      INTEGER, INTENT(IN) :: IPM(NPROPMI, *)
-      my_real, INTENT(INOUT) :: RHO
-      my_real, INTENT(INOUT) :: SSP, PRES, EINT
-      my_real, INTENT(INOUT) :: BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME, BUFMAT(*)
-      my_real, INTENT(INOUT) :: OFF
-      INTEGER, INTENT(IN) :: NPF(SNPC),NVAREOS
-      my_real, INTENT(IN) :: TF(STF),VAREOS(NVAREOS*1)
-      TYPE(MATPARAM_STRUCT_), INTENT(IN) :: MAT_PARAM !material data structure
-C-----------------------------------------------
-C     A r g u m e n t s
-C-----------------------------------------------
-      INTEGER :: ITER, MAX_ITER
-      my_real :: TOL, ERROR
-      my_real :: FUNC, DFUNC, PSTAR, GRUN, VOL, INCR, TEMP, PRESK, DUMMY(6)
-      LOGICAL :: CONT
-C-----------------------------------------------
-C     S o u r c e   L i n e s
-C-----------------------------------------------
-      MAX_ITER = 50
-      TOL = EM06
-      ERROR = ONE
-      DUMMY(1:6)=ZERO
-      
-C     Dummy
-      VOL = ONE
-
-C     Initialization
-      TEMP = ZERO
-      ITER = 0
-      CONT = .TRUE.
-      DO WHILE (CONT .AND. ITER  <  MAX_ITER) 
-         ITER = ITER + 1
-         CALL MULTI_SUBMATLAW(
-     1   0,           MATLAW,      LOCAL_MATID, 1,
-     2   EINT,        PRESK,       RHO,         SSP,
-     3   VOL,         GRUN,        PM,          IPM,
-     4   NPROPM,      NPROPMI,     BUFMAT,      OFF,
-     5   TEMP,        BURNFRAC,    BURNTIME,    DELTAX,
-     6   CURRENT_TIME,DUMMY,       NPF,         TF,
-     7   VAREOS,      NVAREOS,     MAT_PARAM)
-         FUNC = PRESK - PRES
-         ERROR  = ABS(FUNC)
-         IF (ERROR  <  TOL * (ABS(PRES) + ONE)) THEN
-            CONT = .FALSE.
-         ENDIF
-         DFUNC = GRUN
-         IF (GRUN  >  ZERO) THEN
-            INCR = -FUNC / DFUNC
-            EINT = EINT + INCR
-         ELSE
-            CONT = .FALSE.
-            EINT = ZERO
-         ENDIF
-
-      ENDDO
-      END SUBROUTINE SOLVE_EINT
+      END MODULE MULTI_INLET_EBCS_MOD

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m11vs2                 ../engine/source/materials/mat/mat011/m11vs2.F
-      !||--- called by ------------------------------------------------------
-      !||    m11law                 ../engine/source/materials/mat/mat011/m11law.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    m11vs2                 ../engine/source/materials/mat/mat011/m11vs2.F
+!||--- called by ------------------------------------------------------
+!||    m11law                 ../engine/source/materials/mat/mat011/m11law.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE M11VS2(PM    ,IPARG,IXQ  ,ALE_CONNECT  ,ELBUF_TAB  ,V    ,
      2                  X     ,DVP  ,VN   ,W      ,VEL        ,VD2  ,
      3                  VDY   ,VDZ  ,VIS  ,MAT    ,RHOV       ,PV   ,
@@ -76,7 +76,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER                  :: I,II,J,JJ(3),IVOI,ML,N,KTY,KLT,MFT,IS,IX1,IX2,
      .                            INOD,ICF(2,4),MV,MT,K,KK(6),IAD2
-      my_real                  :: YN, ZN, FAC, VN1, VN2, DVY, DVZ, MASSv, Mass
+      my_real                  :: YN, ZN, FAC, VN1, VN2, DVY, DVZ, MASSv
       TYPE(G_BUFEL_)  ,POINTER :: GBUF   
       LOGICAL                  :: bFOUND  
 C-----------------------------------------------
@@ -144,7 +144,9 @@ C-----------------------------------------------
               REV(I) = GBUF%RE(IS+1)
               VIS(I)=VIS(I)+PM(81,MV)*RKV(I)**2/REV(I)
             ENDIF
-            IF (JTHE>0) TV(I)  = GBUF%TEMP(IS+1)
+            IF (GBUF%G_TEMP > 0) THEN
+              TV(I) = GBUF%TEMP(IS+1)  ! The adjacent cell must have an allocated temperature; otherwise, TV is set to T0 as initialized.
+            END IF
             !MOMENTUM
             IF(ALEFVM_Param%IEnabled == 1)THEN          
               IS       = IVOI-MFT
@@ -170,7 +172,7 @@ C-----------------------------------------------
               REV(I) =BUFVOIS(6,IS)                                       
               VIS(I) =VIS(I)+PM(81,MV)*RKV(I)**2/REV(I)                   
             ENDIF                                                         
-            IF(JTHE>0) TV(I) = BUFVOIS(5,IS)
+            TV(I) = BUFVOIS(5,IS)
             !VxV(I)    = BUFVOIS(07,IS)                                 
             !VyV(I)    = BUFVOIS(08,IS)                                 
             !VzV(I)    = BUFVOIS(09,IS)  

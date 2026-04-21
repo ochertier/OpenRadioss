@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dt105law   ../starter/source/materials/time_step/dt105law.F
-      !||--- called by ------------------------------------------------------
-      !||    dtmain     ../starter/source/materials/time_step/dtmain.F
-      !||--- calls      -----------------------------------------------------
-      !||    dtel       ../starter/source/materials/time_step/dtel.F
-      !||    dtsph      ../starter/source/materials/time_step/dtsph.F
-      !||====================================================================
+!||====================================================================
+!||    dt105law   ../starter/source/materials/time_step/dt105law.F
+!||--- called by ------------------------------------------------------
+!||    dtmain     ../starter/source/materials/time_step/dtmain.F
+!||--- calls      -----------------------------------------------------
+!||    dtel       ../starter/source/materials/time_step/dtel.F
+!||    dtsph      ../starter/source/materials/time_step/dtsph.F
+!||====================================================================
       SUBROUTINE DT105LAW(PM,GEO,PID,MAT, DELTAX, AIRE, VOL, DTX)
 C
-C     CALCUL DES DT ELEMENTAIRES POUR LA LOI 105
+C     CALCULATION OF ELEMENTARY DT FOR LAW 105
 C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -60,7 +60,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C=======================================================================
 C
-C   SSP(I) EST ICI EGAL QUND T=0 A LA VDET STOCKEE DANS PM
+C   SSP(I) IS HERE EQUAL WHEN T=0 TO THE VDET STORED IN PM
 C
       DO I=LFT,LLT
          SSP(I)=PM(38,MAT(I))

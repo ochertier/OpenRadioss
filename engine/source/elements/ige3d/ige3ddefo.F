@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ige3ddefo    ../engine/source/elements/ige3d/ige3ddefo.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3duforc3   ../engine/source/elements/ige3d/ig3duforc3.F
-      !||====================================================================
+!||====================================================================
+!||    ige3ddefo    ../engine/source/elements/ige3d/ige3ddefo.F
+!||--- called by ------------------------------------------------------
+!||    ig3duforc3   ../engine/source/elements/ige3d/ig3duforc3.F
+!||====================================================================
       SUBROUTINE IGE3DDEFO(
      1   VX,      VY,      VZ,      MATB,
      2   NCTRL,   WXX,     WYY,     WZZ,
@@ -62,7 +62,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  I, J, INCTRL
-      my_real DT1D2, DT1D, AAA
+      my_real DT1D2, AAA
 C=======================================================================
 
       DO I=1,NEL

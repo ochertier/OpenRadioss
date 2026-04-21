@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_fld_c      ../engine/source/materials/fail/fld/fail_fld_c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc          ../engine/source/materials/mat_share/mulawc.F90
-      !||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter          ../engine/source/tools/curve/finter.F
-      !||    finterfld       ../engine/source/materials/fail/fld/fail_fld_c.F
-      !||    vinter          ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    fail_fld_c      ../engine/source/materials/fail/fld/fail_fld_c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc          ../engine/source/materials/mat_share/mulawc.F90
+!||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
+!||--- calls      -----------------------------------------------------
+!||    finter          ../engine/source/tools/curve/finter.F
+!||    finterfld       ../engine/source/materials/fail/fld/fail_fld_c.F
+!||    vinter2         ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE FAIL_FLD_C(
      1     NEL      ,NUPARAM  ,NFUNC    ,IFUNC    ,
      2     NPF      ,TF       ,TIME     ,UPARAM   ,
      3     NGL      ,IPG      ,ILAY     ,IPTT     ,
-     4     EPSXX    ,EPSYY    ,EPSXY    ,
+     4     EPSXX    ,EPSYY    ,EPSXY    ,LF_DAMMX ,
      5     DEPSXX   ,DEPSYY   ,DEPSXY   ,PLA      ,
      6     ZT       ,OFF      ,FOFF     ,TDEL     ,
      7     FLD_IDX  ,DAM      ,DFMAX    ,DT1      ,
@@ -76,7 +76,8 @@ C IPT                         CURRENT INTEGRATION POINT IN THE LAYER (FOR OUTPUT
 C---------+---------+---+---+--------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: NEL,NUPARAM,NFUNC,IPG,ILAY,IPTT,NIPARAM,NUVAR
+      INTEGER, INTENT(IN) :: NEL,NUPARAM,NFUNC,IPG,ILAY,IPTT,NIPARAM,NUVAR,
+     .   LF_DAMMX
       INTEGER, DIMENSION(NEL)   :: NGL
       INTEGER, DIMENSION(NFUNC) :: IFUNC
       INTEGER, DIMENSION(NIPARAM) :: IPARAM
@@ -88,7 +89,7 @@ C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
       INTEGER ,DIMENSION(NEL), INTENT(INOUT) :: FOFF,FLD_IDX
-      my_real ,DIMENSION(NEL), INTENT(INOUT) :: DFMAX
+      my_real ,DIMENSION(NEL,LF_DAMMX), INTENT(INOUT) :: DFMAX
       my_real ,DIMENSION(NEL), INTENT(INOUT) :: DAM,TDEL
       my_real, DIMENSION(NEL,NUVAR), INTENT(INOUT) :: UVAR
 C-----------------------------------------------
@@ -189,6 +190,9 @@ c
         BETA(I)   = DEMIN(I)/SIGN(MAX(ABS(DEMAJ(I)),EM20),DEMAJ(I))
         UVAR(I,2) = DEMAJ(I)
         UVAR(I,3) = DEMIN(I)
+        IF (IENG == 2) THEN
+          DFMAX(I,4) = BETA(I)
+        ENDIF 
       ENDDO
 c
       !=================================================================
@@ -206,9 +210,10 @@ c
 #include "vectorize.inc"
         DO J = 1,NINDX
           I = INDX(J)
-          EM(I)    = FINTERFLD(EMIN(I),LENF,XF)
-          DAM(I)   = EMAJ(I) / EM(I)
-          DFMAX(I) = MIN(ONE, DAM(I))
+          EM(I)      = FINTERFLD(EMIN(I),LENF,XF)
+          DAM(I)     = EMAJ(I) / EM(I)
+          DFMAX(I,2) = MAX(DAM(I),ZERO)
+          DFMAX(I,1) = MIN(ONE, DAM(I))
         ENDDO
         DEALLOCATE(XF)
       ! -> True strains input
@@ -223,13 +228,14 @@ c
             ILENP(J) = NPF(IFUNC(1)+1) / 2 -IADP(J) - IPOS(J)
             TAB_LOC(J) = EMIN(I)
           ENDDO
-          CALL VINTER(TF,IADP,IPOS,ILENP,NINDX,TAB_LOC,DYDX_LOC,Y_LOC)
+          CALL VINTER2(TF,IADP,IPOS,ILENP,NINDX,TAB_LOC,DYDX_LOC,Y_LOC)
 #include "vectorize.inc"
           DO J = 1,NINDX
             I = INDX(J)
             EM(I) = Y_LOC(J)
             DAM(I) = EMAJ(I) / EM(I)
-            DFMAX(I) = MIN(ONE,DAM(I))
+            DFMAX(I,2) = MAX(DAM(I),ZERO)
+            DFMAX(I,1) = MIN(ONE,DAM(I))
           ENDDO    
         ! -> Non-linear path formulation
         ELSEIF (IENG == 2) THEN
@@ -241,13 +247,14 @@ c
             ILENP(J) = NPF(IFUNC(1)+1) / 2 -IADP(J) - IPOS(J)
             TAB_LOC(J) = BETA(I)
           ENDDO
-          CALL VINTER(TF,IADP,IPOS,ILENP,NINDX,TAB_LOC,DYDX_LOC,Y_LOC)
+          CALL VINTER2(TF,IADP,IPOS,ILENP,NINDX,TAB_LOC,DYDX_LOC,Y_LOC)
 #include "vectorize.inc"
           DO J = 1,NINDX
             I = INDX(J)
             EM(I) = Y_LOC(J)
             DAM(I) = MAX(PLA(I) / EM(I),DAM(I))
-            DFMAX(I) = MIN(ONE,DAM(I))
+            DFMAX(I,2) = MAX(DAM(I),ZERO)
+            DFMAX(I,1) = MIN(ONE,DAM(I))
           ENDDO             
         ENDIF
       ENDIF 
@@ -276,6 +283,7 @@ c
             ELSE
               FLD_IDX(I) = 2      ! zone 2  - high wrinkle tendency
             ENDIF
+            DFMAX(I,3) = FLD_IDX(I)
           ENDDO
         ELSE
 #include "vectorize.inc"
@@ -294,6 +302,7 @@ c
             ELSE
               FLD_IDX(I) = 2      ! zone 2  - high wrinkle tendency
             ENDIF
+            DFMAX(I,3) = FLD_IDX(I)
           ENDDO
         ENDIF
       ELSE 
@@ -314,6 +323,7 @@ c
             ELSE
               FLD_IDX(I) = MAX(2,FLD_IDX(I))      ! zone 2  - high wrinkle tendency
             ENDIF
+            DFMAX(I,3) = FLD_IDX(I)
           ENDDO
         ELSE
 #include "vectorize.inc"
@@ -332,6 +342,7 @@ c
             ELSE
               FLD_IDX(I) = MAX(2,FLD_IDX(I))      ! zone 2  - high wrinkle tendency
             ENDIF
+            DFMAX(I,3) = FLD_IDX(I)
           ENDDO
         ENDIF
       ENDIF
@@ -381,15 +392,15 @@ c------------------------
 c------------------------
       END
 c      
-      !||====================================================================
-      !||    finterfld       ../engine/source/materials/fail/fld/fail_fld_c.F
-      !||--- called by ------------------------------------------------------
-      !||    dam_fld_sol     ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||    fail_fld_c      ../engine/source/materials/fail/fld/fail_fld_c.F
-      !||    fail_fld_tsh    ../engine/source/materials/fail/fld/fail_fld_tsh.F
-      !||    fail_fld_xfem   ../engine/source/materials/fail/fld/fail_fld_xfem.F
-      !||    idx_fld_sol     ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||====================================================================
+!||====================================================================
+!||    finterfld       ../engine/source/materials/fail/fld/fail_fld_c.F
+!||--- called by ------------------------------------------------------
+!||    dam_fld_sol     ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||    fail_fld_c      ../engine/source/materials/fail/fld/fail_fld_c.F
+!||    fail_fld_tsh    ../engine/source/materials/fail/fld/fail_fld_tsh.F
+!||    fail_fld_xfem   ../engine/source/materials/fail/fld/fail_fld_xfem.F
+!||    idx_fld_sol     ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||====================================================================
       my_real FUNCTION FINTERFLD(EPST,LENF,XF)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

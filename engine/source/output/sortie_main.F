@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,80 +20,86 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sortie_main              ../engine/source/output/sortie_main.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                    ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ani_pcont                ../engine/source/output/anim/generate/ani_pcont.F
-      !||    ani_pcont21              ../engine/source/output/anim/generate/ani_pcont.F
-      !||    anicon0                  ../engine/source/output/anim/generate/anicon0.F
-      !||    anicon2                  ../engine/source/output/anim/generate/anicon2.F
-      !||    cndmasi2                 ../engine/source/elements/solid/solide10/s10cndf.F
-      !||    ecrit                    ../engine/source/output/ecrit.F
-      !||    eng_qaprint_driver       ../engine/source/output/qaprint/eng_qaprint_driver.F
-      !||    fcont2_max_output        ../engine/source/output/h3d/h3d_results/fcont2_max_output.F
-      !||    fcont2_min_output        ../engine/source/output/h3d/h3d_results/fcont2_min_output.F
-      !||    fcont_max_output         ../engine/source/output/h3d/h3d_results/fcont_max_output.F
-      !||    file_size                ../common_source/tools/input_output/write_routtines.c
-      !||    fluxsw                   ../engine/source/fluid/fluxsw.F
-      !||    fpcont2_max_output       ../engine/source/output/h3d/h3d_results/fpcont2_max_output.F90
-      !||    fpcont2_min_output       ../engine/source/output/h3d/h3d_results/fpcont2_min_output.F90
-      !||    genani                   ../engine/source/output/anim/generate/genani.F
-      !||    gendynain                ../engine/source/output/dynain/gendynain.F
-      !||    genh3d                   ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||    genoutp                  ../engine/source/output/sty/genoutp.F
-      !||    genstat                  ../engine/source/output/sta/genstat.F
-      !||    hist2                    ../engine/source/output/th/hist2.F
-      !||    noise                    ../engine/source/general_controls/computation/noise.F
-      !||    s10mvnd                  ../engine/source/elements/solid/solide10/s10cndv.F
-      !||    sensor_energy_total      ../engine/source/tools/sensor/sensor_energy_total.F
-      !||    spmd_exch_adm            ../engine/source/mpi/anim/spmd_exch_adm.F
-      !||    spmd_sd_skw_anim         ../engine/source/mpi/output/spmd_sd_skw.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod     ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    aleanim_mod              ../engine/share/modules/aleanim_mod.F
-      !||    anim_mod                 ../common_source/modules/output/anim_mod.F
-      !||    cluster_mod              ../engine/share/modules/cluster_mod.F
-      !||    crackxfem_mod            ../engine/share/modules/crackxfem_mod.F
-      !||    drape_mod                ../engine/share/modules/drape_mod.F
-      !||    dt_mod                   ../engine/source/modules/dt_mod.F
-      !||    ebcs_mod                 ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||    ecnd_mod                 ../engine/share/modules/ecdn_mod.F
-      !||    elbufdef_mod             ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    fpcont2_max_output_mod   ../engine/source/output/h3d/h3d_results/fpcont2_max_output.F90
-      !||    fpcont2_min_output_mod   ../engine/source/output/h3d/h3d_results/fpcont2_min_output.F90
-      !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
-      !||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
-      !||    glob_therm_mod           ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    groupdef_mod             ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
-      !||    inoutfile_mod            ../common_source/modules/inoutfile_mod.F
-      !||    mat_elem_mod             ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod            ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    outmax_mod               ../common_source/modules/outmax_mod.F
-      !||    output_mod               ../common_source/modules/output/output_mod.F90
-      !||    outputs_mod              ../common_source/modules/outputs_mod.F
-      !||    pinchtype_mod            ../common_source/modules/pinchtype_mod.F
-      !||    sensor_mod               ../common_source/modules/sensor_mod.F90
-      !||    stack_mod                ../engine/share/modules/stack_mod.F
-      !||    state_mod                ../common_source/modules/state_mod.F
-      !||    table_mod                ../engine/share/modules/table_mod.F
-      !||    th_surf_mod              ../common_source/modules/interfaces/th_surf_mod.F
-      !||    timer_mod                ../engine/source/system/timer_mod.F90
-      !||    user_windows_mod         ../common_source/modules/user_windows_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sortie_main                      ../engine/source/output/sortie_main.F
+!||--- called by ------------------------------------------------------
+!||    resol                            ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ani_pcont                        ../engine/source/output/anim/generate/ani_pcont.F
+!||    ani_pcont21                      ../engine/source/output/anim/generate/ani_pcont.F
+!||    anicon0                          ../engine/source/output/anim/generate/anicon0.F
+!||    anicon2                          ../engine/source/output/anim/generate/anicon2.F
+!||    cndmasi2                         ../engine/source/elements/solid/solide10/s10cndf.F
+!||    ecrit                            ../engine/source/output/ecrit.F
+!||    eng_qaprint_driver               ../engine/source/output/qaprint/eng_qaprint_driver.F
+!||    fcont2_max_output                ../engine/source/output/h3d/h3d_results/fcont2_max_output.F
+!||    fcont2_min_output                ../engine/source/output/h3d/h3d_results/fcont2_min_output.F
+!||    fcont_max_output                 ../engine/source/output/h3d/h3d_results/fcont_max_output.F
+!||    file_size                        ../common_source/tools/input_output/write_routines.c
+!||    finter                           ../engine/source/tools/curve/finter.F
+!||    fluxsw                           ../engine/source/fluid/fluxsw.F
+!||    fpcont2_max_output               ../engine/source/output/h3d/h3d_results/fpcont2_max_output.F90
+!||    fpcont2_min_output               ../engine/source/output/h3d/h3d_results/fpcont2_min_output.F90
+!||    genani                           ../engine/source/output/anim/generate/genani.F
+!||    gendynain                        ../engine/source/output/dynain/gendynain.F
+!||    genh3d                           ../engine/source/output/h3d/h3d_results/genh3d.F
+!||    genoutp                          ../engine/source/output/sty/genoutp.F
+!||    genstat                          ../engine/source/output/sta/genstat.F
+!||    hist2                            ../engine/source/output/th/hist2.F
+!||    noise                            ../engine/source/general_controls/computation/noise.F
+!||    s10mvnd                          ../engine/source/elements/solid/solide10/s10cndv.F
+!||    sensor_energy_total              ../engine/source/tools/sensor/sensor_energy_total.F
+!||    spmd_exch_adm                    ../engine/source/mpi/anim/spmd_exch_adm.F
+!||    spmd_exch_output_noda_pext       ../engine/source/mpi/output/spmd_exch_output_noda_pext.F
+!||    spmd_sd_skw_anim                 ../engine/source/mpi/output/spmd_sd_skw.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod             ../common_source/modules/ale/ale_connectivity_mod.F
+!||    cluster_mod                      ../engine/share/modules/cluster_mod.F
+!||    crackxfem_mod                    ../engine/share/modules/crackxfem_mod.F
+!||    drape_mod                        ../engine/share/modules/drape_mod.F
+!||    dt_mod                           ../engine/source/modules/dt_mod.F
+!||    ebcs_mod                         ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||    ecnd_mod                         ../engine/share/modules/ecdn_mod.F
+!||    elbufdef_mod                     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    fpcont2_max_output_mod           ../engine/source/output/h3d/h3d_results/fpcont2_max_output.F90
+!||    fpcont2_min_output_mod           ../engine/source/output/h3d/h3d_results/fpcont2_min_output.F90
+!||    fvbag_mod                        ../engine/share/modules/fvbag_mod.F
+!||    fvmbag_meshcontrol_mod           ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
+!||    glob_therm_mod                   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    groupdef_mod                     ../common_source/modules/groupdef_mod.F
+!||    h3d_mod                          ../engine/share/modules/h3d_mod.F
+!||    hist2_mod                        ../engine/source/output/th/hist2.F
+!||    inoutfile_mod                    ../common_source/modules/inoutfile_mod.F
+!||    intbufdef_mod                    ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    loads_mod                        ../common_source/modules/loads/loads_mod.F90
+!||    mat_elem_mod                     ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    message_mod                      ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod                    ../common_source/modules/ale/multi_fvm_mod.F90
+!||    nodal_arrays_mod                 ../common_source/modules/nodal_arrays.F90
+!||    outmax_mod                       ../common_source/modules/outmax_mod.F
+!||    output_mod                       ../common_source/modules/output/output_mod.F90
+!||    pblast_mod                       ../common_source/modules/loads/pblast_mod.F90
+!||    pinchtype_mod                    ../common_source/modules/pinchtype_mod.F
+!||    sensor_mod                       ../common_source/modules/sensor_mod.F90
+!||    spmd_exch_output_noda_pext_mod   ../engine/source/mpi/output/spmd_exch_output_noda_pext.F
+!||    stack_mod                        ../engine/share/modules/stack_mod.F
+!||    state_mod                        ../common_source/modules/state_mod.F
+!||    table_mod                        ../engine/share/modules/table_mod.F
+!||    th_mod                           ../engine/share/modules/th_mod.F
+!||    th_surf_mod                      ../common_source/modules/interfaces/th_surf_mod.F
+!||    timer_mod                        ../engine/source/system/timer_mod.F90
+!||    user_windows_mod                 ../common_source/modules/user_windows_mod.F
+!||====================================================================
       SUBROUTINE SORTIE_MAIN(TIMERS,
      1            PM        ,D           ,V          ,ALE_CONNECT,W        ,
      2            ELBUF     ,IPARG       ,IXS        ,IXQ       ,IXC      ,         
      3            IXT       ,IXP         ,IXR        ,IXTG      ,WA       ,         
      4            ITAB      ,X           ,GEO        ,MS        ,A        ,         
-     5            CONT      ,PARTSAV                 ,ICUT      ,XCUT     ,         
-     6            FINT      ,FEXT        ,FOPT       ,ANIN      ,LPBY     ,         
+     5            PARTSAV                 ,ICUT      ,XCUT     ,         
+     6            LPBY     ,         
      7            NPBY      ,NSTRF       ,RWBUF      ,NPRW      ,EBCS_TAB ,
      8            TANI      ,INOISE      ,BUFNOIS    ,RBY       ,NEFLSW   ,         
-     9            NNFLSW    ,CRFLSW      ,FLSW       ,LOUT      ,                
+     9            NNFLSW    ,CRFLSW      ,FLSW       ,LOUT      ,NODES    ,
      B            FSAV      ,SKEW        ,ELBUF_TAB  ,CLUSTER   ,                   
      C            VR        ,IN          ,WEIGHT     ,FCLUSTER  ,MCLUSTER ,         
      D            DD_IAD    ,DMAS        ,ACCELM     ,GAUGE,             
@@ -109,15 +115,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      U            FR_RBY2   ,IAD_RBY2    ,FR_WALL    ,FR_SEC    ,FXBIPM   ,FXBRPM,  
      V            NDIN      ,FXBDEP      ,FXBVIT     ,FXBACC    ,IFLOW,             
      W            RFLOW     ,IPARTL      ,NPARTL     ,IACCP     ,NACCP,             
-     X            FASOLFR   ,FNCONT      ,FTCONT     ,IPARTH    ,         
+     X            FASOLFR   ,IPARTH    ,         
      Y            FR_MV     ,IPART_STATE ,SH4TREE    ,SH3TREE   ,TEMP,              
      Z            THKE      ,ERR_THK_SH4 ,ERR_THK_SH3,                             
      a            INOD_PXFEM,FTHREAC     ,NODREAC    ,GRESAV   ,         
-     b            DIAG_SMS  ,SH4TRIM     ,SH3TRIM    ,FNCONT2   ,XMOM_SMS ,         
+     b            DIAG_SMS  ,SH4TRIM     ,SH3TRIM    ,XMOM_SMS ,         
      c            IRBE2     ,IRBE3       ,LRBE2      ,LRBE3     ,FR_RBE2  ,         
      d            FR_RBE3M  ,IAD_RBE2    ,DXANCG     ,IEL_PXFEM ,ZI_PLY   ,         
      e            VGAZ      ,FCONTG      ,FNCONTG    ,FTCONTG   ,FANREAC  ,         
-     f            INOD_CRK  ,IEL_CRK     ,ELCUTC     ,IADC_CRK  ,PDAMA2   ,         
+     f            INOD_CRK  ,IEL_CRK     ,ELCUTC     ,IADC_CRK  ,         
      g            RES_SMS   ,SENSORS     ,                   
      h            QFRICINT  ,IGAUP       ,NGAUP      ,WEIGHT_MD ,NCONT    ,         
      i            INDEXCONT ,NODGLOBXFE  ,NODEDGE    ,XFEM_TAB  ,           
@@ -129,11 +135,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      o            SEGQUADFR ,H3D_DATA    ,ISKEW      ,PSKIDS    ,ISKWP    ,
      p            KNOTLOCPC ,KNOTLOCEL   ,PINCH_DATA ,TAG_SKINS6,IRUNN_BIS, 
      q            TF        ,NPC         ,DYNAIN_DATA,FCONT_MAX,MDS_MATID,
-     r            FNCONTP2  ,FTCONTP2    ,IBCL        ,ILOADP   ,LLOADP   ,
+     r            IBCL        ,ILOADP   ,LLOADP   ,
      s            LOADP     ,TAGNCONT    ,LOADP_HYD_INTER,FORC  ,DRAPEG,USER_WINDOWS,
      t            OUTPUT    ,DT          ,FSAVSURF    ,TABLE    ,
      u            LOADS     ,SFANI       ,IPARIT      ,X_C      ,
-     v            SZ_NPCONT2,NPCONT2     ,GLOB_THERM  ,PBLAST   ,WFEXT)
+     v            SZ_NPCONT2,NPCONT2     ,GLOB_THERM  ,PBLAST   ,WFEXT    ,
+     w            MASS0_START)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -150,19 +157,18 @@ C-----------------------------------------------
       USE FVMBAG_MESHCONTROL_MOD
       USE GROUPDEF_MOD
       USE MULTI_FVM_MOD
-      USE ALEANIM_MOD !FANI_CELL 
       USE PINCHTYPE_MOD
       USE INOUTFILE_MOD
       USE DRAPE_MOD
       USE SENSOR_MOD
       USE ALE_CONNECTIVITY_MOD
       USE OUTMAX_MOD
-      USE ANIM_MOD
-      USE OUTPUTS_MOD
       USE MESSAGE_MOD
       USE STATE_MOD
       USE USER_WINDOWS_MOD
       USE OUTPUT_MOD , ONLY : OUTPUT_
+      USE SPMD_EXCH_OUTPUT_NODA_PEXT_MOD
+      USE TH_MOD , ONLY : TH_HAS_NODA_PEXT
       USE DT_MOD
       USE TABLE_MOD
       USE LOADS_MOD
@@ -171,8 +177,10 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       use FPCONT2_MAX_OUTPUT_MOD
       use FPCONT2_MIN_OUTPUT_MOD
-      use glob_therm_mod
+      USE GLOB_THERM_MOD
       use PBLAST_MOD
+      USE HIST2_MOD , ONLY : HIST2
+      USE NODAL_ARRAYS_MOD , ONLY : NODAL_ARRAYS_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -209,6 +217,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(NODAL_ARRAYS_), INTENT(INOUT) :: NODES
       TYPE(TIMER_), INTENT(INOUT) :: TIMERS 
       TYPE(t_ebcs_tab), TARGET, INTENT(IN) :: EBCS_TAB
       LOGICAL LOUT
@@ -243,25 +252,26 @@ C-----------------------------------------------
      .          ACCELM(LLACCELM,*),BUFSF(*),RDATA(*),BUFMAT(*),BUFGEO(*),
      .          SPBUF(*),RIVET(*),XFRAME(NXFRAME,*),ZI_PLY(*),VGAZ(*)
       my_real PM(NPROPM,*),D(3,NUMNOD),V(*),W(*),ELBUF(*),WA(*),X(3,*),GEO(*),
-     .        MS(*), A(3,*), CONT(3,*),XCUT(*),FINT(*),EANI(*),
-     .        FEXT(3,*) ,FOPT(6,*),ANIN(*),RWBUF(*),TANI(*),
+     .        MS(*), A(3,*), XCUT(*),EANI(*),
+     .        RWBUF(*),TANI(*),
      .        AR(3,*),TF(*),FCONT_MAX(*)
+      my_real :: FXBRPM(*)
       my_real FSAVD(NTHVKI,*),
      .        DR(3,*),VOLMON(*),
-     .        FXBRPM(*),FXBDEP(*),FXBVIT(*),FXBACC(*), RFLOW(*),
-     .        FNCONT(3,*),FTCONT(3,*),TEMP(*),THKE(*),DXANCG(3,*),
+     .        FXBDEP(*),FXBVIT(*),FXBACC(*), RFLOW(*),
+     .        TEMP(*),THKE(*),DXANCG(3,*),
      .        ERR_THK_SH4(*),ERR_THK_SH3(*),FTHREAC(*),
-     .        GRESAV(*), DIAG_SMS(*), FNCONT2(3,*), XMOM_SMS(3,*),
-     .        FCONTG(*), FNCONTG(*), FTCONTG(*),FANREAC(*),PDAMA2(*),
+     .        GRESAV(*), DIAG_SMS(*), XMOM_SMS(3,*),
+     .        FCONTG(*), FNCONTG(*), FTCONTG(*),FANREAC(*),
      .        RES_SMS(*),QFRICINT(*), GAUGE(*),
      .        FCLUSTER(*),MCLUSTER(*),RTHBUF(*),WIGE(*),KNOT(*),VSPHIO(*),
-     .        STIFN(*),STIFR(*),MS_2D(*),PSKIDS(*),KNOTLOCPC(*),KNOTLOCEL(*),
-     .        FNCONTP2(3,*)  ,FTCONTP2(3,*)
+     .        STIFN(*),STIFR(*),MS_2D(*),PSKIDS(*),KNOTLOCPC(*),KNOTLOCEL(*)
       INTEGER FR_SEC(NSPMD+1,*),FR_RBY2(3,*),IAD_RBY2(4,*),FR_WALL(*),NODREAC(*),IAD_RBE2(4,*),INDEXCONT(*),NCONT,ITY
       INTEGER NPC(*),MDS_MATID(*)
       INTEGER LLOADP(*),ILOADP(SIZLOADP,*),IBCL(NIBCLD,*)
       INTEGER TAGNCONT(NLOADP_HYD_INTER,NUMNOD),LOADP_HYD_INTER(NLOADP_HYD)
       my_real :: LOADP(LFACCLD,*),FORC(*)
+      my_real, INTENT(IN) :: MASS0_START
 
       INTEGER, DIMENSION(*), INTENT(IN) :: ISKWP
       INTEGER, INTENT(IN) :: SZ_NPCONT2
@@ -296,6 +306,7 @@ C-----------------------------------------------
       type (PBLAST_) ,intent(in)            :: PBLAST
       INTEGER,INTENT(IN) ::  IPARIT
       DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
+      LOGICAL :: TRIGGER_ANIM, TRIGGER_TH, TRIGGER_H3D
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -312,7 +323,8 @@ C-----------------------------------------------
       INTEGER SIZE_MES,LONG,LONG_TMP,N
       INTEGER IFILNAM(2148),IFILNAM_TMP(2148)
 
-      my_real WFEXTH,ENINTOT,EKINTOT
+      my_real WFEXTH,ENINTOT,EKINTOT,DYDX,FINTER
+      EXTERNAL FINTER
       my_real TABFWR0(10),BID
       my_real,  DIMENSION(:),ALLOCATABLE :: VMCDN
       my_real,  DIMENSION(:),ALLOCATABLE :: CSEFRIC,CSEFRIC_STAMP,CSEFRICG,CSEFRICG_STAMP
@@ -371,7 +383,7 @@ c
       CALL SENSOR_ENERGY_TOTAL(SENSORS ,ENINTOT  ,EKINTOT)  
 c
 C---------------------------------------
-C       CALCUL DU FLUX ET DE LA ROTATION
+C       calculation of flux and rotation
 C---------------------------------------
         IF(TT>=OUTPUT%TH%THIS .AND. NSFLSW/=0)
      .  CALL FLUXSW(NSFLSW,NEFLSW,  NNFLSW,  CRFLSW,  FLSW  ,
@@ -379,23 +391,39 @@ C---------------------------------------
 C-----------------------------------------------
 C     CUMUL MASS SPMD
 C-----------------------------------------------
-      IF(IMACH==3.AND.NSPMD>1.AND.(ANIM_N(2)+OUTP_N(2)>0).AND.
-     .  ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.
+      IF(NSPMD>1.AND.(ANIM_N(2)+OUTP_N(2)>0).AND.
+     .  ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.
      .   MANIM==4 .OR.MANIM==5 .OR.MANIM==6 .OR.MANIM==7.OR.
      .   MANIM==8 .OR.MANIM==9 .OR.MANIM==10.OR.MANIM==11.OR.
      .   MANIM==12.OR.MANIM==13.OR.MANIM==14.OR.MANIM==15)) THEN
         LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-        CALL SPMD_EXCH_ADM(ANIN(NDMA+1),IAD_ELEM,FR_ELEM,LENR,WEIGHT_MD)
+        CALL SPMD_EXCH_ADM(OUTPUT%DATA%SCAL_DMAS,IAD_ELEM,FR_ELEM,LENR,WEIGHT_MD)
       ENDIF
-      IF(IMACH==3.AND.NSPMD>1.AND.
+      IF(NSPMD>1.AND.
      .  (ANIM_N(12)+OUTP_N(3)>0).AND.
-     .  ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.
+     .  ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.
      .   MANIM==4 .OR.MANIM==5 .OR.MANIM==6 .OR.MANIM==7.OR.
      .   MANIM==8 .OR.MANIM==9 .OR.MANIM==10.OR.MANIM==11.OR.
      .   MANIM==12.OR.MANIM==13.OR.MANIM==14.OR.MANIM==15)) THEN
         LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-        CALL SPMD_EXCH_ADM(ANIN(NDIN+1),IAD_ELEM,FR_ELEM,LENR,WEIGHT)
+        CALL SPMD_EXCH_ADM(OUTPUT%DATA%SCAL_DINER,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
       ENDIF
+C----------------------
+      ! /TH/NODE (PEXT) or /H3D/NODA/PEXT or /ANIM/NODA/PEXT
+      ! gathering OUTPUT%DATA%NODA_SURF and OUTPUT%DATA%NODA_PEXT on domain 0
+C----------------------
+        TRIGGER_TH = TT >= OUTPUT%TH%THIS
+        TRIGGER_H3D = (ILASTH3D==1.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP) .OR. H3D_DATA%MH3D ==1 .OR.
+     .                 (MSTOP == 1  .AND. ICTLSTOP == 0 .AND. H3D_DATA%IH3D/= 0) .OR.
+     .                 (MSTOP == 2  .AND. H3D_DATA%IH3D/= 0) .OR.
+     .                 (DT2<=ZERO .AND. H3D_DATA%IH3D/= 0) )
+        TRIGGER_ANIM = (TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.
+     .                  MANIM==4 .OR.MANIM==5 .OR.MANIM==6 .OR.MANIM==7.OR.
+     .                  MANIM==12.OR.MANIM==13.OR.MANIM==14.OR.MANIM==15 .OR.
+     .                  (MSTOP == 1 .AND. OUTPUT%TANIM < EP30 .AND. ICTLSTOP == 0) .OR.
+     .                  MSTOP == 2 .OR. DT2<=ZERO
+       CALL SPMD_EXCH_OUTPUT_NODA_PEXT(OUTPUT, NSPMD, NODES, NUMNOD, NUMNODG,
+     .                                 TRIGGER_TH, TRIGGER_ANIM, TRIGGER_H3D )
 C----------------------
 C       Compute contact pressures from normal + tangential contact forces.
 C       Tied Contact : Inter type2
@@ -404,19 +432,19 @@ C----------------------
 
       IF((H3D_DATA%N_SCAL_CSE_FRIC /=0).OR.(H3D_DATA%N_SCAL_CSE_FRICINT /=0)
      .    .AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D .OR.
+     .   (TT>=OUTPUT%TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D .OR.
      .  MANIM==4 .OR.MANIM==5 .OR.MANIM==6 .OR.MANIM==7.OR.
      .  MANIM==8 .OR.MANIM==9 .OR.MANIM==10.OR.MANIM==11.OR.
      .  MANIM==12.OR.MANIM==13.OR.MANIM==14.OR.MANIM==15.OR.
      .  H3D_DATA%MH3D/=0)) THEN
 
-           IF(NINEFRIC > 0) THEN
-             ALLOCATE(CSEFRIC(NINEFRIC*NUMNOD)) ! friction energy by surface unit
+           IF(OUTPUT%DATA%NINEFRIC > 0) THEN
+             ALLOCATE(CSEFRIC(OUTPUT%DATA%NINEFRIC*NUMNOD)) ! friction energy by surface unit
            ELSE
              ALLOCATE(CSEFRIC(0))
            ENDIF   
-           IF(NINEFRIC_STAMP > 0) THEN
-             ALLOCATE(CSEFRIC_STAMP(NINEFRIC_STAMP*NUMNODG)) ! friction energy by surface unit
+           IF(OUTPUT%DATA%NINEFRIC_STAMP > 0) THEN
+             ALLOCATE(CSEFRIC_STAMP(OUTPUT%DATA%NINEFRIC_STAMP*NUMNODG)) ! friction energy by surface unit
 
            ELSE
              ALLOCATE(CSEFRIC_STAMP(0)) 
@@ -445,7 +473,7 @@ C----------------------
      .   ANIM_V(27)+H3D_DATA%N_VECT_PCONT2 /=0..OR.
      .   H3D_DATA%N_SCAL_CSE_FRIC /=0.OR.H3D_DATA%N_SCAL_CSE_FRICINT /=0)
      .    .AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP) .OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP) .OR.
      .  MANIM==4 .OR.MANIM==5 .OR.MANIM==6 .OR.MANIM==7.OR.
      .  MANIM==8 .OR.MANIM==9 .OR.MANIM==10.OR.MANIM==11.OR.
      .  MANIM==12.OR.MANIM==13.OR.MANIM==14.OR.MANIM==15.OR.
@@ -453,15 +481,16 @@ C----------------------
      .   .OR.H3D_DATA%N_VECT_PCONT_MAX>0
      .   .OR.H3D_DATA%N_VECT_PCONT2_MAX>0)THEN
         IF(NINTSTAMP==0)THEN
-          CALL ANI_PCONT(IXS ,IXC    ,IXTG    ,FASOLFR  ,X      ,
-     .               FNCONT  ,FTCONT,IAD_ELEM ,FR_ELEM  ,WEIGHT ,
-     .               IXQ     ,SEGQUADFR,IXS10 ,FNCONTP2,FTCONTP2,
+          CALL ANI_PCONT(OUTPUT, IXS ,IXC    ,IXTG    ,FASOLFR  ,X      ,
+     .               OUTPUT%DATA%VECT_PCONT  ,OUTPUT%DATA%VECT_PCONT_2,IAD_ELEM ,FR_ELEM  ,WEIGHT ,
+     .               IXQ     ,SEGQUADFR,IXS10 ,OUTPUT%DATA%VECT_PCONT2,OUTPUT%DATA%VECT_PCONT2_2,
      .               H3D_DATA,CSEFRIC,CSEFRICG,SZ_NPCONT2,NPCONT2)
+
         ELSE
           IFLAG_ANIPCONT = 1
-          CALL ANI_PCONT21(IXS ,IXC    ,IXTG    ,FASOLFR  ,X      ,
-     .               FNCONT    ,FTCONT ,IAD_ELEM,FR_ELEM  ,WEIGHT ,
-     .               NODGLOB   ,FNCONTG,FTCONTG,FNCONTP2,FTCONTP2,
+          CALL ANI_PCONT21(OUTPUT, IXS ,IXC    ,IXTG    ,FASOLFR  ,X      ,
+     .               OUTPUT%DATA%VECT_PCONT    ,OUTPUT%DATA%VECT_PCONT_2 ,IAD_ELEM,FR_ELEM  ,WEIGHT ,
+     .               NODGLOB   ,FNCONTG,FTCONTG,OUTPUT%DATA%VECT_PCONT2,OUTPUT%DATA%VECT_PCONT2_2,
      .               H3D_DATA  ,CSEFRIC_STAMP,CSEFRICG_STAMP,SZ_NPCONT2,NPCONT2)
         END IF
       END IF
@@ -469,36 +498,32 @@ C------------------------------------------------------
 C       Compute maximum contact force and pressure
 C----------------------------------------------------
       IF(ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX /=0) THEN
-         CALL FCONT_MAX_OUTPUT(CONT,FCONTG,NODGLOB,FCONT_MAX,WEIGHT)
+         CALL FCONT_MAX_OUTPUT(OUTPUT%DATA%VECT_CONT,FCONTG,NODGLOB,FCONT_MAX,WEIGHT)
       ENDIF 
       IF(H3D_DATA%N_VECT_PCONT_MAX /=0) THEN
-         CALL FCONT_MAX_OUTPUT(FNCONT,FNCONTG,NODGLOB,FNCONT_MAX,WEIGHT)
-         CALL FCONT_MAX_OUTPUT(FTCONT,FTCONTG,NODGLOB,FTCONT_MAX,WEIGHT)
+         CALL FCONT_MAX_OUTPUT(OUTPUT%DATA%VECT_PCONT,FNCONTG,NODGLOB,FNCONT_MAX,WEIGHT)
+         CALL FCONT_MAX_OUTPUT(OUTPUT%DATA%VECT_PCONT_2,FTCONTG,NODGLOB,FTCONT_MAX,WEIGHT)
       ENDIF 
       IF(H3D_DATA%N_VECT_CONT2_MAX /=0) THEN
-         CALL FCONT2_MAX_OUTPUT(FNCONT2,FCONT2_MAX,WEIGHT)
+         CALL FCONT2_MAX_OUTPUT(OUTPUT%DATA%VECT_CONT2,FCONT2_MAX,WEIGHT)
       ENDIF 
       IF(H3D_DATA%N_VECT_CONT2_MIN /=0) THEN
-         CALL FCONT2_MIN_OUTPUT(FNCONT2,FCONT2_MIN,WEIGHT)
+         CALL FCONT2_MIN_OUTPUT(OUTPUT%DATA%VECT_CONT2,FCONT2_MIN,WEIGHT)
       ENDIF 
       IF(H3D_DATA%N_VECT_PCONT2_MAX /=0) THEN
-         CALL FPCONT2_MAX_OUTPUT(FNCONTP2,FNCONT2_MAX,SZ_NPCONT2,NPCONT2,WEIGHT,
+         CALL FPCONT2_MAX_OUTPUT(OUTPUT%DATA%VECT_PCONT2,FNCONT2_MAX,SZ_NPCONT2,NPCONT2,WEIGHT,
      .                           NPCONT2_MAX,NUMNOD)
-         CALL FPCONT2_MAX_OUTPUT(FTCONTP2,FTCONT2_MAX,SZ_NPCONT2,NPCONT2,WEIGHT,
+         CALL FPCONT2_MAX_OUTPUT(OUTPUT%DATA%VECT_PCONT2_2,FTCONT2_MAX,SZ_NPCONT2,NPCONT2,WEIGHT,
      .                           NPCONT2_MAX,NUMNOD)
       ENDIF
       IF(H3D_DATA%N_VECT_PCONT2_MIN /=0) THEN
-         CALL FPCONT2_MIN_OUTPUT(FNCONTP2,FNCONT2_MIN,SZ_NPCONT2,NPCONT2,WEIGHT,
+         CALL FPCONT2_MIN_OUTPUT(OUTPUT%DATA%VECT_PCONT2,FNCONT2_MIN,SZ_NPCONT2,NPCONT2,WEIGHT,
      .                           NPCONT2_MIN,NUMNOD)
-         CALL FPCONT2_MIN_OUTPUT(FTCONTP2,FTCONT2_MIN,SZ_NPCONT2,NPCONT2,WEIGHT,
+         CALL FPCONT2_MIN_OUTPUT(OUTPUT%DATA%VECT_PCONT2_2,FTCONT2_MIN,SZ_NPCONT2,NPCONT2,WEIGHT,
      .                           NPCONT2_MIN,NUMNOD)
       ENDIF 
-  
-      IF ((TT>=TANIM .AND. TT<=TANIM_STOP).OR. ! NUMELCRK > NUMELCRK2 .or.   !  => ANIM par fissure avance
-     .   MANIM==4 .OR.MANIM==5 .OR.MANIM==6 .OR.MANIM==7.OR.
-     .   MANIM==12.OR.MANIM==13.OR.MANIM==14.OR.MANIM==15 .OR.
-     .   (MSTOP == 1 .AND. TANIM < EP30 .AND. ICTLSTOP == 0) .OR.   ! If MSTOP==1 + TANIM == EP30, no animation file should be written.
-     .   MSTOP == 2 .OR. DT2<=ZERO )THEN
+
+      IF ( TRIGGER_ANIM )THEN
        IANIM=IANIM+1
 C      N1 = 1
 C      N2 = N1 + NUMNOD
@@ -532,11 +557,7 @@ C
          SN4 = NPART + 1
          SN5 = NEL2D
          SN6 = NPART
-         IF (IMACH==3) THEN
-           SN7 = NELG + 1
-         ELSE
-           SN7 = NEL+1
-         ENDIF
+         SN7 = NELG + 1
          N1 = 1
          N2 = N1 + MAX(3*NUMNOD,6*NEL3D,3*NEL2D,9*NEL1D)
          N3 = N2 + NEL
@@ -545,8 +566,7 @@ C
          N6 = N5 + NEL2D
          N7 = N6 + NPART
          N8 = N7 + NEL + 1
-          IF  (     (IMACH/=3.AND.NUMELX>0)
-     .          .OR.(IMACH==3.AND.NUMELXG>0)) THEN
+          IF  ((NUMELX>0) .OR. (NUMELXG>0)) THEN
 
             SKUIX = 2*MAXNX
             SKXUSR = 3*MAXNX
@@ -589,11 +609,7 @@ C
 c a modifier
          SIG3DSOLID = 8*27*NUMELIG3D
 c
-         IF (IMACH==3) THEN
-          SN9 =  NPART
-         ELSE
-          SN9 = 1
-         ENDIF
+         SN9 =  NPART
 C
          K1=1+LIPART1*(NPART+NTHPART)+2*9*(NPART+NTHPART)
          K2=K1+NUMELS
@@ -614,9 +630,9 @@ c
      2         IXS        ,IXQ     ,IXC          ,IXT       ,IXP       ,
      3         IXR        ,IXTG     ,SN1          ,SN2       ,SN3       ,
      4         SN4        ,IPARG     ,PM          ,GEO       ,MS        ,
-     5         SN5        ,CONT     ,SN6          ,ICUT       ,SKEW      ,
-     6         XCUT       ,FINT     ,ITAB        ,SN7       ,FEXT      ,
-     7         FOPT       ,ANIN     ,LPBY        ,NPBY       ,NSTRF     ,
+     5         SN5        ,OUTPUT%DATA%VECT_CONT     ,SN6          ,ICUT       ,SKEW      ,
+     6         XCUT       ,OUTPUT%DATA%VECT_FINT     ,ITAB        ,SN7       ,OUTPUT%DATA%VECT_FEXT      ,
+     7         OUTPUT%DATA%FOPT       ,LPBY        ,NPBY       ,NSTRF     ,
      8         RWBUF      ,NPRW     ,TANI       ,ELBUF_TAB ,MAT_PARAM,
      A         DD_IAD     ,WEIGHT     ,EANI        ,IPART       ,CLUSTER   ,
      B         IPART(K1)  ,IPART(K2) ,IPART(K3)   ,IPART(K4)   ,IPART(K5) ,
@@ -631,27 +647,36 @@ c
      K         IPART(K10) ,SPBUF     ,IXS10       ,IXS20       ,IXS16     ,
      L         VR          ,MONVOL     ,VOLMON      ,IPM       ,IGEO,NODGLOB,
      M         IAD_ELEM   ,FR_ELEM   ,FR_SEC      ,FR_RBY2     ,IAD_RBY2  ,
-     N         FR_WALL    ,IFLOW     ,RFLOW       ,FNCONT       ,FTCONT    ,
+     N         FR_WALL    ,IFLOW     ,RFLOW       ,OUTPUT%DATA%VECT_PCONT       ,OUTPUT%DATA%VECT_PCONT_2    ,
      O         TEMP       ,THKE     ,ERR_THK_SH4 ,ERR_THK_SH3 ,DIAG_SMS,
-     P         IPARI      ,FNCONT2   ,DR          ,ALE_CONNECT       ,
+     P         IPARI      ,OUTPUT%DATA%VECT_CONT2   ,DR          ,ALE_CONNECT       ,
      Q         IRBE2      ,IRBE3     ,LRBE2       ,LRBE3       ,FR_RBE2   ,
      R         FR_RBE3M   ,IAD_RBE2  ,DXANCG      ,INOD_PXFEM  ,IEL_PXFEM,
      S         ZI_PLY     ,VGAZ     ,FCONTG      ,FNCONTG     ,FTCONTG  ,
      T         FANREAC    ,INOD_CRK  ,IEL_CRK     ,ELCUTC       ,IADC_CRK ,
-     U         PDAMA2     ,RES_SMS   ,WEIGHT_MD   ,NODGLOBXFE  ,NODEDGE  ,
+     U         OUTPUT%DATA%SCAL_DAMA2     ,RES_SMS   ,WEIGHT_MD   ,NODGLOBXFE  ,NODEDGE  ,
      V         FCLUSTER   ,MCLUSTER  ,XFEM_TAB    ,W       ,
      W         NV46       ,IPART(K11),KXIG3D      ,IXIG3D       ,SIG3DSOLID,
      X         KNOT       ,WIGE     ,NERCVOIS    ,NESDVOIS    ,LERCVOIS  ,
      Y         LESDVOIS   ,CRKEDGE   ,INDX_CRK    ,XEDGE4N     ,XEDGE3N   ,
      Z         STACK      ,SPH2SOL   ,STIFN       ,STIFR       ,IGRNOD    ,
      1         H3D_DATA   ,SUBSET    ,MULTI_FVM   ,KNOTLOCPC   ,KNOTLOCEL ,
-     2         FCONT_MAX  ,FNCONTP2  ,FTCONTP2    ,GLOB_THERM  )
+     2         FCONT_MAX  ,OUTPUT%DATA%VECT_PCONT2  ,OUTPUT%DATA%VECT_PCONT2_2    ,GLOB_THERM  ,
+     .         DRAPE_SH4N, DRAPE_SH3N, DRAPEG,OUTPUT    )
 c
        ENDIF
-      IF((TT>=TANIM .AND. TT<=TANIM_STOP))TANIM=TANIM+DTANIM
-      IF ((TSTOP<TANIM).AND.(TANIM<TSTOP+EM06*TSTOP)
-     .     .AND.(TSTOP+EM06*TSTOP<TANIM+DTANIM)) THEN
-         TANIM=TSTOP
+       IF(OUTPUT%DTANIM_FCT_ID > 0) THEN
+          ! missing python here
+          OUTPUT%DTANIM  =  FINTER(OUTPUT%DTANIM_FCT_ID,TT+DT2,NPC,TF,DYDX)   
+       ENDIF
+      IF((TT>=OUTPUT%TANIM .AND.TT<=OUTPUT%TANIM_STOP)) OUTPUT%TANIM=OUTPUT%TANIM+OUTPUT%DTANIM
+      IF ((TSTOP<OUTPUT%TANIM).AND.(OUTPUT%TANIM<TSTOP+EM06*TSTOP)
+     .     .AND.(TSTOP+EM06*TSTOP<OUTPUT%TANIM+OUTPUT%DTANIM)) THEN
+         OUTPUT%TANIM=TSTOP
+!     IF((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP))OUTPUT%TANIM=OUTPUT%TANIM+OUTPUT%DTANIM
+!     IF ((TSTOP<OUTPUT%TANIM).AND.(OUTPUT%TANIM<TSTOP+EM06*TSTOP)
+!    .     .AND.(TSTOP+EM06*TSTOP<OUTPUT%TANIM+OUTPUT%DTANIM)) THEN
+!        OUTPUT%TANIM=TSTOP
       END IF
 C-----------------------------------------------
 C     H3D FILE
@@ -678,11 +703,7 @@ C
          SN4 = NPART + 1
          SN5 = NEL2D
          SN6 = NPART
-         IF (IMACH==3) THEN
-           SN7 = NELG + 1
-         ELSE
-           SN7 = NEL+1
-         ENDIF
+         SN7 = NELG + 1
          N1 = 1
          N2 = N1 + MAX(3*NUMNOD,6*NEL3D,3*NEL2D,9*NEL1D)
          N3 = N2 + NEL
@@ -691,8 +712,7 @@ C
          N6 = N5 + NEL2D
          N7 = N6 + NPART
          N8 = N7 + NEL + 1
-          IF  (     (IMACH/=3.AND.NUMELX>0)
-     .          .OR.(IMACH==3.AND.NUMELXG>0)) THEN
+          IF  ( (NUMELX>0) .OR.(NUMELXG>0) ) THEN
 
             SKUIX = 2*MAXNX
             SKXUSR = 3*MAXNX
@@ -735,11 +755,7 @@ C
 c a modifier
          SIG3DSOLID = 8*27*NUMELIG3D
 c
-         IF (IMACH==3) THEN
-          SN9 =  NPART
-         ELSE
-          SN9 = 1
-         ENDIF
+         SN9 =  NPART
 C
          K1=1+LIPART1*(NPART+NTHPART)+2*9*(NPART+NTHPART)
          K2=K1+NUMELS
@@ -755,14 +771,14 @@ C
          K12=K11+NUMELIG3D
          L1=1+6*(NUMELC+NUMELTG)*IEPSDOT
 c
-         CALL GENH3D(TIMERS,
+         CALL GENH3D(OUTPUT, TIMERS,
      1             X          ,D         ,V           ,A           ,ELBUF     ,
      2             IXS        ,IXQ       ,IXC         ,IXT         ,IXP       ,
      3             IXR        ,IXTG      ,SN1         ,SN2         ,SN3       ,
      4             SN4        ,IPARG     ,PM          ,GEO         ,MS        ,
-     5             SN5        ,CONT      ,SN6         ,ICUT        ,SKEW      ,
-     6             XCUT       ,FINT      ,ITAB        ,SN7         ,FEXT      ,
-     7             FOPT       ,ANIN      ,LPBY        ,NPBY        ,NSTRF     ,
+     5             SN5        ,OUTPUT%DATA%VECT_CONT  ,SN6         ,ICUT  ,SKEW      ,
+     6             XCUT       ,OUTPUT%DATA%VECT_FINT   ,ITAB       ,SN7   ,OUTPUT%DATA%VECT_FEXT,
+     7             OUTPUT%DATA%FOPT       ,LPBY        ,NPBY       ,NSTRF    ,
      8             RWBUF      ,NPRW      ,TANI        ,ELBUF_TAB   ,MAT_PARAM,
      A             DD_IAD     ,WEIGHT    ,EANI        ,IPART       ,CLUSTER   ,
      B             IPART(K1)  ,IPART(K2) ,IPART(K3)   ,IPART(K4)   ,IPART(K5) ,
@@ -777,14 +793,14 @@ c
      K             IPART(K10) ,SPBUF     ,IXS10       ,IXS20       ,IXS16     ,
      L             VR         ,MONVOL    ,VOLMON      ,IPM         ,IGEO,NODGLOB,
      M             IAD_ELEM   ,FR_ELEM   ,FR_SEC      ,FR_RBY2     ,IAD_RBY2  ,
-     N             FR_WALL    ,IFLOW     ,RFLOW       ,FNCONT      ,FTCONT    ,
+     N             FR_WALL    ,IFLOW     ,RFLOW       ,OUTPUT%DATA%VECT_PCONT      ,OUTPUT%DATA%VECT_PCONT_2,
      O             TEMP       ,THKE      ,ERR_THK_SH4 ,ERR_THK_SH3 ,DIAG_SMS,
-     P             IPARI      ,FNCONT2   ,DR          ,ALE_CONNECT       ,
+     P             IPARI      ,OUTPUT%DATA%VECT_CONT2   ,DR          ,ALE_CONNECT       ,
      Q             IRBE2      ,IRBE3     ,LRBE2       ,LRBE3       ,FR_RBE2   ,
      R             FR_RBE3M   ,IAD_RBE2  ,DXANCG      ,INOD_PXFEM  ,IEL_PXFEM,
      S             ZI_PLY     ,VGAZ      ,FCONTG      ,FNCONTG     ,FTCONTG  ,
      T             FANREAC    ,INOD_CRK  ,IEL_CRK     ,ELCUTC      ,IADC_CRK ,
-     U             PDAMA2     ,RES_SMS   ,WEIGHT_MD   ,NODGLOBXFE  ,NODEDGE  ,
+     U             OUTPUT%DATA%SCAL_DAMA2     ,RES_SMS   ,WEIGHT_MD   ,NODGLOBXFE  ,NODEDGE  ,
      V             FCLUSTER   ,MCLUSTER  ,XFEM_TAB    ,W           ,
      W             NV46       ,IPART(K11),KXIG3D      ,IXIG3D      ,SIG3DSOLID,
      X             KNOT       ,WIGE      ,NERCVOIS    ,NESDVOIS    ,LERCVOIS  ,
@@ -792,7 +808,7 @@ c
      Z             STACK      ,SPH2SOL   ,STIFN       ,STIFR       ,IGRNOD    ,
      1             SH4TREE    ,SH3TREE   ,H3D_DATA    ,MULTI_FVM   ,SUBSET    ,
      2             PSKIDS     ,TAG_SKINS6,TF          ,NPC         ,FCONT_MAX ,
-     3             MDS_MATID  ,FNCONTP2  ,FTCONTP2    ,IBCL        ,ILOADP    ,
+     3             MDS_MATID  ,OUTPUT%DATA%VECT_PCONT2  ,OUTPUT%DATA%VECT_PCONT2_2    ,IBCL        ,ILOADP    ,
      4             LLOADP     ,LOADP     ,SENSORS     ,TAGNCONT    ,LOADP_HYD_INTER,
      5             XFRAME     ,FORC      ,AR          ,CSEFRIC     ,CSEFRICG  ,
      6             CSEFRIC_STAMP,CSEFRICG_STAMP,TABLE ,IFRAME      ,LOADS   ,
@@ -803,12 +819,16 @@ c
       IF(ALLOCATED(CSEFRIC_STAMP)) DEALLOCATE(CSEFRIC_STAMP)
       IF(ALLOCATED(CSEFRICG_STAMP)) DEALLOCATE(CSEFRICG_STAMP)
 
+      IF(H3D_DATA%DTH3D_FCT_ID > 0) THEN
+          H3D_DATA%DTH3D  =  FINTER(H3D_DATA%DTH3D_FCT_ID,TT+DT2,NPC,TF,DYDX)  
+       ENDIF
+
       IF(TT>=H3D_DATA%TH3D) H3D_DATA%TH3D = H3D_DATA%TH3D + H3D_DATA%DTH3D
       IF((TSTOP< H3D_DATA%TH3D).AND.(H3D_DATA%TH3D < TSTOP+EM06*TSTOP) .AND.(TSTOP+EM06*TSTOP< H3D_DATA%TH3D + H3D_DATA%DTH3D)) THEN
          H3D_DATA%TH3D = TSTOP
       END IF
 
-      IF (IMACH==3.AND.ISPMD==0) THEN
+      IF (ISPMD==0) THEN
           LENG = NUMNODG
       ELSE
           LENG = 0
@@ -822,11 +842,11 @@ C
        CALL GENOUTP(X     ,D        ,V      ,A      ,
      2             IXS   ,IXQ       ,IXC    ,IXT    ,IXP   ,
      3             IXR   ,IXTG      ,IPARG  ,PM     ,IGEO  ,
-     4             MS    ,CONT      ,ITAB   ,PARTSAV,FINT  ,
-     5             FEXT  ,TANI      ,EANI   ,ANIN   ,IPART ,
+     4             MS    ,OUTPUT%DATA%VECT_CONT      ,ITAB   ,PARTSAV,OUTPUT%DATA%VECT_FINT  ,
+     5             OUTPUT%DATA%VECT_FEXT  ,TANI      ,EANI   ,IPART ,
      6             VR    ,ELBUF_TAB ,DD_IAD ,WEIGHT,
      7             IPM   ,KXSP      ,SPBUF  ,NODGLOB,LENG  ,
-     8             FOPT  ,NOM_OPT   ,NPBY   ,FNCONT ,FTCONT ,
+     8             OUTPUT%DATA%FOPT  ,NOM_OPT   ,NPBY   ,OUTPUT%DATA%VECT_PCONT ,OUTPUT%DATA%VECT_PCONT_2 ,
      9             GEO   ,THKE      ,STACK  ,DRAPE_SH4N, DRAPE_SH3N,
      A             DRAPEG,OUTPUT)
        IF(TT>=TOUTP)TOUTP=TOUTP+DTOUTP
@@ -855,16 +875,7 @@ C .sta files
        K10=K9+NUMELX
        K11=K10+NUMSPH
 C
-       IF(IMACH/=3)THEN
-         LENGC = NUMELC
-         LENGTG= NUMELTG
-         LENGS = NUMELS
-         LENGR = NUMELR
-         LENGP = NUMELP
-         LENGT = NUMELT
-         LENGQ = NUMELQ
-         LENGSPH = NUMSPH
-       ELSEIF (ISPMD==0) THEN
+       IF (ISPMD==0) THEN
          LENGC = NUMELCG
          LENGTG= NUMELTGG
          LENGS = NUMELSG
@@ -922,10 +933,7 @@ C----------------------
        K10=K9+NUMELX
        K11=K10+NUMSPH
 C
-       IF(IMACH/=3)THEN
-         LENGC = NUMELC
-         LENGTG= NUMELTG
-       ELSEIF (ISPMD==0) THEN
+       IF (ISPMD==0) THEN
          LENGC = NUMELCG
          LENGTG= NUMELTGG
        ELSE
@@ -948,7 +956,7 @@ C
       END IF
 
 C----------------------
-C       FICHIERS G ET T
+C       g and t files
 C----------------------
         IF(NABFILE /= 0) THEN
           TABFWR0(1) = TABFWR(1)
@@ -963,16 +971,16 @@ C----------------------
           TABFWR0(10) = TABFWR(10)
         ENDIF
         IF(NINTER+NEXMAD/=0.AND.ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT > 0)THEN
-            IF(SFANI >0)CALL ANICON0(CONT,NUMNOD)
+            IF(OUTPUT%DATA%S_VECT_CONT > 0) CALL ANICON0(OUTPUT%DATA%VECT_CONT,NUMNOD)
             !law151 reaction forces can be output only with H3D (not ANIM files since vectors are at element centroids)
-            IF (MULTI_FVM%IS_USED .AND. H3D_DATA%N_VECT_CONT > 0)CALL ANICON0(FANI_CELL%F18,NUMELS+NUMELQ) !/H3D/ELEM/VECT/CONT
+            IF (MULTI_FVM%IS_USED .AND. H3D_DATA%N_VECT_CONT > 0)CALL ANICON0(OUTPUT%DATA%FANI_CELL%F18,NUMELS+NUMELQ) !/H3D/ELEM/VECT/CONT
         ENDIF
         IF(NINTSTAMP/=0.AND.ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0)THEN
             CALL ANICON2(FCONTG,NCONT,INDEXCONT)     
         ENDIF
         IF(NINTER/=0.AND.ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0)THEN
-            CALL ANICON0(FNCONT,NUMNOD)
-            CALL ANICON0(FTCONT,NUMNOD)
+            CALL ANICON0(OUTPUT%DATA%VECT_PCONT,NUMNOD)
+            CALL ANICON0(OUTPUT%DATA%VECT_PCONT_2,NUMNOD)
         ENDIF
         IF(NINTSTAMP/=0.AND.ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0)THEN
           IF(IFLAG_ANIPCONT > 0) THEN
@@ -985,13 +993,13 @@ C----------------------
         ENDIF
 
         IF(NINTER/=0.AND.ANIM_V(27)+H3D_DATA%N_VECT_PCONT2>0)THEN
-            CALL ANICON0(FNCONTP2,NUMNOD)
-            CALL ANICON0(FTCONTP2,NUMNOD)
+            CALL ANICON0(OUTPUT%DATA%VECT_PCONT2,NUMNOD)
+            CALL ANICON0(OUTPUT%DATA%VECT_PCONT2_2,NUMNOD)
             CALL ANICON0(NPCONT2,NUMNOD)
         ENDIF
 
         N1 = 1
-C second tableau temporaire de taille ngroup pour le spmd
+C second temporary array of size ngroup for spmd
         N2 = 1
 C
       IF (TH_VERS < 40)THEN
@@ -1018,7 +1026,7 @@ c in this case set flag to 1
         ENDIF
 
         IF (ILASTANIM/=1.AND.ILASTANIM/=2) THEN
-C         to avoid double points
+C         To have double points
           IF (NTHGRP01(1)/=0)THEN
             IUNIT = IUHI(1)
             IFIL = IUNIT
@@ -1040,15 +1048,15 @@ C         to avoid double points
      D                 IXRI   ,RIVET  ,IXP      ,
      E                 ISKWN ,IFRAME ,XFRAME ,IXC      ,IXQ ,
      F                 OUTPUT%TH%DTHIS1(1),OUTPUT%TH%THIS1(1), IFIL, NTHGRP1(1),IXTG ,
-     G                 IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                 FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                 IGEO   ,IPM   ,
+     H                 IPARTL,NPARTL, IACCP , NACCP ,
      I                 IPARTH ,2     ,1     ,
      J                 MONVOL,VOLMON,FR_MV  ,TEMP,INOD_PXFEM,
      K                 FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                 IGAUP  ,NGAUP ,AFORM(1),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFA,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
             IF (SIZE_MES==1 .AND.AFORM(1)==3 .AND.ISPMD==0 ) 
      *          CALL file_size(MULTITHFILESIZE(1))
@@ -1077,7 +1085,7 @@ C         to avoid double points
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(2),
      L                  2     ,GAUGE  ,IGAUP,NGAUP   ,RTHBUF ,THKE ,
      M                  STACK ,ISPHIO  ,VSPHIO,ITHFLAG,1,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%SITHBUFA)
+     N                  OUTPUT%TH%SITHBUFA,GLOB_THERM,OUTPUT)
             CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(2) .AND. ISPMD == 0) THEN
@@ -1135,15 +1143,15 @@ C
      D                 IXRI   ,RIVET  ,IXP ,
      E                 ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ ,
      F                 OUTPUT%TH%DTHIS1(2),OUTPUT%TH%THIS1(2), IFIL, NTHGRP1(2),IXTG ,
-     G                 IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                 FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                 IGEO   ,IPM   ,
+     H                 IPARTL,NPARTL, IACCP , NACCP ,
      I                 IPARTH(1,(NPART+NTHPART)+1),2,1,
      J                 MONVOL ,VOLMON,FR_MV  ,TEMP,INOD_PXFEM,
      K                 FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                 IGAUP  ,NGAUP, AFORM(2),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFB,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
             IF (SIZE_MES==1 .AND.AFORM(2)==3 .AND.ISPMD==0 )
      *        CALL file_size(MULTITHFILESIZE(2))
@@ -1170,7 +1178,7 @@ C
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(3),
      L                  3     ,GAUGE  ,IGAUP,NGAUP   ,RTHBUF ,THKE,
      M                  STACK ,ISPHIO  ,VSPHIO,ITHFLAG,2,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%SITHBUFB )
+     N                  OUTPUT%TH%SITHBUFB,GLOB_THERM,OUTPUT)
             CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(3) .AND. ISPMD == 0) THEN
@@ -1230,15 +1238,15 @@ C
      D                 IXRI   ,RIVET  , IXP ,
      E                 ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ ,
      F                 OUTPUT%TH%DTHIS1(3),OUTPUT%TH%THIS1(3), IFIL, NTHGRP1(3),IXTG ,
-     G                 IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                 FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                 IGEO   ,IPM   ,
+     H                 IPARTL,NPARTL, IACCP , NACCP ,
      I                 IPARTH(1,2*(NPART+NTHPART)+1),2,1,
      J                 MONVOL ,VOLMON,FR_MV  ,TEMP,INOD_PXFEM,
      K                 FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                 IGAUP  ,NGAUP ,AFORM(3),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      n                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFC,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(3)==3   .AND.
@@ -1265,7 +1273,7 @@ C
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(4),
      L                  4      ,GAUGE  ,IGAUP,NGAUP  ,RTHBUF  ,THKE  ,
      M                  STACK  ,ISPHIO  ,VSPHIO,ITHFLAG,1,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%SITHBUFC)
+     N                  OUTPUT%TH%SITHBUFC,GLOB_THERM,OUTPUT)
               CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(4) .AND. ISPMD == 0) THEN
@@ -1321,15 +1329,15 @@ C
      D                 IXRI   ,RIVET  , IXP,
      E                 ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ ,
      F                 OUTPUT%TH%DTHIS1(4),OUTPUT%TH%THIS1(4), IFIL, NTHGRP1(4),IXTG ,
-     G                 IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                 FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                 IGEO   ,IPM   ,
+     H                 IPARTL,NPARTL, IACCP , NACCP ,
      I                 IPARTH(1,3*(NPART+NTHPART)+1),2,1,
      J                 MONVOL ,VOLMON,FR_MV ,TEMP,INOD_PXFEM,
      K                 FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                 IGAUP  ,NGAUP ,AFORM(4),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFD,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
          IF(SIZE_MES==1 .AND.
      *     AFORM(4)==3   .AND.
@@ -1358,7 +1366,7 @@ C
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(5),
      L                  5     ,GAUGE  ,IGAUP,NGAUP   ,RTHBUF   ,THKE ,
      M                  STACK ,ISPHIO  ,VSPHIO,ITHFLAG,1,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%SITHBUFD)
+     N                  OUTPUT%TH%SITHBUFD,GLOB_THERM,OUTPUT)
               CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(5) .AND. ISPMD == 0) THEN
@@ -1413,15 +1421,15 @@ C
      D                IXRI   ,RIVET  , IXP ,
      E                ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ ,
      F                OUTPUT%TH%DTHIS1(5),OUTPUT%TH%THIS1(5), IFIL, NTHGRP1(5),IXTG ,
-     G                IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                IGEO   ,IPM   ,
+     H                IPARTL,NPARTL, IACCP , NACCP ,
      I                IPARTH(1,4*(NPART+NTHPART)+1),2,1,
      J                MONVOL ,VOLMON,FR_MV ,TEMP,INOD_PXFEM,
      K                FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                IGAUP  ,NGAUP ,AFORM(5),SIZE_MES,
      M                RTHBUF  ,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFE,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(5)==3   .AND.
@@ -1449,7 +1457,7 @@ C
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(6),
      L                  6     ,GAUGE  ,IGAUP,NGAUP   ,RTHBUF,THKE ,
      M                  STACK ,ISPHIO  ,VSPHIO,ITHFLAG,1,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%SITHBUFE)
+     N                  OUTPUT%TH%SITHBUFE,GLOB_THERM,OUTPUT)
               CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(6) .AND. ISPMD == 0) THEN
@@ -1504,15 +1512,15 @@ C
      D                IXRI   ,RIVET  , IXP ,
      E                ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ ,
      F                OUTPUT%TH%DTHIS1(6),OUTPUT%TH%THIS1(6), IFIL, NTHGRP1(6),IXTG ,
-     G                IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                IGEO   ,IPM   ,
+     H                IPARTL,NPARTL, IACCP , NACCP ,
      I                IPARTH(1,5*(NPART+NTHPART)+1),2,1,
      J                MONVOL,VOLMON,FR_MV  ,TEMP,INOD_PXFEM,
      K                FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                IGAUP,NGAUP ,AFORM(6),SIZE_MES,
      M                RTHBUF,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFF,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(6)==3   .AND.
@@ -1540,7 +1548,7 @@ C
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(7),
      L                  7     ,GAUGE  ,IGAUP,NGAUP   ,RTHBUF,THKE ,
      M                  STACK ,ISPHIO  ,VSPHIO,ITHFLAG,1,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%SITHBUFF)
+     N                  OUTPUT%TH%SITHBUFF,GLOB_THERM,OUTPUT)
               CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(7) .AND. ISPMD == 0) THEN
@@ -1596,15 +1604,15 @@ C
      D                IXRI   ,RIVET  ,IXP ,
      E                ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ ,
      F                OUTPUT%TH%DTHIS1(7),OUTPUT%TH%THIS1(7), IFIL, NTHGRP1(7),IXTG ,
-     G                IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                IGEO   ,IPM   ,
+     H                IPARTL,NPARTL, IACCP , NACCP ,
      I                IPARTH(1,6*(NPART+NTHPART)+1),2,1,
      J                MONVOL ,VOLMON,FR_MV  ,TEMP,INOD_PXFEM,
      K                FTHREAC,NODREAC,GRESAV ,GAUGE  ,
      L                IGAUP,NGAUP ,AFORM(7),SIZE_MES,
      M                RTHBUF,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFG,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(7)==3   .AND.
@@ -1632,7 +1640,7 @@ C
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(8),
      L                  8      ,GAUGE  ,IGAUP,NGAUP  ,RTHBUF  ,THKE  ,
      M                  STACK  ,ISPHIO  ,VSPHIO,ITHFLAG,1,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%SITHBUFG)
+     N                  OUTPUT%TH%SITHBUFG,GLOB_THERM,OUTPUT)
               CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(8) .AND. ISPMD == 0) THEN
@@ -1688,19 +1696,17 @@ C
      D                IXRI   ,RIVET  , IXP ,
      E                ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ ,
      F                OUTPUT%TH%DTHIS1(8),OUTPUT%TH%THIS1(8), IFIL, NTHGRP1(8),IXTG ,
-     G                IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                IGEO   ,IPM   ,
+     H                IPARTL,NPARTL, IACCP , NACCP ,
      I                IPARTH(1,7*(NPART+NTHPART)+1),2,1,
      J                MONVOL ,VOLMON,FR_MV  ,TEMP,INOD_PXFEM,
      K                FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                IGAUP  ,NGAUP ,AFORM(8),SIZE_MES,
      M                RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
-     N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%ITHBUFH,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFH,
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
-        IF(SIZE_MES==1 .AND.
-     *     AFORM(8)==3   .AND.
-     *     ISPMD==0 ) CALL file_size(MULTITHFILESIZE(8))
+        IF(SIZE_MES==1 .AND. AFORM(8)==3 .AND.ISPMD==0 ) CALL file_size(MULTITHFILESIZE(8))
 
        IF(ABFILE(9) /= 0) THEN
 #ifdef DNC
@@ -1724,7 +1730,7 @@ C
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(9),
      L                  9     ,GAUGE  ,IGAUP,NGAUP   ,RTHBUF,THKE ,
      M                  STACK ,ISPHIO  ,VSPHIO,ITHFLAG,1,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%ITHBUFH)
+     N                  OUTPUT%TH%ITHBUFH,GLOB_THERM,OUTPUT)
               CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(9) .AND. ISPMD == 0) THEN
@@ -1744,9 +1750,7 @@ C
               DO I=1,LEN_TMP_NAME!ROOTLEN+LONG_TMP
                 IFILNAM_TMP(I)=ICHAR(TMP_NAME(I:I))!(FILNAMABF_TMP(I:I))
               ENDDO
-               CALL ABFFILE_UPDATE(ABINP,ABOUT,NABFWR(9),IFILNAM,
-     .                      LEN_TMP_NAME2,IFILNAM_TMP,LEN_TMP_NAME,
-     .                      CPTFILE)
+               CALL ABFFILE_UPDATE(ABINP,ABOUT,NABFWR(9),IFILNAM,LEN_TMP_NAME2,IFILNAM_TMP,LEN_TMP_NAME, CPTFILE)
                NABFWR(9) = 0
              ENDIF
 #endif
@@ -1779,19 +1783,17 @@ C
      D                IXRI   ,RIVET  ,IXP ,
      E                ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ ,
      F                OUTPUT%TH%DTHIS1(9),OUTPUT%TH%THIS1(9), IFIL, NTHGRP1(9),IXTG   ,
-     G                IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                IGEO   ,IPM   ,
+     H                IPARTL,NPARTL, IACCP , NACCP ,
      I                IPARTH(1,8*(NPART+NTHPART)+1),2,1,
      J                MONVOL ,VOLMON,FR_MV  ,TEMP,INOD_PXFEM,
      K                FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                IGAUP,NGAUP ,AFORM(9),SIZE_MES,
      M                RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
-     N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%ITHBUFI,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFI,
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
-        IF(SIZE_MES==1 .AND.
-     *     AFORM(9)==3   .AND.
-     *     ISPMD==0 ) CALL file_size(MULTITHFILESIZE(9))
+        IF(SIZE_MES==1 .AND. AFORM(9)==3 .AND. ISPMD==0 ) CALL file_size(MULTITHFILESIZE(9))
             IF(ABFILE(10) /= 0) THEN
 #ifdef DNC
             IFILABF = 20
@@ -1814,7 +1816,7 @@ C
      K                  FTHREAC,NODREAC,GRESAV  ,TABFWR(10),
      L                  10    ,GAUGE  ,IGAUP,NGAUP   ,RTHBUF,THKE ,
      M                  STACK ,ISPHIO  ,VSPHIO,ITHFLAG,9,PINCH_DATA,MULTI_FVM,W,
-     N                  OUTPUT%TH%ITHBUFI)
+     N                  OUTPUT%TH%ITHBUFI,GLOB_THERM,OUTPUT)
               CPTFILE=CPTFILE+1
 
             IF(TT>=TABFWR0(10) .AND. ISPMD == 0) THEN
@@ -1868,19 +1870,17 @@ C
      D                IXRI   ,RIVET  , IXP ,
      E                ISKWN ,IFRAME ,XFRAME,IXC    ,IXQ,
      F                OUTPUT%TH%DTHIS ,OUTPUT%TH%THIS,IFIL  , NTHGRP,IXTG   ,
-     G                IGEO   ,IPM   ,FXBIPM, FXBDEP, FXBVIT,
-     H                FXBACC ,IPARTL,NPARTL, IACCP , NACCP ,
+     G                IGEO   ,IPM   ,
+     H                IPARTL,NPARTL, IACCP , NACCP ,
      I                IPART ,LIPART1    ,8      ,
      J                MONVOL ,VOLMON,FR_MV  ,TEMP,INOD_PXFEM,
      K                FTHREAC,NODREAC,GRESAV  ,GAUGE  ,
      L                IGAUP,NGAUP,ITFORM,SIZE_MES,
      M                RTHBUF ,THKE ,STACK,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUF,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT,MASS0_START)
 
-        IF(SIZE_MES==1 .AND.
-     *     ITFORM==3   .AND.
-     *     ISPMD==0 )CALL file_size(THFILESIZE)
+        IF(SIZE_MES==1 .AND. ITFORM==3 .AND. ISPMD==0 )CALL file_size(THFILESIZE)
 
         IF(ABFILE(1) /= 0) THEN
 #ifdef DNC
@@ -1904,7 +1904,7 @@ C
      K                FTHREAC,NODREAC,GRESAV  ,TABFWR(1),
      L                1     ,GAUGE  ,IGAUP,NGAUP   ,RTHBUF,THKE ,
      M                STACK ,ISPHIO  ,VSPHIO,ITHFLAG,10,PINCH_DATA,MULTI_FVM,W,
-     N                OUTPUT%TH%SITHBUF)
+     N                OUTPUT%TH%SITHBUF,GLOB_THERM,OUTPUT)
 
          IF((TT>=TABFWR0(1) .OR. TT+DT2>TSTOP).AND. ISPMD == 0)THEN
           FILNAMABF_TMP=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'.tmp'
@@ -1924,8 +1924,7 @@ C
             IFILNAM_TMP(I)=ICHAR(TMP_NAME(I:I))!(FILNAMABF_TMP(I:I))
           ENDDO
 
-         CALL ABFFILE_UPDATE(ABINP,ABOUT,NABFWR(1),IFILNAM,LEN_TMP_NAME2,
-     .                      IFILNAM_TMP,LEN_TMP_NAME,0)
+         CALL ABFFILE_UPDATE(ABINP,ABOUT,NABFWR(1),IFILNAM,LEN_TMP_NAME2,IFILNAM_TMP,LEN_TMP_NAME,0)
 
            NABFWR(1) = 0
          ENDIF
@@ -1944,8 +1943,8 @@ C----------------------------------------------
 C-------------------------------------------------------
 C     TRAITEMENT SUR FSAV NON CUMULE
 C-------------------------------------------------------
-      IF(ISPMD==0.AND.THUPDT==1) THEN
-C en SPMD il faut remettre FSAV a 0 sur P0, la ou FSAV n est pas cumule
+      IF(ISPMD == 0 .AND. THUPDT == 1) THEN
+C in spmd, fsav must be reset to 0 on p0, where fsav is not accumulated
         IF(NVOLU>0)THEN
          IAD = NINTER+NRWALL+NRBODY+NSECT+NJOINT
           DO I=1,NVOLU
@@ -1957,7 +1956,7 @@ C en SPMD il faut remettre FSAV a 0 sur P0, la ou FSAV n est pas cumule
       ENDIF
 
 C  FSAV(26) : contact elastic energy is not cumulated : only for int10 and int18 for the moment
-      IF(NINTER>0)THEN
+      IF(NINTER > 0)THEN
           DO I=1,NINTER
             ITY = IPARI(7,I)
             IF(ITY /= 10.AND.(ITY /= 7.OR.IPARI(22,I) /= 7)) THEN 
@@ -1979,16 +1978,16 @@ C /TH/SURF quantities reset to 0 expect for massflow (airbags)
         FSAVSURF(2,1:NSURF) = ZERO  !massflow
         FSAVSURF(3,1:NSURF) = ZERO  !velocity
         FSAVSURF(4,1:NSURF) = ZERO  !pressure
-        FSAVSURF(5,1:NSURF) = ZERO  !A (load,pload)
+        FSAVSURF(5,1:NSURF) = ZERO  !area where pressure is applied
         !FSAVSURF(6,1:NSURF)        !cumulated mass
       ENDIF 
       
       ! -----------------------
       ! need to re-initialize PARTSAV array after any th/abf file writing
-      IF(ISPMD==0) THEN
+      IF(ISPMD == 0) THEN
         ! ---------
         ! check if an abf file was written
-        IF(NABFILE/=0) THEN
+        IF(NABFILE /= 0) THEN
             DO I=1,10
                 IF(TT>TABFWR0(I)) NEED_TO_REINIT_FSAV = .TRUE.
             ENDDO
@@ -2010,7 +2009,14 @@ C /TH/SURF quantities reset to 0 expect for massflow (airbags)
       ENDIF
       ! -----------------------
 
-      IF (ISPMD==0.AND.IFLAG==1) WFEXT  = WFEXT- WFEXTH
+      IF (ISPMD == 0 .AND. IFLAG == 1) WFEXT  = WFEXT- WFEXTH
+
+      ! /TH/NODE (PEXT) or /H3D/NODA/PEXT or /ANIM/NODA/PEXT
+      ! reset for next cycle
+      IF(TH_HAS_NODA_PEXT > 0 .OR. OUTPUT%DATA%ANIM_HAS_NODA_PEXT > 0 .OR. OUTPUT%DATA%H3D_HAS_NODA_PEXT > 0)THEN
+        OUTPUT%DATA%NODA_SURF(1:NUMNOD) = ZERO
+        OUTPUT%DATA%NODA_PEXT(1:NUMNOD) = ZERO
+      ENDIF
 C-----------
       RETURN
       END

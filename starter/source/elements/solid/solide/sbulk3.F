@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sbulk3     ../starter/source/elements/solid/solide/sbulk3.F
-      !||--- called by ------------------------------------------------------
-      !||    inivoid    ../starter/source/elements/initia/inivoid.F
-      !||    s10init3   ../starter/source/elements/solid/solide10/s10init3.F
-      !||    s16init3   ../starter/source/elements/thickshell/solide16/s16init3.F
-      !||    s20init3   ../starter/source/elements/solid/solide20/s20init3.F
-      !||    s4init3    ../starter/source/elements/solid/solide4/s4init3.F
-      !||    s6cinit3   ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||    s8cinit3   ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||    s8zinit3   ../starter/source/elements/solid/solide8z/s8zinit3.F
-      !||    scinit3    ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sinit3     ../starter/source/elements/solid/solide/sinit3.F
-      !||    suinit3    ../starter/source/elements/elbuf_init/suinit3.F
-      !||====================================================================
+!||====================================================================
+!||    sbulk3     ../starter/source/elements/solid/solide/sbulk3.F
+!||--- called by ------------------------------------------------------
+!||    inivoid    ../starter/source/elements/initia/inivoid.F
+!||    s10init3   ../starter/source/elements/solid/solide10/s10init3.F
+!||    s16init3   ../starter/source/elements/thickshell/solide16/s16init3.F
+!||    s20init3   ../starter/source/elements/solid/solide20/s20init3.F
+!||    s4init3    ../starter/source/elements/solid/solide4/s4init3.F
+!||    s6cinit3   ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||    s6zinit3   ../starter/source/elements/solid/solide6z/s6zinit3.F90
+!||    s8cinit3   ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||    s8zinit3   ../starter/source/elements/solid/solide8z/s8zinit3.F
+!||    scinit3    ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sinit3     ../starter/source/elements/solid/solide/sinit3.F
+!||    suinit3    ../starter/source/elements/elbuf_init/suinit3.F
+!||====================================================================
       SUBROUTINE SBULK3(
      1          VOLU    ,NC      ,NNC     ,MAT     ,PM      ,
      2          VOLNOD  ,BVOLNOD ,VNS     ,BNS     ,VNSX    ,
@@ -65,7 +66,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IP, N1, N2, N11, N22, N,
+      INTEGER I, N1, N2, N11, N22, N,
      .        IPERM101(10),IPERM102(10),IPERM103(10),
      .        IPERM161(16),IPERM162(16),
      .        IPERM201(20),IPERM202(20)
@@ -150,7 +151,7 @@ C
 C     10 nodes tetrahedra :
 100   CONTINUE
       DO I=LFT,LLT
-       FAC=TRHEE_OVER_14
+       FAC=THREE_OVER_14
        AV1 = VOLU(I)*FAC/(FOUR*FAC+SIX)
        AV2 = VOLU(I)*ONE /(FOUR*FAC+SIX)
        VNS(1,I)=AV1
@@ -223,7 +224,7 @@ C
 C     20 nodes bricks :
 200   CONTINUE
       DO I=LFT,LLT
-       FAC=TRHEE_OVER_14
+       FAC=THREE_OVER_14
        AV1 = VOLU(I)*FAC/(EIGHT*FAC+TWELVE)
        AV2 = VOLU(I)*ONE /(EIGHT*FAC+TWELVE)
        VNS(1,I)=AV1

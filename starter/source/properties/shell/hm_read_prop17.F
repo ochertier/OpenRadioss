@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop17                ../starter/source/properties/shell/hm_read_prop17.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties            ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                        ../starter/source/output/message/message.F
-      !||    fretitl2                      ../starter/source/starter/freform.F
-      !||    hm_get_float_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_float_array_2indexes.F
-      !||    hm_get_float_array_index      ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv                 ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_2indexes     ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index        ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted        ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    subrotvect                    ../starter/source/model/submodel/subrot.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod                  ../starter/source/modules/defaults_mod.F90
-      !||    elbuftag_mod                  ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||    stack_mod                     ../starter/share/modules1/stack_mod.F
-      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop17                ../starter/source/properties/shell/hm_read_prop17.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties            ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                        ../starter/source/output/message/message.F
+!||    fretitl2                      ../starter/source/starter/freform.F
+!||    hm_get_float_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_float_array_2indexes.F
+!||    hm_get_float_array_index      ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv                 ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_2indexes     ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index        ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted        ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    subrotvect                    ../starter/source/model/submodel/subrot.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod                  ../starter/source/modules/defaults_mod.F90
+!||    elbuftag_mod                  ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    stack_mod                     ../starter/share/modules1/stack_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP17(GEO       ,IGEO     ,PM       ,IPM      ,ISKN     ,
      .                   UNITAB    ,RTRANS   ,LSUBMODEL,SUB_ID   ,IDTITL   ,
      .                   PROP_ID   ,PROP_TAG , STACK_INFO,DEFAULTS_SHELL)
@@ -309,7 +309,7 @@ C---
          IF(ASHEAR == ZERO) ASHEAR=FIVE_OVER_6
 C
          IF (IHBE>11.AND.IHBE<29) THEN
-C---------GEO(13,I) est utilise pour porte dn;GEO(17,I),CVIS se change ----
+C---------- geo (13, i) is used for DN Porte; Geo (17, I), Cvis changes -----
            HM = DN
            DN = CVIS
 C          IGEO(20,I)=ISROT
@@ -493,7 +493,7 @@ C-----------------------------------------------------------------
      .               GEO(16),GEO(13),GEO(38),PTHK,FAIL_SHELL,ISHEAR,ITHK,
      .               IPLAST,IREP,GEO(7),GEO(8),GEO(9),IGEO(14)
          ELSE
-          WRITE(IOUT,2110)PROP_ID,ISTRAIN,GEO(1),ISS,IHBE, ! nly de moins
+          WRITE(IOUT,2110)PROP_ID,ISTRAIN,GEO(1),ISS,IHBE, ! nly of less
      .               ISH3N,
      .               GEO(13),GEO(14),GEO(15),GEO(16),
      .               GEO(38),PTHK,FAIL_SHELL,ISHEAR,ITHK,IPLAST,IREP,
@@ -746,7 +746,7 @@ C----
      & 5X,'SKEW OF THE FIRST ORTHOTROPY DIRECTION.=',I10/,
      & 5X,'REFERENCE DIRECTION FLAG IN SHELL PLANE=',I10/)
  2114 FORMAT(
-     & 5X,'PLY XFEM SHELL COMPOSITE FORMULATION IS ACTIVED '/)
+     & 5X,'PLY XFEM SHELL COMPOSITE FORMULATION IS ACTIVATED '/)
  2121 FORMAT(
      & 5X,'    PLY ',I3/,
      & 5X,'      PLY PID NUMBER  . . . . . . . . .=',I10/

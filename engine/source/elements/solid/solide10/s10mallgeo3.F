@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10mallgeo3   ../engine/source/elements/solid/solide10/s10mallgeo3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3      ../engine/source/elements/solid/solide10/s10forc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    dt_mod        ../engine/source/modules/dt_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s10mallgeo3   ../engine/source/elements/solid/solide10/s10mallgeo3.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3      ../engine/source/elements/solid/solide10/s10forc3.F
+!||--- uses       -----------------------------------------------------
+!||    dt_mod        ../engine/source/modules/dt_mod.F
+!||====================================================================
       SUBROUTINE S10MALLGEO3(
      1   NGL,     OFFG,    VOLG,    DELTAX,
      2   VOLG0,   RX,      RY,      RZ,
@@ -64,7 +64,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ITET,IDELM,ICST
+      INTEGER I,IDELM,ICST
       my_real
      .   A1,A2,A3,A4,
      .   A1X,A2X,A3X,A4X,A1Y,A2Y,A3Y,A4Y,A1Z,A2Z,A3Z,A4Z,

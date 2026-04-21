@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat90                  ../starter/source/materials/mat/mat090/hm_read_mat90.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat                    ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                         ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
-      !||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted         ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword               ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod                   ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod                    ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
-      !||    table_mod                      ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat90                  ../starter/source/materials/mat/mat090/hm_read_mat90.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat                    ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                         ../starter/source/output/message/message.F
+!||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
+!||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted         ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword               ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod                   ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod                    ../starter/share/message_module/message_mod.F
+!||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
+!||    table_mod                      ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT90(UPARAM  ,MAXUPARAM,NUPARAM ,NUVAR    ,IFUNC    ,
      .                         MAXFUNC ,NFUNC    ,PARMAT  ,UNITAB   ,ID       ,
      .                         TITR    ,ISRATE   ,PM      ,IMATVIS  ,LSUBMODEL,
@@ -93,10 +93,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IFLAG,IDAM ,ISMOOTH ,TFLAG   
+      INTEGER I,J,IFLAG,IDAM ,ISMOOTH ,TFLAG,FAIL 
       my_real E0,NU,FCUT,G,C1,SHAPE,HYS,ALPHA
       my_real RATE(1000),YFAC(1000),YFAC_DIM(1000)
-      my_real :: RHO0, RHOR,FCUT_UNIT
+      my_real :: RHO0, RHOR,ECONT,TCUT
       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
@@ -120,6 +120,9 @@ C-----------------------------------------------
       CALL HM_GET_FLOATV('Hys'       ,HYS     ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_ALPHA' ,ALPHA   ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_INTV  ('MAT_TFLAG' ,TFLAG   ,IS_AVAILABLE, LSUBMODEL)
+      CALL HM_GET_INTV  ('LSD_MAT83_FAIL'  ,FAIL   ,IS_AVAILABLE, LSUBMODEL)
+      CALL HM_GET_FLOATV('LSD_MAT83_ED' ,ECONT    ,IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_FLOATV('LSD_MAT83_TC' ,TCUT ,IS_AVAILABLE, LSUBMODEL, UNITAB)
 !   IDAM  ---> not documented, not included within LAW90.cfg
 !!      CALL HM_GET_INTV  ('IDAM'      ,IDAM    ,IS_AVAILABLE, LSUBMODEL)
 !
@@ -131,8 +134,10 @@ C-----------------------------------------------
      .                C1=TITR)
       ENDIF 
       IF(TFLAG == 0) TFLAG = 1
+      IF(ECONT == ZERO) ECONT = E0
+      IF(TCUT <=  ZERO) TCUT = EP20
 !
-!... fonction de charge      
+!... load function
 !
       DO I=1,NFUNC
         CALL HM_GET_INT_ARRAY_INDEX      ('fct_IDL'     ,IFUNC(I)    ,I ,IS_AVAILABLE, LSUBMODEL)
@@ -185,10 +190,16 @@ C-----------------------------------------------
       UPARAM(NUPARAM) = ALPHA
       NUPARAM = NUPARAM + 1
       UPARAM(NUPARAM) = TFLAG 
-!    
-      C1=E0/THREE/(ONE - TWO*NU)
+      NUPARAM = NUPARAM + 1
+      UPARAM(NUPARAM ) = FAIL
+      NUPARAM = NUPARAM + 1
+      UPARAM(NUPARAM ) = TCUT
+      NUPARAM = NUPARAM + 1
+      UPARAM(NUPARAM ) = ECONT
+!   
+      C1=ECONT /THREE/(ONE - TWO*NU)
       PARMAT(1) = C1
-      PARMAT(2) = E0
+      PARMAT(2) = ECONT
       PARMAT(3) = NU
       PARMAT(4) = ISMOOTH
       PARMAT(5) = FCUT
@@ -206,9 +217,9 @@ C
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
         WRITE(IOUT,1100)RHO0                                                     
-        WRITE(IOUT,1150)E0,NU, TFLAG
+        WRITE(IOUT,1150)E0,NU, TFLAG, ECONT, TCUT,FAIL
         WRITE(IOUT,1200)FCUT,ISMOOTH,SHAPE,HYS,ALPHA
-        WRITE(IOUT,1300)(IFUNC(J),RATE(J),YFAC(J),J=1,NFUNC)
+        WRITE(IOUT,1300)(IFUNC(J),RATE(J),YFAC(J),J=1,NFUNC )
       ENDIF
 c-----------------
       CALL INIT_MAT_KEYWORD(MATPARAM,"TOTAL")
@@ -235,9 +246,15 @@ c-----------------
  1150 FORMAT(
      & 5X,'INITIAL YOUNG''S MODULUS. . . . . . . .=',1PG20.13/,
      & 5X,'POISSON''S RATIO. . . . . . . . . . . .=',1PG20.13/,
-     & 5X,'TENSILE STRESS FLAG . . . . . . . . . .=',I10/,
+     & 5X,'TENSILE STRESS FLAG . . . . . . . . . =',I10/,
      & 10X, '1 : FOLLOW THE INPUT CURVE ' /,
-     & 10X, '2 : FOLLOW E0 '/ )
+     & 10X, '2 : FOLLOW E0 '/                            
+     & 5X,'OPTIONAL YOUNG MODULUS . . . . . . . . =',1PG20.13/,
+     & 5X,'TENSION CUT-OOF STRESS . . . . . . . . =',1PG20.13/,
+     & 5X,'FAILURE OPTION AFTER CUT-OFF STRESS IS REACHED =',I10/,
+     & 10X, '0 : TENSILE STRESS REMAINS AT CUT-OFF VALUE'/,
+     & 10X, '1 : THE ELEMENT IS DELETED '/)
+
  1200 FORMAT(
      & 5X,'STRAIN RATE COEFFICIENT . . . . . . . .=',1PG20.13/,
      & 5X,'FLAG FOR FILTERING STRAIN RATE  . . . .=',I10/,
@@ -248,7 +265,4 @@ c-----------------
      & 5X,'LOADING STRESS FUNCTION NUMBER  . . . .=',I10/,
      & 5X,'STRAIN RATE . . . . . . . . . . . . . .=',1PG20.13/,
      & 5X,'SCALE FACTOR. . . . . . . . . . . . . .=',1PG20.13/)
- 1500 FORMAT(
-     & 5X,'PRESSURE DEPENDENT YIELD FUNCTION . . .=',I10/
-     & 5X,'PRESSURE SCALE FACTOR . . . . . . . . .=',1PG20.13)
       END

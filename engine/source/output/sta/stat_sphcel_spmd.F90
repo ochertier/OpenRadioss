@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,36 +20,39 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_sphcel_spmd_mod   ../engine/source/output/sta/stat_sphcel_spmd.F90
-      !||--- called by ------------------------------------------------------
-      !||    genstat                ../engine/source/output/sta/genstat.F
-      !||====================================================================
+!||====================================================================
+!||    stat_sphcel_spmd_mod   ../engine/source/output/sta/stat_sphcel_spmd.F90
+!||--- called by ------------------------------------------------------
+!||    genstat                ../engine/source/output/sta/genstat.F
+!||====================================================================
       module stat_sphcel_spmd_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \sphcel element state file write for mpi
-      !||====================================================================
-      !||    stat_sphcel_spmd      ../engine/source/output/sta/stat_sphcel_spmd.F90
-      !||--- called by ------------------------------------------------------
-      !||    genstat               ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders             ../common_source/tools/sort/my_orders.c
-      !||    spmd_iget_partn_sta   ../engine/source/mpi/output/spmd_stat.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    stat_sphcel_spmd      ../engine/source/output/sta/stat_sphcel_spmd.F90
+!||--- called by ------------------------------------------------------
+!||    genstat               ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders             ../common_source/tools/sort/my_orders.c
+!||    spmd_iget_partn_sta   ../engine/source/mpi/output/spmd_stat.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    my_alloc_mod          ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
         subroutine stat_sphcel_spmd(numnod          ,numsph      ,numsphg      ,nisp          ,npart           ,  &
-                                    ngroup          ,nparg       ,lipart1      ,stat_numelsph ,stat_numelsph_g ,  &
-                                    lengsph         ,nspmd       ,itab         ,ipart         ,kxsp            ,  &
-                                    ipartsph        ,ipart_state ,nodtag       ,stat_indxsph  ,iparg           ,  &
-                                    elbuf_tab       ,idel        )
+          ngroup          ,nparg       ,lipart1      ,stat_numelsph ,stat_numelsph_g ,  &
+          lengsph         ,nspmd       ,itab         ,ipart         ,kxsp            ,  &
+          ipartsph        ,ipart_state ,nodtag       ,stat_indxsph  ,iparg           ,  &
+          elbuf_tab       ,idel        )
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use ELBUFDEF_MOD, only: elbuf_struct_
+          use my_alloc_mod
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -57,10 +60,8 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 #include "task_c.inc"
 #include "units_c.inc"
-#include "mvsiz_p.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -89,12 +90,19 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer :: i,l,k,m 
-          integer :: pos 
-          integer n,jj,iprt0,iprt,ii
-          integer ng,nel,nft,lft,llt,ity,ioff
-          integer np(4*numsph),work(70000),clef(2,numsphg),npglob(4*lengsph)
-          integer iadg(nspmd,npart)
+          integer :: i,k
+          integer :: n,jj,iprt0,iprt,ii
+          integer :: ng,nel,nft,lft,llt,ity,ioff
+          integer :: work(70000)
+          integer,dimension(:,:),allocatable :: iadg
+          integer,dimension(:,:),allocatable :: clef
+          integer,dimension(:),allocatable :: npglob
+          integer,dimension(:),allocatable :: np
+! ----------------------------------------------------------------------------------------------------------------------
+          call my_alloc(clef,2,numsphg)
+          call my_alloc(npglob,4*lengsph)
+          call my_alloc(iadg,nspmd,npart)
+          call my_alloc(np,4*numsph)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -105,7 +113,7 @@
               ity = iparg(5,ng)
               if (ity == 51) then
                 nel = iparg(2,ng)
-                nft = iparg(3,ng) 
+                nft = iparg(3,ng)
                 lft=1
                 llt=nel
                 do i=lft,llt
@@ -122,16 +130,16 @@
                     clef(1,ii)=iprt
                     clef(2,ii)=kxsp(nisp,n)
                     nodtag(kxsp(3,n))=1
-                  endif ! if (ipart_state(iprt) /= 0)
-                enddo ! do i=lft,llt
-              endif ! if (ity == 51)
-            enddo ! do ng=1,ngroup
-          endif ! if (numelsph /= 0)
+                  end if ! if (ipart_state(iprt) /= 0)
+                end do ! do i=lft,llt
+              end if ! if (ity == 51)
+            end do ! do ng=1,ngroup
+          end if ! if (numelsph /= 0)
 
           stat_numelsph_g=0
           call spmd_iget_partn_sta(4,stat_numelsph,stat_numelsph_g,lengsph,np, &
-               iadg,npglob,stat_indxsph)
-          
+            iadg,npglob,stat_indxsph)
+
           if (ispmd==0) then
             do n=1,stat_numelsph_g
               stat_indxsph(n)=n
@@ -140,7 +148,7 @@
             end do
             call my_orders(0,work,clef,stat_indxsph,stat_numelsph_g,2)
 
-          
+
             iprt0=0
             do n=1,stat_numelsph_g
               k=stat_indxsph(n)
@@ -149,18 +157,22 @@
               ioff=npglob(jj+4)
               if (idel==0 .or. (idel==1 .and. ioff >= 1)) then
                 if (iprt /= iprt0) then
-                 write(iugeo,'(a,i10)')'/SPHCEL/',ipart(4,iprt)
-                  write(iugeo,'(a)')'#sphcel_id'
+                  write(iugeo,"(a,i10)")"/SPHCEL/",ipart(4,iprt)
+                  write(iugeo,"(a)")"#sphcel_id"
                   iprt0=iprt
-                endif
-                write(iugeo,'(i10)') npglob(jj+2)
-              endif !if (idel)
-            enddo ! do n=1,stat_numelsph_g
-          endif !if (ispmd)
-          
+                end if
+                write(iugeo,"(i10)") npglob(jj+2)
+              end if !if (idel)
+            end do ! do n=1,stat_numelsph_g
+          end if !if (ispmd)
+
+          deallocate(clef)
+          deallocate(npglob)
+          deallocate(iadg)
+          deallocate(np)
           return
 ! ----------------------------------------------------------------------------------------------------------------------
         end subroutine stat_sphcel_spmd
       end module stat_sphcel_spmd_mod
-      
-      
+
+

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sensor_temp0        ../engine/source/tools/sensor/sensor_temp0.F
-      !||--- called by ------------------------------------------------------
-      !||    resol               ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_allreduce_db   ../engine/source/mpi/generic/spmd_allreduce_db.F
-      !||    sum_6_float         ../engine/source/system/parit.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod        ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sensor_temp0     ../engine/source/tools/sensor/sensor_temp0.F
+!||--- called by ------------------------------------------------------
+!||    resol            ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    sum_6_float      ../engine/source/system/parit.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod     ../common_source/modules/groupdef_mod.F
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SENSOR_TEMP0(NSENSOR,SENSOR_TAB,IGRNOD,TEMP,WEIGHT,COMM_SENS17,SENSOR_STRUCT)
 c-----------------------------------------------------------------------
 !$COMMENT
@@ -44,6 +44,7 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------
 C   M o d u l e s
 c-----------------------------------------------
+      USE SPMD_MOD
       USE GROUPDEF_MOD
       USE SENSOR_MOD
 C-----------------------------------------------
@@ -152,8 +153,9 @@ c
             !   --------------------
             ! reduction with mpi comm
             IF (NSPMD > 1) THEN
-                CALL SPMD_ALLREDUCE_DB(SBUFF_MAX,RBUFF_MAX,COMM_SENS17%BUFFER_SIZE_MIN_MAX,"MAX" )
-                CALL SPMD_ALLREDUCE_DB(SBUFF_MIN,RBUFF_MIN,COMM_SENS17%BUFFER_SIZE_MIN_MAX,"MIN" )
+                CALL SPMD_ALLREDUCE(SBUFF_MAX,RBUFF_MAX,COMM_SENS17%BUFFER_SIZE_MIN_MAX,SPMD_MAX )
+                CALL SPMD_ALLREDUCE(SBUFF_MIN,RBUFF_MIN,COMM_SENS17%BUFFER_SIZE_MIN_MAX,SPMD_MIN)
+                 
             ELSE
                 RBUFF_MAX(:) = SBUFF_MAX(:)
                 RBUFF_MIN(:) = SBUFF_MIN(:)
@@ -199,7 +201,7 @@ c
           !   ----------------
           ! reduction with mpi comm
           IF (NSPMD > 1) THEN
-              CALL SPMD_ALLREDUCE_DB( SBUFF_MEAN,RBUFF_MEAN,COMM_SENS17%BUFFER_SIZE_MEAN,"SUM" )
+               CALL SPMD_ALLREDUCE(SBUFF_MEAN,RBUFF_MEAN,COMM_SENS17%BUFFER_SIZE_MEAN,SPMD_SUM )
           ELSE
               RBUFF_MEAN(:) = SBUFF_MEAN(:)
           ENDIF

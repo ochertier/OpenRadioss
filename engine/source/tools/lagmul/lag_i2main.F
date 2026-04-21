@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lag_i2main      ../engine/source/tools/lagmul/lag_i2main.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult        ../engine/source/tools/lagmul/lag_mult.F
-      !||    lag_multp       ../engine/source/tools/lagmul/lag_mult.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||    i2lagm          ../engine/source/tools/lagmul/lag_i2main.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lag_i2main      ../engine/source/tools/lagmul/lag_i2main.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult        ../engine/source/tools/lagmul/lag_mult.F
+!||    lag_multp       ../engine/source/tools/lagmul/lag_mult.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../engine/source/output/message/message.F
+!||    arret           ../engine/source/system/arret.F
+!||    i2lagm          ../engine/source/tools/lagmul/lag_i2main.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LAG_I2MAIN(
      1      IPARI    ,INTBUF_TAB,IADLL    ,LLL      ,JLL      ,    
      2      SLL      ,XLL      ,COMNTAG  ,LTSM     ,ICFTAG   ,
@@ -99,13 +100,13 @@ C
 C---
       RETURN
       END
-      !||====================================================================
-      !||    i2lagm       ../engine/source/tools/lagmul/lag_i2main.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_i2main   ../engine/source/tools/lagmul/lag_i2main.F
-      !||--- calls      -----------------------------------------------------
-      !||    lag_direct   ../engine/source/tools/lagmul/lag_direct.F
-      !||====================================================================
+!||====================================================================
+!||    i2lagm       ../engine/source/tools/lagmul/lag_i2main.F
+!||--- called by ------------------------------------------------------
+!||    lag_i2main   ../engine/source/tools/lagmul/lag_i2main.F
+!||--- calls      -----------------------------------------------------
+!||    lag_direct   ../engine/source/tools/lagmul/lag_direct.F
+!||====================================================================
       SUBROUTINE I2LAGM(
      1   IRECT    ,NSV      ,IRTL     ,
      2   IADLL    ,LLL      ,
@@ -129,11 +130,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER INOD(5), I,J,K,L,IC,JC,II,JJ,IK,ISK,IAD,NIR,NDL, 
+      INTEGER INOD(5),K,L,IC,II,JJ,IK,IAD,NIR,NDL, 
      .   NC_INI,NCL,COMFLAG
       my_real
-     .   RX(4),RY(4),RZ(4),HLOC(6,6),LLOC(6),
-     .   B1,B2,B3,C1,C2,C3,DET,S,HIJ,
+     .   RX(4),RY(4),RZ(4),
+     .   B1,B2,B3,C1,C2,C3,DET,
      .   X0,X1,X2,X3,X4,XS,Y0,Y1,Y2,Y3,Y4,YS,Z0,Z1,Z2,Z3,Z4,ZS,
      .   X12,X22,X32,X42,Y12,Y22,Y32,Y42,Z12,Z22,Z32,Z42,
      .   XX,YY,ZZ,XXX,YYY,ZZZ,XY,YZ,ZX,XY2,YZ2,ZX2,FACT

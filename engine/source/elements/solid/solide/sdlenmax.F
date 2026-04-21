@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sdlenmax   ../engine/source/elements/solid/solide/sdlenmax.F
-      !||--- called by ------------------------------------------------------
-      !||    s20forc3   ../engine/source/elements/solid/solide20/s20forc3.F
-      !||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||    sforc3     ../engine/source/elements/solid/solide/sforc3.F
-      !||    szforc3    ../engine/source/elements/solid/solidez/szforc3.F
-      !||====================================================================
+!||====================================================================
+!||    sdlenmax   ../engine/source/elements/solid/solide/sdlenmax.F
+!||--- called by ------------------------------------------------------
+!||    s20forc3   ../engine/source/elements/solid/solide20/s20forc3.F
+!||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||    sforc3     ../engine/source/elements/solid/solide/sforc3.F
+!||    szforc3    ../engine/source/elements/solid/solidez/szforc3.F
+!||====================================================================
       SUBROUTINE SDLENMAX(LM_MAX, 
      1   X1,      X2,      X3,      X4,      
      2   X5,      X6,      X7,      X8,      
@@ -60,7 +60,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N
+      INTEGER I
       my_real
      .   RX, RY, RZ, SX, SY, SZ, TX, TY, TZ,NORM
 C=======================================================================

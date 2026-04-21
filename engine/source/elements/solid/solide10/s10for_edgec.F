@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10for_edgec    ../engine/source/elements/solid/solide10/s10for_edgec.F
-      !||--- called by ------------------------------------------------------
-      !||    s10for_distor   ../engine/source/elements/solid/solide10/s10for_distor.F
-      !||====================================================================
+!||====================================================================
+!||    s10for_edgec    ../engine/source/elements/solid/solide10/s10for_edgec.F
+!||--- called by ------------------------------------------------------
+!||    s10for_distor   ../engine/source/elements/solid/solide10/s10for_distor.F
+!||====================================================================
       SUBROUTINE S10FOR_EDGEC(
      .              STI,    LL  ,   STI_C,   
      .              XX ,     YY ,     ZZ ,   
@@ -73,7 +73,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real
      .   STIF(MVSIZ),DMIN(MVSIZ),DMIN2(MVSIZ),FN(MVSIZ,6),
-     .   XM(MVSIZ,6),YM(MVSIZ,6),ZM(MVSIZ,6),KS(MVSIZ),
+     .   XM(MVSIZ,6),YM(MVSIZ,6),ZM(MVSIZ,6),
      .   NJX(MVSIZ,6),NJY(MVSIZ,6),NJZ(MVSIZ,6),FACT,
      .   VXM(MVSIZ,6),VYM(MVSIZ,6),VZM(MVSIZ,6),
      .   DX,DY,DZ,D_MAX,LAM,S2,NORM,LAM0,F_Q,FAC,LENG,

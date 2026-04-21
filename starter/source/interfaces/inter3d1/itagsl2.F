@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    itagsl2                ../starter/source/interfaces/inter3d1/itagsl2.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    intab                  ../starter/source/interfaces/inter3d1/i24tools.F
-      !||    kinset                 ../starter/source/constraints/general/kinset.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    itagsl2                ../starter/source/interfaces/inter3d1/itagsl2.F
+!||--- called by ------------------------------------------------------
+!||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    intab                  ../starter/source/interfaces/inter3d1/i24tools.F
+!||    kinset                 ../starter/source/constraints/general/kinset.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ITAGSL2(IPARI ,NOM_OPT,ITAB  ,IKINE  ,INTBUF_TAB,
      .                   ITAGND,ICNDS10,NSTRF ,ITAGCYC,IRBE2     ,
      .                   IRBE3 ,LRBE3  )
@@ -84,7 +84,7 @@ C=======================================================================
       TAGNOS(1:NUMNOD) = 0
       IKINE1(1:3*NUMNOD) = 0
 C
-C     Tag des Secnds
+C     Tagging of secondary nodes
 C
       DO N=1,NINTER
         NTY  = IPARI(7,N)
@@ -108,7 +108,7 @@ C--         Check of incompatibility with other spt27 or spt28 t2 interfaces - m
         ENDIF
       ENDDO
 C
-C    Tag des noeuds de section (section = IMPDISP dans certains cas)
+C    Tagging section nodes (section = IMPDISP in some cases)
 C
      
       IF(NSECT > 0) THEN
@@ -127,7 +127,7 @@ C
         ENDDO
       ENDIF
 C
-C     Tag des mains pour TYPE2 symetrisees
+C     Tagging main nodes for symmetrized TYPE2
 C
       DO N=1,NINTER
         NTY = IPARI(7,N)

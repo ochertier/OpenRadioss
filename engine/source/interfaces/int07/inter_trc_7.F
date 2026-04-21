@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inter_trc_7        ../engine/source/interfaces/int07/inter_trc_7.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri             ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i7trc              ../engine/source/interfaces/intsort/i7trc.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_struct_mod   ../engine/share/modules/inter_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inter_trc_7        ../engine/source/interfaces/int07/inter_trc_7.F
+!||--- called by ------------------------------------------------------
+!||    inttri             ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    i7trc              ../engine/source/interfaces/intsort/i7trc.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod      ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    inter_struct_mod   ../engine/share/modules/inter_struct_mod.F
+!||====================================================================
         SUBROUTINE INTER_TRC_7( ITASK,NIN,IPARI,IND_IMP,
      1                          INTBUF_TAB,NB_INTER_SORTED,LIST_INTER_SORTED,INTER_STRUCT)
 !$COMMENT
@@ -65,8 +66,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER :: NIN
         INTEGER :: INACTI,IFQ,NSN,NSNROLD,INACIMP
-        INTEGER :: I,N,K,NN,NI,ITIED
-        INTEGER :: I_STOK,CAND_T,CAND_TF
+        INTEGER :: ITIED
+        INTEGER :: I_STOK
         INTEGER :: NUM_IMP
         INTEGER :: KK
 C-----------------------------------------------
@@ -107,7 +108,7 @@ C-----------------------------------------------
                 ENDIF
 
 C=============================================
-C     LES NOEUDS DELETES DEVIENNENT NSN+NSNROLD+1 
+C     LES NODES DELETES DEVIENNENT NSN+NSNROLD+1 
 C=============================================
 C------for travelling nodes detected in imp_solv----- 
                 I_STOK = INTBUF_TAB(NIN)%I_STOK(1)

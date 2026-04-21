@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sorti25           ../engine/source/mpi/interfaces/sorti25.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    sorti25           ../engine/source/mpi/interfaces/sorti25.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE SORTI25(N,ISKY,FSKYI,NFSKYI)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -43,7 +43,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C   test sur n=0
+C   test on n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N

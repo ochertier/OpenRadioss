@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rgbodv                ../engine/source/constraints/general/rbody/rgbodv.F
-      !||--- called by ------------------------------------------------------
-      !||    rbyvit                ../engine/source/constraints/general/rbody/rbyvit.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                ../engine/source/output/message/message.F
-      !||    arret                 ../engine/source/system/arret.F
-      !||    velrot_explicit       ../engine/source/constraints/general/rbody/velrot_explicit.F90
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||    velrot_explicit_mod   ../engine/source/constraints/general/rbody/velrot_explicit.F90
-      !||====================================================================
+!||====================================================================
+!||    rgbodv                ../engine/source/constraints/general/rbody/rgbodv.F
+!||--- called by ------------------------------------------------------
+!||    rbyvit                ../engine/source/constraints/general/rbody/rbyvit.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||    velrot_explicit       ../engine/source/constraints/general/rbody/velrot_explicit.F90
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    velrot_explicit_mod   ../engine/source/constraints/general/rbody/velrot_explicit.F90
+!||====================================================================
       SUBROUTINE RGBODV(V     ,VR   ,X     ,RBY ,NOD  ,
      2                  NBY   ,SKEW ,ISKEW ,FS  ,ITAB ,
      3                  WEIGHT,A    ,AR    ,MS  ,IN   ,
@@ -71,14 +71,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER M, NSN, ICODR, ISK, I, N,ISENS, J, L,NSN_G
+      INTEGER M, NSN, I, N,ISENS, L,NSN_G
 C     REAL
       my_real
-     .   XDUM(3), VG(3), VI(3),
-     .   V1X2, V2X1, V2X3, V3X2, V3X1, V1X3,USDT,DT05,
-     .   VX1, VX2, VX3, MAS,AM1,AM2,AM3,VXX1,VXX2,VXX3,VY1
+     .    VG(3),
+     .   V1X2, V2X1, V2X3, V3X2, V3X1, V1X3,USDT,
+     .   VX1, VX2, VX3,AM1,AM2,AM3,VXX1,VXX2,VXX3,VY1
       my_real
-     .   UX, UY, UZ, NN, FN, FT,LSM(3),VS(3),AS(3)
+     .   UX, UY, UZ, NN, FN, FT,LSM(3),VS(3)
       my_real, DIMENSION(:,:), ALLOCATABLE :: 
      .   R, RR
 C-----------------------------------------------
@@ -87,7 +87,7 @@ C optimisation spmd
       IF (M<0) RETURN
       NSN  =NBY(2)
       NSN_G = NBY(19)
-C en spmd il ne faut sommer qu'une fois la vitesse du centre d'inertie
+C en spmd il ne faut sommer qu'une fois la velocity du centre d'inertie
       FS(7)=FS(7)+VR(1,M)*DT2*WEIGHT(M)
       FS(8)=FS(8)+VR(2,M)*DT2*WEIGHT(M)
       FS(9)=FS(9)+VR(3,M)*DT2*WEIGHT(M)

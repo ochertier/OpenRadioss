@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,35 +20,37 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
-      !||--- called by ------------------------------------------------------
-      !||    forint              ../engine/source/elements/forint.F
-      !||    pforc3              ../engine/source/elements/beam/pforc3.F
-      !||    r23law113           ../engine/source/elements/spring/r23law113.F
-      !||    rforc3              ../engine/source/elements/spring/rforc3.F
-      !||    tforc3              ../engine/source/elements/truss/tforc3.F
-      !||====================================================================
+!||====================================================================
+!||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
+!||--- called by ------------------------------------------------------
+!||    forint              ../engine/source/elements/forint.F
+!||    pforc3              ../engine/source/elements/beam/pforc3.F
+!||    r23law113           ../engine/source/elements/spring/r23law113.F
+!||    rforc3              ../engine/source/elements/spring/rforc3.F
+!||    tforc3              ../engine/source/elements/truss/tforc3.F
+!||====================================================================
       module preload_axial_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !
 !=======================================================================================================================
-!!\brief This subroutine get info of /PRELOD/AXIAL
+!!\brief This subroutine gets info of /PRELOAD/AXIAL
 !=======================================================================================================================
-      !||====================================================================
-      !||    get_preload_axial   ../engine/source/elements/spring/preload_axial.F90
-      !||--- called by ------------------------------------------------------
-      !||    forint              ../engine/source/elements/forint.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter              ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod        ../common_source/modules/constant_mod.F
-      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
-      !||====================================================================
-        subroutine get_preload_axial(                                         &
+!||====================================================================
+!||    get_preload_axial   ../engine/source/elements/spring/preload_axial.F90
+!||--- called by ------------------------------------------------------
+!||    forint              ../engine/source/elements/forint.F
+!||--- uses       -----------------------------------------------------
+!||    constant_mod        ../common_source/modules/constant_mod.F
+!||    finter_mixed_mod    ../engine/source/tools/finter_mixed.F90
+!||    precision_mod       ../common_source/modules/precision_mod.F90
+!||    python_funct_mod    ../common_source/modules/python_mod.F90
+!||    sensor_mod          ../common_source/modules/sensor_mod.F90
+!||====================================================================
+        subroutine get_preload_axial(python, nfunct,                 &
           fun_id    ,    sens_id,          npc,            snpc,     &
           tf        ,        stf,      sensors,            time,     &
           preload1  ,      stf_f)
@@ -57,34 +59,32 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           use constant_mod, only : zero,two_third
           use sensor_mod
+          use python_funct_mod, only : python_
+          use finter_mixed_mod, only : finter_mixed
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
-! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
+          integer, intent (in   )                         :: nfunct       !< number of functions
+          type(python_) ,intent(inout)                     :: python       !< python module
           integer, intent (in   )                         :: fun_id       !< function id
           integer, intent (in   )                         :: sens_id      !< sensor id
           integer, intent (in   )                         :: snpc,stf     !< array dimension
           integer, intent (in   ) ,dimension(snpc)        :: npc          !< index pointer of function
-          type (sensors_) ,intent(in)                     :: sensors      !< sensor mudule
-          my_real, intent (in  )  ,dimension(stf)         :: tf           !< (x,y) of function
-          my_real, intent (in  )                          :: time         !< time
-          my_real, intent (inout)                         :: preload1     !< y-value of preload function
-          my_real, intent (inout)                         :: stf_f        !< stiffness restoring factor
+          type (sensors_) ,intent(in)                     :: sensors      !< sensor module
+          real(kind=WP), intent (in  )  ,dimension(stf)         :: tf           !< (x,y) of function
+          real(kind=WP), intent (in  )                          :: time         !< time
+          real(kind=WP), intent (inout)                         :: preload1     !< y-value of preload function
+          real(kind=WP), intent (inout)                         :: stf_f        !< stiffness restoring factor
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i,j,nld,isens
-          my_real t_start,t_stop,t_shift,deri,tt,t_stif
+          real(kind=WP) :: t_start,t_stop,t_shift,tt,t_stif
 ! ----------------------------------------------------------------------------------------------------------------------
 !           e x t e r n a l   f u n c t i o n s
 ! ----------------------------------------------------------------------------------------------------------------------
-          my_real finter
-          external finter
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -99,52 +99,53 @@
           end if
           tt = time-t_shift
           if (tt>=t_start.and.tt<t_stop) then
-            preload1= finter(fun_id,tt,npc,tf,deri)
+            preload1= finter_mixed(python,nfunct,fun_id,tt,npc,tf)
             t_stif = t_start + (t_stop-t_start)*two_third
             stf_f = zero
           end if
 !---
         end subroutine get_preload_axial
 !=======================================================================================================================
-!!\brief This subroutine compute axial force of 1D-element using /PRELOD/AXIAL
+!!\brief This subroutine computes axial force of 1D-element using /PRELOAD/AXIAL
 !=======================================================================================================================
-      !||====================================================================
-      !||    preload_axial   ../engine/source/elements/spring/preload_axial.F90
-      !||--- called by ------------------------------------------------------
-      !||    pforc3          ../engine/source/elements/beam/pforc3.F
-      !||    r23law113       ../engine/source/elements/spring/r23law113.F
-      !||    rforc3          ../engine/source/elements/spring/rforc3.F
-      !||    tforc3          ../engine/source/elements/truss/tforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod    ../common_source/modules/constant_mod.F
-      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    preload_axial   ../engine/source/elements/spring/preload_axial.F90
+!||--- called by ------------------------------------------------------
+!||    pforc3          ../engine/source/elements/beam/pforc3.F
+!||    r23law113       ../engine/source/elements/spring/r23law113.F
+!||    rforc3          ../engine/source/elements/spring/rforc3.F
+!||    tforc3          ../engine/source/elements/truss/tforc3.F
+!||--- uses       -----------------------------------------------------
+!||    constant_mod    ../common_source/modules/constant_mod.F
+!||    precision_mod   ../common_source/modules/precision_mod.F90
+!||    sensor_mod      ../common_source/modules/sensor_mod.F90
+!||====================================================================
         subroutine preload_axial(nel,preload1,bpreload,v12,stf_f,f1)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use constant_mod, only : zero
           use sensor_mod
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           integer, intent (in   )                       :: nel          !< element number
-          my_real, intent (in   ) , dimension(nel,2)    :: bpreload     !< preload parameters
-          my_real, intent (in   )                       :: preload1     !< preload function value
-          my_real, intent (in   ) , dimension(nel)      :: v12          !< axial velocity
-          my_real, intent (inout) , dimension(nel)      :: f1           !< axial preload force
-          my_real, intent (in   )                       :: stf_f        !< stiffness restoring factor
+          real(kind=WP), intent (in   ) , dimension(nel,2)    :: bpreload     !< preload parameters
+          real(kind=WP), intent (in   )                       :: preload1     !< preload function value
+          real(kind=WP), intent (in   ) , dimension(nel)      :: v12          !< axial velocity
+          real(kind=WP), intent (inout) , dimension(nel)      :: f1           !< axial preload force
+          real(kind=WP), intent (in   )                       :: stf_f        !< stiffness restoring factor
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i
-          my_real y_scal,damp
+          integer :: i
+          real(kind=WP) :: y_scal,damp
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    mrdse2               ../starter/source/materials/mat/mat026/mrdse2.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_eos_sesame   ../starter/source/materials/eos/hm_read_eos_sesame.F
-      !||    hm_read_mat26        ../starter/source/materials/mat/mat026/hm_read_mat26.F
-      !||====================================================================
+!||====================================================================
+!||    mrdse2               ../starter/source/materials/mat/mat026/mrdse2.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_eos_sesame   ../starter/source/materials/eos/hm_read_eos_sesame.F
+!||    hm_read_mat26        ../starter/source/materials/mat/mat026/hm_read_mat26.F
+!||====================================================================
       SUBROUTINE MRDSE2(RR,NR,TT,NT,PP,EE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

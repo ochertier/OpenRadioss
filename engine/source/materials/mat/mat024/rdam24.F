@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rdam24   ../engine/source/materials/mat/mat024/rdam24.F
-      !||--- called by ------------------------------------------------------
-      !||    elas24   ../engine/source/materials/mat/mat024/elas24.F
-      !||====================================================================
+!||====================================================================
+!||    rdam24   ../engine/source/materials/mat/mat024/rdam24.F
+!||--- called by ------------------------------------------------------
+!||    elas24   ../engine/source/materials/mat/mat024/elas24.F
+!||====================================================================
       SUBROUTINE RDAM24(NEL   ,NBDAMA,DAMAI ,ANG   ,DEPS1 ,
      .                  DEPS2 ,DEPS3 ,DEPS4 ,DEPS5 ,DEPS6 )
 C-----------------------------------------------
@@ -58,8 +58,8 @@ C=======================================================================
         S33(I)= S11(I)*S22(I)-S21(I)*S12(I)
       ENDDO
 C . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-C     TRANSFORME INCREMENTS DE DEFORMATION
-C     DANS LE REPERE DES DIRECTIONS DE DOMMAGE
+C     transforms strain increments
+C     in the frame of the damage directions
 C . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
       DO K=1,NBDAMA
         I= DAMAI(K)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_brokmann      ../engine/source/materials/fail/alter/fail_brokmann.F
-      !||--- called by ------------------------------------------------------
-      !||    fail_wind_frwave   ../engine/source/materials/fail/alter/fail_wind_frwave.F
-      !||--- calls      -----------------------------------------------------
-      !||    newman_raju        ../common_source/fail/newman_raju.F90
-      !||--- uses       -----------------------------------------------------
-      !||    newman_raju_mod    ../common_source/fail/newman_raju.F90
-      !||====================================================================
+!||====================================================================
+!||    fail_brokmann      ../engine/source/materials/fail/alter/fail_brokmann.F
+!||--- called by ------------------------------------------------------
+!||    fail_wind_frwave   ../engine/source/materials/fail/alter/fail_wind_frwave.F
+!||--- calls      -----------------------------------------------------
+!||    newman_raju        ../common_source/fail/newman_raju.F90
+!||--- uses       -----------------------------------------------------
+!||    newman_raju_mod    ../common_source/fail/newman_raju.F90
+!||====================================================================
       SUBROUTINE FAIL_BROKMANN(
      .     NEL       ,NUPARAM   ,NUVAR     ,TIME      ,TIMESTEP  ,
      .     UPARAM    ,NGL       ,SIGNXX    ,SIGNYY    ,SIGNXY    ,
@@ -128,7 +128,7 @@ c         take into account high stress rates
 c------------------------
 c         Residual stress
 c------------------------
-          SIG_COSW = SIG_COS - SIG_INI   ! Substracting initial surface stress
+          SIG_COSW = SIG_COS - SIG_INI   ! Subtracting initial surface stress
           SIG_COSW = MAX(ZERO , SIG_COSW)
 c------------------------
 c         Test criteria

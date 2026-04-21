@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,31 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    python_spmd_mod                ../engine/source/mpi/python_spmd_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    funct_python_update_elements   ../engine/source/tools/curve/funct_python_update_elements.F90
-      !||    python_register                ../engine/source/tools/curve/python_register.F90
-      !||====================================================================
+!||====================================================================
+!||    python_spmd_mod                ../engine/source/mpi/python_spmd_mod.F90
+!||--- called by ------------------------------------------------------
+!||    funct_python_update_elements   ../engine/source/tools/curve/funct_python_update_elements.F90
+!||    python_register                ../engine/source/tools/curve/python_register.F90
+!||====================================================================
       module python_spmd_mod
+        implicit none
       contains
 !! \brief initialize the python elemental variables found in the python function
-      !||====================================================================
-      !||    python_element_init   ../engine/source/mpi/python_spmd_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    python_register       ../engine/source/tools/curve/python_register.F90
-      !||--- calls      -----------------------------------------------------
-      !||    c_delete_hash         ../common_source/tools/container/c_hash_table.cpp
-      !||    c_hash_find           ../common_source/tools/container/c_hash_table.cpp
-      !||    c_hash_insert         ../common_source/tools/container/c_hash_table.cpp
-      !||    c_new_hash            ../common_source/tools/container/c_hash_table.cpp
-      !||    spmd_comm_rank        ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_comm_size        ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    python_element_mod    ../common_source/modules/python_element_mod.F90
-      !||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    python_element_init   ../engine/source/mpi/python_spmd_mod.F90
+!||--- called by ------------------------------------------------------
+!||    python_register       ../engine/source/tools/curve/python_register.F90
+!||--- calls      -----------------------------------------------------
+!||    c_delete_hash         ../common_source/tools/container/c_hash_table.cpp
+!||    c_hash_find           ../common_source/tools/container/c_hash_table.cpp
+!||    c_hash_insert         ../common_source/tools/container/c_hash_table.cpp
+!||    c_new_hash            ../common_source/tools/container/c_hash_table.cpp
+!||    spmd_comm_rank        ../engine/source/mpi/spmd_mod.F90
+!||    spmd_comm_size        ../engine/source/mpi/spmd_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    python_element_mod    ../common_source/modules/python_element_mod.F90
+!||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
         subroutine python_element_init(element, n, group_id, local_id, user_ids)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Module
@@ -73,20 +74,21 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                      Body
 ! ----------------------------------------------------------------------------------------------------------------------
-
+          if(element%global%n  == 0) return
           ! Find the local elements requested by python functions
           call c_new_hash(map_id, n)
           do i = 1, n
+            if(user_ids(i) < 0) cycle
             call c_hash_insert(map_id, user_ids(i), i)
-          enddo
+          end do
           local_n = 0
           do i = 1, element%global%n
             j = -1
             call c_hash_find(map_id, element%global%user_ids(i), j)
             if(j > 0) then
               local_n = local_n + 1
-            endif
-          enddo
+            end if
+          end do
           element%local%n = local_n
           if(allocated(element%local%user_ids)) deallocate(element%local%user_ids)
           if(allocated(element%local%group_id)) deallocate(element%local%group_id)
@@ -119,10 +121,10 @@
                 element%local%keyword(local_n)%h3d(k:k) = element%global%keyword(i)%h3d(k:k)
                 element%local%keyword(local_n)%name(k:k) = element%global%keyword(i)%name(k:k)
                 element%local%global_id(local_n) = i
-              enddo
+              end do
               processor(i) = rank
-            endif
-          enddo
+            end if
+          end do
           call c_delete_hash(map_id)
 
           call spmd_allreduce(processor, element%global%processor, element%global%n, SPMD_MAX)
@@ -146,15 +148,15 @@
 !         call flush(6)
         end subroutine python_element_init
 !! \brief synchronize python elemental variables found in the python function
-      !||====================================================================
-      !||    python_element_sync              ../engine/source/mpi/python_spmd_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    funct_python_update_elements     ../engine/source/tools/curve/funct_python_update_elements.F90
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    python_element_mod               ../common_source/modules/python_element_mod.F90
-      !||    spmd_mod                         ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    python_element_sync              ../engine/source/mpi/python_spmd_mod.F90
+!||--- called by ------------------------------------------------------
+!||    funct_python_update_elements     ../engine/source/tools/curve/funct_python_update_elements.F90
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    python_element_mod               ../common_source/modules/python_element_mod.F90
+!||    spmd_mod                         ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
         subroutine python_element_sync(element)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Module
@@ -179,12 +181,12 @@
           values = -HUGE(0.0d0)
           do i = 1, element%local%n
             values(element%local%global_id(i)) = element%local%values(i)
-          enddo
+          end do
           call spmd_allreduce(values, element%global%values, element%global%n, SPMD_MAX)
           deallocate(values)
           do i = 1, element%global%n
             call python_update_elemental_entity(element%global%keyword(i)%h3d,element%global%values(i), element%global%user_ids(i))
-          enddo
+          end do
         end subroutine python_element_sync
 
       end module python_spmd_mod

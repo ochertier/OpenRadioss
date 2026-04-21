@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C calcul des forces sur un groupe d'elements multi-purpose.
-      !||====================================================================
-      !||    xforc3          ../engine/source/elements/xelem/xforc3.F
-      !||--- called by ------------------------------------------------------
-      !||    forints         ../engine/source/elements/forints.F
-      !||--- calls      -----------------------------------------------------
-      !||    sav_buf_point   ../engine/source/user_interface/eng_callback_c.c
-      !||    xbilan3         ../engine/source/elements/xelem/xbilan3.F
-      !||    xcoor3          ../engine/source/elements/xelem/xcoor3.F
-      !||    xcum3           ../engine/source/elements/xelem/xcum3.F
-      !||    xcum3p          ../engine/source/elements/xelem/xcum3.F
-      !||    xdefo3          ../engine/source/elements/xelem/xdefo3.F
-      !||    xforc28         ../engine/source/elements/xelem/xforc28.F
-      !||    xforc29         ../engine/source/elements/xelem/xforc29.F
-      !||    xforc30         ../engine/source/elements/xelem/xforc30.F
-      !||    xforc31         ../engine/source/elements/xelem/xforc31.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+C calculation of forces on a group of multi-purpose elements
+!||====================================================================
+!||    xforc3          ../engine/source/elements/xelem/xforc3.F
+!||--- called by ------------------------------------------------------
+!||    forints         ../engine/source/elements/forints.F
+!||--- calls      -----------------------------------------------------
+!||    sav_buf_point   ../engine/source/user_interface/eng_callback_c.c
+!||    xbilan3         ../engine/source/elements/xelem/xbilan3.F
+!||    xcoor3          ../engine/source/elements/xelem/xcoor3.F
+!||    xcum3           ../engine/source/elements/xelem/xcum3.F
+!||    xcum3p          ../engine/source/elements/xelem/xcum3.F
+!||    xdefo3          ../engine/source/elements/xelem/xdefo3.F
+!||    xforc28         ../engine/source/elements/xelem/xforc28.F
+!||    xforc29         ../engine/source/elements/xelem/xforc29.F
+!||    xforc30         ../engine/source/elements/xelem/xforc30.F
+!||    xforc31         ../engine/source/elements/xelem/xforc31.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE XFORC3(
      1   NFT,      NEL,      GEO,      PM,
      2   ITAB,     KXX,      IXX,      X,
@@ -87,10 +87,10 @@ C-----------------------------------------------
 C     REAL
       my_real
      .     DT1U,
-     .     DTE, DTC, XKM, XCM, XKR, XCR, XM, XINE, EUSR
-      INTEGER I, J, K, IPROP, IMAT, ISENS, NX,
-     .   NB1, NB2, NB3, NB4, NB5, NBFI, UID,
-     .   IGTYP,NUVAR,NUVARN,NUPARAM,
+     .     DTE, EUSR
+      INTEGER I, J, K, IPROP, IMAT, NX,
+     .         UID,
+     .   IGTYP,NUVAR,NUVARN,
      .   NISKYL,KEUSR,
      .   UIX(MAXNX),KVAR,KVARN
        my_real
@@ -232,7 +232,7 @@ C         NSTRAND ELEMENTS.
      6         NUVAR  ,GBUF%VAR(KVAR) ,NUVARN ,GBUF%VARN(KVARN) ,DT1U , DTE)
         ENDIF ! IF (IGTYP == 28)
 C-------
-C       CALCUL DE DT ELEMENTAIRE.
+C       calculation of elementary dt
         IF (GBUF%OFF(I) /= ZERO) THEN
           IF (DTE < DT2T) THEN
            DT2T=DTE

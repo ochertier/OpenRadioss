@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    err_thk             ../engine/source/elements/shell/err_thk.F
-      !||--- called by ------------------------------------------------------
-      !||    resol               ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    admthke             ../engine/source/model/remesh/admthke.F
-      !||    my_barrier          ../engine/source/system/machine.F
-      !||    spmd_exch_nodarea   ../engine/source/mpi/anim/spmd_exch_nodarea.F
-      !||    startimeg           ../engine/source/system/timer.F
-      !||    stoptimeg           ../engine/source/system/timer.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    err_thk             ../engine/source/elements/shell/err_thk.F
+!||--- called by ------------------------------------------------------
+!||    resol               ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    admthke             ../engine/source/model/remesh/admthke.F
+!||    my_barrier          ../engine/source/system/machine.F
+!||    spmd_exch_nodarea   ../engine/source/mpi/anim/spmd_exch_nodarea.F
+!||    startimeg           ../engine/source/system/timer.F
+!||    stoptimeg           ../engine/source/system/timer.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    message_mod         ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ERR_THK(
      .             IXC     ,IXTG    ,IPARG   ,IAD_ELEM,FR_ELEM ,
      .             WEIGHT  ,X       ,ELBUF_TAB,IPART   ,IPARTC  ,
@@ -46,6 +47,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,15 +85,15 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER SH4FT, SH4LT, SH3FT, SH3LT, IERROR, MLW
+      INTEGER SH4FT, SH4LT, SH3FT, SH3LT, MLW
       INTEGER N1,N2,N3,N4,
      .        I,N,NG,NEL,LENR,PRT,IADM
 C     REAL
        my_real
-     .     AREA, A, AT, THK, 
+     .     AREA, AT, 
      .     X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,X4,Y4,Z4,
      .     X31,Y31,Z31,X42,Y42,Z42,X32,Y32,Z32,E3X,E3Y,E3Z,
-     .     TN1,TN2,TN3,TN4,TPG1,TPG2,TPG3,TPG4,UNT
+     .     TN1,TN2,TN3,TN4,UNT
       TYPE(G_BUFEL_) ,POINTER :: GBUF
 C-----------------------------------------------
 C

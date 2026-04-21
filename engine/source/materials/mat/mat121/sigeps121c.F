@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps121c       ../engine/source/materials/mat/mat121/sigeps121c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    mat121c_newton   ../engine/source/materials/mat/mat121/mat121c_newton.F
-      !||    mat121c_nice     ../engine/source/materials/mat/mat121/mat121c_nice.F
-      !||    vinter2          ../engine/source/tools/curve/vinter.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sigeps121c       ../engine/source/materials/mat/mat121/sigeps121c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    mat121c_newton   ../engine/source/materials/mat/mat121/mat121c_newton.F
+!||    mat121c_nice     ../engine/source/materials/mat/mat121/mat121c_nice.F
+!||    vinter2          ../engine/source/tools/curve/vinter.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE SIGEPS121C(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
      2     TF      ,TIMESTEP,TIME    ,UPARAM  ,UVAR    ,RHO     ,PLA     ,
      3     DPLA    ,SOUNDSP ,EPSD    ,GS      ,THK     ,THKLY   ,OFF     ,
      4     DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
-     5     EPSPXX  ,EPSPYY  ,EPSPXY  ,EPSPYZ  ,EPSPZX  ,EPSP    ,EPSPL   ,
+     5     EPSPXX  ,EPSPYY  ,EPSPXY  ,EPSPYZ  ,EPSPZX  ,
      6     SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      8     SIGY    ,ET      ,VARNL   ,INLOC   ,DT      ,
@@ -70,8 +70,7 @@ C-----------------------------------------------
      .   SIGOXX,SIGOYY,SIGOXY,SIGOYZ,SIGOZX
       my_real,DIMENSION(NEL), INTENT(OUT)   :: 
      .   SOUNDSP,SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX
-      my_real,DIMENSION(NEL) :: 
-     .   SIGY,ET,EPSP,EPSPL
+      my_real,DIMENSION(NEL) :: SIGY,ET
       my_real,DIMENSION(NEL), INTENT(INOUT) :: 
      .   PLA,EPSD,THK,OFF,VARNL,DPLA,OFFL
       my_real,DIMENSION(NEL,NUVAR), INTENT(INOUT) :: 
@@ -128,10 +127,6 @@ c
 c      
       END SELECT    
 c
-      ! Store strain-rate for output
-      EPSP(1:NEL)  = EPSD(1:NEL)    
-      ! Store strain-rate for failure criteria
-      EPSPL(1:NEL) = EPSD(1:NEL)
       ! Ductile failure activation
       IOFF_DUCT(1:NEL) = 1
 c
@@ -235,7 +230,7 @@ c
         ENDDO
       ENDIF
 c
-      ! Printout timestep element deletion
+      ! Printout Timestep element deletion
       IF (NINDX>0) THEN
         DO J=1,NINDX
 #include "lockon.inc"

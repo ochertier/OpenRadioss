@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,15 +22,16 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 C
-      !||====================================================================
-      !||    spmd_exchseg_idel   ../engine/source/mpi/kinematic_conditions/spmd_exchseg_idel.F
-      !||--- called by ------------------------------------------------------
-      !||    chkload             ../engine/source/interfaces/chkload.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_local_node_id   ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||--- uses       -----------------------------------------------------
-      !||    nodal_arrays_mod    ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_exchseg_idel     ../engine/source/mpi/kinematic_conditions/spmd_exchseg_idel.F
+!||--- called by ------------------------------------------------------
+!||    chkload               ../engine/source/interfaces/chkload.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    nodal_arrays_mod      ../common_source/modules/nodal_arrays.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCHSEG_IDEL(
      1    BUFS  ,LBUFS ,IXS    ,IXC    ,IXTG   ,
      2    IXQ   ,IPARG ,ITAGL  ,NODES,TAGEL  ,
@@ -39,9 +40,11 @@ C
      5    OFQ   ,LINDEX,IXP    ,IXR    ,IXT    ,
      6    GEO   ,IAD_ELEM)
        USE nodal_arrays_mod
+       use element_mod , only : nixs,nixq,nixc,nixp,nixr,nixt,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -73,9 +76,9 @@ C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGOFF2 ,MSGOFF3, MSGTYP, LOC_PROC,
      .        IERROR,I, IDEB, LEN, N1, N2, N3, N4,
-     .        K, IX, LFT, LLT, II, NN, J, IOFF,
-     .        JD(50), KD(50), NG, IDEL, ITYP, NBEL,
-     .        ITY, MLW, NEL, NFT, KAD, NPT, ISTRA, IHBE,
+     .        K, IX, II, NN, J, IOFF,
+     .           NBEL,
+     .            
      .        REQ_S2(NSPMD),REQ_S3(NSPMD),STATUS(MPI_STATUS_SIZE),
      .        REQ_R1(NSPMD)
       INTEGER, DIMENSION(:), ALLOCATABLE ::  BUFR, BUFS2
@@ -213,7 +216,7 @@ C
         ENDIF
       ENDDO
 C
-C Test reception envoi BUFS
+C Test Reception Shipping Buds
 C
       DO I = 1, NSPMD
         SIZ = (IAD_ELEM(1,I+1)-IAD_ELEM(1,I))
@@ -222,7 +225,7 @@ C
         ENDIF
       ENDDO
 C
-C Reception BUFR dans BUFS2
+C Reception Bufr in BUFS2
 C
       ALLOCATE(BUFS2(LINDEX))
       IF(LINDEX>0) THEN
@@ -245,7 +248,7 @@ C
       DEALLOCATE(BUFS2)
 
 C
-C Test reception envoi BUFR
+C Test Reception Bufr
 C
       DO I = 1, NSPMD
         SIZ = (IAD_ELEM(1,I+1)-IAD_ELEM(1,I))

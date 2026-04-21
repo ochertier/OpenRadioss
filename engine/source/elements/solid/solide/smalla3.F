@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    smalla3    ../engine/source/elements/solid/solide/smalla3.F
-      !||--- called by ------------------------------------------------------
-      !||    s16forc3   ../engine/source/elements/thickshell/solide16/s16forc3.F
-      !||    s20forc3   ../engine/source/elements/solid/solide20/s20forc3.F
-      !||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
-      !||    sforc3     ../engine/source/elements/solid/solide/sforc3.F
-      !||====================================================================
+!||====================================================================
+!||    smalla3    ../engine/source/elements/solid/solide/smalla3.F
+!||--- called by ------------------------------------------------------
+!||    s16forc3   ../engine/source/elements/thickshell/solide16/s16forc3.F
+!||    s20forc3   ../engine/source/elements/solid/solide20/s20forc3.F
+!||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
+!||    sforc3     ../engine/source/elements/solid/solide/sforc3.F
+!||====================================================================
       SUBROUTINE SMALLA3(
      1   SAV,     OFFG,    OFF,     WXX,
      2   WYY,     WZZ,     NEL,     ISMSTR,
@@ -53,10 +53,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-      DOUBLE PRECISION X , Y, Z   ,DV   
+      DOUBLE PRECISION X , Y, Z      
 C-----------------------------------------------
 C-----------------------------
-C     ROTATION RBY DES COORDONNEES POUR SMALL STRAIN
+C     ROTATION RBY COORDINATES FOR SMALL STRAIN
 C-----------------------------
       IF(ISMSTR==11)THEN
 C----SAV : (ismstr=10,11) is differently saved to Ismstr=1      

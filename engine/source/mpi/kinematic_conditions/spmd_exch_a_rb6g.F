@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spmd_exch_a_rb6g   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6g.F
-      !||--- called by ------------------------------------------------------
-      !||    rbyfor             ../engine/source/constraints/general/rbody/rbyfor.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_a_rb6g      ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6g.F
+!||--- called by ------------------------------------------------------
+!||    rbyfor                ../engine/source/constraints/general/rbody/rbyfor.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_A_RB6G(NPBY,RBF6)
-C realise le cumul des acc et stiffness des noeuds main de rigid bodies
-C dans le cas ou tous les procs sont concernes gather/scatter proc0
+C accumulates the acceleration and stiffness of the main nodes of rigid bodies
+C In the case where all the procs are concerned Gather/Scatter PROC0
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -39,6 +40,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g

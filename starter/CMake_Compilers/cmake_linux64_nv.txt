@@ -24,7 +24,11 @@ execute_process(COMMAND gfortran -print-file-name=libgcc.a OUTPUT_VARIABLE LIBGC
 execute_process(COMMAND gfortran -print-file-name=libquadmath.a OUTPUT_VARIABLE LIBQUADMATH_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 #hm_reader
-set ( reader_lib "-L${source_directory}/../extlib/hm_reader/linux64/ -lhm_reader_linux64 ${source_directory}/../extlib/hm_reader/linux64/libapr-1.so.0 " )
+if ( USE_OPEN_READER STREQUAL 1 )
+       set ( reader_lib "-L${source_directory}/../exec -lopen_reader_linux64")
+else ()
+       set ( reader_lib "-L${source_directory}/../extlib/hm_reader/linux64/ -lhm_reader_linux64 -lapr-1 " )
+endif()
 
 #Lapack
 set (lapack_lib "${source_directory}/../extlib/lapack-3.10.0/lib_linux64_gf/liblapack.a ${source_directory}/../extlib/lapack-3.10.0/lib_linux64_gf/librefblas.a ${source_directory}/../extlib/lapack-3.10.0/lib_linux64_gf/libtmglib.a")
@@ -35,6 +39,10 @@ set (metis_lib "${source_directory}/../extlib/metis/linux64/libmetis_linux64_gcc
 #ZLIB
 set (zlib_inc "-I${source_directory}/../extlib/zlib/linux64/include")
 set (zlib_lib "${source_directory}/../extlib/zlib/linux64/lib/libz.a")
+
+# MD5
+set (md5_inc "-I${source_directory}/../extlib/md5/include")
+set (md5_lib "-L${source_directory}/../extlib/md5/linux64/ -lmd5")
 
 #
 # compiler Flags
@@ -104,9 +112,9 @@ set (CMAKE_EXE_LINKER_FLAGS " -Wl,--export-dynamic -Wl,-no-pie -O2" )
 
 #Libraries
 if ( static_link STREQUAL "1" )
-set (LINK "dl ${flexpipe_lib} ${metis_lib} ${reader_lib} ${lapack_lib} ${zlib_lib} ${LIBGFORTRAN_PATH} ${LIBGCC_PATH} ${LIBQUADMATH_PATH} -ldl -Bstatic_pgi -Bstatic_c++libs -Bstatic_gcc " )
+set (LINK "dl ${flexpipe_lib} ${metis_lib} ${reader_lib} ${lapack_lib} ${zlib_lib} ${md5_lib} ${LIBGFORTRAN_PATH} ${LIBGCC_PATH} ${LIBQUADMATH_PATH} -ldl -Bstatic_pgi -Bstatic_c++libs -Bstatic_gcc " )
 else()
-set (LINK "dl ${flexpipe_lib} ${metis_lib} ${reader_lib} ${lapack_lib} ${zlib_lib} ${LIBGFORTRAN_PATH} ${LIBGCC_PATH} ${LIBQUADMATH_PATH} -ldl" )
+set (LINK "dl ${flexpipe_lib} ${metis_lib} ${reader_lib} ${lapack_lib} ${zlib_lib} ${md5_lib} ${LIBGFORTRAN_PATH} ${LIBGCC_PATH} ${LIBQUADMATH_PATH} -ldl" )
 endif()
 string(STRIP ${LINK} LINK)
 

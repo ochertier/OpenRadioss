@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    law119_membrane       ../engine/source/materials/mat/mat119/law119_membrane.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps119c            ../engine/source/materials/mat/mat119/sigeps119c.F
-      !||--- calls      -----------------------------------------------------
-      !||    table_vinterp         ../engine/source/tools/curve/table_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    law119_membrane       ../engine/source/materials/mat/mat119/law119_membrane.F
+!||--- called by ------------------------------------------------------
+!||    sigeps119c            ../engine/source/materials/mat/mat119/sigeps119c.F
+!||--- calls      -----------------------------------------------------
+!||    table_vinterp         ../engine/source/tools/curve/table_tools.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE LAW119_MEMBRANE(
      .            NEL    ,NUPARAM,NUVAR  ,UPARAM ,UVAR   ,
      .            GS     ,ET     ,DEPSXX ,DEPSYY ,DEPSXY    ,
@@ -72,9 +72,9 @@ C-----------------------------------------------
      .           NDIM,IRELOAD
       my_real :: NU12,NU21,G12,A11,A12,A22,RCOMP,
      .           FSCALE,FSCALE1,FSCALE2,FSCALET,DW,HT,HF,
-     .           DET,S,D,T,P1,P2,R,DEZZ,SVM2,XINT,YINT
+     .           DET,S,D,P1,P2,R,SVM2,XINT,YINT
       INTEGER ,DIMENSION(NEL)   :: INDXU,INDXL,INDXR,INDXT,INDXC,INDXX
-      my_real ,DIMENSION(NEL)   :: EPSQ,SVM,ETX,ETL,ETU,EXX,EYY,DX,DY,
+      my_real ,DIMENSION(NEL)   :: EPSQ,SVM,ETX,ETL,ETU,
      .  SIGF,EMAX,SMAX,EMINRL,SMINRL,EMAXRL,SMAXRL,BETA
       INTEGER ,DIMENSION(NEL,1) :: IPOS1
       my_real ,DIMENSION(NEL,1) :: XX1

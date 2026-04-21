@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    upwind_v   ../engine/source/elements/solid/solide/upwind_v.F
-      !||--- called by ------------------------------------------------------
-      !||    amomtn3    ../engine/source/elements/solid/solide/amomtn3.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod    ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    upwind_v   ../engine/source/elements/solid/solide/upwind_v.F
+!||--- called by ------------------------------------------------------
+!||    amomtn3    ../engine/source/elements/solid/solide/amomtn3.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod    ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE UPWIND_V(
      1   RHO,     VIS,     VDX,     VDY,
      2   VDZ,     R,       S,       T,
@@ -60,8 +60,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real
-     .  FAC,PE,D1,D2,D3,DIST,CH1,CH2,
-     .  DV(MVSIZ),V(MVSIZ)
+     .  FAC,PE,D1,D2,D3,CH1,CH2,
+     .  V(MVSIZ)
       INTEGER I
 C-----------------------------------------------
 

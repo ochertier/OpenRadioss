@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    law69_nlsqf_auto       ../starter/source/materials/tools/law69_nlsqf_auto.F
-      !||--- called by ------------------------------------------------------
-      !||    law69_upd              ../starter/source/materials/mat/mat069/law69_upd.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    law69_check            ../starter/source/materials/tools/nlsqf.F
-      !||    law69_guess1           ../starter/source/materials/tools/nlsqf.F
-      !||    law69_guess_bounds     ../starter/source/materials/tools/nlsqf.F
-      !||    mrqmin                 ../starter/source/materials/tools/nlsqf.F
-      !||    ogden0                 ../starter/source/materials/tools/nlsqf.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    law69_nlsqf_auto       ../starter/source/materials/tools/law69_nlsqf_auto.F
+!||--- called by ------------------------------------------------------
+!||    law69_upd              ../starter/source/materials/mat/mat069/law69_upd.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    law69_check            ../starter/source/materials/tools/nlsqf.F
+!||    law69_guess1           ../starter/source/materials/tools/nlsqf.F
+!||    law69_guess_bounds     ../starter/source/materials/tools/nlsqf.F
+!||    mrqmin                 ../starter/source/materials/tools/nlsqf.F
+!||    ogden0                 ../starter/source/materials/tools/nlsqf.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LAW69_NLSQF_AUTO(LAWID,STRETCH,Y,MA,NMUAL,NPT,MUAL,
-     $                            ICHECK, NSTART, ERRTOL,ID,TITR)
+     $                            ICHECK, NSTART, ERRTOL,ID,TITR , IS_ENCRYPTED)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -53,7 +53,7 @@ C-----------------------------------------------
     !   D u m m y   A r g u m e n t s
     !----------------------------------------------- 
       INTEGER ,  INTENT(INOUT) :: LAWID, NMUAL, MA,ICHECK
-      INTEGER ,  INTENT(IN)    :: NPT, NSTART,ID
+      INTEGER ,  INTENT(IN)    :: NPT, NSTART,ID,IS_ENCRYPTED
       my_real ,  INTENT(IN)    :: ERRTOL
       my_real , DIMENSION(NPT) , INTENT(IN) :: Y,STRETCH
       my_real , DIMENSION(10), INTENT(INOUT) :: MUAL
@@ -64,15 +64,15 @@ C-----------------------------------------------
       INTEGER MAXA 
       PARAMETER (MAXA=20)
 
-      INTEGER I,IDUM,ITER,ICOUNT,J,K,IRET ,ISTART, NPSAVED, 
+      INTEGER I,ITER,J,IRET ,ISTART, NPSAVED, 
      .        IVALID,ICOMP, MMAX,MINITER_LM, MAXITER_LM,
      .        CNT_HIT_EPS_LM,LMT_HIT_EPS_LM, LMSTOP,IFUNCS,
      .        NGUESS,NMUALS,LOOP_ISTART ,ICHECK_GUESS,
      .        JCHECK, IFIT_SUCCESS,IEND_FINDING,IEND_ITER,
      .        MU_INCR_GUESS,IRND1,ISWITCH
       INTEGER NONZERO(MAXA)
-      my_real GAMMA,ERRNOW,GASDEV,ERRPRE,ERRMIN, ERRMAX, 
-     .        ERRAVE, ERRAVE_MIN,YOGD,XOGD,EPS_LM,MAX_ABS_YI,
+      my_real GAMMA,ERRNOW,ERRPRE, 
+     .        ERRAVE, ERRAVE_MIN,YOGD,EPS_LM,MAX_ABS_YI,
      .        SMALL_FAC_ABS_YI, SMALL_ABS_YI,SPREADY,GAMMA_STOP,
      .        ERR
       my_real A(MAXA),COVAR(MAXA,MAXA),ALPHA(MAXA,MAXA),
@@ -81,6 +81,7 @@ C-----------------------------------------------
 
       my_real, DIMENSION(:), ALLOCATABLE :: SIG
 !!=======================================================================
+      !
       ISWITCH = 0 
       MINITER_LM = 5
       MAXITER_LM = 100 
@@ -163,7 +164,7 @@ C=======================================================================
         IEND_ITER = 0
         ATRY(1:MAXA) = ZERO ! Initialization of ATRY
         DO WHILE ( ISTART < NSTART  )     !!! 111 continue
-      !!       get one guess point A0(1:NMUAL)  
+      !!Get One Guess Point A0 (1: Nmual)  
           CALL LAW69_GUESS1(
      $            LAWID, NMUAL, ICHECK_GUESS, MU_INCR_GUESS,IRND1,
      $            A0, NONZERO, MCOF_MIN, MCOF_MAX, NGUESS)
@@ -341,17 +342,18 @@ C
           MUAL(I) = ZERO
         ENDDO
       ENDIF
-
-      WRITE(IOUT,'(//6X,A,/)')'FITTING RESULT COMPARISON:'
-      WRITE(IOUT,'(6X,A,/)')'UNIAXIAL TEST DATA'
-      WRITE(IOUT,'(A20,5X,A20,A30)') 'NOMINAL STRAIN',
+       IF(IS_ENCRYPTED == 0)THEN
+         WRITE(IOUT,'(//6X,A,/)')'FITTING RESULT COMPARISON:'
+        WRITE(IOUT,'(6X,A,/)')'UNIAXIAL TEST DATA'
+        WRITE(IOUT,'(A20,5X,A20,A30)') 'NOMINAL STRAIN',
      *      'NOMINAL STRESS(TEST)', 'NOMINAL STRESS(RADIOSS)'
-      DO I=1,NPT
-        CALL OGDEN0(STRETCH(I), AS, YOGD, NMUALS)
-        WRITE(IOUT, '(1F18.6, 3X,1F20.13, 6X, 1F20.13)')
-     *   STRETCH(I)-ONE,Y(I),YOGD
-      ENDDO      
-
+        DO I=1,NPT
+          CALL OGDEN0(STRETCH(I), AS, YOGD, NMUALS)
+          WRITE(IOUT, '(1F18.6, 3X,1F20.13, 6X, 1F20.13)')
+     *     STRETCH(I)-ONE,Y(I),YOGD
+        ENDDO    
+      ENDIF    
+!
       WRITE(IOUT, '(A)') '-------------------------------------------'
       WRITE(IOUT, '(A,F10.2,A)') 'AVERAGED ERROR OF FITTING : ', 
      .                            ERRAVE_MIN*100.0, '%'

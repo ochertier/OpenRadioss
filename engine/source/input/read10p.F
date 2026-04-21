@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read10p   ../engine/source/input/read10p.F
-      !||--- called by ------------------------------------------------------
-      !||    fredli    ../engine/source/input/fredli.F
-      !||    freeig    ../engine/source/input/freeig.F
-      !||    frerbo    ../engine/source/input/frerbo.F
-      !||    rdele     ../engine/source/input/rdele.F
-      !||--- calls      -----------------------------------------------------
-      !||    wciusc2   ../engine/source/input/wciusc2.F
-      !||====================================================================
+!||====================================================================
+!||    read10p   ../engine/source/input/read10p.F
+!||--- called by ------------------------------------------------------
+!||    fredli    ../engine/source/input/fredli.F
+!||    freeig    ../engine/source/input/freeig.F
+!||    frerbo    ../engine/source/input/frerbo.F
+!||    rdele     ../engine/source/input/rdele.F
+!||--- calls      -----------------------------------------------------
+!||    wciusc2   ../engine/source/input/wciusc2.F
+!||====================================================================
       SUBROUTINE READ10P(IREC,NBC,KEY0,IV2,JJ)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

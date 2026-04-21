@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s4coor3             ../starter/source/elements/solid/solide4/s4coor3.F
-      !||--- called by ------------------------------------------------------
-      !||    inirig_mat          ../starter/source/elements/initia/inirig_mat.F
-      !||    inisoldist          ../starter/source/initial_conditions/inivol/inisoldist.F
-      !||    inivoid             ../starter/source/elements/initia/inivoid.F
-      !||    multifluid_init3t   ../starter/source/multifluid/multifluid_init3t.F
-      !||    s4init3             ../starter/source/elements/solid/solide4/s4init3.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkvolume_4n      ../starter/source/elements/solid/solide/checksvolume.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod         ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s4coor3             ../starter/source/elements/solid/solide4/s4coor3.F
+!||--- called by ------------------------------------------------------
+!||    inirig_mat          ../starter/source/elements/initia/inirig_mat.F
+!||    inisoldist          ../starter/source/initial_conditions/inivol/inisoldist.F
+!||    inivoid             ../starter/source/elements/initia/inivoid.F
+!||    multifluid_init3t   ../starter/source/multifluid/multifluid_init3t.F
+!||    s4init3             ../starter/source/elements/solid/solide4/s4init3.F
+!||--- calls      -----------------------------------------------------
+!||    checkvolume_4n      ../starter/source/elements/solid/solide/checksvolume.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod         ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S4COOR3(X     ,XREFS   ,IXS    ,NGL     ,MXT    ,
      .                  NGEO  ,IX1     ,IX2    ,IX3     ,IX4    ,
      .                  X1   ,X2   ,X3   ,X4   ,Y1   ,Y2   ,
      .                  Y3   ,Y4   ,Z1   ,Z2   ,Z3   ,Z4   )
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -62,14 +63,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,N1,N2,N3,N4
+      INTEGER I
 C-----------------------------------------------
 C   E x t e r n a l  F u n c t i o n s
 C-----------------------------------------------
       my_real
      .   CHECKVOLUME_4N
 C=======================================================================
-C     CONNECTIVITES ET NUMERO DE MATERIAU ET PID
+C     connectivities and material number and pid
 C--------------------------------------------------
       DO I=LFT,LLT
         MXT(I) =IXS(1,I)

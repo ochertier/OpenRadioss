@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mjwl    ../engine/source/materials/mat/mat005/mjwl.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain   ../engine/source/materials/mat_share/mmain.F90
-      !||====================================================================
+!||====================================================================
+!||    mjwl    ../engine/source/materials/mat/mat005/mjwl.F
+!||--- called by ------------------------------------------------------
+!||    mmain   ../engine/source/materials/mat_share/mmain.F90
+!||====================================================================
       SUBROUTINE MJWL(PM    ,MAT  ,OFF   ,SIG   ,EINT ,
      1                PSH   ,P0   ,QOLD  ,VOL   ,BFRAC,
      2                VOLN  ,QNEW ,SOLD1 ,SOLD2 ,SOLD3,
@@ -60,9 +60,9 @@ C-----------------------------------------------
       my_real
      .   EINC(MVSIZ) , ESPE(MVSIZ), W1DF(MVSIZ)
       my_real
-     .   TBEGIN, TEND, TT0, 
+     .   TBEGIN, TEND,
      .   VOLO(MVSIZ),FACM(MVSIZ),POLD(MVSIZ),PNEW(MVSIZ),
-     .   EADD, LAMBDA,RR,RR2,A,M,N,XSI, BULK
+     .   EADD, LAMBDA,RR,RR2,A,M,N,BULK
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -77,7 +77,7 @@ C-----------------------------------------------
 
       !================      AFTERBURNING     ============================!
       ! computes E <- E + lambda(t)*E_add
-      QOPT       = PM(042,MAT(1))
+      QOPT       = NINT(PM(042,MAT(1)))
       EADD       = PM(160,MAT(1))
       TBEGIN     = PM(161,MAT(1))
       TEND       = PM(162,MAT(1))

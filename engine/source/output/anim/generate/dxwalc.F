@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C            SPMD_AGETMSR                    /spe/mach_spmd.F
-      !||====================================================================
-      !||    dxwalc         ../engine/source/output/anim/generate/dxwalc.F
-      !||--- called by ------------------------------------------------------
-      !||    dxyzsect       ../engine/source/output/anim/generate/dxyzsect.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_agetmsr   ../engine/source/mpi/anim/spmd_agetmsr.F
-      !||    write_r_c      ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    dxwalc         ../engine/source/output/anim/generate/dxwalc.F
+!||--- called by ------------------------------------------------------
+!||    dxyzsect       ../engine/source/output/anim/generate/dxyzsect.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_agetmsr   ../engine/source/mpi/anim/spmd_agetmsr.F
+!||    write_r_c      ../common_source/tools/input_output/write_routines.c
+!||====================================================================
       SUBROUTINE DXWALC(X ,RWL ,MSR ,
      3            XMIN ,YMIN ,ZMIN  ,XMAX ,YMAX  ,
      4            ZMAX,FR_WALL)
@@ -51,7 +51,7 @@ C-----------------------------------------------
       INTEGER I
 C     REAL
       my_real
-     .   XWL, YWL, ZWL,XN,YN,ZN,D,DX,DY,DZ,XL, R, V1, V2, V3, VV1,
+     .   XWL, YWL, ZWL,XN,YN,ZN,DX,DY,DZ,XL, R, V1, V2, V3, VV1,
      .   VV2, VV3, VV, X0, Y0, Z0, ALPHA, S, C
       REAL R4
 C-----------------------------------------------

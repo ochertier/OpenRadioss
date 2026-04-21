@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat151             ../starter/source/materials/mat/mat151/hm_read_mat151.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    init_mat_keyword           ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
-      !||    inivol_def_mod             ../starter/share/modules1/inivol_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat151             ../starter/source/materials/mat/mat151/hm_read_mat151.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    init_mat_keyword           ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+!||    inivol_def_mod             ../starter/share/modules1/inivol_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT151( MTAG, PM, IPM, ID, TITR, MULTI_FVM, UNITAB, LSUBMODEL, MATPARAM )
 C-----------------------------------------------
 C   M o d u l e s
@@ -77,6 +77,7 @@ C-----------------------------------------------
       INTEGER :: II
       my_real :: FRAC_VOL, SUM_FRAC_VOL
       my_real :: VFRAC(21)
+      my_real :: FAC
       INTEGER :: IMID(21)
 C-----------------------------------------------
 C     B o d y
@@ -118,8 +119,8 @@ C-----------------------------------------------
          ENDIF
       ENDDO
 
-      ! Warning and Error messages
-      IF (SUM_FRAC_VOL /= ONE) THEN
+      ! Warning and Error messages SUM_FRAC_VOL /= 1.0
+      IF (ABS(ONE-SUM_FRAC_VOL) > EM14) THEN
          IF (NUM_INIVOL == 0) THEN
             CALL ANCMSG(MSGID = 1512, MSGTYPE = MSGERROR, ANMODE = ANINFO, C1 = "ERROR", I1 = ID, R1 = SUM_FRAC_VOL)
          ELSE

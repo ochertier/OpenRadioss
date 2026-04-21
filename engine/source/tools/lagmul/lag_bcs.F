@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lag_bcs        ../engine/source/tools/lagmul/lag_bcs.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult       ../engine/source/tools/lagmul/lag_mult.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lag_bcs        ../engine/source/tools/lagmul/lag_bcs.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult       ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE LAG_BCS(IGRNOD ,IBCSLAG,SK     ,RLL    ,NGRNOD ,
      2                   IADLL  ,LLL    ,JLL    ,SLL    ,XLL    ,
      3                   COMNTAG,ICFTAG ,JCFTAG ,MASS   ,INER   ,
@@ -64,11 +64,11 @@ C-----------------------------------------------
       my_real
      .   AA,VV,HH,R,SK1,SK2,SK3,DTM2
 C-----------------------------------------------
-C        NC : nombre de condition cinematique 
-C        IC : numero de la condition cinematique (1,NC)
+C        NC: number of cinematic condition 
+C        ic: number of the kinematic condition (1,nc)
 C        IK : 
-C        I  : numero global du noeud (1,NUMNOD)
-C        J  : direction 1,2,3,4,5,6
+C        I  : global node number (1,NUMNOD)
+C        J ': direction 1,2,3,4,5,6
 C------
 C        IADLL(NC)        : IAD = IADLL(IC)
 C        IK = IAD,IAD+1,IAD+2,...
@@ -366,10 +366,10 @@ c                print*,'RLL(',NC,') =',RLL(NC), DR(1,NN)
               ENDIF
             ENDIF
           ENDIF
-C---      Direct solution
+C--- Direct solution
          ELSE
            IF(IS==1) THEN
-C----           REPERE GLOBAL
+C----           GLOBAL REFERENCE FRAME
              IF(CT==1)THEN
                V(3,NN)=ZERO
                A(3,NN)=ZERO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ruser46      ../engine/source/elements/spring/ruser46.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3       ../engine/source/elements/spring/rforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_u_func   ../engine/source/user_interface/ufunc.F
-      !||    get_u_mid    ../engine/source/user_interface/upidmid.F
-      !||    get_u_mnu    ../engine/source/user_interface/upidmid.F
-      !||    get_u_pid    ../engine/source/user_interface/upidmid.F
-      !||    get_u_pnu    ../engine/source/user_interface/upidmid.F
-      !||    get_u_time   ../engine/source/user_interface/uaccess.F
-      !||====================================================================
+!||====================================================================
+!||    ruser46      ../engine/source/elements/spring/ruser46.F
+!||--- called by ------------------------------------------------------
+!||    rforc3       ../engine/source/elements/spring/rforc3.F
+!||--- calls      -----------------------------------------------------
+!||    get_u_func   ../engine/source/user_interface/ufunc.F
+!||    get_u_mid    ../engine/source/user_interface/upidmid.F
+!||    get_u_mnu    ../engine/source/user_interface/upidmid.F
+!||    get_u_pid    ../engine/source/user_interface/upidmid.F
+!||    get_u_pnu    ../engine/source/user_interface/upidmid.F
+!||    get_u_time   ../engine/source/user_interface/uaccess.F
+!||====================================================================
       SUBROUTINE RUSER46(NEL,IOUT   ,IPROP  ,UVAR   ,NUVAR  ,
      2             FX      ,FY      ,FZ     ,XMOM   ,YMOM   ,
      3             ZMOM    ,E       ,OFF    ,STIFM  ,STIFR  ,
@@ -118,7 +118,7 @@ C   D u m m y   A r g u m e n t s   a n d   F u n c t i o n
 C----------------------------------------------------------
       INTEGER IOUT,NEL,NUVAR,IPROP,
      .        GET_U_PNU,GET_U_PID,GET_U_MID,GET_U_MNU,
-     .        KFUNC,KMAT,KPROP
+     .        KFUNC
       my_real
      .   UVAR(NUVAR,*),DT ,
      .   FX(*), FY(*), FZ(*), E(*), VX(*),MASS(*) ,XINER(*),
@@ -142,8 +142,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,IFUNC1,IFUNC2,IFUNC3,IFUNC4,IFUNC5,EPSI
       my_real
-     .        ELASTIF,X,DXDY,XLIM1,XLIM2,FMX,FMN,DX,DAMP,
-     .        FUX1,FUX2,FUX3,FUX4,DEBUG,SLOPE
+     .        ELASTIF,X,DXDY,XLIM1,XLIM2,DX,DAMP,
+     .        FUX1,FUX2,FUX3,FUX4,SLOPE
       my_real
      .        TT,NEWLEN,DELTALEN,DELTALENDOT,SCALET,SCALEX,SCALEV,SCALEF
 C-----------------------------------------------

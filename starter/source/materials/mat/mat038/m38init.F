@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m38init   ../starter/source/materials/mat/mat038/m38init.F
-      !||--- called by ------------------------------------------------------
-      !||    matini    ../starter/source/materials/mat_share/matini.F
-      !||    sigin3b   ../starter/source/elements/solid/solid8p/sigin3b.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter    ../starter/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    m38init   ../starter/source/materials/mat/mat038/m38init.F
+!||--- called by ------------------------------------------------------
+!||    matini    ../starter/source/materials/mat_share/matini.F
+!||    sigin3b   ../starter/source/elements/solid/solid8p/sigin3b.F
+!||--- calls      -----------------------------------------------------
+!||    finter    ../starter/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE M38INIT(
      1      NEL    , NUPARAM, NUVAR   , NFUNC  , IFUNC  , NPF   ,
      2      TF     , UPARAM , RHO0    , VOLUME , EINT   ,UVAR   ) 
@@ -80,7 +80,7 @@ C----------------------------------------------------------------
       INTEGER          I, J
 C     REAL
       my_real
-     .   DECAY,TENSIONCUT,TOLERANCE,LAMDA,EFINAL,EPSFIN,
+     .   TENSIONCUT,TOLERANCE,LAMDA,EFINAL,EPSFIN,
      .   E0,VT,VC,RV,BETA,HYSTER,
      .   RATEDAMP,THETA,P0,RELAXP,MAXPRES,PHI,
      .   GAMMA,VISCOSITY,EXPONAS,EXPONBS,FUNLOAD,RUNLOAD,

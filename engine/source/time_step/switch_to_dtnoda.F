@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    switch_to_dtnoda   ../engine/source/time_step/switch_to_dtnoda.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2           ../engine/source/engine/radioss2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../engine/source/output/message/message.F
-      !||    arret              ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    groupdef_mod       ../common_source/modules/groupdef_mod.F
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    switch_to_dtnoda      ../engine/source/time_step/switch_to_dtnoda.F
+!||--- called by ------------------------------------------------------
+!||    radioss2              ../engine/source/engine/radioss2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod          ../common_source/modules/groupdef_mod.F
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod          ../common_source/tools/memory/my_alloc.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SWITCH_TO_DTNODA(
      .                  IXR      ,GEO      ,PM       ,IPARG    ,ELBUF_TAB,
      .                  MS       ,IN       ,ITAB     ,IGEO     ,IPM    ,
@@ -42,9 +45,12 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixr
+      USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
-C-----------------------------------------------
+C-----------------------------------------------      
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
@@ -88,12 +94,18 @@ C-----------------------------------------------
      .        K1,K11,K12,K13,K14,
      .        IOK,IDTGRX,NG
       INTEGER I15ATH,I15A,I15B,I15C,I15D,I15E,I15F,I15G,I15H,I15I,I15J,I15K
-      INTEGER TAGN(NUMNOD), TAGR(NUMELR),TAGPRT_SMS(NPART)
 C     REAL
       my_real
      .   XKM, XCM, XKR, XCR, XIN(MVSIZ)
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       INTEGER, DIMENSION(:), POINTER :: IPARTR
+      INTEGER, DIMENSION(:), ALLOCATABLE :: TAGN
+      INTEGER, DIMENSION(:), ALLOCATABLE :: TAGR
+      INTEGER, DIMENSION(:), ALLOCATABLE :: TAGPRT_SMS
+C-----------------------------------------------------
+      CALL MY_ALLOC(TAGN,NUMNOD)
+      CALL MY_ALLOC(TAGR,NUMELR)
+      CALL MY_ALLOC(TAGPRT_SMS,NPART)
 C-----------------------------------------------------
 C     Check for springs with stiffness but no mass
 C     ... Switch for cohesive elements should also be done here ...
@@ -298,5 +310,9 @@ C------------------------------------------
         END IF
       END IF
 C------------------------------------------
+      DEALLOCATE(TAGN)
+      DEALLOCATE(TAGR)
+      DEALLOCATE(TAGPRT_SMS)
+C-----------------------------------------------------
       RETURN
       END      

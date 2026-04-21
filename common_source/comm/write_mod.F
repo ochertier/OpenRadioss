@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,294 +20,294 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    write_mod       ../common_source/comm/write_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    write_sensors   ../engine/source/output/restart/write_sensors.F
-      !||====================================================================
+!||====================================================================
+!||    write_mod       ../common_source/comm/write_mod.F
+!||--- called by ------------------------------------------------------
+!||    write_sensors   ../engine/source/output/restart/write_sensors.F
+!||====================================================================
       MODULE WRITE_MOD
 #include "my_real.inc"
       CONTAINS
 !! \brief Wrapper routine to WRITE_I_C, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_integer   ../common_source/comm/write_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    write_sensors   ../engine/source/output/restart/write_sensors.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_i_c       ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    write_integer   ../common_source/comm/write_mod.F
+!||--- called by ------------------------------------------------------
+!||    write_sensors   ../engine/source/output/restart/write_sensors.F
+!||--- calls      -----------------------------------------------------
+!||    write_i_c       ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         SUBROUTINE WRITE_INTEGER(A)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(IN) :: A !< value to be written in a file
+          INTEGER, INTENT(IN) :: A !< value to be written in a file
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: ONE
+          INTEGER :: ONE
 C-----------------------------------------------
-        ONE = 1
-        CALL WRITE_I_C(A,ONE)
+          ONE = 1
+          CALL WRITE_I_C(A,ONE)
         END SUBROUTINE
-      !||====================================================================
-      !||    write_integer_1d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    write_integer_1d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_i_c          ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         SUBROUTINE WRITE_INTEGER_1D(A,N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(IN) :: A(N) !< value to be written in a file
-        INTEGER, INTENT(IN) :: N !< Dimension1
-        CALL WRITE_I_C(A,N)
+          INTEGER, INTENT(IN) :: A(N) !< value to be written in a file
+          INTEGER, INTENT(IN) :: N !< Dimension1
+          CALL WRITE_I_C(A,N)
         END SUBROUTINE
-      !||====================================================================
-      !||    write_integer_2d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    write_integer_2d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_i_c          ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         SUBROUTINE WRITE_INTEGER_2D(A,N,M)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(IN) :: A(N,M) !< value to be written in a file
-        INTEGER, INTENT(IN) :: N,M !< Dimensions
+          INTEGER, INTENT(IN) :: A(N,M) !< value to be written in a file
+          INTEGER, INTENT(IN) :: N,M !< Dimensions
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: D
+          INTEGER :: D
 C-----------------------------------------------
-        D = M * N
-        CALL WRITE_I_C(A,D)
+          D = M * N
+          CALL WRITE_I_C(A,D)
         END SUBROUTINE
-      !||====================================================================
-      !||    write_integer_3d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    write_integer_3d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_i_c          ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         SUBROUTINE WRITE_INTEGER_3D(A,L,N,M)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(IN) :: A(L,N,M) !< value to be written in a file
-        INTEGER, INTENT(IN) :: L,N,M !< Dimensions
+          INTEGER, INTENT(IN) :: A(L,N,M) !< value to be written in a file
+          INTEGER, INTENT(IN) :: L,N,M !< Dimensions
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: D
+          INTEGER :: D
 C-----------------------------------------------
-        D = L * M * N
-        CALL WRITE_I_C(A,D)
+          D = L * M * N
+          CALL WRITE_I_C(A,D)
         END SUBROUTINE
 
 !! \brief Wrapper routine to WRITE_DB, to be used in order to avoid dummy-argument mismatch at error at compile tile
 
 !! \brief Wrapper routine to WRITE_DB, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_real   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_db     ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_real   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_db     ../common_source/tools/input_output/write_db.F
+!||====================================================================
         SUBROUTINE WRITE_REAL(A)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        my_real , INTENT(IN) :: A  !< value to be written
+          my_real , INTENT(IN) :: A  !< value to be written
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: ONE
+          INTEGER :: ONE
 C-----------------------------------------------
-        ONE = 1
-        CALL WRITE_DB(A,ONE)
+          ONE = 1
+          CALL WRITE_DB(A,ONE)
         END SUBROUTINE
 !! \brief Wrapper routine to WRITE_DB, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_real_1d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_db        ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_real_1d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_db        ../common_source/tools/input_output/write_db.F
+!||====================================================================
         SUBROUTINE WRITE_REAL_1D(A,N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        my_real , INTENT(IN) :: A(N)  !< value to be written
-        INTEGER , INTENT(IN) :: N  !<  size
+          my_real , INTENT(IN) :: A(N)  !< value to be written
+          INTEGER , INTENT(IN) :: N  !<  size
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: D
+          INTEGER :: D
 C-----------------------------------------------
-        D = N
-        CALL WRITE_DB(A,D)
+          D = N
+          CALL WRITE_DB(A,D)
         END SUBROUTINE
 !! \brief Wrapper routine to WRITE_DB, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_real_2d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_db        ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_real_2d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_db        ../common_source/tools/input_output/write_db.F
+!||====================================================================
         SUBROUTINE WRITE_REAL_2D(A,M,N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        my_real , INTENT(IN) :: A(M,N)  !< value to be written
-        INTEGER, INTENT(IN) :: N,M  !<  size
+          my_real , INTENT(IN) :: A(M,N)  !< value to be written
+          INTEGER, INTENT(IN) :: N,M  !<  size
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: D
+          INTEGER :: D
 C-----------------------------------------------
-        D = M * N
-        CALL WRITE_DB(A,D)
+          D = M * N
+          CALL WRITE_DB(A,D)
         END SUBROUTINE
 !! \brief Wrapper routine to WRITE_DB, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_real_3d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_db        ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_real_3d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_db        ../common_source/tools/input_output/write_db.F
+!||====================================================================
         SUBROUTINE WRITE_REAL_3D(A,L,M,N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        my_real , INTENT(IN) :: A(L,M,N)  !< value to be written
-        INTEGER , INTENT(IN) :: L,N,M  !<  size
+          my_real , INTENT(IN) :: A(L,M,N)  !< value to be written
+          INTEGER , INTENT(IN) :: L,N,M  !<  size
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: D
+          INTEGER :: D
 C-----------------------------------------------
-        D = L * M * N
-        CALL WRITE_DB(A,D)
+          D = L * M * N
+          CALL WRITE_DB(A,D)
         END SUBROUTINE
 !! \brief Wrapper routine to WRITE_DPDB, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_double   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_dpdb     ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_double   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_dpdb     ../common_source/tools/input_output/write_db.F
+!||====================================================================
         SUBROUTINE WRITE_DOUBLE(A)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        DOUBLE PRECISION , INTENT(IN) :: A  !< value to be written
+          DOUBLE PRECISION , INTENT(IN) :: A  !< value to be written
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: ONE
+          INTEGER :: ONE
 C-----------------------------------------------
-        ONE = 1
-        CALL WRITE_DPDB(A,ONE)
+          ONE = 1
+          CALL WRITE_DPDB(A,ONE)
         END SUBROUTINE
 
 !! \brief Wrapper routine to WRITE_DPDB, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_double_1d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_dpdb        ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_double_1d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_dpdb        ../common_source/tools/input_output/write_db.F
+!||====================================================================
         SUBROUTINE WRITE_DOUBLE_1D(A,N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        DOUBLE PRECISION , INTENT(IN) :: A(N)  !< value to be written
-        INTEGER, INTENT(IN) :: N  !<  size
+          DOUBLE PRECISION , INTENT(IN) :: A(N)  !< value to be written
+          INTEGER, INTENT(IN) :: N  !<  size
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: D
+          INTEGER :: D
 C-----------------------------------------------
-        D = N
-        CALL WRITE_DPDB(A,D)
+          D = N
+          CALL WRITE_DPDB(A,D)
         END SUBROUTINE
 !! \brief Wrapper routine to WRITE_DPDB, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_double_2d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_dpdb        ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_double_2d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_dpdb        ../common_source/tools/input_output/write_db.F
+!||====================================================================
         SUBROUTINE WRITE_DOUBLE_2D(A,M,N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        DOUBLE PRECISION , INTENT(IN) :: A(M,N)  !< value to be written
-        INTEGER, INTENT(IN) :: N,M  !<  size
+          DOUBLE PRECISION , INTENT(IN) :: A(M,N)  !< value to be written
+          INTEGER, INTENT(IN) :: N,M  !<  size
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: D
+          INTEGER :: D
 C-----------------------------------------------
-        D = M * N
-        CALL WRITE_DPDB(A,D)
+          D = M * N
+          CALL WRITE_DPDB(A,D)
         END SUBROUTINE
 !! \brief Wrapper routine to WRITE_DPDB, to be used in order to avoid dummy-argument mismatch at error at compile tile
-      !||====================================================================
-      !||    write_double_3d   ../common_source/comm/write_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_dpdb        ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_double_3d   ../common_source/comm/write_mod.F
+!||--- calls      -----------------------------------------------------
+!||    write_dpdb        ../common_source/tools/input_output/write_db.F
+!||====================================================================
         SUBROUTINE WRITE_DOUBLE_3D(A,L,M,N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        IMPLICIT NONE
+          IMPLICIT NONE
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        DOUBLE PRECISION , INTENT(IN) :: A(L,M,N)  !< value to be written
-        INTEGER , INTENT(IN) :: L,N,M  !<  size
+          DOUBLE PRECISION , INTENT(IN) :: A(L,M,N)  !< value to be written
+          INTEGER , INTENT(IN) :: L,N,M  !<  size
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: D
+          INTEGER :: D
 C-----------------------------------------------
-        D = L * M * N
-        CALL WRITE_DPDB(A,D)
+          D = L * M * N
+          CALL WRITE_DPDB(A,D)
         END SUBROUTINE
       END MODULE

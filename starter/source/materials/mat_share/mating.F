@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mating   ../starter/source/materials/mat_share/mating.F
-      !||--- called by ------------------------------------------------------
-      !||    matini   ../starter/source/materials/mat_share/matini.F
-      !||====================================================================
+!||====================================================================
+!||    mating   ../starter/source/materials/mat_share/mating.F
+!||--- called by ------------------------------------------------------
+!||    matini   ../starter/source/materials/mat_share/matini.F
+!||====================================================================
       SUBROUTINE MATING(PM   ,VOL ,OFF    ,EINT  ,RHO ,
      .                  SIG  ,IX  ,NIX    ,SIGI  ,EPSP,
      .                  NSIG ,MAT ,NUMS   ,PT    ,NEL ,
-     .                  FILL ,TEMP)
+     .                  FILL ,TEMP,TEMPEL )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,7 +48,8 @@ C-----------------------------------------------
       INTEGER   NIX, NSIG, NUMS, NEL
       INTEGER   IX(NIX,*),PT(*),MAT(*)
       my_real :: PM(NPROPM,*), SIG(NEL,6), SIGI(NSIG,*)
-      my_real, DIMENSION(NEL) :: VOL,OFF,EINT,RHO,EPSP,FILL,TEMP
+      my_real, DIMENSION(NEL) :: VOL,OFF,EINT,RHO,EPSP,FILL
+      my_real, DIMENSION(NEL) :: TEMP,TEMPEL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -61,7 +62,11 @@ C=======================================================================
        IF(MA == 0)CYCLE
        EINT(I)=PM(23,MA)
        RHO(I) =PM(89,MA)
-       TEMP(I)=PM(79,MA)
+       IF (TEMPEL(I) > ZERO) THEN
+         TEMP(I) = TEMPEL(I)
+       ELSE
+         TEMP(I) = PM(79,MA)
+       END IF
 C-----------------------------
        IF (ISIGI == 0) THEN
 C-----------------------------
@@ -78,7 +83,7 @@ C
 C 
         FILL(I)=ONE
 C-----------------------------
-       ELSE ! CONTRAINTES INITIALES
+       ELSE ! INITIAL STRESSES
 C-----------------------------
         IF (ABS(ISIGI)/=3.AND.ABS(ISIGI)/=4.AND.ABS(ISIGI)/=5) THEN
           II = I+NFT
@@ -137,10 +142,10 @@ C-----------
             ELSEIF (JLAG/=0.AND.JSPH == 0) THEN
               VOL(I) = VOL(I) * RHO(I) / PM(1,MA)
             ENDIF
-C           EPSP NON UTILISE DANS MAT TYPE 1 ET ECRASE PAR EINT
+C           EPSP NOT USED IN MAT TYPE 1 AND OVERWRITTEN BY EINT
             IF (SIGI(10,JJ)/=ZERO) EPSP(I) = SIGI(10,JJ)
             IF (SIGI( 9,JJ)/=ZERO) EINT(I) = SIGI(9,JJ)
-C           TAUX DE REMPLISSAGE
+C           FILLING RATE
             IF(SIGI(11,JJ)/=ZERO) FILL(I)=SIGI(11,JJ)
           ENDIF
         ENDIF

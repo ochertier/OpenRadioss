@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fsdcod                 ../starter/source/system/fsdcod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    iniguser               ../starter/source/system/iniguser.F
-      !||    nintri                 ../starter/source/system/nintrr.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_mod           ../starter/share/modules1/intstamp_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
-      SUBROUTINE FSDCOD(BUFMAT    ,PM        ,GEO       ,IBCL      ,IPRES    ,
+!||====================================================================
+!||    fsdcod                 ../starter/source/system/fsdcod.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    iniguser               ../starter/source/system/iniguser.F
+!||    nintri                 ../starter/source/system/nintrr.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    intstamp_mod           ../starter/share/modules1/intstamp_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
+      SUBROUTINE FSDCOD(PYTHON, BUFMAT    ,PM        ,GEO       ,IBCL      ,IPRES    ,
      .                  IBFV      ,ISKEW     ,ISKN      ,SENSORS   ,MAT_PARAM,
      .                  ITABM1    ,SKEW      ,LACCELM   ,INSEL     ,BUFGEO   ,
      .                  IBCSLAG   ,IGEO      ,IPM       ,
      .                  IBFT      ,IBCV      ,IBFVEL    ,
      .                  IBCR      ,TABLE     ,NPC1      ,NPC       ,PLD      ,
-     .                  NOM_OPT   ,IBFFLUX   ,GLOB_THERM)  
+     .                  NOM_OPT   ,IBFFLUX   ,GLOB_THERM,NIMPVEL   ,NIMPDISP ,
+     .                  NIMPACC)  
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------C     
@@ -52,6 +53,7 @@ C    ...
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE python_funct_mod, only : python_
       USE MESSAGE_MOD
       USE INTSTAMP_MOD
       USE TABLE_MOD
@@ -73,6 +75,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(PYTHON_), INTENT(IN) :: PYTHON
       TYPE(glob_therm_) ,intent(in) :: glob_therm
       INTEGER IBFV(NIFV,*),NPC(*), NPC1(*), IBCL(NIBCLD,*), IPRES(NIBCLD,*),
      .        ISKEW(*), ISKN(LISKN,*), ITABM1(*),
@@ -80,6 +83,7 @@ C-----------------------------------------------
      .        IPM(NPROPMI,NUMMAT), IGEO(NPROPGI,NUMGEO),IBCV(GLOB_THERM%NICONV,*),
      .        IBCR(GLOB_THERM%NIRADIA,*),IBFFLUX(GLOB_THERM%NITFLUX,*)
       INTEGER ,DIMENSION(NIFV,NFXVEL)  ,INTENT(INOUT) :: IBFVEL
+      INTEGER, INTENT(IN) :: NIMPVEL, NIMPDISP, NIMPACC
       INTEGER ,DIMENSION(GLOB_THERM%NIFT,GLOB_THERM%NFXTEMP) ,INTENT(INOUT) :: IBFT
       my_real PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO),SKEW(LSKEW,*), PLD(*),BUFMAT(*)
       TYPE(TTABLE) , DIMENSION(NTABLE) :: TABLE
@@ -153,7 +157,7 @@ C
 C
         ID=IPM(1,I)
         CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,I),LTITR)
-        ILAW=NINT(PM(19,I))
+        ILAW=IPM(2,I)
 C
         IF(ILAW == 11) THEN
 C
@@ -568,27 +572,9 @@ C
           ENDIF
         ENDIF
 C------------
-183         IEXPAN =  IPM(218,I)
-         IF(IEXPAN > 0)THEN
-           IS=IPM(219,I)
-           IF(IS > 0)THEN
-             DO J=1,NFUNCT
-               IF(IS == NPC1(J))  THEN
-                 IPM(219,I)=J
-                 GOTO 299
-               ENDIF
-             ENDDO
-             CALL ANCMSG(MSGID=126,
-     .                   MSGTYPE=MSGERROR,
-     .                   ANMODE=ANINFO_BLIND_1,
-     .                   I1=ID,
-     .                   C1=TITR,
-     .                   I2=IS)
-           ENDIF
-         ENDIF
- 299   CONTINUE
+183     CONTINUE
 C------------
-C     fin boucle sur mats :
+C     END OF LOOP ON MATS:
  300  CONTINUE
  
  
@@ -600,7 +586,7 @@ C     fin boucle sur mats :
 
           ID=IPM(1,IMAT)
           CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,IMAT),LTITR)
-          ILAW=NINT(PM(19,I))
+          ILAW=IPM(2,I)
 
           A_FUNC = PM(35,IMAT) 
           IF(A_FUNC /= 0)THEN                                                                                                
@@ -631,7 +617,6 @@ C     fin boucle sur mats :
          ENDIF
 
       ENDDO
- 
  
  
 C
@@ -669,7 +654,7 @@ C
      .                    ANMODE=ANINFO_BLIND_1,
      .                    I1=ID,
      .                    C1=TITR,
-     .                    I2=ISERV(K+3))
+     .                    I2=ISERV(K))
             ENDIF
  330      CONTINUE
           IF (IGEO(119,I) /=0)THEN                    
@@ -740,11 +725,11 @@ c            IF(NPC(2*NFUNCT+LOAD+1) <0 .OR. NPC(2*NFUNCT+UNLOAD+1) <0)THEN
                    X2 =PLD(NPC(UNLOAD)+K1+2)*XSCALE
                    YY1=PLD(NPC(UNLOAD)+K1+1)
                    Y2 =PLD(NPC(UNLOAD)+K1+3)
-                   IF ( XX1<=ZERO .AND.X2> ZERO)ALPHA2=(Y2-YY1)/(X2-XX1)!  passage par zero
+                   IF ( XX1<=ZERO .AND.X2> ZERO)ALPHA2=(Y2-YY1)/(X2-XX1)! CROSSING THROUGH ZERO
                    IF (Y2>=T1 .AND.YY1<=T2.AND.X2>=S1.AND.XX1<=S2)THEN
                      DYDX = (Y2-YY1) / (X2-XX1)
                      DTDS = (T2-T1) / (S2-S1)
-                     IF (DYDX > DTDS) THEN ! intersection des courbes
+                     IF (DYDX > DTDS) THEN ! INTERSECTION OF CURVES
                        SX = (T1-YY1-DTDS*S1+DYDX*XX1) / (DYDX-DTDS)
                        TY =  T1 + DTDS*(SX - S1)
                      ENDIF 
@@ -794,7 +779,7 @@ C
      .                    ANMODE=ANINFO_BLIND_1,
      .                    I1=ID,
      .                    C1=TITR,
-     .                    I2=ISERV(K+3))
+     .                    I2=ISERV(K))
             ENDIF
  331      CONTINUE
           IF (IGEO(201,I) > 0) THEN
@@ -1388,41 +1373,137 @@ C
      .              I1=IPRES(5,I))
  500  CONTINUE
 C
-C     6) FIXED VELOCITIES
+C     6) FIXED DISPLACEMENTS
 C
-      DO 540 I=1,NFXVEL
-        DO 520 J=1,NFUNCT
+
+      DO I=1,NIMPDISP
+        OK = 0
+        DO J=1,NFUNCT
           IF(IBFV(3,I) == NPC1(J)) THEN
             IBFV(3,I)=J
-            GOTO 540
-          ENDIF
- 520    CONTINUE
+            OK = 1
+            EXIT
+          END IF
+        END DO
+
+        IF (OK == 0) THEN
         CALL ANCMSG(MSGID=120,
      .              MSGTYPE=MSGERROR,
      .              ANMODE=ANINFO_BLIND_1,
-     .              C1='IMPOSED VELOCITIES',
+     .              C1='IMPOSED DISPLACEMENTS',
      .              I1=IBFV(3,I))
- 540  CONTINUE
+        END IF
+      END DO
 c
-      DO 560 I=1,NFXVEL
+      DO I=1,NIMPDISP
+        OK = 0
         DO J=1,NFUNCT
           IF (IBFV(15,I)== 0) THEN 
-            GOTO 560
+            OK = 1
+            EXIT
           ELSE    
             IF(IBFV(15,I) == NPC1(J)) THEN
               IBFV(15,I)=J
-              GOTO 560
+              OK = 1
+              EXIT
             ENDIF
           ENDIF
         END DO
+        IF (OK == 0) THEN
+          CALL ANCMSG(MSGID=120,
+     .                MSGTYPE=MSGERROR,
+     .                ANMODE=ANINFO_BLIND_1,
+     .                C1='IMPOSED DISPLACEMENTS',
+     .                I1=IBFV(3,I))
+        END IF
+      END DO
+C
+C     7) FIXED VELOCITIES
+C
+      DO I=1+NIMPDISP,NIMPVEL+NIMPDISP
+        OK = 0
+        DO J=1,NFUNCT
+          IF(IBFV(3,I) == NPC1(J)) THEN
+            IBFV(3,I)=J
+            OK = 1
+            EXIT
+          END IF
+        END DO
+        IF (OK == 0) THEN
+          CALL ANCMSG(MSGID=120,
+     .                MSGTYPE=MSGERROR,
+     .                ANMODE=ANINFO_BLIND_1,
+     .                C1='IMPOSED VELOCITIES',
+     .                I1=IBFV(3,I))
+        END IF
+      END DO
+c
+      DO I=1+NIMPDISP,NIMPVEL+NIMPDISP
+        OK = 0
+        DO J=1,NFUNCT
+          IF (IBFV(15,I)== 0) THEN 
+            OK = 1
+            EXIT
+          ELSE    
+            IF(IBFV(15,I) == NPC1(J)) THEN
+              IBFV(15,I)=J
+              OK = 1
+              EXIT
+            END IF
+          END IF
+        END DO
+        IF(OK == 0) THEN
         CALL ANCMSG(MSGID=120,
      .              MSGTYPE=MSGERROR,
      .              ANMODE=ANINFO_BLIND_1,
      .              C1='IMPOSED VELOCITIES',
      .              I1=IBFV(3,I))
- 560  CONTINUE
+        END IF
+      END DO
 C
+C     8) FIXED ACCELERATIONS
+C
+      DO I=1+NIMPVEL+NIMPDISP,NIMPACC+NIMPVEL+NIMPDISP
+        OK = 0
+        DO J=1,NFUNCT
+          IF(IBFV(3,I) == NPC1(J)) THEN
+            IBFV(3,I)=J
+            OK = 1
+            EXIT
+          END IF
+        END DO
 
+        IF (OK == 0) THEN
+        CALL ANCMSG(MSGID=120,
+     .              MSGTYPE=MSGERROR,
+     .              ANMODE=ANINFO_BLIND_1,
+     .              C1='IMPOSED ACCELERATIONS',
+     .              I1=IBFV(3,I))
+        END IF
+      END DO
+c
+      DO I=1+NIMPVEL+NIMPDISP,NIMPACC+NIMPVEL+NIMPDISP
+        OK = 0
+        DO J=1,NFUNCT
+          IF (IBFV(15,I)== 0) THEN 
+            OK = 1
+            EXIT
+          ELSE    
+            IF(IBFV(15,I) == NPC1(J)) THEN
+              IBFV(15,I)=J
+              OK = 1
+              EXIT
+            ENDIF
+          ENDIF
+        END DO
+        IF (OK == 0) THEN
+          CALL ANCMSG(MSGID=120,
+     .                MSGTYPE=MSGERROR,
+     .                ANMODE=ANINFO_BLIND_1,
+     .                C1='IMPOSED ACCELERATIONS',
+     .                I1=IBFV(3,I))
+        END IF
+      END DO
 C=======================================================================
 C
 C     (II) SKEW
@@ -1489,7 +1570,7 @@ c 745  CONTINUE
 
 
 C---------------------------
-C     6) FIXED temperatures
+C     9) FIXED temperatures
 C---------------------------
       DO 751 I=1,GLOB_THERM%NFXTEMP
         DO 750 J=1,NFUNCT
@@ -1505,7 +1586,7 @@ C---------------------------
      .              I1=IBFT(2,I))
  751  CONTINUE
 C------------------------------
-C     6) FIXED convective flux
+C     10 Convective Flow
 C------------------------------
       DO 753 I=1,GLOB_THERM%NUMCONV
         DO 752 J=1,NFUNCT
@@ -1521,7 +1602,7 @@ C------------------------------
      .              I1=IBCV(5,I))
  753  CONTINUE
 C-----------------------------
-C     6) FIXED radiative flux
+C     11) FIXED radiative flux
 C-----------------------------
       DO 755 I=1,GLOB_THERM%NUMRADIA
         DO 754 J=1,NFUNCT
@@ -1537,7 +1618,7 @@ C-----------------------------
      .              I1=IBCR(5,I))
  755  CONTINUE
 C---------------------------
-C     7) FIXED heat flux
+C     12) FIXED heat flux
 C---------------------------
       DO 757 I=1,GLOB_THERM%NFXFLUX
         DO 756 J=1,NFUNCT
@@ -1761,14 +1842,14 @@ C---------------------
       ENDDO
 c
 C----------------------------
-C     (IV) TRAITEMENT DES TABLES
+C     (IV) PROCESSING OF TABLES
 C----------------------------
 C
 C         1) LOIS 73
 C
       DO I=1,NUMMAT
 C
-        ILAW=NINT(PM(19,I))
+        ILAW=IPM(2,I)
 C
         ID=IPM(1,I)
         CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,I),LTITR)
@@ -1921,29 +2002,29 @@ C      USER
 C----------------------
       CALL INIGUSER(BUFGEO,IGEO,IPM,NPC1)
 C------------------------------------------------------------------
-C      POINTS DE DETONATION,
-C      SEGMENTS DE DETONATION,
-C      DETONATION AVEC ECRAN,
+C      DETONATION POINTS,
+C      DETONATION SEGMENTS,
+C      DETONATION WITH SCREEN,
 C      PLANAR DETONATION WAVE.
 C------------------------------------------------------------------
-C Traitement des id matriau (Mdet) dans lecdet.F avec le check des user flags
+C Treatment of Matriaux ID (MDET) in Lecdet.f with the flag -like checkout
 
       RETURN
 C-----
       END
 C
-      !||====================================================================
-      !||    m20dcod                ../starter/source/system/fsdcod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    arret                  ../starter/source/system/arret.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    m20dcod                ../starter/source/system/fsdcod.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE M20DCOD(MLAW_TAG, IPM  ,PM, MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1986,7 +2067,7 @@ C     SUBMAT FOR MULTIUMAT LAW20
 C-----------------------------------------------
 C
       DO I=1,NUMMAT
-        ILAW=NINT(PM(19,I))
+        ILAW=IPM(2,I)
         IF(ILAW == 20) THEN
           ID=IPM(1,I)
           CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,I),LTITR)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_sphio          ../starter/source/loads/sph/hm_read_sphio.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    get_u_geo              ../starter/source/user_interface/uaccess.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    udouble                ../starter/source/system/sysfus.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_sphio          ../starter/source/loads/sph/hm_read_sphio.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    get_u_geo              ../starter/source/user_interface/uaccess.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    subrotpoint            ../starter/source/model/submodel/subrot.F
+!||    udouble                ../starter/source/system/sysfus.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_SPHIO(ISPHIO   ,VSPHIO   ,IPART    ,IGRSURF  ,
      .                         NOD2SP   ,IPARTSP  ,ITAB     ,X        ,
      .                         MFI      ,LWASPIO  ,ITABM1   ,UNITAB   ,
-     .                         LSUBMODEL)
+     .                         LSUBMODEL,RTRANS   ,NRTRANS )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -72,11 +73,13 @@ C-----------------------------------------------
       INTEGER ISPHIO(NISPHIO,*), IPART(LIPART1,*),
      .        NOD2SP(*),IPARTSP(*),
      .        ITAB(*),MFI,LWASPIO,ITABM1(*)
+      INTEGER, INTENT(IN) :: NRTRANS
       my_real
      .   VSPHIO(*),X(3,*)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
+      my_real, DIMENSION(NTRANSF,NRTRANS),INTENT(IN) ::  RTRANS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -84,7 +87,7 @@ C-----------------------------------------------
      .  IPROP, ISU, NSEG,
      .  MFITMP, IVAD, LVAD, ITYPE, IDSURF, IFTEMP,
      .  IFVITS,IFDENS, IFPRES, IFENER,SKIP,
-     .  IAD,IN1,IN2,IN3,IN4, IUN,NBOX,NBOY,NBOZ,NBAND
+     .  IAD,IN1,IN2,IN3,IN4, IUN,NBOX,NBOY,NBOZ,NBAND,SUB_ID
       CHARACTER MESS*40
       CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER(LEN=NCHARKEY) :: KEY
@@ -94,7 +97,7 @@ C-----------------------------------------------
      .   X12,Y12,Z12,X13,Y13,Z13,NN,NX,NY,NZ,
      .   DBUCS,XBMIN,YBMIN,ZBMIN,XBMAX,YBMAX,ZBMAX,
      .   PINFINI,CARL,XX(9),FCUT,
-     .   RHOIN_UNIT,PIN_UNIT,EIN_UNIT
+     .   RHOIN_UNIT,PIN_UNIT,EIN_UNIT,XL(3)
       LOGICAL IS_AVAILABLE,FOUND
 C-----------------------------------------------
       DATA MESS/'SPH INLET/OUTLET DEFINITION             '/
@@ -161,7 +164,7 @@ C
       I = 0
       DO N = 1,NSPHIO
         SKIP = 0
-CC----------Multidomaines --> on ignore les inlets non tages------------
+CC --------- Multidomatic-> We do not know the inlets non-tages ------------------------------------
         IF (NSUBDOM > 0) THEN
           IF (TAGSPHIO(N) == 0) SKIP = 1
         ENDIF
@@ -172,7 +175,8 @@ C
           TITR = ''   
           CALL HM_OPTION_READ_KEY(LSUBMODEL, 
      .                            OPTION_ID   = ID, 
-     .                            OPTION_TITR = TITR) 
+     .                            OPTION_TITR = TITR, 
+     .                          SUBMODEL_ID   = SUB_ID)
 C        
           I = I+1
           ISPHIO(NISPHIO,I)=ID
@@ -241,6 +245,17 @@ C         input by coordinates ->  ISPHIO(12,I) = 1
             CALL HM_GET_FLOATV('XM2' ,XX(7)   ,IS_AVAILABLE,LSUBMODEL, UNITAB)   
             CALL HM_GET_FLOATV('YM2' ,XX(8)   ,IS_AVAILABLE,LSUBMODEL, UNITAB)  
             CALL HM_GET_FLOATV('ZM2' ,XX(9)   ,IS_AVAILABLE,LSUBMODEL, UNITAB)              
+            IF(SUB_ID /= 0) THEN
+              XL(1:3) = XX(1:3)
+              CALL SUBROTPOINT(XL(1),XL(2),XL(3),RTRANS,SUB_ID,LSUBMODEL)
+              XX(1:3) = XL(1:3) 
+              XL(1:3) = XX(4:6)
+              CALL SUBROTPOINT(XL(1),XL(2),XL(3),RTRANS,SUB_ID,LSUBMODEL)
+              XX(4:6) = XL(1:3) 
+              XL(1:3) = XX(7:9)
+              CALL SUBROTPOINT(XL(1),XL(2),XL(3),RTRANS,SUB_ID,LSUBMODEL)
+              XX(7:9) = XL(1:3) 
+            END IF
             DO J = 1,9
               VSPHIO(IVAD+3+J) = XX(J)
             ENDDO 
@@ -325,7 +340,7 @@ C----------------------------------------------------------------------
       ENDDO
       MFI = MFITMP
 C-------------------------------------
-C Recherche des ID doubles
+C search for duplicate ids
 C-------------------------------------
       CALL UDOUBLE(ISPHIO(NISPHIO,1),NISPHIO,NSPHIO,MESS,0,BID)
 C-------------------------------------

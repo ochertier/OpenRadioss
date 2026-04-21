@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inintsub_11            ../starter/source/output/subinterface/inintsub_11.F
-      !||--- called by ------------------------------------------------------
-      !||    inintsub               ../starter/source/interfaces/interf1/inintsub.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    bitset                 ../starter/source/interfaces/inter3d1/bitget.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inintsub_11            ../starter/source/output/subinterface/inintsub_11.F
+!||--- called by ------------------------------------------------------
+!||    inintsub               ../starter/source/interfaces/interf1/inintsub.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    bitset                 ../starter/source/interfaces/inter3d1/bitget.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ININTSUB_11(ITAB      ,IGRSLIN ,IGRSURF ,NOM_OPT ,INTBUF_TAB,
      .                       NRTM      ,NRTM0  ,NSN     ,NISUBS  ,NISUBM    ,
      .                       NOINT     ,NI     ,NOD2RTMS,NOD2RTMM,KAD       ,
@@ -129,7 +129,7 @@ C
            CALL FRETITL2(TITR1,NOM_OPT(LNOPT1-LTITR+1,NINTER+JSUB),LTITR)
            IF(NOM_OPT(2,NINTER+JSUB) == NOINT .AND. NOM_OPT(5,NINTER+JSUB) == 1)THEN
                KSUB=KSUB+1
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB(KSUB) = JSUB
                INTBUF_TAB(NI)%TYPSUB(KSUB) = 1
 C
@@ -179,7 +179,7 @@ C
 
                KSUB=KSUB+1
 C
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB (KSUB) = JSUB
 C
 C      prepare ADDSUBS , LISUBS (K31) : 
@@ -310,7 +310,7 @@ C
 
                KSUB=KSUB+1
 C
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB (KSUB) = JSUB
 C
 C      prepare ADDSUBS , LISUBS (K31) : 
@@ -482,7 +482,7 @@ C
 
                KSUB=KSUB+1
 C
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB (KSUB) = JSUB
 C
 C      prepare ADDSUBS , LISUBS (K31) : 
@@ -612,7 +612,7 @@ C
 
                KSUB=KSUB+1
 C
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB (KSUB) = JSUB
 C
 C      prepare ADDSUBS , LISUBS (K31) : 
@@ -743,7 +743,7 @@ C
             IF(NOM_OPT(2,NINTER+JSUB)==NOINT
      .         .AND.NOM_OPT(5,NINTER+JSUB)==1)THEN
                KSUB=KSUB+1
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB(KSUB) = JSUB
                   INTBUF_TAB(NI)%TYPSUB(KSUB) = 1
 C
@@ -781,7 +781,7 @@ C
 
                KSUB=KSUB+1
 C
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB (KSUB) = JSUB
 C
 C      prepare ADDSUBS , LISUBS (K31) : 
@@ -909,7 +909,7 @@ C
 
                KSUB=KSUB+1
 C
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB (KSUB) = JSUB
 C
 C      prepare ADDSUBS , LISUBS (K31) : 
@@ -1068,7 +1068,7 @@ C
 
                KSUB=KSUB+1
 C
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB (KSUB) = JSUB
 C
 C      prepare ADDSUBS , LISUBS (K31) : 
@@ -1195,7 +1195,7 @@ C
 
                KSUB=KSUB+1
 C
-C      LISUB(KSUB)=JSUB no interne de la sous-interface
+C      Lisub (ksub) = internal JSUB of the sub-interface
                INTBUF_TAB(NI)%LISUB (KSUB) = JSUB
 C
 C      prepare ADDSUBS , LISUBS (K31) : 

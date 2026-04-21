@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thres          ../engine/source/output/th/thres.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2          ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar           ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    thres          ../engine/source/output/th/thres.F
+!||--- called by ------------------------------------------------------
+!||    hist2          ../engine/source/output/th/hist2.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE THRES(IPARG,ITHBUF,ELBUF_TAB,WA,IGEO,
      .                      IXR,NTHGRP2,ITHGRP,X)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -44,7 +44,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -66,13 +65,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: II,I,N,IH,NG,ITY,MTE,K,IP,L
-      INTEGER :: IJK,LWA,NEL,NFT,IPROP,IGTYP,J,JJ(6)
+      INTEGER :: IJK,NEL,NFT,IPROP,IGTYP,JJ(6)
       INTEGER :: NITER,IAD,NN,IADV,NVAR,ITYP,NODE1,NODE2,NODE3
-      my_real
-     . WWA(100)
-      my_real
-     . V1,V2,V3,E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z
-C
+      my_real WWA(100)
+      my_real V1,V2,V3,E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z
       TYPE(G_BUFEL_)  ,POINTER :: GBUF
 !$COMMENT
 !       THRES description
@@ -98,14 +94,12 @@ C-----------------------------------------------
         
           IF(ITYP==6) THEN
             IH=IAD
-C   specifique spmd
-            IF (IMACH == 3) THEN
+C   SPECIFIC SPMD
 C decalage IH
                 DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
                     IH = IH + 1
                 ENDDO
                 IF (IH >= IAD+NN) CYCLE 
-            ENDIF
 C
             DO NG=1,NGROUP
                 ITY=IPARG(5,NG)
@@ -132,14 +126,12 @@ C
 C
                             IF (K == N) THEN
                                 IH=IH+1
-C   traitement specifique spmd
-                                IF (IMACH == 3) THEN
-C recherche du ii correct
-                                    II = ((IH-1) - IAD)*NVAR
-                                    DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                                        IH = IH + 1
-                                    ENDDO
-                                ENDIF
+C   SPECT SPMD treatment
+C search for the correct ii
+                                II = ((IH-1) - IAD)*NVAR
+                                DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                                    IH = IH + 1
+                                ENDDO
 C
                                 IF (IH > IAD+NN) GOTO 666
 C
@@ -185,13 +177,11 @@ C
 C
                             IF (K == N) THEN
                                 IH=IH+1
-                                IF (IMACH == 3) THEN
-C recherche du ii correct
-                                    II = ((IH-1) - IAD)*NVAR
-                                    DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                                        IH = IH + 1
-                                    ENDDO
-                                ENDIF
+C search for the correct ii
+                                II = ((IH-1) - IAD)*NVAR
+                                DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                                    IH = IH + 1
+                                ENDDO
 C
                                 IF (IH > IAD+NN) GOTO 666
 C
@@ -243,13 +233,11 @@ C
 C
                             IF (K == N) THEN
                                 IH=IH+1
-                                IF (IMACH == 3) THEN
-C recherche du ii correct
-                                    II = ((IH-1) - IAD)*NVAR
-                                    DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                                        IH = IH + 1
-                                    ENDDO
-                                ENDIF
+C search for the correct ii
+                                II = ((IH-1) - IAD)*NVAR
+                                DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                                    IH = IH + 1
+                                ENDDO
 C
                                 IF (IH > IAD+NN) GOTO 666
 C
@@ -302,12 +290,10 @@ C
 C
                             IF (K == N) THEN
                                 IH=IH+1
-                                IF (IMACH == 3) THEN
-                                    II = ((IH-1) - IAD)*NVAR
-                                    DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                                        IH = IH + 1
-                                    ENDDO
-                                ENDIF
+                                II = ((IH-1) - IAD)*NVAR
+                                DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                                    IH = IH + 1
+                                ENDDO
 C
                                 IF (IH > IAD+NN) GOTO 666
 C
@@ -357,14 +343,12 @@ C
 C
                             IF (K == N) THEN
                                 IH=IH+1
-C   traitement specifique spmd
-                                IF (IMACH == 3) THEN
-C recherche du ii correct
-                                    II = ((IH-1) - IAD)*NVAR
-                                    DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                                        IH = IH + 1
-                                    ENDDO
-                                ENDIF
+C   SPECT SPMD treatment
+C search for the correct ii
+                                II = ((IH-1) - IAD)*NVAR
+                                DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                                    IH = IH + 1
+                                ENDDO
 C
                                 IF (IH > IAD+NN) GOTO 666
 C
@@ -418,14 +402,12 @@ C
 C
                                     IF (K == N) THEN
                                         IH=IH+1
-C   traitement specifique spmd
-                                        IF (IMACH == 3) THEN
-C recherche du ii correct
-                                            II = ((IH-1) - IAD)*NVAR
-                                            DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH<IAD+NN)
-                                                IH = IH + 1
-                                            ENDDO
-                                        ENDIF
+C   SPECT SPMD treatment
+C search for the correct ii
+                                        II = ((IH-1) - IAD)*NVAR
+                                        DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH<IAD+NN)
+                                            IH = IH + 1
+                                        ENDDO
 C
                                         IF (IH > IAD+NN) GOTO 666
 C
@@ -505,7 +487,7 @@ C---            deformation globale
                                         WWA(44)=-WWA(41)                       
                                         WWA(45)=-WWA(42)                       
                                         WWA(46)=-WWA(43)                       
-C---            rotation locale Noeud1                     
+C--- Local rotation node1                     
                                         V1 = -GBUF%VR_REPCVT(JJ(1)+I-1)
                                         V2 = GBUF%V_REPCVT(JJ(2)+I-1)
                                         V3 = GBUF%V_REPCVT(JJ(3)+I-1)
@@ -516,7 +498,7 @@ C---            rotation globale Noeud1
                                         WWA(53)= V1*E1X+V2*E1Y+V3*E1Z              
                                         WWA(54)= V1*E2X+V2*E2Y+V3*E2Z              
                                         WWA(55)= V1*E3X+V2*E3Y+V3*E3Z              
-C---            rotation locale Noeud2                     
+C--- Local rotation node2                     
                                         V2 = GBUF%VR_REPCVT(JJ(2)+I-1)
                                         V3 = GBUF%VR_REPCVT(JJ(3)+I-1)
                                         WWA(62)=-V1                            
@@ -550,14 +532,12 @@ c
 C
                                     IF (K == N) THEN
                                         IH=IH+1
-C   traitement specifique spmd
-                                        IF (IMACH == 3) THEN
-C recherche du ii correct
-                                            II = ((IH-1) - IAD)*NVAR
-                                            DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                                                IH = IH + 1
-                                            ENDDO
-                                        ENDIF
+C   SPECT SPMD treatment
+C search for the correct ii
+                                        II = ((IH-1) - IAD)*NVAR
+                                        DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                                            IH = IH + 1
+                                        ENDDO
 C
                                         IF (IH > IAD+NN) GOTO 666
 C
@@ -603,14 +583,12 @@ C
 C
                                     IF (K == N) THEN
                                         IH=IH+1
-C   traitement specifique spmd
-                                        IF (IMACH == 3) THEN
-C recherche du ii correct
-                                            II = ((IH-1) - IAD)*NVAR
-                                            DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                                                IH = IH + 1
-                                            ENDDO
-                                        ENDIF
+C   SPECT SPMD treatment
+C search for the correct ii
+                                        II = ((IH-1) - IAD)*NVAR
+                                        DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                                            IH = IH + 1
+                                        ENDDO
 C
                                         IF (IH > IAD+NN) GOTO 666
 C

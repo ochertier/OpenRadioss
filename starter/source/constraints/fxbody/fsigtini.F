@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fsigtini   ../starter/source/constraints/fxbody/fsigtini.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbsini    ../starter/source/constraints/fxbody/fxbsini.F
-      !||--- calls      -----------------------------------------------------
-      !||    c3curvi    ../starter/source/constraints/fxbody/fsigtini.F
-      !||    c3defli    ../starter/source/constraints/fxbody/fsigtini.F
-      !||    c3evec3    ../starter/source/elements/sh3n/coque3n/c3evec3.F
-      !||    c3pxpyi    ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||    ccoefi     ../starter/source/constraints/fxbody/fsigcini.F
-      !||    cm1inif    ../starter/source/elements/shell/coque/cm1inif.F
-      !||====================================================================
+!||====================================================================
+!||    fsigtini      ../starter/source/constraints/fxbody/fsigtini.F
+!||--- called by ------------------------------------------------------
+!||    fxbsini       ../starter/source/constraints/fxbody/fxbsini.F
+!||--- calls      -----------------------------------------------------
+!||    c3curvi       ../starter/source/constraints/fxbody/fsigtini.F
+!||    c3defli       ../starter/source/constraints/fxbody/fsigtini.F
+!||    c3evec3       ../starter/source/elements/sh3n/coque3n/c3evec3.F
+!||    c3pxpyi       ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||    ccoefi        ../starter/source/constraints/fxbody/fsigcini.F
+!||    cm1inif       ../starter/source/elements/shell/coque/cm1inif.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE FSIGTINI(FXBELM, IPARG , X     , PM, IXTG , 
      .                    GEO   , FXBMOD, FXBSIG, R , NELTG)
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,7 +61,6 @@ C-----------------------------------------------
       INTEGER IG,OFFSET,FIRST,LAST,NFT,I,NG,IEL,
      .        N1,N2,N3,ISM,ITHK,NPT,NFS
       INTEGER MAT(MVSIZ), PROP(MVSIZ)
-      INTEGER II,J
       my_real
      .   VL(3,3,MVSIZ), VRL(3,3,MVSIZ)
       my_real
@@ -209,11 +210,11 @@ C
 C
       RETURN
       END SUBROUTINE FSIGTINI
-      !||====================================================================
-      !||    c3defli    ../starter/source/constraints/fxbody/fsigtini.F
-      !||--- called by ------------------------------------------------------
-      !||    fsigtini   ../starter/source/constraints/fxbody/fsigtini.F
-      !||====================================================================
+!||====================================================================
+!||    c3defli    ../starter/source/constraints/fxbody/fsigtini.F
+!||--- called by ------------------------------------------------------
+!||    fsigtini   ../starter/source/constraints/fxbody/fsigtini.F
+!||====================================================================
       SUBROUTINE C3DEFLI (NEL  ,VL   ,GSTR ,
      .                    PX1  ,PY1  ,PY2  ,
      .                    E1X  ,E2X  ,E3X  ,E1Y  ,E2Y  ,E3Y ,E1Z ,E2Z ,E3Z ,
@@ -298,11 +299,11 @@ C
       ENDDO
       RETURN
       END SUBROUTINE C3DEFLI
-      !||====================================================================
-      !||    c3curvi    ../starter/source/constraints/fxbody/fsigtini.F
-      !||--- called by ------------------------------------------------------
-      !||    fsigtini   ../starter/source/constraints/fxbody/fsigtini.F
-      !||====================================================================
+!||====================================================================
+!||    c3curvi    ../starter/source/constraints/fxbody/fsigtini.F
+!||--- called by ------------------------------------------------------
+!||    fsigtini   ../starter/source/constraints/fxbody/fsigtini.F
+!||====================================================================
       SUBROUTINE C3CURVI(NEL  ,VRL  ,
      .                   PX1  ,PY1  ,PY2  ,
      .                   E1X  ,E2X  ,E3X  ,E1Y  ,E2Y  ,E3Y ,E1Z ,E2Z ,E3Z ,

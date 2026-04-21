@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    w_elig3d    ../starter/source/restart/ddsplit/w_elig3d.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    w_elig3d    ../starter/source/restart/ddsplit/w_elig3d.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE W_ELIG3D(KXIG3D,NUMELIG3D_L,ISUMNIG3D_L,IXIG3D,
      +                  PROC,NODLOCAL,LEN_IA)
 C-----------------------------------------------
@@ -46,7 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, NN, IAD, IAD_L, J, NB_L, NNOD, IE_L,
+      INTEGER I, IAD, IAD_L, J, NB_L, NNOD, IE_L,
      .        KXIG3D_L(NIXIG3D,NUMELIG3D_L), IXIG3D_L(ISUMNIG3D_L)
 C
       IE_L = 0

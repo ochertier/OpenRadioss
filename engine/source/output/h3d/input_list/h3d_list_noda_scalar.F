@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_list_nodal_scalar   ../engine/source/output/h3d/input_list/h3d_list_noda_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    lech3d                  ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                 ../engine/share/modules/h3d_mod.F
-      !||    message_mod             ../engine/share/message_module/message_mod.F
-      !||====================================================================
-      SUBROUTINE H3D_LIST_NODAL_SCALAR(H3D_KEYWORD_NODAL_SCALAR,GEO,NKEY)
+!||====================================================================
+!||    h3d_list_nodal_scalar   ../engine/source/output/h3d/input_list/h3d_list_noda_scalar.F
+!||--- called by ------------------------------------------------------
+!||    lech3d                  ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                 ../engine/share/modules/h3d_mod.F
+!||    message_mod             ../engine/share/message_module/message_mod.F
+!||    output_mod              ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE H3D_LIST_NODAL_SCALAR(OUTPUT,H3D_KEYWORD_NODAL_SCALAR,GEO,NKEY)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,13 +48,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       TYPE (H3D_KEYWORD) H3D_KEYWORD_NODAL_SCALAR(*)
       my_real GEO(NPROPG,NUMGEO)
       INTEGER, INTENT(INOUT) :: NKEY
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NIPMAX
+      INTEGER I
 C=========================================================================
       I = 0
 c-----------------------------------------------
@@ -143,39 +146,39 @@ c-----------------------------------------------
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Stiffness'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VFRAC'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VFRAC/1'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumetric Fraction - 1'
       H3D_KEYWORD_NODAL_SCALAR(I)%COMMENT  = 'Element volumetric fraction reported to node, used with LAW37 and LAW51'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VFRAC'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VFRAC/2'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumetric Fraction - 2'
       H3D_KEYWORD_NODAL_SCALAR(I)%COMMENT  = 'Element volumetric fraction reported to node, used with LAW37 and LAW51'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VFRAC'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VFRAC/3'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumetric Fraction - 3'
       H3D_KEYWORD_NODAL_SCALAR(I)%COMMENT  = 'Element volumetric fraction reported to node, used with LAW37 and LAW51'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VFRAC'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VFRAC/4'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumetric Fraction - 4'
       H3D_KEYWORD_NODAL_SCALAR(I)%COMMENT  = 'Element volumetric fraction reported to node, used with LAW37 and LAW51'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVFRAC'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVFRAC/1'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumetric Fraction - 1'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVFRAC'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVFRAC/2'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumetric Fraction - 2'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVFRAC'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVFRAC/3'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumetric Fraction - 3'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVFRAC'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVFRAC/4'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumetric Fraction - 4'
 c-----------------------------------------------
       I = I + 1
@@ -183,7 +186,7 @@ c-----------------------------------------------
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Centroid New Volume'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVOL'
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'ZVOLD'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Centroid Old Volume'
 c-----------------------------------------------
       I = I + 1
@@ -227,6 +230,11 @@ c-----------------------------------------------
       H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'VOL'
       H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal Volumes'
       H3D_KEYWORD_NODAL_SCALAR(I)%COMMENT  = 'Volume at element centroid (FVMBAG)'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_NODAL_SCALAR(I)%KEY3  = 'PEXT'
+      H3D_KEYWORD_NODAL_SCALAR(I)%TEXT1  = 'Nodal External Pressure'
+      H3D_KEYWORD_NODAL_SCALAR(I)%COMMENT  = 'Pressure Applied by load case'
 c-----------------------------------------------
 
       NKEY=I

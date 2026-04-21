@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop06           ../starter/source/properties/solid/hm_read_prop06.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    arret                    ../starter/source/system/arret.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    istr                     ../starter/source/tools/univ/istr.F
-      !||    subrotvect               ../starter/source/model/submodel/subrot.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop06           ../starter/source/properties/solid/hm_read_prop06.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    arret                    ../starter/source/system/arret.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    istr                     ../starter/source/tools/univ/istr.F
+!||    subrotvect               ../starter/source/model/submodel/subrot.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP06(GEO      ,IGEO    ,PROP_TAG,MULTI_FVM ,IGTYP   ,
      .                          IG       ,IDTITL  ,UNITAB  ,LSUBMODEL ,RTRANS  ,
      .                          SUB_ID   ,ISKN    ,IPART   ,SUB_INDEX,DEFAULTS_SOLID)
@@ -118,12 +118,12 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IHBE,ISMSTR,IPLAS,ICPRE,ICSTR,IINT,IP,ISK,IREP,JCVT,
      .    NPT,NPTR,NPTS,NPTT,ITET4,IET,ISTR,IHBE_OLD,ITET10,
-     .    ISHEAR,ISORTH,ICONTROL_D,ICONTROL
+     .    ISORTH,ICONTROL_D,ICONTROL
       my_real
      .    CVIS,QA,QB,QH,VX,VY,VZ,ANGLE,DTMIN,PX,PY,PZ,VN,
      .    VDEFMIN,VDEFMAX,ASPMAX,ASPTET
       INTEGER K,NSPHDIR,ID_PARTSPH,IPARTSPH,J
-      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS, IMAS_DS,
+      INTEGER     IHBE_DS,ISST_DS,IFRAME_DS,
      .            ITET4_D,ITET10_D,ICPRE_D
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------

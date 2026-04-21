@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,59 +20,67 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hist2                   ../engine/source/output/th/hist2.F
-      !||--- called by ------------------------------------------------------
-      !||    sortie_main             ../engine/source/output/sortie_main.F
-      !||--- calls      -----------------------------------------------------
-      !||    bufmonv                 ../engine/source/output/th/hist2.F
-      !||    cur_fil_c               ../common_source/tools/input_output/write_routtines.c
-      !||    flu_fil_c               ../common_source/tools/input_output/write_routtines.c
-      !||    fseek_c_rd              ../common_source/tools/input_output/write_routtines.c
-      !||    nvar                    ../engine/source/input/nvar.F
-      !||    spmd_collect_seatbelt   ../engine/source/mpi/output/spmd_collect_seatbelt.F
-      !||    spmd_gatherv            ../engine/source/mpi/generic/spmd_gatherv.F
-      !||    spmd_glob_dsum9         ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_glob_rsum_poff     ../engine/source/mpi/generic/spmd_glob_rsum_poff.F
-      !||    spmd_sd_acc             ../engine/source/mpi/output/spmd_sd_acc.F
-      !||    spmd_sd_gau             ../engine/source/mpi/output/spmd_sd_gau.F
-      !||    surf_area               ../engine/source/output/th/surf_area.F
-      !||    surf_mass_monv          ../engine/source/output/th/surf_mass.F
-      !||    thcluster               ../engine/source/output/th/thcluster.F
-      !||    thcoq                   ../engine/source/output/th/thcoq.F
-      !||    thfxmod                 ../engine/source/output/th/thfxmod.F
-      !||    thkin                   ../engine/source/output/th/thkin.F
-      !||    thmonv                  ../engine/source/output/th/thmonv.F
-      !||    thnod                   ../engine/source/output/th/thnod.F
-      !||    thnst                   ../engine/source/output/th/thnst.F
-      !||    thpout                  ../engine/source/output/th/thpout.F
-      !||    thquad                  ../engine/source/output/th/thquad.F
-      !||    thres                   ../engine/source/output/th/thres.F
-      !||    thrnur                  ../engine/source/output/th/thrnur.F
-      !||    thsens                  ../engine/source/output/th/thsens.F
-      !||    thsol                   ../engine/source/output/th/thsol.F
-      !||    thsph                   ../engine/source/output/th/thsph.F
-      !||    thsurf                  ../engine/source/output/th/thsurf.F
-      !||    thtrus                  ../engine/source/output/th/thtrus.F
-      !||    write_th                ../engine/source/output/th/write_th.F
-      !||    wrtdes                  ../engine/source/output/th/wrtdes.F
-      !||    wrtdes0                 ../engine/source/output/th/wrtdes0.F
-      !||--- uses       -----------------------------------------------------
-      !||    cluster_mod             ../engine/share/modules/cluster_mod.F
-      !||    ebcs_mod                ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||    elbufdef_mod            ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod          ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    groupdef_mod            ../common_source/modules/groupdef_mod.F
-      !||    matparam_def_mod        ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    output_mod              ../common_source/modules/output/output_mod.F90
-      !||    pinchtype_mod           ../common_source/modules/pinchtype_mod.F
-      !||    seatbelt_mod            ../common_source/modules/seatbelt_mod.F
-      !||    sensor_mod              ../common_source/modules/sensor_mod.F90
-      !||    stack_mod               ../engine/share/modules/stack_mod.F
-      !||    th_mod                  ../engine/share/modules/th_mod.F
-      !||    th_surf_mod             ../common_source/modules/interfaces/th_surf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hist2_mod     ../engine/source/output/th/hist2.F
+!||--- called by ------------------------------------------------------
+!||    sortie_main   ../engine/source/output/sortie_main.F
+!||====================================================================
+      MODULE HIST2_MOD
+      CONTAINS
+!||====================================================================
+!||    hist2                   ../engine/source/output/th/hist2.F
+!||--- called by ------------------------------------------------------
+!||    sortie_main             ../engine/source/output/sortie_main.F
+!||--- calls      -----------------------------------------------------
+!||    bufmonv                 ../engine/source/output/th/hist2.F
+!||    cur_fil_c               ../common_source/tools/input_output/write_routines.c
+!||    flu_fil_c               ../common_source/tools/input_output/write_routines.c
+!||    fseek_c_rd              ../common_source/tools/input_output/write_routines.c
+!||    spmd_collect_seatbelt   ../engine/source/mpi/output/spmd_collect_seatbelt.F
+!||    spmd_gatherv            ../engine/source/mpi/generic/spmd_gatherv.F
+!||    spmd_glob_dsum9         ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_glob_rsum_poff     ../engine/source/mpi/generic/spmd_glob_rsum_poff.F
+!||    spmd_sd_acc             ../engine/source/mpi/output/spmd_sd_acc.F
+!||    spmd_sd_gau             ../engine/source/mpi/output/spmd_sd_gau.F
+!||    surf_area               ../engine/source/output/th/surf_area.F
+!||    surf_mass_monv          ../engine/source/output/th/surf_mass.F
+!||    thcluster               ../engine/source/output/th/thcluster.F
+!||    thcoq                   ../engine/source/output/th/thcoq.F
+!||    thkin                   ../engine/source/output/th/thkin.F
+!||    thmonv                  ../engine/source/output/th/thmonv.F
+!||    thnod                   ../engine/source/output/th/thnod.F
+!||    thnst                   ../engine/source/output/th/thnst.F
+!||    thpout                  ../engine/source/output/th/thpout.F
+!||    thquad                  ../engine/source/output/th/thquad.F
+!||    thres                   ../engine/source/output/th/thres.F
+!||    thrnur                  ../engine/source/output/th/thrnur.F
+!||    thsechecksum            ../engine/source/output/th/thchecksum.F90
+!||    thsens                  ../engine/source/output/th/thsens.F
+!||    thsol                   ../engine/source/output/th/thsol.F
+!||    thsph                   ../engine/source/output/th/thsph.F
+!||    thsurf                  ../engine/source/output/th/thsurf.F
+!||    thtrus                  ../engine/source/output/th/thtrus.F
+!||    write_th                ../engine/source/output/th/write_th.F
+!||    wrtdes                  ../engine/source/output/th/wrtdes.F
+!||    wrtdes0                 ../engine/source/output/th/wrtdes0.F
+!||--- uses       -----------------------------------------------------
+!||    cluster_mod             ../engine/share/modules/cluster_mod.F
+!||    ebcs_mod                ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||    elbufdef_mod            ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod             ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod          ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    groupdef_mod            ../common_source/modules/groupdef_mod.F
+!||    matparam_def_mod        ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
+!||    output_mod              ../common_source/modules/output/output_mod.F90
+!||    pinchtype_mod           ../common_source/modules/pinchtype_mod.F
+!||    seatbelt_mod            ../common_source/modules/seatbelt_mod.F
+!||    sensor_mod              ../common_source/modules/sensor_mod.F90
+!||    stack_mod               ../engine/share/modules/stack_mod.F
+!||    th_mod                  ../engine/share/modules/th_mod.F
+!||    th_surf_mod             ../common_source/modules/interfaces/th_surf_mod.F
+!||    thsechecksum_mod        ../engine/source/output/th/thchecksum.F90
+!||====================================================================
       SUBROUTINE HIST2(PM      ,D         ,X        ,V           ,A         ,
      2                 IXS     ,BUFEL     ,WA       ,IPARG       ,SENSOR_TAB,
      4                 FSAV    ,FLSW      ,SKEW     ,ELBUF_TAB   ,CLUSTER   ,
@@ -85,15 +93,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D                 LRIVET  ,RIVET     ,IXP      ,
      E                 ISKWN   ,IFRAME    ,XFRAME   ,IXC         ,IXQ       ,
      F                 DTHIS0  ,THIS0     ,IFIL     ,NTHGRP2     ,IXTG      ,
-     G                 IGEO    ,IPM       ,FXBIPM   ,FXBDEP      ,FXBVIT    ,
-     H                 FXBACC  ,IPARTL    ,NPARTL   ,IACCP       ,NACCP     ,
+     G                 IGEO    ,IPM       ,
+     H                 IPARTL  ,NPARTL    ,IACCP    ,NACCP       ,
      I                 IPARTH  ,NPARTH    ,NVPARTH  ,
      J                 MONVOL  ,VOLMON    ,FR_MV    ,TEMP,INOD   ,
      K                 FTHREAC ,NODREAC   ,GRESAV   ,GAUGE       ,
      L                 IGAUP   ,NGAUP     ,ITTYP    ,SIZE_MES    ,
      M                 RTHBUF  ,THKE      ,STACK    ,ISPHIO      ,VSPHIO    ,
      N                 ITHFLAG ,PINCH_DATA,MULTI_FVM,W           ,SITHBUF   ,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV ,GLOB_THERM  ,OUTPUT)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV ,GLOB_THERM  ,OUTPUT    ,
+     P                 MASS0_START)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -111,6 +120,9 @@ C-----------------------------------------------
       USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
       use glob_therm_mod
       USE OUTPUT_MOD , ONLY : OUTPUT_
+      use thsechecksum_mod
+      use element_mod , only : nixs,nixq,nixc,nixp,nixr,nixt,nixtg
+      USE SEATBELT_MOD , only : NGUIDED_CABLE_G
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -149,7 +161,7 @@ C-----------------------------------------------
      .   ITHGRP(NITHGR,*),ITHBUF(*),
      .   IXR(NIXR,*),KXSP(NISP,*),NOD2SP(*),LRIVET(4,*),IPM(NPROPMI,NUMMAT),
      .   ISKWN(LISKN,*),IFRAME(LISKN,*),IXC(NIXC,NUMELC),IXQ(NIXQ,NUMELQ),
-     .   IXTG(NIXTG,*),IFIL,NTHGRP2,FXBIPM(*),IPARTL(*),IACCP(*),
+     .   IXTG(NIXTG,*),IFIL,NTHGRP2,IPARTL(*),IACCP(*),
      .   NACCP(*),NPARTH,IPARTH(NPARTH,*),NVPARTH,
      .   MONVOL(*), FR_MV(*),INOD(*),
      .   NODREAC(*),KXX(NIXX,*),IGAUP(*),NGAUP(*),ITTYP,
@@ -160,9 +172,10 @@ C-----------------------------------------------
      .   ACCELM(LLACCELM,*), GEO(NPROPG,*),SPBUF(*),XFRAME(NXFRAME,*),
      .   AR(3,NUMNOD),VR(3,NUMNOD),DR(3,NUMNOD),
      .   RIVET(NRIVF,*), THKE(*),
-     .   RIVOFF(NRIVET), FXBDEP(*), FXBVIT(*), FXBACC(*), VOLMON(*),
+     .   RIVOFF(NRIVET), VOLMON(*),
      .   TEMP(*),FTHREAC(*),GRESAV(NPSAV,*), GAUGE(LLGAUGE,NBGAUGE),RTHBUF(*),
      .   VSPHIO(*), W(3,NUMNOD)
+      my_real, INTENT(IN   ) :: MASS0_START
       REAL(KIND=8), INTENT(INOUT) :: THIS0, DTHIS0
       INTEGER, DIMENSION(NIXP,NUMELP) ,INTENT(IN):: IXP
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
@@ -190,7 +203,7 @@ C-----------------------------------------------
       my_real XX,YY,ZZ,DET,XXMOM,YYMOM,ZZMOM, 
      .        XCG, YCG, ZCG, IXX, IYY, IZZ,IXY, IYZ, IZX,                   
      .        JXX, JYY, JZZ, JXY, JYZ, JZX, AA, THISC,          
-     .        FSAVINT(NTHVKI,NINTER+NINTSUB),FSAVVENT(5,NVENTTOT),          
+     .        FSAVINT(NTHVKI,NINTER+NINTSUB+NGUIDED_CABLE_G),FSAVVENT(5,NVENTTOT),          
      .        FAC,ARRAY(5)                            
       my_real, DIMENSION(100) :: SUBSAV  
       my_real, DIMENSION(1) :: WA_LOCAL
@@ -297,14 +310,20 @@ C------------------------
           WA(II+6) =XMASS
           WA(II+7) =DT2
           WA(II+8) =ENROT
-          WA(II+9) =OUTPUT%WFEXT
+          WA(II+9) =OUTPUT%TH%WFEXT
           WA(II+10)=REINT
           WA(II+11)=ECONT+ECONT_CUMU+ECONTV+ECONTD   ! Global contact energy : Sum of contact energies
           WA(II+12)=EHOUR
           WA(II+13)= ECONT+ECONT_CUMU !Contact Elastic Energy
           WA(II+14)= ECONTV ! Contact Frictional Energy
           WA(II+15)= ECONTD ! Damping Frictional Energy
-C         NGLOBTH depends on /TH/VERS
+          WA(II+16)= WPLAST ! Plastic Work
+          WA(II+17)= XMASS-MASS0_START ! Added mass
+          WA(II+18)= EP02*(XMASS - MASS0_START) / MAX(MASS0,EM20) ! Added mass % 
+          WA(II+19)= OUTPUT%DATA%INOUT%DM_IN    !inlet mass
+          WA(II+20)= OUTPUT%DATA%INOUT%DM_OUT   !outlet mass
+          WA(II+21)= OUTPUT%DATA%INOUT%DE_IN    !inlet energy
+          WA(II+22)= OUTPUT%DATA%INOUT%DE_OUT   !outlet energy
           IF(IUNIT==IUHIS) CALL WRTDES(WA,WA,NGLOBTH,ITTYP,1)
         ENDIF  ! ISPMD==0
 C-----------------------------
@@ -437,6 +456,8 @@ C                                    [Izx Iyz Izz]   {ZZMOM}
                   WA(II)=PARTSAV(4,I)/MAX(PARTSAV(6,I),EM20)
                 ELSEIF(K==31) THEN 
                   WA(II)=PARTSAV(5,I)/MAX(PARTSAV(6,I),EM20)
+                ELSEIF(K==32) THEN 
+                  WA(II)=PARTSAV(29,I)
                 ELSEIF(K > 0 .AND. SIZE(PARTSAV,1) >= K) THEN
                   WA(II)=PARTSAV(K,I)
                 ELSE 
@@ -566,6 +587,8 @@ C                                    [Izx Iyz Izz]   {ZZMOM}
                  WA(II)=SUBSAV(4)/MAX(SUBSAV(6),EM20)
               ELSEIF(K==31) THEN 
                  WA(II)=SUBSAV(5)/MAX(SUBSAV(6),EM20)
+              ELSEIF(K==32) THEN
+                 WA(II)=SUBSAV(29)
               ELSEIF(K > 0) THEN
                  WA(II)=SUBSAV(K)
               ELSE 
@@ -580,12 +603,14 @@ C-------------------------------------------------------
 C      TH GROUP KINE SPMD
 C       (  FSAV(NTHVKI,*), with NTHVKI = 18  )
 C-------------------------------------------------------
-       FSAVMAX = NVOLU+NRBAG+NJOINT+NSECT+NRBODY+NRWALL+NINTER+NINTSUB
+       FSAVMAX = NVOLU+NRBAG+NJOINT+NSECT+NRBODY+NRWALL+NINTER+NINTSUB+NGUIDED_CABLE_G
 
        IF (NSPMD > 1) THEN
          CALL SPMD_GLOB_DSUM9(FSAV,NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT))
          IF((NVOLU+NRBAG)>0)CALL SPMD_GLOB_DSUM9(FSAV(1,1+NINTER+NRWALL+NRBODY+NSECT+NJOINT),NTHVKI*(NVOLU+NRBAG))
          IF(NINTSUB>0)CALL SPMD_GLOB_DSUM9(FSAV(1,1+NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG),NTHVKI*NINTSUB)
+         IF(NGUIDED_CABLE_G>0)
+     .     CALL SPMD_GLOB_DSUM9(FSAV(1,1+NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG+NINTSUB),NTHVKI*NGUIDED_CABLE_G)
        ENDIF
        IF(FSAVMAX>0) THEN
          IF (ISPMD/=0) THEN
@@ -597,13 +622,16 @@ C-------------------------------------------------------
          ENDIF
        ENDIF
 C
-       IF(NINTER+NINTSUB/=0.AND.ISPMD==0)THEN
+       IF(NINTER+NINTSUB+NGUIDED_CABLE_G/=0.AND.ISPMD==0)THEN
          DO J=1,NTHVKI
            DO N=1,NINTER
              FSAVINT(J,N)=FSAV(J,N)
            END DO
            DO N=1,NINTSUB
              FSAVINT(J,NINTER+N)=FSAV(J,(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG)+N)
+           END DO
+           DO N=1,NGUIDED_CABLE_G
+             FSAVINT(J,NINTER+NINTSUB+N)=FSAV(J,(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG+NINTSUB)+N)
            END DO
          END DO
        END IF
@@ -620,21 +648,21 @@ C
        END IF
 
 C---------------------------------------------------------
-C      /TH/SURF : 6 output channels
+C      /Th/surfing: 6 output channels
 C---------------------------------------------------------
-      !FSAVSURF(1, 1:NSURF) : area           (ebcs + monvol + ploads)
-      !FSAVSURF(2, 1:NSURF) : massflow       (ebcs + monvol         )
-      !FSAVSURF(3, 1:NSURF) : velocity       (ebcs + monvol + ploads)
-      !FSAVSURF(4, 1:NSURF) : pressure       (ebcs + monvol + ploads)
-      !FSAVSURF(5, 1:NSURF) : A              (                ploads)
-      !FSAVSURF(6, 1:NSURF) : cumulated mass (ebcs + monvol         )
+      !FSAVSURF(1, 1:NSURF) : area                        (ebcs + monvol + ploads)
+      !FSAVSURF(2, 1:NSURF) : massflow                    (ebcs + monvol         )
+      !FSAVSURF(3, 1:NSURF) : velocity                    (ebcs + monvol + ploads)
+      !FSAVSURF(4, 1:NSURF) : pressure                    (ebcs + monvol + ploads)
+      !FSAVSURF(5, 1:NSURF) : area with applied pressure  (                ploads)
+      !FSAVSURF(6, 1:NSURF) : cumulated mass              (ebcs + monvol         )
 C-----------------------------------
 C      /TH/SURF (AREA) if not already computed
 C-----------------------------------
        DO I=1,NSURF
          IF(IGRSURF(I)%TH_SURF == 1 .AND. FSAVSURF(1,I) == ZERO) THEN
            NN = IGRSURF(I)%NSEG
-           CALL SURF_AREA(X, NN, IGRSURF(I)%NODES, FSAVSURF(1,I), NUMNOD)
+           CALL SURF_AREA(X, NN, IGRSURF(I)%NODES, FSAVSURF(1,I), NUMNOD, N2D)
          ENDIF
        ENDDO
 
@@ -656,11 +684,11 @@ C---------------------------------------------------------
        IF(ISPMD ==0 ) THEN
          DO I=1,NSURF
            IF(IGRSURF(I)%TH_SURF == 1) THEN
-             !IF(N_S_E_G_LOADP(I) > 0) THEN
-               FSAVSURF(4,I)=FSAVSURF(4,I) ! The pressure in an average pressure
-             !ELSE
-             !  FSAVSURF(4,I)= ZERO
-             !ENDIF
+             IF( FSAVSURF(5,I) > ZERO )THEN
+               FSAVSURF(4,I) = FSAVSURF(4,I) / FSAVSURF(5,I) ! The pressure in an average pressure
+             ELSE
+               FSAVSURF(4,I) = ZERO
+             ENDIF
            ENDIF
          ENDDO
        ENDIF
@@ -680,7 +708,6 @@ C---------------------------------------------------------
              IF(FSAVSURF(1,SURF_ID) > ZERO)THEN
                FSAVSURF(3,SURF_ID) =  FSAVSURF(3,SURF_ID) / FSAVSURF(1,SURF_ID)  !mean velocity
                FSAVSURF(4,SURF_ID) =  FSAVSURF(4,SURF_ID) / FSAVSURF(1,SURF_ID)  !mean pressure
-               FSAVSURF(5,SURF_ID) =  FSAVSURF(5,SURF_ID) / FSAVSURF(1,SURF_ID)  !mean acceleration
              ENDIF
            ENDIF
          ENDDO!next K
@@ -715,14 +742,14 @@ C--------------------------------------------
 C      PRE-TREATMENT ACCELEROMETERS (SPMD ONLY)
 C--------------------------------------------
        IF(NACCELM>0 .AND. NSPMD > 1)THEN
-C gather sur p0 des valeurs a jour pour les accelerometres
+C gather on proc 0 of up-to-date values for the accelerometers
          CALL SPMD_SD_ACC(ACCELM,IACCP,NACCP)
        END IF
 C--------------------------------------------
 C      PRE-TREATMENT GAUGES (SPMD ONLY)
 C--------------------------------------------
        IF(NBGAUGE>0 .AND. NSPMD > 1)THEN
-C gather sur p0 des valeurs a jour pour les gauges
+C gather on proc 0 of up-to-date values for the gauges
          CALL SPMD_SD_GAU(GAUGE,IGAUP,NGAUP)
        END IF
 C--------------------------------------------
@@ -783,7 +810,7 @@ C-------------------------------------------------------
 !   TH optimization for node elements
         !   initialization of local array       
         WA_NOD(ID_HIST)%WA_REAL( 1:WA_NOD_SIZE(ID_HIST) ) = ZERO
-        CALL THNOD(ITHBUF ,
+        CALL THNOD(OUTPUT, ITHBUF ,
      2   WA_NOD(ID_HIST)%WA_REAL,X       ,D       ,V      ,A      ,
      3             VR      ,AR      ,ISKWN   ,IFRAME  ,SKEW   ,
      4             XFRAME  ,WEIGHT  ,TEMP    ,INOD    ,FTHREAC,
@@ -1246,11 +1273,7 @@ C-----------------------------
      .   FSAV(1,1+NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU),
      .   ITTYP)
           ELSEIF (ITYP==112) THEN
-C-----------------------------
-C           MODE
-C-----------------------------
-            CALL THFXMOD(IAD,    NN,     ITHBUF, IADV,   NVAR,
-     .                   FXBIPM, FXBDEP, FXBVIT, FXBACC,ITTYP)
+
           ELSEIF (ITYP==113) THEN
 C-----------------------------
 C           GAUGE
@@ -1368,6 +1391,16 @@ C-----------------------------
      .           IAD    ,IAD+NN-1 ,IADV   ,IADV+NVAR-1,ITHBUF   ,
      .           WA     ,ITTYP    ,SITHBUF)
 C
+c
+          ELSEIF (ITYP == 121) THEN
+C-----------------------------
+C           SENSORS
+C-----------------------------
+            CALL THSECHECKSUM (
+     .           IAD    ,IAD+NN-1 ,IADV   ,IADV+NVAR-1,ITHBUF   ,
+     .           WA     ,ITTYP    ,SITHBUF,SWA,ISPMD)
+C
+c----
 c----
           ENDIF  ! ITYP
        ENDDO
@@ -1453,13 +1486,14 @@ C reset GRESAV array
       ENDIF
 C-----------   
       RETURN
-      END
+      END SUBROUTINE HIST2
+      END MODULE HIST2_MOD
 C
-      !||====================================================================
-      !||    bufmonv   ../engine/source/output/th/hist2.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2     ../engine/source/output/th/hist2.F
-      !||====================================================================
+!||====================================================================
+!||    bufmonv   ../engine/source/output/th/hist2.F
+!||--- called by ------------------------------------------------------
+!||    hist2     ../engine/source/output/th/hist2.F
+!||====================================================================
       SUBROUTINE BUFMONV(FSAVVENT,IVOLU,RBAGHOL,FR_MV)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1503,5 +1537,5 @@ C             Aout, Aout1, Uout, Mout, Hout
         END IF
       END DO
       RETURN
-      END
+      END SUBROUTINE BUFMONV
 

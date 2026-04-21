@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvtemp         ../engine/source/airbag/fvtemp.F
-      !||--- called by ------------------------------------------------------
-      !||    fv_up_switch   ../engine/source/airbag/fv_up_switch.F
-      !||    fvbag1         ../engine/source/airbag/fvbag1.F
-      !||    fvupd1         ../engine/source/airbag/fvupd.F
-      !||--- uses       -----------------------------------------------------
-      !||    cast_mod       ../common_source/modules/cast_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    fvtemp         ../engine/source/airbag/fvtemp.F
+!||--- called by ------------------------------------------------------
+!||    fv_up_switch   ../engine/source/airbag/fv_up_switch.F
+!||    fvbag1         ../engine/source/airbag/fvbag1.F
+!||    fvupd1         ../engine/source/airbag/fvupd.F
+!||--- uses       -----------------------------------------------------
+!||    cast_mod       ../common_source/modules/cast_mod.F90
+!||====================================================================
       SUBROUTINE FVTEMP(ITYP  , EFAC_IN , CPA_IN  , CPB_IN  , CPC_IN  ,
      .                  CPD_IN   , CPE_IN  , CPF_IN  , RMW_IN  , TEMP0_IN,
      .                  TEMP_IN  )

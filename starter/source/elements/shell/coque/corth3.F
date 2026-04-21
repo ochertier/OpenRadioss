@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    corth3         ../starter/source/elements/shell/coque/corth3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3epsini       ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||    c3init3        ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cbainit3       ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cdkepsini      ../starter/source/elements/sh3n/coquedk/cdkepsini.F
-      !||    cdkinit3       ../starter/source/elements/sh3n/coquedk/cdkinit3.F
-      !||    cepsini        ../starter/source/elements/shell/coque/cepsini.F
-      !||    cinit3         ../starter/source/elements/shell/coque/cinit3.F
-      !||    cnepsini       ../starter/source/elements/shell/coqueba/cnepsini.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    corth3         ../starter/source/elements/shell/coque/corth3.F
+!||--- called by ------------------------------------------------------
+!||    c3epsini       ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||    c3init3        ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cbainit3       ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cdkepsini      ../starter/source/elements/sh3n/coquedk/cdkepsini.F
+!||    cdkinit3       ../starter/source/elements/sh3n/coquedk/cdkinit3.F
+!||    cepsini        ../starter/source/elements/shell/coque/cepsini.F
+!||    cinit3         ../starter/source/elements/shell/coque/cinit3.F
+!||    cnepsini       ../starter/source/elements/shell/coqueba/cnepsini.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE CORTH3(ELBUF_STR,DIR_A   ,DIR_B   ,JFT    ,JLT    ,
      .                  NLAY     ,IREP    ,NEL     ,
      .                  X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
@@ -68,16 +68,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,J,N,ILAW,IDIR,IT,NPTT
+      INTEGER I, J, N, ILAW, IDIR, IT, NPTT
 C     REAL
       my_real
-     .  X31(MVSIZ), Y31(MVSIZ), Z31(MVSIZ),
-     .  X32(MVSIZ), Y32(MVSIZ), Z32(MVSIZ),
-     .  X21(MVSIZ), Y21(MVSIZ), Z21(MVSIZ),
      .  E11(MVSIZ),E12(MVSIZ),E13(MVSIZ),
      .  E21(MVSIZ),E22(MVSIZ),E23(MVSIZ)
       my_real
-     .     V1,V2,V3,VR,VS,AA,BB,SUMA,S1,S2
+     .     V1,V2,V3,VR,VS,AA,BB,SUMA
       my_real, 
      .   DIMENSION(:) , POINTER :: DIR1, DIR2
       TYPE(L_BUFEl_DIR_), POINTER :: LBUF_DIR

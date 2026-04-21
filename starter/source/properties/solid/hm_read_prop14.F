@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop14           ../starter/source/properties/solid/hm_read_prop14.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    arret                    ../starter/source/system/arret.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    hm_read_ale_close        ../starter/source/ale/hm_read_ale_close.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop14           ../starter/source/properties/solid/hm_read_prop14.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    arret                    ../starter/source/system/arret.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    hm_read_ale_close        ../starter/source/ale/hm_read_ale_close.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP14(GEO,IGEO,PROP_TAG,MULTI_FVM,IGTYP,IG,TITR,UNITAB,
      .                          LSUBMODEL,IPART,DEFAULTS_SOLID)
 C-----------------------------------------------
@@ -98,9 +98,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IHBE,ISMSTR,IPLAS,ICPRE,ICSTR,IINT,JCVT,NPG,NPT,NPTR,NPTS,NPTT, ISTRAIN,IET,IHBE_OLD,ID
-      INTEGER I8PT,ITET4,ITET4_PREV,NSPHDIR,ID_SENS,ID_PARTSPH,IPARTSPH,J,ITET10,I_ALE_FLAG,IHBE_PR
+      INTEGER ITET4,ITET4_PREV,NSPHDIR,ID_SENS,ID_PARTSPH,IPARTSPH,J,ITET10,I_ALE_FLAG,IHBE_PR
       my_real CVIS,QA,QB,QH,VNS1,VNS2,DTMIN,VDEFMIN,VDEFMAX,ASPMAX,ASPTET 
-      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS,ITET4_D,ITET10_D,ICPRE_D,ICONTROL_D,ICONTROL
+      INTEGER     IHBE_DS,ISST_DS,IFRAME_DS,ITET4_D,ITET10_D,ICPRE_D,ICONTROL_D,ICONTROL
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED, lFOUND
       CHARACTER(LEN=NCHARLINE) ::  MSGLINE
 C-----------------------------------------------
@@ -348,7 +348,7 @@ C--------------------------------------------------
       IF (QA == ZERO) QA = ONEP1         
       IF (QB == ZERO) QB = FIVEEM2      
 
-      ! --default CVIS (hourglass)  --- 
+      ! --Default Cvis (Hourglass) --- 
       IF (IHBE == 24) THEN
         IF (CVIS == ZERO) CVIS = EM01
         GEO(13) = CVIS        
@@ -357,7 +357,7 @@ C--------------------------------------------------
         IINT = IET
       ELSEIF (IHBE==1.OR.IHBE==2) THEN
         IF (QH == ZERO.AND.ICONTROL==0) QH = EM01
-        IF (QH == ZERO.AND.ICONTROL==1) QH = TEN
+        IF (QH == ZERO.AND.ICONTROL==1) QH = ONE
         CVIS = ZERO
         GEO(13) = QH
       ELSE        
@@ -535,21 +535,21 @@ C
       END SUBROUTINE HM_READ_PROP14
 
 
-      !||====================================================================
-      !||    hm_read_prop14f          ../starter/source/properties/solid/hm_read_prop14.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    hm_read_ale_close        ../starter/source/ale/hm_read_ale_close.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop14f          ../starter/source/properties/solid/hm_read_prop14.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    hm_read_ale_close        ../starter/source/ale/hm_read_ale_close.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP14F(GEO,IGEO,PROP_TAG,MULTI_FVM,IGTYP,IG,TITR,UNITAB,LSUBMODEL,
      .                          DEFAULTS_SOLID)
 C-----------------------------------------------
@@ -607,9 +607,9 @@ C MODIFIED ARGUMENT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IHBE,ISMSTR,IPLAS,ICPRE,ICSTR,IINT,JCVT,NPG,NPT,NPTR,NPTS,NPTT, ISTRAIN,IET,IHBE_OLD,ID,I8PT,J
-      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS
-      my_real CVIS,QA,QB,QH,VNS1,VNS2,DTMIN 
+      INTEGER IHBE,ISMSTR,IPLAS,ICPRE,ICSTR,IINT,JCVT,NPG,NPT,IHBE_OLD,ID
+      INTEGER     IHBE_DS,ISST_DS,IFRAME_DS
+      my_real CVIS,QA,QB,QH,VNS1,VNS2 
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------
 C   S o u r c e   L i n e s

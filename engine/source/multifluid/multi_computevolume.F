@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_computevolume   ../engine/source/multifluid/multi_computevolume.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain               ../engine/source/ale/alemain.F
-      !||    multi_timeevolution   ../engine/source/multifluid/multi_timeevolution.F
-      !||--- calls      -----------------------------------------------------
-      !||    qvolu2                ../engine/source/elements/solid_2d/quad/qvolu2.F
-      !||    sderi3                ../engine/source/elements/solid/solide/sderi3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    multi_computevolume   ../engine/source/multifluid/multi_computevolume.F
+!||--- called by ------------------------------------------------------
+!||    alemain               ../engine/source/ale/alemain.F
+!||    multi_timeevolution   ../engine/source/multifluid/multi_timeevolution.F
+!||--- calls      -----------------------------------------------------
+!||    qvolu2                ../engine/source/elements/solid_2d/quad/qvolu2.F
+!||    sderi3                ../engine/source/elements/solid/solide/sderi3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE MULTI_COMPUTEVOLUME(NEL, NG, IPARG, SYM, 
      .     ELBUF_TAB, IXS, IXQ, IXTG, VOLNEW, XGRID)
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------

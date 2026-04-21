@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7buce_crit       ../engine/source/interfaces/intsort/i7buce_crit.F
-      !||--- called by ------------------------------------------------------
-      !||    i7main_crit_tri   ../engine/source/interfaces/intsort/i7main_crit_tri.F
-      !||====================================================================
+!||====================================================================
+!||    i7buce_crit       ../engine/source/interfaces/intsort/i7buce_crit.F
+!||--- called by ------------------------------------------------------
+!||    i7main_crit_tri   ../engine/source/interfaces/intsort/i7main_crit_tri.F
+!||====================================================================
        SUBROUTINE I7BUCE_CRIT(
      1       X       ,NSV   ,MSR   ,NSN   ,NMN     ,
      2       ITASK   ,XSAV  ,NIN   ,STFN  ,V       ,
@@ -51,14 +51,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSNF,NMNF,NSNL,NMNL,I, J, II, N
+      INTEGER NSNF,NMNF,NSNL,NMNL,I, J, II
       my_real
      .   XSLV(6),XMSR(6), VSLV(6), VMSR(6)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
-C     0- CALCUL DU CRITERE POUR SAVOIR SI ON DOIT TRIER OU NON
+C     0- calculation of the criterion to know if we should sort or not
 C
 C
       DO I = 1, 3
@@ -171,7 +171,7 @@ C
         ENDDO
 !$OMP END DO NOWAIT
       ENDIF       
-C dist calcule une fois pour toutes les interfaces dans COMCRIT (ci-dessous)
+C dist calculated once for all interfaces in COMCRIT (below)
 C
       IF(NSPMD==1) THEN
 !$OMP DO SCHEDULE(guided)

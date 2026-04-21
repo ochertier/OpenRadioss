@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdkfcum3   ../engine/source/elements/sh3n/coquedk/cdkfcum3.F
-      !||--- called by ------------------------------------------------------
-      !||    cdkforc3   ../engine/source/elements/sh3n/coquedk/cdkforc3.F
-      !||====================================================================
+!||====================================================================
+!||    cdkfcum3   ../engine/source/elements/sh3n/coquedk/cdkfcum3.F
+!||--- called by ------------------------------------------------------
+!||    cdkforc3   ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+!||====================================================================
       SUBROUTINE CDKFCUM3(JFT,JLT,PX2,PY2,PX3,PY3,
      1              R11,R12,R13,R21,R22,R23,R31,R32,R33,
      1              F11,F12,F13,F21,F22,F23,F31,F32,F33,
@@ -47,7 +47,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
       my_real
      .     LX,LY,LZ
 C-----------------------------------------------

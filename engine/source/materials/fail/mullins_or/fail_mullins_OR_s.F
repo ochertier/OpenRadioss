@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_mullins_or_s   ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw               ../engine/source/materials/mat_share/mulaw.F90
-      !||    usermat_solid       ../engine/source/materials/mat_share/usermat_solid.F
-      !||--- calls      -----------------------------------------------------
-      !||    mullins_or          ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
-      !||====================================================================
+!||====================================================================
+!||    fail_mullins_or_s   ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
+!||--- called by ------------------------------------------------------
+!||    mulaw               ../engine/source/materials/mat_share/mulaw.F90
+!||    usermat_solid       ../engine/source/materials/mat_share/usermat_solid.F
+!||--- calls      -----------------------------------------------------
+!||    mullins_or          ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
+!||====================================================================
       SUBROUTINE FAIL_MULLINS_OR_S(
      1     NEL    ,NUPARAM  ,NUVAR   ,
      2     TIME   ,TIMESTEP ,UPARAM  ,NGL    ,  
@@ -80,8 +80,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,JJ,K,IR,IADBUF,NINDX,IFAIL
-      INTEGER, DIMENSION(NEL) :: INDX
+      INTEGER I
+ 
       my_real 
      .    COEFR, BETAF ,COEFM,SXX,SYY,SZZ,TRACE,ETA(NEL)
 C=======================================================================
@@ -115,15 +115,15 @@ c-----------------------------------------------
 c-----------           
       RETURN
       END
-      !||====================================================================
-      !||    mullins_or          ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
-      !||--- called by ------------------------------------------------------
-      !||    fail_mullins_or_s   ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
-      !||    neo_hook_t          ../engine/source/materials/mat/mat100/neo_hook_t.F
-      !||    polystress2         ../engine/source/materials/mat/mat100/sigpoly.F
-      !||    polystrest2         ../engine/source/materials/mat/mat100/sigpoly.F
-      !||    sigaboyce           ../engine/source/materials/mat/mat100/sigaboyce.F
-      !||====================================================================
+!||====================================================================
+!||    mullins_or          ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
+!||--- called by ------------------------------------------------------
+!||    fail_mullins_or_s   ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F
+!||    neo_hook_t          ../engine/source/materials/mat/mat100/neo_hook_t.F
+!||    polystress2         ../engine/source/materials/mat/mat100/sigpoly.F
+!||    polystrest2         ../engine/source/materials/mat/mat100/sigpoly.F
+!||    sigaboyce           ../engine/source/materials/mat/mat100/sigaboyce.F
+!||====================================================================
       SUBROUTINE MULLINS_OR(
      1                NEL ,NUVAR,  COEFR,BETAF ,
      2                COEFM, WW  , UVAR, ETA )
@@ -172,12 +172,9 @@ C   VARIABLES FOR FUNCTION INTERPOLATION
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,JJ,K,IR,IADBUF,NINDX,IFAIL
-      INTEGER, DIMENSION(NEL) :: 
-     .   INDX
-C
+      INTEGER I
       my_real, DIMENSION(NEL)  ::  WMAX
-      my_real :: DF12, DF23, DF13,TERM
+      my_real :: TERM
 C=======================================================================
       DO I = 1, NEL 
        WMAX(I)  = MAX (UVAR(I,1),WW(I))

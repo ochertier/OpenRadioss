@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    press_seg3            ../engine/source/loads/general/load_pcyl/press_seg3.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_pre_skin_scalar   ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||    h3d_skin_vector       ../engine/source/output/h3d/h3d_results/h3d_skin_vector.F
-      !||    pressure_cyl          ../engine/source/loads/general/load_pcyl/pressure_cyl.F
-      !||--- calls      -----------------------------------------------------
-      !||    table_interp_dydx     ../engine/source/tools/curve/table_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    pload_cyl_mod         ../common_source/modules/loads/pload_cyl_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    press_seg3            ../engine/source/loads/general/load_pcyl/press_seg3.F
+!||--- called by ------------------------------------------------------
+!||    h3d_pre_skin_scalar   ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||    h3d_skin_vector       ../engine/source/output/h3d/h3d_results/h3d_skin_vector.F
+!||    pressure_cyl          ../engine/source/loads/general/load_pcyl/pressure_cyl.F
+!||--- calls      -----------------------------------------------------
+!||    table_interp_dydx     ../engine/source/tools/curve/table_tools.F
+!||--- uses       -----------------------------------------------------
+!||    pload_cyl_mod         ../common_source/modules/loads/pload_cyl_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE PRESS_SEG3(A     ,B     ,C     ,N1    ,DIR    ,
      .                      IFUNC ,TABLE ,XFACR ,XFACT ,PRESS  )
 C-----------------------------------------------
@@ -67,7 +67,6 @@ C-----------------------------------------------
       my_real, DIMENSION(2) :: XX
 
 
-      INTEGER :: i
 c-----------------------------------------------
 c     1) find intersection point P between plane surface A-B-C and line N1-N2
 c     2) calculate radial coordinates of each segment node in cylindrical

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ige3daire       ../engine/source/elements/ige3d/ig3daire.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3duforc3      ../engine/source/elements/ige3d/ig3duforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    dersbasisfuns   ../engine/source/elements/ige3d/dersbasisfuns.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ige3daire       ../engine/source/elements/ige3d/ig3daire.F
+!||--- called by ------------------------------------------------------
+!||    ig3duforc3      ../engine/source/elements/ige3d/ig3duforc3.F
+!||--- calls      -----------------------------------------------------
+!||    dersbasisfuns   ../engine/source/elements/ige3d/dersbasisfuns.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE IGE3DAIRE(ITEL , N     , XXI   , YYI   , ZZI ,
      1                     WWI  , IDX   , IDY   , IDZ   , AIRE, 
      2                     NCTRL, GAUSSX, GAUSSY, GAUSSZ, KX  ,
@@ -101,7 +101,7 @@ C BUILD NUMERATORS AND DENOMINATORS
       SUMXI(2)=ZERO
       SUMXI(3)=ZERO
 
-C BOUCLE SUR TOUT LES POINTS DE CONTROLE 
+C LOOP OVER ALL CONTROL POINTS
 
       DO K = 0,PZ
         DO J = 0,PY

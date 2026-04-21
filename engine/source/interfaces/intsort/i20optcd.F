@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i20optcd          ../engine/source/interfaces/intsort/i20optcd.F
-      !||--- called by ------------------------------------------------------
-      !||    i20main_opt_tri   ../engine/source/interfaces/intsort/i20main_opt_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    sync_data         ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box           ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i20optcd          ../engine/source/interfaces/intsort/i20optcd.F
+!||--- called by ------------------------------------------------------
+!||    i20main_opt_tri   ../engine/source/interfaces/intsort/i20main_opt_tri.F
+!||--- calls      -----------------------------------------------------
+!||    sync_data         ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box           ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I20OPTCD(NSV    ,CAND_E ,CAND_N ,XA     ,I_STOK ,
      2                   IRECT  ,GAP    ,GAP_S  ,GAP_M  ,IGAP   ,
      3                   STFA   ,ITASK  ,STF    ,IFQ    ,IFPEN  ,
@@ -67,11 +67,11 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,L,IS,JS,LS,NLS,NLT,NSEG,NLS2,SG,FIRST,LAST,MSEG,NLF,II
-      INTEGER LIST(MVSIZ),IG(MVSIZ),IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),
+      INTEGER LIST(MVSIZ), IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), 
      .        IX4(MVSIZ), LISTI(MVSIZ),IL(MVSIZ),COUNT_CAND,CT
       my_real
      .        XI,X1,X2,X3,X4,YI,Y1,Y2,Y3,Y4,ZI,Z1,Z2,Z3,Z4,
-     .        XMIN,XMAX,YMIN,YMAX,ZMIN,ZMAX,V12,V22,V32,V42
+     . XMIN,XMAX,YMIN,YMAX,ZMIN,ZMAX
       my_real
      .        GAPV(MVSIZ)
       my_real
@@ -190,7 +190,7 @@ c           ZI = X(3,IG(IS))
         ENDDO
        ELSE
         DO LS = NLF, NLT
-C   conserver LISTI et LIST pour optimiser le code genere (IA64)
+C   keep LISTI and LIST to optimize generated code (IA64)
           IS = LISTI(LS)
           I=JS+IS
           L  = CAND_E(I)
@@ -414,15 +414,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i20optcde         ../engine/source/interfaces/intsort/i20optcd.F
-      !||--- called by ------------------------------------------------------
-      !||    i20main_opt_tri   ../engine/source/interfaces/intsort/i20main_opt_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    sync_data         ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box           ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i20optcde         ../engine/source/interfaces/intsort/i20optcd.F
+!||--- called by ------------------------------------------------------
+!||    i20main_opt_tri   ../engine/source/interfaces/intsort/i20main_opt_tri.F
+!||--- calls      -----------------------------------------------------
+!||    sync_data         ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box           ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I20OPTCDE(CAND_M,CAND_S  ,XA      ,I_STOK,
      2                    IXLINS ,IXLINM  ,GAP     ,NIN   ,
      3                    V      ,GAP_S   ,GAP_M   ,IGAP  ,
@@ -460,13 +460,12 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I , L, NN1, NN2
       my_real
-     .        XI,X1,X2,X3,X4,YI,Y1,Y2,Y3,Y4,ZI,Z1,Z2,Z3,Z4,
+     . X1,X2,X3,X4,Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,
      .        XMINS,XMAXS,YMINS,YMAXS,ZMINS,ZMAXS,
-     .        XMINM,XMAXM,YMINM,YMAXM,ZMINM,ZMAXM,
-     .        V12,V22,V32,V42,VV
+     .        XMINM,XMAXM,YMINM,YMAXM,ZMINM,ZMAXM
       INTEGER MSEG
       my_real
-     .        GAPV(MVSIZ),DTTI(MVSIZ)
+     . GAPV(MVSIZ)
       INTEGER LIST(MVSIZ), LISTI(MVSIZ)
       INTEGER IS,JS,LS,NLS,NLT,NSEG,NLF,II,NLS2
       INTEGER N1L(MVSIZ),N2L(MVSIZ),M1L(MVSIZ),M2L(MVSIZ)
@@ -625,7 +624,7 @@ C
 C
          NLS=0
          DO LS = NLF, NLT
-C   conserver LISTI et LIST pour optimiser le code genere (IA64)
+C   keep LISTI and LIST to optimize generated code (IA64)
           IS = LISTI(LS)
           I=JS+IS
           II = CAND_S(I)-NLINSA

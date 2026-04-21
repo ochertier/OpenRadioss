@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps120_dp   ../engine/source/materials/mat/mat120/sigeps120_dp.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps120      ../engine/source/materials/mat/mat120/sigeps120.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps120_dp   ../engine/source/materials/mat/mat120/sigeps120_dp.F
+!||--- called by ------------------------------------------------------
+!||    sigeps120      ../engine/source/materials/mat/mat120/sigeps120.F
+!||====================================================================
       SUBROUTINE SIGEPS120_DP(
      1      NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
      2      UPARAM  ,UVAR    ,OFF     ,PLA     ,EPSD    ,SOUNDSP ,
@@ -66,16 +66,16 @@ C----------------------------------------------------------------
       INTEGER  ,DIMENSION(NEL) :: INDX,INDF
 c     material parameters
       my_real :: YOUNG,NU,SSP,G,G2,BULK,YLD0,QQ,BETA,HH,C11,C12,
-     .   A1F,A2F,A1H,A2H,AS,D1C,D2C,D1F,D2F,D_TRX,D_JC,DM,EXPN
+     .   A1F,A2F,A1H,A2H,AS,D1C,D2C,D1F,D2F,D_TRX,D_JC,EXPN
 c     Johnson & Cook rate-dependency
-      my_real CC,EPSDREF,EPSDMAX,FRATE,FCUT,ALPHA,ALPHAI
+      my_real CC,EPSDREF,EPSDMAX,FCUT,ALPHA,ALPHAI
 c     Local variables
-      my_real FACR,TRIAX,RVOCE,FDP,I1P,IP,JP,TP,FACT,FACD,DFAC,DTINV,
+      my_real FACR,TRIAX,RVOCE,FDP,I1P,IP,JP,TP,FACT,DFAC,DTINV,
      .   DLAM,DDEP,DFDLAM,DFDPLA,DYLD_DPLA,DPLA_DLAM,DPHI_DLAM,
      .   GAMC,GAMF,NP_XX,NP_YY,NP_ZZ,NP_XY,NP_YZ,NP_ZX,
      .   NF_XX,NF_YY,NF_ZZ,NF_XY,NF_YZ,NF_ZX,DPXX,DPYY,DPZZ,DPXY,DPYZ,DPZX
-      my_real ,DIMENSION(NEL) :: I1,J2,A1,A2,YLD,PHI,DAM,FDAM,JCRATE,
-     .   SXX,SYY,SZZ,SXY,SYZ,SZX,DPLA,JCR_LOG,GAMMA,GAMMAV,DGAMM,PLA_NL,DPDT_NL
+      my_real ,DIMENSION(NEL) :: I1,J2,A1,A2,YLD,PHI,DAM,JCRATE,
+     .   SXX,SYY,SZZ,SXY,SYZ,SZX,DPLA,JCR_LOG,GAMMA,DGAMM,PLA_NL,DPDT_NL
 c--------------------------------
 c     Material parameters
 c--------------------------------

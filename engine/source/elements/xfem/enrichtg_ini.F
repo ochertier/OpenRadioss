@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    enrichtg_ini    ../engine/source/elements/xfem/enrichtg_ini.F
-      !||--- called by ------------------------------------------------------
-      !||    inixfem         ../engine/source/elements/xfem/inixfem.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret           ../engine/source/system/arret.F
-      !||    clskew3         ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
-      !||    lsint4          ../engine/source/elements/xfem/crklayer4n_adv.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    enrichtg_ini    ../engine/source/elements/xfem/enrichtg_ini.F
+!||--- called by ------------------------------------------------------
+!||    inixfem         ../engine/source/elements/xfem/inixfem.F
+!||--- calls      -----------------------------------------------------
+!||    arret           ../engine/source/system/arret.F
+!||    clskew3         ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
+!||    lsint4          ../engine/source/elements/xfem/crklayer4n_adv.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE ENRICHTG_INI(ELBUF_STR,
      .      IXTG     ,NFT      ,JFT     ,JLT    ,NXLAY   ,
      .      IAD_CRKTG,IEL_CRKTG,INOD_CRK,ELCUTC ,NODEDGE ,
@@ -39,6 +40,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
       USE CRACKXFEM_MOD
       USE ELBUFDEF_MOD
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,9 +68,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,K,ELCRK,ELCRKTG,ELCUT,pp1,pp2,pp3,IADC(3),IENR0(3),
-     . IENR(3),IED,IEDGE,r,IE10,IE20,IE1,IE2,NOD1,NOD2,N(3),DX(6),
-     . NX(3),dd(3),LAYCUT,ISIGN1,ISIGN2,ISIGN3,SIGBETA,IAD1,IAD2,
-     . ISIGN0(NXEL,3),p1,p2,ICUTEDGE,IBOUNDEDGE,
+     . IENR(3),IED,IEDGE,IE10,IE20,IE1,IE2,NOD1,NOD2,N(3),DX(6),
+     . NX(3),dd(3),LAYCUT,ISIGN1,ISIGN2,ISIGN3,SIGBETA,
+     . ISIGN0(NXEL,3),p1,p2,
      . NTAG(3),EDGEENR(3),ENR(3),ILAY,ITRI,NX1,NX2,NX3,NM,NP
       my_real
      .   X1G(MVSIZ),X2G(MVSIZ),X3G(MVSIZ),Y1G(MVSIZ),Y2G(MVSIZ),
@@ -78,9 +80,9 @@ C-----------------------------------------------
      .   R13(MVSIZ),R21(MVSIZ),R22(MVSIZ),R23(MVSIZ),R31(MVSIZ),
      .   R32(MVSIZ),R33(MVSIZ),XL1(MVSIZ),YL1(MVSIZ),XL2(MVSIZ),
      .   YL2(MVSIZ),XL3(MVSIZ),YL3(MVSIZ),
-     .   FIT(3,MVSIZ),OFFG(MVSIZ),XIN(2,MVSIZ),YIN(2,MVSIZ),XXX,YYY,ZZZ,FI,
+     .   FIT(3,MVSIZ),OFFG(MVSIZ),XIN(2,MVSIZ),YIN(2,MVSIZ),FI,
      .   XXL(3,MVSIZ),YYL(3,MVSIZ),XN(3),YN(3),XM(2),YM(2)
-      my_real X1,Y1,X2,Y2,X3,Y3,X10,Y10,Z10,X20,Y20,Z20,
+      my_real X1,Y1,X2,Y2,X3,Y3,
      .   BETA,AREA1,AREA2,AREA3
       DATA dd/2,3,1/
       DATA DX/1,2,3,1,2,3/

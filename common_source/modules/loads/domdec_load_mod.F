@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,21 +22,23 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #include "my_real.inc"
 c-----------------------------------------------------------------------
-      !||====================================================================
-      !||    domdec_load_mod   ../common_source/modules/loads/domdec_load_mod.F
-      !||====================================================================
-        MODULE DOMDEC_LOAD_MOD
+!||====================================================================
+!||    domdec_load_mod   ../common_source/modules/loads/domdec_load_mod.F
+!||--- called by ------------------------------------------------------
+!||    loads_mod         ../common_source/modules/loads/loads_mod.F90
+!||====================================================================
+      MODULE DOMDEC_LOAD_MOD
 c-----------------------------------------------------------------------
         TYPE DOMDEC_PROC_LOAD_
-            INTEGER :: LOCAL_SEGMENT_NUMBER ! number of segment on the proc I
-            INTEGER :: S_LOCAL_SEGMENT ! size of LOCAL_SEGMENT array
-            INTEGER ,DIMENSION(:) ,ALLOCATABLE :: LOCAL_SEGMENT ! list of segments defined on the proc I
+          INTEGER :: LOCAL_SEGMENT_NUMBER ! number of segment on the proc I
+          INTEGER :: S_LOCAL_SEGMENT ! size of LOCAL_SEGMENT array
+          INTEGER ,DIMENSION(:) ,ALLOCATABLE :: LOCAL_SEGMENT ! list of segments defined on the proc I
         END TYPE DOMDEC_PROC_LOAD_
         TYPE DOMDEC_LOAD_
-            ! ---------
-            INTEGER, DIMENSION(:), ALLOCATABLE :: SEGMENT_TO_PROC ! processor where the segment is defined
-            TYPE(DOMDEC_PROC_LOAD_) ,DIMENSION(:) ,ALLOCATABLE :: PROC ! data structure to save the segment per proc
-            ! ---------
+          ! ---------
+          INTEGER, DIMENSION(:), ALLOCATABLE :: SEGMENT_TO_PROC ! processor where the segment is defined
+          TYPE(DOMDEC_PROC_LOAD_) ,DIMENSION(:) ,ALLOCATABLE :: PROC ! data structure to save the segment per proc
+          ! ---------
         END TYPE DOMDEC_LOAD_
 c-----------------------------------------------------------------------
       END MODULE DOMDEC_LOAD_MOD

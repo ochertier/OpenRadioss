@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i23main_opt_tri   ../engine/source/interfaces/intsort/i23main_opt_tri.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri            ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i23optcd          ../engine/source/interfaces/int23/i23optcd.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i23main_opt_tri   ../engine/source/interfaces/intsort/i23main_opt_tri.F
+!||--- called by ------------------------------------------------------
+!||    inttri            ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    i23optcd          ../engine/source/interfaces/int23/i23optcd.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I23MAIN_OPT_TRI(
      1                  IPARI   ,INTBUF_TAB ,NIN     ,ITASK ,
      2                  COUNT_REMSLV,X )
@@ -58,10 +59,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER KK, I, INACTI, I_STOK, NSN
+      INTEGER  INACTI, I_STOK, NSN
 C     REAL
       my_real
-     .   STARTT,GAP,STOPT, DX, DY, DZ, GAPMIN
+     .   STARTT,GAP,STOPT, GAPMIN
 C-----------------------------------------------
 C
       NSN    =IPARI(5,NIN)
@@ -76,7 +77,7 @@ C
       GAPMIN =INTBUF_TAB%VARIABLES(13)
 C
 C-----------------------------------------------------------
-C     Filtrage des candidats a l'impact
+C     Filtrage des CANDIDATES a l'impact
 C     (si candidat retenu, cand_n(i) = - cand_n(i))
 C-----------------------------------------------------------
        I_STOK = INTBUF_TAB%I_STOK(1)

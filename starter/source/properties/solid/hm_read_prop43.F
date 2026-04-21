@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop43           ../starter/source/properties/solid/hm_read_prop43.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop43           ../starter/source/properties/solid/hm_read_prop43.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP43(GEO   ,IGEO  ,IOUT      ,IG     ,
      .                          NUVAR ,PARGEO,IGTYP,PROP_TAG,
      .                          UNITAB,LSUBMODEL,DEFAULTS_SOLID)
@@ -80,8 +80,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IOUT,IERROR,NUVAR,NPG,JCVT,ISMSTR
-      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS
+      INTEGER IOUT, NUVAR, NPG, JCVT, ISMSTR
+      INTEGER     IHBE_DS, ISST_DS, IFRAME_DS
       my_real
      .   TTHICK
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED

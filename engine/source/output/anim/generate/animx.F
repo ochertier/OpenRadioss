@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    animx           ../engine/source/output/anim/generate/animx.F
-      !||--- called by ------------------------------------------------------
-      !||    genani          ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||    sav_buf_point   ../engine/source/user_interface/eng_callback_c.c
-      !||    xanim28         ../engine/source/elements/xelem/xanim28.F
-      !||    xanim29         ../engine/source/output/anim/generate/xanim29.F
-      !||    xanim30         ../engine/source/output/anim/generate/xanim30.F
-      !||    xanim31         ../engine/source/output/anim/generate/xanim31.F
-      !||    xcoor3          ../engine/source/elements/xelem/xcoor3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    animx           ../engine/source/output/anim/generate/animx.F
+!||--- called by ------------------------------------------------------
+!||    genani          ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../engine/source/output/message/message.F
+!||    arret           ../engine/source/system/arret.F
+!||    sav_buf_point   ../engine/source/user_interface/eng_callback_c.c
+!||    xanim28         ../engine/source/elements/xelem/xanim28.F
+!||    xanim29         ../engine/source/output/anim/generate/xanim29.F
+!||    xanim30         ../engine/source/output/anim/generate/xanim30.F
+!||    xanim31         ../engine/source/output/anim/generate/xanim31.F
+!||    xcoor3          ../engine/source/elements/xelem/xcoor3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ANIMX(ELBUF_TAB,
      .           IPARG    ,ITAB     ,X        ,KXX      ,IXX    ,
      .           IPARTX   ,PM       ,GEO      ,BUFMAT   ,BUFGEO ,
@@ -87,10 +87,10 @@ C     REAL
      .     OFF, MASSELE, EINTELE
       INTEGER IPRT, NG, MYNEL, MYNFT, MYIAD, MYITY,
      .   I, J, K, IPROP, IMAT, NX,
-     .   NB1, NB2, NB3, NB4, NB5, NBFI, UID,
-     .   IGTYP,NUVAR,NUVARN,NUPARAM,
+     .   UID,
+     .   IGTYP,NUVAR,NUVARN,
      .   L, NAX1D, NAX2D, NAX3D, NEDGE, NFACET, NSOLID,
-     .   IADNOD, NUSR, NOSYS,KVAR,KVARN
+     .   IADNOD, KVAR,KVARN
       CHARACTER*40 MESS
 C
       TYPE(G_BUFEL_)  ,POINTER :: GBUF
@@ -126,13 +126,6 @@ C
             IGTYP =  NINT(GEO(12,IPROP))
             NUVAR =  NINT(GEO(25,IPROP))
             NUVARN=  NINT(GEO(35,IPROP))
-C
-cc            NB1 =(I-1)*(3+NUVAR+NUVARN*NX)+MYIAD
-cc            NB2 =NB1 +1
-cc            NB3 =NB2 +1
-cc            NB4 =NB3 +1
-cc            NB5 =NB4 +NUVAR
-cc            NBFI=NB5 +NUVARN*NX
             KVAR  = NUVAR*(I-1)+1
             KVARN = NUVARN*NX*(I-1)+1
 C-------

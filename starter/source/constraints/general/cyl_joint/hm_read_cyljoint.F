@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_cyljoint       ../starter/source/constraints/general/cyl_joint/hm_read_cyljoint.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    anodset                ../starter/source/output/analyse/analyse_node.c
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_sz_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    ifrontplus             ../starter/source/spmd/node/frontplus.F
-      !||    kinset                 ../starter/source/constraints/general/kinset.F
-      !||    nodgrnr5               ../starter/source/starter/freform.F
-      !||    udouble                ../starter/source/system/sysfus.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    joint_mod              ../starter/share/modules1/joint_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_cyljoint       ../starter/source/constraints/general/cyl_joint/hm_read_cyljoint.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    anodset                ../starter/source/output/analyse/analyse_node.c
+!||    fretitl                ../starter/source/starter/freform.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_sz_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    ifrontplus             ../starter/source/spmd/node/frontplus.F
+!||    kinset                 ../starter/source/constraints/general/kinset.F
+!||    nodgrnr5               ../starter/source/starter/freform.F
+!||    udouble                ../starter/source/system/sysfus.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    joint_mod              ../starter/share/modules1/joint_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_CYLJOINT(LJOINT ,ITABM1,IKINE  ,ITAB   ,IGRNOD,
      .                            NOM_OPT,LSUBMODEL)
 C-----------------------------------------------
@@ -81,10 +81,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K, I, NS, J, LJ, NU, IDIR,ID,N1,N2,IGU,IKINE1(3*NUMNOD),
-     .        IFLAGUNIT,FLAG_FMT_TMP,IFIX_TMP,UID,NY,SUB_ID,
-     .        IGS
-      my_real BID
+      INTEGER :: K, I, NS, J, LJ, NU, IDIR,ID,N1,N2,IGU,IKINE1(3*NUMNOD),UID,NY,SUB_ID,IGS
+      my_real :: BID
       CHARACTER MESS*40
       CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL :: IS_AVAILABLE
@@ -160,7 +158,7 @@ C
 
       ENDDO
 C-------------------------------------
-C Recherche des ID doubles
+C Searching for duplicate IDs
 C-------------------------------------
       CALL UDOUBLE(NOM_OPT,LNOPT1,NJOINT,MESS,0,BID)
 C

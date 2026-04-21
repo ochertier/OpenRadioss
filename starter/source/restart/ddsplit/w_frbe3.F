@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    w_frbe3    ../starter/source/restart/ddsplit/w_frbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit    ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal     ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    w_frbe3    ../starter/source/restart/ddsplit/w_frbe3.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit    ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal     ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE W_FRBE3(IRBE3   ,LRBE3  ,PROC    ,LLRBE3_L,
-     .                   FRBE3   ,FRBE3AD,LEN_IA  )
+     .                   FRBE3   ,FRBE3AD,LEN_IA  ,NRBE3PEN_L)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,6 +45,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER PROC, LLRBE3_L, LEN_IA,
      .        IRBE3(NRBE3L,*), LRBE3(*)
+      INTEGER, INTENT(IN) :: NRBE3PEN_L
       my_real
      .        FRBE3(6,*),FRBE3AD(*)
 C-----------------------------------------------
@@ -55,9 +56,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, KL, NSNL, NSN, ILP, NN, M, N,IAD,IADS
+      INTEGER I, J, K, NSNL, NSN, NN, N, IADS
       my_real
-     .        FBTMP1(6,LLRBE3_L),FBTMP2(2*LLRBE3_L)
+     .        FBTMP1(6,LLRBE3_L),FBTMP2(2*LLRBE3_L),FBTMP3(10*NRBE3PEN_L)
 C
       NSNL = 0
       IADS=SLRBE3/2
@@ -79,7 +80,11 @@ C
 C
       CALL WRITE_DB(FBTMP1,LLRBE3_L*6)
       CALL WRITE_DB(FBTMP2,LLRBE3_L*2)
-      LEN_IA = LEN_IA + LLRBE3_L*8
+      IF (NRBE3PEN_L>0) THEN 
+        FBTMP3 =ZERO
+        CALL WRITE_DB(FBTMP3,10*NRBE3PEN_L)
+      END IF
+      LEN_IA = LEN_IA + LLRBE3_L*8 + NRBE3PEN_L*10
 C
       RETURN
       END

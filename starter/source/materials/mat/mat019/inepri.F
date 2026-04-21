@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    inepri      ../starter/source/materials/mat/mat019/inepri.F
-      !||--- called by ------------------------------------------------------
-      !||    inirby      ../starter/source/constraints/general/rbody/inirby.F
-      !||    inirbys     ../starter/source/constraints/general/rbody/inirby.F
-      !||    rigid_mat   ../starter/source/materials/mat/mat019/rigid_mat.F
-      !||--- calls      -----------------------------------------------------
-      !||    valpr       ../starter/source/materials/mat/mat019/valpr.F
-      !||====================================================================
+!||====================================================================
+!||    inepri      ../starter/source/materials/mat/mat019/inepri.F
+!||--- called by ------------------------------------------------------
+!||    inirby      ../starter/source/constraints/general/rbody/inirby.F
+!||    inirbys     ../starter/source/constraints/general/rbody/inirby.F
+!||    rigid_mat   ../starter/source/materials/mat/mat019/rigid_mat.F
+!||--- calls      -----------------------------------------------------
+!||    valpr       ../starter/source/materials/mat/mat019/valpr.F
+!||====================================================================
       SUBROUTINE INEPRI(XI,BM)
 C------------------------------------
-C     CALCUL INERTIES ET REPERE PRINCIPAL
+C     INERTIA CALCULATION AND PRINCIPAL FRAME
 C------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

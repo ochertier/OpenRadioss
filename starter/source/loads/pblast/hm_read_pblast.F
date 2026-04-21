@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_pblast                     ../starter/source/loads/pblast/hm_read_pblast.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                             ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                             ../starter/source/output/message/message.F
-      !||    arret                              ../starter/source/system/arret.F
-      !||    hm_get_floatv                      ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv                        ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key                 ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start                    ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    ngr2usr                            ../starter/source/system/nintrr.F
-      !||    subrotpoint                        ../starter/source/model/submodel/subrot.F
-      !||    usr2sys                            ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod                 ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                        ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                            ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod                       ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_pblast                     ../starter/source/loads/pblast/hm_read_pblast.F
+!||--- called by ------------------------------------------------------
+!||    lectur                             ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                             ../starter/source/output/message/message.F
+!||    arret                              ../starter/source/system/arret.F
+!||    hm_get_floatv                      ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv                        ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key                 ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start                    ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    ngr2usr                            ../starter/source/system/nintrr.F
+!||    subrotpoint                        ../starter/source/model/submodel/subrot.F
+!||    usr2sys                            ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod                 ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                        ../starter/share/message_module/message_mod.F
+!||    r2r_mod                            ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod                       ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PBLAST(PBLAST,
      .                          ITAB      ,ITABM1 ,UNITAB   ,IGRSURF ,NUMLOADP,
      .                          ILOADP    ,LLOADP ,FACLOADP ,X       ,BUFSF   ,
@@ -112,7 +112,6 @@ C-----------------------------------------------
       my_real ZC ! scaled height of charge
       my_real alpha_zc,angle_g,HZ
       my_real Lg,Zg,tmp_var,Z_struct,Zx,Zy,Zz,ProjZ(3),ProjDet(3)
-      my_real kk ! lb/ft**1/3 -> mm/g**1/3
       my_real P_inci,P_refl,decay_inci,decay_refl,I_inci,I_refl
       my_real DT_0,TSTOP,TA_PBLAST
       my_real b_min, b_max
@@ -127,7 +126,8 @@ C-----------------------------------------------
       INTEGER SURF_ID_ground,internal_SURF_ID_GROUND
       INTEGER curve_id1,curve_id2,SEG_UNDERGROUND
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
-
+      INTEGER :: ISHAPE
+      INTEGER :: NWARN !< number of segment for which it is not possible to correlate the positive impulse. It may happen that for a given Pmax and dt0 value even building a triangle shape leads to a lower impulse that the targeted one.
       TYPE(FRIEDLANDER_PARAMS_) :: FRIEDLANDER_PARAMS
 C-----------------------------------------------
 C   C o n s t a n t   V a l u e s
@@ -214,6 +214,10 @@ C-------------------------------------------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
+      base_x = -huge(base_x)
+      base_y = -huge(base_y)
+      base_z = -huge(base_z)
+      
       !init tables
       CALL PBLAST_INIT_TABLES(PBLAST%PBLAST_DATA)
       tmp(1:3) = HUGE(tmp(1))
@@ -225,8 +229,10 @@ C-----------------------------------------------
       HC = ZERO
       BOOL_SKIP_CALC = .FALSE.
       IS_ITA_SHIFT = .FALSE.
+      NWARN = 0
 
       ALLOCATE( OUTPUT_USER_PARAMS(6,PBLAST%NLOADP_B))
+      OUTPUT_USER_PARAMS(:,:) = ZERO
 
       CALL HM_OPTION_START('/LOAD/PBLAST')
 
@@ -234,7 +240,7 @@ C-----------------------------------------------
         K_BLAST = K-NLOADP_F
         CALL HM_OPTION_READ_KEY(LSUBMODEL, OPTION_TITR = TITR, OPTION_ID = ID, SUBMODEL_ID = SUB_ID)
         IAD = NUMLOADP + 1
-        SURF_ID = 0 !target surface id
+        SURF_ID = 0 !Target surface ID
         SURF_ID_GROUND = 0 !ground surface id
         internal_SURF_ID = 0
         SEG_UNDERGROUND = 0
@@ -271,6 +277,7 @@ C-----------------------------------------------
         CALL HM_GET_FLOATV('Tstop',TSTOP,IS_AVAILABLE_TSTOP, LSUBMODEL, UNITAB)
         !---line-4
         CALL HM_GET_INTV('surf_ground_ID', SURF_ID_GROUND, IS_AVAILABLE, LSUBMODEL)
+        CALL HM_GET_INTV('Ishape', ISHAPE, IS_AVAILABLE, LSUBMODEL)
 
          OUTPUT_USER_PARAMS(1,K_BLAST)=SURF_ID
          OUTPUT_USER_PARAMS(2,K_BLAST)=SURF_ID_GROUND
@@ -397,6 +404,12 @@ C-----------------------------------------------
         !  3: AIR BURST
         IF(IABAC <= 0)IABAC=1
         IF(IABAC >= 4)IABAC=1
+
+        !ISHAPE
+        !  1: spherical (with ground) - default
+        !  2: spherical (without ground)
+        !  3: cylindrical (with ground)
+        IF(ISHAPE <= 0 .OR. ISHAPE >= 4) ISHAPE=1
 
         !--------------------------------------------------------------
         !   S u r f a c e   S e g m e n t s
@@ -661,6 +674,7 @@ C-----------------------------------------------
         IF(internal_SURF_ID /= 0)THEN
           ILOADP( 1,K) = 4*NUMSEG
           ILOADP( 2,K) = internal_SURF_ID
+          ILOADP( 3,K) = ISHAPE
           ILOADP( 4,K) = IAD
           ILOADP( 5,K) = 3
           ILOADP( 6,K) = IZ_UPDATE
@@ -798,34 +812,35 @@ C-----------------------------------------------
                 !Warning Message if Z is out of bounds (precondition for subroutine BLAST_PARAMETERS__FREE_AIR_MODEL)
                 IF(Z > 0.5 .AND. Z < 400.)THEN
                 ELSEIF(Z <= 0.5)THEN
-                  IF (N4 == 0)THEN
-                    WRITE(IOUT,FMT='(A,3I11)')
-     .               "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
-                    WRITE(ISTDO,FMT='(A,3I11)')
-     .               "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
+                  WRITE(IOUT, FMT='(A,I0,A)')   "Warning : /LOAD/PBLAST id=",ID," R/W**(1/3) < 0.5 cm/g**(1/3)"
+                  WRITE(ISTDO,FMT='(A,I0,A)')   "Warning : /LOAD/PBLAST id=",ID," R/W**(1/3) < 0.5 cm/g**(1/3)"
+                  WRITE(IOUT, FMT='(A)')        "          Radial Distance too close to the charge"
+                  WRITE(ISTDO,FMT='(A)')        "          Radial Distance too close to the charge"
+                  IF (N4 == 0 .OR. N3 == N4)THEN
+                    WRITE(IOUT, FMT='(A,3I11)') "          -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
+                    WRITE(ISTDO,FMT='(A,3I11)') "          -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
                   ELSE
-                    WRITE(IOUT,FMT='(A,4I11)')"Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ",
-     .               ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
-                    WRITE(ISTDO,FMT='(A,4I11)')"Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ",
-     .               ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+                    WRITE(IOUT, FMT='(A,4I11)') "          -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+                    WRITE(ISTDO,FMT='(A,4I11)') "          -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
                   ENDIF
                   PBLAST%PBLAST_TAB(ILD_PBLAST)%TAGMSG(I) = 1
+
                 ELSEIF(Z > 400.)THEN
-                  IF (N4==0)THEN
-                    WRITE(IOUT,FMT='(A,3I11)')
-     .               "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
-                    WRITE(ISTDO,FMT='(A,3I11)')
-     .               "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
+                  WRITE(IOUT, FMT='(A,I0,A)')   "Warning : /LOAD/PBLAST id=",ID," R/W**(1/3) > 400. cm/g**(1/3)"
+                  WRITE(ISTDO,FMT='(A,I0,A)')   "Warning : /LOAD/PBLAST id=",ID," R/W**(1/3) > 400. cm/g**(1/3)"
+                  WRITE(IOUT,  FMT='(A)')       "          Radial Distance too far from the charge"
+                  WRITE(ISTDO, FMT='(A)')       "          Radial Distance too far from the charge"
+                  IF (N4 == 0 .OR. N3 == N4)THEN
+                    WRITE(IOUT, FMT='(A,3I11)') "          -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
+                    WRITE(ISTDO,FMT='(A,3I11)') "          -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
                   ELSE
-                    WRITE(IOUT,FMT='(A,4I11)')"Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ",
-     .               ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
-                    WRITE(ISTDO,FMT='(A,4I11)')"Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ",
-     .               ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+                    WRITE(IOUT, FMT='(A,4I11)') "          -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+                    WRITE(ISTDO,FMT='(A,4I11)') "          -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
                   ENDIF
                   PBLAST%PBLAST_TAB(ILD_PBLAST)%TAGMSG(I) = 1
                 ENDIF
 
-                !Angle from detonation point
+                !Angle from Detonation Point
                 cos_theta = Dx*Nx_SEG + Dy*Ny_SEG + Dz*Nz_SEG
                 cos_theta = cos_theta/MAX(EM20,NORM_*DNORM)
 
@@ -834,7 +849,7 @@ C-----------------------------------------------
                  CALL PBLAST_PARAMETERS__FREE_AIR(PBLAST,Z, W13, TDET,
      +                                            FAC_P_bb, FAC_I_bb, FAC_T_bb,
      +                                            IS_DECAY_TO_BE_COMPUTED,
-     +                                            FRIEDLANDER_PARAMS)
+     +                                            FRIEDLANDER_PARAMS, NWARN)
 
                  P_inci     = FRIEDLANDER_PARAMS%P_inci
                  P_refl     = FRIEDLANDER_PARAMS%P_refl
@@ -856,7 +871,7 @@ C-----------------------------------------------
 
                 HZ = ( Nx_SURF*Zx + Ny_SURF*Zy + Nz_SURF*Zz  - Nx_SURF*Xdet - Ny_SURF*Ydet - Nz_SURF*Zdet )
 
-                IF(HZ < ZERO)THEN
+                IF(HZ < -em10 .AND. ISHAPE /= 2)THEN
 
                   !FACE IS UNDERGROUND
                   P_inci = zero
@@ -888,41 +903,52 @@ C-----------------------------------------------
                   tmp(2) = (ProjZ(2)-ProjDet(2))
                   tmp(3) = (ProjZ(3)-ProjDet(3))
                   LG = SQRT(TMP(1)*TMP(1)+TMP(2)*TMP(2)+TMP(3)*TMP(3))
-                  cos_theta = (ProjDet(1)-ProjZ(1))*Nx_SEG + (ProjDet(2)-ProjZ(2))*Ny_SEG + (ProjDet(3)-ProjZ(3))*Nz_SEG
-                  cos_theta = cos_theta/MAX(EM20,LG*NORM_)
-                  ZG = LG*FAC_L_bb/W13     !scaled horizontal distance (ground)
+                  ZG = LG*FAC_L_bb/W13
 
                   ! scaled distance
-                  Z = ZG !in abac unit ID  g,cm,mus
+                  SELECT CASE(ISHAPE)
+                    CASE (1,2)
+                      Z = DNORM / W13    !spherical
+                      !Angle from Detonation Point
+                      cos_theta = Dx*Nx_SEG + Dy*Ny_SEG + Dz*Nz_SEG
+                      cos_theta = cos_theta/MAX(EM20,NORM_*DNORM)
+                   CASE(3)
+                      Z = ZG             !cylindrical - in abac unit ID  g,cm,mus
+                      !Angle from Detonation Point
+                      !   is here cos between (Det-ProjZ) and normal
+                      cos_theta = (ProjDet(1)-ProjZ(1))*Nx_SEG + (ProjDet(2)-ProjZ(2))*Ny_SEG + (ProjDet(3)-ProjZ(3))*Nz_SEG
+                      cos_theta = cos_theta/MAX(EM20,LG*NORM_)
+                  END SELECT
 
                   !finding index for TM5-1300 abacuses from bijection.
                   IF(Z > 0.5 .AND. Z < 400.)THEN
+                    !inside interpolation table
+
                   ELSEIF(Z <= 0.5)THEN
-                    IF (N4 == 0)THEN
-                      WRITE(IOUT,FMT='(A,3I11)')
-     .                 "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
-                      WRITE(ISTDO,FMT='(A,3I11)')
-     .                 "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
+                    WRITE(IOUT, FMT='(A,I0,A)')"Warning : /LOAD/PBLAST id=",ID," Rg/W**(1/3) < 0.5 cm/g**(1/3)"
+                    WRITE(ISTDO,FMT='(A,I0,A)')"Warning : /LOAD/PBLAST id=",ID," Rg/W**(1/3) < 0.5 cm/g**(1/3)"
+                    WRITE(IOUT, FMT='(A)')     "          Horizontal Distance on Ground (Rg) is too close to the charge"
+                    WRITE(ISTDO,FMT='(A)')     "          Horizontal Distance on Ground (Rg) is too close to the charge"
+                    IF (N4 == 0 .OR. N3 == N4)THEN
+                      WRITE(IOUT, FMT='(A,3I11)')  "         -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
+                      WRITE(ISTDO,FMT='(A,3I11)')  "         -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
                     ELSE
-                      WRITE(IOUT,FMT='(A,4I11)')
-     .                 "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
-                      WRITE(ISTDO,FMT='(A,4I11)')
-     .                 "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+                      WRITE(IOUT, FMT='(A,4I11)')  "         -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+                      WRITE(ISTDO,FMT='(A,4I11)')  "         -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
                     ENDIF
                     PBLAST%PBLAST_TAB(ILD_PBLAST)%TAGMSG(I) = 1
+
                   ELSEIF(Z > 400.)THEN
-                    IF (N4==0)THEN
-                      WRITE(IOUT,FMT='(A,3I11)')
-     .                 "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
-                      WRITE(ISTDO,FMT='(A,3I11)')
-     .                 "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
+                    WRITE(IOUT, FMT='(A,I0,A)')"Warning : /LOAD/PBLAST id=",ID," Rg/W**(1/3) > 400. cm/g**(1/3)"
+                    WRITE(ISTDO,FMT='(A,I0,A)')"Warning : /LOAD/PBLAST id=",ID," Rg/W**(1/3) > 400. cm/g**(1/3)"
+                    WRITE(IOUT, FMT='(A)')     "          Horizontal Distance on Ground (Rg) is too far from the charge"
+                    WRITE(ISTDO,FMT='(A)')     "          Horizontal Distance on Ground (Rg) is too far from the charge"
+                    IF (N4 == 0 .OR. N3 == N4)THEN
+                      WRITE(IOUT, FMT='(A,3I11)')  "         -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
+                      WRITE(ISTDO,FMT='(A,3I11)')  "         -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3)
                     ELSE
-                      WRITE(IOUT,FMT='(A,4I11)')
-     .                 "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ",
-     .                 ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
-                      WRITE(ISTDO,FMT='(A,4I11)')
-     .                 "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ",
-     .                 ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+                      WRITE(IOUT, FMT='(A,4I11)')  "         -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+                      WRITE(ISTDO,FMT='(A,4I11)')  "         -> Segment nodes : ", ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
                     ENDIF
                     PBLAST%PBLAST_TAB(ILD_PBLAST)%TAGMSG(I) = 1
                   ENDIF
@@ -930,7 +956,7 @@ C-----------------------------------------------
                   CALL PBLAST_PARAMETERS__SURFACE_BURST( PBLAST,Z, W13, TDET,
      +                                             FAC_P_bb, FAC_I_bb, FAC_T_bb,
      +                                             IS_DECAY_TO_BE_COMPUTED,
-     +                                             FRIEDLANDER_PARAMS )
+     +                                             FRIEDLANDER_PARAMS,NWARN )
                   P_inci     = FRIEDLANDER_PARAMS%P_inci
                   P_refl     = FRIEDLANDER_PARAMS%P_refl
                   I_inci     = FRIEDLANDER_PARAMS%I_inci
@@ -1000,19 +1026,29 @@ C-----------------------------------------------
                   ANGLE_g = acos(ANGLE_g)
                   ANGLE_g = cst_180/PI_*ANGLE_g !debug purpose
                   IF(ANGLE_g < ZERO)THEN
-                    WRITE(IOUT,*) ' ** WARNING : /LOAD/PBLAST id=',ID,' NEGATIVE ANGLE,',ANGLE_g,' FACE:',ITAB((/N1,N2,N3,N4/)),
-     .                            ' SEEMS TO BE BELOW THE GROUND'
-                    WRITE(ISTDO,*)' ** WARNING : /LOAD/PBLAST id=',ID,' NEGATIVE ANGLE,',ANGLE_g,' FACE:',ITAB((/N1,N2,N3,N4/)),
-     .                            ' SEEMS TO BE BELOW THE GROUND'
-                    ANGLE_g = ZERO
-                    PBLAST%PBLAST_TAB(ILD_PBLAST)%TAGMSG(I) = 1
+                   WRITE(IOUT,*)                'Warning : /LOAD/PBLAST id=',ID,' NEGATIVE ANGLE,',ANGLE_g
+                   WRITE(ISTDO,*)               'Warning : /LOAD/PBLAST id=',ID,' NEGATIVE ANGLE,',ANGLE_g
+                   IF(N4 == 0 .OR. N3 == N4)THEN
+                     WRITE(IOUT,FMT= '(A,3I11)')'           FACE:',ITAB((/N1,N2,N3/)),' SEEMS TO BE BELOW THE GROUND'
+                     WRITE(ISTDO,FMT='(A,3I11)')'           FACE:',ITAB((/N1,N2,N3/)),' SEEMS TO BE BELOW THE GROUND'
+                   ELSE
+                     WRITE(IOUT,FMT= '(A,4I11)')'           FACE:',ITAB((/N1,N2,N3,N4/)),' SEEMS TO BE BELOW THE GROUND'
+                     WRITE(ISTDO,FMT='(A,4I11)')'           FACE:',ITAB((/N1,N2,N3,N4/)),' SEEMS TO BE BELOW THE GROUND'
+                   ENDIF
+                   ANGLE_g = ZERO
+                   PBLAST%PBLAST_TAB(ILD_PBLAST)%TAGMSG(I) = 1
                   ELSEIF(ANGLE_g > 85.00000)THEN
-                    WRITE(IOUT,FMT='(A,I0,A,E10.4,A,4I11)')
-     .              ' ** WARNING : /LOAD/PBLAST id=',ID,' ANGLE IS OVER THE UPPER BOUND,',ANGLE_g,
-     .                                            '. ANGLE SET TO 85.00 FOR FACE:',ITAB((/N1,N2,N3,N4/))
-                    WRITE(ISTDO,FMT='(A,I0,A,E10.4,A,4I11)')
-     .              ' ** WARNING : /LOAD/PBLAST id=',ID,' ANGLE IS OVER THE UPPER BOUND,',ANGLE_g,
-     .                                            '. ANGLE SET TO 85.00 FOR FACE:',ITAB((/N1,N2,N3,N4/))
+                    WRITE(IOUT, FMT='(A,I0,A,E10.4)')
+     .                'Warning : /LOAD/PBLAST id=',ID,' ANGLE IS OVER THE UPPER BOUND,',ANGLE_g
+                    WRITE(ISTDO,FMT='(A,I0,A,E10.4)')
+     .                'Warning : /LOAD/PBLAST id=',ID,' ANGLE IS OVER THE UPPER BOUND,',ANGLE_g
+                    IF(N4 == 0 .OR. N3 == N4)THEN
+                      WRITE(IOUT, FMT='(A,3I11)')'          ANGLE SET TO 85.00 FOR FACE:',ITAB((/N1,N2,N3/))
+                      WRITE(ISTDO,FMT='(A,3I11)')'          ANGLE SET TO 85.00 FOR FACE:',ITAB((/N1,N2,N3/))
+                    ELSE
+                      WRITE(IOUT, FMT='(A,4I11)')'          ANGLE SET TO 85.00 FOR FACE:',ITAB((/N1,N2,N3,N4/))
+                      WRITE(ISTDO,FMT='(A,4I11)')'          ANGLE SET TO 85.00 FOR FACE:',ITAB((/N1,N2,N3,N4/))
+                    ENDIF
                     ANGLE_g = 85.00000
                     PBLAST%PBLAST_TAB(ILD_PBLAST)%TAGMSG(I) = 1
                   ENDIF
@@ -1022,7 +1058,7 @@ C-----------------------------------------------
      +                                            FAC_P_bb, FAC_I_bb, FAC_T_bb,
      +                                            IS_DECAY_TO_BE_COMPUTED,
      +                                            ID,'LOAD',.TRUE.,
-     +                                            FRIEDLANDER_PARAMS)
+     +                                            FRIEDLANDER_PARAMS,NWARN)
 
                  P_inci     = FRIEDLANDER_PARAMS%P_inci
                  P_refl     = FRIEDLANDER_PARAMS%P_refl
@@ -1077,6 +1113,16 @@ C-----------------------------------------------
              MSGOUT2='THERE WILL NOT BE LOADED WITH BLAST PRESSURE'
              CALL ANCMSG(MSGID=1907,MSGTYPE=MSGWARNING,ANMODE=ANINFO,C1=TRIM(TITR),I1=ID,C2=MSGOUT1,C3=MSGOUT2)
            ENDIF
+           IF(IMODEL == 2 .AND. NWARN > 0)THEN
+             MSGOUT1=''
+             WRITE(MSGOUT1,FMT='(I0,A)') NWARN,
+     .       ' SEGMENT(S) HAS EXCESSIVE POSITIVE IMPULSE REGARDING THE PEAK PRESSURE AND POSITIVE DURATION.'
+             MSGOUT2=''
+             MSGOUT2=
+     .       'A TRIANGULAR WAVEFORM WILL BE USED INSTEAD TO MAXIMIZE THE IMPULSE. DEFINING A PMIN VALUE IS STRONGLY RECOMMENDED'
+             CALL ANCMSG(MSGID=1907,MSGTYPE=MSGWARNING,ANMODE=ANINFO,C1=TRIM(TITR),I1=ID,C2=MSGOUT1,C3=MSGOUT2)
+           ENDIF
+
 
         ENDIF
 
@@ -1155,6 +1201,9 @@ C---------------------------------
         IF(NDT /= 0)WRITE (IOUT,2014)NDT
         IF(IABAC >=2)THEN
           WRITE(IOUT,2034)NX_SURF,NY_SURF,NZ_SURF
+        ENDIF
+        IF(IABAC == 2)THEN
+          WRITE(IOUT,2036)ISHAPE
         ENDIF
         IF(IABAC == 3) WRITE(IOUT,2023) HC
         IF(ITA_SHIFT == 2)THEN
@@ -1238,6 +1287,8 @@ C-------------------------------------------------------------------------------
  2035 FORMAT(
      .     5X,'TIME SHIFT VALUE',/,
      .     5X,'  (MINIMUM AMONG ALL PBLAST OPTIONS). =',E12.4//)
+ 2036 FORMAT(
+     .     5X,'ISHAPE FLAG  . . . . . . . . . . . .  =',I10)
 
 C-----------------------------------------------
  1000 CONTINUE

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    anim_build_index_all   ../engine/source/output/anim/reader/anim_build_index_all.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../engine/source/input/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../engine/source/output/message/message.F
-      !||    arret                  ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    stack_mod              ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    anim_build_index_all   ../engine/source/output/anim/reader/anim_build_index_all.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../engine/source/input/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../engine/source/output/message/message.F
+!||    arret                  ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    stack_mod              ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE ANIM_BUILD_INDEX_ALL(ISPMD   ,MCHECK ,SENSORS ,IGEO    ,GEO    )
 C-----------------------------------------------
 C   M o d u l e s
@@ -70,6 +70,7 @@ C-------------------------------------------
       NIPMAX_SOL = 0
       NPTS = 1
       NPTT = 0
+      NPTR= 1
       NPTT_PLY = 0
       IF (MCHECK == 0) THEN
         ALLOCATE (SENSORS%ANIM(SENSORS%NANIM))
@@ -157,12 +158,12 @@ C-------------------------------------------
              ANIM_CT(4)    = 1
              NCT_ANI = NCT_ANI + 1
            ENDIF
-c           IF(NIPMAX<=100)THEN
+C           IF(NIPMAX<=100)THEN
              DO I=1,NIPMAX
                ANIM_CT(100+I) = 1
                NCT_ANI = NCT_ANI + 1
              ENDDO
-c           ENDIF
+C           ENDIF
          ENDIF
          IF (ISTRAIALL == 1)THEN
            IF (ANIM_CT(7) == 0) THEN
@@ -702,9 +703,9 @@ C--------due to existing Anim designs: fix thickness dir to J and limite other d
                   CASE(1)
                     IF (N14R==0) N14R= IGEO(15,I)
                 END SELECT
-c              NPTR= MAX(NPTR,N14R)
-c              NPTS= MAX(NPTS,N14S)
-c              NPTT= MAX(NPTT,N14T)
+C              NPTR= MAX(NPTR,N14R)
+C              NPTS= MAX(NPTS,N14S)
+C              NPTT= MAX(NPTT,N14T)
               N14S=MAX(N14R,N14S,N14T)
               NPTR= MAX(NPTR,2)
               NPTS= MAX(NPTS,IGEO(15,I),N14S)
@@ -979,7 +980,6 @@ C
         NFE_ANI = NFE_ANI + ANIM_FE(I)
        ENDDO
        IF(ANIM_V(12) == 1)NV_ANI=NV_ANI+1
-       IF(ANIM_V(4)==1.AND.ANIMCONT == 0) NV_ANI=NV_ANI-1
        IF(ANIM_V(27)==1)NV_ANI=NV_ANI+1
       ENDIF
 C-----

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,45 +20,47 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbainit3                  ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                    ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                    ../starter/source/output/message/message.F
-      !||    c1buf3                    ../starter/source/elements/shell/coque/c1buf3.F
-      !||    cbufxfe                   ../starter/source/elements/xfem/cbufxfe.F
-      !||    ccoori                    ../starter/source/elements/shell/coque/ccoori.F
-      !||    cderii                    ../starter/source/elements/shell/coque/cderii.F
-      !||    cepschk                   ../starter/source/elements/shell/coque/cepsini.F
-      !||    cfailini                  ../starter/source/elements/shell/coque/cfailini.F
-      !||    cfailini4                 ../starter/source/elements/shell/coque/cfailini.F
-      !||    cinmas                    ../starter/source/elements/shell/coque/cinmas.F
-      !||    cm35in3                   ../starter/source/materials/mat/mat035/cm35in3.F
-      !||    cmaini3                   ../starter/source/elements/sh3n/coquedk/cmaini3.F
-      !||    cmatini                   ../starter/source/materials/mat_share/cmatini.F
-      !||    cmatini4                  ../starter/source/materials/mat_share/cmatini4.F
-      !||    cndleni                   ../starter/source/elements/shell/coqueba/cndleni.F
-      !||    cnepsini                  ../starter/source/elements/shell/coqueba/cnepsini.F
-      !||    cneveci                   ../starter/source/elements/shell/coqueba/cneveci.F
-      !||    corth3                    ../starter/source/elements/shell/coque/corth3.F
-      !||    csigini4                  ../starter/source/elements/shell/coqueba/scigini4.F
-      !||    csms11_ini                ../starter/source/elements/shell/coque/cinit3.F
-      !||    cstraini4                 ../starter/source/elements/shell/coqueba/cstraini4.F
-      !||    cuserini                  ../starter/source/elements/shell/coque/cuserini.F
-      !||    cuserini4                 ../starter/source/elements/shell/coqueba/cuserini4.F
-      !||    cveok3                    ../starter/source/elements/shell/coque/cveok3.F
-      !||    fail_windshield_init      ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
-      !||    fractal_dmg_init          ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
-      !||    fretitl2                  ../starter/source/starter/freform.F
-      !||    layini1                   ../starter/source/elements/shell/coqueba/layini1.F
-      !||    thickini                  ../starter/source/elements/shell/coqueba/thickini.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod                 ../starter/share/modules1/drape_mod.F
-      !||    fractal_dmg_init_mod      ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
-      !||    message_mod               ../starter/share/message_module/message_mod.F
-      !||    stack_mod                 ../starter/share/modules1/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cbainit3                  ../starter/source/elements/shell/coqueba/cbainit3.F
+!||--- called by ------------------------------------------------------
+!||    initia                    ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                    ../starter/source/output/message/message.F
+!||    c1buf3                    ../starter/source/elements/shell/coque/c1buf3.F
+!||    cbufxfe                   ../starter/source/elements/xfem/cbufxfe.F
+!||    ccoori                    ../starter/source/elements/shell/coque/ccoori.F
+!||    cderii                    ../starter/source/elements/shell/coque/cderii.F
+!||    cepschk                   ../starter/source/elements/shell/coque/cepsini.F
+!||    cfailini                  ../starter/source/elements/shell/coque/cfailini.F
+!||    cfailini4                 ../starter/source/elements/shell/coque/cfailini.F
+!||    cinmas                    ../starter/source/elements/shell/coque/cinmas.F
+!||    cm35in3                   ../starter/source/materials/mat/mat035/cm35in3.F
+!||    cmaini3                   ../starter/source/elements/sh3n/coquedk/cmaini3.F
+!||    cmatini                   ../starter/source/materials/mat_share/cmatini.F
+!||    cmatini4                  ../starter/source/materials/mat_share/cmatini4.F
+!||    cndleni                   ../starter/source/elements/shell/coqueba/cndleni.F
+!||    cnepsini                  ../starter/source/elements/shell/coqueba/cnepsini.F
+!||    cneveci                   ../starter/source/elements/shell/coqueba/cneveci.F
+!||    corth3                    ../starter/source/elements/shell/coque/corth3.F
+!||    csigini4                  ../starter/source/elements/shell/coqueba/scigini4.F
+!||    csms11_ini                ../starter/source/elements/shell/coque/cinit3.F
+!||    cstraini4                 ../starter/source/elements/shell/coqueba/cstraini4.F
+!||    cuserini                  ../starter/source/elements/shell/coque/cuserini.F
+!||    cuserini4                 ../starter/source/elements/shell/coqueba/cuserini4.F
+!||    cveok3                    ../starter/source/elements/shell/coque/cveok3.F
+!||    fail_windshield_init      ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
+!||    fractal_dmg_init          ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
+!||    fretitl2                  ../starter/source/starter/freform.F
+!||    initemp_shell             ../starter/source/materials/therm/initemp_shell.F90
+!||    layini1                   ../starter/source/elements/shell/coqueba/layini1.F
+!||    thickini                  ../starter/source/elements/shell/coqueba/thickini.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod                 ../starter/share/modules1/drape_mod.F
+!||    fractal_dmg_init_mod      ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
+!||    initemp_shell_mod         ../starter/source/materials/therm/initemp_shell.F90
+!||    message_mod               ../starter/share/message_module/message_mod.F
+!||    stack_mod                 ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE CBAINIT3(
      1           ELBUF_STR,IXC      ,PM       ,X       ,GEO     ,
      2           XMAS     ,IN       ,NVC      ,DTELEM  ,IGRSH4N ,
@@ -92,6 +94,8 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       use brokmann_random_def_mod
       use glob_therm_mod
+      use initemp_shell_mod
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -285,6 +289,13 @@ C         PART_AREA(J) = PART_AREA(J) + AREA(I)
         ENDDO
       ENDIF
 C------------
+!
+!     Initialize element temperature from /initemp
+!      
+      IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+        CALL INITEMP_SHELL(ELBUF_STR,TEMP,NEL,NUMNOD,NUMELC,4,NIXC,IXC)    
+      END IF
+C------------
       CALL CINMAS(X,XREFC(1,1,NFT+1),IXC,GEO,PM,
      .            XMAS,IN,THKE,IHBE,PARTSAV,
      .            V,IPART(NFT+1),MSC(NFT+1),INC(NFT+1),AREA    , 
@@ -296,7 +307,7 @@ C------------
      .            PERTURB,IX1     ,IX2      ,IX3     ,IX4     ,
      .            IDRAPE  ,DRAPEG%INDX)
 C-----------------------------------------------
-      IF (MTN == 1 .OR. MTN == 3 .OR. MTN == 23 .OR. MTN == 91) NPT = 0
+      IF (MTN == 1 .OR. MTN == 91 .AND. NPT/=1) NPT = 0
 C---------------------------
       CALL CDERII(PX1G,PX2G,PY1G,PY2G,
      .            X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  , 
@@ -356,7 +367,7 @@ c
      .                 X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .                 Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
      .                 E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,X ,
-     .                 NPT_ALL,IDRAPE ,SCDRAPE , DRAPEG%INDX)
+     .                 NPT_ALL,IDRAPE ,SCDRAPE , DRAPEG%INDX,LTITR )
 c
           IF (( ISIGSH/=0 .OR. ITHKSHEL == 2) .and. IHBE == 11) THEN
             IF (MPT>0) 
@@ -375,6 +386,11 @@ c
      6          GBUF%PLA,THKE    ,IGTYP    ,NEL   ,ISIGSH  ,
      7          E1X   ,E2X      ,E3X      ,E1Y   ,E2Y  ,E3Y,
      8          E1Z   ,E2Z      ,E3Z     ,DIR_A  ,DIR_B,POSLY )
+           IF (MPT == 0) THEN
+             DO I=LFT,LLT
+               GBUF%FORPG_G(PTF+I+JJ(1:5))=GBUF%FORPG(PTF+I+JJ(1:5))
+             END DO
+           END IF 
            IF (ITHKSHEL == 2) THEN
              DO I=LFT,LLT
                GBUF%STRA(I+JJ(1:8))=GBUF%STRA(I+JJ(1:8))+
@@ -437,7 +453,7 @@ c
 C-----------------------------------------------------------------------
 C     CALCUL DES DEFORMATIONS INITIALES (MEMBRANE)
 c-----------------------------------------------------------------------
-      IF (IHBE > 20 .AND. IHBE < 29) THEN   !   1 Gauss point
+      IF (IHBE > 20 .AND. IHBE < 29) THEN   !   1 Gauss Point
 c
         IR  = 1
         IS  = 1
@@ -460,7 +476,7 @@ c
           CALL CEPSCHK(LFT, LLT,NFT, PM, GEO,IXC(1,NFT+1),
      .                 GBUF%STRA,THKE,NEL     ,CPT_ELTENS)
           IF (ISMSTR == 1 .AND. MTN==19) IPARG(9)=11
-          IF (MTN==58) THEN
+          IF (MTN==58 .AND. NPT_ALL==1) THEN
 C-------IINT to say NXREF > 0      
               IPARG(36)=1
             DO I=LFT,LLT                          
@@ -526,6 +542,11 @@ c---
      6         GBUF%PLA,THKE    ,IGTYP    ,NEL   ,ISIGSH  ,
      7          E1X   ,E2X      ,E3X      ,E1Y   ,E2Y  ,E3Y,
      8          E1Z   ,E2Z      ,E3Z     ,DIR_A  ,DIR_B,POSLY )
+           IF (MPT == 0) THEN
+             DO I=LFT,LLT
+               GBUF%FOR_G(I+JJ(1:5))=GBUF%FOR(I+JJ(1:5))
+             END DO
+           END IF 
 C--------to fill GBUF%STRPG     
          IF (ITHKSHEL == 2.AND.GBUF%G_STRPG>GBUF%G_STRA) 
      1     CALL CSTRAINI4(LFT   ,LLT    ,NFT    ,NEL    ,NUMSHEL,
@@ -655,7 +676,7 @@ C to be checked for IGTYP = 51
 c
       ENDIF  ! IHBE
 C-------------------------------------------
-c     CALCUL DES DT ELEMENTAIRES
+c     calculation of elementary dt
 C-------------------------------------------
          IF (IGTYP /= 1  .AND. IGTYP /= 7  .AND.
      .       IGTYP /= 9  .AND. IGTYP /= 10 .AND.

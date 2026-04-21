@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    get_q4lsys      ../engine/source/output/sta/sta_c_get_q4lsys.F
-      !||--- called by ------------------------------------------------------
-      !||    stat_c_strsfg   ../engine/source/output/sta/stat_c_strsfg.F
-      !||--- calls      -----------------------------------------------------
-      !||    clskew3         ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
-      !||    cortdir3        ../engine/source/elements/shell/coque/cortdir3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    get_q4lsys      ../engine/source/output/sta/sta_c_get_q4lsys.F
+!||--- called by ------------------------------------------------------
+!||    stat_c_strsfg   ../engine/source/output/sta/stat_c_strsfg.F
+!||--- calls      -----------------------------------------------------
+!||    clskew3         ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
+!||    cortdir3        ../engine/source/elements/shell/coque/cortdir3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||====================================================================
         SUBROUTINE GET_Q4LSYS(JFT    ,JLT    ,IXC    ,X    ,OFFG   ,
      .                        IREL   ,VQ     ,NLAY   ,IREP ,NEL    ,
      .                        DIR_A  ,DIR_B  ,ELBUF_STR)
@@ -37,6 +38,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixc
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
 c-----------------------------------------------
@@ -53,7 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I,J,K,L
+      INTEGER I
       INTEGER IXCTMP2,IXCTMP3,IXCTMP4,IXCTMP5
       my_real 
      .   RX(MVSIZ),RY(MVSIZ),RZ(MVSIZ),SX(MVSIZ),SY(MVSIZ),

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fredec2im              ../starter/source/output/message/fredec2im.F
-      !||--- called by ------------------------------------------------------
-      !||    build_msg              ../starter/source/output/message/build_msg.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                  ../starter/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    fredec2im              ../starter/source/output/message/fredec2im.F
+!||--- called by ------------------------------------------------------
+!||    build_msg              ../starter/source/output/message/build_msg.F
+!||--- calls      -----------------------------------------------------
+!||    arret                  ../starter/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE FREDEC2IM(LINE1,ID)
 C-----------------------------------------------
 C   M o d u l e s
@@ -50,7 +50,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       CHARACTER(LEN=NCHARLINE) :: MOT
-      INTEGER I,J1,J2,J
+      INTEGER I, J1, J2
       MOT=' '
       I=2
       DO WHILE(LINE1(I:I)/='/')

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25gap3       ../engine/source/interfaces/int25/i25gap3.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_gap   ../engine/source/interfaces/int25/i25main_gap.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier    ../engine/source/system/machine.F
-      !||====================================================================
+!||====================================================================
+!||    i25gap3       ../engine/source/interfaces/int25/i25gap3.F
+!||--- called by ------------------------------------------------------
+!||    i25main_gap   ../engine/source/interfaces/int25/i25main_gap.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier    ../engine/source/system/machine.F
+!||====================================================================
       SUBROUTINE I25GAP3(
      1 ITASK,
      2 NRTM  ,IRECT   ,GAP_NM   ,GAP_M   ,
@@ -55,7 +55,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,IW,I1,I2,I3,MG,M,IP,IGTYP,
+      INTEGER I,J,M,
      .        NMNF,NMNL,NRTMF,NRTML,IERROR
       my_real,
      .       DIMENSION(:), ALLOCATABLE :: WA
@@ -71,7 +71,7 @@ C-----------------------------------------------
       NRTML = (ITASK+1) * NRTM / NTHREAD
       MAXDGAP_L = -EP30
 C------------------------------------
-C GAP_S = Secnds nodes gap [NSN]
+C GAP_S = Seconds nodes gap [NSN]
 C GAPN_M = gap for each node on main [NMN]
 C GAP_NM = gap of each node on each main segment [4*NRTM]
 C GAP_M = for each main segment, max of gap of its connected nodes [NRTM]

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10nx3     ../engine/source/elements/solid/solide10/s10nx3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3   ../engine/source/elements/solid/solide10/s10forc3.F
-      !||====================================================================
+!||====================================================================
+!||    s10nx3     ../engine/source/elements/solid/solide10/s10nx3.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3   ../engine/source/elements/solid/solide10/s10forc3.F
+!||====================================================================
       SUBROUTINE S10NX3(
      1   NX,      NEL,     NPT)
 C-----------------------------------------------
@@ -48,8 +48,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IP,N,K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,
-     .        M,IPERM(10,4)
+      INTEGER I,IP,K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,
+     .        IPERM(10,4)
 
       DATA IPERM/
      .            2, 4, 3, 1, 9,10, 6, 5, 8, 7,

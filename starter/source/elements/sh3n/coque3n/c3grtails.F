@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c3grtails              ../starter/source/elements/sh3n/coque3n/c3grtails.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    arret                  ../starter/source/system/arret.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    zeroin                 ../starter/source/system/zeroin.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod              ../starter/share/modules1/drape_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
-      !||    stack_mod              ../starter/share/modules1/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    c3grtails              ../starter/source/elements/sh3n/coque3n/c3grtails.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    zeroin                 ../starter/source/system/zeroin.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod              ../starter/share/modules1/drape_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+!||    stack_mod              ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE C3GRTAILS(
      1       IXTG    ,PM     ,IPARG   ,GEO    ,
      2       EADD    ,ND     ,IPARTTG,DD_IAD ,
@@ -45,7 +45,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6       IPART   ,SH3TREE,NOD2ELTG,ITRIOFF,
      7       SH3TRIM,TAGPRT_SMS,IWORKSH, STACK,
      8       DRAPE  ,RNOISE,
-     9       MAT_PARAM, SH3ANG,DRAPEG,PRINT_FLAG,PTSH3N)
+     9       MAT_PARAM, SH3ANG,DRAPEG,PRINT_FLAG,PTSH3N,DAMP_RANGE_PART)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -58,13 +58,15 @@ C-----------------------------------------------
       USE DRAPE_MOD
       USE MATPARAM_DEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE ALE_MOD , ONLY : ALE
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
 C     IXTG(NIXTG,NUMELTG)TABLEAU CONECS+PID+MID+NOS TRIANGLES       E
-C     PM(NPROPM,NUMMAT)  TABLEAU DES CARACS DES MATERIAUX           E
+C     PM(NPROPM,NUMMAT)  ARRAY OF MATERIAL CHARACTERISTICS           E
 C     IPARG(NPARG,NGROUP)TABLEAU DES CARACTERISTIQUES DES GROUPES   E/S
-C     GEO(NPROPG,NUMGEO) TABLEAU DES CARACS DES PID                 E
+C     GEO(NPROPG,NUMGEO) ARRAY OF PID CHARACTERISTICS                 E
 C     EADD(NUMELTG)      TABLEAU DES ADRESSES DANS IDAM CHGT DAMIER E
 C     IPARTTG(NUMELTG)                                              E/S
 C     INUM(8,NUMELTG)     TABLEAU DE TRAVAIL                         E/S
@@ -103,6 +105,7 @@ C-----------------------------------------------
      .        TAGPRT_SMS(*),IWORKSH(3,*)
       INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
       INTEGER , DIMENSION(NUMELTG) , INTENT(INOUT):: PTSH3N
+      INTEGER , INTENT(IN) :: DAMP_RANGE_PART(NPART)     !< flag to compute the damping range
       MY_REAL PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO),THK(*),XNUM(*),RNOISE(NPERTURB,*), SH3ANG(*)
 C-----------------------------------------------
       TYPE (STACK_PLY) :: STACK
@@ -124,7 +127,7 @@ C-----------------------------------------------
      .   IMATLY,IXFEM,IPTUN,IREP,IFWV,
      .   ISUBSTACK,IPPID,IPMAT,ISH3N, NPG,IDROT1,NB_LAW58,IPERT,
      .   STAT, IGMAT,ISM0,JALE_FROM_MAT, JALE_FROM_PROP,NSLICE,KK,NPT_DRP,
-     .   IDRAPE, JJ,IEL,IEL0
+     .   IDRAPE, JJ,IEL,IEL0,IDAMP_FREQ_RANGE
       INTEGER WORK(70000),NGP(NSPMD+1)
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: ISTOR
       INTEGER ID,IPARTR2R
@@ -158,11 +161,11 @@ C
       IPTUN = 1
       IXFEM_ERR = 0
 C--------------------------------------------------------------
-C         BORNAGE DES GROUPES DE MVSIZ
+C         LIMITING OF MVSIZ GROUPS
 C--------------------------------------------------------------
       NGR1 = NGROUP + 1
 C
-C phase 1 : domain decompostition
+C Phase 1: Domain Decomposition
 C
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
@@ -236,7 +239,8 @@ C
             XNUM_DRAPE(I)%NPLY  = NPT                                
             XNUM_DRAPE(I)%INDX_PLY(1:NPT) = DRAPE(IEL0)%INDX_PLY(1:NPT)
             NPT = DRAPE(IEL0)%NPLY_DRAPE                                      
-            XNUM_DRAPE(I)%NPLY_DRAPE = NPT           
+            XNUM_DRAPE(I)%NPLY_DRAPE = NPT  
+            XNUM_DRAPE(I)%THICK  = DRAPE(IEL0)%THICK      
             DO JJ = 1, NPT                                                  
               DRAPE_PLY => DRAPE(IEL0)%DRAPE_PLY(JJ)                              
               NSLICE =  DRAPE_PLY%NSLICE                                        
@@ -333,7 +337,8 @@ C
             DRAPE(IEL)%INDX_PLY = 0                            
             DRAPE(IEL)%INDX_PLY(1:NPT) =  XNUM_DRAPE(INDEX(I))%INDX_PLY(1:NPT) 
             NPT = XNUM_DRAPE(INDEX(I))%NPLY_DRAPE       ! NPT_DRP                                   
-            DRAPE(IEL)%NPLY_DRAPE= NPT
+            DRAPE(IEL)%NPLY_DRAPE = NPT
+            DRAPE(IEL)%THICK =  XNUM_DRAPE(INDEX(I))%THICK
             ALLOCATE(DRAPE(IEL)%DRAPE_PLY(NPT))         
             DO JJ = 1, NPT                                                                   
               DRAPE_PLY => DRAPE(IEL)%DRAPE_PLY(JJ)                                           
@@ -461,7 +466,7 @@ C
         DEALLOCATE(INUM_WORKSH)     
       ENDDO   ! ND
 C     
-C RENUMEROTATION DE L'ARBRE
+C RENAMING OF THE TREE
 C
       IF(NADMESH/=0)THEN
         DO  I=1,NUMELTG
@@ -472,7 +477,7 @@ C
         ENDDO
       END IF
 C
-C RENUMEROTATION POUR SURFACES
+C RENAMING FOR SURFACES
 C
       DO I=1,NSURF
         NN=IGRSURF(I)%NSEG
@@ -482,7 +487,7 @@ C
         ENDDO
       ENDDO
 C
-C RENUMEROTATION POUR GROUPES DE SHELL
+C RENAMING FOR SHELL GROUPS
 C
       DO I=1,NGRSH3N
         NN=IGRSH3N(I)%NENTITY
@@ -497,8 +502,8 @@ C
         IF(NOD2ELTG(I) /= 0)NOD2ELTG(I)=ITR1(NOD2ELTG(I))
       END DO
 C
-C phase 2 : bornage en groupe de mvsiz
-C ngroup est global, iparg est global mais organise en fonction de dd
+C Phase 2: MVSIZ Group Bounds
+C ngroup is global, iparg is global but organized according to dd
 C
       DO 300 N=1,ND
        NFT = 0
@@ -633,7 +638,7 @@ C----- fixed to 1 excepting small strain case
            IF (ITHK<0) THEN
             ITHK = 1 
             IF (MAT_PARAM(MID)%SMSTR==1 .OR. MLN == 1) ITHK = 0
-C--------message out       
+C------- Out message       
             ISM0 = ITHK
             IF (ITHK == 0) ISM0=2
                 CALL ANCMSG(MSGID=1770,
@@ -647,7 +652,7 @@ C--------message out
 C----- fixed to iterative, but can be changed in fonction of law           
            IF (IPLA<0) THEN
              IPLA = 1
-C--------message out       
+C------- Out message       
                 CALL ANCMSG(MSGID=1771,
      .                      MSGTYPE=MSGINFO,
      .                      ANMODE=ANINFO_BLIND_2,
@@ -671,7 +676,7 @@ C----certain laws to use 4 to see one by one
                 IF (MLN == 19 .AND. NPN==1) ISMST =11
               END IF
               GEO(3,PID) = ISMST
-C--------message out       
+C------- Out message       
                 CALL ANCMSG(MSGID=1772,
      .                      MSGTYPE=MSGINFO,
      .                      ANMODE=ANINFO_BLIND_2,
@@ -890,6 +895,20 @@ C     Multifluid law, setting NLAY
              IPARG(13,NGROUP)=+ABS(JTHE)  ! -1 nodal temperature    +1 centroid temperature
           ENDIF
 
+          !ALE REZONING/REMAPING : number of MAT/EOS variables to treat (used by staggered scheme only : arezon.F)
+          !  With ALE framework, since the Mesh is arbitrary, the variable must be updated to map thei expected location and not follow the arbitrary mesh displacement
+          !  this numbering here will be used in arezon.F to loop over variables to rezon/remap
+          IF(JALE == 1)THEN
+            ALE%REZON%NUM_NUVAR_MAT = MAX(ALE%REZON%NUM_NUVAR_MAT, MAT_PARAM(MID)%REZON%NUM_NUVAR_MAT)
+            ALE%REZON%NUM_NUVAR_EOS = MAX(ALE%REZON%NUM_NUVAR_EOS, MAT_PARAM(MID)%REZON%NUM_NUVAR_EOS)
+          ENDIF
+
+          !ALE UVAR REZONING  (81:MAT,  82:EOS)
+          IF(JALE == 1)THEN
+            IPARG(81,NGROUP) = MAT_PARAM(MID)%REZON%NUM_NUVAR_MAT
+            IPARG(82,NGROUP) = MAT_PARAM(MID)%REZON%NUM_NUVAR_EOS
+          ENDIF
+
           IPARG(45,NGROUP)= ILEV
           IF(ILEV/=0 .AND. ISH3N > 2)THEN
             ID=IGEO(1,PID)
@@ -962,6 +981,9 @@ C for stack
           IPARG(71,NGROUP) = ISUBSTACK
           IPARG(75,NGROUP) = IGMAT 
           IPARG(92,NGROUP) = IDRAPE  ! 
+C         damping frequency range apply to group
+          IDAMP_FREQ_RANGE = DAMP_RANGE_PART(IPARTTG(II))
+          IPARG(93,NGROUP) = IDAMP_FREQ_RANGE          
 C          
           NFT = NFT + NE1
 c  220    CONTINUE
@@ -969,7 +991,7 @@ c  220    CONTINUE
          NGP(P)=NGROUP-NGP(P)
         ENDIF
        ENDDO
-C      DD_IAD => nb groupes par sous domaine
+C      Dd_iad => nb groups by sub -domain
        NGP(NSPMD+1)=0
        DO P = 1, NSPMD
          NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    enrichc_ini     ../engine/source/elements/xfem/enrichc_ini.F
-      !||--- called by ------------------------------------------------------
-      !||    inixfem         ../engine/source/elements/xfem/inixfem.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret           ../engine/source/system/arret.F
-      !||    clskew3         ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
-      !||    lsint4          ../engine/source/elements/xfem/crklayer4n_adv.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    enrichc_ini     ../engine/source/elements/xfem/enrichc_ini.F
+!||--- called by ------------------------------------------------------
+!||    inixfem         ../engine/source/elements/xfem/inixfem.F
+!||--- calls      -----------------------------------------------------
+!||    arret           ../engine/source/system/arret.F
+!||    clskew3         ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
+!||    lsint4          ../engine/source/elements/xfem/crklayer4n_adv.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE ENRICHC_INI(ELBUF_STR,XFEM_STR,
      .      IXC      ,NFT     ,JFT     ,JLT    ,NXLAY   ,
      .      IADC_CRK ,IEL_CRK ,INOD_CRK,ELCUTC ,NODEDGE ,
@@ -39,6 +40,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
       USE CRACKXFEM_MOD
       USE ELBUFDEF_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -82,7 +84,7 @@ C-----------------------------------------------
      .   YL2(MVSIZ),XL3(MVSIZ),YL3(MVSIZ),XL4(MVSIZ),YL4(MVSIZ),
      .   FIT(4,MVSIZ),OFFG(MVSIZ),XIN(2,MVSIZ),YIN(2,MVSIZ),
      .   XXL(4,MVSIZ),YYL(4,MVSIZ),XN(4),YN(4),DX(8),XM(2),YM(2)
-      my_real XXX,YYY,ZZZ,FI,BETA,X10,Y10,Z10,X20,Y20,Z20,
+      my_real XXX,YYY,ZZZ,FI,BETA,
      .   X1,Y1,X2,Y2,X3,Y3,X4,Y4,AREA1,AREA2,AREA3
       DATA DD/2,3,4,1/
       DATA DX/1,2,3,4,1,2,3,4/

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i18for3                ../engine/source/interfaces/int18/i18for3.F
-      !||--- called by ------------------------------------------------------
-      !||    i7mainf                ../engine/source/interfaces/int07/i7mainf.F
-      !||--- calls      -----------------------------------------------------
-      !||    i7ass0                 ../engine/source/interfaces/int07/i7ass3.F
-      !||    i7ass2                 ../engine/source/interfaces/int07/i7ass3.F
-      !||    i7ass3                 ../engine/source/interfaces/int07/i7ass3.F
-      !||    multi_i18_force_poff   ../engine/source/interfaces/int18/multi_i18_force_poff.F
-      !||    multi_i18_force_pon    ../engine/source/interfaces/int18/multi_i18_force_pon.F
-      !||--- uses       -----------------------------------------------------
-      !||    aleanim_mod            ../engine/share/modules/aleanim_mod.F
-      !||    anim_mod               ../common_source/modules/output/anim_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    tri7box                ../engine/share/modules/tri7box.F
-      !||====================================================================
-      SUBROUTINE I18FOR3(JLT      ,A          ,V         ,IBCC      ,ICODT         ,
+!||====================================================================
+!||    i18for3_mod   ../engine/source/interfaces/int18/i18for3.F
+!||--- called by ------------------------------------------------------
+!||    i7mainf       ../engine/source/interfaces/int07/i7mainf.F
+!||====================================================================
+      MODULE I18FOR3_MOD
+      CONTAINS
+!||====================================================================
+!||    i18for3                ../engine/source/interfaces/int18/i18for3.F
+!||--- called by ------------------------------------------------------
+!||    i7mainf                ../engine/source/interfaces/int07/i7mainf.F
+!||--- calls      -----------------------------------------------------
+!||    i7ass0                 ../engine/source/interfaces/int07/i7ass3.F
+!||    i7ass2                 ../engine/source/interfaces/int07/i7ass3.F
+!||    i7ass3                 ../engine/source/interfaces/int07/i7ass3.F
+!||    multi_i18_force_poff   ../engine/source/interfaces/int18/multi_i18_force_poff.F
+!||    multi_i18_force_pon    ../engine/source/interfaces/int18/multi_i18_force_pon.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    h3d_mod                ../engine/share/modules/h3d_mod.F
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    tri7box                ../engine/share/modules/tri7box.F
+!||====================================================================
+      SUBROUTINE I18FOR3(OUTPUT, JLT      ,A          ,V         ,IBCC      ,ICODT         ,
      2                  FSAV      ,GAP        ,FRIC      ,MS        ,VISC          ,
      3                  VISCF     ,NOINT      ,STFN      ,ITAB      ,CN_LOC        ,
      4                  STFVAL    ,STIFN      ,STIF      ,FSKYI     ,ISKY          ,
@@ -49,15 +56,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A                  P1        ,P2         ,P3        ,P4        ,FCONT         ,
      B                  IX1       ,IX2        ,IX3       ,IX4       ,NSVG          ,
      C                  IVIS2     ,NELTST     ,ITYPTST   ,DT2T      ,IXS           ,
-     D                  GAPV      ,INACTI     ,CAND_P    ,INDEX     ,NISKYFI       ,
+     D                  GAPV      ,CAND_P     ,INDEX     ,NISKYFI   ,
      E                  KINET     ,NEWFRONT   ,ISECIN    ,NSTRF     ,SECFCUM       ,
      F                  X         ,IRECT      ,CE_LOC    ,MFROT     ,IFQ           ,
-     G                  FROT_P    ,CAND_FX    ,CAND_FY   ,CAND_FZ   ,ALPHA0        ,
-     H                  IFPEN     ,IPRES      ,ICONTACT  ,IGROUPS   ,IPARG         ,
+     G                  FROT_P    ,CAND_FX    ,CAND_FY   ,CAND_FZ   ,
+     H                  IFPEN     ,ICONTACT   ,IGROUPS   ,IPARG     ,
      J                  VISCN     ,VXI        ,VYI       ,VZI       ,MSI           ,
      K                  KINI      ,NIN        ,NISUB     ,LISUB     ,ADDSUBS       ,
      L                  ADDSUBM   ,LISUBS     ,LISUBM    ,FSAVSUB   ,CAND_N        ,
-     M                  ILAGM     ,ICURV      ,PRES      ,FNCONT    ,MS0           ,
+     M                  ILAGM     ,ICURV      ,FNCONT    ,MS0           ,
      N                  JTASK     ,ISENSINT   ,FSAVPARIT ,NFT       ,MULTI_FVM     ,
      O                  H3D_DATA  ,ELBUF_TAB  ,IDIR      )
 C-----------------------------------------------
@@ -76,9 +83,9 @@ C-----------------------------------------------
       USE TRI7BOX
       USE MULTI_FVM_MOD
       USE H3D_MOD
-      USE ALEANIM_MOD !FANI_CELL   
       USE ELBUFDEF_MOD   
-      USE ANIM_MOD    
+      USE OUTPUT_MOD    
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -106,14 +113,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER, INTENT(IN) :: IDIR
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
-      INTEGER NELTST,ITYPTST,JLT,IBCC,IVIS2,INACTI,IPRES,NIN,
+      INTEGER NELTST,ITYPTST,JLT,IBCC,IVIS2,NIN,
      .        ICODT(*), ITAB(*), ISKY(*), KINET(*),
      .        MFROT, IFQ, NOINT,NEWFRONT,ISECIN, NSTRF(*),
      .        IRECT(4,*),IFPEN(*) ,ICONTACT(*), CAND_N(*),
      .        KINI(*),IGROUPS(NUMELS),
-     .        ISET, NISKYFI,INTTH,IFORM,JTASK,NFT,IPARG(NPARG)
+     .        NISKYFI,JTASK,NFT,IPARG(NPARG)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        CN_LOC(MVSIZ),CE_LOC(MVSIZ),INDEX(MVSIZ),NSVG(MVSIZ),
      .        NISUB, LISUB(*), ADDSUBS(*), ADDSUBM(*), LISUBS(*),
@@ -121,8 +129,8 @@ C-----------------------------------------------
       my_real
      .   STFVAL,CAND_P(*),FROT_P(*), X(3,*),MS0(*),
      .   A(3,*), MS(*), V(3,*), FSAV(*),FCONT(3,*),
-     .   CAND_FX(*),CAND_FY(*),CAND_FZ(*),ALPHA0,
-     .   GAP, FRIC,VISC,VISCF,VIS,DT2T,STFN(*),STIFN(*),
+     .   CAND_FX(*),CAND_FY(*),CAND_FZ(*),
+     .   GAP, FRIC,VISC,VISCF,DT2T,STFN(*),STIFN(*),
      .   FSKYI(LSKYI,NFSKYI),FSAVSUB(NTHVKI,*),FNCONT(3,*),
      .   FSAVPARIT(NISUB+1,11,*)
       my_real
@@ -133,51 +141,33 @@ C-----------------------------------------------
      .     LC1(MVSIZ), LC2(MVSIZ), LC3(MVSIZ), LC4(MVSIZ),
      .     P1(MVSIZ), P2(MVSIZ), P3(MVSIZ), P4(MVSIZ), STIF(MVSIZ),
      .     GAPV(MVSIZ),
-     .     SECFCUM(7,NUMNOD,NSECT), TMP(MVSIZ),
-     .     STIFSAV(MVSIZ), VISCN(*),
-     .     VXI(MVSIZ),VYI(MVSIZ),VZI(MVSIZ),MSI(2*MVSIZ),
-     .     PRES(*), RSTIF  
+     .     SECFCUM(7,NUMNOD,NSECT),
+     .     VISCN(*),
+     .     VXI(MVSIZ),VYI(MVSIZ),VZI(MVSIZ),MSI(2*MVSIZ)
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
       TYPE(H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J1, IG, J, JG , K0,NBINTER,K1S,K,IL,IE, NN, NI,
-     .        NA1,NA2
+      INTEGER I, J, JG, K0, NBINTER, K1S, K, IE, NN, NI
       my_real
      .   FXI(MVSIZ), FYI(MVSIZ), FZI(MVSIZ), FNI(MVSIZ),
-     .   FXT(MVSIZ),FYT(MVSIZ),FZT(MVSIZ),
      .   FX1(MVSIZ), FX2(MVSIZ), FX3(MVSIZ), FX4(MVSIZ),
      .   FY1(MVSIZ), FY2(MVSIZ), FY3(MVSIZ), FY4(MVSIZ),
      .   FZ1(MVSIZ), FZ2(MVSIZ), FZ3(MVSIZ), FZ4(MVSIZ),
      .   N1(MVSIZ), N2(MVSIZ), N3(MVSIZ), PENE(MVSIZ),
-     .   VIS2(MVSIZ), DTMI(MVSIZ), XMU(MVSIZ),
+     .   DTMI(MVSIZ),
      .   H1(MVSIZ), H2(MVSIZ), H3(MVSIZ), H4(MVSIZ),
-     .   VX(MVSIZ), VY(MVSIZ), VZ(MVSIZ), VN(MVSIZ),DIST(MVSIZ), 
-     .   VNX, VNY, VNZ, AA, CRIT,S2,RDIST,
-     .   V2, FM2, DT1INV, VISCA, FAC,FF,ALPHI,ALPHA,BETA,
-     .   FX, FY, FZ, F2, MAS2, M2SK, DTMI0,FT,FN,FMAX,FTN,
-     .   FACM1, ECONTT, ECONVT, H0, LA1, LA2, LA3, LA4,
+     .   VX(MVSIZ), VY(MVSIZ), VZ(MVSIZ), VN(MVSIZ),DIST(MVSIZ),
+     .   S2,
+     .   DT1INV, FAC,FF,
+     .   MAS2, DTMI0,
+     .   ECONTT, H0, LA1, LA2, LA3, LA4,
      .   D1,D2,D3,D4,A1,A2,A3,A4,ECONTDT,
-     .   FSAV1, FSAV2, FSAV3, FSAV4, FSAV5, FSAV6, FSAV7, FSAV8, 
-     .   FSAV9, FSAV10, FSAV11, FSAV12, FSAV13, FSAV14, FSAV15, FFO,
-     .   E10, H0D, S2D, SUM,
-     .   LA1D,LA2D,LA3D,LA4D,T1,T1D,T2,T2D,FFD,VISD,FACD,D1D,
-     .   P1S(MVSIZ),P2S(MVSIZ),P3S(MVSIZ),P4S(MVSIZ),
-     .   D2D,D3D,D4D,VNXD,VNYD,VNZD,V2D,FM2D,F2D,AAD,FXD,FYD,FZD,
-     .   A1D,A2D,A3D,A4D,VV,AX1,AX2,AY1,AY2,AZ1,AZ2,AX,AY,AZ,
-     .   AREA,P,VV1,VV2,V21,DMU, H00 ,A0X,A0Y,A0Z,RX,RY,RZ,
-     .   ANX,ANY,ANZ,AAN,AAX,AAY,AAZ ,RR,RS,AAA ,TM,TS
-      my_real
-     .   SURFX,SURFY,SURFZ,SURF
-      my_real
-     .   ST1(MVSIZ),ST2(MVSIZ),ST3(MVSIZ),ST4(MVSIZ),STV(MVSIZ),
-     .   KT(MVSIZ),C(MVSIZ),CF(MVSIZ),
-     .   KS(MVSIZ),K1(MVSIZ),K2(MVSIZ),K3(MVSIZ),K4(MVSIZ),
-     .   CS(MVSIZ),C1(MVSIZ),C2(MVSIZ),C3(MVSIZ),C4(MVSIZ),
-     .   CX,CY,CFI,AUX,PHI1(MVSIZ), PHI2(MVSIZ), PHI3(MVSIZ),
-     .   PHI4(MVSIZ),DX, DTI
-      INTEGER JSUB,KSUB,JJ,KK,IN,NSUB,IBID,ITASK,NELFT,NELLT
+     .   FSAV1, FSAV2, FSAV3, FSAV8,
+     .   FSAV9, FSAV10, FSAV11,
+     .   H00
+      INTEGER JSUB, KSUB, JJ, KK, IN, NSUB, IBID, ITASK
       my_real FSAVSUB1(15,NISUB),IMPX,IMPY,IMPZ,PP1,PP2,PP3,PP4,BID
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -373,13 +363,6 @@ C-----------------------------------------------
        FSAV10=FSAV10+ABS(IMPZ)
        FSAV11=FSAV11+FNI(I)*DT12
       ENDDO
-      IF (IPRES /= 0)THEN
-#include "lockon.inc"
-        DO I=1,JLT
-          PRES(CE_LOC(I)) = PRES(CE_LOC(I)) + FNI(I)
-        ENDDO
-#include "lockoff.inc"
-      END IF
 #include "lockon.inc"
         FSAV(1)=FSAV(1)+FSAV1
         FSAV(2)=FSAV(2)+FSAV2
@@ -693,12 +676,12 @@ C---------------------------------
        !FZI(I)=ZERO
       ENDDO    
                    
-      !SPMD : identification des noeuds interf. utiles a envoyer
+      !SPMD: Identification of interf nodes.useful to send
       IF (NSPMD > 1) THEN
         DO I = 1,JLT
           NN = NSVG(I)
           IF(NN<0)THEN
-            ! tag temporaire de NSVFI a -
+            ! temporary tag of nsvfi a -
             NSVFI(NIN)%P(-NN) = -ABS(NSVFI(NIN)%P(-NN))
           ENDIF
         ENDDO
@@ -774,9 +757,9 @@ C---------------------------------
                DO I=1,JLT
                  JG=NSVG(I)-NUMNOD
                  IF(JG>0) THEN ! local cell
-                    FANI_CELL%F18(1,JG)=FANI_CELL%F18(1,JG)-FXI(I)
-                    FANI_CELL%F18(2,JG)=FANI_CELL%F18(2,JG)-FYI(I)
-                    FANI_CELL%F18(3,JG)=FANI_CELL%F18(3,JG)-FZI(I)
+                    OUTPUT%DATA%FANI_CELL%F18(1,JG)=OUTPUT%DATA%FANI_CELL%F18(1,JG)-FXI(I)
+                    OUTPUT%DATA%FANI_CELL%F18(2,JG)=OUTPUT%DATA%FANI_CELL%F18(2,JG)-FYI(I)
+                    OUTPUT%DATA%FANI_CELL%F18(3,JG)=OUTPUT%DATA%FANI_CELL%F18(3,JG)-FZI(I)
                   ENDIF
                ENDDO     
              ENDIF                                                                 
@@ -785,7 +768,7 @@ C---------------------------------
              DO I=1,JLT                                                               
               JG = NSVG(I)                                                              
               IF(JG > 0) THEN                                                          
-                ! en SPMD : traitement a refaire apres reception noeud remote si JG < 0 
+                ! SPMD : reprocess required after receiving a remote node if JG < 0
                 FCONT(1,JG)=FCONT(1,JG)- FXI(I)                                         
                 FCONT(2,JG)=FCONT(2,JG)- FYI(I)                                         
                 FCONT(3,JG)=FCONT(3,JG)- FZI(I)
@@ -795,7 +778,7 @@ C---------------------------------
 #include "lockoff.inc"
       ENDIF
       IF((ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT > 0 .AND.
-     .    ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP) .OR.
+     .    ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP) .OR.
      .    (MANIM>=4.AND.MANIM<=15).OR.H3D_DATA%MH3D /= 0))
      .   .OR.H3D_DATA%N_VECT_PCONT_MAX>0)THEN
 #include "lockon.inc"
@@ -827,8 +810,8 @@ C-----------------------------------------------------
                IF(ISECUT /= 0)THEN
 #include "lockon.inc"
                  DO K=1,JLT
-                   ! attention aux signes pour le cumul des efforts
-                   ! a rendre conforme avec CFORC3
+                   ! Be careful with sign conventions during force accumulation
+                   ! Ensure consistency with CFORC3 implementation
                    IF(SECFCUM(4,IX1(K),I) == ONE)THEN
                     SECFCUM(1,IX1(K),I)=SECFCUM(1,IX1(K),I)-FX1(K)
                     SECFCUM(2,IX1(K),I)=SECFCUM(2,IX1(K),I)-FY1(K)
@@ -851,7 +834,7 @@ C-----------------------------------------------------
                    ENDIF
                    JG = NSVG(K)
                    IF(JG > 0) THEN
-                     ! en SPMD : traitement a refaire apres reception noeud remote si JG < 0
+                     ! SPMD : reprocess required after receiving a remote node if JG < 0
                      IF(SECFCUM(4,JG,I) == 1.)THEN
                        SECFCUM(1,JG,I)=SECFCUM(1,JG,I)+FXI(K)
                        SECFCUM(2,JG,I)=SECFCUM(2,JG,I)+FYI(K)
@@ -870,4 +853,6 @@ C-----------------------------------------------------
       ENDIF!(ISECIN > 0)
 C-----------------------------------------------------
       RETURN
-      END
+      END SUBROUTINE I18FOR3
+C-----------------------------------------------------
+      END MODULE I18FOR3_MOD

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lec_inistate           ../starter/source/elements/initia/lec_inistate.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_read_inistate_d00   ../starter/source/elements/initia/hm_read_inistate_d00.F
-      !||    lec_inistate_tri       ../starter/source/elements/initia/lec_inistate_tri.F
-      !||    lec_inistate_yfile     ../starter/source/initial_conditions/inista/lec_inistate_yfile.F
-      !||--- uses       -----------------------------------------------------
-      !||    mapping_option_mod     ../starter/share/modules1/dichotomy_mod.F
-      !||    stack_mod              ../starter/share/modules1/stack_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lec_inistate           ../starter/source/elements/initia/lec_inistate.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_read_inistate_d00   ../starter/source/elements/initia/hm_read_inistate_d00.F
+!||    lec_inistate_tri       ../starter/source/elements/initia/lec_inistate_tri.F
+!||    lec_inistate_yfile     ../starter/source/initial_conditions/inista/lec_inistate_yfile.F
+!||--- uses       -----------------------------------------------------
+!||    mapping_option_mod     ../starter/share/modules1/dichotomy_mod.F
+!||    stack_mod              ../starter/share/modules1/stack_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE LEC_INISTATE(      IXS          ,IXQ          ,IXC          ,IXT     ,
      1                  IXP        ,IXR          ,GEO          ,PM           ,KXSP    ,
      2                  IXTG       ,INDEX        ,ITRI         ,
@@ -55,6 +55,7 @@ C-----------------------------------------------
       USE MAPPING_OPTION_MOD
       USE STACK_MOD
       USE MATPARAM_DEF_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -112,7 +113,7 @@ C-----------------------------------------------
       LOGICAL IS_STATE
 C=======================================================================
 C
-C -- LECTURE OF INITIAL STATE DATA - EXTRACTED FROM INITIA.F
+C -- READING OF INITIAL STATE DATA - EXTRACTED FROM INITIA.F
 C
 C=======================================================================
       IUSER = 0

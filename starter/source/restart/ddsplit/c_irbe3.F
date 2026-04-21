@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c_irbe3   ../starter/source/restart/ddsplit/c_irbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit   ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal    ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    c_irbe3   ../starter/source/restart/ddsplit/c_irbe3.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit   ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal    ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE C_IRBE3(IRBE3,LRBE3,NSKYRBE3_L,PROC  ,
-     .                   NRBE3_L,SLMN_L ,NBDDRBE3M)
+     .                   NRBE3_L,SLMN_L ,NBDDRBE3M,NRBE3PEN_L)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,6 +45,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER PROC, NSKYRBE3_L,NRBE3_L,SLMN_L,NBDDRBE3M,
      .        IRBE3(NRBE3L,*), LRBE3(*)
+      INTEGER, INTENT(INOUT) :: NRBE3PEN_L
 C-----------------------------------------------
 C   F u n c t i o n
 C-----------------------------------------------
@@ -53,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, NSN, ILP, N,P,M
+      INTEGER I, J, K, NSN, ILP, N,P,M,IPEN
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGI
 C-----------------------------------------------
 !     allocate 1d array
@@ -61,10 +62,12 @@ C-----------------------------------------------
 ! ----------------------------
 C
       SLMN_L = 0
+      NRBE3PEN_L =0
       DO I = 1, NRBE3
         NSN = IRBE3(5,I)
         K = IRBE3(1,I)
         M = IRBE3(3,I)
+        IPEN = IRBE3(9,I)
        ILP = 0
        DO J = 1, NSN
           N = LRBE3(K+J)
@@ -72,15 +75,16 @@ C
             ILP = ILP + 1
           ENDIF
        ENDDO
-C--------------pour exchange,meme sans node secnd----
+C------------- For Exchange, even without node second ----
        IF (NLOCAL(M,PROC+1)==1.OR.ILP>0)THEN
         NRBE3_L = NRBE3_L+1
+        IF (IPEN>0) NRBE3PEN_L = NRBE3PEN_L+1
        END IF
        SLMN_L = SLMN_L + ILP
       ENDDO
 C
       IF(IPARI0/=0) NSKYRBE3_L = SLMN_L*0
-C-------------pour main nodes---------
+C-------------for main nodes---------
       DO I = 1, NUMNOD
         TAGI(I) = 0
       END DO
@@ -88,15 +92,15 @@ C-------------pour main nodes---------
           N = LRBE3(I)
             IF(NLOCAL(N,PROC+1)==1) THEN
               IF(TAGI(N)==0) THEN
-C decompte des frontieres de main nodes
+C counting boundaries of main nodes
                 DO P = 1, NSPMD
                   IF(NLOCAL(N,P)==1)THEN
                     NBDDRBE3M = NBDDRBE3M + 1
                   END IF
                 END DO
-C on ne se compte pas soi-meme
+C We do not count ourselves
                 NBDDRBE3M = NBDDRBE3M - 1
-C pour ne pas prendre en compte 2 fois des noeuds main de RBE3 differentes ds les frontieres
+C to avoid counting main nodes of different RBE3s in the boundaries twice
                 TAGI(N) = 1
               END IF
             ENDIF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25remline    ../starter/source/interfaces/int25/i25remlin.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3        ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11pene_lin   ../starter/source/interfaces/inter3d1/i11remlin.F
-      !||    origin        ../starter/source/model/remesh/build_admesh.F
-      !||====================================================================
+!||====================================================================
+!||    i25remline         ../starter/source/interfaces/int25/i25remlin.F
+!||--- called by ------------------------------------------------------
+!||    inint3             ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    i11pene_lin        ../starter/source/interfaces/inter3d1/i11remlin.F
+!||    origin             ../starter/source/model/remesh/build_admesh.F
+!||====================================================================
       SUBROUTINE I25REMLINE(
      1         X    ,NEDGE ,LEDGE ,NUMNOD ,GAP_E    ,GAP_E_L,
      2         IGAP0,IGAP  ,DRAD  ,BGAPEMX,BGAPEMX_L,KREMNODE, 
      3         REMNODE,NREMNODE,I_START,I_MEM_REM,INOD2LIN,
-     4         TAGSECND,NOD2LIN,DGAPLOAD)
+     4         TAGSECND,NOD2LIN,DGAPLOAD,PERM,PERM_INV,
+     5         GAP_MAXNEIGH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,28 +48,32 @@ C-----------------------------------------------
       INTEGER NEDGE, NUMNOD,IGAP0,IGAP, NREMNODE
       INTEGER LEDGE(NLEDGE,*),KREMNODE(*),REMNODE(*),I_START,I_MEM_REM
       INTEGER INOD2LIN(NUMNOD+1),TAGSECND(NUMNOD),NOD2LIN(2*NEDGE)
+      INTEGER , INTENT(INOUT) :: PERM(NEDGE),PERM_INV(NEDGE)
       my_real
      .        X(3,*),GAP_E(*),GAP_E_L(*),DRAD,BGAPEMX,BGAPEMX_L
       my_real , INTENT(IN) :: DGAPLOAD
+      my_real , INTENT(INOUT) :: GAP_MAXNEIGH(NEDGE)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,LIN,ILIN,LEVEL,CPT,NBLIN,LIN1,L,CPT1,N,NBLIN_MAX,CPT_TOTAL
-      INTEGER ::   IM1,IM2
+      INTEGER I,II,J,JJ,K,LIN,ILIN,LEVEL,CPT,NBLIN,LIN1,L,CPT1,CPT2,N,NBLIN_MAX,CPT_TOTAL
+      INTEGER ::   IM1,IM2,FOUND,LL,TOT_SYM
       INTEGER, DIMENSION(:),ALLOCATABLE ::
-     .        KNOD2LIN,TAGNOD,ORIGIN,ITAG,LISTLIN,LISTLINTMP,LISTLINTOTAL
+     .        KNOD2LIN,TAGNOD,ORIGIN,ITAG,LISTLIN,LISTLINTMP,LISTLINTOTAL,
+     .        REM_TMP,KREM_TMP
+      INTEGER, DIMENSION(:,:),ALLOCATABLE :: TAG_SYM     
       my_real
      .        DMAX,NEW_DIST,PENE,I11PENE_LIN,XL,GAPV,GAP,DRAD2
       my_real, DIMENSION(:),ALLOCATABLE ::
-     .        DIST1
+     .        DIST1,GAP_E_SORT
 C-----------------------------------------------
 c Build inverse connectivity for segments - only at first pass (I_START=1)
 C-----------------------------------------------
 C
-       DRAD2 = ZERO !no thermal exchange for E2E 
+      DRAD2 = ZERO !no thermal exchange for E2E 
       IF (I_START ==1) THEN
 C
-        ALLOCATE(KNOD2LIN(NUMNOD+1))
+        ALLOCATE(KNOD2LIN(NUMNOD+1),GAP_E_SORT(NEDGE))
 C
         KREMNODE(1) = 1
         NOD2LIN(1:2*NEDGE)    = 0
@@ -81,7 +86,19 @@ C
           TAGSECND(LEDGE(5,I)) = 1
           TAGSECND(LEDGE(6,I)) = 1
         ENDDO
-
+        GAP_MAXNEIGH(1:NEDGE) = GAP_E(1:NEDGE)
+C        
+C       edges are sorted by increasing gap
+        DO I=1,NEDGE
+           PERM(I) =I
+           GAP_E_SORT(I) = GAP_E(I)
+        ENDDO  
+        CALL STLSORT_REAL_INT(NEDGE,GAP_E_SORT,PERM)
+        IF(ALLOCATED(GAP_E_SORT)) DEALLOCATE(GAP_E_SORT) 
+        DO II=1,NEDGE
+          I=PERM(NEDGE - II + 1)
+          PERM_INV(I) =II
+        ENDDO 
 
 C-----------------------------------------------
 C  Definition of node to segment connections
@@ -131,10 +148,11 @@ C
         LISTLINTMP(1:NEDGE)=0
         LISTLINTOTAL(1:NEDGE) = 0
         CPT_TOTAL = 0
+C        
+C       loop on edges with decreasing gap
+        DO II=I_START,NEDGE
 
-C
-        DO I=I_START,NEDGE
-
+          I=PERM(NEDGE - II + 1)
           LEVEL = 1
           LIN = I
 
@@ -147,11 +165,10 @@ C
           XL = (X(1,LEDGE(5,I))-X(1,LEDGE(6,I)))**2+(X(2,LEDGE(5,I))-X(2,LEDGE(6,I)))**2+(X(3,LEDGE(5,I))-X(3,LEDGE(6,I)))**2
           XL = SQRT(XL)
 C
-
           IF(IGAP0 == 0) THEN
-            GAP = BGAPEMX+TWO*GAP_E(I)
+            GAP = GAP_MAXNEIGH(I)+TWO*GAP_E(I)
           ELSE
-             GAP = TWO*(BGAPEMX+GAP_E(I))
+            GAP = TWO*(GAP_MAXNEIGH(I)+GAP_E(I))
           ENDIF
           IF(IGAP==3) GAP = MIN(GAP,GAP_E_L(I)+BGAPEMX_L)
  
@@ -175,7 +192,7 @@ C
 C
               PENE = ZERO
               IF ((DIST1(LEDGE(5,LIN)) > DMAX).AND.(DIST1(LEDGE(6,LIN)) > DMAX).AND.(LEVEL>2)) THEN
-                PENE = I11PENE_LIN(X,LEDGE(5,LIN),LEDGE(5,LIN),LEDGE(5,I),LEDGE(6,I),DMAX)
+                PENE = I11PENE_LIN(X,LEDGE(5,LIN),LEDGE(6,LIN),LEDGE(5,I),LEDGE(6,I),DMAX)
               ENDIF
 C
               IF ((LEVEL <= 2).OR.(DIST1(LEDGE(5,LIN)) <= DMAX).OR.(DIST1(LEDGE(6,LIN)) <= DMAX).OR.(PENE > ZERO)) THEN
@@ -234,8 +251,8 @@ CC END DO WHILE
 C
 C-- Check memory for data storage
 C
-          I_START = I
-          IF (KREMNODE(I)+CPT_TOTAL > NREMNODE) THEN
+          I_START = II
+          IF (KREMNODE(II)+CPT_TOTAL > NREMNODE) THEN
 C--         Not enough memory - upgrade_remnode
             I_MEM_REM = 1
             EXIT
@@ -245,7 +262,6 @@ C
           IM1 = LEDGE(5,I)
           IM2 = LEDGE(6,I)
 C
-
             DO L=1,CPT_TOTAL
               LIN = LISTLINTOTAL(L)
               IF ((IM1 /= LEDGE(5,LIN)).AND.(IM1 /= LEDGE(6,LIN))
@@ -261,19 +277,20 @@ C--- lines with common nodes with main lines are already removed - no need to st
                 GAPV = SQRT(TWO)*MAX(DRAD2,GAPV+DGAPLOAD)
 
                 IF ((DIST1(LEDGE(5,LIN)) <= GAPV).OR.(DIST1(LEDGE(6,LIN)) <= GAPV)) THEN
-                  REMNODE(KREMNODE(I)+CPT1) = LIN
+                  REMNODE(KREMNODE(II)+CPT1) = LIN
                   CPT1 = CPT1 + 1
+                  GAP_MAXNEIGH(LIN) = MAX(GAP_MAXNEIGH(LIN),GAP_E(I))
                 ELSE
                   PENE = I11PENE_LIN(X,LEDGE(5,LIN),LEDGE(6,LIN),LEDGE(5,I),LEDGE(6,I),GAPV)
                   IF (PENE > 0) THEN
-                    REMNODE(KREMNODE(I)+CPT1) = LIN
+                    REMNODE(KREMNODE(II)+CPT1) = LIN
                     CPT1 = CPT1 + 1
+                    GAP_MAXNEIGH(LIN) = MAX(GAP_MAXNEIGH(LIN),GAP_E(I))
                   ENDIF
                 ENDIF
               ENDIF
-            ENDDO
-            KREMNODE(I+1) = KREMNODE(I) + CPT1
-
+            ENDDO            
+            KREMNODE(II+1) = KREMNODE(II) + CPT1
 C
 C-----------------------------------------------
 C  Clean of used arrays
@@ -302,7 +319,92 @@ C
           LISTLIN(1:NBLIN_MAX)=0
 C
         ENDDO
+
 CC END DO NEDGE
+C
+        IF (I_MEM_REM == 0) THEN
+C         Symmetry check                    
+          ALLOCATE(TAG_SYM(2,NEDGE))
+          TAG_SYM(1:2,1:NEDGE) = 0
+          TOT_SYM = 0
+          DO I=1,NEDGE
+            II = PERM_INV(I)
+            CPT1 = KREMNODE(II+1) - KREMNODE(II)
+            DO L=1,CPT1
+              JJ = REMNODE(KREMNODE(II)+L-1)
+              LIN = PERM_INV(REMNODE(KREMNODE(II)+L-1))
+              CPT2 = KREMNODE(LIN+1) - KREMNODE(LIN)
+              FOUND = 0
+              DO  LL=1,CPT2
+                J = REMNODE(KREMNODE(LIN)+LL-1)
+                IF (I==J) FOUND = 1 
+              ENDDO   
+              IF (FOUND == 0) THEN 
+                TOT_SYM = TOT_SYM + 1
+                TAG_SYM(2,JJ) = TAG_SYM(2,JJ) + 1
+                TAG_SYM(1,I) = 1
+              ENDIF  
+            ENDDO
+          ENDDO
+c
+          IF (KREMNODE(NEDGE+1)+TOT_SYM > NREMNODE) THEN
+C--         Not enough memory to store missing symetrised connections - upgrade_remnode
+            I_MEM_REM = 1
+            I_START = NEDGE
+            I_MEM_REM = 1
+          ENDIF       
+        ENDIF  
+c
+        IF (I_MEM_REM == 0) THEN           
+C
+          ALLOCATE(REM_TMP(NREMNODE),KREM_TMP(NEDGE+1))
+          REM_TMP(1:NREMNODE) = REMNODE(1:NREMNODE)
+          KREM_TMP(1:NEDGE+1) = KREMNODE(1:NEDGE+1)
+          KREMNODE(1) = 1
+C
+          DO I=1,NEDGE
+            II = PERM_INV(I)
+            CPT1 = KREM_TMP(II+1) - KREM_TMP(II)
+            KREMNODE(I+1) = KREMNODE(I) + CPT1 + TAG_SYM(2,I)
+          ENDDO
+C          
+C         REMNODE is reorganized in edge order
+          DO I=1,NEDGE
+            II = PERM_INV(I)
+            CPT1 = KREM_TMP(II+1) - KREM_TMP(II)       
+            DO L=1,CPT1
+              LIN = REM_TMP(KREM_TMP(II)+L-1)
+              REMNODE(KREMNODE(I)+L-1) = LIN
+            ENDDO
+          ENDDO
+C
+          IF (TOT_SYM > 0) THEN
+            TAG_SYM(2,1:NEDGE) = 0
+C           Missing connections are added for symetrization         
+            DO I=1,NEDGE
+              IF (TAG_SYM(1,I) > 0) THEN
+                II = PERM_INV(I)
+                CPT1 = KREM_TMP(II+1) - KREM_TMP(II)  
+                DO L=1, CPT1
+                  LIN = REMNODE(KREMNODE(I)+L-1)
+                  JJ = PERM_INV(LIN)
+                  CPT2 = KREM_TMP(JJ+1) - KREM_TMP(JJ)
+                  FOUND = 0
+                  DO  LL=1,CPT2
+                    IF (I==REMNODE(KREMNODE(LIN)+LL-1)) FOUND = 1 
+                  ENDDO 
+                  IF (FOUND == 0) THEN
+                    TAG_SYM(2,LIN) = TAG_SYM(2,LIN) + 1
+                    REMNODE(KREMNODE(LIN)+CPT2 + TAG_SYM(2,LIN)-1) = I
+                  ENDIF  
+                ENDDO   
+              ENDIF
+            ENDDO  
+          ENDIF  
+C            
+          DEALLOCATE(REM_TMP,KREM_TMP,TAG_SYM) 
+
+        ENDIF
 C
       ENDIF
 C
@@ -311,25 +413,23 @@ C
       IF(ALLOCATED(LISTLINTOTAL)) DEALLOCATE(LISTLINTOTAL)
       IF(ALLOCATED(LISTLIN)) DEALLOCATE(LISTLIN)
       IF(ALLOCATED(LISTLINTMP)) DEALLOCATE(LISTLINTMP)
-
-
 C
       RETURN
       END
 
 
-      !||====================================================================
-      !||    remn_i2op_edg25        ../starter/source/interfaces/int25/i25remlin.F
-      !||--- called by ------------------------------------------------------
-      !||    remn_i2op              ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    upgrade_remnode_e2s    ../starter/source/interfaces/interf1/upgrade_remnode.F
-      !||    upgrade_remnode_edg2   ../starter/source/interfaces/interf1/upgrade_remnode.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    remn_i2op_edg25        ../starter/source/interfaces/int25/i25remlin.F
+!||--- called by ------------------------------------------------------
+!||    remn_i2op              ../starter/source/interfaces/inter3d1/i7remnode.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    upgrade_remnode_e2s    ../starter/source/interfaces/interf1/upgrade_remnode.F
+!||    upgrade_remnode_edg2   ../starter/source/interfaces/interf1/upgrade_remnode.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE REMN_I2OP_EDG25(N         ,FLAGREMNODE, IPARI   ,INTBUF_TAB   ,I2NODE  ,
      .                          POINTS_I2N ,I2NODE_SIZE, NOM_OPT ,ITAB,FLAG_OUTPUT)
 C-----------------------------------------------
@@ -367,14 +467,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER II,J,K,IE,NN, NM,N2,ND,NES,NM2,M,
-     .       NN2,NNOD,NNREM_EDG,KI,KL,JJ,IEDG,IEDGS,ES,
-     .       COMPTEUR,I,L,L1,IS,IIS,NS,IADA,III,JJJ,NNOD_2,
+     .       NNREM_EDG,KI,KL,JJ,IEDGS,ES,
+     .       I,L,IS,IIS,NS,IADA,III,JJJ,NNOD_2,
      .       FIRST,LAST,NNREM_EDG_SAVE,
      .        OFFSET, NBR_INTRA,NBR_EXTRA,TOTAL_INSERTED,
-     .        OLDSIZE,MAX_INSERTED_EDG,
+     .        OLDSIZE,
      .        NREMOV_EDG,NEDGE,MAX_INSERTED_I2,ND_TAG,
      .        SOL_EDGE,SH_EDGE,IEDGE,NRTM
-       INTEGER(8) :: SIZE_INSERTED_EDG
+      INTEGER(8) :: SIZE_INSERTED_EDG,MAX_INSERTED_EDG,DIFF_INT8
       INTEGER, DIMENSION(:),ALLOCATABLE :: TAGD_EDG
       INTEGER ID
       CHARACTER(LEN=NCHARTITLE) :: TITR
@@ -391,7 +491,7 @@ C-----------------------------------------------
 !       NBR_EXTRA : integer , number of old remaining edges
 !       TOTAL_INSERTED : integer , total number of inserted edgees
 !       NBR_INSERT_II : integer, dimension = NEDGE , number of inserted edges for each II edge
-!       ADRESS_II : integer, dimension = NEDGE , adress of the first inserted edges for each II segment
+!       ADRESS_II : integer, dimension = NEDGE , address of the first inserted edges for each II segment
 !       KREMNODE_EDG_SAVE : integer, dimension = NEDGE+1 , list of old edges
 !       SIZE_INSERTED_EDG : integer, size of the INSERTED_EDG array ; SIZE_INSERTED_EDG is an upper bound, 
 !                            can be optimized!
@@ -454,7 +554,8 @@ C--------------------------------------------------------------------
 
            MAX_INSERTED_EDG = 0
            DO I=1,NUMNOD
-                MAX_INSERTED_EDG = MAX( MAX_INSERTED_EDG,(INOD2LIN(I+1)-INOD2LIN(I)) ) 
+              DIFF_INT8 = INOD2LIN(I+1)-INOD2LIN(I)
+              MAX_INSERTED_EDG = MAX(MAX_INSERTED_EDG,DIFF_INT8) 
            ENDDO
 
            ALLOCATE( NBR_INSERT_II(NRTM) )
@@ -465,7 +566,7 @@ C--------------------------------------------------------------------
            KREMNODE_EDG_SAVE(1:NRTM+1) = 0
            NBR_INSERT_II(1:NRTM) = 0
            JJJ = 0
-           NNREM_EDG = 0
+           NNREM_EDG = 0         
            DO II=1,NRTM
               K = INTBUF_TAB(N)%KREMNODE(II)+1
               L = INTBUF_TAB(N)%KREMNODE(II+1)               
@@ -477,7 +578,7 @@ C--------------------------------------------------------------------
                     IF (TAGD_EDG(IEDGS)==0) THEN
                        NNREM_EDG = NNREM_EDG + 1  
                        TAGD_EDG(IEDGS)=1  
-                       JJJ = JJJ + 1
+                       JJJ = JJJ + 1                                        
                        INSERTED_EDG(JJJ) = IEDGS  
                        NBR_INSERT_II(II) = NBR_INSERT_II(II) +1
                     ENDIF
@@ -500,7 +601,7 @@ C--------------------------------------------------------------------
 
            INTBUF_TAB(N)%REMNODE_E2S(1:NNREM_EDG) = INSERTED_EDG(1:NNREM_EDG)
            INTBUF_TAB(N)%KREMNODE_E2S(1:NRTM+1) = KREMNODE_EDG_SAVE(1:NRTM+1) 
-           INTBUF_TAB(N)%KREMNODE_E2S(1)=0
+           INTBUF_TAB(N)%KREMNODE_E2S(1)=0         
            DO II=1,NRTM+1
               INTBUF_TAB(N)%KREMNODE_E2S(II) =INTBUF_TAB(N)%KREMNODE_E2S(II)+1
            ENDDO
@@ -681,10 +782,10 @@ C extend INSERTED_EDG if needed
                 ENDDO
                ENDIF
             END DO ! 
-            
+           
            !   -------------------
            !   Adding edges where 2 nodes already tagged 
-           !  Two nodes of what? type25 or type2, which tag?
+           !  Two nodes of what? type25 or type2, which tag?        
           
             DO ND = 1,ND_TAG
               NES = IDX_ND( ND)
@@ -706,14 +807,14 @@ C extend INSERTED_EDG if needed
                  ENDIF
               ENDIF
             ENDDO
-
+            
             
            !   -------------------
            !   number of inserted edges
             NBR_INSERT_II(II) = NNREM_EDG - NNREM_EDG_SAVE
             KREMNODE_EDG_SAVE(II) = KREMNODE_EDG_SAVE(II+1) - KREMNODE_EDG_SAVE(II)
             IADA = IADA + KREMNODE_EDG_SAVE(II)
-           !   adress of the first inserted node
+           !   address of the first inserted node
             ADRESS_II(II) = IADA
             KREMNODE_EDG_SAVE(II) = IADA + NBR_INSERT_II(II) - 1
             IADA = IADA + NBR_INSERT_II(II)
@@ -857,10 +958,10 @@ C
             CALL UPGRADE_REMNODE_EDG2(IPARI(1,N),NNREM_EDG,INTBUF_TAB(N))
             INTBUF_TAB(N)%REMNODE_EDG(1:NNREM_EDG) = REMNODE_EDG(1:NNREM_EDG)
             INTBUF_TAB(N)%KREMNODE_EDG(2:NEDGE+1) = KREMNODE_EDG_SAVE(1:NEDGE) 
-            INTBUF_TAB(N)%KREMNODE_EDG(1)=0
+            INTBUF_TAB(N)%KREMNODE_EDG(1)=0         
             DO II=1,NEDGE+1
               INTBUF_TAB(N)%KREMNODE_EDG(II) =INTBUF_TAB(N)%KREMNODE_EDG(II)+1
-            ENDDO
+            ENDDO          
              ! ---------
             IF(FLAG_OUTPUT>0) THEN
               ! Output message 

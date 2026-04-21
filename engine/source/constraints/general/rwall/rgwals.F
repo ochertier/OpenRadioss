@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rgwals        ../engine/source/constraints/general/rwall/rgwals.F
-      !||--- called by ------------------------------------------------------
-      !||    rgwal0        ../engine/source/constraints/general/rwall/rgwal0.F
-      !||    rgwal0_imp    ../engine/source/constraints/general/rwall/rgwal0.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier    ../engine/source/system/machine.F
-      !||    sum_6_float   ../engine/source/system/parit.F
-      !||====================================================================
+!||====================================================================
+!||    rgwals        ../engine/source/constraints/general/rwall/rgwals.F
+!||--- called by ------------------------------------------------------
+!||    rgwal0        ../engine/source/constraints/general/rwall/rgwal0.F
+!||    rgwal0_imp    ../engine/source/constraints/general/rwall/rgwal0.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier    ../engine/source/system/machine.F
+!||    sum_6_float   ../engine/source/system/parit.F
+!||====================================================================
       SUBROUTINE RGWALS(X    ,A    ,V    ,RWL  ,NSW   ,
      1                  NSN  ,ITIED,MSR  ,MS   ,WEIGHT,
      2                  ICONT,FRWL6,IMP_S,NT_RW,IDDL  ,
@@ -270,7 +270,7 @@ C
       IF(IMCONV==1)THEN
           TFXT=TFXT+HALF*DT1*TFXTN
           TFXT2=TFXT2+HALF*DT1*TFXTN2
-#include "atomic.inc"
+!$OMP ATOMIC
           WFEXT=WFEXT+TFXT
           WFEXT_MD=WFEXT_MD+TFXT2
 
@@ -310,7 +310,7 @@ C
            N=NSW(I)
            IF (NDOF(N)>0) THEN
 C to be uncommented the day it is parallel in implicit
-#include "atomic.inc"
+!$OMP ATOMIC
              NT_RW = NT_RW + 1
            END IF
          ENDDO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,65 +20,65 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    genani1                ../starter/source/output/anim/genani1.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ani_txt                ../starter/source/output/anim/ani_txt.F
-      !||    ani_txt50              ../starter/source/output/anim/ani_txt.F
-      !||    anioff0                ../starter/source/output/anim/anioff0.F
-      !||    anioffc                ../starter/source/output/anim/anioffc.F
-      !||    aniofff                ../starter/source/output/anim/aniofff.F
-      !||    anioffs                ../starter/source/output/anim/anioffs.F
-      !||    aniskew                ../starter/source/output/anim/aniskew.F
-      !||    aniskewf               ../starter/source/output/anim/aniskewf.F
-      !||    delnumb0               ../starter/source/output/anim/delnumb0.F
-      !||    delnumbc               ../starter/source/output/anim/delnumbc.F
-      !||    delnumbf               ../starter/source/output/anim/delnumbf.F
-      !||    delnumbs               ../starter/source/output/anim/delnumbs.F
-      !||    delsub                 ../starter/source/output/anim/delsub.F
-      !||    dfunc0                 ../starter/source/output/anim/dfunc0.F
-      !||    dfuncc                 ../starter/source/output/anim/dfuncc.F
-      !||    dfuncf                 ../starter/source/output/anim/dfuncf.F
-      !||    dfuncs                 ../starter/source/output/anim/dfuncs.F
-      !||    dmasani0               ../starter/source/output/anim/dmasani0.F
-      !||    dmasanic               ../starter/source/output/anim/dmasanic.F
-      !||    dmasanif               ../starter/source/output/anim/dmasanif.F
-      !||    dmasanis               ../starter/source/output/anim/dmasanis.F
-      !||    donerby                ../starter/source/output/anim/donerby.F
-      !||    donerwl                ../starter/source/output/anim/donerwl.F
-      !||    donesec                ../starter/source/output/anim/donesec.F
-      !||    donesrg                ../starter/source/output/anim/donesrg.F
-      !||    dparrby                ../starter/source/output/anim/dparrby.F
-      !||    dparrws                ../starter/source/output/anim/dparrws.F
-      !||    dparsrg                ../starter/source/output/anim/dparsrg.F
-      !||    drbycnt                ../starter/source/output/anim/drbycnt.F
-      !||    dseccnt                ../starter/source/output/anim/dseccnt.F
-      !||    dsecnor                ../starter/source/output/anim/dsecnor.F
-      !||    dsphcnt                ../starter/source/output/anim/dsphcnt.F
-      !||    dsphnor                ../starter/source/output/anim/dsphnor.F
-      !||    dsrgcnt                ../starter/source/output/anim/dsrgcnt.F
-      !||    dsrgnor                ../starter/source/output/anim/dsrgnor.F
-      !||    dxyzsect               ../starter/source/output/anim/dxyzsect.F
-      !||    dxyzsph                ../starter/source/output/anim/dxyzsph.F
-      !||    dxyzsrg                ../starter/source/output/anim/dxyzsrg.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    parsor0                ../starter/source/output/anim/parsor0.F
-      !||    parsorc                ../starter/source/output/anim/parsorc.F
-      !||    parsorf                ../starter/source/output/anim/parsorf.F
-      !||    parsors                ../starter/source/output/anim/parsors.F
-      !||    tensor0                ../starter/source/output/anim/tensor0.F
-      !||    tensorc                ../starter/source/output/anim/tensorc.F
-      !||    tensors                ../starter/source/output/anim/tensors.F
-      !||    velvec                 ../starter/source/output/anim/velvec.F
-      !||    xyz16                  ../starter/source/output/anim/genani1.F
-      !||    xyznor                 ../starter/source/output/anim/xyznor.F
-      !||    xyznor16               ../starter/source/output/anim/genani1.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod              ../starter/share/modules1/fvbag_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    genani1                ../starter/source/output/anim/genani1.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ani_txt                ../starter/source/output/anim/ani_txt.F
+!||    ani_txt50              ../starter/source/output/anim/ani_txt.F
+!||    anioff0                ../starter/source/output/anim/anioff0.F
+!||    anioffc                ../starter/source/output/anim/anioffc.F
+!||    aniofff                ../starter/source/output/anim/aniofff.F
+!||    anioffs                ../starter/source/output/anim/anioffs.F
+!||    aniskew                ../starter/source/output/anim/aniskew.F
+!||    aniskewf               ../starter/source/output/anim/aniskewf.F
+!||    delnumb0               ../starter/source/output/anim/delnumb0.F
+!||    delnumbc               ../starter/source/output/anim/delnumbc.F
+!||    delnumbf               ../starter/source/output/anim/delnumbf.F
+!||    delnumbs               ../starter/source/output/anim/delnumbs.F
+!||    delsub                 ../starter/source/output/anim/delsub.F
+!||    dfunc0                 ../starter/source/output/anim/dfunc0.F
+!||    dfuncc                 ../starter/source/output/anim/dfuncc.F
+!||    dfuncf                 ../starter/source/output/anim/dfuncf.F
+!||    dfuncs                 ../starter/source/output/anim/dfuncs.F
+!||    dmasani0               ../starter/source/output/anim/dmasani0.F
+!||    dmasanic               ../starter/source/output/anim/dmasanic.F
+!||    dmasanif               ../starter/source/output/anim/dmasanif.F
+!||    dmasanis               ../starter/source/output/anim/dmasanis.F
+!||    donerby                ../starter/source/output/anim/donerby.F
+!||    donerwl                ../starter/source/output/anim/donerwl.F
+!||    donesec                ../starter/source/output/anim/donesec.F
+!||    donesrg                ../starter/source/output/anim/donesrg.F
+!||    dparrby                ../starter/source/output/anim/dparrby.F
+!||    dparrws                ../starter/source/output/anim/dparrws.F
+!||    dparsrg                ../starter/source/output/anim/dparsrg.F
+!||    drbycnt                ../starter/source/output/anim/drbycnt.F
+!||    dseccnt                ../starter/source/output/anim/dseccnt.F
+!||    dsecnor                ../starter/source/output/anim/dsecnor.F
+!||    dsphcnt                ../starter/source/output/anim/dsphcnt.F
+!||    dsphnor                ../starter/source/output/anim/dsphnor.F
+!||    dsrgcnt                ../starter/source/output/anim/dsrgcnt.F
+!||    dsrgnor                ../starter/source/output/anim/dsrgnor.F
+!||    dxyzsect               ../starter/source/output/anim/dxyzsect.F
+!||    dxyzsph                ../starter/source/output/anim/dxyzsph.F
+!||    dxyzsrg                ../starter/source/output/anim/dxyzsrg.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    parsor0                ../starter/source/output/anim/parsor0.F
+!||    parsorc                ../starter/source/output/anim/parsorc.F
+!||    parsorf                ../starter/source/output/anim/parsorf.F
+!||    parsors                ../starter/source/output/anim/parsors.F
+!||    tensor0                ../starter/source/output/anim/tensor0.F
+!||    tensorc                ../starter/source/output/anim/tensorc.F
+!||    tensors                ../starter/source/output/anim/tensors.F
+!||    velvec                 ../starter/source/output/anim/velvec.F
+!||    xyz16                  ../starter/source/output/anim/genani1.F
+!||    xyznor                 ../starter/source/output/anim/xyznor.F
+!||    xyznor16               ../starter/source/output/anim/genani1.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod              ../starter/share/modules1/fvbag_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE GENANI1(X      , BUFEL  , IXS   , IXQ    , IXC     ,
      2                   IXT    , IXP    , IXR   , IXTG   , SWAFT   ,
      3                   IPARG  , PM     , GEO   , SKEW   , ITAB    ,
@@ -104,6 +104,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE INOUTFILE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -117,7 +118,6 @@ C-----------------------------------------------
 #include      "sphcom.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr15_c.inc"
 #include      "scr16_c.inc"
@@ -231,11 +231,7 @@ C
 C-----------------------------------------------
 C      ANIM MULTI-LEVEL DOMDEC
 C-----------------------------------------------
-      IF (IMACH==3) THEN
-         WRITE(CTITR(1),'(A25)') 'SPMD Domain Decomposition'
-      ELSEIF (DSANIM==1) THEN
-         WRITE(CTITR(1),'(A30,I3)') 'Impl. graph - Dom. Dec. Level ',1
-      ENDIF
+      WRITE(CTITR(1),'(A25)') 'SPMD Domain Decomposition'
       DO I=2,NLEVEL
          WRITE(CTITR(I),'(A30,I3)') 'Impl. graph - Dom. Dec. Level ',I
       ENDDO
@@ -287,7 +283,7 @@ C
         EL2FA(I)=0
       ENDDO
 C-----------------------------------------------
-C   COUPES DANS LES SOLIDES
+C   SECTIONS IN SOLIDS
 C-----------------------------------------------
       NODCUT=0
       NELCUT=0
@@ -552,7 +548,7 @@ C
                      INOD(3)=FVOFF(1,I)+FVDATA(I)%IFVTRI_ANIM(3,NN)-1
                      INOD(4)=INOD(3)
                      II=II+1
-C Nombre de noeuds distincts de la coque (apres fusion dans FVMESH)
+C Number of distinct nodes of the shell (after merging in FVMESH)
                      NND=1
                      IF (INOD(2)/=INOD(1)) NND=NND+1
                      IF (INOD(3)/=INOD(1).AND.
@@ -1032,10 +1028,10 @@ C-----------------------------------------------
        DO I=1,NMANIM      ! Don't work !!!
           DO J=1,2
              IFUNC=NMFUNC(J)
-             CALL TENSORC(MBUFEL(1,I), IPARG, IFUNC,
-     .                    INVERT, NELCUT, EL2FA, NBF, WAFT,
-     .                    IAD, NBF_L, NBPART,
-     .                    X, IXC, IGEO, IXTG)
+!            CALL TENSORC(MBUFEL(1,I), IPARG, IFUNC,
+!    .                    INVERT, NELCUT, EL2FA, NBF, WAFT,
+!    .IAD, nbf_l, nbpart,
+!    .                    X, IXC, IGEO, IXTG)
              R4 = ZERO
              DO K=1,NESBW2
               CALL WRITE_R_C(R4,1)
@@ -1399,7 +1395,7 @@ C Brick
          OFF=1
          CALL DELSUB(1,     CEP,    1, OFF, NUMELS,
      .               EL2FA, FUNC)
-C Particules SPH
+C SPH particles
          IF (ISPH3D==1) THEN
             OFF=1
             CALL DELSUB(1, CEPSP,1 ,OFF, NUMSPH,
@@ -1434,9 +1430,9 @@ C-----------------------------------------------
       DO I=1,NMANIM
          DO J=1,1
             IFUNC=NMFUNC(J)
-            CALL TENSORS(MBUFEL(1,I), IPARG,  IFUNC, IXS,   PM,
-     .                   EL2FA,       NNN,    WAFT,
-     .                   X,     IPART,IPARTSP,     ISPH3D, IPM  )
+!           CALL TENSORS(MBUFEL(1,I), IPARG,  IFUNC, IXS,   PM,
+!    .                   EL2FA,       NNN,    WAFT,
+!    .                   X,     IPART,IPARTSP,     ISPH3D, IPM  )
          ENDDO
       ENDDO
 C-----------------------------------------------
@@ -1528,7 +1524,7 @@ C-----------------------------------------------
       ENDIF
       CALL WRITE_I_C(NFE_ANI,1)
       CALL WRITE_I_C(NFT_ANI,1)
-C FLAG POUR SKEW
+C FLAG FOR SKEW
       CALL WRITE_I_C(1,1)
 
 C-----------------------------------------------
@@ -1685,10 +1681,10 @@ C
       DO I=1,NMANIM
          DO J=1,8
             IFUNC=NMFUNC(J)
-            CALL DFUNCF(MBUFEL(1,I), WAFT, IFUNC, IPARG,  GEO,
-     .                  IXT,         IXP,  IXR,   MAS,    PM,
-     .                  EL2FA,       NB1D, IAD,   NBPART,
-     .                  XFUNC1)
+!           CALL DFUNCF(MBUFEL(1,I), WAFT, IFUNC, IPARG,  GEO,
+!    .                  IXT,         IXP,  IXR,   MAS,    PM,
+!    .                  EL2FA,       NB1D, IAD,   NBPART,
+!    .                  XFUNC1)
             R4 = ZERO
             DO K=1,NERBY
               CALL WRITE_R_C(R4,1)
@@ -2058,7 +2054,7 @@ C #PARTS FILLES
                N3=N3+1
             ENDIF
           ENDDO
-C CUTS DANS LE SUBSET GLOBAL
+C CUTS IN THE GLOBAL SUBSET
           N1=N1+NCUTS
 C PARTS FILLES 2D
           CALL WRITE_I_C(N1,1)
@@ -2066,7 +2062,7 @@ C PARTS FILLES 2D
             IF(MATER(K)>0.AND.MATER(K)<=M01)
      .         CALL WRITE_I_C(MATER(K)-1,1)
           ENDDO
-C CUTS DANS LE SUBSET GLOBAL
+C CUTS IN THE GLOBAL SUBSET
           DO J=1,NCUTS
               CALL WRITE_I_C(M1-NRWALL-NSECT-NSURG-NSMAD-J,1)
           ENDDO
@@ -2369,7 +2365,7 @@ C #PARTS FILLES
                N3=N3+1
             ENDIF
           ENDDO
-C CUTS DANS LE SUBSET GLOBAL
+C CUTS IN THE GLOBAL SUBSET
           N1=N1+NCUTS
 C PARTS FILLES 2D
           CALL WRITE_I_C(N1,1)
@@ -2458,7 +2454,7 @@ C
 C=======================================================================
       IF(ISPH3D==1.OR.NUMSPH_T+MAXPJET==0) GOTO 700
 C-----------------------------------------------
-C   prepare sorties SUBSET : PART FILLES meshless
+C   PREPARE Subset outings: Part girls meshless
 C-----------------------------------------------
       DO I=1,NPART
         MATER(I)=-MATER(I)
@@ -2551,7 +2547,7 @@ C-----------------------------------------------
          DO I=1,NUMSPH
             FUNC(I)=ZERO
          ENDDO
-C Particules SPH
+C SPH particles
          OFF=1
          CALL DELSUB(1,     CEPSP, 1, OFF, NUMSPH,
      .               EL2FA, FUNC )
@@ -2690,13 +2686,15 @@ C-----------------------------------------------
 C
       RETURN
       END 
-      !||====================================================================
-      !||    xyz16       ../starter/source/output/anim/genani1.F
-      !||--- called by ------------------------------------------------------
-      !||    genani1     ../starter/source/output/anim/genani1.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    xyz16         ../starter/source/output/anim/genani1.F
+!||--- called by ------------------------------------------------------
+!||    genani1       ../starter/source/output/anim/genani1.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE XYZ16(IXS,IXS10,IXS20,IXS16,X)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2776,13 +2774,15 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    xyznor16    ../starter/source/output/anim/genani1.F
-      !||--- called by ------------------------------------------------------
-      !||    genani1     ../starter/source/output/anim/genani1.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    xyznor16      ../starter/source/output/anim/genani1.F
+!||--- called by ------------------------------------------------------
+!||    genani1       ../starter/source/output/anim/genani1.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE XYZNOR16(IXS,IXS10,IXS20,IXS16,X)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

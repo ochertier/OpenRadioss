@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thermbilan            ../engine/source/constraints/thermic/thermbilan.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_barrier          ../engine/source/mpi/generic/spmd_barrier.F
-      !||    spmd_glob_rsum_poff   ../engine/source/mpi/generic/spmd_glob_rsum_poff.F
-      !||--- uses       -----------------------------------------------------
-      !||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    thermbilan            ../engine/source/constraints/thermic/thermbilan.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_barrier          ../engine/source/mpi/spmd_mod.F90
+!||    spmd_glob_rsum_poff   ../engine/source/mpi/generic/spmd_glob_rsum_poff.F
+!||--- uses       -----------------------------------------------------
+!||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE THERMBILAN(GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      use spmd_mod, only : SPMD_BARRIER
       use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

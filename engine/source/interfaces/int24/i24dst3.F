@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24dst3       ../engine/source/interfaces/int24/i24dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24mainf      ../engine/source/interfaces/int24/i24main.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24nexttria   ../engine/source/interfaces/int24/i24dst3.F
-      !||    intersecsh    ../engine/source/interfaces/int24/i24dst3.F
-      !||    intersecv     ../engine/source/interfaces/int24/i24dst3.F
-      !||    intersecv0    ../engine/source/interfaces/int24/i24dst3.F
-      !||    s_in_m4       ../engine/source/interfaces/int24/i24dst3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box       ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24dst3       ../engine/source/interfaces/int24/i24dst3.F
+!||--- called by ------------------------------------------------------
+!||    i24mainf      ../engine/source/interfaces/int24/i24main.F
+!||--- calls      -----------------------------------------------------
+!||    i24nexttria   ../engine/source/interfaces/int24/i24dst3.F
+!||    intersecsh    ../engine/source/interfaces/int24/i24dst3.F
+!||    intersecv     ../engine/source/interfaces/int24/i24dst3.F
+!||    intersecv0    ../engine/source/interfaces/int24/i24dst3.F
+!||    s_in_m4       ../engine/source/interfaces/int24/i24dst3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box       ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24DST3(
      1                  JLT    ,CAND_N ,CAND_E ,CN_LOC ,CE_LOC ,
      2                  X1     ,X2     ,X3     ,X4     ,Y1     ,
@@ -201,7 +201,7 @@ C-----------------------------------------------
      .     X12D,Y12D,Z12D,GAP2D,XI5D,YI5D,ZI5D,S2D, LA0,LB0,LC0,
      .     HLA, ADT,OVERW,EPS,PENE_SH,OVERW0,VOL,EPS2,DGAP,RX,RY,RZ,
      .     PENE_TM(MVSIZ),LA_TM(MVSIZ),LB_TM(MVSIZ),N_TM(3,MVSIZ),
-     .     AREA(MVSIZ)
+     .     AREA(MVSIZ),F_PENE,FAC_K,FAC_P
       INTEGER ICONTACT(MVSIZ),IT0(3,20),IT(3,20,MVSIZ),IC(10,20),
      .     ISTEP(MVSIZ),IRTLM_OLD(MVSIZ),SUBTRIA_N(MVSIZ),
      .     NSS,MGLOB,ibug,JG,IZLIM,ip,IKEEP,LARGEP,IPEN0(MVSIZ),IER,
@@ -212,7 +212,7 @@ C-----------------------------------------------
 ! +----+----------+----------+-------------+
 ! | IC                                     |
 ! +----+----------+----------+-------------+
-! | ST | noeuds T | noeuds TV| noeuds Quad |
+! | ST | nodes T | nodes TV| nodes Quad |
 ! +----+----------+----------+-------------+        11-------10       
 ! |  1 |  5  1  2 | 14  3  4 |  3  4  1  2 |         |\ 19  /|        
 ! |  2 |  5  2  3 | 15  4  1 |  4  1  2  3 |         | \   / |                                    
@@ -262,7 +262,7 @@ C-----------------------------------------------
      .   17,12,13 ,  0, 1, 4 ,  1, 4,12,13/
 
 ! +------+-------------------------------------------+
-! |      |       sous-triangle voisins               |
+! ||Voisins subtriangle |
 ! |sous  +----------+----------+---------------------+
 ! |trian |       n3/=n4        |             n3=n4   |
 ! |      +----------+----------+----------+----------+
@@ -400,24 +400,24 @@ c CAND_T(I)==2 => only edge candidate
       ENDDO
 C--------------------------------------------------------
 C   ISTEP
-c      0 : rien  faire (>STIF=0...)
-c      1 : calcul Hi,pene... si ancien contact
-c                             si change de segment ou soustrianle st => ISTEP=3
-c                             sinon (ISTEP=0) plus rien  faire
+c      0: nothing (> stif = 0 ...)
+c      1 : calculation Hi,pene... si ancien contact
+c                             if segment changes or subtract st => istep=3
+c                             Otherwise (istep = 0) nothing
 c      2 : algo d'intersection si pas de contact prcdent
 c                             si intersection => ISTEP=3
-c                             sinon plus rien  faire
-c      3 : algo de glissement
+c                             Otherwise nothing more
+c      3: sliding algorithm
 c                             si ne glisse pas                => ISTEP=5 
-c                             si glisse mais pas hors surface => ISTEP=4 
-c                             si glisse hors surface          => ISTEP=0 plus rien  faire
+c                             If sliding but not out of surface => istep = 4 
+c                             If sliding out of surface => istep = 0 nothing more
 c      4 : algo de glissement !!!! not used
-c                             si ne glisse pas hors surface => ISTEP=5 
-c                             si glisse mais pas hors surface => ISTEP=4 
-c                             si glisse hors surface          => ISTEP=0 plus rien  faire
-c      5 : calcul Hi,pene ... pour nouveau contact ou ancien avec glissement
+c                             If not slide out of surface => istep = 5 
+c                             If sliding but not out of surface => istep = 4 
+c                             If sliding out of surface => istep = 0 nothing more
+c      5: compute hi, pene ... for new contact or previous with sliding
 c      
-c      6 : special shell plane/shell plance case: treated by node/edge(line) with Iedge=1
+c      6 : special shell plane/shell plane case: treated by node/edge(line) with Iedge=1
 C--------------------------------------------------------
 
 C--------------------------------------------------------
@@ -1159,7 +1159,7 @@ c         check if outside side AB
               SUBTRIA_TM(I) = SUBTRIA(I)
 c         check if outside side BC, or when there is rebound and strictly outside
           ELSEIF(LA(I)<-EPSEXT.OR.(PENE(I)==ZERO.AND.LA(I)<ZERO))THEN
-c hors zone d'extension de surface
+c Excluding surface extension zone
             ISTEP(I)=3
             SUBTRIA_N(I)=IT0(1,ITQ)
             IZLIM=-1
@@ -1294,8 +1294,8 @@ c             convex
             LB(I) = LB(I)/AAA
         ENDIF
 
-c interpolation des normales si impact dans la zone
-c   +/- extension de surface
+c normal interpolation if  in the zone
+c   +/- Exsurface tension
         IF(IZLIM==1 .OR. ISPT2(I)>0)THEN
 C--------------- Use for calculate consisting Dpene in i24forc3       
             NM1(I) = N1(I)
@@ -1651,7 +1651,7 @@ C----- due to different algorithms used in starter/engine, it's more assurant to
         END IF!(IKEEP == 1)THEN
 C
       ENDDO
-!                numerotation des sous-triangles
+! numbering of sub-triangles
 !
 !                                      
 !                 6o------o5           
@@ -1678,7 +1678,7 @@ C
 !                 1o------o2
 !
 ! +------+-------------------------------------------+
-! |      |       sous-triangle voisins               |
+! |      |          neigh. subtriangle               |
 ! |sous  +----------+----------+---------------------+
 ! |trian |       n3/=n4        |             n3=n4   |
 ! |      +----------+----------+----------+----------+
@@ -1711,11 +1711,11 @@ C
 ! +------+----------+----------+----------+----------+
 !        
 !
-!                connetivite des sous-triangles IC(10,*)
+!                Connectivitis of subtriangles IC (10,*)
 !
 !
 ! +----+----------+----------+-------------+
-! | ST | noeuds T | noeuds TV| noeuds Quad |
+! | ST | nodes T | nodes TV| nodes Quad |
 ! +----+----------+----------+-------------+          
 ! |  1 |  5  1  2 | 14  3  4 |  3  4  1  2 |
 ! |  2 |  5  2  3 | 15  4  1 |  4  1  2  3 |        11-------10       
@@ -1816,8 +1816,8 @@ c     .         +GAP_NM(9,CAND_E(I))+GAP_NM(10,CAND_E(I))
 c     .        +GAP_NM(11,CAND_E(I))+GAP_NM(12,CAND_E(I)) /= ZERO)THEN
         IF(ISHEL(I)>0) THEN
 
-c        la normale sur les point 6 a 17 est approche
-c        pour la correction du gap (utilise pendant un seul cycle)
+c        the normal on points 6 to 17 is approximated
+c        for gap correction (used for only one cycle)
 
          BBB = SQRT(SX21140(I)*SX21140(I)
      +             +SY21140(I)*SY21140(I)
@@ -2035,7 +2035,7 @@ c      write(iout,*)'i24dst3 6'
        IF(ISTEP(I) /= 3)CYCLE
        ISTEP(I) = 5
 ! +------+-------------------------------------------+
-! |      |       sous-triangle voisins               |
+! |      |      neigh subtriangle                    |
 ! |sous  +----------+----------+---------------------+
 ! |trian |       n3/=n4        |             n3=n4   |
 ! |      +----------+----------+----------+----------+
@@ -2278,7 +2278,7 @@ c a vrifier          4,IF(MVOISIN(4,CAND_E(I))==0)IT( 3, 1,I) = 0
         NY(I) = NQY
         NZ(I) = NQZ
 
-c       calcul des plans bisecteurs
+c       calculation of bisector planes
         NQRX = NRX + NQX
         NQRY = NRY + NQY
         NQRZ = NRZ + NQZ
@@ -2572,12 +2572,11 @@ c         scharp angle bound nodal normal to 45 from segment normal
         LC(I) = ONE - LA(I) - LB(I)
 
         IF(LA(I)>=ZERO.and.LB(I)>=ZERO.and.LC(I)>=ZERO)THEN
-c interpolation des normales
-c avec surponderation du point central (quadrangles)
-c avec surponderation de la facette (triangles)
+c normal interpolation
+c with overweighting of the central point (quadrangles)
+c with overweighting of the facet (triangles)
 c        goto 2345
 c          add ici
- 2345     continue
           IF (IKEEP==1) THEN
            PENE(I) = ZERO
            ICONTACT(I) = 0
@@ -2733,7 +2732,7 @@ c          ELSEIF(IX3(I) == IX4(I))THEN impossible
           N3(I) = N3(I)*S2
  3456     continue
         ENDIF
-c interpolation des normales seulement en glissement et en option avec implicite
+c normal interpolation only in sliding and optionally with implicit
 C------issue w/ sp too small value of S2----
         IF ((IMPL_S>0 .AND. ITTOFF>0))  THEN
 C        IF (ISPT2(I)>0.OR.(IMPL_S>0 .AND. ITTOFF>0))  THEN
@@ -2897,7 +2896,6 @@ c            TIME_S(N) = ADT0(I)
 
 c debug
 !!!      goto 123      
- 123  continue
 C=======================================================================
 c       special plan/plan: node/edge
 C=======================================================================
@@ -2905,7 +2903,7 @@ C=======================================================================
 ! +----+----------+----------+-------------+
 ! | IC                                     |
 ! +----+----------+----------+-------------+
-! | ST | noeuds T | noeuds TV| noeuds Quad |
+! | ST | nodes T | nodes TV| nodes Quad |
 ! +----+----------+----------+-------------+        11-------10       
 ! |  1 |  5  1  2 | 14  3  4 |  3  4  1  2 |         |\ 19  /|        
 ! |  2 |  5  2  3 | 15  4  1 |  4  1  2  3 |         | \   / |                                    
@@ -3401,6 +3399,14 @@ C-----peneref for nonlinear stif (quadratic...)
             PENE_SH = EM01*PENE_OLDFI(NIN)%P(5,JG)
           ENDIF
           PENREF(I) = MAX(PENREF(I),PENE_SH)
+          IF (IKNON(I)<0) THEN 
+            F_PENE = EM01*PENE(I)/PENE_SH
+            PENREF(I) = ZERO ! not to do quadratic stif
+            IF (F_PENE>TWO_THIRD) THEN
+              FAC_K = MIN(TWENTY,SIX*F_PENE)
+              PENREF(I) = PENE_SH/SQRT(FAC_K)
+            END IF
+          END IF
         ENDDO
       ELSE
         DO I=1,JLT
@@ -3425,15 +3431,15 @@ C-----peneref for nonlinear stif (quadratic...)
 C
       RETURN
       END
-      !||====================================================================
-      !||    i24nexttria    ../engine/source/interfaces/int24/i24dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24dst3        ../engine/source/interfaces/int24/i24dst3.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24nexttria2   ../engine/source/interfaces/int24/i24dst3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box        ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24nexttria    ../engine/source/interfaces/int24/i24dst3.F
+!||--- called by ------------------------------------------------------
+!||    i24dst3        ../engine/source/interfaces/int24/i24dst3.F
+!||--- calls      -----------------------------------------------------
+!||    i24nexttria2   ../engine/source/interfaces/int24/i24dst3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box        ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24NEXTTRIA(
      1          IZLIM,ISTEP,SUBTRIA_N,SUBTRIA,
      2          LARGEP,PENE ,XXL  ,YYL  ,ZZL  ,
@@ -3476,7 +3482,7 @@ C-----------------------------------------------
 ! +----+----------+----------+-------------+
 ! | IC                                     |
 ! +----+----------+----------+-------------+
-! | ST | noeuds T | noeuds TV| noeuds Quad |
+! | ST | nodes T | nodes TV| nodes Quad |
 ! +----+----------+----------+-------------+        11-------10       
 ! |  1 |  5  1  2 | 14  3  4 |  3  4  1  2 |         |\ 19  /|        
 ! |  2 |  5  2  3 | 15  4  1 |  4  1  2  3 |         | \   / |                                    
@@ -3526,7 +3532,7 @@ C-----------------------------------------------
      .   17,12,13 ,  0, 1, 4 ,  1, 4,12,13/
 
 ! +------+-------------------------------------------+
-! |      |       sous-triangle voisins               |
+! ||Voisins subtriangle |
 ! |sous  +----------+----------+---------------------+
 ! |trian |       n3/=n4        |             n3=n4   |
 ! |      +----------+----------+----------+----------+
@@ -3700,7 +3706,7 @@ c       check if outside side AB
      7      LC   ,GAP2 ,EPS  )
 c         check if outside side BC
       ELSEIF(LA<-EPS)THEN
-c hors zone d'extension de surface
+c Excluding surface extension zone
             ISTEP=3
             SUBTRIA_N=IT0(1,ITQ)
             IZLIM=-1
@@ -3725,13 +3731,13 @@ c         convex
 
       RETURN
       END
-      !||====================================================================
-      !||    i24nexttria2   ../engine/source/interfaces/int24/i24dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24nexttria    ../engine/source/interfaces/int24/i24dst3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box        ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24nexttria2   ../engine/source/interfaces/int24/i24dst3.F
+!||--- called by ------------------------------------------------------
+!||    i24nexttria    ../engine/source/interfaces/int24/i24dst3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box        ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24NEXTTRIA2(
      1          IZLIM,ISTEP,SUBTRIA_N,SUBTRIA,
      2          LARGEP,PENE ,XXL  ,YYL  ,ZZL  ,
@@ -3781,7 +3787,7 @@ C-----------------------------------------------
 ! +----+----------+----------+-------------+
 ! | IC                                     |
 ! +----+----------+----------+-------------+
-! | ST | noeuds T | noeuds TV| noeuds Quad |
+! | ST | nodes T | nodes TV| nodes Quad |
 ! +----+----------+----------+-------------+        11-------10       
 ! |  1 |  5  1  2 | 14  3  4 |  3  4  1  2 |         |\ 19  /|        
 ! |  2 |  5  2  3 | 15  4  1 |  4  1  2  3 |         | \   / |                                    
@@ -3831,7 +3837,7 @@ C-----------------------------------------------
      .   17,12,13 ,  0, 1, 4 ,  1, 4,12,13/
 
 ! +------+-------------------------------------------+
-! |      |       sous-triangle voisins               |
+! ||Voisins subtriangle |
 ! |sous  +----------+----------+---------------------+
 ! |trian |       n3/=n4        |             n3=n4   |
 ! |      +----------+----------+----------+----------+
@@ -4005,7 +4011,7 @@ c     6      N1   ,N2   ,N3   ,LA   ,LB   ,
 c     7      LC   )
 c         check if outside side BC
       ELSEIF(LA<-EPS)THEN
-c hors zone d'extension de surface
+c Excluding surface extension zone
             ISTEP=3
             SUBTRIA_N=IT0(1,ITQ)
             IZLIM=-1
@@ -4030,11 +4036,11 @@ c         convex
 
       RETURN
       END
-      !||====================================================================
-      !||    s_in_m4   ../engine/source/interfaces/int24/i24dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24dst3   ../engine/source/interfaces/int24/i24dst3.F
-      !||====================================================================
+!||====================================================================
+!||    s_in_m4   ../engine/source/interfaces/int24/i24dst3.F
+!||--- called by ------------------------------------------------------
+!||    i24dst3   ../engine/source/interfaces/int24/i24dst3.F
+!||====================================================================
       SUBROUTINE S_IN_M4(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,X4,Y4,Z4,
      1                   XI,YI,ZI,IER)
 C-----------------------------------------------
@@ -4196,11 +4202,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    intersecv   ../engine/source/interfaces/int24/i24dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24dst3     ../engine/source/interfaces/int24/i24dst3.F
-      !||====================================================================
+!||====================================================================
+!||    intersecv   ../engine/source/interfaces/int24/i24dst3.F
+!||--- called by ------------------------------------------------------
+!||    i24dst3     ../engine/source/interfaces/int24/i24dst3.F
+!||====================================================================
       SUBROUTINE INTERSECV(
      1                    ISTEP    ,SUBTRIA,IXX3  ,IXX4  ,
      1                    INTERSECT,V12   ,V23    ,V34   ,V41    ,
@@ -4621,11 +4627,11 @@ C----------loose tolerance for tria
 C
       RETURN
       END
-      !||====================================================================
-      !||    intersecv0   ../engine/source/interfaces/int24/i24dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24dst3      ../engine/source/interfaces/int24/i24dst3.F
-      !||====================================================================
+!||====================================================================
+!||    intersecv0   ../engine/source/interfaces/int24/i24dst3.F
+!||--- called by ------------------------------------------------------
+!||    i24dst3      ../engine/source/interfaces/int24/i24dst3.F
+!||====================================================================
       SUBROUTINE INTERSECV0(
      1                    ISTEP    ,SUBTRIA,IXX3  ,IXX4  ,
      1                    INTERSECT,V12   ,V23    ,V34   ,V41    ,
@@ -5004,14 +5010,14 @@ c            ZOI = ZI - ADT*VZI
 C
       RETURN
       END
-      !||====================================================================
-      !||    intersecsh   ../engine/source/interfaces/int24/i24dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24dst3      ../engine/source/interfaces/int24/i24dst3.F
-      !||--- calls      -----------------------------------------------------
-      !||    n2edge3      ../engine/source/interfaces/int24/i24dst3.F
-      !||    n2edge3l     ../engine/source/interfaces/int24/n2edge3l.F
-      !||====================================================================
+!||====================================================================
+!||    intersecsh   ../engine/source/interfaces/int24/i24dst3.F
+!||--- called by ------------------------------------------------------
+!||    i24dst3      ../engine/source/interfaces/int24/i24dst3.F
+!||--- calls      -----------------------------------------------------
+!||    n2edge3      ../engine/source/interfaces/int24/i24dst3.F
+!||    n2edge3l     ../engine/source/interfaces/int24/n2edge3l.F
+!||====================================================================
       SUBROUTINE INTERSECSH(
      1                    ISTEP    ,SUBTRIA0,IXX3  ,IXX4  ,
      1                    INTERSECT,XX1    ,
@@ -5090,7 +5096,7 @@ C------------------------------------------------
 ! | / 1 \ |
 ! |/     \|
 ! 1-------2
-!C-----case secnd shell node/edge shell (12,23,34,41)
+!C-----case second shell node/edge shell (12,23,34,41)
 C--------edge selection: first look at smallest distance DNO,then final intersection
          NEG = 0
          DO J=1,4
@@ -5285,11 +5291,11 @@ C------------out of seg
 C
       RETURN
       END
-      !||====================================================================
-      !||    n2edge3      ../engine/source/interfaces/int24/i24dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    intersecsh   ../engine/source/interfaces/int24/i24dst3.F
-      !||====================================================================
+!||====================================================================
+!||    n2edge3      ../engine/source/interfaces/int24/i24dst3.F
+!||--- called by ------------------------------------------------------
+!||    intersecsh   ../engine/source/interfaces/int24/i24dst3.F
+!||====================================================================
         SUBROUTINE N2EDGE3(
      1                           XXI    ,YYI      ,ZZI    ,
      2                           XXJ    ,YYJ      ,ZZJ    ,

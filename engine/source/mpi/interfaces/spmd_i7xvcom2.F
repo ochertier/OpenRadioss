@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,25 +22,29 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 #define TO1D(i,j,k,s1,s2) i+(j-1)*s1+(k-1)*s1*s2
-      !||====================================================================
-      !||    spmd_i7xvcom2    ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_tripi        ../engine/source/implicit/imp_int_k.F
-      !||    resol            ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../engine/source/output/message/message.F
-      !||    arret            ../engine/source/system/arret.F
-      !||    getdpdaanc       ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    putdpdaanc       ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    putdpzero        ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod     ../common_source/modules/groupdef_mod.F
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||    tri25ebox        ../engine/share/modules/tri25ebox.F
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i7xvcom2         ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
+!||--- called by ------------------------------------------------------
+!||    imp_tripi             ../engine/source/implicit/imp_int_k.F
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||    getdpdaanc            ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    putdpdaanc            ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    putdpzero             ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod          ../common_source/modules/groupdef_mod.F
+!||    intbufdef_mod         ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    interfaces_mod        ../common_source/modules/interfaces/interfaces_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod         ../common_source/modules/ale/multi_fvm_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri25ebox             ../engine/share/modules/tri25ebox.F
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_I7XVCOM2(
      1   IPARI   ,X       ,V       ,MS      ,
      2   IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
@@ -49,7 +53,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5   IGRBRIC ,TEMP   ,IFLAG   ,IRLEN7T ,ISLEN7T ,
      6   IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
      7   ISLEN20E,IKINE  ,DIAG_SMS,SENSOR_TAB,INTBUF_TAB,INT24E2EUSE,
-     8   FORNEQS ,MULTI_FVM,INTERFACES)
+     8   FORNEQS ,MULTI_FVM,INTERFACES,ISH_OFFSET)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -61,9 +65,11 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE SENSOR_MOD
       USE INTERFACES_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -87,7 +93,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ,INTENT(IN) :: NSENSOR
+      INTEGER ,INTENT(IN) :: NSENSOR,ISH_OFFSET
       INTEGER IMSCH, I2MSCH, IFLAG, NBINTC,
      .        ISLEN7, IRLEN7, ISLEN11, IRLEN11, ISLEN17, IRLEN17,
      .        IRLEN7T, ISLEN7T,IRLEN20,ISLEN20,IRLEN20T,ISLEN20T,
@@ -107,12 +113,12 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, L, ADD, NB, LEN, SIZ, LOC_PROC, I, NOD, NSN,
+      INTEGER P, L, ADD, NB, LEN, SIZ, LOC_PROC, I, NOD,
      .        NIN, IDEB, N, MSGTYP, IERROR, DT_CST, II,
      .        N1, N2, LENI, LEN11, NTY, IALLOCS, IALLOCR, INACTI,
-     .        LEN17, IGN, IGE, NMES, NME, NAD, NN, IES, LEN7T,
+     . LEN17, IGN, IGE, NMES, NME, NN, IES, LEN7T,
      .        LEN20, LEN20T, NLN, LEN20E, INC,LEN11T,
-     .        IL, IL1, IL2, MSGOFF,INTNITSCHE,LENNIT,NISUB,
+     . IL, IL1, IL2, MSGOFF,INTNITSCHE,NISUB,
      .        STATUS(MPI_STATUS_SIZE),
 C parasiz car variable en save
      .        DEBUT(NINTER),  DEBUTE(NINTER),
@@ -121,15 +127,13 @@ C parasiz car variable en save
      .        ISENS,INTERACT,POINT,LSAV
        INTEGER :: LOC_NOD
 C Type 25 E2E:
-       INTEGER IAM,JAM,M1,M2,NRTM
 C
       my_real
      .        VDT, X1, X2, X3, X4,X9, X10, X11, X12, XC, AN, AX,
-     .        D4, BN, BX, CN, CX, D8, DN, DX, STARTT, STOPT, TS
+     . D4, BN, BX, CN, CX, D8, DN, DX, STARTT, STOPT, TS
       my_real       ,DIMENSION(:), ALLOCATABLE :: BBUFS, BBUFR
 C type 25
-      INTEGER IEDGE,LEN25E
-      INTEGER I1,I2,IE,JE
+      INTEGER IEDGE,LEN25E,INCLUD_X
       DOUBLE PRECISION
      *   ZERODP
       DATA MSGOFF/161/
@@ -150,7 +154,10 @@ C
       ENDIF
       IF ((IRAD2R==1).AND.(NCYCLE<2)) DT_CST = 1
       IF(I2MSCH==1) DT_CST = 1
-      LEN = 3 + 3*MAX(IRESP,IMPL_S,MIN(NBI18,1),INT24E2EUSE) + DT_CST
+! S/R directly X
+      INCLUD_X = 0
+      IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1.OR.ISH_OFFSET>0) INCLUD_X=1
+      LEN = 3 + 3*INCLUD_X + DT_CST
 C type 7 + heat
       LEN7T  = LEN + 1
 C  NITSCHE
@@ -167,7 +174,7 @@ C  type 20
 C  type 20 + heat
       LEN20T = LEN20 + 1
 C type 20 edge
-      LEN20E = 2 * (3 + 3 + DT_CST + 18*(1+IRESP) + 6 + 3 +1) + 3  ! base sur 2 fois taille int11 + specifique type 20
+      LEN20E = 2 * (3 + 3 + DT_CST + 18*(1+IRESP) + 6 + 3 +1) + 3  ! Base on 2 times int11 + specific size 20
       IF(IDTMINS > 0 .OR. IDTMINS_INT /= 0 ) LEN20E = LEN20E + 2
 
 C type 25
@@ -179,8 +186,10 @@ C
          NIN = INTLIST(II)
          NTY = IPARI(7,NIN)
          NISUB = IPARI(36,NIN)
-         IF((NTY == 25.OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN
-              IFSUB_CAREA = .TRUE.
+         IF(NTY == 25.AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN ! if Carea output for TH and subinterfaces
+            IFSUB_CAREA = .TRUE.
+        ELSEIF(NTY==24.AND.INTERFACES%PARAMETERS%INTCAREA > 0) THEN ! if Carea output for TH and subinterfaces
+            IFSUB_CAREA = .TRUE.
          ENDIF
       ENDDO
 C
@@ -282,19 +291,19 @@ c              IF(NTY == 24 .AND. INTNITSCHE > 0 ) LENI = LENI + 3
               IF(NB>0) THEN
                 L = L + NB*LENI
               ENDIF
-              IF((NTY == 25.OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN
+              IF(((NTY == 25.AND.NISUB > 0).OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0) THEN
                   IFSUB_CAREA = .TRUE.
                   IF(NB>0) THEN
                      L = L + NB
                   ENDIF
               ENDIF
 
-C ajout partie edge pour type 20
+C Add part of Edge for Type 20
               IF(NTY==20)THEN
                 NB = NSNFIE(NIN)%P(P)
                 IF(NB>0) L = L + NB*LEN20E
               END IF
-C ajout partie edge pour type 25
+C Add part of Edge for Type 25
               IF(NTY==25 .AND. IEDGE /= 0)THEN
                 NB = NSNFIE(NIN)%P(P)
                 IF(NB>0) L = L + NB*LEN25E
@@ -304,7 +313,7 @@ C ajout partie edge pour type 25
             SIZ = L+1-ADD 
             IF(SIZ>0)THEN
               MSGTYP = MSGOFF
-C BUFS : envoi partie force et reception partie vitesse
+C BUFS: Shipping Part Force and Reception Speed Party
               CALL MPI_IRECV(
      .          BBUFR(ADD),SIZ,REAL     ,IT_SPMD(P),MSGTYP,
      .          SPMD_COMM_WORLD,REQ_RI(P),IERROR    )
@@ -355,7 +364,9 @@ C
                 INACTI = IPARI(22,NIN)           
                 INTNITSCHE = IPARI(86,NIN)
                 IFSUB_CAREA = .FALSE.
-                IF((NTY == 25.OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN ! if Carea output for TH and subinterfaces
+                IF(NTY == 25.AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN ! if Carea output for TH and subinterfaces
+                    IFSUB_CAREA = .TRUE.
+                ELSEIF(NTY==24.AND.INTERFACES%PARAMETERS%INTCAREA > 0) THEN ! if Carea output for TH and subinterfaces
                     IFSUB_CAREA = .TRUE.
                 ENDIF
 
@@ -368,7 +379,7 @@ C
                  ! ---------------------------------
                  IF(DT_CST/=0)THEN
                   ! ---------------------------------
-                  IF(IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF(INCLUD_X==1) THEN
                     DO I = 1, NB
                       N = NSVSI(NIN)%P(IDEB+I)
                       NOD = INTBUF_TAB(NIN)%NSV(N)
@@ -425,7 +436,7 @@ C T24 E2E fictive nodes have ID higher than Numnod. Position & Mass are stored i
                  ! ---------------------------------
                  ELSE   ! dt_cst/=0
                   ! ---------------------------------
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       N=NSVSI(NIN)%P(IDEB+I)
                       NOD = INTBUF_TAB(NIN)%NSV(N)
@@ -485,6 +496,21 @@ C T24 E2E fictive nodes have ID higher than Numnod. Position & Mass are stored i
                   ENDIF
                   ! ---------------------------------
                  ENDIF
+
+                 IF(IFSUB_CAREA) THEN
+                    DO I = 1, NB
+                      N=NSVSI(NIN)%P(IDEB+I)
+                      NOD = INTBUF_TAB(NIN)%NSV(N)
+                      IF(NOD <= NUMNOD)THEN
+                         BBUFS(L+1) = INTERFACES%PARAMETERS%INTAREAN(NOD) 
+                         L = L +1 
+                      ELSE
+                         BBUFS(L+1) = ZERO
+                         L = L +1
+                      ENDIF                      
+                    ENDDO
+
+                  ENDIF
 C
                 ELSEIF((NTY== 7.AND.INTTH>0).OR.
      .                 (NTY==25.AND.INTTH>0).OR.
@@ -494,7 +520,7 @@ C
                  ! ---------------------------------
                  IF(DT_CST/=0)THEN
                   ! ---------------------------------
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       N = NSVSI(NIN)%P(IDEB+I)
                       NOD = INTBUF_TAB(NIN)%NSV(N)
@@ -551,7 +577,7 @@ C
                   ! ---------------------------------
                  ! ---------------------------------
                  ELSE ! dt_cst /=0
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                   ! ---------------------------------
                     DO I = 1, NB
                       N=NSVSI(NIN)%P(IDEB+I)
@@ -595,10 +621,25 @@ C
                   ! ---------------------------------
                  ENDIF ! dst_cst /=0
                  ! ---------------------------------
+
+                 IF(IFSUB_CAREA) THEN
+                    DO I = 1, NB
+                      N=NSVSI(NIN)%P(IDEB+I)
+                      NOD = INTBUF_TAB(NIN)%NSV(N)
+                      IF(NOD <= NUMNOD)THEN
+                         BBUFS(L+1) = INTERFACES%PARAMETERS%INTAREAN(NOD) 
+                         L = L +1 
+                      ELSE
+                         BBUFS(L+1) = ZERO                                      
+                         L = L +1
+                      ENDIF                      
+                    ENDDO
+
+                  ENDIF
 C--------Nitsche
                 ELSEIF(NTY==24 .AND. INTTH ==0.AND.INTNITSCHE > 0) THEN
                  IF(DT_CST/=0)THEN
-                  IF(IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF(INCLUD_X==1) THEN
                     DO I = 1, NB
                       N = NSVSI(NIN)%P(IDEB+I)
                       NOD = INTBUF_TAB(NIN)%NSV(N)
@@ -643,7 +684,7 @@ C T24 E2E fictive nodes have ID higher than Numnod. Position & Mass are stored i
                     POINT = 7
                   ENDIF
                  ELSE
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       N=NSVSI(NIN)%P(IDEB+I)
                       NOD = INTBUF_TAB(NIN)%NSV(N)
@@ -689,13 +730,28 @@ C T24 E2E fictive nodes have ID higher than Numnod. Position & Mass are stored i
                       POINT = 6
                   ENDIF
                  ENDIF
+
+                 IF(IFSUB_CAREA) THEN
+                    DO I = 1, NB
+                      N=NSVSI(NIN)%P(IDEB+I)
+                      NOD = INTBUF_TAB(NIN)%NSV(N)
+                      IF(NOD <= NUMNOD)THEN
+                         BBUFS(L+1) = INTERFACES%PARAMETERS%INTAREAN(NOD) 
+                         L = L +1 
+                      ELSE
+                         BBUFS(L+1) = ZERO                                      
+                         L = L +1
+                      ENDIF                      
+                    ENDDO
+
+                  ENDIF
 C
 
 C----Nitsche
 C
                 ELSEIF(NTY==24.AND.INTTH>0.AND.INTNITSCHE > 0) THEN
                  IF(DT_CST/=0)THEN
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       N = NSVSI(NIN)%P(IDEB+I)
                       NOD = INTBUF_TAB(NIN)%NSV(N)
@@ -740,7 +796,7 @@ C
                     POINT = 8
                   ENDIF
                  ELSE
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       N=NSVSI(NIN)%P(IDEB+I)
                       NOD = INTBUF_TAB(NIN)%NSV(N)
@@ -787,9 +843,12 @@ C
                     DO I = 1, NB
                       N=NSVSI(NIN)%P(IDEB+I)
                       NOD = INTBUF_TAB(NIN)%NSV(N)
-                      IF(NOD > NUMNOD)THEN
-                         BBUFS(L+1) = INTERFACES%PARAMETERS%INTAREAN(NOD)     
+                      IF(NOD <= NUMNOD)THEN
+                         BBUFS(L+1) = INTERFACES%PARAMETERS%INTAREAN(NOD) 
                          L = L +1 
+                      ELSE
+                         BBUFS(L+1) = ZERO                                      
+                         L = L +1
                       ENDIF                      
                     ENDDO
 
@@ -1124,7 +1183,7 @@ C Alphak(2)
                         BBUFS(L+17) = INTBUF_TAB(NIN)%ALPHAK((IL-1)*3+2)
 C
 C DA
-C adresse dans INBUF entier => buffer double precision de taille 18*2
+C Address in integer inbuf => double precision buffer 18*2
                         CALL PUTDPDAANC(
      .                    INTBUF_TAB(NIN)%DAANC6(1+(IL-1)*3*6*2),BBUFS(L+18),IRESP,
      .                         INC)
@@ -1179,7 +1238,7 @@ C Alphak(2)
                         BBUFS(L+17) = INTBUF_TAB(NIN)%ALPHAK((IL-1)*3+2)
 C
 C DA
-C adresse dans INBUF entier => buffer double precision de taille 18*2
+C Address in integer inbuf => double precision buffer 18*2
                         CALL PUTDPDAANC(
      .                    INTBUF_TAB(NIN)%DAANC6(1+(IL-1)*3*6*2),BBUFS(L+18),IRESP,
      .                         INC)
@@ -1237,7 +1296,7 @@ C Alphak(2)
                         BBUFS(L+16) = INTBUF_TAB(NIN)%ALPHAK((IL-1)*3+2)
 
 C DA
-C adresse dans INBUF entier => buffer double precision de taille 18*2
+C Address in integer inbuf => double precision buffer 18*2
                         CALL PUTDPDAANC(
      .                    INTBUF_TAB(NIN)%DAANC6(1+(IL-1)*3*6*2),BBUFS(L+17),IRESP,
      .                         INC)
@@ -1289,7 +1348,7 @@ C DAANC
 C Alphak(2)
                         BBUFS(L+16) = INTBUF_TAB(NIN)%ALPHAK((IL-1)*3+2)
 
-C adresse dans INBUF entier => buffer double precision de taille 18*2
+C Address in integer inbuf => double precision buffer 18*2
                         CALL PUTDPDAANC(
      .                    INTBUF_TAB(NIN)%DAANC6(1+(IL-1)*3*6*2),BBUFS(L+17),IRESP,
      .                         INC)
@@ -1351,7 +1410,7 @@ C DAANC
 C Alphak(2)
                         BBUFS(L+18) = INTBUF_TAB(NIN)%ALPHAK((IL-1)*3+2)
 C DA
-C adresse dans INBUF entier => buffer double precision de taille 18*2
+C Address in integer inbuf => double precision buffer 18*2
                         CALL PUTDPDAANC(
      .                    INTBUF_TAB(NIN)%DAANC6(1+(IL-1)*3*6*2),BBUFS(L+19),IRESP,
      .                    INC)
@@ -1405,7 +1464,7 @@ C DAANC
 C Alphak(2)
                         BBUFS(L+18) = INTBUF_TAB(NIN)%ALPHAK((IL-1)*3+2)
 C DA
-C adresse dans INBUF entier => buffer double precision de taille 18*2
+C Address in integer inbuf => double precision buffer 18*2
                         CALL PUTDPDAANC(
      .                    INTBUF_TAB(NIN)%DAANC6(1+(IL-1)*3*6*2),BBUFS(L+19),IRESP,
      .                         INC)
@@ -1462,7 +1521,7 @@ C DAANC
 C Alphak(2)
                         BBUFS(L+17) = INTBUF_TAB(NIN)%ALPHAK((IL-1)*3+2)
 C DA
-C adresse dans INBUF entier => buffer double precision de taille 18*2
+C Address in integer inbuf => double precision buffer 18*2
                         CALL PUTDPDAANC(
      .                    INTBUF_TAB(NIN)%DAANC6(1+(IL-1)*3*6*2),BBUFS(L+18),IRESP,
      .                         INC)
@@ -1515,7 +1574,7 @@ C DAANC
 C Alphak(2)
                         BBUFS(L+17)  = INTBUF_TAB(NIN)%ALPHAK((IL-1)*3+2)
 C DA
-C adresse dans INBUF entier => buffer double precision de taille 18*2
+C Address in integer inbuf => double precision buffer 18*2
                         CALL PUTDPDAANC(
      .                    INTBUF_TAB(NIN)%DAANC6(1+(IL-1)*3*6*2),BBUFS(L+18),IRESP,
      .                         INC)
@@ -1547,7 +1606,7 @@ C
                 NB = NSNSIE(NIN)%P(P)
                 IDEB = DEBUTE(NIN)
                 IF(NB>0) THEN
-C besoin si partie non edge pas traite
+C Needed if edge part not processed 
                   NTY   =IPARI(7,NIN)
                   NLN = IPARI(35,NIN)
                   IF(DT_CST/=0)THEN
@@ -1991,12 +2050,12 @@ c                       ASSERT(.FALSE.)
 c                     ENDIF
 
 CC C verifier la portabilite:
-CC C LONG = TRANSFER(court) => les deriners bits de LONG pas specifies dans
-CC C la norme
-CC                       BBUFS(L+16) = 0
-CC                       BBUFS(L+17) = 0
-CC                       BBUFS(L+18) = 0
-CC                       BBUFS(L+19) = 0
+CLONG = TRANSFER(short) => the last bits of LONG not specified in
+Cthe standard
+Cc'bbufs (l+16) = 0
+Cc'bbufs (l+17) = 0
+Cc'bbufs (l+18) = 0
+Cc'bbufs (l+19) = 0
 CC                       BBUFS(L+16) = TRANSFER(INTBUF_TAB(NIN)%LEDGE((N-1)*NLEDGE+1),ONE)
 CC                       BBUFS(L+17) = TRANSFER(INTBUF_TAB(NIN)%LEDGE((N-1)*NLEDGE+2),ONE)
 CC                       BBUFS(L+18) = TRANSFER(INTBUF_TAB(NIN)%LEDGE((N-1)*NLEDGE+3),ONE)
@@ -2032,7 +2091,7 @@ C                     BBUFS(L+27) = 1 ! main of the edge
             SIZ = L+1-ADD
             IF(SIZ>0)THEN
               MSGTYP = MSGOFF
-C BUFR : reception partie force et envoi partie vitesse
+C Bufr: Reception Part Force and Shipping Party Speed
               CALL MPI_ISEND(
      .          BBUFS(ADD),SIZ,REAL     ,IT_SPMD(P),MSGTYP,
      .          SPMD_COMM_WORLD,REQ_SI(P),IERROR    )
@@ -2041,7 +2100,7 @@ C BUFR : reception partie force et envoi partie vitesse
         ENDDO
         ADDS(NSPMD+1)=ADDS(NSPMD)+SIZ
 C
-C Attente reception buffer et decompactage
+C Buffer reception and decompacting
 C
       ELSEIF(IFLAG==2.OR.IFLAG==3)THEN
        IF(ISTOCOM==1)THEN
@@ -2069,7 +2128,9 @@ C            DO NIN = 1, NINTER
                 INTTH = IPARI(47,NIN)
                 INTNITSCHE = IPARI(86,NIN)
                 IFSUB_CAREA = .FALSE.
-                IF((NTY == 25.OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN ! if Carea output for TH and subinterfaces
+                IF(NTY == 25.AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN ! if Carea output for TH and subinterfaces
+                    IFSUB_CAREA = .TRUE.
+                ELSEIF(NTY==24.AND.INTERFACES%PARAMETERS%INTCAREA > 0) THEN ! if Carea output for TH and subinterfaces
                     IFSUB_CAREA = .TRUE.
                 ENDIF
                 IF((NTY==7.AND.INTTH == 0).OR.NTY==10.OR.
@@ -2078,7 +2139,7 @@ C            DO NIN = 1, NINTER
      .             (NTY==24.AND.INTTH == 0.AND.INTNITSCHE == 0).OR.
      .             (NTY==25.AND.INTTH == 0)  )THEN
                  IF(DT_CST/=0)THEN
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       XFI(NIN)%P(1,I+IDEB) = BBUFR(L+1)
                       XFI(NIN)%P(2,I+IDEB) = BBUFR(L+2)
@@ -2107,7 +2168,7 @@ C            DO NIN = 1, NINTER
                     POINT=4
                   ENDIF
                  ELSE
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       XFI(NIN)%P(1,I+IDEB) = BBUFR(L+1)
                       XFI(NIN)%P(2,I+IDEB) = BBUFR(L+2)
@@ -2134,6 +2195,13 @@ C            DO NIN = 1, NINTER
                     POINT=3
                   ENDIF
                  ENDIF
+
+                  IF(IFSUB_CAREA) THEN
+                      DO I = 1, NB
+                        INTAREANFI(NIN)%P(I+IDEB) = BBUFR(L+1)
+                        L = L + 1
+                      ENDDO
+                  ENDIF
 C
                 ELSEIF((NTY ==7  .AND. INTTH > 0 ).OR.
      .                 (NTY ==25 .AND. INTTH > 0 ).OR.
@@ -2202,12 +2270,17 @@ C
                     ENDIF
                    ENDIF
 
-
+                  IF(IFSUB_CAREA) THEN
+                      DO I = 1, NB
+                        INTAREANFI(NIN)%P(I+IDEB) = BBUFR(L+1)
+                        L = L + 1
+                      ENDDO
+                  ENDIF
 
 C--- Nitsche
                 ELSEIF(NTY==24.AND.INTTH == 0.AND.INTNITSCHE > 0)THEN
                  IF(DT_CST/=0)THEN
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       XFI(NIN)%P(1,I+IDEB) = BBUFR(L+1)
                       XFI(NIN)%P(2,I+IDEB) = BBUFR(L+2)
@@ -2242,7 +2315,7 @@ C--- Nitsche
                     POINT=6
                   ENDIF
                  ELSE
-                  IF (IRESP==1.OR.IMPL_S==1.OR.NBI18>0.OR.INT24E2EUSE==1) THEN
+                  IF (INCLUD_X==1) THEN
                     DO I = 1, NB
                       XFI(NIN)%P(1,I+IDEB) = BBUFR(L+1)
                       XFI(NIN)%P(2,I+IDEB) = BBUFR(L+2)
@@ -2275,6 +2348,13 @@ C--- Nitsche
                     POINT=6
                   ENDIF
                  ENDIF
+
+                  IF(IFSUB_CAREA) THEN
+                      DO I = 1, NB
+                        INTAREANFI(NIN)%P(I+IDEB) = BBUFR(L+1)
+                        L = L + 1
+                      ENDDO
+                  ENDIF
 C
                 ELSEIF(NTY==24.AND.INTTH > 0.AND.INTNITSCHE > 0) THEN
                    IF(DT_CST/=0)THEN
@@ -3410,7 +3490,7 @@ C cas interface inactive
 C
 C Attente ISEND
 C
-C flag 3 utile pour restart en cours de run
+C flag 3 useful for restart during run
        IF(IFLAG/=3) THEN
          DO P = 1, NSPMD
            IF(ADDS(P+1)-ADDS(P)>0) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_rivet    ../starter/source/elements/reader/hm_read_rivet.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../starter/source/output/message/message.F
-      !||    anodset          ../starter/source/output/analyse/analyse_node.c
-      !||    ifrontplus       ../starter/source/spmd/node/frontplus.F
-      !||    nlocal           ../starter/source/spmd/node/ddtools.F
-      !||    rivet0           ../starter/source/elements/reader/rivet0.F
-      !||    usr2sys          ../starter/source/system/sysfus.F
-      !||    vdouble          ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
-      !||    submodel_mod     ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_rivet    ../starter/source/elements/reader/hm_read_rivet.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../starter/source/output/message/message.F
+!||    anodset          ../starter/source/output/analyse/analyse_node.c
+!||    ifrontplus       ../starter/source/spmd/node/frontplus.F
+!||    nlocal           ../starter/source/spmd/node/ddtools.F
+!||    rivet0           ../starter/source/elements/reader/rivet0.F
+!||    usr2sys          ../starter/source/system/sysfus.F
+!||    vdouble          ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+!||    submodel_mod     ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_RIVET(IXRI  ,V    ,VR   ,MS    ,IN    ,
      .                         RIVET ,GEO  ,ITAB ,ITABM1,IKINE ,
      .                         IPART ,IGEO ,LSUBMODEL)
@@ -113,9 +113,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I1, I2, PID,MT,IPID,J,N,STAT,P,IF1,IF2
-      INTEGER CPT,INDEX_PART
-      CHARACTER MESS*40, MESS2*40
+      INTEGER I, I1, I2, PID,MT,IPID,J,STAT,P,IF1,IF2
+      INTEGER INDEX_PART
+      CHARACTER MESS*40
       my_real BID
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_RIVET,IPART_RIVET
 C-----------------------------------------------
@@ -186,7 +186,7 @@ C--------------------------------------------------
         ENDDO
       ENDDO
 C-------------------------------------
-C Recherche des ID doubles
+C Search for double IDs
 C-------------------------------------
       CALL VDOUBLE(IXRI(4,1),4,NRIVET,MESS,0,BID)
 C-------------------------------------

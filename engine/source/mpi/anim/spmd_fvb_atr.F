@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_fvb_atr   ../engine/source/mpi/anim/spmd_fvb_atr.F
-      !||--- called by ------------------------------------------------------
-      !||    genani         ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_i_c      ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod      ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_fvb_atr          ../engine/source/mpi/anim/spmd_fvb_atr.F
+!||--- called by ------------------------------------------------------
+!||    genani                ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    write_i_c             ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod             ../engine/share/modules/fvbag_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_FVB_ATR(NBID1, NBID2, NBID3, FVEL2FA, FVINUM,
      .                        FVOFF)
 C-----------------------------------------------
@@ -38,6 +39,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -87,7 +89,7 @@ C
                         INOD(3)=FVOFF(1,I)+FVDATA(I)%IFVTRI_ANIM(3,NN)-1
                         INOD(4)=INOD(3)
                         II=II+1
-C Nombre de noeuds distincts de la coque (apres fusion dans FVMESH)
+C Number of distinct nodes of the shell (after merging in FVMESH)
                         NND=1
                         IF (INOD(2)/=INOD(1)) NND=NND+1
                         IF (INOD(3)/=INOD(1).AND.
@@ -126,7 +128,7 @@ C
                   INOD(3)=FVOFF(1,I)+IBUF(JJ+3)
                   INOD(4)=FVOFF(1,I)+IBUF(JJ+4)
 C
-C Nombre de noeuds distincts de la coque (apres fusion dans FVMESH)
+C Number of distinct nodes of the shell (after merging in FVMESH)
                   NND=1
                   IF (INOD(2)/=INOD(1)) NND=NND+1
                   IF (INOD(3)/=INOD(1).AND.

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    gradient_reconstruction2         ../engine/source/ale/alemuscl/gradient_reconstruction2.F
-      !||--- called by ------------------------------------------------------
-      !||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod             ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    alemuscl_mod                     ../common_source/modules/ale/alemuscl_mod.F
-      !||    segvar_mod                       ../engine/share/modules/segvar_mod.F
-      !||====================================================================
-      SUBROUTINE GRADIENT_RECONSTRUCTION2(ITASK, IXQ, X, ALE_CONNECT, NV46, ITRIMAT, SEGVAR)
+!||====================================================================
+!||    gradient_reconstruction2         ../engine/source/ale/alemuscl/gradient_reconstruction2.F
+!||--- called by ------------------------------------------------------
+!||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod             ../common_source/modules/ale/ale_connectivity_mod.F
+!||    alemuscl_mod                     ../common_source/modules/ale/alemuscl_mod.F
+!||    element_mod                      ../common_source/modules/elements/element_mod.F90
+!||    segvar_mod                       ../engine/share/modules/segvar_mod.F
+!||====================================================================
+      SUBROUTINE GRADIENT_RECONSTRUCTION2(IXQ, X, ALE_CONNECT, NV46, ITRIMAT, SEGVAR)
 C-----------------------------------------------
 C  D e s c r i p t i o n
 C  This subroutine computes a gradient of the scalar field value in each 
@@ -42,6 +43,7 @@ C-----------------------------------------------
       USE ALEMUSCL_MOD
       USE SEGVAR_MOD
       USE ALE_CONNECTIVITY_MOD
+      use element_mod , only :nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,7 +56,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: ITASK
       INTEGER, INTENT(IN) :: NV46
       INTEGER, INTENT(IN) :: IXQ(NIXQ, NUMELQ)
       my_real, INTENT(IN) :: X(3, NUMNOD)

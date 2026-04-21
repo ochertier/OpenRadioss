@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sdlensh3n2   ../engine/source/elements/thickshell/solide6c/sdlensh3n2.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cforc3     ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||====================================================================
+!||====================================================================
+!||    sdlensh3n2   ../engine/source/elements/thickshell/solide6c/sdlensh3n2.F
+!||--- called by ------------------------------------------------------
+!||    s6cforc3     ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||====================================================================
       SUBROUTINE SDLENSH3N2(
      1   VOLN,    LLSH3N,  AREA, X1,      X2,
      2   X3,      X4,      X5,      X6,
@@ -52,7 +52,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N
+      INTEGER I
       my_real
      .        E1X(MVSIZ), E1Y(MVSIZ), E1Z(MVSIZ),
      .        E2X(MVSIZ), E2Y(MVSIZ), E2Z(MVSIZ),

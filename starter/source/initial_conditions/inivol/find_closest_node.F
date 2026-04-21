@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    find_closest_node   ../starter/source/initial_conditions/inivol/find_closest_node.F
-      !||--- called by ------------------------------------------------------
-      !||    phase_detection     ../starter/source/initial_conditions/inivol/phase_detection.F
-      !||====================================================================
+!||====================================================================
+!||    find_closest_node   ../starter/source/initial_conditions/inivol/find_closest_node.F
+!||--- called by ------------------------------------------------------
+!||    phase_detection     ../starter/source/initial_conditions/inivol/phase_detection.F
+!||====================================================================
         SUBROUTINE FIND_CLOSEST_NODE(LEADING_DIRECTION,N1,N2,N3,
      .                                             X1,X2,EPS, 
      .                                             KEY1,KEY2,ID_X2,ID_LIST)

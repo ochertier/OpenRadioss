@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbastra3pinch   ../engine/source/elements/shell/coqueba/cbastra3pinch.F
-      !||--- called by ------------------------------------------------------
-      !||    cbaforc3        ../engine/source/elements/shell/coqueba/cbaforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    pinchtype_mod   ../common_source/modules/pinchtype_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cbastra3pinch   ../engine/source/elements/shell/coqueba/cbastra3pinch.F
+!||--- called by ------------------------------------------------------
+!||    cbaforc3        ../engine/source/elements/shell/coqueba/cbaforc3.F
+!||--- uses       -----------------------------------------------------
+!||    pinchtype_mod   ../common_source/modules/pinchtype_mod.F
+!||====================================================================
       SUBROUTINE CBASTRA3PINCH(
      1                         JFT   ,JLT   ,NPLAT    ,IPLAT    ,
      2                         VDEFPINCH    ,EPINCHXZ ,
@@ -58,7 +58,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,EP
+      INTEGER I,EP
 C-----------------------------------------------
 #include "vectorize.inc"
       DO I=JFT,JLT 
@@ -67,7 +67,7 @@ C-----------------------------------------------
         EPINCHYZ(EP) = VDEFPINCH(EP,2) * DT1C(EP)
         EZZ(EP)      = VDEFPINCH(EP,3) * DT1C(EP)
         EZZPG(EP,NG) = EZZ(EP)
-C       for outputs in TH, strains are accumulated strains
+C       For outputs in TH, strains are accumulated strains
         EPGPINCHXZ(EP) = EPGPINCHXZ(EP) + EPINCHXZ(EP)
         EPGPINCHYZ(EP) = EPGPINCHYZ(EP) + EPINCHYZ(EP)
         EPGPINCHZZ(EP) = EPGPINCHZZ(EP) + EZZPG(EP,NG)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r26sig                ../engine/source/elements/spring/r26sig.F
-      !||--- called by ------------------------------------------------------
-      !||    r26def3               ../engine/source/elements/spring/r26def3.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    r26sig                ../engine/source/elements/spring/r26sig.F
+!||--- called by ------------------------------------------------------
+!||    r26def3               ../engine/source/elements/spring/r26def3.F
+!||--- calls      -----------------------------------------------------
+!||    finter                ../engine/source/tools/curve/finter.F
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||====================================================================
       SUBROUTINE R26SIG(PYTHON, 
      1   FX,      XK,      DX,      DXOLD,
      2   E,       OFF,     XL0,     TF,
@@ -83,7 +83,7 @@ C-----------------------------------------------
       my_real
      .    finter
 C=======================================================================
-      NFUNCT = PYTHON%funct_offset + PYTHON%nb_functs ! total number of functions = non-python + python
+      NFUNCT = PYTHON%funct_offset + PYTHON%nb_functs - PYTHON%nb_sensors! total number of functions = non-python + python
       DT11 = DT1
       IF (DT11 == ZERO) DT11 = EP30
       DO I=1,NEL
@@ -104,7 +104,7 @@ C
           DV0(I) = DV(I)
         ENDDO
       ENDIF
-c     filtrage des vitesses
+c     velocity filtering
       DO I=1,NEL
         DV(I)  = (ONE-ALPHA(I))*DV0(I) + ALPHA(I)*DV(I)
         DV0(I) =  DV(I)
@@ -128,7 +128,7 @@ C-------------------------------------
             FX(I) = FOLD(I) + XK(I)*DDX(I)
           ENDIF
           IAD = 100
-C calcul du y_max
+C calculation of y_max
           NFUNC(I) = IGEO(20,PID(I))  
           XFAC(I) = GEO(5,PID(I))
           J1 = 1                                                   
@@ -173,7 +173,7 @@ C
               FMAX(I) = -FMAX(I)*YFAC1(I)  
              ENDIF
           ENDIF                                                    
-C calcul du y_min  
+C calculation of y_min
           J1 = NFUNC(I) + 1                                        
           NFUND(I) = IGEO(21,PID(I))                               
           DO J=2,NFUND(I)-1                                        

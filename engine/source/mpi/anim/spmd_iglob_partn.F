@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,22 +22,25 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 
-      !||====================================================================
-      !||    spmd_iglob_partn   ../engine/source/mpi/anim/spmd_iglob_partn.F
-      !||--- called by ------------------------------------------------------
-      !||    parsor0            ../engine/source/output/anim/generate/parsor0.F
-      !||    parsor_crk         ../engine/source/output/anim/generate/parsor_crk.F
-      !||    parsor_ply         ../engine/source/output/anim/generate/parsor_ply.F
-      !||    parsorc            ../engine/source/output/anim/generate/parsorc.F
-      !||    parsorf            ../engine/source/output/anim/generate/parsorf.F
-      !||    parsors            ../engine/source/output/anim/generate/parsors.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_iglob_partn      ../engine/source/mpi/anim/spmd_iglob_partn.F
+!||--- called by ------------------------------------------------------
+!||    parsor0               ../engine/source/output/anim/generate/parsor0.F
+!||    parsor_crk            ../engine/source/output/anim/generate/parsor_crk.F
+!||    parsor_ply            ../engine/source/output/anim/generate/parsor_ply.F
+!||    parsorc               ../engine/source/output/anim/generate/parsorc.F
+!||    parsorf               ../engine/source/output/anim/generate/parsorf.F
+!||    parsors               ../engine/source/output/anim/generate/parsors.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_IGLOB_PARTN(IAD,NBPART,IADG,SBUF)
-C iglob_part reconstruit sur p0 un tableau global de part 
+C iglob_part reconstructs on p0 a global array of part
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -57,7 +60,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGOFF,MSGTYP,INFO,K,N,NB_TMP
+      INTEGER MSGOFF,MSGTYP,K,N,NB_TMP
       INTEGER, DIMENSION(:),ALLOCATABLE :: RECBUF
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR
 

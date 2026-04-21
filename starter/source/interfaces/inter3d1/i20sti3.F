@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i20sti3                ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    bitget                 ../starter/source/interfaces/inter3d1/bitget.F
-      !||    bitset                 ../starter/source/interfaces/inter3d1/bitget.F
-      !||    bitunset               ../starter/source/interfaces/inter3d1/bitget.F
-      !||    i20nelts               ../starter/source/interfaces/inter3d1/inelt.F
-      !||    i4gmx3                 ../starter/source/interfaces/inter3d1/i4gmx3.F
-      !||    incoq3                 ../starter/source/interfaces/inter3d1/incoq3.F
-      !||    ineltc                 ../starter/source/interfaces/inter3d1/inelt.F
-      !||    insol3                 ../starter/source/interfaces/inter3d1/insol3.F
-      !||    volint                 ../starter/source/interfaces/inter3d1/volint.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i20sti3                ../starter/source/interfaces/inter3d1/i20sti3.F
+!||--- called by ------------------------------------------------------
+!||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    bitget                 ../starter/source/interfaces/inter3d1/bitget.F
+!||    bitset                 ../starter/source/interfaces/inter3d1/bitget.F
+!||    bitunset               ../starter/source/interfaces/inter3d1/bitget.F
+!||    i20nelts               ../starter/source/interfaces/inter3d1/inelt.F
+!||    i4gmx3                 ../starter/source/interfaces/inter3d1/i4gmx3.F
+!||    incoq3                 ../starter/source/interfaces/inter3d1/incoq3.F
+!||    ineltc                 ../starter/source/interfaces/inter3d1/inelt.F
+!||    insol3                 ../starter/source/interfaces/inter3d1/insol3.F
+!||    volint                 ../starter/source/interfaces/inter3d1/volint.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I20STI3(
      1 PM        ,GEO       ,X         ,MS        ,
      2 IXS       ,IXC       ,IXTG      ,IXT       ,
@@ -61,6 +61,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs,nixc,nixtg,nixt,nixp
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,7 +77,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NRT, NINT, NTY, NOINT,NSN,IGAP, NDDIM,
+      INTEGER NRT, NINT, NTY, NOINT,NSN,IGAP,
      .        INACTI,IFS2,NLN      
       INTEGER IRECT(4,*), IXS(NIXS,*), IXC(NIXC,*),
      .   NSV(*), IXTG(NIXTG,*), IXT(NIXT,*), IXP(NIXP,*),
@@ -99,22 +100,22 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NDX, I, J, INRT, NELS,NELS2, MT, JJ, JJJ, NELC,
-     .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,IP,NM1,
+      INTEGER NDX, I, J, INRT, NELS, MT, JJ, JJJ, NELC,
+     .   MG, L, NELTG,IE,IP,NM1,
      .  IGTYP,IPGMAT,IGMAT,ISUBSTACK
 C     REAL
       my_real
-     .   DXM, GAPMX, GAPMN, AREA, VOL, DX,GAPS1,GAPS2, GAPM, DDX, 
+     .   DXM, GAPMX, GAPMN, AREA, VOL, DX,GAPS1,GAPS2, GAPM, 
      .   GAPTMP, GAPSCALE,SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
      .   SLSFAC,GAPINFS,GAPINFM,GAPSUPS,GAPSUPM,ST
       INTEGER TAG(NUMNOD)
       INTEGER BITUNSET,BITGET,BITSET
       EXTERNAL BITUNSET,BITGET,BITSET
 C--------------------------------------------------------------
-C     CALCUL DES RIGIDITES DES SEGMENTS 
-C     V16 : DANS LE CAS OU ONE SEGMENT APPARTIENT A LA FOIS
-C           A UNE BRIQUE ET A UNE COQUE ON CHOISIT LA RIGIDITE
-C           DE LA COQUE SAUF SI LE MATERIAU COQUE EST NUL.
+C     CALCULATION OF SEGMENT STIFFNESSES
+C     V16 : IN THE CASE WHERE ONE SEGMENT BELONGS BOTH
+C           TO A BRICK AND A SHELL, THE SHELL STIFFNESS IS CHOSEN
+C           OF THE SHELL UNLESS THE SHELL MATERIAL IS NULL.
 C---------------------------------------------------------------
 
 C---------------------------------------------------------------
@@ -143,7 +144,7 @@ C---------------------------------------------------------------
         GAPSCALE = ONE
       ENDIF  
 C------------------------------------
-C     GAP NOEUDS SECONDS
+C     GAP NODES SECONDS
 C------------------------------------
       IF(IGAP>=1)THEN
        DO I=1,NUMNOD
@@ -202,7 +203,7 @@ C------------------------------------
        ENDDO
       ENDIF
 C
-C calcul du surface second. ---
+C calculation of the second surface. ---
       IF(INTTH > 0 ) THEN
        DO I = 1,NSN    
           AREAS(I) = ZERO
@@ -224,7 +225,7 @@ C calcul du surface second. ---
       ENDIF
 C
 C------------------------------------
-C     STIF NOEUDS SECONDS
+C     STIF NODES SECONDS
 C------------------------------------
       IF(SLSFAC >= ZERO)THEN
        DO I=1,NUMELC
@@ -283,7 +284,7 @@ c       ENDDO
       ENDIF
 
 C------------------------------------
-C     SURFACE DE COQUE OU SOLIDE
+C     SHELL OR SOLID SURFACE
 C------------------------------------
 C------------------------------------
 C     STIF FACES MAIN
@@ -500,7 +501,7 @@ c          NBINFLG(IRECT(4,INRT))=BITUNSET(NBINFLG(IRECT(4,INRT)),7)
         END IF
       END IF
 C----------------------
-C     SURFACE DE SEGMENTS
+C     SEGMENT SURFACE
 C----------------------
 C----------------------
 C     ELEMENTS SOLIDES
@@ -700,25 +701,8 @@ C
       ENDIF
 C
       IF(NELS+NELC+NELTG==0)THEN
-       IF (IMACH/=3) THEN
-         IF(NINT>0) THEN
-            CALL ANCMSG(MSGID=92,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-         IF(NINT<0) THEN
-            CALL ANCMSG(MSGID=93,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-       ELSE
-C      en SPMD il faut un element associe a l'arrete sinon erreur
+
+C      In SPMD you need an element associated with the edge otherwise error
          IF(NINT>0) THEN
             CALL ANCMSG(MSGID=481,
      .                  MSGTYPE=MSGERROR,
@@ -735,7 +719,7 @@ C      en SPMD il faut un element associe a l'arrete sinon erreur
      .                  C1=TITR,
      .                  I2=I)
          ENDIF
-       ENDIF
+
       ENDIF
   500 CONTINUE
 C---------------------------
@@ -780,7 +764,7 @@ c           WRITE(IOUT,1300)GAPMIN
          ELSE
            GAPMIN = GAP
          ENDIF
-C SUP DES GAPS VARIABLES
+C ABOVE VARIABLE GAPS
          GAP = MAX(GAPS1+GAPS2,GAPMIN)
          GAP=MIN(GAP,GAPMAX)
          IF(INACTI/=7.AND.GAP>HALF*GAPMX)THEN
@@ -794,27 +778,27 @@ C SUP DES GAPS VARIABLES
          ENDIF
        ENDIF
 C---------------------------------------------
-C     MISE A ONE DU MULTIPLICATEUR NODALE DES RIGIDITES 
+C     SETTING TO ONE OF THE NODAL STIFFNESS MULTIPLIER
 C---------------------------------------------
-c     STFN est temporairement de 1 a NSN au lien de 1 a NLN
+c     STFN is temporarily from 1 to NSN instead of 1 to NLN
       DO L=1,NSN
          STFN(L) = 1.
       ENDDO
 C---------------------------------------------
-C     LIMITATION DU GAP DES SOLIDES
+C     LIMITATION OF THE GAP OF SOLIDS
 C---------------------------------------------
       IF (IGAP/=0) THEN
         DO I = 1, NRT
           IF(GAP_M(I) == ZERO)THEN
             GAP_SH(I) = MIN(GAPSOLIDMAX,GAP_SH(I))
             GAP_SH(I) = MAX(GAPSOL,GAP_SH(I))
-c GAP_M pour tri
+c GAP_M for sorting
             GAP_M(I)=GAP_M(I)+TWO*GAP_SH(I)
           ENDIF
         ENDDO
       ENDIF
 C
-C Calcul du gap reel a utiliser lors du critere de retri
+C Calculation of the real gap to be used during the retri criterion
 C
       GAPSHMAX = ZERO
       IF (IGAP==0) THEN
@@ -845,22 +829,22 @@ C------------
       RETURN
  1300 FORMAT(2X,'GAP MIN = ',1PG20.13)
       END
-      !||====================================================================
-      !||    i20sti3e               ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    get_u_geo              ../starter/source/user_interface/uaccess.F
-      !||    i11coq                 ../starter/source/interfaces/inter3d1/i11coq.F
-      !||    i11fil                 ../starter/source/interfaces/inter3d1/i11coq.F
-      !||    i11gmx3                ../starter/source/interfaces/inter3d1/i11gmx3.F
-      !||    i11sol                 ../starter/source/interfaces/inter3d1/i11sol.F
-      !||    my_exit                ../starter/source/output/analyse/analyse.c
-      !||    volint                 ../starter/source/interfaces/inter3d1/volint.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i20sti3e               ../starter/source/interfaces/inter3d1/i20sti3.F
+!||--- called by ------------------------------------------------------
+!||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    get_u_geo              ../starter/source/user_interface/uaccess.F
+!||    i11coq                 ../starter/source/interfaces/inter3d1/i11coq.F
+!||    i11fil                 ../starter/source/interfaces/inter3d1/i11coq.F
+!||    i11gmx3                ../starter/source/interfaces/inter3d1/i11gmx3.F
+!||    i11sol                 ../starter/source/interfaces/inter3d1/i11sol.F
+!||    my_exit                ../starter/source/output/analyse/analyse.c
+!||    volint                 ../starter/source/interfaces/inter3d1/volint.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I20STI3E(
      1 X     ,IXLIN ,STF   ,IXS   ,PM    ,
      2 GEO   ,NRT   ,IXC   ,NINTR ,SLSFAC,
@@ -876,6 +860,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs,nixc,nixtg,nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -886,7 +871,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr08_c.inc"
 #include      "scr23_c.inc"
 C-----------------------------------------------
@@ -913,20 +897,20 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NDX, I, INRT, NELS, MT, JJ, JJJ, NELC, J,
-     .   MG, NUM, NPT, LL, L, NN, NELTG,NELT,NELP,NELR,
-     .   IGTYP, I1, I2,IP,NELX,IPGMAT,IGMAT,ISUBSTACK
+      INTEGER NDX, I, INRT, NELS, MT, JJ, JJJ, NELC,
+     .   MG, NELTG,NELT,NELP,NELR,
+     .   IGTYP,NELX,IPGMAT,IGMAT,ISUBSTACK
 C     REAL
       my_real
      .   DXM, GAPMX, GAPMN, AREA, VOL, DX,GAP1,GAPS1,GAPTMP,
-     .   GET_U_GEO,ST
+     .   GET_U_GEO
 C-----------------------------------------------
       EXTERNAL GET_U_GEO
 C--------------------------------------------------------------
-C     CALCUL DES RIGIDITES DES SEGMENTS 
-C     V16 : DANS LE CAS OU ONE SEGMENT APPARTIENT A LA FOIS
-C           A UNE BRIQUE ET A UNE COQUE ON CHOISIT LA RIGIDITE
-C           DE LA COQUE SAUF SI LE MATERIAU COQUE EST NUL.
+C     CALCULATION OF SEGMENT STIFFNESSES
+C     V16 : IN THE CASE WHERE ONE SEGMENT BELONGS BOTH
+C           TO A BRICK AND A SHELL, THE SHELL STIFFNESS IS CHOSEN
+C           OF THE SHELL UNLESS THE SHELL MATERIAL IS NULL.
 C---------------------------------------------------------------
       DXM=ZERO
       NDX=0      
@@ -1259,31 +1243,8 @@ C
         ENDIF
       ENDIF
 C---------------------------
-      IF (IMACH/=3) THEN
-       IF(NELS+NELC+NELTG+NELT+NELP+NELR+NUMELX==0
-     .                       .AND.SLSFAC>0.)THEN
-C       IF(NINTR>0) WRITE (IOUT,1100) I, NOINT
-         IF(NINTR>0) THEN
-            CALL ANCMSG(MSGID=92,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-C       IF(NINTR<0) WRITE (IOUT,1200) I, NOINT
-C       IWARN=IWARN+1
-         IF(NINTR<0) THEN
-            CALL ANCMSG(MSGID=93,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-       ENDIF
-      ELSEIF(NELS+NELC+NELTG+NELT+NELP+NELR+NUMELX==0.)THEN
-C en SPMD il faut un element associe a l'arrete sinon erreur
+      IF(NELS+NELC+NELTG+NELT+NELP+NELR+NUMELX==0.)THEN
+C In SPMD you need an element associated with the edge otherwise error
         IF(NINTR>0) THEN
           CALL ANCMSG(MSGID=481,
      .                MSGTYPE=MSGERROR,
@@ -1301,6 +1262,7 @@ C en SPMD il faut un element associe a l'arrete sinon erreur
      .                I2=I)
         ENDIF
       ENDIF
+
   500 CONTINUE
 C---------------------------
 C     GAP 
@@ -1351,7 +1313,7 @@ C---------------------------
           ENDIF
           IF(NINTR<0)WRITE(IOUT,1300)HALF*(GAPMIN+GAP1)
         ENDIF
-C GAP MINI ET SUP DES GAPS VARIABLES
+C MINI GAP AND ABOVE VARIABLE GAPS
         IF(NINTR>0)THEN
           GAPMIN = GAP1
           GAPMAX = GAPS1
@@ -1381,10 +1343,10 @@ C---------------------------
       ENDIF
 C---------------------------------------------
 C
-C Calcul du gap reel a utiliser lors du critere de retri
+C Calculation of the real gap to be used during the retri criterion
 C
       IF (IGAP==0) THEN
-        GAPINF=GAPMAX/TWO ! remultiplie par 2 dans i20ini3
+        GAPINF=GAPMAX/TWO ! multiplied by 2 in i20ini3
       ELSE
         DO I = 1, NRT
           GAPINF = MIN(GAPINF,GAP_SM(I))
@@ -1395,11 +1357,11 @@ C
  1300 FORMAT(2X,'COMPUTED GAP = ',1PG20.13)
 
       END
-      !||====================================================================
-      !||    i20nlg    ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20ini3   ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||====================================================================
+!||====================================================================
+!||    i20nlg    ../starter/source/interfaces/inter3d1/i20sti3.F
+!||--- called by ------------------------------------------------------
+!||    i20ini3   ../starter/source/interfaces/inter3d1/i20ini3.F
+!||====================================================================
       SUBROUTINE I20NLG(NLN  ,NRTM,NSN  ,NLINS ,NLINM ,
      .                  NLG  ,IRECT,NSV ,IXLINS,IXLINM,
      .                  NMN  ,NSNE ,NMNE,MSR   ,NSVE  ,
@@ -1470,7 +1432,7 @@ C-----------------------------------------------
       ENDDO
 
       DO I=1,NSN
-c en input STFA(1:NLN) est STFN(1:NSN) eventuellement mis a zero si pene initiale
+c In input stfa (1: nln) is STFN (1: nsn) Possibly put to zero if pene initial
         J = NSV(I)
         STIF(J) = STFA(I)
       ENDDO
@@ -1479,7 +1441,7 @@ c en input STFA(1:NLN) est STFN(1:NSN) eventuellement mis a zero si pene initial
         STFA(I) = STIF(I)
       ENDDO
 
-c STFA sera recalcule dans I20STIFN /inter3d1/i20stifn.F
+c STFA sera recalcule in I20STIFN /inter3d1/i20stifn.F
       DO I=1,NLN
         DXANC(1,I) = XANEW(1,NLG(I))-X(1,NLG(I))
         DXANC(2,I) = XANEW(2,NLG(I))-X(2,NLG(I))

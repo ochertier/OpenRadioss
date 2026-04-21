@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s4lagsfem         ../engine/source/elements/solid/solide4_sfem/s4lagsfem.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    foat_to_6_float   ../engine/source/system/parit.F
-      !||    initbuf           ../engine/share/resol/initbuf.F
-      !||    s10volnod3        ../engine/source/elements/solid/solide4_sfem/s10volnod3.F
-      !||    s10volnodt3       ../engine/source/elements/solid/solide4_sfem/s10volnodt3.F
-      !||    s4volnod3         ../engine/source/elements/solid/solide4_sfem/s4volnod3.F
-      !||    s4volnod_sm       ../engine/source/elements/solid/solide4_sfem/s4volnod_sm.F
-      !||    spmd_exch_vol     ../engine/source/mpi/nodes/spmd_exch_vol.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod       ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    s4lagsfem         ../engine/source/elements/solid/solide4_sfem/s4lagsfem.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float   ../engine/source/system/parit.F
+!||    initbuf           ../engine/share/resol/initbuf.F
+!||    s10volnod3        ../engine/source/elements/solid/solide4_sfem/s10volnod3.F
+!||    s10volnodt3       ../engine/source/elements/solid/solide4_sfem/s10volnodt3.F
+!||    s4volnod3         ../engine/source/elements/solid/solide4_sfem/s4volnod3.F
+!||    s4volnod_sm       ../engine/source/elements/solid/solide4_sfem/s4volnod_sm.F
+!||    spmd_exch_vol     ../engine/source/mpi/nodes/spmd_exch_vol.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod       ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod       ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE S4LAGSFEM(IPARG,IXS,X,V,ELBUF_TAB,SFEM_NODVAR,S_SFEM_NODVAR,
      .                     IAD_ELEM,FR_ELEM,IXS10,XDP,SXDP,
      .                     NUMNOD, SFR_ELEM, NSPMD, NUMELS, NUMELS8, NUMELS10, NPARG, NGROUP, IRESP)
@@ -44,6 +45,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD         
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

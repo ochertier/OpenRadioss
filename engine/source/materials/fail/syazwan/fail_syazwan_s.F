@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_syazwan_s   ../engine/source/materials/fail/syazwan/fail_syazwan_s.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain            ../engine/source/materials/mat_share/mmain.F90
-      !||    mulaw            ../engine/source/materials/mat_share/mulaw.F90
-      !||    usermat_solid    ../engine/source/materials/mat_share/usermat_solid.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter           ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    fail_syazwan_s   ../engine/source/materials/fail/syazwan/fail_syazwan_s.F
+!||--- called by ------------------------------------------------------
+!||    mmain            ../engine/source/materials/mat_share/mmain.F90
+!||    mulaw            ../engine/source/materials/mat_share/mulaw.F90
+!||    usermat_solid    ../engine/source/materials/mat_share/usermat_solid.F
+!||--- calls      -----------------------------------------------------
+!||    finter           ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE FAIL_SYAZWAN_S(
      1     NEL     ,UPARAM   ,NUPARAM ,UVAR    ,NUVAR   ,
      2     TIME    ,NGL      ,IPG     ,DPLA    ,TDELE   ,

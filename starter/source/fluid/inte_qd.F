@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inthqd          ../starter/source/fluid/inte_qd.F
-      !||--- called by ------------------------------------------------------
-      !||    mass_fluid_qd   ../starter/source/fluid/mass-fluid_qd.F
-      !||====================================================================
+!||====================================================================
+!||    inthqd          ../starter/source/fluid/inte_qd.F
+!||--- called by ------------------------------------------------------
+!||    mass_fluid_qd   ../starter/source/fluid/mass-fluid_qd.F
+!||====================================================================
       SUBROUTINE INTHQD(X1 , Y1,  Z1,  X2,  Y2,  Z2,
      .                  X3,  Y3,  Z3,  X4,  Y4,  Z4,
      .                  XP,  YP,  ZP,  XS,  YS,  ZS,
@@ -72,9 +72,9 @@ C
      .           .0771604938272, .1234567901234,
      .           .0771604938272/
 C-------------------------------------------------------------
-C DISTANCE A LA SOURCE
+C DISTANCE TO THE SOURCE
       R2=(XP-XS)**2+(YP-YS)**2+(ZP-ZS)**2
-C NOMBRE DE POINTS DE GAUSS
+C NUMBER OF GAUSS POINTS
       IF (R2>HUNDRED*D2) THEN
          NPG=1
          IAD=1
@@ -112,11 +112,11 @@ C
       END
 C
 C
-      !||====================================================================
-      !||    intgqd          ../starter/source/fluid/inte_qd.F
-      !||--- called by ------------------------------------------------------
-      !||    mass_fluid_qd   ../starter/source/fluid/mass-fluid_qd.F
-      !||====================================================================
+!||====================================================================
+!||    intgqd          ../starter/source/fluid/inte_qd.F
+!||--- called by ------------------------------------------------------
+!||    mass_fluid_qd   ../starter/source/fluid/mass-fluid_qd.F
+!||====================================================================
       SUBROUTINE INTGQD(X1 , Y1,  Z1,  X2,  Y2,  Z2,
      .                  X3,  Y3,  Z3,  X4,  Y4,  Z4,
      .                  XP,  YP,  ZP,  XS,  YS,  ZS,
@@ -164,9 +164,9 @@ C
      .           .0771604938272, .1234567901234,
      .           .0771604938272/
 C-------------------------------------------------------------
-C DISTANCE A LA SOURCE
+C DISTANCE TO THE SOURCE
       R2=(XP-XS)**2+(YP-YS)**2+(ZP-ZS)**2
-C NOMBRE DE POINTS DE GAUSS
+C NUMBER OF GAUSS POINTS
       IF (R2>HUNDRED*D2) THEN
          NPG=1
          IAD=1

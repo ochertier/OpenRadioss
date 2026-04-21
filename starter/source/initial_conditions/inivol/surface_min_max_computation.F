@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    surface_min_max_computation   ../starter/source/initial_conditions/inivol/surface_min_max_computation.F
-      !||--- called by ------------------------------------------------------
-      !||    init_inivol                   ../starter/source/initial_conditions/inivol/init_inivol.F90
-      !||--- uses       -----------------------------------------------------
-      !||    inivol_def_mod                ../starter/share/modules1/inivol_mod.F
-      !||====================================================================
+!||====================================================================
+!||    surface_min_max_computation   ../starter/source/initial_conditions/inivol/surface_min_max_computation.F
+!||--- called by ------------------------------------------------------
+!||    init_inivol                   ../starter/source/initial_conditions/inivol/init_inivol.F90
+!||--- uses       -----------------------------------------------------
+!||    inivol_def_mod                ../starter/share/modules1/inivol_mod.F
+!||====================================================================
       SUBROUTINE SURFACE_MIN_MAX_COMPUTATION(
      .                                       NSURF, NUMNOD,
      .                                       SURFACE_NUMBER,MIN_MAX_POSITION,X,IGRSURF,INIVOL)
@@ -50,7 +50,7 @@ C-----------------------------------------------
         INTEGER, INTENT(IN) :: SURFACE_NUMBER ! number of surface
         my_real, DIMENSION(6), INTENT(INOUT) :: MIN_MAX_POSITION ! min/max position
         my_real, DIMENSION(3,NUMNOD), INTENT(IN) :: X ! position
-        TYPE (SURF_), DIMENSION(NSURF), INTENT(IN) :: IGRSURF ! surface data
+        TYPE (SURF_), DIMENSION(NSURF), INTENT(IN) :: IGRSURF ! surface
         TYPE (INIVOL_STRUCT_), INTENT(IN) :: INIVOL ! inivol data
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

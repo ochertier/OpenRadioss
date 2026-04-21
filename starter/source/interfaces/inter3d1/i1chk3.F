@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i1chk3                 ../starter/source/interfaces/inter3d1/i1chk3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    incoq3                 ../starter/source/interfaces/inter3d1/incoq3.F
-      !||    ineltc                 ../starter/source/interfaces/inter3d1/inelt.F
-      !||    inelts                 ../starter/source/interfaces/inter3d1/inelt.F
-      !||    insol3                 ../starter/source/interfaces/inter3d1/insol3.F
-      !||    local_index            ../starter/source/interfaces/interf1/local_index.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i1chk3                 ../starter/source/interfaces/inter3d1/i1chk3.F
+!||--- called by ------------------------------------------------------
+!||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    incoq3                 ../starter/source/interfaces/inter3d1/incoq3.F
+!||    ineltc                 ../starter/source/interfaces/inter3d1/inelt.F
+!||    inelts                 ../starter/source/interfaces/inter3d1/inelt.F
+!||    insol3                 ../starter/source/interfaces/inter3d1/insol3.F
+!||    local_index            ../starter/source/interfaces/interf1/local_index.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I1CHK3(X        ,IRECT   ,IXS      ,NRT      ,IXC       ,
      .                  NINT     ,NSN     ,NSV      ,NOINT    ,IXTG      ,
      .                  GEO      ,PM      ,KNOD2ELS ,KNOD2ELC ,KNOD2ELTG ,
@@ -51,6 +51,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only :nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -114,7 +115,7 @@ C-----------------------------------------------
            ENDIF
         ENDIF
       ENDDO!next I
-      !LE NOEUD GLOBAL EST REMPLACE PAR LE NOEUD LOCAL DANS IRECT
+      !THE GLOBAL NODE IS REPLACED BY THE LOCAL NODE IN IRECT
       DO I=1,NRT
         DO J=1,4
           IG=IRECT(J,I)

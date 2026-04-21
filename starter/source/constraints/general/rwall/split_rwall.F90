@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,28 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    split_rwall_mod   ../starter/source/constraints/general/rwall/split_rwall.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur            ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    split_rwall_mod   ../starter/source/constraints/general/rwall/split_rwall.F90
+!||--- called by ------------------------------------------------------
+!||    lectur            ../starter/source/starter/lectur.F
+!||====================================================================
       module split_rwall_mod
+        implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \brief Here is a small description of the routine, [after the header]
 !! \details if needed, more details can be added here
-      !||====================================================================
-      !||    split_rwall      ../starter/source/constraints/general/rwall/split_rwall.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    plist_ifront     ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    constraint_mod   ../starter/source/modules/constaint_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    split_rwall      ../starter/source/constraints/general/rwall/split_rwall.F90
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    plist_ifront     ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    constraint_mod   ../starter/source/modules/constaint_mod.F90
+!||====================================================================
         subroutine split_rwall(nrwall,nspmd,nnprw ,slprw,nprw,lprw,constraint_struct)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -51,10 +52,6 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
-! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           integer, intent(in) :: nrwall !< number of RWALL
@@ -62,7 +59,7 @@
           integer, intent(in) :: nnprw !< 2nd dim of nprw
           integer, intent(in) :: slprw !< dim of lprw
           integer, dimension(nrwall*nnprw), intent(in) :: nprw !<  rwall data
-          integer, dimension(slprw), intent(in) :: lprw !< list of S node 
+          integer, dimension(slprw), intent(in) :: lprw !< list of S node
           type(constraint_), intent(inout) :: constraint_struct !< constraint structure for the splitting
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
@@ -95,10 +92,10 @@
               do i =1,proc_number
                 proc_id = proc_list(i)
                 constraint_struct%rwall%spmd(n)%m_proc_list(proc_id) = 1
-              enddo
+              end do
               ! ---------
 
-              ! ---------            
+              ! ---------
               do i=1,s_node_number
                 proc_number = 0
                 node_id = lprw(index_lprw+i)
@@ -107,11 +104,11 @@
                   proc_id = proc_list(j)
                   if(constraint_struct%rwall%spmd(n)%m_proc_list(proc_id) == 0) cycle
                   constraint_struct%rwall%dd(proc_id,n) = constraint_struct%rwall%dd(proc_id,n) + 1
-                enddo
-              enddo
-              ! ---------              
-            endif
-        
+                end do
+              end do
+              ! ---------
+            end if
+
             ! ---------
             ! get the main processor of the current rwall
             proc_main = 1
@@ -121,13 +118,13 @@
               if(constraint_struct%rwall%dd(i,n)>max_node_number) then
                 max_node_number = constraint_struct%rwall%dd(i,n)
                 proc_main = i
-              elseif(constraint_struct%rwall%dd(i,n)==0.and.constraint_struct%rwall%spmd(n)%m_proc_list(i)==1) then
+              else if(constraint_struct%rwall%dd(i,n)==0.and.constraint_struct%rwall%spmd(n)%m_proc_list(i)==1) then
                 constraint_struct%rwall%dd(i,n) = -1
                 if(s_node_number==0) proc_main = i
-              endif
-            enddo
+              end if
+            end do
             ! ---------
- 
+
 
             constraint_struct%rwall%dd(nspmd+1,n) = s_node_number
             constraint_struct%rwall%dd(nspmd+2,n) = proc_main
@@ -138,12 +135,12 @@
               if(constraint_struct%rwall%spmd(n)%m_proc_list(i)==1) then
                 constraint_struct%rwall%spmd(n)%pmain = proc_main
                 constraint_struct%rwall%spmd(n)%s_node_number = s_node_number
-              endif
-            enddo
+              end if
+            end do
             ! ---------
 
             index_lprw = index_lprw + s_node_number
-          enddo
+          end do
           ! ------------
 
 ! ----------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  --New-- Hill model + MMC failure model
-      !||====================================================================
-      !||    sigeps72   ../engine/source/materials/mat/mat072/sigeps72.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw      ../engine/source/materials/mat_share/mulaw.F90
-      !||====================================================================
+!||====================================================================
+!||    sigeps72   ../engine/source/materials/mat/mat072/sigeps72.F
+!||--- called by ------------------------------------------------------
+!||    mulaw      ../engine/source/materials/mat_share/mulaw.F90
+!||====================================================================
       SUBROUTINE SIGEPS72(
      1     NEL      ,NUPARAM  ,NUVAR    ,
      2     TIME     ,TIMESTEP ,UPARAM   ,RHO0     ,RHO      ,
@@ -49,7 +49,7 @@ C---------+---------+---+---+--------------------------------------------
 #include      "com08_c.inc"
 #include      "units_c.inc"
 C
-      INTEGER NEL,NUPARAM,NUVAR,IPT,NGL(NEL),INLOC
+      INTEGER NEL,NUPARAM,NUVAR,NGL(NEL),INLOC
       my_real
      .   TIME,TIMESTEP,UPARAM(NUPARAM),
      .   RHO(NEL),RHO0(NEL),
@@ -100,9 +100,9 @@ C-----------------------------------------------
       A1      = UPARAM(7)   ! Diag. component of 3D elastic matrix
       A2      = UPARAM(8)   ! Non-diag. component of 3D elastic matrix
       BULK    = UPARAM(9)   ! Bulk modulus
-      LAMHOOK = UPARAM(10)  ! Hooke's lamba coefficient
+      LAMHOOK = UPARAM(10)  ! Hooke's lambda coefficient
       ! Hardening parameter
-      SIGY    = UPARAM(11)  ! Initial yield stress 
+      SIGY    = UPARAM(11)  ! Initial yield stress
       EPS0    = UPARAM(12)  ! Initial plastic strain (> 0)
       NEXPO   = UPARAM(13)  ! Hardening exponent
       ! Hill yield criterion parameters

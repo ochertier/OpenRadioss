@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25buce       ../engine/source/interfaces/intsort/i25buce.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_tri   ../engine/source/interfaces/intsort/i25main_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i25trivox     ../engine/source/interfaces/intsort/i25trivox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    tri7box       ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25buce       ../engine/source/interfaces/intsort/i25buce.F
+!||--- called by ------------------------------------------------------
+!||    i25main_tri   ../engine/source/interfaces/intsort/i25main_tri.F
+!||--- calls      -----------------------------------------------------
+!||    i25trivox     ../engine/source/interfaces/intsort/i25trivox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||    tri7box       ../engine/share/modules/tri7box.F
+!||====================================================================
        SUBROUTINE I25BUCE(
      1   X        ,V       ,IRECT   ,NSV      ,STFN     , 
      2   NMN      ,NRTM    ,NSN     ,CAND_E   ,CAND_N   ,
@@ -59,7 +59,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NMN, NRTM, NSN, NOINT,IDT,NIN, NSNR
+      INTEGER NMN, NRTM, NSN, NOINT, NIN, NSNR
       INTEGER IRECT(4,*),NSV(*),ITASK,ILEV, IGAP
       INTEGER CAND_E(*),CAND_N(*),MSEGTYP(*)
       INTEGER MULNSN,ESHIFT,NCONT,I_MEM,
@@ -76,21 +76,20 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, IP0, IP1, MAXSIZ,
-     .        LOC_PROC, N, ISZNSNR,
-     .        NSNFIOLD(NSPMD)
+      INTEGER I, 
+     . ISZNSNR
 C     REAL
       my_real
      .        XYZM(6), AAA
       INTEGER NBX,NBY,NBZ
       INTEGER (KIND=8) :: NBX8,NBY8,NBZ8,RES8,LVOXEL8   
-      INTEGER :: INIVOXEL_L
+ 
 
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
-C----- TRI DES ELEMENTS ET DES NOEUDS
+C----- sorting of elements and nodes
 C
 C-----------------------------------------------
 C
@@ -181,7 +180,7 @@ C=============================================================================
      A   IGAP    ,GAP_S_L  ,GAP_M_L  ,ICODT   ,ISKEW    ,
      B   DRAD    ,DGAPLOAD )
 C
-C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATS
+C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATES
 C
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_rbe3   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3t1           ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_rbe3        ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3.F
+!||--- called by ------------------------------------------------------
+!||    rbe3t1                ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_RBE3(
      1   A    ,AR     ,MS    ,IN     ,STIFN,
      2   STIFR,FR_M   ,IAD_M ,LCOMM  ,ISIZE,
      3   IROT  )
-C realise le cumul des acc et masses aux noeuds main d'Rbe3
+C performs the accumulation of accelerations and masses at the main nodes of rbe3
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g

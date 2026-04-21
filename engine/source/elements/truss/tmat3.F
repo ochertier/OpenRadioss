@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tmat3   ../engine/source/elements/truss/tmat3.F
-      !||--- called by ------------------------------------------------------
-      !||    tke3    ../engine/source/elements/truss/tke3.F
-      !||====================================================================
+!||====================================================================
+!||    tmat3   ../engine/source/elements/truss/tmat3.F
+!||--- called by ------------------------------------------------------
+!||    tke3    ../engine/source/elements/truss/tke3.F
+!||====================================================================
       SUBROUTINE TMAT3(JFT    ,JLT    ,PM    ,MAT    ,AREA   ,
      .                 AL     ,KX     )
 C-----------------------------------------------
@@ -44,7 +44,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
       my_real
      .   YM
 C-----------------------------------------------

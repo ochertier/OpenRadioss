@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ale_check_lag   ../starter/source/ale/ale_check_lag.F
-      !||--- called by ------------------------------------------------------
-      !||    alelec          ../starter/source/ale/alelec.F
-      !||    r2r_group       ../starter/source/coupling/rad2rad/r2r_group.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ale_check_lag   ../starter/source/ale/ale_check_lag.F
+!||--- called by ------------------------------------------------------
+!||    alelec          ../starter/source/ale/alelec.F
+!||    r2r_group       ../starter/source/coupling/rad2rad/r2r_group.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ALE_CHECK_LAG(NALE,IXS,IXQ,IXC,IXT,IXTG,PM,ITAB,NALE_R2R,FLAG_R2R,IGEO)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -42,6 +42,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -77,7 +78,7 @@ C--------------------------------------------------------------
           IMAT = IABS(IXQ(1,M)) !/EULER/MAT or /ALE/MAT
           IPROP = IABS(IXQ(6,M))!/PROP/TYPE14 (IALE_FLAG)
           IF(IMAT == 0)CYCLE
-          JALE_FROM_MAT = PM(72,IMAT)
+          JALE_FROM_MAT = NINT(PM(72,IMAT))
           JALE_FROM_PROP = IGEO(62,IPROP)
           IAL = JALE_FROM_MAT + JALE_FROM_PROP
           IF(IAL /= 0)CYCLE
@@ -102,7 +103,7 @@ C--------------------------------------------------------------
           IMAT = IABS(IXS(1,M)) !/EULER/MAT or /ALE/MAT
           IPROP = IABS(IXS(10,M))!/PROP/TYPE14 (IALE_FLAG)
           IF(IMAT == 0)CYCLE
-          JALE_FROM_MAT = PM(72,IMAT)
+          JALE_FROM_MAT = NINT(PM(72,IMAT))
           JALE_FROM_PROP = IGEO(62,IPROP)
           IAL = JALE_FROM_MAT + JALE_FROM_PROP
           IF(IAL /= 0)CYCLE

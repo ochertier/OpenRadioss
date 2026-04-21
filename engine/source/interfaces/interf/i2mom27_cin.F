@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2mom27_cin   ../engine/source/interfaces/interf/i2mom27_cin.F
-      !||--- called by ------------------------------------------------------
-      !||    i2for27       ../engine/source/interfaces/interf/i2for27.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod       ../engine/share/modules/h3d_mod.F
-      !||    outmax_mod    ../common_source/modules/outmax_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i2mom27_cin   ../engine/source/interfaces/interf/i2mom27_cin.F
+!||--- called by ------------------------------------------------------
+!||    i2for27       ../engine/source/interfaces/interf/i2for27.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod       ../engine/share/modules/h3d_mod.F
+!||    outmax_mod    ../common_source/modules/outmax_mod.F
+!||====================================================================
       SUBROUTINE I2MOM27_CIN(NSN ,NMN     ,AR      ,IRECT    ,CRST    ,
      2               MSR     ,NSV     ,IRTL    ,IN       ,MS      ,
      3               A       ,X       ,WEIGHT  ,STIFR    ,STIFN   ,
@@ -56,36 +56,27 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, I3, J3, I2, J2, I1, J1, II, L, JJ, W,NIR
+      INTEGER I, J, K, II, L, JJ, W,NIR
 C     REAL
       my_real
-     .   H(4), XMSJ, SS, ST, XMSI, FXI, FYI, FZI, MXI, MYI, MZI,INS,
+     .   H(4), SS, ST, FXI, FYI, FZI, MXI, MYI, MZI,INS,
      .   X0,X1,X2,X3,X4,Y0,Y1,Y2,Y3,Y4,Z0,Z1,Z2,Z3,Z4,AA,
      .   XC0,YC0,ZC0,SP,SM,TP,TM,XC,YC,ZC,
      .   STF,AI,H2(4)
 C=======================================================================
-C     MINER(II) initialise a MS(J) dans resol_init
+C     MINER(II) initialise a MS(J) in resol_init
       IF(ANIM_N(12)+OUTP_N(3)+H3D_DATA%N_SCAL_DINER >0) THEN
         DO II=1,NMN
           J=MSR(II)
           ADI(J) = ADI(J)*NMAS(II)
         ENDDO
       ENDIF
-      IF (IMACH/=3) THEN
-#include "vectorize.inc"
-        DO II=1,NMN
-          J=MSR(II)
-          IN(J)=MAX(EM20,IN(J))
-        ENDDO
-      ENDIF
-C
       IF(IMPL_S>0) THEN
       DO II=1,NSN
        K = INDXC(II)

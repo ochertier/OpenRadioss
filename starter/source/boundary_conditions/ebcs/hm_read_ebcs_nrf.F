@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_ebcs_nrf         ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_nrf.F
-      !||--- called by ------------------------------------------------------
-      !||    read_ebcs                ../starter/source/boundary_conditions/ebcs/read_ebcs.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    ngr2usr                  ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_ebcs_nrf         ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_nrf.F
+!||--- called by ------------------------------------------------------
+!||    read_ebcs                ../starter/source/boundary_conditions/ebcs/read_ebcs.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    ngr2usr                  ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_EBCS_NRF(IGRSURF, MULTI_FVM, UNITAB, ID, TITR, UID, LSUBMODEL, EBCS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -68,14 +68,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ISU,SENS,MONVOL,SURF,
-     .        IPRES,IRHO,NOD,IAD,J,K1,K2,NSEG,IENER,IVX,IVY,IVZ,IALPHA
-      INTEGER LISTE(NUMNOD), IMAT,IVEL_TYP,U_IALPHA,U_IRHO,U_IPRES,IFLAGUNIT,FLAG_FMT,
-     .        CHECK_CUMUL_VF(2)
-      my_real C,PRES,RHO,LCAR,R1,R2,ENER,VX,VY,VZ, ALPHA, TCAR_VF, TCAR_P
-      CHARACTER MESS*40,chain*9, chain1*64
-      CHARACTER(LEN=NCHARKEY) :: KEY
-      LOGICAL FOUND
+      INTEGER ISU,SURF,J,NSEG
+      INTEGER IMAT,IFLAGUNIT
+      my_real TCAR_VF,TCAR_P
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       INTEGER, EXTERNAL :: NGR2USR
 C-----------------------------------------------

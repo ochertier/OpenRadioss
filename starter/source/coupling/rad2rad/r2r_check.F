@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r2r_check      ../starter/source/coupling/rad2rad/r2r_check.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../starter/source/output/message/message.F
-      !||    grfind         ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||    r2r_mod        ../starter/share/modules1/r2r_mod.F
-      !||    restmod        ../starter/share/modules1/restart_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_check      ../starter/source/coupling/rad2rad/r2r_check.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../starter/source/output/message/message.F
+!||    grfind         ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||    r2r_mod        ../starter/share/modules1/r2r_mod.F
+!||    restmod        ../starter/share/modules1/restart_mod.F
+!||====================================================================
       SUBROUTINE R2R_CHECK(IEXTER ,IGRNOD   ,IPARTL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -61,7 +61,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER STAT,I,IGR,IGRS,N,K,ADD
+        INTEGER I, IGR, IGRS, N, K, ADD
         CHARACTER MESS*40
         INTEGER, DIMENSION(:), ALLOCATABLE :: TAGPART
 C-----------------------------------------------

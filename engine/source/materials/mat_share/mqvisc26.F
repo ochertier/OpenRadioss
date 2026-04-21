@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mqvisc26   ../engine/source/materials/mat_share/mqvisc26.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain      ../engine/source/materials/mat_share/mmain.F90
-      !||====================================================================
+!||====================================================================
+!||    mqvisc26   ../engine/source/materials/mat_share/mqvisc26.F
+!||--- called by ------------------------------------------------------
+!||    mmain      ../engine/source/materials/mat_share/mmain.F90
+!||====================================================================
       SUBROUTINE MQVISC26(
      1   PM,      OFF,     RHO,     RK,
      2   T,       SSP,     RE,      STI,
      3   DT2T,    NELTST,  ITYPTST, AIRE,
      4   OFFG,    GEO,     PID,     VOL,
      5   VD2,     DELTAX,  VIS,     D1,
-     6   D2,      D3,      PNEW,    PSH,
+     6   D2,      D3,      PSH,
      7   MAT,     NGL,     QVIS,    SSP_EQ,
      8   XK,      NEL,     ITY,     ISMSTR,
      9   JTUR,    JTHE)
@@ -72,19 +72,19 @@ C-----------------------------------------------
      .   PM(NPROPM,*), OFF(*), RHO(*), RK(*), T(*), RE(*),STI(*),
      .   OFFG(*),GEO(NPROPG,*),
      .   VOL(*), VD2(*), DELTAX(*), SSP(*), AIRE(*), VIS(*), 
-     .   PSH(*), PNEW(*),QVIS(*) ,SSP_EQ(*), 
+     .   PSH(*), QVIS(*) ,SSP_EQ(*),
      .   D1(*), D2(*), D3(*), XK(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J, MT, K, MX
+      INTEGER I, MT, MX
 C     REAL
       my_real
      .   DD(MVSIZ), AL(MVSIZ),
      .   DTX(MVSIZ), AD(MVSIZ), QX(MVSIZ), CX(MVSIZ),
      .   QA, QB, VISI, FACQ,QAA,
      .   CNS1, CNS2, SPH, AK1, BK1, AK2, BK2, TLI, AKK, XMU, TMU, RPR,
-     .   ATU, QAD, QBD, QAAP
+     .   ATU
       my_real 
      .   TIDT,TVOL,TRHO,TAIRE
 C=======================================================================
@@ -138,9 +138,8 @@ C
         DO I=1,NEL
           CNS2=GEO(17,MX)*SSP(I)*AL(I)*RHO(I)
           PSH(I)=PM(88,MT)
-          PNEW(I)=0.
           QAA = QA*QA*AD(I)
-          QX(I)=(QB+CNS1)*SSP(I)+DELTAX(I) * QAA
+          QX(I)=(QB+CNS1)*SSP(I)+AL(I) * QAA
      .     + VISI*(TWO*VIS(I)+CNS2) / MAX(EM20,RHO(I)*DELTAX(I))
           QVIS(I)=RHO(I)*AD(I)*AL(I)*(QAA*AL(I)+QB*SSP(I))
         ENDDO
@@ -152,7 +151,6 @@ C
         DO I=1,NEL
           CNS2=PM(94,MT)*SSP(I)*AL(I)*RHO(I)
           PSH(I)=PM(88,MT)
-          PNEW(I)=0.
           QAA = QA*QA*AD(I)
           QX(I)=(QB+CNS1)*SSP(I)+DELTAX(I) *QAA
      .     + VISI*(2.*VIS(I)+CNS2) / MAX(EM20,RHO(I)*DELTAX(I))

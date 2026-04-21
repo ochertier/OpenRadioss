@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    plot_curve_mod   ../common_source/modules/plot_curve_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    add_mass_stat    ../starter/source/tools/admas/add_mass_stat.F
-      !||    outrin           ../starter/source/materials/time_step/outri.F
-      !||====================================================================
+!||====================================================================
+!||    plot_curve_mod   ../common_source/modules/plot_curve_mod.F
+!||--- called by ------------------------------------------------------
+!||    add_mass_stat    ../starter/source/tools/admas/add_mass_stat.F
+!||    outrin           ../starter/source/materials/time_step/outri.F
+!||====================================================================
       MODULE PLOT_CURVE_MOD
-      INTERFACE
-      SUBROUTINE PLOT_CURVE(X, Y, NB_POINTS, INPUT_SIZE_X, INPUT_SIZE_Y, 
-     .                      INPUT_X_MINVALUE, INPUT_Y_MINVALUE, INPUT_X_MAXVALUE, 
-     .                      INPUT_Y_MAXVALUE, INPUT_SYMBOL, INPUT_CURVE_TYPE,
-     .                      INPUT_TXT_X, INPUT_TXT_Y)   
+        INTERFACE
+          SUBROUTINE PLOT_CURVE(X, Y, NB_POINTS, INPUT_SIZE_X, INPUT_SIZE_Y,
+     .                          INPUT_X_MINVALUE, INPUT_Y_MINVALUE, INPUT_X_MAXVALUE,
+     .                          INPUT_Y_MAXVALUE, INPUT_SYMBOL, INPUT_CURVE_TYPE,
+     .                          INPUT_TXT_X, INPUT_TXT_Y)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -39,20 +39,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     . X(NB_POINTS),Y(NB_POINTS)
-      INTEGER NB_POINTS,NB_GRADUATION,INPUT_SIZE_X, INPUT_SIZE_Y, INPUT_CURVE_TYPE
-      my_real
-     . INPUT_X_MINVALUE, INPUT_Y_MINVALUE, 
-     . INPUT_X_MAXVALUE, INPUT_Y_MAXVALUE
-      CHARACTER*1 INPUT_SYMBOL
-      CHARACTER(*) INPUT_TXT_X, INPUT_TXT_Y
+            my_real
+     .       X(NB_POINTS),Y(NB_POINTS)
+            INTEGER NB_POINTS,NB_GRADUATION,INPUT_SIZE_X, INPUT_SIZE_Y, INPUT_CURVE_TYPE
+            my_real
+     .       INPUT_X_MINVALUE, INPUT_Y_MINVALUE,
+     .       INPUT_X_MAXVALUE, INPUT_Y_MAXVALUE
+            CHARACTER*1 INPUT_SYMBOL
+            CHARACTER(*) INPUT_TXT_X, INPUT_TXT_Y
 C-----------------------------------------------
-      OPTIONAL ::
-     .   INPUT_SIZE_X, INPUT_SIZE_Y, INPUT_X_MINVALUE, INPUT_Y_MINVALUE, 
-     .   INPUT_X_MAXVALUE, INPUT_Y_MAXVALUE, INPUT_SYMBOL, 
-     .   INPUT_CURVE_TYPE, INPUT_TXT_X, INPUT_TXT_Y
-      END SUBROUTINE
-      END INTERFACE
+            OPTIONAL ::
+     .         INPUT_SIZE_X, INPUT_SIZE_Y, INPUT_X_MINVALUE, INPUT_Y_MINVALUE,
+     .         INPUT_X_MAXVALUE, INPUT_Y_MAXVALUE, INPUT_SYMBOL,
+     .         INPUT_CURVE_TYPE, INPUT_TXT_X, INPUT_TXT_Y
+          END SUBROUTINE
+        END INTERFACE
 C=======================================================================
-      END MODULE 
+      END MODULE

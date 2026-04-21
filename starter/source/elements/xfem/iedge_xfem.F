@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    iedge_xfem    ../starter/source/elements/xfem/iedge_xfem.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur        ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    iedge_xfem    ../starter/source/elements/xfem/iedge_xfem.F
+!||--- called by ------------------------------------------------------
+!||    lectur        ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE IEDGE_XFEM(
      .           IBORDNODE ,IXC       ,IXTG    ,IEDGESH4,IEDGESH3,
      .           IBORDEDGE ,NODEDGE   ,IELCRKC ,IELCRKTG,IEDGE   ,
      .           CEP_CRK   ,IEDGE_TMP0)
 C=======================================================================
       USE MESSAGE_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,7 +67,7 @@ C
       DATA NEXTK3/2,3,1/
 C=======================================================================
       NLMAX  = 4*ECRKXFEC + 3*ECRKXFETG   ! max edges
-      NELALL = ECRKXFEC+ECRKXFETG         ! max eleemnts
+      NELALL = ECRKXFEC+ECRKXFETG         ! max elements
 C
       ALLOCATE (LINEIX(2,NLMAX)      ,STAT=stat)
       ALLOCATE (LINEIX2(2,NLMAX)     ,STAT=stat)
@@ -95,7 +96,7 @@ C
         CALL ANCMSG(MSGID=268 ,MSGTYPE=MSGERROR,ANMODE=ANSTOP,C1='EDGE XFEM')
       END IF
 c---------------------------------------
-c       recherche de toutes les lignes dans la surface (shells)
+c       search for all lines in the surface (shells)
 c---------------------------------------
       LL  = 0  ! nb edges
       NEL = 0  ! nb elements
@@ -397,9 +398,9 @@ C-----------
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    distfuncc1   ../starter/source/elements/xfem/iedge_xfem.F
-      !||====================================================================
+!||====================================================================
+!||    distfuncc1   ../starter/source/elements/xfem/iedge_xfem.F
+!||====================================================================
       SUBROUTINE DISTFUNCC1(PLXN,PLYN,PLZN,FI,
      .      X,Y,Z,XINT1X,XINT1Y,XINT1Z)
 C-----------------------------------------------
@@ -427,9 +428,9 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    distfuncc2   ../starter/source/elements/xfem/iedge_xfem.F
-      !||====================================================================
+!||====================================================================
+!||    distfuncc2   ../starter/source/elements/xfem/iedge_xfem.F
+!||====================================================================
       SUBROUTINE DISTFUNCC2(XN,YN,ZN,
      .           XT1,YT1,ZT1,XT2,YT2,ZT2,DIS)
 C-----------------------------------------------

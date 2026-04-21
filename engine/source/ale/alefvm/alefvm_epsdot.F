@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alefvm_epsdot   ../engine/source/ale/alefvm/alefvm_epsdot.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3          ../engine/source/elements/solid/solide/sforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    alefvm_mod      ../common_source/modules/ale/alefvm_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alefvm_epsdot   ../engine/source/ale/alefvm/alefvm_epsdot.F
+!||--- called by ------------------------------------------------------
+!||    sforc3          ../engine/source/elements/solid/solide/sforc3.F
+!||--- uses       -----------------------------------------------------
+!||    alefvm_mod      ../common_source/modules/ale/alefvm_mod.F
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE ALEFVM_EPSDOT (
-     1                          IXS,  NV46, SIG,  QVIS, VOL,
+     1                          IXS,  VOL,
      2                          N1X,  N2X,  N3X,  N4X,  N5X,   N6X,
      3                          N1Y,  N2Y,  N3Y,  N4Y,  N5Y,   N6Y,
      4                          N1Z,  N2Z,  N3Z,  N4Z,  N5Z,   N6Z,
@@ -46,6 +47,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ALEFVM_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,25 +72,20 @@ C subroutine is unplugged
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER :: IXS(NIXS,*),NV46,IPM(NPROPMI,*),NEL
-      my_real :: SIG(NEL,6),QVIS(*),VOL(MVSIZ),DXX(MVSIZ),DYY(MVSIZ), DZZ(MVSIZ),X(3,*)
+      INTEGER :: IXS(NIXS,*),IPM(NPROPMI,*),NEL
+      my_real :: VOL(MVSIZ),DXX(MVSIZ),DYY(MVSIZ), DZZ(MVSIZ),X(3,*)
       my_real :: N1X(*), N2X(*),  N3X(*), N4X(*), N5X(*), N6X(*),
      .           N1Y(*), N2Y(*),  N3Y(*), N4Y(*), N5Y(*), N6Y(*),
      .           N1Z(*), N2Z(*),  N3Z(*), N4Z(*), N5Z(*), N6Z(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I, II, IV, J, MT, IALEFVM_FLG
-      my_real :: VALEL(MVSIZ)  , VALVOIS(NV46,MVSIZ), P(MVSIZ) , 
-     .           S1(MVSIZ)     , S2(MVSIZ)          , S3(MVSIZ), 
-     .           S4(MVSIZ)     , S5(MVSIZ)          , S6(MVSIZ),
-     .           PVOIS(6,MVSIZ), Vface(3,6)         , GradV(3,3) ,
-     .           EPSDOT(6) 
+      INTEGER :: I, II, MT, IALEFVM_FLG
+      my_real :: Vface(3,6), GradV(3,3), EPSDOT(6)
       INTEGER :: NC1(MVSIZ),NC2(MVSIZ),NC3(MVSIZ),NC4(MVSIZ),NC5(MVSIZ),NC6(MVSIZ),NC7(MVSIZ),NC8(MVSIZ)
-      my_real
-     .   X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ), X5(MVSIZ), X6(MVSIZ), X7(MVSIZ), X8(MVSIZ),
-     .   Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ), Y5(MVSIZ), Y6(MVSIZ), Y7(MVSIZ), Y8(MVSIZ),
-     .   Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ), Z5(MVSIZ), Z6(MVSIZ), Z7(MVSIZ), Z8(MVSIZ)
+      my_real :: X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ), X5(MVSIZ), X6(MVSIZ), X7(MVSIZ), X8(MVSIZ),
+     .           Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ), Y5(MVSIZ), Y6(MVSIZ), Y7(MVSIZ), Y8(MVSIZ),
+     .           Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ), Z5(MVSIZ), Z6(MVSIZ), Z7(MVSIZ), Z8(MVSIZ)
      
       LOGICAL :: debug_outp
       INTEGER :: idbf,idbl
@@ -99,6 +96,7 @@ C-----------------------------------------------
       MT          = IXS(1,NFT+1)
       IALEFVM_FLG = IPM(251,MT)
       IF(IALEFVM_FLG <= 1)RETURN
+      epsdot(1:6) = zero
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_bilan           ../engine/source/multifluid/multi_bilan.F
-      !||--- called by ------------------------------------------------------
-      !||    multi_globalize       ../engine/source/multifluid/multi_globalize.F
-      !||    multi_update_global   ../engine/source/multifluid/multi_update_global.F
-      !||--- uses       -----------------------------------------------------
-      !||    multi_fvm_mod         ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    multi_bilan           ../engine/source/multifluid/multi_bilan.F
+!||--- called by ------------------------------------------------------
+!||    multi_globalize       ../engine/source/multifluid/multi_globalize.F
+!||    multi_update_global   ../engine/source/multifluid/multi_update_global.F
+!||--- uses       -----------------------------------------------------
+!||    multi_fvm_mod         ../common_source/modules/ale/multi_fvm_mod.F90
+!||====================================================================
       SUBROUTINE MULTI_BILAN(PARTSAV, VOL, MULTI_FVM,
      .     NEL, NFT, IPARTS, GRESAV, IGRTH, GRTH)
 C-----------------------------------------------
@@ -53,8 +53,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I, M
-      my_real :: EI_SAV(NEL), EK_SAV(NEL), 
-     .     XM_SAV(NEL), YM_SAV(NEL), ZM_SAV(NEL), RBIDON(1), VA2(NEL),
+      my_real ::   
+     .        RBIDON(1), VA2(NEL),
      .     MAS(NEL), OFF(NEL), VX(NEL), VY(NEL), VZ(NEL)
       
       RBIDON(1) = ZERO

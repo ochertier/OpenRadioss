@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop32           ../starter/source/properties/spring/hm_read_prop32.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    set_u_geo                ../starter/source/user_interface/uaccess.F
-      !||    set_u_pnu                ../starter/source/user_interface/uaccess.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop32           ../starter/source/properties/spring/hm_read_prop32.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    set_u_geo                ../starter/source/user_interface/uaccess.F
+!||    set_u_pnu                ../starter/source/user_interface/uaccess.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP32(IOUT  ,NUVAR ,PARGEO,UNITAB,IG,
      .                          IGTYP,PROP_TAG,TITR,LSUBMODEL)
 C-----------------------------------------------
@@ -242,7 +242,7 @@ C
        ELSEIF(ITYP==2)THEN
         WRITE(IOUT,1002)AMAS,STIF0,ISENS,ILOCK,IFUNC1,DSCAL
        ELSEIF(ITYP==3)THEN
-        WRITE(IOUT,1002)AMAS,STIF0,ISENS,ILOCK,IFUNC2,TSCAL
+        WRITE(IOUT,1003)AMAS,STIF0,ISENS,ILOCK,IFUNC2,TSCAL
        ELSEIF(ITYP==4)THEN
         WRITE(IOUT,1004)AMAS,STIF0,ISENS,ILOCK,IFUNC1,DSCAL,IFUNC2,TSCAL
        ENDIF
@@ -268,8 +268,8 @@ C
       PROP_TAG(IGTYP)%G_SKEW = 3
       PROP_TAG(IGTYP)%G_SKEW_ERR = 3
       PROP_TAG(IGTYP)%G_MASS = 1
-      PROP_TAG(IGTYP)%G_V_REPCVT  = 3 ! -- VITESSES REPERE CONVECTEE (V_REPCVT)
-      PROP_TAG(IGTYP)%G_VR_REPCVT = 3  ! -- VITESSES REPERE CONVECTEE (VR_REPCVT)
+      PROP_TAG(IGTYP)%G_V_REPCVT  = 3 ! -- VELOCITIES convected frameE (V_REPCVT)
+      PROP_TAG(IGTYP)%G_VR_REPCVT = 3  ! -- VELOCITIES convected frameE (VR_REPCVT)
       PROP_TAG(IGTYP)%G_NUVAR = NUVAR
 C
       RETURN
@@ -298,8 +298,8 @@ C
      & 5X,'STIFFNESS BEFORE SENSOR ACTIVATION. . .=',1PG20.13/,
      & 5X,'ACTIVATION SENSOR ID. . . . . . . . . .=',I10/,
      & 5X,'FLAG FOR LOCK FEATURE ACTIVATION. . . .=',I10/,
-     & 5X,'FORCE(DISP-ACTIV_DISP) FUNCTION ID. . .=',I10/,
-     & 5X,'ABSCISSA SCALE FACTOR ON CURVE . . . . =',1PG20.13//)
+     & 5X,'FORCE SCALE VERSUS DISP. FUNCTION ID. .=',I10/,
+     & 5X,'ABSCISSA SCALE FACTOR ON CURVE. . . . .=',1PG20.13//)
  1003 FORMAT(
      & 5X,'NON LINEAR PRETENSION SPRING',/,
      & 5X,'----------------------------',/,
@@ -308,8 +308,8 @@ C
      & 5X,'STIFFNESS BEFORE SENSOR ACTIVATION. . .=',1PG20.13/,
      & 5X,'ACTIVATION SENSOR ID. . . . . . . . . .=',I10/,
      & 5X,'LOCK FEATURE. . . . . . . . . . . . . .=',I10/,
-     & 5X,'FORCE(TIME-ACTIV_TIME) FUNCTION ID. . .=',I10/,
-     & 5X,'ABSCISSA SCALE FACTOR ON CURVE . . . . =',1PG20.13//)
+     & 5X,'FORCE SCALE VERSUS TIME FUNCTION ID . .=',I10/,
+     & 5X,'ABSCISSA SCALE FACTOR ON CURVE. . . . .=',1PG20.13//)
  1004 FORMAT(
      & 5X,'NON LINEAR PRETENSION SPRING',/,
      & 5X,'----------------------------',/,
@@ -318,10 +318,10 @@ C
      & 5X,'STIFFNESS BEFORE SENSOR ACTIVATION. . .=',1PG20.13/,
      & 5X,'ACTIVATION SENSOR ID. . . . . . . . . .=',I10/,
      & 5X,'FLAG FOR LOCK FEATURE ACTIVATION. . . .=',I10/,
-     & 5X,'FORCE(DISP-ACTIV_DISP) FUNCTION ID. . .=',I10/,
-     & 5X,'ABSCISSA SCALE FACTOR ON CURVE . . . . =',1PG20.13/,
-     & 5X,'F. SCALE FAC(TIME-ACTIV_T) FUNCTION ID.=',I10/,
-     & 5X,'ABSCISSA SCALE FACTOR ON CURVE . . . . =',1PG20.13//)
+     & 5X,'FORCE SCALE VERSUS DISP. FUNCTION ID. .=',I10/,
+     & 5X,'ABSCISSA SCALE FACTOR ON CURVE. . . . .=',1PG20.13/,
+     & 5X,'FORCE SCALE VERSUS TIME FUNCTION ID . .=',I10/,
+     & 5X,'ABSCISSA SCALE FACTOR ON CURVE. . . . .=',1PG20.13//)
 C
  1400 FORMAT(
      & 5X,'USER PROPERTY SET'/,
@@ -333,23 +333,23 @@ C
      & 5X,'CONFIDENTIAL DATA'//)
 C
       END
-      !||====================================================================
-      !||    rini32                 ../starter/source/properties/spring/hm_read_prop32.F
-      !||--- called by ------------------------------------------------------
-      !||    rinit3                 ../starter/source/elements/spring/rinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    area                   ../starter/source/properties/spring/hm_read_prop32.F
-      !||    get_u_geo              ../starter/source/user_interface/uaccess.F
-      !||    get_u_mat              ../starter/source/user_interface/uaccess.F
-      !||    get_u_mid              ../starter/source/user_interface/uaccess.F
-      !||    get_u_mnu              ../starter/source/user_interface/uaccess.F
-      !||    get_u_pid              ../starter/source/user_interface/uaccess.F
-      !||    get_u_pnu              ../starter/source/user_interface/uaccess.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
-      SUBROUTINE RINI32(NEL   ,IOUT   ,IPROP ,
+!||====================================================================
+!||    rini32                 ../starter/source/properties/spring/hm_read_prop32.F
+!||--- called by ------------------------------------------------------
+!||    rinit3                 ../starter/source/elements/spring/rinit3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    area                   ../starter/source/properties/spring/hm_read_prop32.F
+!||    get_u_geo              ../starter/source/user_interface/uaccess.F
+!||    get_u_mat              ../starter/source/user_interface/uaccess.F
+!||    get_u_mid              ../starter/source/user_interface/uaccess.F
+!||    get_u_mnu              ../starter/source/user_interface/uaccess.F
+!||    get_u_pid              ../starter/source/user_interface/uaccess.F
+!||    get_u_pnu              ../starter/source/user_interface/uaccess.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
+      SUBROUTINE RINI32(NEL   ,IPROP ,
      3                  IX    ,XL     ,MASS  ,XINER  ,STIFM ,
      4                  STIFR ,VISCM  ,VISCR ,UVAR   ,NUVAR ,
      5                  ID,TITR,EINT,NPF,TF)
@@ -431,7 +431,7 @@ C-----------------------------------------------
 C----------------------------------------------------------
 C   D u m m y   A r g u m e n t s   a n d   F u n c t i o n
 C----------------------------------------------------------
-      INTEGER IOUT,NUVAR,NEL,IPROP,   
+      INTEGER NUVAR,NEL,IPROP,   
      .        IX(4,NEL),NPF(*),KFUNC,
      .        GET_U_PNU,GET_U_PID,GET_U_MID,GET_U_MNU
       my_real 
@@ -556,13 +556,13 @@ C FOR NODAL AND ELEMENT TIME STEP COMPUTATION
 C
       RETURN
       END
-      !||====================================================================
-      !||    area          ../starter/source/properties/spring/hm_read_prop32.F
-      !||--- called by ------------------------------------------------------
-      !||    rini32        ../starter/source/properties/spring/hm_read_prop32.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    area          ../starter/source/properties/spring/hm_read_prop32.F
+!||--- called by ------------------------------------------------------
+!||    rini32        ../starter/source/properties/spring/hm_read_prop32.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE AREA(D1,X,X2,Y,Y2,EINT,STIF0)
       USE MESSAGE_MOD
 C-------------------------------------------------------------------------

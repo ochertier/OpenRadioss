@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C --- fluid structure       
-      !||====================================================================
-      !||    vfluid       ../engine/source/elements/solid/solide/vfluid.F
-      !||--- called by ------------------------------------------------------
-      !||    prelecflow   ../engine/source/elements/solid/solide/prelecflow.F
-      !||====================================================================
+!||====================================================================
+!||    vfluid       ../engine/source/elements/solid/solide/vfluid.F
+!||--- called by ------------------------------------------------------
+!||    prelecflow   ../engine/source/elements/solid/solide/prelecflow.F
+!||====================================================================
       SUBROUTINE VFLUID(
      1   UVAR,    NEL,     MLW,     PHI1,
      2   PHI2,    PHI3,    NFT)
@@ -41,8 +41,6 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: NFT
       INTEGER NEL,MLW
-      my_real
-     .   DT2T
       my_real
      .  PHI1(*),PHI2(*),UVAR(*),PHI3(*)
 C-----------------------------------------------
@@ -66,7 +64,7 @@ C
         UVAR(I + NEL) = PHI2(IE)*VOL0
       ENDDO    
 C------------------------------------------------------
-C     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
+C     CALCULATION OF STRESSES ACCORDING TO CONSTITUTIVE LAWS
 C------------------------------------------------------
       RETURN
       END

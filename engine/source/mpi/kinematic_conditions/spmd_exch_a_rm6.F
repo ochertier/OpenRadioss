@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,21 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spmd_exch_a_rm6   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rm6.F
-      !||--- called by ------------------------------------------------------
-      !||    rmatforp          ../engine/source/materials/mat/mat013/rmatforp.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_a_rm6       ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rm6.F
+!||--- called by ------------------------------------------------------
+!||    rmatforp              ../engine/source/materials/mat/mat013/rmatforp.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_A_RM6(
      1    IAD_RBY,FR_RBY6,ICSIZE,RBF6)
-C realise le cumul des acc et stifness des noeuds main de rigid bodies
+C performs the accumulation of accelerations and stiffness at the main nodes of rigid bodies
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -54,7 +57,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,LOC_PROC,A_AR,NOD,L,I,J,IAD,IRB,
+      INTEGER MSGTYP,LOC_PROC,A_AR,L,I,J,IAD,IRB,
      .        MSGOFF,SIZ,IDEB, LEN,INDEX,NBINDEX,
      .        INDEXI(NSPMD),REQ_R(NSPMD),REQ_S(NSPMD)
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR

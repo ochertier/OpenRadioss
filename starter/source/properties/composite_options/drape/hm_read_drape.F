@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prelecdrape    ../starter/source/properties/composite_options/drape/hm_read_drape.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    udouble                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prelecdrape    ../starter/source/properties/composite_options/drape/hm_read_drape.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    udouble                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PRELECDRAPE(IDRAPEID,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -62,7 +62,7 @@ C-----------------------------------------------
       CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER MESS*40
       DATA MESS/'DRAPE DEFINITION                        '/
-c      REAL ou REAL*8
+c      REAL or REAL*8
       my_real
      .    BID
 C======================================================================|
@@ -82,28 +82,28 @@ C-------------------------------------
       RETURN
       END
 C
-      !||====================================================================
-      !||    hm_read_drape                 ../starter/source/properties/composite_options/drape/hm_read_drape.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                        ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                        ../starter/source/output/message/message.F
-      !||    hm_get_float_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_float_array_2indexes.F
-      !||    hm_get_int_array_2indexes     ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index        ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string_index           ../starter/source/devtools/hm_reader/hm_get_string_index.F
-      !||    hm_option_read_key            ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start               ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    udouble                       ../starter/source/system/sysfus.F
-      !||    udouble3                      ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod                     ../starter/share/modules1/drape_mod.F
-      !||    hm_option_read_mod            ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||    stack_mod                     ../starter/share/modules1/stack_mod.F
-      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_drape                 ../starter/source/properties/composite_options/drape/hm_read_drape.F
+!||--- called by ------------------------------------------------------
+!||    lectur                        ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                        ../starter/source/output/message/message.F
+!||    hm_get_float_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_float_array_2indexes.F
+!||    hm_get_int_array_2indexes     ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index        ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string_index           ../starter/source/devtools/hm_reader/hm_get_string_index.F
+!||    hm_option_read_key            ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start               ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    udouble                       ../starter/source/system/sysfus.F
+!||    udouble3                      ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod                     ../starter/share/modules1/drape_mod.F
+!||    hm_option_read_mod            ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    stack_mod                     ../starter/share/modules1/stack_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_DRAPE(DRAPE_WRK ,IWORK_T ,IWORKSH,IGRSH3N    ,IGRSH4N,
      .                         IXC   ,IXTG  ,IGEO   ,IGEO_STACK ,LSUBMODEL  ,
      .                         UNITAB, INDXSH )
@@ -118,6 +118,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -148,9 +149,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  ::I, II,J,JJ,IX,ID,SHELL_ID,SH3N_ID,GRSHEL_ID,GRSH3N_ID,OFFC,
-     . IT1,IT2,IT3,IT4,NEL,IAD,ITY,IDSHEL,IDSH3N,PID,
-     . JPID,IGTYP,IE,IP,IDRP,JDRP,ISH,IGR,JGR,IS,LISTMAX,SLICELISTMAX,
-     . NIS,NO_ISH,NO_ISHEUSED_DRAPE,NUMS,NPT,IPPID,ISL,NPT_DRP,NSLICE,
+     . IT1,IT2,IT3,IT4,NEL,ITY,IDSHEL,IDSH3N,PID,
+     . JPID,IGTYP,IE,IP,IDRP,JDRP,ISH,IGR,JGR,LISTMAX,SLICELISTMAX,
+     . NIS,NO_ISH,NPT,IPPID,ISL,NPT_DRP,NSLICE,
      . SLICELIST,NPT_SLICE,MAT_ID,NO_USED_DRAPE
       INTEGER , DIMENSION(NDRAPE) :: DRP_SHEL, DRP_SH3N,DRAPE_ID
       my_real
@@ -511,7 +512,7 @@ c                      IGEO(1, JPID)       ! ply pid ID
         ! To be checked for sh3n, grsh3n
         !   - double she3n -
         CALL UDOUBLE3(ITMP_SH3N,2,IT2,MESS5,MESS3,0,BID)
-        !   - double grshel -
+        !   - Double GRSHEL -
         CALL UDOUBLE3(ITMP_GRSH3N,2,IT4,MESS5,MESS4,0,BID)
         !-------------------------------------------------------------------------
         ! Filling DRAPE data structure
@@ -1116,7 +1117,7 @@ C---
       ! End reading /DRAPE
       !====================================================================================
 C-------------------------------------
-C Recherche des ID doubles (parmis les options /DRAPE)
+C Search for double IDs (among /DRAPE options)
 C-------------------------------------
       CALL UDOUBLE(DRAPE_ID,1,NDRAPE,MESS,0,BID)
 C---

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8zdericto3   ../engine/source/elements/solid/solide8z/s8zdericto3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8zforc3      ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s8zdericto3   ../engine/source/elements/solid/solide8z/s8zdericto3.F
+!||--- called by ------------------------------------------------------
+!||    s8zforc3      ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S8ZDERICTO3(
      1   OFF,     DET,     NGL,     X1,
      2   X2,      X3,      X4,      X5,
@@ -91,11 +91,11 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NGL(*), I, J ,ICOR
+      INTEGER NGL(*), I 
 C     REAL
 C                                                                     12
       my_real
-     .   DETT(MVSIZ) ,   
+     .      
      .   JACI1, JACI2, JACI3,
      .   JACI4, JACI5, JACI6,
      .   JACI7, JACI8, JACI9,

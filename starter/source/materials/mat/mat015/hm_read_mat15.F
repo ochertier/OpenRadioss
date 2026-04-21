@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat15            ../starter/source/materials/mat/mat015/hm_read_mat15.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat15            ../starter/source/materials/mat/mat015/hm_read_mat15.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT15(
      .             LSUBMODEL,MTAG     ,UNITAB   ,IPM      ,PM       ,
      .             MAT_ID   ,TITR     ,MATPARAM ,ISRATE   ,PARMAT   )
@@ -77,16 +77,16 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IOFF,ICC,IFLAG
       my_real
-     .   N12, N21, E11, E22, G12, G23, G31, EPST1, EPST2, CB, CN,
+     .   N12, N21, E11, E22, G12, G23, G31, CB, CN,
      .   FMAX, SIGYT1, SIGYT2, SIGYC1, SIGYC2, SIGYT12, SIGYC12, 
      .   C1, SSP, F1, F2, F11, F22, F33, F12, FT1, WPLAMX,
-     .   EPSM1, EPSM2, DMAX, SHRDAM, SHRMAX, SHRDMAX,ALPHA,CC,EPS0,
-     .   CBT1,CNT1,SIGMXT1,CCT1,CBT2,CNT2,SIGMXT2,CCT2,DETC, DE,
-     .   CBC1,CNC1,SIGMXC1,CCC1,CBC2,CNC2,SIGMXC2,CCC2,FCUT,
-     .   CBT12,CNT12,SIGMXT12,CCT12,CBC12,CNC12,SIGMXC12,CCC12,
-     .   EPS1T1,EPS2T1,SIGRST1,WPLAMXT1,EPS1T2,EPS2T2,SIGRST2,
-     .   WPLAMXT2,EPS1C1,EPS2C1,SIGRSC1,WPLAMXC1,EPS1C2,EPS2C2,
-     .   SIGRSC2,WPLAMXC2,EPS1T12,EPS2T12,SIGRST12,WPLAMXT12,
+     .      ALPHA,CC,EPS0,
+     .   DETC, DE,
+     .   FCUT,
+     .   
+     .   EPS1T1,EPS2T1,EPS1T2,EPS2T2,
+     .   
+     .   
      .   BETA, TMAX,S1,S2,S12,C11,C22,WPLAREF,RHO0,RHOR
       LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE
 C-----------------------------------------------
@@ -381,7 +381,7 @@ C---
       PM(151) = C22
       PM(152)  =S12
 c
-C---- Definition des variables internes (stockage elementaire)
+C---- Definition of internal variables (Elementary storage)
 c
       MTAG%G_PLA    = 1    
       MTAG%L_PLA    = 1   ! NB10

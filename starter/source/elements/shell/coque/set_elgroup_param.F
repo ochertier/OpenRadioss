@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    set_elgroup_param   ../starter/source/elements/shell/coque/set_elgroup_param.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur              ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    set_elgroup_param   ../starter/source/elements/shell/coque/set_elgroup_param.F
+!||--- called by ------------------------------------------------------
+!||    lectur              ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SET_ELGROUP_PARAM(
      .           GROUP_PARAM_TAB,IPARG    ,NGROUP   ,N2D      ,
      .           IPM            ,IGEO     ,PM       ,GEO      ,
@@ -80,39 +80,38 @@ c
 c         Set default membrane shell viscosity parameter (DM)         
 c
           IF (DM == ZERO) THEN
-            IF (ILAW == 65 ) THEN
-              DM = FIVEEM2
-            ELSEIF (ILAW == 19 .or. ILAW == 119) THEN
-              IF (ITY == 3 .and. IHBE == 23) THEN
-                DM = ZEP015
-              ELSE
-                DM = FOURTH
-              END IF
-            ELSEIF (ILAW == 58 .or. ILAW == 158) THEN
-              IF (IHBE == 11) THEN
-                DM = ONE_FIFTH
-              ELSE
-                DM = THREE_OVER_4*EM01
-              ENDIF
-            ELSEIF (IHBE == 23 .AND. (IGTYP==1.OR.IGTYP==9)) THEN
-              DM = ZEP015
-            ELSEIF (IHBE == 23) THEN
-              IF (ILAW==2.OR.ILAW==27.OR.ILAW==36.OR.ILAW==32.OR.ILAW==43) THEN
-                DM = ZEP015
-              ENDIF
-            ENDIF
-          ENDIF
-c------   specific default dm for QEPH,QBAT
-          IF (IHBE == 23 .AND. (ILAW==25 .OR. ILAW == 125 .OR. ILAW==127)) THEN                                             
-            IF (DM == ZERO) DM=EM01
-          ENDIF
-c
+            SELECT CASE (ILAW)
+              CASE (65)
+                DM = FIVEEM2
+              CASE (19, 119)
+                IF (ITY == 3 .AND. IHBE == 23) THEN
+                  DM = ZEP015
+                ELSE
+                  DM = FOURTH
+                END IF
+              CASE (58, 158)
+                IF (IHBE == 11) THEN
+                  DM = ONE_FIFTH
+                ELSE
+                  DM = THREE_OVER_4 * EM01
+                END IF
+              CASE (25, 123, 125, 127,132)
+                IF (IHBE == 23) DM = EM01
+              CASE (42, 69)
+                IF (IHBE == 11) THEN
+                  DM = ZEP04
+                ELSE
+                  DM = ZEP03
+                END IF
+              CASE DEFAULT
+                IF (IHBE == 23 .AND. (IGTYP == 1 .or. IGTYP == 9)) DM = ZEP015
+            END SELECT
+          END IF
+c------   specific composite IGMAT > 0
           IF (IGMAT > 0) THEN  ! .and. (ILAW /= 15 .AND. ILAW /= 27)) THEN
             IF (DM == ZERO) DM = FIVEEM2
-          ELSEIF (ILAW == 1 .or. ILAW == 2 .or. ILAW == 22 ) THEN
-            IF (IDEF == 1) DM = ZERO
-          ELSEIF ( ILAW == 15 .or. ILAW == 27 .or. ILAW == 25 .or. ILAW==125 
-     .                                                        .or. ILAW == 127) THEN
+          ELSEIF ( ILAW == 15 .or. ILAW == 27 .or. ILAW == 25  .or. ILAW == 123
+     .                        .or. ILAW==125  .or. ILAW == 127 .or. ILAW == 132) THEN
             IF (DM == ZERO) DM = FIVEEM2
           ENDIF !(IGMAT > 0
 c          

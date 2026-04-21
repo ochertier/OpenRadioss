@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    airbaga1     ../engine/source/airbag/airbaga1.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol0      ../engine/source/airbag/monvol0.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter       ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod   ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    airbaga1           ../engine/source/airbag/airbaga1.F
+!||--- called by ------------------------------------------------------
+!||    monvol0            ../engine/source/airbag/monvol0.F
+!||--- uses       -----------------------------------------------------
+!||    finter_mixed_mod   ../engine/source/tools/finter_mixed.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE AIRBAGA1(IVOLU  ,NJET    ,IBAGJET ,NVENT   ,IBAGHOL    ,
      2                    ICBAG  ,RVOLU   ,RBAGJET ,RBAGHOL ,RCBAG      ,
      3                    RVOLUV ,NPC     ,TF      ,NSENSOR ,SENSOR_TAB ,
      4                    VOL    ,PMAIN   ,GEO     ,IGEO    ,PM         ,
-     5                    WFEXT )
+     5                    WFEXT, PYTHON )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
+      USE python_funct_mod
       USE SENSOR_MOD
+      USE finter_mixed_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,7 +52,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "units_c.inc"
 #include      "scr02_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr18_c.inc"
 #include      "task_c.inc"
@@ -68,18 +69,19 @@ C-----------------------------------------------
      .   GEO(NPROPG,*),PM(NPROPM,*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
+      TYPE(PYTHON_), intent(inout) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IMASS, ITEMP, ISENS, K, IFLU, IEQUI,
+      INTEGER I, IMASS, ITEMP, ISENS, IFLU, IEQUI,
      .        IDEF, NAV, II, IS, IDTPDEF,IDPDEF,
      .        IV, IJ,ITTF
       INTEGER IK, KK, I_GAS, I_INJ, IMOL, NGASES, I_TYPINJ
       my_real
      .   PDEF, PEXT, PVOIS, DTPDEFC,
      .   GAMA, AMU, TSTART, TSG,TSG2,
-     .   AMTOT, P, RO, DTX, POLD, DV,
-     .   ROT, DYDX, FTEMP, FMASS, DT, AREA,
+     .   AMTOT, P, POLD, DV,
+     .   ROT,  FTEMP, FMASS, DT, AREA,
      .   CV, CP, CVG, CPG, CPA, CPB, CPC, CVI, CPI, CPAI, CPBI, CPCI,
      .   RMWI, RMWG,
      .   RNM_OLD, RNM, RNMG,
@@ -91,8 +93,6 @@ C-----------------------------------------------
       my_real
      .   MW, CPD, CPE, CPF, CPDI, CPEI, CPFI, R_IGC1, DGMIN, ASTIME,
      .   DGEIN, HCONV, TEXT, MOLFR, MW_MIX
-      my_real FINTER 
-      EXTERNAL FINTER
 C-----------------------------------------------
       FTEMP = ZERO
       PEXT     =RVOLU(3)
@@ -129,7 +129,7 @@ C
         IBAGHOL(12,IV) = IDPDEF 
         RBAGHOL(5,IV)  = DTPDEFC
       ENDDO
-      IF(IMACH/=3.OR.ISPMD+1==PMAIN) THEN
+      IF(ISPMD+1==PMAIN) THEN
 C Mass loss & Enthalpy Loss
         DO IV=1,NVENT
           RBAGHOL(19,IV)= RBAGHOL(19,IV) + RBAGHOL(21,IV)*DT1
@@ -148,9 +148,9 @@ C-------------------------
          PDEF   = RCBAG(1,I)
          DTPDEFC= RCBAG(5,I)
 c         PVOIS  =RVOLUV(12,II)
-c           afin d'eviter probleme de meme adressage memoire
-c           de RVOLU(12) et RVOLUV(12) on utilise RVOLU(31)
-c           qui etait dispo
+c           In order to avoid the same address problem
+c           de Rvoli (12) and Rvoluv (12) We use Rvoli (31)
+c           who was available
          PVOIS  =RVOLUV(31,II)
          IF(IDEF==0.AND.POLD>PDEF+PVOIS)
      .      RCBAG(5,I)=DTPDEFC+DT1
@@ -208,7 +208,7 @@ C
             RVOLU(11)= GMI
             RVOLU(14)= RMWI*GMI
             RVOLU(20)= GMI
-            IF(IMACH/=3.OR.ISPMD+1==PMAIN) THEN
+            IF(ISPMD+1==PMAIN) THEN
               WRITE(IOUT,*)
      .        ' *** MONITORED VOLUME : INITIAL EQUILIBRIUM IS SET ***'
               WRITE(IOUT,'(A,I10,A,G20.13,A)') 
@@ -237,7 +237,7 @@ C--------------------------
 C
       IF (IS/=0)THEN
 C-----------------------------
-C     MASSE MOLAIRE DU MELANGE
+C     MOLECULAR MASS OF THE MIXTURE
 C-----------------------------
        DO IJ=1,NJET
          I_INJ    = IBAGJET(13,IJ)
@@ -265,7 +265,7 @@ C
             IF(IMOL == 0) THEN
                MW_MIX = MW_MIX + MW*MOLFR
             ELSE
-               MW_MIX = MW_MIX + MW*FINTER(IMOL,TSG,NPC,TF,DYDX)
+               MW_MIX = MW_MIX + MW*FINTER_MIXED(PYTHON,NFUNCT,IMOL,TSG,NPC,TF)
             ENDIF
          ENDDO
          RBAGJET(19,IJ) = MW_MIX
@@ -331,7 +331,7 @@ C
           IF (TSG2 <= ZERO) TSG2 = TSG
 C
           IF(ITEMP>0) THEN
-            TEMP=FTEMP*FINTER(ITEMP,TSG,NPC,TF,DYDX)
+            TEMP=FTEMP*FINTER_MIXED(PYTHON,NFUNCT,ITEMP,TSG,NPC,TF)
           ELSE
             TEMP=FTEMP
           ENDIF
@@ -348,14 +348,14 @@ C
          GMASS_OLD=RBAGJET(KK+2,IJ)
          IF(TT>=TSTART)THEN
           IF(IMASS>0) THEN
-            GMASS=HALF * FMASS * (FINTER(IMASS,TSG,NPC,TF,DYDX) + 
-     .            FINTER(IMASS,TSG2,NPC,TF,DYDX))
+            GMASS=HALF * FMASS * (FINTER_MIXED(PYTHON,NFUNCT,IMASS,TSG,NPC,TF) + 
+     .            FINTER_MIXED(PYTHON,NFUNCT,IMASS,TSG2,NPC,TF))
             IF(I_TYPINJ == 2) THEN
                MW_MIX = RBAGJET(19,IJ)
                IF(IMOL == 0) THEN
                  GMASS=GMASS*MW*MOLFR/MW_MIX
                ELSE
-                 GMASS=GMASS*MW*FINTER(IMOL,TSG,NPC,TF,DYDX)/MW_MIX
+                 GMASS=GMASS*MW*FINTER_MIXED(PYTHON,NFUNCT,IMOL,TSG,NPC,TF)/MW_MIX
                ENDIF
             ENDIF
             IF(IFLU==1)GMASS = GMASS*DT1 + GMASS_OLD
@@ -384,10 +384,10 @@ C
          RBAGJET(KK+1,IJ) = GMTOT
          RBAGJET(KK+2,IJ) = GMASS
          AMTOT = AMTOT + DGMASS
-        ENDDO      !fin de boucle gaz
-       ENDDO       !fin de boucle injecteurs
+        ENDDO      !end of gas loop
+       ENDDO       !end of injectors loop
 C-------------------------
-C FUITES ET COMMUNICATIONS
+C LEAKS AND COMMUNICATIONS
 C-------------------------
        DO IJ=1,NJET
          I_INJ    = IABS(IBAGJET(13,IJ))
@@ -432,10 +432,10 @@ C
 
            RBAGJET(KK+1,IJ) = GMTOT
            AMTOT = AMTOT - DGMOUT
-         ENDDO     !fin de boucle gaz
-       ENDDO       !fin de boucle injecteurs
+         ENDDO     !end of gas loop
+       ENDDO       !end of injectors loop
 C------------------------------------
-C      CONTRIBUTION DU GAZ INITIAL...
+C      CONTRIBUTION OF THE INITIAL GAS...
 C------------------------------------
        DGMOUT=RVOLU(24)*DT1
        DGMIN =RVOLU(64)*DT1
@@ -471,7 +471,7 @@ C
        AMTOT = AMTOT-DGMOUT+DGMIN
        RVOLU(11)=GMI
 C------------------------------------------
-C      VARIATION DE TEMPERATURE et PRESSION
+C      VARIATION OF TEMPERATURE and PRESSURE
 C------------------------------------------
        GMI =RVOLU(11)
        RNM =GMI*RMWI
@@ -508,7 +508,7 @@ C RATE OF HEAT LOSS
 C--------------------
        RVOLU(55) = HCONV*AREA*MAX((TBAG-TEXT),ZERO)
 C-------------------------------------------------------------------
-C      GAMA DU MELANGE (inclus caracteristiques du gaz a l'initial).
+C      Gama of the Melange (included characteristics of the gas at the initial).
 C-------------------------------------------------------------------
        CPI=CPAI+CPBI*TBAG+CPCI*TBAG*TBAG
      .     +CPDI*TBAG*TBAG*TBAG
@@ -558,7 +558,7 @@ C------
        ELSE
         Q=-AMU*SQRT(P*AREA*ROT/VOL)*DV/AREA/DT1
        ENDIF
-       IF (IMACH/=3.OR.ISPMD+1==PMAIN) THEN
+       IF (ISPMD+1==PMAIN) THEN
         WFEXT=WFEXT+(HALF*(P+POLD+Q+QOLD)-PEXT)*DV
         RVOLU(32)=RVOLU(32) + (HALF*(P+POLD)-PEXT)*DV
        ENDIF
@@ -594,13 +594,13 @@ C      DP/DRO GAZ PARFAIT+ADIABATIQUE=GAMA*R/MW*TBAG
        ENDIF
        IF(IDTMIN(9)==1.AND.DT<DTMIN1(9)) THEN
          TSTOP = TT
-         IF (IMACH/=3.OR.ISPMD+1==PMAIN) THEN
+         IF (ISPMD+1==PMAIN) THEN
            WRITE(IOUT,*)  '-- MINIMUM MONITORED VOLUME TIME STEP '
            WRITE(ISTDO,*) '-- MINIMUM MONITORED VOLUME TIME STEP '
          ENDIF
        ELSEIF(IDTMIN(9)==5.AND.DT<DTMIN1(9)) THEN
          MSTOP = 2
-         IF (IMACH/=3.OR.ISPMD+1==PMAIN) THEN
+         IF (ISPMD+1==PMAIN) THEN
            WRITE(IOUT,*)  '-- MINIMUM MONITORED VOLUME TIME STEP '
            WRITE(ISTDO,*) '-- MINIMUM MONITORED VOLUME TIME STEP '
          ENDIF

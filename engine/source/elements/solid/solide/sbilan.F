@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sbilan                ../engine/source/elements/solid/solide/sbilan.F
-      !||--- called by ------------------------------------------------------
-      !||    s8cforc3              ../engine/source/elements/thickshell/solide8c/s8cforc3.F
-      !||    s8eforc3              ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8sforc3              ../engine/source/elements/solid/solide8s/s8sforc3.F
-      !||    s8zforc3              ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||    sforc3                ../engine/source/elements/solid/solide/sforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sbilan                ../engine/source/elements/solid/solide/sbilan.F
+!||--- called by ------------------------------------------------------
+!||    s8cforc3              ../engine/source/elements/thickshell/solide8c/s8cforc3.F
+!||    s8eforc3              ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8sforc3              ../engine/source/elements/solid/solide8s/s8sforc3.F
+!||    s8zforc3              ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||    sforc3                ../engine/source/elements/solid/solide/sforc3.F
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SBILAN(PARTSAV,EINT,RHO,RK,VOL,
      .   VX1, VX2, VX3, VX4, VX5, VX6, VX7, VX8,
      .   VY1, VY2, VY3, VY4, VY5, VY6, VY7, VY8,
@@ -43,7 +43,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .   X1, X2, X3, X4, X5, X6, X7, X8,
      .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
      .   Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .   ITASK,IPARG,SENSORS)
+     .   ITASK,IPARG,SENSORS,G_WPLA,WPLA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -75,6 +75,8 @@ C-----------------------------------------------
      .  X1(*), X2(*), X3(*), X4(*), X5(*), X6(*), X7(*), X8(*),
      .  Y1(*), Y2(*), Y3(*), Y4(*), Y5(*), Y6(*), Y7(*), Y8(*),
      .  Z1(*), Z2(*), Z3(*), Z4(*), Z5(*), Z6(*), Z7(*), Z8(*)
+      INTEGER, INTENT(IN) :: G_WPLA
+      my_real,DIMENSION(NEL*G_WPLA), INTENT(IN) :: WPLA
       INTEGER IEXPAN,ITASK,
      .  IPARTS(*),GRTH(*),IGRTH(*),IPARG(*),NEL
       INTEGER,INTENT(IN) :: IFVM22
@@ -97,9 +99,8 @@ C     REAL
      .   IXX(MVSIZ), IYY(MVSIZ), IZZ(MVSIZ),
      .   IXY(MVSIZ), IYZ(MVSIZ), IZX(MVSIZ),
      .   REI(MVSIZ), REK(MVSIZ), OFF_L(MVSIZ)
-      INTEGER IC, II, J, JST(MVSIZ+1)
 C-----------------------------------------------
-      FLAG = IPARG(80) ! Flag pour sorties additionnelles
+      FLAG = IPARG(80) ! flag for additional outputs
 C-----------------------------------------------
 C     CALCUL BILAN SORTIES DEF 
 C-----------------------------------------------
@@ -151,6 +152,7 @@ C
           PARTSAV(4,M)=PARTSAV(4,M) + YM(I)
           PARTSAV(5,M)=PARTSAV(5,M) + ZM(I)
           IF (OFF(I) >= ONE) PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I)
+          IF (G_WPLA > 0)  PARTSAV(29,M)=PARTSAV(29,M) + WPLA(I)
         ENDDO
       ELSE
         DO I=1,NEL
@@ -161,6 +163,7 @@ C
             PARTSAV(4,M)=PARTSAV(4,M) + YM(I)
             PARTSAV(5,M)=PARTSAV(5,M) + ZM(I)
             PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I)
+            IF (G_WPLA > 0)  PARTSAV(29,M)=PARTSAV(29,M) + WPLA(I)
         ENDDO
       END IF
 C

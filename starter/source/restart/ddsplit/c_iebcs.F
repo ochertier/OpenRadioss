@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c_iebcs    ../starter/source/restart/ddsplit/c_iebcs.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit    ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    iface      ../starter/source/ale/ale3d/iface.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c_iebcs       ../starter/source/restart/ddsplit/c_iebcs.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    iface         ../starter/source/ale/ale3d/iface.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
        SUBROUTINE C_IEBCS(IXS, IXQ, IXTG, 
      .     NUMELS, NUMELQ, NUMELTG,
      .      NEBCS, CEP, NUMEL,  PROC,
      .     IEBCS_NELEM_L, IEBCS_TYPE, IEBCS_LISTELEM_L, IEBCS_LISTFAC_L,IEBCS_LISTDP0_L, LENGTH, N2D,
      .     MULTI_FVM_IS_USED,FLAG,EBCS_TAB)
        USE EBCS_MOD
+       use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -61,8 +62,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------   
-      INTEGER :: I, KK, TYP, JBUF, K1, K2, K3, NSEG, NSEG_L, IELEM, ELEM_ID, ISEG
-      INTEGER :: II
+      INTEGER :: I, TYP, NSEG, NSEG_L, IELEM, ISEG
       INTEGER, DIMENSION(:), ALLOCATABLE  :: LOCALID
       INTEGER, DIMENSION(:, :), POINTER :: IX
       my_real :: DP0

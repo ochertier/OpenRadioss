@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_gravit         ../engine/source/ams/sms_gravit.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter             ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sms_gravit         ../engine/source/ams/sms_gravit.F
+!||--- called by ------------------------------------------------------
+!||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
+!||--- calls      -----------------------------------------------------
+!||    finter             ../engine/source/tools/curve/finter.F
+!||--- uses       -----------------------------------------------------
+!||    finter_mixed_mod   ../engine/source/tools/finter_mixed.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SMS_GRAVIT(IGRV  ,AGRV   ,NPC   ,TF   ,A     ,
      2                      V     ,X      ,SKEW  ,MS   ,SENSOR_TAB,
-     3                      WEIGHT,IB    ,ITASK,TAGSLV_RBY_SMS,NSENSOR, WFEXT)
+     3                      WEIGHT,IB    ,ITASK,TAGSLV_RBY_SMS,NSENSOR, WFEXT,python)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
+      USE python_funct_mod, ONLY : python_
+      use finter_mixed_mod, only : finter_mixed
       USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -52,20 +56,21 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NPC(*),NDDIM,NVDIM,NSENSOR
+      INTEGER NPC(*),NSENSOR
       INTEGER IGRV(NIGRV,*),IB(*)
       INTEGER WEIGHT(*), ITASK, TAGSLV_RBY_SMS(*)
       my_real
      .   AGRV(LFACGRV,*), TF(*), A(3,*), V(3,*), MS(*),
      .   X(3,*), SKEW(LSKEW,*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
+      TYPE(python_), intent(inout) :: python
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NL, N1, ISK, N2, IFUNC, K1, K2, K3, ISENS,K,NN,IAD,J, IADF, IADL
-      my_real NX, NY, NZ, AXI, A0, AA, VV, FX, FY, FZ, AX, DYDX, TS,GAMA, WFEXTT,FCX,FCY
+      my_real    A0, AA, VV,  TS,GAMA, WFEXTT,FCX,FCY
       my_real,EXTERNAL :: FINTER
-      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C=======================================================================
       WFEXTT=ZERO
 C
@@ -92,8 +97,8 @@ C
         ENDIF
 C
         IF (IFUNC > 0) THEN
-          A0   = FCY*FINTER(IFUNC,(TS-DT1)*FCX,NPC,TF,DYDX)
-          GAMA = FCY*FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
+          A0   = FCY*FINTER_MIXED(python,nfunct,IFUNC,(TS-DT1)*FCX,NPC,TF)
+          GAMA = FCY*FINTER_MIXED(python,nfunct,IFUNC,TS*FCX,NPC,TF)
         ELSE
           A0   = FCY
           GAMA = FCY
@@ -125,9 +130,8 @@ C
         ENDIF
       END DO
 C
-#include "atomic.inc"
+!$OMP ATOMIC
       WFEXT = WFEXT + WFEXTT
-#include "atomend.inc"
 C
       RETURN
       END

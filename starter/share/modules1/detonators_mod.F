@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,58 +20,64 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    detonators_mod               ../starter/share/modules1/detonators_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    binit2                       ../starter/source/ale/bimat/binit2.F
-      !||    contrl                       ../starter/source/starter/contrl.F
-      !||    detcord                      ../starter/source/initial_conditions/detonation/detcord.F
-      !||    detcord0                     ../starter/source/initial_conditions/detonation/detcord0.F
-      !||    ecran1                       ../starter/source/initial_conditions/detonation/ecran1.F
-      !||    ecran2                       ../starter/source/initial_conditions/detonation/ecran2.F
-      !||    ig3dinit3                    ../starter/source/elements/ige3d/ig3dinit3.F
-      !||    initia                       ../starter/source/elements/initia/initia.F
-      !||    iombr                        ../starter/source/initial_conditions/detonation/iombr.F
-      !||    lectur                       ../starter/source/starter/lectur.F
-      !||    m105init                     ../starter/source/materials/mat/mat105/m105init.F
-      !||    m51init                      ../starter/source/materials/mat/mat051/m51init.F
-      !||    m5in2                        ../starter/source/initial_conditions/detonation/m5in2.F
-      !||    m5in2t                       ../starter/source/initial_conditions/detonation/m5in2t.F
-      !||    m5in3                        ../starter/source/initial_conditions/detonation/m5in3.F
-      !||    m97init                      ../starter/source/materials/mat/mat097/m97init.F
-      !||    matini                       ../starter/source/materials/mat_share/matini.F
-      !||    multifluid_init2             ../starter/source/multifluid/multifluid_init2.F
-      !||    multifluid_init2t            ../starter/source/multifluid/multifluid_init2t.F
-      !||    multifluid_init3             ../starter/source/multifluid/multifluid_init3.F
-      !||    multifluid_init3t            ../starter/source/multifluid/multifluid_init3t.F
-      !||    prelecdet                    ../starter/source/initial_conditions/detonation/prelecdet.F
-      !||    printstsz                    ../starter/source/spmd/node/st_array_size.F
-      !||    q4init2                      ../starter/source/elements/solid_2d/quad4/q4init2.F
-      !||    qinit2                       ../starter/source/elements/solid_2d/quad/qinit2.F
-      !||    r2r_group                    ../starter/source/coupling/rad2rad/r2r_group.F
-      !||    r2r_prelec                   ../starter/source/coupling/rad2rad/r2r_prelec.F
-      !||    read_detonators              ../starter/source/initial_conditions/detonation/read_detonators.F
-      !||    read_dfs_detcord             ../starter/source/initial_conditions/detonation/read_dfs_detcord.F
-      !||    read_dfs_detline             ../starter/source/initial_conditions/detonation/read_dfs_detline.F
-      !||    read_dfs_detplan             ../starter/source/initial_conditions/detonation/read_dfs_detplan.F
-      !||    read_dfs_detpoint            ../starter/source/initial_conditions/detonation/read_dfs_detpoint.F
-      !||    read_dfs_wave_shaper         ../starter/source/initial_conditions/detonation/read_dfs_wave_shaper.F
-      !||    s10init3                     ../starter/source/elements/solid/solide10/s10init3.F
-      !||    s16init3                     ../starter/source/elements/thickshell/solide16/s16init3.F
-      !||    s20init3                     ../starter/source/elements/solid/solide20/s20init3.F
-      !||    s4init3                      ../starter/source/elements/solid/solide4/s4init3.F
-      !||    s6cinit3                     ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||    s8cinit3                     ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||    s8zinit3                     ../starter/source/elements/solid/solide8z/s8zinit3.F
-      !||    scinit3                      ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sinit3                       ../starter/source/elements/solid/solide/sinit3.F
-      !||    spinit3                      ../starter/source/elements/sph/spinit3.F
-      !||    st_qaprint_dfs_detonators    ../starter/source/output/qaprint/st_qaprint_dfs_detonators.F
-      !||    st_qaprint_driver            ../starter/source/output/qaprint/st_qaprint_driver.F
-      !||    st_qaprint_internal_groups   ../starter/source/output/qaprint/st_qaprint_internal_groups.F
-      !||    starter0                     ../starter/source/starter/starter0.F
-      !||    suinit3                      ../starter/source/elements/elbuf_init/suinit3.F
-      !||====================================================================
+!||====================================================================
+!||    detonators_mod                 ../starter/share/modules1/detonators_mod.F
+!||--- called by ------------------------------------------------------
+!||    binit2                         ../starter/source/ale/bimat/binit2.F
+!||    contrl                         ../starter/source/starter/contrl.F
+!||    ddsplit                        ../starter/source/restart/ddsplit/ddsplit.F
+!||    detcord                        ../starter/source/initial_conditions/detonation/detcord.F
+!||    detcord0                       ../starter/source/initial_conditions/detonation/detcord0.F
+!||    ecran1                         ../starter/source/initial_conditions/detonation/ecran1.F
+!||    ecran2                         ../starter/source/initial_conditions/detonation/ecran2.F
+!||    eikonal_bcs_sym_tag            ../starter/source/initial_conditions/detonation/eikonal_bcs_sym_tag.F90
+!||    eikonal_fast_marching_method   ../starter/source/initial_conditions/detonation/eikonal_fast_marching_method.F90
+!||    eikonal_init_start_list        ../starter/source/initial_conditions/detonation/eikonal_init_start_list.F90
+!||    eikonal_solver                 ../starter/source/initial_conditions/detonation/eikonal_solver.F90
+!||    ig3dinit3                      ../starter/source/elements/ige3d/ig3dinit3.F
+!||    initia                         ../starter/source/elements/initia/initia.F
+!||    iombr                          ../starter/source/initial_conditions/detonation/iombr.F
+!||    lectur                         ../starter/source/starter/lectur.F
+!||    m105init                       ../starter/source/materials/mat/mat105/m105init.F
+!||    m51init                        ../starter/source/materials/mat/mat051/m51init.F
+!||    m5in2                          ../starter/source/initial_conditions/detonation/m5in2.F
+!||    m5in2t                         ../starter/source/initial_conditions/detonation/m5in2t.F
+!||    m5in3                          ../starter/source/initial_conditions/detonation/m5in3.F
+!||    m97init                        ../starter/source/materials/mat/mat097/m97init.F
+!||    matini                         ../starter/source/materials/mat_share/matini.F
+!||    multifluid_init2               ../starter/source/multifluid/multifluid_init2.F
+!||    multifluid_init2t              ../starter/source/multifluid/multifluid_init2t.F
+!||    multifluid_init3               ../starter/source/multifluid/multifluid_init3.F
+!||    multifluid_init3t              ../starter/source/multifluid/multifluid_init3t.F
+!||    prelecdet                      ../starter/source/initial_conditions/detonation/prelecdet.F
+!||    printstsz                      ../starter/source/spmd/node/st_array_size.F
+!||    q4init2                        ../starter/source/elements/solid_2d/quad4/q4init2.F
+!||    qinit2                         ../starter/source/elements/solid_2d/quad/qinit2.F
+!||    r2r_group                      ../starter/source/coupling/rad2rad/r2r_group.F
+!||    r2r_prelec                     ../starter/source/coupling/rad2rad/r2r_prelec.F
+!||    read_detonators                ../starter/source/initial_conditions/detonation/read_detonators.F
+!||    read_dfs_detcord               ../starter/source/initial_conditions/detonation/read_dfs_detcord.F
+!||    read_dfs_detline               ../starter/source/initial_conditions/detonation/read_dfs_detline.F
+!||    read_dfs_detplan               ../starter/source/initial_conditions/detonation/read_dfs_detplan.F
+!||    read_dfs_detpoint              ../starter/source/initial_conditions/detonation/read_dfs_detpoint.F
+!||    read_dfs_wave_shaper           ../starter/source/initial_conditions/detonation/read_dfs_wave_shaper.F
+!||    s10init3                       ../starter/source/elements/solid/solide10/s10init3.F
+!||    s16init3                       ../starter/source/elements/thickshell/solide16/s16init3.F
+!||    s20init3                       ../starter/source/elements/solid/solide20/s20init3.F
+!||    s4init3                        ../starter/source/elements/solid/solide4/s4init3.F
+!||    s6cinit3                       ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||    s6zinit3                       ../starter/source/elements/solid/solide6z/s6zinit3.F90
+!||    s8cinit3                       ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||    s8zinit3                       ../starter/source/elements/solid/solide8z/s8zinit3.F
+!||    scinit3                        ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sinit3                         ../starter/source/elements/solid/solide/sinit3.F
+!||    spinit3                        ../starter/source/elements/sph/spinit3.F
+!||    st_qaprint_dfs_detonators      ../starter/source/output/qaprint/st_qaprint_dfs_detonators.F
+!||    st_qaprint_driver              ../starter/source/output/qaprint/st_qaprint_driver.F
+!||    st_qaprint_internal_groups     ../starter/source/output/qaprint/st_qaprint_internal_groups.F
+!||    starter0                       ../starter/source/starter/starter0.F
+!||    suinit3                        ../starter/source/elements/elbuf_init/suinit3.F
+!||====================================================================
       MODULE DETONATORS_MOD
 C-----------------------------------------------
 #include      "my_real.inc"
@@ -81,10 +87,18 @@ C-----------------------------------------------
         TYPE DETONATOR_POINT_STRUCT_
           LOGICAL :: IS_MAT_VALID = .FALSE.
           INTEGER :: MAT = 0
+          INTEGER :: SHADOW = 0
+          INTEGER :: iframe1 = 0 ! optional frame (1st sym plane)
+          INTEGER :: iframe2 = 0 ! optional frame (2nd sym plane)
+          my_real :: O1(3)=0. ! origin for iframe1
+          my_real :: O2(3)=0. ! origin for iframe2
+          my_real :: N1(3)=0. ! normal vector from plane defined with iframe1
+          my_real :: N2(3)=0. ! normal vector from plane defined with iframe2
           my_real :: TDET
           my_real :: XDET
           my_real :: YDET
           my_real :: ZDET
+          my_real :: R0
           !optional list of nodes
           INTEGER :: GRNOD_ID
           INTEGER :: NNOD
@@ -160,15 +174,17 @@ C-----------------------------------------------
           TYPE(DETONATOR_CORD_STRUCT_), DIMENSION(:), ALLOCATABLE :: CORD
           TYPE(DETONATOR_WAVE_SHAPER_STRUCT_), DIMENSION(:), ALLOCATABLE :: WAVE_SHAPER
           TYPE(DETONATOR_PLANE_STRUCT_), DIMENSION(:), ALLOCATABLE :: PLANE
+          !global flag
+          LOGICAL IS_SHADOWING_REQUIRED
         END TYPE DETONATORS_STRUCT_
         
       CONTAINS
 
-      !||====================================================================
-      !||    deallocate_detonators   ../starter/share/modules1/detonators_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                  ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    deallocate_detonators   ../starter/share/modules1/detonators_mod.F
+!||--- called by ------------------------------------------------------
+!||    lectur                  ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE DEALLOCATE_DETONATORS(DETONATORS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

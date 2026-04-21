@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    main_beam18    ../engine/source/elements/beam/main_beam18.F
-      !||--- called by ------------------------------------------------------
-      !||    pforc3         ../engine/source/elements/beam/pforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    fail_beam18    ../engine/source/elements/beam/fail_beam18.F
-      !||    m2lawpi        ../engine/source/materials/mat/mat002/m2lawpi.F
-      !||    mulaw_ib       ../engine/source/elements/beam/mulaw_ib.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    mat_elem_mod   ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    main_beam18    ../engine/source/elements/beam/main_beam18.F
+!||--- called by ------------------------------------------------------
+!||    pforc3         ../engine/source/elements/beam/pforc3.F
+!||--- calls      -----------------------------------------------------
+!||    fail_beam18    ../engine/source/elements/beam/fail_beam18.F
+!||    m2lawpi        ../engine/source/materials/mat/mat002/m2lawpi.F
+!||    mulaw_ib       ../engine/source/elements/beam/mulaw_ib.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    mat_elem_mod   ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||====================================================================
       SUBROUTINE MAIN_BEAM18(ELBUF_STR,
      1                  NEL     ,NPT     ,MTN     ,IMAT    ,
      2                  PID     ,NGL     ,PM      ,IPM     ,
@@ -43,7 +43,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      8                  IFAIL   ,SBUFMAT ,SNPC    ,STF     ,NUMMAT   ,
      9                  NUMGEO  ,IOUT    ,ISTDO   ,NPROPMI ,NPROPM   ,
      A                  NPROPG  ,TIME    ,DTIME   ,IDEL7NOK,ISIGI    ,
-     B                  IMCONV  ,ISMSTR  ,MAT_PARAM)
+     B                  IMCONV  ,ISMSTR  ,MAT_PARAM ,NTABLE,TABLE    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -72,6 +72,8 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN) :: ISIGI
       INTEGER ,INTENT(IN) :: IMCONV
       INTEGER ,INTENT(IN) :: ISMSTR
+      INTEGER ,INTENT(IN) :: NTABLE
+      TYPE(TTABLE), DIMENSION(NTABLE), INTENT(INOUT)    :: TABLE      ! TABLE DATA    
       INTEGER ,DIMENSION(NEL)  ,INTENT(IN) :: PID
       INTEGER ,DIMENSION(NEL)  ,INTENT(IN) :: NGL
       INTEGER ,DIMENSION(SNPC) ,INTENT(IN) :: NPF
@@ -82,9 +84,9 @@ C-----------------------------------------------
       my_real ,INTENT(IN) :: PM(NPROPM,NUMMAT)
       my_real ,INTENT(IN) :: GEO(NPROPG,NUMGEO)
       my_real ,DIMENSION(NEL)  ,INTENT(IN)  :: AL
-      my_real ,DIMENSION(NEL)  ,INTENT(IN)  :: TEMPEL
       my_real ,DIMENSION(NEL)  ,INTENT(OUT) :: EPSD
       my_real ,DIMENSION(SBUFMAT) ,INTENT(IN) :: BUFMAT
+      my_real ,DIMENSION(NEL)  ,INTENT(INOUT) :: TEMPEL
       my_real ,DIMENSION(NEL)  ,INTENT(INOUT) :: OFF
       my_real ,DIMENSION(NEL,2),INTENT(INOUT) :: EINT
       my_real ,DIMENSION(NEL,3),INTENT(INOUT) :: FOR,MOM
@@ -99,16 +101,18 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,J,IPT,IPID,IPLA,NPAR,IADBUF,NFUNC,ISRATE,IPY,IPZ,IPA,II(3)
-      my_real :: DTINV,ASRATE,EPSDI,DMPM,DMPF,SPE,SPG,RHO,FACT,AREA,
-     .           DMM,DMPFL,IXX,IYY,IZZ,G,E,DAMAGE_LOC,DFXX,DFXY,DFXZ
+      INTEGER :: I,J,IPT,IPID,IPLA,ISRATE,IPY,IPZ,IPA,II(3)
+      my_real :: ASRATE,EPSDI,FACT,AREA,
+     .           DAMAGE_LOC,DFXX,DFXY,DFXZ,
+     .           SIGNXX,SIGNXY,SIGNXZ,SIGOXX,SIGOXY,SIGOXZ
       my_real ,DIMENSION(NEL ):: DEGMB,DEGSH,DEGFX,YPT,ZPT,APT,OFF_OLD
-      my_real ,DIMENSION(:,:) ,ALLOCATABLE :: DPLA
+      my_real ,DIMENSION(:,:) ,ALLOCATABLE :: DPLA,SIGY,VM,VM0
 C=======================================================================
       IPY  = 200        
       IPZ  = 300        
       IPA  = 400        
       IPID = PID(1)
+      AREA = GEO(1 ,IPID)
       DO I=1,3
         II(I) = NEL*(I-1)
       ENDDO
@@ -157,12 +161,22 @@ C
           MOM(I,3) = ZERO
         ENDDO
       ENDIF
+c
+      ! Plasticity specific tables
       IPLA = ELBUF_STR%BUFLY(1)%L_PLA
       ALLOCATE (DPLA(NEL*IPLA,NPT*IPLA))
-      IF (IFAIL > 0 .and. IPLA > 0) THEN
-        DO I = 1,NEL
-          DO J=1,NPT
+      ALLOCATE (SIGY(NEL*IPLA,NPT*IPLA)) 
+      ALLOCATE (VM0(NEL*IPLA,NPT*IPLA))   
+      ALLOCATE (VM(NEL*IPLA,NPT*IPLA))  
+      IF (IPLA > 0) THEN
+        DO J=1,NPT
+          DO I = 1,NEL
             DPLA(I,J) = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%PLA(I)
+            SIGY(I,J) = 1.E30 
+            SIGOXX    = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%SIG(II(1)+I)
+            SIGOXY    = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%SIG(II(2)+I)
+            SIGOXZ    = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%SIG(II(3)+I) 
+            VM0(I,J)  = SQRT(SIGOXX**2 + THREE*(SIGOXY**2 + SIGOXZ**2))
           ENDDO
         ENDDO
       ENDIF
@@ -170,45 +184,54 @@ c---------------------------
 c     material models
 c---------------------------
       IF (MTN == 2) THEN
-        CALL M2LAWPI(ELBUF_STR,
-     1               1      ,NEL    ,NPT    ,PM     ,GEO     ,
-     2               EINT   ,OFF    ,IMAT    ,
-     3               PID    ,EPSD   ,EXX    ,EXY    ,EXZ     ,
-     4               KXX    ,KYY    ,KZZ    ,AL     ,NEL     ,
-     5               IPM    ,ASRATE ,DTIME  ,NUMMAT )
+        CALL M2LAWPI(ELBUF_STR,MAT_PARAM,
+     1               NEL    ,NPT    ,GEO    ,EINT   ,OFF    ,
+     3               PID    ,EPSD   ,EXX    ,EXY    ,EXZ    ,
+     4               KXX    ,KYY    ,KZZ    ,AL     ,ASRATE ,
+     5               DTIME  ,JTHE   ,TEMPEL ,SIGY   )
 c
       ELSE
-c
+c     
         CALL MULAW_IB(ELBUF_STR,
      1                NEL     ,NPT     ,MTN     ,IMAT    ,
      2                PID     ,NGL     ,IPM     ,
      3                GEO     ,OFF     ,
      4                EPSD    ,BUFMAT  ,NPF     ,TF      ,
      5                EXX     ,EXY     ,EXZ     ,KXX     ,
-     6                KYY     ,KZZ     ,JTHE    ,TEMPEL  )
+     6                KYY     ,KZZ     ,JTHE    ,TEMPEL  ,SIGY  )
       ENDIF
+!
+c---------------------------
+c     Computation of Plastic Work
+c---------------------------
+      IF (IPLA > 0) THEN
+        DO J=1,NPT
+          DO I = 1,NEL
+            DPLA(I,J) = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%PLA(I) - DPLA(I,J)
+            SIGNXX = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%SIG(II(1)+I)
+            SIGNXY = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%SIG(II(2)+I)
+            SIGNXZ = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%SIG(II(3)+I)
+            VM(I,J) = SQRT(SIGNXX**2 + THREE*(SIGNXY**2 + SIGNXZ**2))
+            IF (ELBUF_STR%GBUF%G_WPLA > 0) ELBUF_STR%GBUF%WPLA(I) = ELBUF_STR%GBUF%WPLA(I) + 
+     .             HALF*(VM(I,J)+VM0(I,J))*DPLA(I,J)*AL(I)*AREA/NPT
+          ENDDO
+        ENDDO
+      ENDIF  
 c---------------------------
 c     failure models
 c---------------------------
       IF (IFAIL > 0) THEN
-        IF (IPLA > 0) THEN
-          DO I = 1,NEL
-            DO J=1,NPT
-              DPLA(I,J) = ELBUF_STR%BUFLY(1)%LBUF(1,1,J)%PLA(I) -DPLA(I,J)
-            ENDDO
-          ENDDO
-        END IF           
 c
-        AREA = GEO(1 ,IPID)
         CALL FAIL_BEAM18(
-     .              ELBUF_STR,MAT_PARAM%FAIL(1),NUMMAT  ,NUMGEO  ,
-     .              NPROPM   ,NPROPG  ,SNPC    ,STF     ,
-     .              NEL      ,NPT     ,IMAT    ,IPID    ,JTHE    ,
-     .              TEMPEL   ,NGL     ,PM      ,GEO     ,
+     .              ELBUF_STR,MAT_PARAM%FAIL(1),MAT_PARAM,NUMGEO ,
+     .              NPROPG   ,SNPC    ,STF     ,
+     .              NEL      ,NPT     ,IPID    ,JTHE    ,
+     .              TEMPEL   ,NGL     ,GEO     ,
      .              OFF      ,EPSD    ,NPF     ,TF      ,
      .              DPLA     ,EINT    ,TIME    ,IOUT    ,ISTDO   ,
      .              AL       ,ISMSTR  ,EXX     ,EXY     ,EXZ     ,
-     .              KXX      ,KYY     ,KZZ     ,DTIME)
+     .              KXX      ,KYY     ,KZZ     ,DTIME   ,
+     .              NTABLE   ,TABLE   ,SIGY    )
        END IF
 C------------------------------------
 c     resultant force and moment
@@ -233,7 +256,7 @@ c------------------------------------
          ENDDO
       ELSE     
 C-----------------------
-C      FORCES ET MOMENTS
+C      FORCES AND MOMENTS
 C-----------------------
         DO IPT = 1,NPT        
          DO I=1,NEL

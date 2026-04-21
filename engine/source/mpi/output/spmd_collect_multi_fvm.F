@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_collect_multi_fvm   ../engine/source/mpi/output/spmd_collect_multi_fvm.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                    ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    double_array_checksum    ../engine/source/mpi/output/node_checksum.F
-      !||    my_orders                ../common_source/tools/sort/my_orders.c
-      !||--- uses       -----------------------------------------------------
-      !||    checksum_mod             ../engine/source/mpi/output/node_checksum.F
-      !||    debug_mod                ../engine/share/modules/debug_mod.F
-      !||    inoutfile_mod            ../common_source/modules/inoutfile_mod.F
-      !||    multi_fvm_mod            ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_collect_multi_fvm   ../engine/source/mpi/output/spmd_collect_multi_fvm.F
+!||--- called by ------------------------------------------------------
+!||    resol                    ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    double_array_checksum    ../engine/source/mpi/output/node_checksum.F
+!||    my_orders                ../common_source/tools/sort/my_orders.c
+!||--- uses       -----------------------------------------------------
+!||    checksum_mod             ../engine/source/mpi/output/node_checksum.F
+!||    debug_mod                ../engine/share/modules/debug_mod.F
+!||    element_mod              ../common_source/modules/elements/element_mod.F90
+!||    inoutfile_mod            ../common_source/modules/inoutfile_mod.F
+!||    multi_fvm_mod            ../common_source/modules/ale/multi_fvm_mod.F90
+!||    spmd_comm_world_mod      ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_COLLECT_MULTI_FVM(IXS,MULTI_FVM,FLAG)
 !$COMMENT
 !       SPMD_COLLECT_MULTI_FVM description
@@ -49,6 +51,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       USE INOUTFILE_MOD
       USE DEBUG_MOD
       USE MULTI_FVM_MOD
+      use element_mod , only : nixs
+      USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,8 +79,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-      INTEGER MSGOFF,MSGOFF0,MSGTYP,INFO,I,K,NG,N,
-     .        EMPL,FILEN 
+      INTEGER MSGOFF,MSGOFF0,MSGTYP,I,K,N,
+     .        FILEN 
       CHARACTER FILNAM*100,CYCLENUM*7
       INTEGER :: LEN_TMP_NAME,SHIFT
       CHARACTER(len=2148) :: TMP_NAME
@@ -112,7 +116,6 @@ C-----------------------------------------------
       IF (ISPMD/=0) THEN
  
       DO I = 1,NUMELS
-!        SDNODG(I) = IXS(NIXS,I)
         AGLOB(1,I) = IXS(NIXS,I)
         AGLOB(2,I) = MULTI_FVM%VEL(1,I)
         AGLOB(3,I) = MULTI_FVM%VEL(2,I)

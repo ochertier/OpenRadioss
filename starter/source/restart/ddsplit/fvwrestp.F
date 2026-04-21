@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    fvwrestp                 ../starter/source/restart/ddsplit/fvwrestp.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit                  ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvwrestp                 ../starter/source/restart/ddsplit/fvwrestp.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit                  ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
+!||====================================================================
             SUBROUTINE FVWRESTP(PROC)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -49,7 +49,7 @@ C-----------------------------------------------
       INTEGER LEN, I, NNS, NNTR, LENP, NPOLY, LENH, NPOLH, TABI(11),
      .        LENP_ANIM, NPOLH_ANIM, LENH_ANIM, NNS_ANIM
 C--------------------------------------
-C     ECRITURE DES DIMENSIONS
+C     WRITING OF DIMENSIONS
 C--------------------------------------
       LEN=1
         CALL WRITE_I_C(NFVBAG,LEN)
@@ -135,7 +135,7 @@ C
            CALL WRITE_I_C(TABI,LEN)
        
 C--------------------------------------
-C     ECRITURE DES ENTIERS
+C     WRITING OF INTEGERS
 C--------------------------------------
          LEN=3*NNS
            CALL WRITE_I_C(FVDATA(I)%IFVNOD,LEN)
@@ -158,7 +158,7 @@ C
               CALL WRITE_I_C(FVDATA(I)%REDIR_ANIM,NNS_ANIM)
          ENDIF
 C--------------------------------------
-C     ECRITURE DES REELS
+C     WRITING OF REAL NUMBERS
 C--------------------------------------
            LEN = 1
            CALL WRITE_DB(FVDATA(I)%PDISP_OLD,LEN)

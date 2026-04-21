@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_update_global   ../engine/source/multifluid/multi_update_global.F
-      !||--- called by ------------------------------------------------------
-      !||    multi_timeevolution   ../engine/source/multifluid/multi_timeevolution.F
-      !||--- calls      -----------------------------------------------------
-      !||    multi_bilan           ../engine/source/multifluid/multi_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod           ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod         ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    multi_update_global   ../engine/source/multifluid/multi_update_global.F
+!||--- called by ------------------------------------------------------
+!||    multi_timeevolution   ../engine/source/multifluid/multi_timeevolution.F
+!||--- calls      -----------------------------------------------------
+!||    multi_bilan           ../engine/source/multifluid/multi_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    initbuf_mod           ../engine/share/resol/initbuf.F
+!||    multi_fvm_mod         ../common_source/modules/ale/multi_fvm_mod.F90
+!||====================================================================
       SUBROUTINE MULTI_UPDATE_GLOBAL(NG, ELBUF_TAB, IPARG, ITASK, MULTI_FVM, 
      .     PARTSAV, IPARTS, GRESAV, IGRTH, GRTH, VOLNEW, PRED, TIMESTEP)
 C-----------------------------------------------
@@ -65,7 +65,7 @@ C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
       TYPE(G_BUFEL_), POINTER :: GBUF
       INTEGER :: II, I
-      my_real :: RHO, ETOT, VEL2, VOL, SUMFLUX(5)
+      my_real ::  VEL2
       my_real :: VII(5)
       INTEGER :: NEL, NFT
 C-----------------------------------------------

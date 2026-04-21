@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps28    ../engine/source/materials/mat/mat028/sigeps28.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw       ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8      ../engine/source/materials/mat_share/mulaw8.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter      ../engine/source/tools/curve/finter.F
-      !||    vinter2     ../engine/source/tools/curve/vinter.F
-      !||    vinter2dp   ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps28    ../engine/source/materials/mat/mat028/sigeps28.F
+!||--- called by ------------------------------------------------------
+!||    mulaw       ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8      ../engine/source/materials/mat_share/mulaw8.F90
+!||--- calls      -----------------------------------------------------
+!||    finter      ../engine/source/tools/curve/finter.F
+!||    vinter2     ../engine/source/tools/curve/vinter.F
+!||    vinter2dp   ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE SIGEPS28 (
      1     NEL    ,NUPARAM,NUVAR   ,NFUNC   ,IFUNC   ,NPF    ,
      2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0    ,RHO    ,
@@ -149,17 +149,17 @@ C        NPF,TF  : FUNCTION PARAMETER
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IADBUF,IF1,IF2,AUX,IC,II,K,
+      INTEGER I,J,IADBUF,IF1,IF2,AUX,IC,II,
      .        IAD1(MVSIZ),IPOS1(MVSIZ),ILEN1(MVSIZ),
      .        INDEX(MVSIZ),
      .        NINDX,INDX(MVSIZ)
       my_real
      .        E11,E22,E33,G12,G23,G31,
-     .        Y11,Y22,Y33,Y12,Y23,Y31,EP1,EP2,EP3,EP4,EP5,EP6,
+     .        
      .        YC(MVSIZ),FAC1(MVSIZ),FAC2(MVSIZ),
      .        FAC3(MVSIZ),FAC4(MVSIZ),FAC5(MVSIZ),FAC6(MVSIZ),
-     .        DYDX,DYDXV(MVSIZ),EP(MVSIZ,6),EPC(MVSIZ),
-     .        EMX11,EMX22,EMX33,EMX12,EMX23,EMX31,AMUV
+     .        DYDXV(MVSIZ),EP(MVSIZ,6),EPC(MVSIZ),
+     .        EMX11,EMX22,EMX33,EMX12,EMX23,EMX31
 C=======================================================================
 C     USER VARIABLES INITIALIZATION
 C-----------------------------------------------

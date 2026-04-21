@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r4cum3p     ../engine/source/elements/spring/r4cum3p.F
-      !||--- called by ------------------------------------------------------
-      !||    r23law113   ../engine/source/elements/spring/r23law113.F
-      !||    r23law114   ../engine/source/elements/spring/r23law114.F
-      !||    rforc3      ../engine/source/elements/spring/rforc3.F
-      !||====================================================================
+!||====================================================================
+!||    r4cum3p     ../engine/source/elements/spring/r4cum3p.F
+!||--- called by ------------------------------------------------------
+!||    r23law113   ../engine/source/elements/spring/r23law113.F
+!||    r23law114   ../engine/source/elements/spring/r23law114.F
+!||    rforc3      ../engine/source/elements/spring/rforc3.F
+!||====================================================================
       SUBROUTINE R4CUM3P(
      1   FORX,    FORY,    FORZ,    XMOM,
      2   YMOM,    ZMOM,    STI,     STIR,
@@ -71,14 +71,13 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, II, N, J
+      INTEGER I, II, N
 C     REAL
       my_real
      .   F11(MVSIZ), F21(MVSIZ), F31(MVSIZ), 
      .   M11(MVSIZ), M21(MVSIZ), M31(MVSIZ),
      .   M12(MVSIZ), M22(MVSIZ), M32(MVSIZ),
-     .   YMOM1, YMOM2, ZMOM1, ZMOM2, YMOM1P, ZMOM1P,
-     .   YMOM2P,ZMOM2P
+     . YMOM1, YMOM2, ZMOM1, ZMOM2
 C-----------------------------------------------
       DO I=1,NEL
         F11(I)=EXX(I)*FORX(I)+EXY(I)*FORY(I)+EXZ(I)*FORZ(I)

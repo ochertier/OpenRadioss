@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fredamp       ../engine/source/input/fredamp.F
-      !||--- called by ------------------------------------------------------
-      !||    freform       ../engine/source/input/freform.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    wriusc2       ../engine/source/input/wriusc2.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fredamp       ../engine/source/input/fredamp.F
+!||--- called by ------------------------------------------------------
+!||    freform       ../engine/source/input/freform.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||    wriusc2       ../engine/source/input/wriusc2.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FREDAMP(IKAD,KEY0,KDAMP,NDAMP)
 C-----------------------------------------------
 C   M o d u l e s
@@ -52,16 +52,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K, NN, ID, IKEY, IDG, IGR, NBC, KORTH
+      INTEGER K, NN, ID, IKEY, IGR, NBC, KORTH
       my_real DAMPA, DAMPB
-      character carte*100
+      
 C=======================================================================
       K=0
       IKEY = KDAMP
       IGR = 0
       IF (NDAMP == 1) THEN
-        READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(7X,I5,37X,I10)',ERR=9990)
+        READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(6X,I10,85X,I10)',ERR=9990)
      .                                                       ID,NBC
+
         IF (ID/=1.AND.NBC==1) THEN
           KORTH=0
           K=K+1
@@ -118,8 +119,9 @@ C           damparz, damprbz
         ENDIF
       ELSE
         DO NN=1,NDAMP
-          READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(7X,I5,37X,I10)',ERR=9990)
-     .                                                         ID,NBC
+          READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(6X,I10,85X,I10)',ERR=9990)
+     .                                                       ID,NBC
+     
           IF(NBC/=6)THEN
             KORTH=0
             K=K+1

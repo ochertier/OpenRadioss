@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2_dtn_27       ../starter/source/interfaces/inter3d1/i2_dtn_27.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2_dtn_27_cin   ../starter/source/interfaces/inter3d1/i2_dtn_27.F
-      !||    i2_dtn_27_pen   ../starter/source/interfaces/inter3d1/i2_dtn_27.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_dtn_27       ../starter/source/interfaces/inter3d1/i2_dtn_27.F
+!||--- called by ------------------------------------------------------
+!||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    i2_dtn_27_cin   ../starter/source/interfaces/inter3d1/i2_dtn_27.F
+!||    i2_dtn_27_pen   ../starter/source/interfaces/inter3d1/i2_dtn_27.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I2_DTN_27(X,INTBUF_TAB,IPARI,STIFN,MS,IN,N,NSN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -55,7 +55,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,NI,NINDXC,NINDXP
+      INTEGER I,NINDXC,NINDXP
 C=======================================================================
       NINDXC = 0
       NINDXP = 0
@@ -83,12 +83,12 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    i2_dtn_27_cin   ../starter/source/interfaces/inter3d1/i2_dtn_27.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_dtn_27       ../starter/source/interfaces/inter3d1/i2_dtn_27.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_dtn_27_cin   ../starter/source/interfaces/inter3d1/i2_dtn_27.F
+!||--- called by ------------------------------------------------------
+!||    i2_dtn_27       ../starter/source/interfaces/inter3d1/i2_dtn_27.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I2_DTN_27_CIN(X,IRECT ,CRST    ,CSTS_BIS, NSV  ,
      2                         IRTL  ,IPARI, MSEGTYP2, STIFN, STIFR,
      2                         MS, IN, IRUPT)
@@ -107,9 +107,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER II,I,J,JJ,L,IX1,IX2,IX3,IX4,NIR,NRTM,NSN,NMN,K
+      INTEGER II,I,J,JJ,L,IX1,IX2,IX3,IX4,NIR,NRTM,NSN,NMN
       my_real
-     .   BID,BID4(4),BID9(9),X1,X2,X3,X4,Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,XS(3),XM(3),X0,Y0,Z0,BETAX,BETAY,BETAZ,
+     .   BID,BID4(4),BID9(9),X1,X2,X3,X4,Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,XS(3),XM(3),X0,Y0,Z0,BETAX,BETAY,
      .   E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z,H(4),H2(4),SS,ST,SP,SM,TP,TM,RS(3),RM(3),RX(4),RY(4),RZ(4),
      .   FAC_TRIANG,STBRK,DWDU,STIFMR,STIFM,INS,STF,AA
 C=======================================================================
@@ -271,7 +271,7 @@ C--
      .                        BID4   ,BID4   ,BID4   ,STIFMR ,BETAX   ,
      .                        BETAY)
           ELSE
-C--           moment balance
+C- Balance moment
               CALL I2LOCEQ_27(NIR    ,RS     ,RX     ,RY     ,RZ      ,
      .                        BID4   ,BID4   ,BID4   ,H      ,STIFM   ,
      .                        BID4   ,BID4   ,BID4   ,STIFMR ,BETAX   ,
@@ -323,12 +323,12 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    i2_dtn_27_pen   ../starter/source/interfaces/inter3d1/i2_dtn_27.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_dtn_27       ../starter/source/interfaces/inter3d1/i2_dtn_27.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_dtn_27_pen   ../starter/source/interfaces/inter3d1/i2_dtn_27.F
+!||--- called by ------------------------------------------------------
+!||    i2_dtn_27       ../starter/source/interfaces/inter3d1/i2_dtn_27.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I2_DTN_27_PEN(X,IRECT ,CRST    ,NSV  ,IRTL,
      2                         IPARI,MSEGTYP2,STIFN, STIFR,STFN,
      3                         STFR,VISC,IN,IRUPT)
@@ -350,15 +350,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIR,I,J,II,JJ,L,W,NN,KK,LLT,
-     .        IX1, IX2, IX3, IX4,NSVG,NSN
+      INTEGER NIR,I,II,L,
+     .        IX1, IX2, IX3, IX4,NSN
 C     REAL
       my_real
      .   S,T,SP,SM,TP,TM,E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z,
      .   XSM,YSM,ZSM,XM,YM,ZM,X1,X2,X3,X4,Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,X0,Y0,Z0,XS,YS,ZS,STIFM,
      .   STF,STR,STBRK,B1,B2,B3,C1,C2,C3,DET
       my_real
-     .   H(4),RX(4),RY(4),RZ(4),RM(3),RS(3),STIF, VIS
+     .   H(4),RX(4),RY(4),RZ(4),RM(3),RS(3)
       my_real
      .   LEN2,FAC_TRIANG,IROT,SKEW(9),TT,BID,BID3(4)
 C=======================================================================
@@ -544,14 +544,14 @@ C------------------------------------------------
 C
           IF (IROT > ZERO) THEN
 C
-C--   Secnd node shell of  spring
+C--   Second node shell of  spring
 C
             LEN2 = XSM**2+YSM**2+ZSM**2
             STR = (STFR(II)+STFN(II)*LEN2)*(VISC + SQRT(VISC**2 + ONE))**2
 C
           ELSE
 C
-C--   Secnd node of solids
+C--   Second node of solids
 C
             STR = ZERO
 c           update main forces (moment balance)

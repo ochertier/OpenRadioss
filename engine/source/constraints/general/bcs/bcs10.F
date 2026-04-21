@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    bcs10   ../engine/source/constraints/general/bcs/bcs10.F
-      !||--- called by ------------------------------------------------------
-      !||    resol   ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    bcs1v   ../engine/source/constraints/general/bcs/bcs1.F
-      !||====================================================================
+!||====================================================================
+!||    bcs10   ../engine/source/constraints/general/bcs/bcs10.F
+!||--- called by ------------------------------------------------------
+!||    resol   ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    bcs1v   ../engine/source/constraints/general/bcs/bcs1.F
+!||====================================================================
       SUBROUTINE BCS10(NODFT,NODLT  ,ICODT  ,ICODR,ISKEW,
      2                 SKEW ,A      ,AR     ,MS   ,V    ,
      3                 VR   )
@@ -48,8 +48,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, K, ISK, LCOD, NINDX,
-     .        INDX(1024),L,J
+      INTEGER I, N, NINDX,
+     .        INDX(1024)
 C-----------------------------------------------
       DO 420 I = NODFT,NODLT,1024
         NINDX = 0

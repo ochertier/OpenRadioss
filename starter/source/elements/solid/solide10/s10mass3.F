@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10mass3     ../starter/source/elements/solid/solide10/s10mass3.F
-      !||--- called by ------------------------------------------------------
-      !||    inirig_mat   ../starter/source/elements/initia/inirig_mat.F
-      !||    s10init3     ../starter/source/elements/solid/solide10/s10init3.F
-      !||--- calls      -----------------------------------------------------
-      !||    s4fraca10    ../starter/source/elements/solid/solide10/s10mass3.F
-      !||====================================================================
+!||====================================================================
+!||    s10mass3     ../starter/source/elements/solid/solide10/s10mass3.F
+!||--- called by ------------------------------------------------------
+!||    inirig_mat   ../starter/source/elements/initia/inirig_mat.F
+!||    s10init3     ../starter/source/elements/solid/solide10/s10init3.F
+!||--- calls      -----------------------------------------------------
+!||    s4fraca10    ../starter/source/elements/solid/solide10/s10mass3.F
+!||====================================================================
       SUBROUTINE S10MASS3(
      1   MASS,MS ,PARTSAV,IPART  ,MSS ,VOLU,
      2   XX  ,YY ,ZZ     ,VX     ,VY  ,VZ  ,  
@@ -76,7 +76,7 @@ C
       DATA IPERM3/1,3,6,5,0,0,0,0,0,0/
 C
 C-----------------------------------------------------------------------
-      FAC=TRHEE_OVER_14
+      FAC=THREE_OVER_14
       FACIROT = NINE + THIRD
 
       IF(IREST_MSELT /= 0)THEN
@@ -130,7 +130,7 @@ C         Not yet compatible with IMAS_DS/=0
           MSS(6,I)=AM
           MSS(5,I)=AM
           AAA=STI(I)*TWO/THIRTY2
-          BBB=STI(I)*TWO*SEVEN/FOURTY8
+          BBB=STI(I)*TWO*SEVEN/FORTY8
           STIFN(NC(I,1))=STIFN(NC(I,1))+AAA
           STIFN(NC(I,2))=STIFN(NC(I,2))+AAA
           STIFN(NC(I,3))=STIFN(NC(I,3))+AAA
@@ -219,7 +219,7 @@ C          Not yet compatible with IMAS_DS/=0
            STIFN(NC(I,4))=STIFN(NC(I,4))+AAA
            DO N=5,10
              IF(NC(I,N)/=0)THEN
-               MSSX(N-4,I) = AM*FACIROT !  meme masse que dans le cas standard
+               MSSX(N-4,I) = AM*FACIROT ! same mass as in the standard case
                STIFN(NC(I,N))=STIFN(NC(I,N))+AAA*FACIROT
              ENDIF
            ENDDO
@@ -304,7 +304,7 @@ C
 
       IF(JTHE < 0) THEN
        DO I=LFT,LLT
-        FAC=TRHEE_OVER_14
+        FAC=THREE_OVER_14
         AM = MASSCP(I)*FAC/(FOUR*FAC + SIX)
         BM = MASSCP(I)*ONE/(FOUR*FAC + SIX)
         MCPS(1,I)=AM
@@ -329,11 +329,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    s10msi     ../starter/source/elements/solid/solide10/s10mass3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10init3   ../starter/source/elements/solid/solide10/s10init3.F
-      !||====================================================================
+!||====================================================================
+!||    s10msi     ../starter/source/elements/solid/solide10/s10mass3.F
+!||--- called by ------------------------------------------------------
+!||    s10init3   ../starter/source/elements/solid/solide10/s10init3.F
+!||====================================================================
       SUBROUTINE S10MSI(RHO,MASS,VOLU,DTELEM,STI,
      .                  OFF,SIG,EINT,
      .                  OFFG,SIGG,EINTG,RHOG,WIP,
@@ -400,13 +400,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    s4fraca10   ../starter/source/elements/solid/solide10/s10mass3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10mass3    ../starter/source/elements/solid/solide10/s10mass3.F
-      !||--- calls      -----------------------------------------------------
-      !||    area_tria   ../starter/source/elements/solid/solide4/s4mass3.F
-      !||====================================================================
+!||====================================================================
+!||    s4fraca10   ../starter/source/elements/solid/solide10/s10mass3.F
+!||--- called by ------------------------------------------------------
+!||    s10mass3    ../starter/source/elements/solid/solide10/s10mass3.F
+!||--- calls      -----------------------------------------------------
+!||    area_tria   ../starter/source/elements/solid/solide4/s4mass3.F
+!||====================================================================
       SUBROUTINE S4FRACA10(X,IX1 ,IX2,IX3 ,IX4 ,PTG  ,IMAS_DS )
 C----------------------------------------------
 C     MASS PARTITION IN FUNCTION OF NODAL ANGLES by AREA
@@ -432,9 +432,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER, INTENT(IN) ::  IMAS_DS
-      INTEGER I,J,K,N,IP,I1,I2,I3,I4
+      INTEGER I,J
       my_real
-     .   XX,YY,ZZ,XY,YZ,ZX,P1,P2,P3,P4,S
+     .   S
       my_real
      .   A1(MVSIZ), A2(MVSIZ), A3(MVSIZ),A4(MVSIZ)
 C=======================================================================

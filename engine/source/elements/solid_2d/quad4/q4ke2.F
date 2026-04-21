@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    q4ke2          ../engine/source/elements/solid_2d/quad4/q4ke2.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_q4       ../engine/source/implicit/assem_q4.F
-      !||    mmat_h1        ../engine/source/elements/solid/solide8z/mmat_h1.F
-      !||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
-      !||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
-      !||    q4deri2        ../engine/source/elements/solid_2d/quad4/q4deri2.F
-      !||    q4deric2       ../engine/source/elements/solid_2d/quad4/q4deric2.F
-      !||    q4kega2        ../engine/source/elements/solid_2d/quad4/q4kega2.F
-      !||    q4kel2         ../engine/source/elements/solid_2d/quad4/q4kel2.F
-      !||    q4kep2         ../engine/source/elements/solid_2d/quad4/q4kep2.F
-      !||    q4kerot2       ../engine/source/elements/solid_2d/quad4/q4kerot2.F
-      !||    qcoor2         ../engine/source/elements/solid_2d/quad/qcoor2.F
-      !||    qrcoor2        ../engine/source/elements/solid_2d/quad/qrcoor2.F
-      !||    qvolu2         ../engine/source/elements/solid_2d/quad/qvolu2.F
-      !||    s8zsigp3       ../engine/source/elements/solid/solide8z/s8zsigp3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    q4ke2          ../engine/source/elements/solid_2d/quad4/q4ke2.F
+!||--- called by ------------------------------------------------------
+!||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_q4       ../engine/source/implicit/assem_q4.F
+!||    mmat_h1        ../engine/source/elements/solid/solide8z/mmat_h1.F
+!||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
+!||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
+!||    q4deri2        ../engine/source/elements/solid_2d/quad4/q4deri2.F
+!||    q4deric2       ../engine/source/elements/solid_2d/quad4/q4deric2.F
+!||    q4kega2        ../engine/source/elements/solid_2d/quad4/q4kega2.F
+!||    q4kel2         ../engine/source/elements/solid_2d/quad4/q4kel2.F
+!||    q4kep2         ../engine/source/elements/solid_2d/quad4/q4kep2.F
+!||    q4kerot2       ../engine/source/elements/solid_2d/quad4/q4kerot2.F
+!||    qcoor2         ../engine/source/elements/solid_2d/quad/qcoor2.F
+!||    qrcoor2        ../engine/source/elements/solid_2d/quad/qrcoor2.F
+!||    qvolu2         ../engine/source/elements/solid_2d/quad/qvolu2.F
+!||    s8zsigp3       ../engine/source/elements/solid/solide8z/s8zsigp3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE Q4KE2(
      1   PM,       GEO,      IXQ,      X,
      2   ELBUF_STR,NEL,      LIAD,     ICP,
@@ -55,6 +56,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD            
+      use element_mod , only : nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -112,7 +114,7 @@ c  I   BUFMAT()            buffer for material constitution computation
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,J,EP
+      INTEGER I, J, EP
 C
       INTEGER IKORTH,IADBUF,ICPG,IPREDU
 C
@@ -150,7 +152,7 @@ C     [K]=[R][K']T([R])
      +    Z14(MVSIZ),Z23(MVSIZ),
      +    Y234(MVSIZ),Y124(MVSIZ),YAVG(MVSIZ),
      +    PYC1(MVSIZ),PYC2(MVSIZ),PZC1(MVSIZ),PZC2(MVSIZ),
-     +    AY(MVSIZ),AY1(MVSIZ),AY2(MVSIZ),AY3(MVSIZ),AY4(MVSIZ),
+     + AY(MVSIZ),
      +    AIRE(MVSIZ),VOLU(MVSIZ),
      +    PY1(MVSIZ),PY2(MVSIZ),PY3(MVSIZ),PY4(MVSIZ),
      +    PZ1(MVSIZ),PZ2(MVSIZ),PZ3(MVSIZ),PZ4(MVSIZ),
@@ -182,10 +184,7 @@ C     USED ONLY FOR SUBROUTINE INTERFACE
       my_real
      +    VD2(MVSIZ),VIS(MVSIZ),
      +    RX(MVSIZ),RY(MVSIZ),RZ(MVSIZ),
-     +    SX(MVSIZ),SY(MVSIZ),SZ(MVSIZ),
-     +    TX(MVSIZ),TY(MVSIZ),TZ(MVSIZ)
-      my_real
-     +    AA,BB
+     +    SX(MVSIZ),SY(MVSIZ),SZ(MVSIZ)
 C
       my_real
      +  WI,KSI,ETA

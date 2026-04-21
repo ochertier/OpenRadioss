@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r2def3             ../engine/source/elements/spring/r2def3.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3             ../engine/source/elements/spring/rforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    repla3             ../engine/source/elements/spring/repla3.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod   ../common_source/modules/python_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    r2def3             ../engine/source/elements/spring/r2def3.F
+!||--- called by ------------------------------------------------------
+!||    rforc3             ../engine/source/elements/spring/rforc3.F
+!||--- calls      -----------------------------------------------------
+!||    redef3             ../engine/source/elements/spring/redef3.F90
+!||    repla3             ../engine/source/elements/spring/repla3.F
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    redef3_mod         ../engine/source/elements/spring/redef3.F90
+!||====================================================================
       SUBROUTINE R2DEF3(PYTHON,
      1   SKEW,    GEO,     FX,      FY,
      2   FZ,      E,       DX,      DY,
@@ -127,7 +129,7 @@ C     REAL
      .     GF3(MVSIZ),HX(MVSIZ), HY(MVSIZ), HZ(MVSIZ),
      .     X0_INI(MVSIZ),Y0_INI(MVSIZ),Z0_INI(MVSIZ)
       my_real
-     .     SX,SY,SZ,XX,YY,ZZ,XKA,YKA,ZKA,AA,BB,CC,X21PHI,Y21PHI,Z21PHI,
+     .     SX,SY,SZ,XX,YY,ZZ,XKA,YKA,ZKA,
      .     ASRATE,DLIM,NOT_USED,NOT_USED2(2)
       DOUBLE PRECISION X21DP(MVSIZ),Y21DP(MVSIZ),Z21DP(MVSIZ),
      .                 X0DP(MVSIZ),Y0DP(MVSIZ),Z0DP(MVSIZ)

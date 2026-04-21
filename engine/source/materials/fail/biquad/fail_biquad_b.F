@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_biquad_b   ../engine/source/materials/fail/biquad/fail_biquad_b.F
-      !||--- called by ------------------------------------------------------
-      !||    fail_beam3      ../engine/source/elements/beam/fail_beam3.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter          ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    fail_biquad_b   ../engine/source/materials/fail/biquad/fail_biquad_b.F
+!||--- called by ------------------------------------------------------
+!||    fail_beam3      ../engine/source/elements/beam/fail_beam3.F
+!||--- calls      -----------------------------------------------------
+!||    finter          ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE FAIL_BIQUAD_B(
      .           NEL      ,NGL      ,NUPARAM  ,UPARAM   ,
      .           TIME     ,SVM      ,PRESSURE ,
      .           DPLA     ,OFF      ,DFMAX    ,
      .           TDEL     ,IOUT     ,ISTDO    ,IFUNC    ,NFUNC,
      .           SNPC     ,NPF      , STF     , TF      ,
-     .           NUVAR    , UVAR   ,AL)           
+     .           NUVAR    , UVAR   ,AL, 
+     .           DMGSCL)       
 C-----------------------------------------------
 c    BIQUAD- failure model for standard beams (TYPE 3) IRUP=30
 C-----------------------------------------------
@@ -66,20 +67,21 @@ C-----------------------------------------------
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: SVM     ! Von Mises stress
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: PRESSURE! element pressure
 
-      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: OFF     ! element desactivation flag
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: OFF     ! flag
       my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: DFMAX   ! maximum damage
-      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: TDEL    ! desactivation time
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: TDEL    ! deactivation time
       my_real ,DIMENSION(NEL,NUVAR),INTENT(INOUT) :: UVAR   
+      my_real, DIMENSION(NEL)     ,INTENT(INOUT) :: DMGSCL 
 C!-----------------------------------------------
 C!   L o c a l   V a r i a b l e s
 C!-----------------------------------------------
-      INTEGER I,J,IDEL,IDEV,IFLAG(NEL),INDX(NEL),IADBUF,NINDX,
-     .        INDEX(NEL),IR,IFAIL,JJ,MATID,SEL,ICOUP
+      INTEGER I,J,INDX(NEL),NINDX,
+     .        IR,SEL,ICOUP
       my_real 
-     .        D1,DF,TRIAX,SCALE,SXX,SYY,SZZ
+     .        D1,DF,TRIAX
       my_real EPS_FAIL,FINTER
       EXTERNAL FINTER
-      my_real P1X,P1Y,S1X,S1Y,S2Y, A1, B1, C1, REF_EL_LEN, LAMBDA,FAC,DCRIT,EXP
+      my_real P1X,P1Y,S1X,S1Y, A1, B1, C1, REF_EL_LEN, LAMBDA,FAC,DCRIT,EXP
       my_real X_1(3) , X_2(3)
 
 C!--------------------------------------------------------------
@@ -182,6 +184,22 @@ c-----------------------------
            ENDIF
         ENDIF 
       ENDDO      
+c------------------------
+c     STRESS SOFTENING
+c------------------------
+      IF (ICOUP == 1) THEN
+        DO I = 1,NEL
+          IF (DFMAX(I) >= DCRIT) THEN 
+            IF (DCRIT < ONE) THEN 
+              DMGSCL(I) = ONE - ((DFMAX(I)-DCRIT)/MAX(ONE-DCRIT,EM20))**EXP
+            ELSE
+              DMGSCL(I) = ZERO
+            ENDIF
+          ELSE
+            DMGSCL(I) = ONE
+          ENDIF
+        ENDDO
+      ENDIF
 c------------------------
       IF (NINDX > 0) THEN        
         DO J=1,NINDX             

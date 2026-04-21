@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rmdim_imp    ../engine/source/model/remesh/rm_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    dim_kinmax   ../engine/source/implicit/ind_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    cp_int       ../engine/source/implicit/produt_v.F
-      !||    reorder_a    ../engine/source/implicit/ind_glob_k.F
-      !||--- uses       -----------------------------------------------------
-      !||    remesh_mod   ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rmdim_imp     ../engine/source/model/remesh/rm_imp0.F
+!||--- called by ------------------------------------------------------
+!||    dim_kinmax    ../engine/source/implicit/ind_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    cp_int        ../engine/source/implicit/produt_v.F
+!||    reorder_a     ../engine/source/implicit/ind_glob_k.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod   ../common_source/modules/elements/element_mod.F90
+!||    remesh_mod    ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE RMDIM_IMP(IXC ,IXTG  ,NDOF   ,NNMAX ,NKINE,
      1                     INLOC,NROW ,ITAB   ,SH4TREE,SH3TREE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE REMESH_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -319,15 +321,15 @@ C
       RETURN
       END     
 
-      !||====================================================================
-      !||    rmind_imp    ../engine/source/model/remesh/rm_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    ind_kine_k   ../engine/source/implicit/ind_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    reorder_a    ../engine/source/implicit/ind_glob_k.F
-      !||--- uses       -----------------------------------------------------
-      !||    remesh_mod   ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rmind_imp    ../engine/source/model/remesh/rm_imp0.F
+!||--- called by ------------------------------------------------------
+!||    ind_kine_k   ../engine/source/implicit/ind_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    reorder_a    ../engine/source/implicit/ind_glob_k.F
+!||--- uses       -----------------------------------------------------
+!||    remesh_mod   ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE RMIND_IMP(NNMAX,INLOC,NROWK,ICOK )
 C-----------------------------------------------
 C   M o d u l e s
@@ -371,15 +373,15 @@ C
       RETURN
       END     
 
-      !||====================================================================
-      !||    rm_imp0      ../engine/source/model/remesh/rm_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    rm_imp1      ../engine/source/model/remesh/rm_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    remesh_mod   ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rm_imp0      ../engine/source/model/remesh/rm_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    rm_imp1      ../engine/source/model/remesh/rm_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    remesh_mod   ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE RM_IMP0(NDDL  ,IADK  ,JDIK  ,DIAG_K ,LT_K  ,
      1                   NDOF  ,IDDL  ,IKC   ,B      ,ITAB  )
 C-----------------------------------------------
@@ -414,19 +416,19 @@ C
       RETURN
       END     
 
-      !||====================================================================
-      !||    rm_imp1      ../engine/source/model/remesh/rm_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rm_imp0      ../engine/source/model/remesh/rm_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_kii      ../engine/source/implicit/imp_glob_k.F
-      !||    get_kij      ../engine/source/implicit/imp_glob_k.F
-      !||    print_wkij   ../engine/source/implicit/imp_glob_k.F
-      !||    put_kii      ../engine/source/implicit/imp_glob_k.F
-      !||    put_kij      ../engine/source/implicit/imp_glob_k.F
-      !||    updkdd       ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updkdd1      ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    rm_imp1      ../engine/source/model/remesh/rm_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rm_imp0      ../engine/source/model/remesh/rm_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    get_kii      ../engine/source/implicit/imp_glob_k.F
+!||    get_kij      ../engine/source/implicit/imp_glob_k.F
+!||    print_wkij   ../engine/source/implicit/imp_glob_k.F
+!||    put_kii      ../engine/source/implicit/imp_glob_k.F
+!||    put_kij      ../engine/source/implicit/imp_glob_k.F
+!||    updkdd       ../engine/source/interfaces/interf/i2_imp1.F
+!||    updkdd1      ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE RM_IMP1(NIR  ,IRECT ,I    ,NR   ,NODS ,
      3                   ITAB ,IKC  ,NDOF  ,NDDL ,IDDL ,
      4                   IADK ,JDIK ,DIAG_K,LT_K ,B    )
@@ -515,18 +517,20 @@ C------- Update ---
 C
       RETURN
       END
-      !||====================================================================
-      !||    rm_imp2      ../engine/source/model/remesh/rm_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    recukin      ../engine/source/implicit/recudis.F
-      !||--- uses       -----------------------------------------------------
-      !||    remesh_mod   ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rm_imp2       ../engine/source/model/remesh/rm_imp0.F
+!||--- called by ------------------------------------------------------
+!||    recukin       ../engine/source/implicit/recudis.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod   ../common_source/modules/elements/element_mod.F90
+!||    remesh_mod    ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE RM_IMP2(IXC,IXTG,V ,VR ,SH4TREE,SH3TREE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE REMESH_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

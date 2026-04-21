@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thnst_count   ../engine/source/output/th/thnst_count.F
-      !||--- called by ------------------------------------------------------
-      !||    init_th       ../engine/source/output/th/init_th.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar          ../engine/source/input/nvar.F
-      !||====================================================================
+!||====================================================================
+!||    thnst_count   ../engine/source/output/th/thnst_count.F
+!||--- called by ------------------------------------------------------
+!||    init_th       ../engine/source/output/th/init_th.F
+!||====================================================================
       SUBROUTINE THNST_COUNT(NTHGRP2, ITHGRP, WA_SIZE, INDEX_WA_NST, 
      .                      IPARG,ITHBUF,SITHBUF)
 C-----------------------------------------------
@@ -52,12 +50,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL :: BOOL
-      INTEGER II, I, J, N, IH, NG, ITY, MTE, NB0, NB1, NB2, NB3,
-     .   NB4, NB5, NNB3, MB1, MB2, MB3, MB4, MB5, K, IST, IP, L,
-     .   LWA, IMAT, IPROP, NX, IGTYP, NUVAR, NUVARN,NEL,NFT,
-     .   KVAR,KVARN
-      my_real
-     .   WWA(100)
+      INTEGER II, I, J, N, IH, NG, ITY, 
+     . K,
+     . NXN,NEL,NFT
       INTEGER :: J_FIRST,NITER,IAD,NN,IADV,NVAR,ITYP,IJK
       INTEGER, DIMENSION(NTHGRP2) :: INDEX_NST
 C-------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps70                ../engine/source/materials/mat/mat070/sigeps70.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw                   ../engine/source/materials/mat_share/mulaw.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter                  ../engine/source/tools/curve/finter.F
-      !||    table_mat_vinterp       ../engine/source/materials/tools/table_mat_vinterp.F
-      !||    vinter2                 ../engine/source/tools/curve/vinter.F
-      !||--- uses       -----------------------------------------------------
-      !||    matparam_def_mod        ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    table_mat_vinterp_mod   ../engine/source/materials/tools/table_mat_vinterp.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps70                ../engine/source/materials/mat/mat070/sigeps70.F
+!||--- called by ------------------------------------------------------
+!||    mulaw                   ../engine/source/materials/mat_share/mulaw.F90
+!||--- calls      -----------------------------------------------------
+!||    finter                  ../engine/source/tools/curve/finter.F
+!||    table_mat_vinterp       ../engine/source/materials/tools/table_mat_vinterp.F
+!||    vinter2                 ../engine/source/tools/curve/vinter.F
+!||--- uses       -----------------------------------------------------
+!||    matparam_def_mod        ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    table_mat_vinterp_mod   ../engine/source/materials/tools/table_mat_vinterp.F
+!||====================================================================
       SUBROUTINE SIGEPS70(
      1   NEL,     NUPARAM, NUVAR,   MFUNC,
      2   KFUNC,   NPF,     TF,      TIME,
@@ -131,7 +131,7 @@ C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
       my_real 
-     .    UVAR(NEL,NUVAR), OFF(NEL),  PLA(NEL), OFFG(NEL), RHOREF(MVSIZ)
+     .    UVAR(NEL,NUVAR), OFF(NEL), OFFG(NEL), RHOREF(MVSIZ)
 C-----------------------------------------------
 C   VARIABLES FOR FUNCTION INTERPOLATION 
 C-----------------------------------------------
@@ -150,18 +150,18 @@ C        NPF,TF  : FUNCTION PARAMETER
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,II,J,J1,J2,IADBUF,NFUNC,
+      INTEGER :: I,II,J,IADBUF,NFUNC,
      .   NINDEX_EPSSM,NINDEX_EPST,NINDEX_MU,NLOAD,NUNLOAD,MX,
      .         ILOAD0,IDAMAGE,ITENS,NUMTABL
       INTEGER, DIMENSION(100)   :: IFUNC
-      INTEGER, DIMENSION(NEL)   :: JJ,IE_CST,ILOAD
+      INTEGER, DIMENSION(NEL)   :: IE_CST,ILOAD
       INTEGER, DIMENSION(NEL)   :: INDEX_EPSSM,INDEX_EPST,INDEX_MU
       INTEGER, DIMENSION(NEL)   :: IPOS1,IADP1,ILENP1
       INTEGER, DIMENSION(NEL,2) :: IPOS
-      my_real :: YLD_EMAX,R,FAC,YP1,YP2,EPSP0,EPSPMAX,E,DELTA,SVM2,SVM,
+      my_real :: YLD_EMAX,R,EPSP0,EPSPMAX,E,DELTA,SVM2,SVM,
      .        AA,E0,NU,EMAX,EPSSMAX,DSIG,P,EXPO,HYS,DE,YFACC,MU,ALPHA
       my_real, DIMENSION(NEL) :: ALPHA_1,AA1,AA2,EPST,YLDMIN,YLDMAX,YLDELAS,
-     .   G,SIG0,EPS0,EPSS,TAB_LOC1,TAB_LOC2,YLD,DFC
+     .   G,SIG0,EPS0,EPSS,TAB_LOC1,YLD,DFC
       my_real, DIMENSION(NEL,2) :: XVEC
 C=======================================================================
       MX = MAT(1)
@@ -188,7 +188,7 @@ C
       YLD_EMAX= UPARAM(IADBUF + 2*NFUNC + 15)
       NUMTABL = MATPARAM%NTABLE
 C-----------------------------------------------
-C     epst_spherique
+C     EPST_SPERIQUE
 C-------------------
       DO I=1,NEL
         EPST(I) = EPSXX(I)**2 + EPSYY(I)**2 + EPSZZ(I)**2
@@ -453,7 +453,7 @@ C =====================================================
       END IF
 C 
 C-------------------
-C projection spherique
+C Spherical projection
 C-------------------
       IF (IDAMAGE == 0 ) THEN
         DO I=1,NEL        

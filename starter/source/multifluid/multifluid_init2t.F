@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multifluid_init2t      ../starter/source/multifluid/multifluid_init2t.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    c3veok3                ../starter/source/elements/sh3n/coque3n/c3veok3.F
-      !||    m5in2t                 ../starter/source/initial_conditions/detonation/m5in2t.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    multifluid_init2t      ../starter/source/multifluid/multifluid_init2t.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    c3veok3                ../starter/source/elements/sh3n/coque3n/c3veok3.F
+!||    m5in2t                 ../starter/source/initial_conditions/detonation/m5in2t.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MULTIFLUID_INIT2T(ELBUF_STR, NEL, NSIGS, NVC, IPARG, IXTG, ALE_CONNECTIVITY,
      .     IGEO, IPART, IPARTTG, IPM, PTSH3N, NPF, ILOADP, 
      .     XGRID, PM, GEO, SIGI, SKEW, TF, BUFMAT, FACLOAD, MULTI_FVM, 
@@ -46,6 +46,7 @@ C-----------------------------------------------
       USE DETONATORS_MOD
       USE ALE_CONNECTIVITY_MOD
       USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -101,6 +102,7 @@ C-----------------------------------------------
      .     Y3(MVSIZ), Z3(MVSIZ),
      .     NX(MVSIZ), NY(MVSIZ), NZ(MVSIZ),
      .     LGTH1(MVSIZ), LGTH2(MVSIZ), LGTH3(MVSIZ),PRES,VFRAC
+      my_real :: TEMPEL(NEL)
       INTEGER :: II, I, IP, IBID, ILAY, MATLAW
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
@@ -114,6 +116,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     B e g i n n i n g   o f   s u b r o u t i n e
 C-----------------------------------------------
+      TEMPEL(:) = ZERO
 C     Global buffer
       GBUF => ELBUF_STR%GBUF
 C     Number of layers ( = number of material in law 151)
@@ -179,7 +182,7 @@ C     Material initialization
      .        MAT, IPM, NSIGS, NUMSH3N, PTSH3N,
      .        IP, NGL, NPF, TF, BUFMAT,
      .        GBUF, LBUF, MBUF, ELBUF_STR, ILOADP,
-     .        FACLOAD, GBUF%DELTAX)
+     .        FACLOAD, GBUF%DELTAX,TEMPEL,MAT_PARAM )
      
          VFRAC = MAT_PARAM( IXTG(1,1+NFT) )%MULTIMAT%VFRAC(ILAY)
          PRES  = PM(104,  MAT_PARAM( IXTG(1,1+NFT) )%MULTIMAT%MID(ILAY)   )
@@ -195,7 +198,7 @@ C     Material initialization
                ENDIF
                ERROR_THROWN = .TRUE.
             ENDIF
-            CALL M5IN2T(PM, MAT,  IPM(1, IXTG(1,1+NFT)), DETONATORS, LBUF%TB, NGL, XGRID, IXTG, NIXTG)
+            CALL M5IN2T(PM, MAT,  IPM(1, IXTG(1,1+NFT)), DETONATORS, LBUF%TB, XGRID, IXTG, NIXTG)
          ENDIF
       ENDDO
 

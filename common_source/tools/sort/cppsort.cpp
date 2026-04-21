@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2025 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2026 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -90,5 +90,22 @@ extern "C" {
     void STLSORT_INT_INT_(int *len, int* keys,  int *values) {
          stlsort_generic_generic<int,int>(len, keys, values); 
     }
+
+ // sort array with real and key
+    void stlsort_real_int(int *len, my_real* keys,  int *values) {
+         stlsort_generic_generic<my_real,int>(len, keys, values); 
+    }
+    void stlsort_real_int__(int *len, my_real* keys,  int *values) {
+         stlsort_generic_generic<my_real,int>(len, keys, values); 
+    }
+    void _FCALL stlsort_real_int_(int *len, my_real* keys,  int *values) {
+         stlsort_generic_generic<my_real,int>(len, keys, values); 
+    }
+    void _FCALL STLSORT_REAL_INT(int *len, my_real* keys,  int *values) {
+         stlsort_generic_generic<my_real,int>(len, keys, values); 
+    }
+    void STLSORT_REAL_INT_(int *len, my_real* keys,  int *values) {
+         stlsort_generic_generic<my_real,int>(len, keys, values); 
+    } 
 }
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fxbodvp1   ../engine/source/constraints/fxbody/fxbodvp.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbyvit    ../engine/source/constraints/fxbody/fxbyvit.F
-      !||--- calls      -----------------------------------------------------
-      !||    fxbsys     ../engine/source/constraints/fxbody/fxbsys.F
-      !||    fxlink     ../engine/source/constraints/fxbody/fxbodv.F
-      !||    splink     ../engine/source/constraints/fxbody/fxbodv.F
-      !||====================================================================
+!||====================================================================
+!||    fxbodvp1   ../engine/source/constraints/fxbody/fxbodvp.F
+!||--- called by ------------------------------------------------------
+!||    fxbyvit    ../engine/source/constraints/fxbody/fxbyvit.F
+!||--- calls      -----------------------------------------------------
+!||    fxbsys     ../engine/source/constraints/fxbody/fxbsys.F
+!||    fxlink     ../engine/source/constraints/fxbody/fxbodv.F
+!||    splink     ../engine/source/constraints/fxbody/fxbodv.F
+!||====================================================================
       SUBROUTINE FXBODVP1(FXBRPM, FXBGLM, FXBLM , MVN   , MCD  ,
      .                    SE    , SV    , FXBVIT, FXBACC, NME  ,
      .                    NMOD  , ISH   , DMT   , FSAV  , FXBFC,
@@ -154,13 +154,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    fxbodvp2   ../engine/source/constraints/fxbody/fxbodvp.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbyvit    ../engine/source/constraints/fxbody/fxbyvit.F
-      !||--- calls      -----------------------------------------------------
-      !||    fxspin     ../engine/source/constraints/fxbody/fxbodv.F
-      !||====================================================================
+!||====================================================================
+!||    fxbodvp2   ../engine/source/constraints/fxbody/fxbodvp.F
+!||--- called by ------------------------------------------------------
+!||    fxbyvit    ../engine/source/constraints/fxbody/fxbyvit.F
+!||--- calls      -----------------------------------------------------
+!||    fxspin     ../engine/source/constraints/fxbody/fxbodv.F
+!||====================================================================
       SUBROUTINE FXBODVP2(FXBRPM, FXBNOD , FXBMOD  , FXBVIT , FXBACC,
      .                    NME   , NMOD   , V       , VR     , A     ,
      .                    AR    , MS     , IN      , NSN    , IDMAST,
@@ -195,7 +195,7 @@ C-----------------------------------------------
      .        USDT, ECBIDT, ECBIDR, VV(6), DT05, VX, VY, VZ, VRX, VRY,
      .        VRZ
 C-----------------------------------------------
-C   RESTITUTION DES VITESSES SUR LES SECNDS
+C   restitution of velocities on the seconds
 C-----------------------------------------------
       CALL FXSPIN(FXBRPM, FXBVIT, SPIN, R12, DT2)
 C
@@ -359,7 +359,7 @@ C
       IF (PMAIN/=ISPMD) FXBRPM(12)=ZERO  
       FXBRPM(12)=FXBRPM(12)-ECBIDT-ECBIDR
 C-----------------------------------------------
-C   RESTITUTION SUR LE MAIN
+C   restitution on the main
 C-----------------------------------------------
       IF (IDMAST/=0) THEN
          A(1,IDMAST)=FXBACC(10)

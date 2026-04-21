@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cfint_reg        ../engine/source/elements/shell/coque/cfint_reg.F
-      !||--- called by ------------------------------------------------------
-      !||    cforc3           ../engine/source/elements/shell/coque/cforc3.F
-      !||    czforc3          ../engine/source/elements/shell/coquez/czforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cfint_reg        ../engine/source/elements/shell/coque/cfint_reg.F
+!||--- called by ------------------------------------------------------
+!||    cforc3           ../engine/source/elements/shell/coque/cforc3.F
+!||    czforc3          ../engine/source/elements/shell/coquez/czforc3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+!||====================================================================
       SUBROUTINE CFINT_REG(
      1   NLOC_DMG,VAR_REG, THK,     NEL,
      2   OFF,     AREA,    NC1,     NC2,
@@ -72,7 +72,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,II,K,N1,N2,N3,N4,L_NLOC,J,NDNOD
       my_real 
-     . DX, DY, DZ, L2,NTN,NTN_UNL,NTN_VNL,XI,NTVAR,A,ZETA,
+     .    L2,NTN,NTN_UNL,NTN_VNL,XI,NTVAR,A,ZETA,
      . B1,B2,B3,B4,SSPNL,NTH1,NTH2,BTH1,BTH2,K1,K2,K12,
      . DTNL_TH,DTNL,LE_MAX,MAXSTIF,DTNOD,DT2P
       my_real, DIMENSION(:,:), ALLOCATABLE :: 
@@ -87,11 +87,6 @@ C-----------------------------------------------
      . MASSTH,UNLTH,VNLTH,FNLTH
       my_real, DIMENSION(:,:), ALLOCATABLE :: 
      . STIFNLTH,DTN
-      ! Safety coefficient for non-local stability vs mechanical stability
-      ! (it has been slightly increased vs nloc_dmg_init.F)
-      my_real, PARAMETER :: CSTA  = 40.0D0
-      ! Coefficient for non-local stability to take into account damping
-      my_real, PARAMETER :: CDAMP = 0.7D0
 c-----------------------------------------------------------------------
 c     VAR_REG :  variable a regulariser (local cumulated plastic strain)
 c     NTVAR  =  NT * VAR_REG
@@ -277,8 +272,8 @@ C
                   ENDIF
                 ENDDO
               ENDDO
+              DTNOD = DTMIN1(11)*(SQRT(CSTA))
             ENDIF
-            DTNOD = DTMIN1(11)*(SQRT(CSTA))
           ENDIF
 C
           ! Classical nodal timestep check

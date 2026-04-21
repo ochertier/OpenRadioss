@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mass_fluid_qd   ../starter/source/fluid/mass-fluid_qd.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_bem     ../starter/source/loads/bem/hm_read_bem.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||    intanl_qd       ../starter/source/fluid/intanl_qd.F
-      !||    intanl_tg       ../starter/source/fluid/intanl_tg.F
-      !||    intgqd          ../starter/source/fluid/inte_qd.F
-      !||    intgtg          ../starter/source/fluid/inte_tg.F
-      !||    inthqd          ../starter/source/fluid/inte_qd.F
-      !||    inthtg          ../starter/source/fluid/inte_tg.F
-      !||    invert          ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mass_fluid_qd   ../starter/source/fluid/mass-fluid_qd.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_bem     ../starter/source/loads/bem/hm_read_bem.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../starter/source/output/message/message.F
+!||    intanl_qd       ../starter/source/fluid/intanl_qd.F
+!||    intanl_tg       ../starter/source/fluid/intanl_tg.F
+!||    intgqd          ../starter/source/fluid/inte_qd.F
+!||    intgtg          ../starter/source/fluid/inte_tg.F
+!||    inthqd          ../starter/source/fluid/inte_qd.F
+!||    inthtg          ../starter/source/fluid/inte_tg.F
+!||    invert          ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MASS_FLUID_QD(NNO, NEL, IFLOW, IBUF, ELEM, X,
-     .                         NORMAL, AF, MFLE, CBEM, RHO)
+     .                         NORMAL, AF, MFLE, CBEM, RHO,IRESP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -55,13 +55,14 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNO, NEL, IFLOW(*), IBUF(*), ELEM(5,*)
       my_real X(3,*), AF(*), NORMAL(3,*), MFLE(NEL,*), CBEM(NEL,*), RHO
+      INTEGER,INTENT(IN):: IRESP
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IFORM, KFORM, ILVOUT, NELMAX
-      INTEGER IN, JN, KN, N1, N2, N3, N4, N5, NN1, NN2, NN3, NN4, NNJ, IEL, JEL, ERR
-      my_real X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, X4, Y4, Z4, XQ, YQ, ZQ, R2,
-     .        XP, YP, ZP, X13, Y13, Z13, X24, Y24, Z24,
+      INTEGER IN, JN, KN, N1, N2, N3, N4, N5, NN1, NN2, NN3, NN4, IEL, JEL, ERR
+      my_real X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, X4, Y4, Z4, XQ, YQ, ZQ,
+     .        XP, YP, ZP,
      .        NRX, NRY, NRZ,  AREA, D2, RVAL, RVLH, RVLG
       my_real MASSX, MASSY, MASSZ, WI(4,2), SUM
       my_real, DIMENSION(:,:), ALLOCATABLE :: BBEM, EBEM
@@ -123,7 +124,7 @@ C           IF (ILVOUT>=2) CALL PROGBAR_C(IEL,NEL)
            Z2=X(3,NN2)
            Z3=X(3,NN3)
            Z4=X(3,NN4)
-C  Control point P
+C  Control Point P
            XP=WI(1,N5)*X1+WI(2,N5)*X2+WI(3,N5)*X3+WI(4,N5)*X4
            YP=WI(1,N5)*Y1+WI(2,N5)*Y2+WI(3,N5)*Y3+WI(4,N5)*Y4
            ZP=WI(1,N5)*Z1+WI(2,N5)*Z2+WI(3,N5)*Z3+WI(4,N5)*Z4
@@ -162,7 +163,7 @@ C
                 Z3=X(3,NN3)
                 Z4=X(3,NN4)
                 AREA=AF(JEL)
-C  Position de la source Q
+C  Position of source Q
                 XQ=WI(1,JN)*X1+WI(2,JN)*X2+WI(3,JN)*X3+WI(4,JN)*X4
                 YQ=WI(1,JN)*Y1+WI(2,JN)*Y2+WI(3,JN)*Y3+WI(4,JN)*Y4
                 ZQ=WI(1,JN)*Z1+WI(2,JN)*Z2+WI(3,JN)*Z3+WI(4,JN)*Z4
@@ -219,7 +220,7 @@ C           IF (ILVOUT>=2) CALL PROGBAR_C(IEL,NEL)
            Z2=X(3,NN2)
            Z3=X(3,NN3)
            Z4=X(3,NN4)
-C  Control point P
+C  Control Point P
            XP=WI(1,IN)*X1+WI(2,IN)*X2+WI(3,IN)*X3+WI(4,IN)*X4
            YP=WI(1,IN)*Y1+WI(2,IN)*Y2+WI(3,IN)*Y3+WI(4,IN)*Y4
            ZP=WI(1,IN)*Z1+WI(2,IN)*Z2+WI(3,IN)*Z3+WI(4,IN)*Z4
@@ -316,27 +317,28 @@ C         MFLE(1:NEL,1:NEL) = MATMUL(CMAT(1:NEL,1:NEL),CBEM(1:NEL,1:NEL))
 C         CMAT(1:NEL,1:NEL) = TRANSPOSE(CBEM(1:NEL,1:NEL))
 C         MFLE(1:NEL,1:NEL) = MFLE(1:NEL,1:NEL) + MATMUL(CMAT(1:NEL,1:NEL),BBEM(1:NEL,1:NEL))
 C         CMAT(1:NEL,1:NEL) = CBEM(1:NEL,1:NEL)
-#if defined(mkl)
-C #warning "MKL used: DAA will be fast"
+  
+         IF (IRESP == 0)THEN
+         ! Double Precision version : use either Lapack / MKP or ARMPL
 
-         ALPHA = 1.0D0
-         BETA = 0.0D0
-         CALL DGEMM('T','N',NEL,NEL,NEL,ALPHA,CBEM,NEL,BBEM,NEL,BETA,MFLE,NEL)
-         ALPHA = 1.0D0
-         BETA = 1.0D0
-         CALL DGEMM('N','T',NEL,NEL,NEL,ALPHA,BBEM,NEL,CBEM,NEL,BETA,MFLE,NEL)
-#else
-C #warning "MKL not used: DAA will be slow"
-         DO JN=1,NEL
-            DO IN=1,NEL
+           ALPHA = 1.0D0
+           BETA = 0.0D0
+           CALL DGEMM('T','N',NEL,NEL,NEL,ALPHA,CBEM,NEL,BBEM,NEL,BETA,MFLE,NEL)
+           ALPHA = 1.0D0
+           BETA = 1.0D0
+           CALL DGEMM('N','T',NEL,NEL,NEL,ALPHA,BBEM,NEL,CBEM,NEL,BETA,MFLE,NEL)
+         ELSE
+         ! Single Precision version / Bad performance 
+           DO JN=1,NEL
+             DO IN=1,NEL
                SUM=ZERO
                DO KN=1,NEL
                   SUM=SUM+BBEM(KN,IN)*CBEM(KN,JN)+CBEM(KN,IN)*BBEM(KN,JN)
                ENDDO
                MFLE(IN,JN)=SUM
-            ENDDO
-         ENDDO
-#endif
+             ENDDO
+           ENDDO
+         ENDIF
          RETURN
       ENDIF
 C---------------------------------------------------

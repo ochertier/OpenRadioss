@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    damping51      ../engine/source/assembly/damping.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    damping_vref   ../engine/source/assembly/damping_vref.F
-      !||    get_u_func     ../engine/source/user_interface/ufunc.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    damping51                        ../engine/source/assembly/damping.F
+!||--- called by ------------------------------------------------------
+!||    resol                            ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    damping_vref                     ../engine/source/assembly/damping_vref.F
+!||    damping_vref_compute_dampa       ../engine/source/assembly/damping_vref_compute_dampa.F90
+!||    get_u_func                       ../engine/source/user_interface/ufunc.F
+!||--- uses       -----------------------------------------------------
+!||    damping_vref_compute_dampa_mod   ../engine/source/assembly/damping_vref_compute_dampa.F90
+!||    groupdef_mod                     ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE DAMPING51(
      1  DIM    ,V      ,
      2  VR     ,A      ,AR     ,MS     ,IN     ,
@@ -40,6 +42,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
+      use damping_vref_compute_dampa_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,7 +60,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER DIM,ITASK,WEIGHT(*),ICONTACT(*),I_DAMP_RDOF_TAB(*),TAGSLV_RBY(*)
+      INTEGER DIM,WEIGHT(*),ICONTACT(*),I_DAMP_RDOF_TAB(*),TAGSLV_RBY(*)
       INTEGER ,INTENT(IN) :: NDAMP_VREL,ID_DAMP_VREL(NDAMP_VREL)
       INTEGER ,INTENT(IN) :: FR_DAMP_VREL(NSPMD+2,NDAMP_VREL),IPARIT,ISPMD
       my_real V(3,*), VR(3,*), A(3,*), AR(3,*) ,MS(*), IN(*),DAMPR(NRDAMP,*), DAMP(DIM,*), SKEW(LSKEW,*)
@@ -69,12 +72,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL :: NEED_COMPUTE
-      INTEGER I,J,N,ND,IGR,ISK,FL_VREL,ID_RBY,ID_FUNC
+      INTEGER I,N,ND,IGR,ISK,FL_VREL,ID_RBY,FL_FREQ_RANGE,ITYPE
       my_real, DIMENSION(3) :: DAMP_A,DAMP_B
       my_real, DIMENSION(3) :: DA_,DW_LOCAL,OMEGA_,BETASDT_
-      my_real :: AA,DW,DA,BETASDT,OMEGA,FACTB,DAMPT,D_TSTART,D_TSTOP,
+      my_real :: DW,DA,BETASDT,OMEGA,FACTB,DAMPT,D_TSTART,D_TSTOP,
      .           V_REF(3,NDAMP),A_REF(3,NDAMP),V_REFSKW(3),A_REFSKW(3),
-     .           FREQ,FACT,DAM(3),DARM(3),DFM,GET_U_FUNC,DXDY,DTINI
+     .           GET_U_FUNC
       EXTERNAL GET_U_FUNC      
 C-----------------------------------------------
 C     C = a M + b K
@@ -98,11 +101,20 @@ C-----------------------------------------------
       DO ND=1,NDAMP
         IGR   = NINT(DAMPR(2,ND))
         ISK   = NINT(DAMPR(15,ND))
-        FACTB = DAMPR(16,ND)
+        FACTB = ONE
+!        FACTB = DAMPR(16,ND) ! used for alpha of func
         DAMPT  = MIN(DT1,DT2)*FACTB
         D_TSTART = DAMPR(17,ND)
         D_TSTOP  = DAMPR(18,ND)
-        FL_VREL = NINT(DAMPR(21,ND))
+        ITYPE = NINT(DAMPR(21,ND))
+        FL_VREL = 0
+        FL_FREQ_RANGE = 0
+        SELECT CASE (ITYPE)
+           CASE(2) 
+             FL_VREL = 1
+           CASE(3) 
+             FL_FREQ_RANGE = 1
+        END SELECT
         ID_RBY = NINT(DAMPR(25,ND))        
 C
         IF (TT>=D_TSTART .AND. TT<=D_TSTOP) THEN
@@ -112,7 +124,7 @@ C-------------------------------------------------------------------------------
 C---------- Damping in global coordinates system -----------------------------------
 C-----------------------------------------------------------------------------------
 C
-              IF (FL_VREL == 0) THEN
+              IF ((FL_VREL == 0).AND.(FL_FREQ_RANGE == 0)) THEN
 C-------------Damping using global velocities 
                 IF (DAMPR(19,ND)==0) THEN
 C-------------------------------------------------
@@ -132,7 +144,7 @@ C-------------------------------------------------
                     BETASDT_(3)= -MIN(DAMP_B(3),DAMPT)*DT1/MAX(DT1*DT1,EM30)
                     OMEGA_(3)  = ONE/ (ONE + HALF * DAMP_A(3) * DT1)
                     ! --------------
-#include "vectorize.inc"
+
                     DO N=1,IGRNOD(IGR)%NENTITY
                         I=IGRNOD(IGR)%ENTITY(N)
                         IF(TAGSLV_RBY(I)==0) THEN
@@ -177,11 +189,11 @@ C
                     BETASDT_(3)= -MIN(DAMP_B(3),DAMPT)*DT1/MAX(DT1*DT1,EM30)
                     OMEGA_(3)  = ONE/ (ONE + HALF * DAMP_A(3) * DT1)
                     ! --------------
-#include "vectorize.inc"
+ 
                     DO N=1,IGRNOD(IGR)%NENTITY
                         I=IGRNOD(IGR)%ENTITY(N)
                         IF(TAGSLV_RBY(I)==0) THEN
-C----- Damping seulement pour les noeuds en contact avec temporisation -----
+C----- Damping only for nodes in contact with time delay -----
                             NEED_COMPUTE = .TRUE.
                             IF (DAMPR(19,ND)/=0) THEN
                                 IF (ICONTACT(I)/=0) I_DAMP_RDOF_TAB(I) = DAMPR(19,ND)
@@ -220,42 +232,13 @@ C
 C-------------Damping using average relative velocity - trans dof only ----
 C
 C---------------alpha = Cdamp_M / dt--------------
-                FREQ = DAMPR(28,ND)
-                ID_FUNC = NINT(DAMPR(26,ND))
-                DTINI = DAMPR(29,ND)
-                IF (ID_FUNC > 0) THEN
-                  FACT = GET_U_FUNC(ID_FUNC,TT,DXDY)
-                ELSE
-                  FACT = ONE
-                ENDIF
-                IF (DT1 > ZERO) THEN
-                  IF (FREQ > ZERO) THEN
-                    DAMP_A(1)  = FACT*DAMPR(3,ND)*4*PI*FREQ
-                    DAMP_A(2)  = FACT*DAMPR(3,ND)*4*PI*FREQ
-                    DAMP_A(3)  = FACT*DAMPR(3,ND)*4*PI*FREQ                
-                  ELSE
-                    IF (DTINI == ZERO) THEN
-  !                   Initial time step is saved                    
-                      DTINI = DT1
-                      DAMPR(29,ND) = DT1
-                    endif  
-                    DAMP_A(1)  = FACT*DAMPR(3,ND)*(ONE/DTINI)
-                    DAMP_A(2)  = FACT*DAMPR(5,ND)*(ONE/DTINI)
-                    DAMP_A(3)  = FACT*DAMPR(7,ND)*(ONE/DTINI)
-                  ENDIF
-                ELSE      
-                  DAMP_A(1) = ZERO
-                  DAMP_A(2) = ZERO
-                  DAMP_A(3) = ZERO            
-                ENDIF
-!               damping coefficient is saved for timestep computation in dtnodarayl.F
-                DAMPR(30,ND) = MAX(DAMP_A(1),DAMP_A(2),DAMP_A(3))
+                call damping_vref_compute_dampa(nd,ndamp,nrdamp,dampr,dt1,tt,damp_a)
 !                
                 OMEGA_(1)  = ONE/ (ONE + HALF * DAMP_A(1) * DT1)
                 OMEGA_(2)  = ONE/ (ONE + HALF * DAMP_A(2) * DT1)
                 OMEGA_(3)  = ONE/ (ONE + HALF * DAMP_A(3) * DT1)   
 C-------------------------------------------------
-#include "vectorize.inc"
+
                 DO N=1,IGRNOD(IGR)%NENTITY
                   I=IGRNOD(IGR)%ENTITY(N)
                   IF(TAGSLV_RBY(I)==0) THEN
@@ -268,7 +251,7 @@ C-------------------------------------------------
                   ENDIF
                 ENDDO
 C-------------------------------------------------
-#include "vectorize.inc"
+
                 DO N=1,IGRNOD(IGR)%NENTITY
                   I=IGRNOD(IGR)%ENTITY(N)
                   IF(TAGSLV_RBY(I)==0) THEN
@@ -281,7 +264,6 @@ C-------------------------------------------------
                   ENDIF
                 ENDDO
 C-------------------------------------------------
-#include "vectorize.inc"
                 DO N=1,IGRNOD(IGR)%NENTITY
                   I=IGRNOD(IGR)%ENTITY(N)
                   IF(TAGSLV_RBY(I)==0) THEN
@@ -301,7 +283,7 @@ C-------------------------------------------------------------------------------
 C---------- Damping in local coordinates system ------------------------------------
 C-----------------------------------------------------------------------------------
 C
-              IF (FL_VREL == 0) THEN
+              IF ((FL_VREL == 0).AND.(FL_FREQ_RANGE == 0)) THEN
 C-------------Damping using global velocities 
                 IF (DAMPR(19,ND)==0) THEN
 C-------------------------------------------------
@@ -332,7 +314,7 @@ C-------------------------------------------------
                     DAMP_B(3) = DAMPR(8,ND)
                     BETASDT_(3)= -MIN(DAMP_B(3),DAMPT)*DT1/MAX(DT1*DT1,EM30)
                     OMEGA_(3)  = ONE/ (ONE + HALF * DAMP_A(3) * DT1)
-#include "vectorize.inc"
+
                     DO N=1,IGRNOD(IGR)%NENTITY
                         I=IGRNOD(IGR)%ENTITY(N)
                         IF(TAGSLV_RBY(I)==0) THEN
@@ -429,11 +411,11 @@ C-------------------------------------------------
                     DAMP_B(3) = DAMPR(14,ND)
                     BETASDT_(3)= -MIN(DAMP_B(3),DAMPT)*DT1/MAX(DT1*DT1,EM30)
                     OMEGA_(3)  = ONE/ (ONE + HALF * DAMP_A(3) * DT1)
-#include "vectorize.inc"
+
                     DO N=1,IGRNOD(IGR)%NENTITY
                         I=IGRNOD(IGR)%ENTITY(N)
                         IF(TAGSLV_RBY(I)==0) THEN
-C----- Damping seulement pour les noeuds en contact avec temporisation -----
+C----- Damping only for nodes in contact with time delay -----
                             NEED_COMPUTE = .TRUE.
                             IF (DAMPR(19,ND)/=0) THEN
                                 IF (ICONTACT(I)/=0) I_DAMP_RDOF_TAB(I) = DAMPR(19,ND)
@@ -521,42 +503,12 @@ C
      .                      +SKEW(9,ISK)*A_REF(3,ND)
 C
 C---------------alpha = Cdamp_M / dt--------------
-                FREQ = DAMPR(28,ND)
-                ID_FUNC = NINT(DAMPR(26,ND))
-                DTINI = DAMPR(29,ND)
-                IF (ID_FUNC > 0) THEN
-                  FACT = GET_U_FUNC(ID_FUNC,TT,DXDY)
-                ELSE
-                  FACT = ONE
-                ENDIF
-                IF (DT1 > ZERO) THEN
-                  IF (FREQ > ZERO) THEN
-                    DAMP_A(1)  = FACT*DAMPR(3,ND)*4*PI*FREQ
-                    DAMP_A(2)  = FACT*DAMPR(5,ND)*4*PI*FREQ
-                    DAMP_A(3)  = FACT*DAMPR(7,ND)*4*PI*FREQ                
-                  ELSE
-                    IF (DTINI == ZERO) THEN
-  !                   Initial time step is saved                    
-                      DTINI = DT1
-                      DAMPR(29,ND) = DT1
-                    endif  
-                    DAMP_A(1)  = FACT*DAMPR(3,ND)*(ONE/DTINI)
-                    DAMP_A(2)  = FACT*DAMPR(5,ND)*(ONE/DTINI)
-                    DAMP_A(3)  = FACT*DAMPR(7,ND)*(ONE/DTINI)
-                  ENDIF
-                ELSE      
-                  DAMP_A(1) = ZERO
-                  DAMP_A(2) = ZERO
-                  DAMP_A(3) = ZERO            
-                ENDIF
-!               damping coefficient is saved for timestep computation in dtnodarayl.F
-                DAMPR(30,ND) = MAX(DAMP_A(1),DAMP_A(2),DAMP_A(3))
+                call damping_vref_compute_dampa(nd,ndamp,nrdamp,dampr,dt1,tt,damp_a)
 !                     
                 OMEGA_(1)  = ONE/ (ONE + HALF * DAMP_A(1) * DT1)
                 OMEGA_(2)  = ONE/ (ONE + HALF * DAMP_A(2) * DT1)
                 OMEGA_(3)  = ONE/ (ONE + HALF * DAMP_A(3) * DT1)                            
 C-------------------------------------------------
-#include "vectorize.inc"
                 DO N=1,IGRNOD(IGR)%NENTITY
                   I=IGRNOD(IGR)%ENTITY(N)
                   IF(TAGSLV_RBY(I)==0) THEN
@@ -616,7 +568,8 @@ C-----------------------------------------------
         DAMPT  = MIN(DT1,DT2)*FACTB
         D_TSTART = DAMPR(17,ND)
         D_TSTOP  = DAMPR(18,ND)
-        IF (TT>=D_TSTART .AND. TT<=D_TSTOP) THEN
+        FL_FREQ_RANGE = NINT(DAMPR(31,ND))
+        IF ((TT>=D_TSTART .AND. TT<=D_TSTOP).AND.(FL_FREQ_RANGE==0)) THEN
         IF(ISK<=1)THEN
 C-------------------------------------------------
           IF(IRODDL/=0)THEN
@@ -624,11 +577,11 @@ C-------------------------------------------------
            DAMPB = DAMPR(10,ND)
            BETASDT= -MIN(DAMPB,DAMPT)*DT1/MAX(DT1*DT1,EM30)
            OMEGA  = ONE/ (ONE + HALF * DAMPA * DT1)
-#include "vectorize.inc"
+
            DO N=1,IGRNOD(IGR)%NENTITY
             I=IGRNOD(IGR)%ENTITY(N)
             IF(TAGSLV_RBY(I)/=0) CYCLE
-C----- Damping seulement pour les noeuds en contact avec temporisation -----
+C----- Damping only for nodes in contact with time delay -----
             IF (DAMPR(19,ND)/=0) THEN
               IF (ICONTACT(I)/=0) I_DAMP_RDOF_TAB(I) = DAMPR(19,ND)
               IF (I_DAMP_RDOF_TAB(I)==0) GOTO 351
@@ -646,11 +599,11 @@ C--------------------------------------------------------
            DAMPB = DAMPR(12,ND)
            BETASDT= -MIN(DAMPB,DAMPT)*DT1/MAX(DT1*DT1,EM30)
            OMEGA  = ONE/ (ONE + HALF * DAMPA * DT1)
-#include "vectorize.inc"
+
            DO N=1,IGRNOD(IGR)%NENTITY
             I=IGRNOD(IGR)%ENTITY(N)
             IF(TAGSLV_RBY(I)/=0) CYCLE
-C----- Damping seulement pour les noeuds en contact avec temporisation -----
+C----- Damping only for nodes in contact with time delay -----
             IF (DAMPR(19,ND)/=0) THEN
               IF (I_DAMP_RDOF_TAB(I)==0) GOTO 451
             ENDIF
@@ -667,11 +620,11 @@ C--------------------------------------------------------
            DAMPB = DAMPR(14,ND)
            BETASDT= -MIN(DAMPB,DAMPT)*DT1/MAX(DT1*DT1,EM30)
            OMEGA  = ONE/ (ONE + HALF * DAMPA * DT1)
-#include "vectorize.inc"
+
            DO N=1,IGRNOD(IGR)%NENTITY
             I=IGRNOD(IGR)%ENTITY(N)
             IF(TAGSLV_RBY(I)/=0) CYCLE
-C----- Damping seulement pour les noeuds en contact avec temporisation -----
+C----- Damping only for nodes in contact with time delay -----
             IF (DAMPR(19,ND)/=0) THEN
               IF (I_DAMP_RDOF_TAB(I)==0) GOTO 551
               I_DAMP_RDOF_TAB(I)=I_DAMP_RDOF_TAB(I)-1
@@ -723,11 +676,11 @@ C--------------------------------------------------------
            DAMPB = DAMPR(10,ND)
            BETASDT= -MIN(DAMPB,DAMPT)*DT1/MAX(DT1*DT1,EM30)
            OMEGA  = ONE/ (ONE + HALF * DAMPA * DT1)
-#include "vectorize.inc"
+
            DO N=1,IGRNOD(IGR)%NENTITY
             I=IGRNOD(IGR)%ENTITY(N)
             IF(TAGSLV_RBY(I)/=0) CYCLE
-C----- Damping seulement pour les noeuds en contact avec temporisation -----
+C----- Damping only for nodes in contact with time delay -----
             IF (DAMPR(19,ND)/=0) THEN
               IF (ICONTACT(I)/=0) I_DAMP_RDOF_TAB(I) = DAMPR(19,ND)    
               IF (I_DAMP_RDOF_TAB(I)==0) GOTO 751
@@ -746,11 +699,11 @@ C--------------------------------------------------------
            DAMPB = DAMPR(12,ND)
            BETASDT= -MIN(DAMPB,DAMPT)*DT1/MAX(DT1*DT1,EM30)
            OMEGA  = ONE/ (ONE + HALF * DAMPA * DT1)
-#include "vectorize.inc"
+
            DO N=1,IGRNOD(IGR)%NENTITY
             I=IGRNOD(IGR)%ENTITY(N)
             IF(TAGSLV_RBY(I)/=0) CYCLE
-C----- Damping seulement pour les noeuds en contact avec temporisation -----
+C----- Damping only for nodes in contact with time delay -----
             IF (DAMPR(19,ND)/=0) THEN   
               IF (I_DAMP_RDOF_TAB(I)==0) GOTO 851       
             ENDIF
@@ -768,11 +721,11 @@ C--------------------------------------------------------
            DAMPB = DAMPR(14,ND)
            BETASDT= -MIN(DAMPB,DAMPT)*DT1/MAX(DT1*DT1,EM30)
            OMEGA  = ONE/ (ONE + HALF * DAMPA * DT1)
-#include "vectorize.inc"
+
            DO N=1,IGRNOD(IGR)%NENTITY
             I=IGRNOD(IGR)%ENTITY(N)
             IF(TAGSLV_RBY(I)/=0) CYCLE
-C----- Damping seulement pour les noeuds en contact avec temporisation -----
+C----- Damping only for nodes in contact with time delay -----
             IF (DAMPR(19,ND)/=0) THEN
               IF (I_DAMP_RDOF_TAB(I)==0) GOTO 951
               I_DAMP_RDOF_TAB(I)=I_DAMP_RDOF_TAB(I)-1      
@@ -826,13 +779,13 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    damping44      ../engine/source/assembly/damping.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    damping44      ../engine/source/assembly/damping.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE DAMPING44(
      1  DIM    ,V      ,
      2  VR     ,A      ,AR     ,MS     ,IN     ,
@@ -857,7 +810,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER DIM,ITASK,WEIGHT(*),TAGSLV_RBY(*)
+      INTEGER DIM,WEIGHT(*),TAGSLV_RBY(*)
       my_real V(3,*), VR(3,*), A(3,*), AR(3,*) ,MS(*), IN(*),DAMPR(4,*), DAMP(DIM,*)
       DOUBLE PRECISION, INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
@@ -866,7 +819,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N,ND,IGR
-      my_real BETASDT,AA,DA,DW,OMEGA
+      my_real BETASDT,DA,DW,OMEGA
 C-----------------------------------------------
 C     C = a M + b K
 C======================================================================|
@@ -879,7 +832,6 @@ C======================================================================|
         OMEGA  = ONE/ (ONE + HALF * DAMPA * DT1)
         DO J=1,3
           IF(IRODDL==0)THEN
-#include "vectorize.inc"
             DO N=1,IGRNOD(IGR)%NENTITY
               I=IGRNOD(IGR)%ENTITY(N)
               IF(TAGSLV_RBY(I)/=0) CYCLE
@@ -890,7 +842,6 @@ C======================================================================|
               DW =DW+MS(I)*DA*(V(J,I)+HALF*A(J,I)*DT1)*DT12*WEIGHT(I)
             ENDDO
           ELSE
-#include "vectorize.inc"
             DO N=1,IGRNOD(IGR)%NENTITY
               I=IGRNOD(IGR)%ENTITY(N)
               IF(TAGSLV_RBY(I)/=0) CYCLE
@@ -919,13 +870,13 @@ C
 C--------------------------
 C          DAMPING alpha M + beta K
 C--------------------------
-      !||====================================================================
-      !||    damping        ../engine/source/assembly/damping.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    damping        ../engine/source/assembly/damping.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE DAMPING(NODFT,NODLT,V ,VR,A ,AR ,DAMP,MS,IN,
      .                   IGRNOD,DIM,ITASK,WEIGHT,TAGSLV_RBY, WFEXT)
 C-----------------------------------------------
@@ -958,7 +909,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N
-      my_real BETASDT,AA,DA,DW,OMEGA
+      my_real BETASDT,DA,DW,OMEGA
 C-----------------------------------------------
 C
 C     C = a M + b K
@@ -966,7 +917,7 @@ C
 C
 C     Fint(1)  = Fint0(0) + K v(1/2) dt1 + C v(1)
 C     Fint0(1) = Fint0(0) + K v(1/2) dt1
-C     Fint(1)  = Fint0(1) + C v(1)
+C     Fint (1) = fint0 (1) + c'v (1)
 C     Fint(1)  = Fint0(1) + [a M + b K] v(1)
 C
 C     a0(1) = a0(0) - K/M v(1/2) dt1
@@ -1001,7 +952,6 @@ C
       IF(IDAMPG==0)THEN
        DO J=1,3
         IF(IRODDL==0)THEN
-#include "vectorize.inc"
          DO I=NODFT,NODLT
           IF(TAGSLV_RBY(I)/=0) CYCLE
           DA = A(J,I) - DAMPA*V(J,I) - BETASDT *(A(J,I) - DAMP(J,I))
@@ -1011,7 +961,6 @@ C
           DW=DW+WEIGHT(I)*(MS(I)*DA*(V(J,I)+HALF*A(J,I)*DT1)*DT12)
          ENDDO
         ELSE
-#include "vectorize.inc"
          DO I=NODFT,NODLT
           IF(TAGSLV_RBY(I)/=0) CYCLE
           DA = A(J,I) - DAMPA*V(J,I) - BETASDT *(A(J,I) - DAMP(J,I))
@@ -1030,7 +979,6 @@ C
       ELSEIF(ITASK==0)THEN
        DO J=1,3
         IF(IRODDL==0)THEN
-#include "vectorize.inc"
          DO N=1,IGRNOD(IDAMPG)%NENTITY
           I=IGRNOD(IDAMPG)%ENTITY(N)
           IF(TAGSLV_RBY(I)/=0) CYCLE
@@ -1041,7 +989,6 @@ C
           DW =DW+WEIGHT(I)*MS(I)*DA*(V(J,I)+HALF*A(J,I)*DT1)*DT12
          ENDDO
         ELSE
-#include "vectorize.inc"
          DO N=1,IGRNOD(IDAMPG)%NENTITY
           I=IGRNOD(IDAMPG)%ENTITY(N)
           IF(TAGSLV_RBY(I)/=0) CYCLE

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sfor_visn10     ../engine/source/elements/solid/solide10/sfor_visn10.F
-      !||--- called by ------------------------------------------------------
-      !||    s10for_distor   ../engine/source/elements/solid/solide10/s10for_distor.F
-      !||====================================================================
+!||====================================================================
+!||    sfor_visn10     ../engine/source/elements/solid/solide10/sfor_visn10.F
+!||--- called by ------------------------------------------------------
+!||    s10for_distor   ../engine/source/elements/solid/solide10/s10for_distor.F
+!||====================================================================
       SUBROUTINE SFOR_VISN10(VC ,    FLD,   TOL_V,     MU ,    
      .                       VX ,     VY,      VZ,   IFCTL,
      .                    FOR_T1, FOR_T2,  FOR_T3,  FOR_T4,
@@ -65,8 +65,8 @@ C-----------------------------------------------
       INTEGER I,J
 C                                                                     12
       my_real
-     .   VRE(10),VXC,VYC,VZC,FX,FY,FZ,FAC,VNJ,VL,TOL_V2,
-     .   VXM,VYM,VZM,V2MAX(MVSIZ),VC2
+     .   FAC,VNJ,VL,TOL_V2,
+     .   V2MAX(MVSIZ),VC2
 C----------------------------
         TOL_V2 = TOL_V*TOL_V
         IFCTL = 0
@@ -83,10 +83,8 @@ C----------------------------
            VC2 = VC(I,1)*VC(I,1)+VC(I,2)*VC(I,2)+VC(I,3)*VC(I,3)
            IF (STIF(I)==ZERO.OR.VC2 <EM20) CYCLE
            VL = TOL_V2*VC2
-           IF (V2MAX(I) > VL) THEN
-              IFC1(I) = 1
-              IFCTL=1
-           END IF
+           IF (V2MAX(I) > VL) IFC1(I) = 1
+           IF (IFC1(I) > 0)   IFCTL=1
          END DO
 C
        IF (IFCTL==1) THEN

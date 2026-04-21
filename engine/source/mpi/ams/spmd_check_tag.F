@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_check_tag    ../engine/source/mpi/ams/spmd_check_tag.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_exch_smst2   ../engine/source/mpi/ams/spmd_exch_smst2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../engine/source/output/message/message.F
-      !||    arret             ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||    restmod           ../engine/share/modules/restart_mod.F
-      !||    tri7box           ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_check_tag    ../engine/source/mpi/ams/spmd_check_tag.F
+!||--- called by ------------------------------------------------------
+!||    spmd_exch_smst2   ../engine/source/mpi/ams/spmd_exch_smst2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg            ../engine/source/output/message/message.F
+!||    arret             ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod       ../engine/share/message_module/message_mod.F
+!||    restmod           ../engine/share/modules/restart_mod.F
+!||    tri7box           ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_CHECK_TAG(NIN,I_STOK,INTBUF_TAB,TAG,NSNR,
      .                          NSN,NTY,INACTI,IFQ,ITIED,NRTS)
 C-----------------------------------------------
@@ -163,7 +164,7 @@ C-----------------------------------------------
                IF(TAG(NI)>-1) THEN
                  CAND_N_LOC(L) = INTBUF_TAB%CAND_N(K)
                  CAND_E_LOC(L) = INTBUF_TAB%CAND_E(K)
-                 IF(NTY==24.OR.NTY==25)THEN ! rien a faire (a TT=0)
+                 IF(NTY==24.OR.NTY==25)THEN ! Nothing to do (a tt = 0)
                  ELSE
                    IF((NTY==7.OR.NTY==20).AND.(INACTI==5.OR.INACTI==6.OR.INACTI==7)) 
      .              CAND_P_LOC(L) = INTBUF_TAB%CAND_P(K)
@@ -188,7 +189,7 @@ C-----------------------------------------------
               ! Local
                  CAND_N_LOC(L) = INTBUF_TAB%CAND_N(K)
                  CAND_E_LOC(L) = INTBUF_TAB%CAND_E(K)
-                 IF(NTY==24.OR.NTY==25)THEN ! rien a faire (a TT=0) 
+                 IF(NTY==24.OR.NTY==25)THEN ! Nothing to do (a tt = 0) 
                  ELSE
                    IF((NTY==7.OR.NTY==20).AND.(INACTI==5.OR.INACTI==6.OR.INACTI==7))
      .              CAND_P_LOC(L) = INTBUF_TAB%CAND_P(K)
@@ -212,7 +213,7 @@ C-----------------------------------------------
             ENDDO
             INTBUF_TAB%CAND_N(1:I_STOK) = 0
             INTBUF_TAB%CAND_E(1:I_STOK) = 0
-            IF(NTY==24.OR.NTY==25)THEN ! rien a faire (a TT=0) 
+            IF(NTY==24.OR.NTY==25)THEN ! Nothing to do (a tt = 0) 
             ELSE
               IF((NTY==7.OR.NTY==20).AND.(INACTI==5.OR.INACTI==6.OR.INACTI==7))
      .           INTBUF_TAB%CAND_P(1:I_STOK) = 0
@@ -235,7 +236,7 @@ C-----------------------------------------------
             IF(I_STOK>0) THEN
              INTBUF_TAB%CAND_N(1:I_STOK) = CAND_N_LOC(1:I_STOK)
              INTBUF_TAB%CAND_E(1:I_STOK) = CAND_E_LOC(1:I_STOK)
-             IF(NTY==24.OR.NTY==25)THEN ! rien a faire 
+             IF(NTY==24.OR.NTY==25)THEN ! nothing to do 
              ELSE
                IF((NTY==7.OR.NTY==20).AND.(INACTI==5.OR.INACTI==6.OR.INACTI==7)) 
      .            INTBUF_TAB%CAND_P(1:I_STOK) = CAND_P_LOC(1:I_STOK)
@@ -257,7 +258,7 @@ C-----------------------------------------------
             ENDIF
             DEALLOCATE( CAND_N_LOC )
             DEALLOCATE( CAND_E_LOC )
-            IF(NTY==24.OR.NTY==25)THEN ! rien a faire 
+            IF(NTY==24.OR.NTY==25)THEN ! nothing to do 
             ELSE
               IF((NTY==7.OR.NTY==20).AND.(INACTI==5.OR.INACTI==6.OR.INACTI==7))
      .          DEALLOCATE( CAND_P_LOC )

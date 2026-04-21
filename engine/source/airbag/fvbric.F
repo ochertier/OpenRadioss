@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvbric          ../engine/source/airbag/fvbric.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh0         ../engine/source/airbag/fvmesh0.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_fvb_gath   ../engine/source/mpi/airbags/spmd_fvb_gath.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod       ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvbric          ../engine/source/airbag/fvbric.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh0         ../engine/source/airbag/fvmesh0.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_fvb_gath   ../engine/source/mpi/airbags/spmd_fvb_gath.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod       ../engine/share/modules/fvbag_mod.F
+!||====================================================================
       SUBROUTINE FVBRIC(IVOLU, RVOLU, IBUF, X, NN)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -52,7 +52,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, II, NBX, NBY, NBRIC, NNB, IFV, NNB1, J, K, NV, NALL,
+      INTEGER I, NBX, NBY, NBRIC, NNB, IFV, NNB1, J, K, NV, NALL,
      .        NC, TNC(4), TNV(5,6), KK, L, N1, N2, N3, N4, N5, N6, N7,
      .        N8, I1, I2 
       my_real
@@ -74,7 +74,7 @@ C
 C
       IFV=IVOLU(45)
       IF (NSPMD == 1) THEN
-C traitement necessaire pour rester p/on
+C treatment necessary to stay p/we
          DO I=1,FVSPMD(IFV)%NN_L
             I1=FVSPMD(IFV)%IBUF_L(1,I)
             I2=FVSPMD(IFV)%IBUF_L(2,I)

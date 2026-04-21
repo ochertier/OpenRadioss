@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,32 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    table2d_vinterp_log      ../engine/source/tools/curve/table2d_vinterp_log.F
-      !||--- called by ------------------------------------------------------
-      !||    fail_gene1_c             ../engine/source/materials/fail/gene1/fail_gene1_c.F
-      !||    fail_gene1_s             ../engine/source/materials/fail/gene1/fail_gene1_s.F
-      !||    mat107_newton            ../engine/source/materials/mat/mat107/mat107_newton.F
-      !||    mat107_nice              ../engine/source/materials/mat/mat107/mat107_nice.F
-      !||    mat107c_newton           ../engine/source/materials/mat/mat107/mat107c_newton.F
-      !||    mat107c_nice             ../engine/source/materials/mat/mat107/mat107c_nice.F
-      !||    mat112_xia_newton        ../engine/source/materials/mat/mat112/mat112_xia_newton.F
-      !||    mat112_xia_nice          ../engine/source/materials/mat/mat112/mat112_xia_nice.F
-      !||    mat112c_xia_newton       ../engine/source/materials/mat/mat112/mat112c_xia_newton.F
-      !||    mat112c_xia_nice         ../engine/source/materials/mat/mat112/mat112c_xia_nice.F
-      !||    sigeps109                ../engine/source/materials/mat/mat109/sigeps109.F
-      !||    sigeps109c               ../engine/source/materials/mat/mat109/sigeps109c.F
-      !||    sigeps110c_lite_newton   ../engine/source/materials/mat/mat110/sigeps110c_lite_newton.F
-      !||    sigeps110c_lite_nice     ../engine/source/materials/mat/mat110/sigeps110c_lite_nice.F
-      !||    sigeps110c_newton        ../engine/source/materials/mat/mat110/sigeps110c_newton.F
-      !||    sigeps110c_nice          ../engine/source/materials/mat/mat110/sigeps110c_nice.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../engine/source/output/message/message.F
-      !||    arret                    ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||    table_mod                ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    table2d_vinterp_log      ../engine/source/tools/curve/table2d_vinterp_log.F
+!||--- called by ------------------------------------------------------
+!||    fail_gene1_b             ../engine/source/materials/fail/gene1/fail_gene1_b.F90
+!||    fail_gene1_c             ../engine/source/materials/fail/gene1/fail_gene1_c.F
+!||    fail_gene1_ib            ../engine/source/materials/fail/gene1/fail_gene1_ib.F90
+!||    fail_gene1_s             ../engine/source/materials/fail/gene1/fail_gene1_s.F
+!||    mat107_newton            ../engine/source/materials/mat/mat107/mat107_newton.F
+!||    mat107_nice              ../engine/source/materials/mat/mat107/mat107_nice.F
+!||    mat107c_newton           ../engine/source/materials/mat/mat107/mat107c_newton.F
+!||    mat107c_nice             ../engine/source/materials/mat/mat107/mat107c_nice.F
+!||    mat112_xia_newton        ../engine/source/materials/mat/mat112/mat112_xia_newton.F
+!||    mat112_xia_nice          ../engine/source/materials/mat/mat112/mat112_xia_nice.F
+!||    mat112c_xia_newton       ../engine/source/materials/mat/mat112/mat112c_xia_newton.F
+!||    mat112c_xia_nice         ../engine/source/materials/mat/mat112/mat112c_xia_nice.F
+!||    sigeps109                ../engine/source/materials/mat/mat109/sigeps109.F
+!||    sigeps109c               ../engine/source/materials/mat/mat109/sigeps109c.F
+!||    sigeps110c_lite_newton   ../engine/source/materials/mat/mat110/sigeps110c_lite_newton.F
+!||    sigeps110c_lite_nice     ../engine/source/materials/mat/mat110/sigeps110c_lite_nice.F
+!||    sigeps110c_newton        ../engine/source/materials/mat/mat110/sigeps110c_newton.F
+!||    sigeps110c_nice          ../engine/source/materials/mat/mat110/sigeps110c_nice.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../engine/source/output/message/message.F
+!||    arret                    ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod              ../engine/share/message_module/message_mod.F
+!||    table_mod                ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE TABLE2D_VINTERP_LOG(TABLE,ISMOOTH,DIMX,NEL,IPOS,XX,YY,DYDX1,DYDX2)
 C-----------------------------------------------
       USE TABLE_MOD
@@ -82,8 +84,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  NXK(2), IB(2,2,NEL) 
-      INTEGER :: I,I1,I2,J1,J2,K,N,M,L,IN,IM,IL,N1,IL1,IL2,NDIM
-      my_real :: DX1,DX2,YA1,YA2,YB1,YB2,X1_1,X1_2,X2_1,X2_2,XX2,
+      INTEGER :: I,I1,I2,J1,J2,K,N,M,IM,N1,IL1,IL2,NDIM
+      my_real :: DX2,YA1,YA2,YB1,YB2,X1_1,X1_2,X2_1,X2_2,XX2,
      .           X1,X2,Y1,Y2,R1,R2,UNR1,UNR2
       TYPE(TTABLE_XY)                ,POINTER :: TY
       TYPE(TTABLE_XY), DIMENSION(:)  ,POINTER :: TX

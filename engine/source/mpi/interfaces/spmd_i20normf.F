@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_i20normf   ../engine/source/mpi/interfaces/spmd_i20normf.F
-      !||--- called by ------------------------------------------------------
-      !||    i20mainf        ../engine/source/interfaces/int20/i20mainf.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i20normf         ../engine/source/mpi/interfaces/spmd_i20normf.F
+!||--- called by ------------------------------------------------------
+!||    i20mainf              ../engine/source/interfaces/int20/i20mainf.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_I20NORMF(
      1 SOLIDN_NORMAL,SOLIDN_NORMAL_F,SOLIDN_NORMAL_FE,NIN     ,IRLEN20 ,
      2 ISLEN20      ,IRLEN20T       ,ISLEN20T        ,IRLEN20E,ISLEN20E,
@@ -43,6 +44,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -112,7 +114,7 @@ C
         IF(P/=LOC_PROC)THEN
           NB  = NSNFI(NIN)%P(P)
           L = L + NB*LEN20
-C ajout partie edge pour type 20
+C Add part of Edge for Type 20
           NB = NSNFIE(NIN)%P(P)
           L = L + NB*LEN20E
           SIZ = L+1-ADD
@@ -174,7 +176,7 @@ C end i20 edge
           SIZ = L+1-ADD
           IF(SIZ>0)THEN
             MSGTYP = MSGOFF
-C BUFR : reception partie force et envoi partie vitesse
+C Bufr: Reception Part Force and Shipping Party Speed
             CALL MPI_ISEND(
      .        BBUFS(ADD),SIZ,MPI_INTEGER,IT_SPMD(P),MSGTYP,
      .        SPMD_COMM_WORLD,REQ_SI(P),IERROR    )
@@ -183,7 +185,7 @@ C BUFR : reception partie force et envoi partie vitesse
       ENDDO
       ADDS(NSPMD+1)=ADDS(NSPMD)+SIZ
 C
-C Attente reception buffer et decompactage
+C Buffer reception and decompacting
 C
       IF(ISTOCOM==1)THEN
 C

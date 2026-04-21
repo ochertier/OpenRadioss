@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat24            ../starter/source/materials/mat/mat024/hm_read_mat24.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat24            ../starter/source/materials/mat/mat024/hm_read_mat24.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT24(
      .           NUPARAM  ,NUVAR    ,NFUNC    ,IPM      ,PM       ,
      .           MTAG     ,MAT_ID   ,TITR     ,UNITAB   ,LSUBMODEL,
@@ -86,7 +86,7 @@ C-----------------------------------------------
       INTEGER :: ICAP,ILAW,ISRATE
       my_real :: RHO0,RHOR,YMC,ANUC,FC,FT,FB,F2D,S0,HT,DSUP1,EPSMAX,VKY,RT,
      .   RC,HBP,ALI,ALF,VMAX,ROK,RO0,HV0,YMS,Y0S,ETS,ARM1,ARM2,ARM3,
-     .   ETC,BULK,EXPO,F2D0,AA,CC,BC,SQ32,BT,AC,EPS0,HVFAC
+     .   ETC,BULK,EXPO,F2D0,AA,CC,BC,BT,AC,EPS0,HVFAC
       CHARACTER*64 :: message
       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED
 C=======================================================================
@@ -229,7 +229,7 @@ c
 C-----------------------
 C     OTTOSEN SURFACE PARAMETERS
 C-----------------------
-C     Failure surface : f = r - rf = 0
+C     Failure surface: F = R - RF = 0
 C
 C     Ottosen surface defined with :
 C      -> rf = 1/AA (-BB+SQRT(BB  / B2 -AA(SM-CC))
@@ -298,7 +298,7 @@ c---------------------
       NFUNC   = 0
       NUVAR   = 0
 c-----------------
-c---- Definition des variables internes (stockage elementaire)
+c---- Definition of internal variables (Elementary storage)
 c-----------------
       MTAG%G_GAMA  = 6  
       MTAG%G_PLA = 1

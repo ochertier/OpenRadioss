@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,17 +22,19 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 
-      !||====================================================================
-      !||    spmd_exch_i25   ../engine/source/mpi/interfaces/spmd_exch_i25.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_i25         ../engine/source/mpi/interfaces/spmd_exch_i25.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod         ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_EXCH_I25(IPARI    ,INTBUF_TAB     ,ITAB,
      *                         IAD_ELEM ,FR_ELEM,INTLIST,NBINTC,
      *                         IAD_I25  ,FR_I25  ,SFR_I25,FLAG)
@@ -45,6 +47,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -72,11 +75,11 @@ C-----------------------------------------------
 #ifdef MPI
       INTEGER STATUS(MPI_STATUS_SIZE)
       INTEGER P,LENSD,LENRV,IERROR,
-     *        SIZ,LOC_PROC,MSGTYP,IDEB(NINTER),IDB,PROC,
+     * SIZ,LOC_PROC,MSGTYP,IDEB(NINTER),IDB,
      *        MSGOFF,MSGOFF2,MSGOFF3,MSGOFF4,MSGOFF5
-      INTEGER I,J,L,NB,NL,NN,K,N,NOD,MODE,LEN,ALEN,ND,FLG,NIN,NTY,
-     *        NSN,SN,SSIZ,NBI,
-     *        SURF,SURFR,SUBTRIAR,KLEAVE,KLEAVE_R,PROC_R,I_STOK,IT,CT,MS,
+      INTEGER I, L, NB, NN, K, NOD, LEN, ALEN, ND, NIN, NTY, 
+     * NSN,SN,
+     * SURF,SURFR,SUBTRIAR,KLEAVE,KLEAVE_R,PROC_R,
      *        NI,ILEN,RLEN,LI,LR
 
       my_real
@@ -89,8 +92,8 @@ C-----------------------------------------------
      
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: ISENDBUF
       INTEGER, DIMENSION(:), ALLOCATABLE :: IRECBUF
-      INTEGER, DIMENSION(:), ALLOCATABLE :: SNIDX
-      INTEGER, DIMENSION(:), ALLOCATABLE :: ITRI,INDTRI,ISCANDR
+ 
+ 
       INTEGER, DIMENSION(:), ALLOCATABLE:: REQ_SI,REQ_RI,REQ_S,IADS
       INTEGER, DIMENSION(:), ALLOCATABLE:: REQ_S2,REQ_R,REQ_R2,IADR
 
@@ -107,7 +110,7 @@ C-----------------------------------------------
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 C ----------------------------------      
-C IFLAG=1 partie1 - Send   
+C Iflag = 1 part 1 - Send   
 C ----------------------------------      
       IF(FLAG==1)THEN
 C      WRITE(6,*) __FILE__,__LINE__ ; CALL FLUSH(6)
@@ -131,13 +134,13 @@ C      WRITE(6,*) __FILE__,__LINE__ ; CALL FLUSH(6)
 
 C--------------------------------------------------------
 
-C Comm sur l'interface type 25
-C 1ere partie, on ramene sur le proc qui a les noeuds slv les valeurs de IRTLM_FI + TIME_SFI & traitements
-C 2eme partie on les traite sur le proc  qui a les neouds slv les valeurs
-C 3eme partie on renvoie sur les procs remotes les valeurs globalisees
+C Comm on the type 25 interface
+C First part, we bring back to the proc that has the secondary nodes the values of IRTLM_FI + TIME_SFI & treatments
+C Second part, we process them on the proc that has the secondary nodes the values
+C Third part, we send back to the remote procs the globalized values
 
 C--------------------------------------------------------
-C 1ere partie, on ramene sur le proc qui a les neouds slv les valeurs de IRTLM_FI + TIME_SFI
+C First part, we bring back to the proc that has the secondary nodes the values of IRTLM_FI + TIME_SFI
 C--------------------------------------------------------
 
       LOC_PROC = ISPMD+1
@@ -149,7 +152,7 @@ C--------------------------------------------------------
       ALEN=6
 
 
-C Comptage des tailles de buffer  Reception et envoi
+C counting buffer sizes for reception and sending
       DO P=1,NSPMD
          IADR(P)=LENRV+1
          DO NI=1,NBINTC
@@ -163,7 +166,7 @@ C Comptage des tailles de buffer  Reception et envoi
       ENDDO
       IADR(NSPMD+1)=LENRV+1
 
-C Preparation du send
+C preparation of send
       IF(LENSD>0)THEN
           ALLOCATE(BBUFS(LENSD),STAT=IERROR)
           IF(IERROR/=0) THEN
@@ -173,7 +176,7 @@ C Preparation du send
       ENDIF
 
 C ---------------------------------------------
-C Preparation du recieve
+C preparation of receive
       IF(LENRV>0)THEN
           ALLOCATE(BBUFR(LENRV),STAT=IERROR)
           IF(IERROR/=0) THEN
@@ -307,7 +310,7 @@ c                          ELSEIF(ABS(TIME_S_2) > ABS(TIME_SR_2))THEN
                             INTBUF_TAB(NIN)%TIME_S(2*(ND-1)+2) = TIME_SR_2
 c                          END IF 
 
-c inutile
+c useless
 c                       elseif(SURFR > 0 .AND. TIME_SR_1 == EP20 .AND. KLEAVE_R > 0)THEN
 c
 c                         INTBUF_TAB(NIN)%IRTLM(4*(ND-1)+1)  = SURFR
@@ -375,7 +378,7 @@ c         if(itab(sn)==29376)print *,'recoit nsnsi apr',loc_proc,p,INTBUF_TAB(NI
           L=L+SIZ
       ENDDO        ! DO P=1, NSPMD
 
-C Fin du send
+C end of send
       DO P = 1, NSPMD
           IF (P==NSPMD)THEN
              SIZ=LENSD-IADS(P)
@@ -390,8 +393,8 @@ C Fin du send
       IF (ALLOCATED(BBUFS)) DEALLOCATE(BBUFS)
       IF (ALLOCATED(BBUFR)) DEALLOCATE(BBUFR)
 C-----------------------------------------------------------
-C 2eme partie - echanges sur les noeuds seconds frontieres
-C               pour toutes les interface type 25.
+C Second part - exchanges on the secondary boundary nodes
+C               for all interface type 25.
 C-----------------------------------------------------------
       IADS(1:NSPMD+1)=0
 
@@ -402,7 +405,7 @@ C-----------------------------------------------------------
       IADS(NSPMD+1)=SFR_I25+1
 
 c     print *,'iads',ispmd+1,iads(1),iads(2),iads(3)
-C Preparation du send
+C preparation of send
       ILEN=5
       RLEN=2
       ASSERT(SFR_I25 >= 0) 
@@ -411,7 +414,7 @@ C Preparation du send
       ALLOCATE(RSENDBUF(RLEN,SFR_I25))
       ALLOCATE(RRECBUF(RLEN*SFR_I25))
 
-C mise en place du irecieve
+C implementation of the IRECIEVE
       DO P=1,NSPMD
         SIZ = IADS(P+1)-IADS(P)
         ASSERT(SIZ >= 0)
@@ -506,7 +509,7 @@ c           print *,'recept recu entiers',ispmd+1,p
           CALL MPI_WAIT(REQ_R2(P),STATUS,IERROR)
 c           print *,'recept recu reels',ispmd+1,p
 
-C Traitements
+C Treatments
         
          DO NI=1,NBINTC
            NIN = INTLIST(NI)
@@ -565,10 +568,10 @@ c                       ELSEIF(ABS(TIME_S_2) > ABS(TIME_SR_2))THEN
 c                       END IF 
 
 
-c inutile
+c useless
 c                     elseif(SURFR > 0 .AND. TIME_SR_1 == EP20 .AND. KLEAVE_R > 0)THEN
 cC
-cC                      le nd est ressorti du contact ou il etait precedemment sur le proc remote
+cC the node has exited the contact where it was previously on the remote proc
 cC                                                                             ------------------
 c                       INTBUF_TAB(NIN)%IRTLM(4*(ND-1)+1)  = SURFR
 c                       INTBUF_TAB(NIN)%IRTLM(4*(ND-1)+2)  = SUBTRIAR
@@ -650,7 +653,7 @@ C Fin send
       IF(ALLOCATED(RRECBUF))DEALLOCATE(RRECBUF)
 
 C ------------------------------------------------------------------
-C 3e partie on renvoie les valeurs globalisees sur les procs remote
+C Third part we send back the globalized values to the remote procs
 C ------------------------------------------------------------------
       LOC_PROC = ISPMD+1
       IADS = 0
@@ -659,7 +662,7 @@ C ------------------------------------------------------------------
       LENRV = 0
 
       ALEN=6
-C Comptage des tailles de buffer  Receeption et envoi
+C counting buffer sizes for reception and sending
       DO P=1,NSPMD
          IADR(P)=LENRV+1
          DO NI=1,NBINTC
@@ -681,7 +684,7 @@ C Comptage des tailles de buffer  Receeption et envoi
           ENDIF
       ENDIF
 
-C Preparation du recieve
+C preparation of receive
       IF(LENRV>0)THEN
           ALLOCATE(BBUFR(LENRV),STAT=IERROR)
           IF(IERROR/=0) THEN
@@ -711,7 +714,7 @@ C Send
            NTY   =IPARI(7,NIN)
            IF(NTY==25)THEN
                NB = NSNSI(NIN)%P(P)
-C Preparation du send
+C preparation of send
                DO NN=1,NB
                  ND = NSVSI(NIN)%P(IDEB(NIN)+NN)
                  NOD=INTBUF_TAB(NIN)%NSV(ND)
@@ -785,7 +788,7 @@ c     .                       BBUFR(IADR(P)+L:IADR(P)+L+3)
           ENDIF
       ENDDO
 
-C Fin du send
+C end of send
       DO P = 1, NSPMD
           IF (P==NSPMD)THEN
              SIZ=LENSD-IADS(P)

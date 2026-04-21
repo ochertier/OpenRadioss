@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps34c   ../engine/source/materials/mat/mat034/sigeps34c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter      ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps34c   ../engine/source/materials/mat/mat034/sigeps34c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    finter      ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE SIGEPS34C(
      1     NEL    ,NUPARAM,NUVAR   ,NFUNC   ,IFUNC  ,
      2     NPF    , TF     ,TIME   ,TIMESTEP,UPARAM  ,
@@ -76,14 +76,14 @@ C----------------------------------------------------------------
 C----------------------------------------------------------------
 C  L O C A L  V A R I B L E S
 C----------------------------------------------------------------
-       INTEGER :: I, IFORM
+       INTEGER :: I
        my_real :: BULK,BULK3,G_INS,G_INF,GE,GE2,GV,GV2,C1,C2,BETA,
-     .   AA, BB, DAV, P, TRACE, H0(6),H(6),ALPHA,DP_DRHO,CC2
+     .   AA, BB,H(6),DP_DRHO,CC2
         my_real ,DIMENSION(NEL) :: 
-     .   DEPSM,DEPSZZ, SIGNZZ, SIGOZZ, DEPSDXX,DEPSDYY,DEPSDZZ, DP,
+     .   DEPSM,DEPSZZ, DEPSDXX,DEPSDYY,DEPSDZZ, DP,
      .   DEXX,DEYY,DEZZ,DEXY,DEYZ,DEZX,DDEXX,DDEYY,DDEZZ,DDEXY,DDEYZ,
      .   DDEZX,DEPSDXY,DEPSDYZ,DEPSDZX,EPSPM,
-     .   DEPSVXX,DEPSVYY,DEPSVZZ,DEPSVXY,DEPSVYZ,DEPSVZX,EM,EPSM ,EPSZZ,
+     .   DEPSVXX,DEPSVYY,DEPSVZZ,DEPSVXY,DEPSVYZ,DEPSVZX,EM ,EPSZZ,
      .   EPSPZZ 
 C=======================================================================
           BULK  = UPARAM(1)     

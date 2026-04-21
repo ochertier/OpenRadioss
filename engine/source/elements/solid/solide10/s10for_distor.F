@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10for_distor   ../engine/source/elements/solid/solide10/s10for_distor.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3        ../engine/source/elements/solid/solide10/s10forc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    s10for_edgec    ../engine/source/elements/solid/solide10/s10for_edgec.F
-      !||    sfor_n2stria2   ../engine/source/elements/solid/solide10/sfor_n2stria2.F
-      !||    sfor_visn10     ../engine/source/elements/solid/solide10/sfor_visn10.F
-      !||====================================================================
+!||====================================================================
+!||    s10for_distor   ../engine/source/elements/solid/solide10/s10for_distor.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3        ../engine/source/elements/solid/solide10/s10forc3.F
+!||--- calls      -----------------------------------------------------
+!||    s10for_edgec    ../engine/source/elements/solid/solide10/s10for_edgec.F
+!||    sfor_n2stria2   ../engine/source/elements/solid/solide10/sfor_n2stria2.F
+!||    sfor_visn10     ../engine/source/elements/solid/solide10/sfor_visn10.F
+!||====================================================================
       SUBROUTINE S10FOR_DISTOR(
      1              STI,   FLD  ,   STI_C,   
      2              XX ,     YY ,     ZZ ,   
@@ -78,8 +78,8 @@ C-----------------------------------------------
      .   FORC_N1(MVSIZ,3),FORC_N2(MVSIZ,3),FORC_N3(MVSIZ,3),
      .   PENMIN(MVSIZ),PENREF(MVSIZ),MARGE(MVSIZ),
      .   VCX(MVSIZ,4),VCY(MVSIZ,4),VCZ(MVSIZ,4),
-     .   FORC_N4(MVSIZ,3),FCX,FCY,FCZ,FAC,GAP_MAX,GAP_MIN,
-     .   TOL_T,TOL_C, TOL_V, TOL_E    
+     .   FORC_N4(MVSIZ,3),FCX,FCY,FCZ,GAP_MAX,GAP_MIN,
+     .   TOL_C, TOL_V, TOL_E    
       INTEGER I,J,NCTL,IFCTL,IFC1(MVSIZ),IFC2(MVSIZ)
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
@@ -127,7 +127,7 @@ C-----------------------------------------------
      .                FOR_T9, FOR_T10, STIF  ,    IFC1,
      .                NEL   ,E_DISTOR, DT1 )
         NCTL = NCTL + IFCTL
-C---- element center
+C---- Element center
         XC = ZERO
         YC = ZERO
         ZC = ZERO
@@ -319,9 +319,12 @@ C---- seg 4 : 1,3,4 (7 10 8)
      .                   DT1 )
         NCTL = NCTL + IFCTL
 C---- force assemblage and STI update (dt)
-        IF (NCTL >0) THEN
+!        IF (NCTL >0) THEN : potential P/ON issue
           DO I=1,NEL
             IF (STI_C(I) ==ZERO) CYCLE
+            IF (STIF(I)>STI_C(I)) STI(I) = MAX(STI(I),STIF(I))
+            IF (FORC_N(I,1)==ZERO.AND.FORC_N(I,2)==ZERO
+     .            .AND.FORC_N(I,3)==ZERO) CYCLE
              FCX = EM01*FORC_N(I,1)
              FCY = EM01*FORC_N(I,2)
              FCZ = EM01*FORC_N(I,3)
@@ -356,7 +359,6 @@ C---- force assemblage and STI update (dt)
              FY(I,10)=FY(I,10) + FOR_T10(I,2) + FCY
              FZ(I,10)=FZ(I,10) + FOR_T10(I,3) + FCZ
 C             
-             STI(I) = MAX(STI(I),STIF(I))
           END DO 
           DO I=1,NEL  ! 1 5 7 8
             IF (FORC_N1(I,1)==ZERO.AND.FORC_N1(I,2)==ZERO
@@ -434,7 +436,7 @@ C
              FY(I,10)=FY(I,10) + FCY
              FZ(I,10)=FZ(I,10) + FCZ
           END DO 
-        ENDIF 
+!        ENDIF 
 C      
       RETURN
       END

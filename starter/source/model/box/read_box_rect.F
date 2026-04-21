@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_box_rect          ../starter/source/model/box/read_box_rect.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_box            ../starter/source/model/box/hm_read_box.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    subrotpoint            ../starter/source/model/submodel/subrot.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_box_rect          ../starter/source/model/box/read_box_rect.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_box            ../starter/source/model/box/hm_read_box.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    subrotpoint            ../starter/source/model/submodel/subrot.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE READ_BOX_RECT(
      .           IBOX     ,IAD      ,NBOX     ,ISKN     ,SKEW     ,
      .           ITABM1   ,X        ,RTRANS   ,UNITAB   ,LSUBMODEL)
@@ -78,7 +78,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,J,N1,N2,UID,BOXID,SUB_ID,SKEW_ID,ISK,IUNIT,FLAGUNIT,
      .           SUB_INDEX 
-      my_real :: FAC_L,XP1,YP1,ZP1,XP2,YP2,ZP2
+      my_real :: XP1,YP1,ZP1,XP2,YP2,ZP2
       CHARACTER(LEN=NCHARKEY)    :: KEY
       CHARACTER(LEN=NCHARTITLE)  :: TITR,MESS
       LOGICAL :: IS_AVAILABLE

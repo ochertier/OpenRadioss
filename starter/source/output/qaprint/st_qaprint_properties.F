@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    st_qaprint_properties   ../starter/source/output/qaprint/st_qaprint_properties.F
-      !||--- called by ------------------------------------------------------
-      !||    st_qaprint_driver       ../starter/source/output/qaprint/st_qaprint_driver.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl2                ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    st_qaprint_properties   ../starter/source/output/qaprint/st_qaprint_properties.F
+!||--- called by ------------------------------------------------------
+!||    st_qaprint_driver       ../starter/source/output/qaprint/st_qaprint_driver.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl2                ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE ST_QAPRINT_PROPERTIES(IGEO      ,GEO       ,BUFGEO    ,
      .                                 PM_STACK  ,GEO_STACK ,IGEO_STACK)
 C============================================================================
@@ -66,14 +66,12 @@ C=======================================================================
         DO MY_PID=1,NUMGEO
         CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,MY_PID),LTITR) 
 C
-C         Le Titr de la PID sert de nom de la variable dans le ref.extract , suivi de l'ID de la PID 
-C         2 PIDs peuvent avoir le meme titre
           IF(LEN_TRIM(TITR)/=0)THEN
             CALL QAPRINT(TITR(1:LEN_TRIM(TITR)),IGEO(1,MY_PID),0.0_8)
           ELSE
             CALL QAPRINT('A_PID_FAKE_NAME',IGEO(1,MY_PID),0.0_8)
           END IF
-          DO I=1,NPROPGI-LTITR ! si on ne peut pas tester une chaine de caracteres, do i=1,npropgi
+          DO I=1,NPROPGI-LTITR 
             IF(IGEO(I,MY_PID)/=0)THEN
 C
 C             VARNAME: variable name in ref.extract (without blanks)

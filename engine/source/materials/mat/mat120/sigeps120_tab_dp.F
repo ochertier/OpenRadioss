@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps120_tab_dp      ../engine/source/materials/mat/mat120/sigeps120_tab_dp.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps120             ../engine/source/materials/mat/mat120/sigeps120.F
-      !||--- calls      -----------------------------------------------------
-      !||    table_vinterp         ../engine/source/tools/curve/table_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps120_tab_dp      ../engine/source/materials/mat/mat120/sigeps120_tab_dp.F
+!||--- called by ------------------------------------------------------
+!||    sigeps120             ../engine/source/materials/mat/mat120/sigeps120.F
+!||--- calls      -----------------------------------------------------
+!||    table_vinterp         ../engine/source/tools/curve/table_tools.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE SIGEPS120_TAB_DP(
      1      NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
      2      UPARAM  ,UVAR    ,OFF     ,PLA     ,EPSD    ,SOUNDSP ,
@@ -38,7 +38,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5      SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6      SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      7      NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,
-     8      JTHE    ,INLOC   ,DPLANL  ,DMG     ,DMG_SCALE)
+     8      INLOC   ,DPLANL  ,DMG     ,DMG_SCALE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -57,7 +57,7 @@ C-----------------------------------------------
 C----------------------------------------------------------------
 C  D u m m y   A R G U M E N T S
 C----------------------------------------------------------------
-      INTEGER :: NEL,NUPARAM,NUVAR,NVARTMP,NUMTABL,JTHE,INLOC
+      INTEGER :: NEL,NUPARAM,NUVAR,NVARTMP,NUMTABL,INLOC
       my_real :: TIME,TIMESTEP
       INTEGER ,DIMENSION(NEL)    ,INTENT(IN) :: NGL
       INTEGER ,DIMENSION(NTABLE) ,INTENT(IN) :: ITABLE
@@ -85,11 +85,11 @@ C----------------------------------------------------------------
       INTEGER  ,DIMENSION(NEL) :: INDX,INDF
 c     material parameters
       my_real :: YOUNG,NU,SSP,G,G2,BULK,YLD0,C11,C12,
-     .   A1F,A2F,A1H,A2H,AS,D1C,D2C,D1F,D2F,D_TRX,D_JC,DM,EXPN
+     .   A1F,A2F,A1H,A2H,AS,D1C,D2C,D1F,D2F,D_TRX,D_JC,EXPN
 c     Johnson & Cook rate-dependency
-      my_real CC,EPSDREF,EPSDMAX,FRATE,FCUT,ALPHA,ALPHAI
+      my_real CC,EPSDREF,EPSDMAX,FCUT,ALPHA,ALPHAI
 c     Local variables
-      my_real FACR,TRIAX,I1P,IP,JP,TP,FACT,FACD,DFAC,DTINV,
+      my_real FACR,TRIAX,I1P,IP,JP,TP,FACT,DFAC,DTINV,
      .   DLAM,DDEP,DFDLAM,DFDPLA,DPLA_DLAM,DPHI_DLAM,
      .   GAMC,GAMF,NP_XX,NP_YY,NP_ZZ,NP_XY,NP_YZ,NP_ZX,
      .   NF_XX,NF_YY,NF_ZZ,NF_XY,NF_YZ,NF_ZX,DPXX,DPYY,DPZZ,DPXY,DPYZ,DPZX
@@ -269,11 +269,7 @@ c
       ELSE
         XVEC3(1:NEL,1) = PLA(1:NEL)
         XVEC3(1:NEL,2) = EPSD(1:NEL)
-        IF (JTHE > 0) THEN
-          XVEC3(1:NEL,3) = TEMP(1:NEL)
-        ELSE
-          XVEC3(1:NEL,3) = ZERO
-        END IF
+        XVEC3(1:NEL,3) = TEMP(1:NEL)
         IPOS3(1:NEL,1) = VARTMP(1:NEL,1)
         IPOS3(1:NEL,2) = 1
         IPOS3(1:NEL,3) = 1

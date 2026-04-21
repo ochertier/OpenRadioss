@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_set_array     ../starter/source/model/sets/create_set_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set               ../starter/source/model/sets/hm_set.F
-      !||    sort_set             ../starter/source/model/sets/sort_sets.F
-      !||--- calls      -----------------------------------------------------
-      !||    create_set_list      ../starter/source/model/sets/create_set_clause.F
-      !||    create_set_list_g    ../starter/source/model/sets/create_set_clause.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod   ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod          ../starter/share/message_module/message_mod.F
-      !||    submodel_mod         ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_set_array     ../starter/source/model/sets/create_set_clause.F
+!||--- called by ------------------------------------------------------
+!||    hm_set               ../starter/source/model/sets/hm_set.F
+!||    sort_set             ../starter/source/model/sets/sort_sets.F
+!||--- calls      -----------------------------------------------------
+!||    create_set_list      ../starter/source/model/sets/create_set_clause.F
+!||    create_set_list_g    ../starter/source/model/sets/create_set_clause.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod   ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod          ../starter/share/message_module/message_mod.F
+!||    submodel_mod         ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SET_ARRAY(SET_ARRAY ,ARRAY_SIZE, 
      .                            ISETM  , NSET_GENERAL,
      .                            JCLAUSE ,OPT_G ,IS_AVAILABLE ,
@@ -89,20 +89,20 @@ C-----------------------------------------------
         ENDIF
 C-----------------------------------------------
       END
-      !||====================================================================
-      !||    create_set_list             ../starter/source/model/sets/create_set_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_set_array            ../starter/source/model/sets/create_set_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                      ../starter/source/output/message/message.F
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_set_list             ../starter/source/model/sets/create_set_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_set_array            ../starter/source/model/sets/create_set_clause.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                      ../starter/source/output/message/message.F
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SET_LIST(
      .               ARRAY, ARRAY_SIZE, ISETM ,NSET_GENERAL ,JCLAUSE ,IS_AVAILABLE ,LSUBMODEL,
      .               CLAUSE,FLAG)
@@ -138,7 +138,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JCLAUSE, ARRAY_SIZE,NSET_GENERAL,FLAG
       LOGICAL :: IS_AVAILABLE
-      INTEGER, INTENT(IN), DIMENSION(NSETS,2) :: ISETM
+      INTEGER, INTENT(IN), DIMENSION(NSET_GENERAL,2) :: ISETM
       INTEGER ARRAY(*)
       TYPE (SET_) ::  CLAUSE
       TYPE(SUBMODEL_DATA),INTENT(IN):: LSUBMODEL(*)
@@ -216,19 +216,19 @@ C-------------------------
       RETURN
       END
 
-      !||====================================================================
-      !||    create_set_list_g           ../starter/source/model/sets/create_set_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_set_array            ../starter/source/model/sets/create_set_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_set_list_g           ../starter/source/model/sets/create_set_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_set_array            ../starter/source/model/sets/create_set_clause.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SET_LIST_G(
      .               ARRAY, ARRAY_SIZE,  ISETM, NSET_GENERAL, JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -334,15 +334,15 @@ C=======================================================================
       DEALLOCATE (SET_READ_TMP)
       DEALLOCATE (RESULT)
       END
-      !||====================================================================
-      !||    create_set_clause      ../starter/source/model/sets/create_set_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                 ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
-      !||--- uses       -----------------------------------------------------
-      !||    set_mod                ../starter/share/modules1/set_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_set_clause      ../starter/source/model/sets/create_set_clause.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                 ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
+!||--- uses       -----------------------------------------------------
+!||    set_mod                ../starter/share/modules1/set_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SET_CLAUSE(SET,
      .                             SETL,SETL_SIZE,
      .                             CLAUSE,
@@ -352,7 +352,8 @@ C=======================================================================
      .                             SH3TREE   ,KNOD2ELS ,NOD2ELS   ,KNOD2ELC  ,NOD2ELC,
      .                             KNOD2ELTG ,NOD2ELTG ,IPARTC    ,IPARTG    ,IPARTS ,
      .                             IPART     ,OPT_A    ,OPT_O     ,KNOD2ELQ  ,NOD2ELQ,
-     .                             X         ,KEYSET   ,OPT_E     ,DELBUF    )
+     .                             X         ,KEYSET   ,OPT_E     ,DELBUF    ,IPARTQ ,
+     .                             NUMELQ    )
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -377,6 +378,7 @@ C-----------------------------------------------
       USE SET_SCRATCH_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
       USE SET_MOD , ONLY : SET_ADD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -387,7 +389,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SETL_SIZE
+      INTEGER SETL_SIZE,NUMELQ
       INTEGER  OPT_A,OPT_O,OPT_E
       INTEGER, DIMENSION(NSETS),    INTENT(IN) :: SETL
       TYPE (SET_),DIMENSION(NSETS), INTENT(IN) :: SET
@@ -399,7 +401,7 @@ C
      .        IXP(NIXP,*),IXR(NIXR,*),
      .        SH4TREE(*),SH3TREE(*),KNOD2ELS(*),KNOD2ELC(*),KNOD2ELTG(*),
      .        KNOD2ELQ(*),NOD2ELS(*),NOD2ELC(*),NOD2ELTG(*),NOD2ELQ(*),
-     .        IPARTS(*),IPARTC(*),IPARTG(*),IPART(LIPART1,*)
+     .        IPARTS(*),IPARTC(*),IPARTG(*),IPART(LIPART1,*),IPARTQ(NUMELQ)
       my_real X(3,*)
       CHARACTER(LEN=NCHARFIELD) :: KEYSET
 C-----------------------------------------------
@@ -420,7 +422,7 @@ C-----------------------------------------------
      .                              SH3TREE   ,KNOD2ELS ,NOD2ELS ,KNOD2ELC  ,NOD2ELC,
      .                              KNOD2ELTG ,NOD2ELTG ,IPARTC  ,IPARTG    ,IPARTS ,
      .                              IPART     ,OPT_A    ,OPT_O   ,KNOD2ELQ  ,NOD2ELQ,
-     .                              X         ,KEYSET   ,OPT_E   ,DELBUF    )
+     .                              X         ,KEYSET   ,OPT_E   ,DELBUF    ,IPARTQ)
 C
        ENDDO
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_submodgrn           ../starter/source/groups/hm_submodgr.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_lecgrn              ../starter/source/groups/hm_lecgrn.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_submodgrn           ../starter/source/groups/hm_submodgr.F
+!||--- called by ------------------------------------------------------
+!||    hm_lecgrn              ../starter/source/groups/hm_lecgrn.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_SUBMODGRN(
      .           ITAB   ,ITABM1    ,ISUBMOD  ,SID     ,
      .           NNOD   ,MESS      ,FLAG     ,TITR    ,
@@ -160,17 +160,17 @@ C-------------------------------------
 C-------------------------
       RETURN
       END
-      !||====================================================================
-      !||    hm_submodgre           ../starter/source/groups/hm_submodgr.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_lecgre              ../starter/source/groups/hm_lecgre.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_submodgre           ../starter/source/groups/hm_submodgr.F
+!||--- called by ------------------------------------------------------
+!||    hm_lecgre              ../starter/source/groups/hm_lecgre.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_SUBMODGRE(
      .           ISUBMOD  ,IX      ,NIX      ,SID      ,
      .           NEL      ,NUMEL   ,IELT     ,MESS     ,
@@ -223,7 +223,7 @@ C-----------------------------------------------
        END SUBROUTINE  
       END INTERFACE     
 C-----------------------------------------------
-C     IELT = ELEMENT TYPE (0 POUR NOEUDS, 1 BRIC, 2 QUAD, 3 SHELL, 
+C     IELT = ELEMENT TYPE (0 FOR NODES, 1 BRIC, 2 QUAD, 3 SHELL, 
 C                          4 TRUSS, 5 BEAM, 6 SPRINGS,7 SHELL_3N)
 C=======================================================================
 C     Tag submodels
@@ -283,7 +283,7 @@ c
 C-------------------------------------
 C Tag submodel ELEMS
 C-------------------------------------
-C     IELT = ELEMENT TYPE (0 POUR NOEUDS, 1 BRIC, 2 QUAD, 3 SHELL, 
+C     IELT = ELEMENT TYPE (0 FOR NODES, 1 BRIC, 2 QUAD, 3 SHELL, 
 C                          4 TRUSS, 5 BEAM, 6 SPRINGS,7 SHELL_3N)
       IF (IELT == 1) THEN
         ELEMTYPE = 208

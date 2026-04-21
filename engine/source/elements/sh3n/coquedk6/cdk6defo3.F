@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
-      !||====================================================================
-      !||    cdk6defo3   ../engine/source/elements/sh3n/coquedk6/cdk6defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    cdk6forc3   ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
-      !||====================================================================
+!||====================================================================
+!||    cdk6defo3   ../engine/source/elements/sh3n/coquedk6/cdk6defo3.F
+!||--- called by ------------------------------------------------------
+!||    cdk6forc3   ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
+!||====================================================================
       SUBROUTINE CDK6DEFO3(JFT,JLT,VLX,VLY,VLZ,VZ4,VZ5,VZ6,
      1                     PX2,PY2,PX3,PY3,PB1,PB2,PB3,VDEF)
 C-----------------------------------------------
@@ -46,9 +46,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
-      my_real
-     .   A5,A6,A4
+      INTEGER I
+      my_real A5,A6,A4
 C-----------------------------------------------
 C
       DO I=JFT,JLT
@@ -56,8 +55,8 @@ C
        VDEF(I,2)=PY2(I)*VLY(I,1)+PY3(I)*VLY(I,2)
        VDEF(I,3)=PX2(I)*VLY(I,1)+PX3(I)*VLY(I,2)
      .          +PY2(I)*VLX(I,1)+PY3(I)*VLX(I,2)
-       VDEF(I,4)=0.
-       VDEF(I,5)=0.
+       VDEF(I,4)=ZERO
+       VDEF(I,5)=ZERO
       ENDDO
 C
       DO I=JFT,JLT

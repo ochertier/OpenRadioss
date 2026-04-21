@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intal2          ../engine/source/ale/inter/intal2.F
-      !||--- called by ------------------------------------------------------
-      !||    intal1          ../engine/source/ale/inter/intal1.F
-      !||--- calls      -----------------------------------------------------
-      !||    iqel02          ../engine/source/ale/ale2d/iqel02.F
-      !||    iqel03          ../engine/source/ale/ale3d/iqel03.F
-      !||    iqela1          ../engine/source/ale/inter/iqela1.F
-      !||    iqela2          ../engine/source/ale/inter/iqela2.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod         ../engine/share/modules/h3d_mod.F
-      !||====================================================================
-      SUBROUTINE INTAL2(IPARI,INTBUF_TAB         , X        ,V         ,
+!||====================================================================
+!||    intal2          ../engine/source/ale/inter/intal2.F
+!||--- called by ------------------------------------------------------
+!||    intal1          ../engine/source/ale/inter/intal1.F
+!||--- calls      -----------------------------------------------------
+!||    iqel02          ../engine/source/ale/ale2d/iqel02.F
+!||    iqel03          ../engine/source/ale/ale3d/iqel03.F
+!||    iqela1          ../engine/source/ale/inter/iqela1.F
+!||    iqela2          ../engine/source/ale/inter/iqela2.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod         ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    output_mod      ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE INTAL2(output,IPARI,INTBUF_TAB         , X        ,V         ,
      1           A           ,ISKEW   ,SKEW      ,LCOD      ,E         ,
      2           MSM         ,MS      ,ITAB      ,FSAV      ,FCONT     ,
-     3           FNCONT      ,FTCONT  ,H3D_DATA  )
+     3           FNCONT      ,H3D_DATA  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
       USE H3D_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,9 +57,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(output_), intent(inout) :: output
       INTEGER,INTENT(INOUT) :: IPARI(SIPARI), ISKEW(*), LCOD(*), ITAB(NUMNOD)
       my_real,INTENT(INOUT) :: X(3,NUMNOD), V(3,NUMNOD), A(3,NUMNOD), SKEW(*), E(*), MSM(*), MS(*),FSAV(*)
-      my_real,INTENT(INOUT) :: FCONT(3,*),FNCONT(3,*),FTCONT(3,*)       
+      my_real,INTENT(INOUT) :: FCONT(3,*),FNCONT(3,*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
       TYPE(H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
@@ -81,18 +85,18 @@ C-----------------------------------------------
      3   INTBUF_TAB%N )
       ENDIF
 
-      CALL IQELA1
-     1   (X         ,SKEW      ,A         ,E         ,MSM       ,
-     2    INTBUF_TAB%IRECTM,INTBUF_TAB%NRT,INTBUF_TAB%CSTS,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
-     3    INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,MS        ,INTBUF_TAB%N,LCOD      ,
-     4    ISKEW           ,FSAV,ITAB ,FCONT,FNCONT,FTCONT,H3D_DATA, 
-     5    NSN, NMN)
+      CALL IQELA1(output,
+     1    A                ,E               ,MSM           ,
+     2    INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS ,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
+     3    INTBUF_TAB%ILOCS ,INTBUF_TAB%IRTLM,MS            ,INTBUF_TAB%N  ,LCOD    ,
+     4    ISKEW            ,FSAV            ,FCONT         ,FNCONT        ,H3D_DATA,
+     5    NSN              ,NMN)
 
       CALL IQELA2
-     1   (X         ,SKEW      ,A         ,E         ,MSM       ,
-     2    INTBUF_TAB%IRECTM,INTBUF_TAB%NRT,INTBUF_TAB%CSTS,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
-     3    INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,LCOD      ,V         ,ISKEW     ,
-     4    INTBUF_TAB%N,ITAB, NSN, NMN     )
+     1   (SKEW             ,A              ,E             ,MSM           ,
+     2    INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
+     3    INTBUF_TAB%IRTLM ,LCOD           ,V             ,ISKEW         ,
+     4    INTBUF_TAB%N     ,ITAB           ,NSN           , NMN     )
 
       RETURN
       END

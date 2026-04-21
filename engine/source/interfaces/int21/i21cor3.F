@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21cor3             ../engine/source/interfaces/int21/i21cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i21mainf            ../engine/source/interfaces/int21/i21mainf.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_glob_mod   ../engine/share/modules/intstamp_glob_mod.F
-      !||    tri7box             ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i21cor3             ../engine/source/interfaces/int21/i21cor3.F
+!||--- called by ------------------------------------------------------
+!||    i21mainf            ../engine/source/interfaces/int21/i21mainf.F
+!||--- uses       -----------------------------------------------------
+!||    intstamp_glob_mod   ../engine/share/modules/intstamp_glob_mod.F
+!||    tri7box             ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I21COR3(JLT   ,NIN    ,X       ,IRECT ,NSN   ,
      2                NSV      ,CAND_E ,CAND_N  ,STF   ,STFN  ,
      3                XM0      ,NOD_NORMAL,IRTLM ,CSTS ,MSR   ,
@@ -50,7 +50,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      K                Y4       ,Z4     ,DRAD    ,PENRAD ,TINT ,
      L                TEMPM    ,IFORM  ,H1      ,H2     ,H3   ,
      N                H4       ,DIST   ,ITAB    ,NOINT  ,DEPTH,
-     M                INVN     )
+     M                INVN     ,INTFRIC,IPARTFRICS,IPARTFRICSI,IPARTFRICM,
+     G                IPARTFRICMI,NRTM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -79,8 +80,11 @@ C-----------------------------------------------
      .        IRTLM(2,*), MSR(*), NODNX_SMS(*),
      .        JLT, NOINT, IGAP , NSN, NIN, IGSTI, IADM, NRADM, INTTH,
      .        IROT, MSTR, IFPEN(*), ILEV, IFORM,INVN
+      INTEGER , INTENT(IN) :: INTFRIC, NRTM
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ), ITRIA(MVSIZ), NSMS(MVSIZ),ITAB(*)
+      INTEGER , INTENT(IN) :: IPARTFRICS(NSN),IPARTFRICM(NRTM)
+      INTEGER , INTENT(INOUT) :: IPARTFRICSI(MVSIZ),IPARTFRICMI(MVSIZ)
 C     REAL
       my_real
      .   X(3,*), STF(*), STFN(*),GAP_S(*),
@@ -101,15 +105,15 @@ C     REAL
      .   STIF(MVSIZ) ,GAPV(MVSIZ),
      .   VXM, VYM, VZM,
      .   VXI(MVSIZ), VYI(MVSIZ), VZI(MVSIZ), MSI(MVSIZ),
-     .   LB(MVSIZ), LC(MVSIZ), LS, ASI(MVSIZ), BSI(MVSIZ),
+     .   LB(MVSIZ), LC(MVSIZ), ASI(MVSIZ), BSI(MVSIZ),
      .   XP(MVSIZ), YP(MVSIZ), ZP(MVSIZ),
      .   PENRAD(*),H1(MVSIZ), H2(MVSIZ),H3(MVSIZ),H4(MVSIZ),
      .   DIST(MVSIZ)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,IL, L, IG,JFT, IX,  NI,
-     .        N1, N2, N3, N4,I1,I2,I3,I4,ND,NG
+      INTEGER I ,J  , L, IG,  NI,
+     .           I1,I2,I3,I4,ND,NG
       my_real
      .   XT1(MVSIZ), XT2(MVSIZ), XT3(MVSIZ),
      .   YT1(MVSIZ), YT2(MVSIZ), YT3(MVSIZ),
@@ -506,7 +510,7 @@ C
 C
       DO I=1,JLT
 
-C3 pas la meme distance que dans i21dst3 : DIST <= Pi(I)
+Cnot the same distance as in i21dst3: DIST <= Pi(I)
 c       LB(I) = MIN(ONE,MAX(LB(I),ZERO))
 c       LC(I) = MIN(ONE,MAX(LC(I),ZERO))
 c       LA(I) = MIN(ONE,MAX(LA(I),ZERO))
@@ -554,6 +558,17 @@ C PENRAD mesure si Gap < Dist < Dradiation
 C Out of the gap (Gap < dist < Dradiation)
         ENDDO
       END IF
+C
+C----Friction model : second part IDs---------
+      IF(INTFRIC > 0) THEN
+         DO I=1,JLT
+           NI = CAND_N(I)
+           L  = CAND_E(I)
+           IPARTFRICSI(I)= IPARTFRICS(NI)
+           IPARTFRICMI(I) = IPARTFRICM(L)
+C
+         ENDDO
+       ENDIF
 C---------------------
 C      PENE INITIALE
 C---------------------

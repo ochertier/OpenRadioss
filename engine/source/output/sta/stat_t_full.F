@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_t_full         ../engine/source/output/sta/stat_t_full.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat             ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    stat_t_full         ../engine/source/output/sta/stat_t_full.F
+!||--- called by ------------------------------------------------------
+!||    genstat             ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
+!||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod        ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE STAT_T_FULL(
      1                  ELBUF_TAB ,IPARG ,GEO    ,IGEO        ,IXT       ,
      2                  WA        ,WAP0  ,IPARTT ,IPART_STATE ,STAT_INDXT,
@@ -37,7 +39,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD         
+      USE ELBUFDEF_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixt
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,7 +57,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SIZLOC,SIZP0
+      INTEGER SIZP0
       INTEGER IXT(NIXT,*),IPARG(NPARG,*),IGEO(NPROPGI,*),
      .        IPARTT(*),IPART_STATE(*),STAT_INDXT(*)
       my_real   
@@ -64,10 +68,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,K,N,JJ,LEN,IOFF,IE,NG,NEL,NFT,LFT,
-     .   LLT,ITY,ID,IPRT0,IPRT,IGTYP,IPROP,G_PLA
-      INTEGER PTWA(STAT_NUMELT),
-     .        PTWA_P0(0:MAX(1,STAT_NUMELT_G))
-      CHARACTER*100 DELIMIT,LINE
+     .   LLT,ITY,ID,IPRT0,IPRT,IGTYP,IPROP
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA_P0
+      CHARACTER*100 DELIMIT
       TYPE(G_BUFEL_)  ,POINTER :: GBUF
 C-----------------------------------------------
       DATA DELIMIT(1:60)
@@ -76,6 +80,9 @@ C-----------------------------------------------
      ./'----7----|----8----|----9----|----10---|'/
 C=======================================================================
 C     TRUSS
+C-----------------------------------------------
+      CALL MY_ALLOC(PTWA,STAT_NUMELT)
+      ALLOCATE(PTWA_P0(0:MAX(1,STAT_NUMELS_G)))
 C-----------------------------------------------
       JJ = 0
 !
@@ -116,7 +123,7 @@ C-----------------------------------------------
                 JJ = JJ + 4
 !---
                 IE=IE+1
-!---            pointeur de fin de zone dans WA
+!end-of-zone pointer in wa
                 PTWA(IE)=JJ
               ENDIF ! IF (IPART_STATE(IPRT) /= 0)
             ENDDO  !  DO I=LFT,LLT
@@ -128,7 +135,7 @@ c------- end loop over truss elements
 !     TRUSS - WRITE
 !-----------------------------------------------------------------------
       IF (NSPMD == 1) THEN
-!     recopies inutiles pour simplification du code.
+! unnecessary copies for code simplification
         PTWA_P0(0)=0
         DO N=1,STAT_NUMELT
           PTWA_P0(N)=PTWA(N)
@@ -138,7 +145,7 @@ c------- end loop over truss elements
           WAP0(J)=WA(J)
         ENDDO
       ELSE
-!       construit les pointeurs dans le tableau global WAP0
+! builds the pointers in the global array wap0
         CALL SPMD_STAT_PGATHER(PTWA,STAT_NUMELT,PTWA_P0,STAT_NUMELT_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
@@ -147,9 +154,9 @@ c------- end loop over truss elements
       IF (ISPMD == 0 .AND. LEN > 0) THEN
         IPRT0 = 0
         DO N=1,STAT_NUMELT_G
-!         retrouve le nieme elt dans l'ordre d'id croissant
+!         find the nieme elt in the order of an increasing id
           K=STAT_INDXT(N)
-!         retrouve l'adresse dans WAP0
+!         Find the address in WAP0
           J=PTWA_P0(K-1)
 !
           IOFF = NINT(WAP0(J + 1))
@@ -184,5 +191,8 @@ c------- end loop over truss elements
         ENDDO  !  DO N=1,STAT_NUMELT_G
       ENDIF  !  IF (ISPMD == 0.AND.LEN > 0)
 !---
+      DEALLOCATE(PTWA)
+      DEALLOCATE(PTWA_P0)
+c-----------
       RETURN
       END

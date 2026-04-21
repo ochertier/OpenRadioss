@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,14 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+!||====================================================================
+!||    init_inivol_2d_polygons_mod   ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
+!||--- called by ------------------------------------------------------
+!||    init_inivol                   ../starter/source/initial_conditions/inivol/init_inivol.F90
+!||====================================================================
+      module init_inivol_2D_polygons_mod
+        implicit none
+      contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
@@ -29,34 +37,35 @@
 !! \details STEP 1 :elem is inside user polygon : if and only all its nodes are inside it
 !! \details STEP 2 :elem is outside suer polygon : if their encompassing boxes are not intersecting
 !! \details STEP 3 : for all other case compute clipping and decide (no clip : outside,   clip area > 0.0 : cut)
-      !||====================================================================
-      !||    init_inivol_2d_polygons    ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
-      !||--- called by ------------------------------------------------------
-      !||    init_inivol                ../starter/source/initial_conditions/inivol/init_inivol.F90
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    inivol_def_mod             ../starter/share/modules1/inivol_mod.F
-      !||====================================================================
-      subroutine init_inivol_2D_polygons( &
-                                i_inivol  ,      idc,           mat_param, GLOBAL_xyz, &
-                                NUM_INIVOL,   inivol,               nsurf,    igrsurf, &
-                                nparg     ,   ngroup,               iparg,     numnod, &
-                                numeltg   ,    nixtg,                ixtg,     igrnod, &
-                                numelq    ,     nixq,                 ixq,     ngrnod, &
-                                x         , nbsubmat,                kvol,     nummat, &
-                                sipart    ,    ipart,               bufsf,     sbufsf, &
-                                i15b      ,    i15h ,                itab)
+!||====================================================================
+!||    init_inivol_2d_polygons    ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
+!||--- called by ------------------------------------------------------
+!||    init_inivol                ../starter/source/initial_conditions/inivol/init_inivol.F90
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    inivol_def_mod             ../starter/share/modules1/inivol_mod.F
+!||====================================================================
+        subroutine init_inivol_2D_polygons( &
+          i_inivol  ,      idc,           mat_param, GLOBAL_xyz, &
+          NUM_INIVOL,   inivol,               nsurf,    igrsurf, &
+          nparg     ,   ngroup,               iparg,     numnod, &
+          numeltg   ,    nixtg,                ixtg,     igrnod, &
+          numelq    ,     nixq,                 ixq,     ngrnod, &
+          x         , nbsubmat,                kvol,     nummat, &
+          sipart    ,    ipart,               bufsf,     sbufsf, &
+          i15b      ,    i15h ,                itab)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
-      use constant_mod , only : zero, em20, em10, em06, em02, fourth, third, half, one, two, pi, ep9, ep10, ep20
-      use array_mod , only : array_type, alloc_1d_array, dealloc_1d_array, dealloc_3d_array
-      use inivol_def_mod , only : inivol_struct_
-      use groupdef_mod , only : surf_, group_
-      use elbufdef_mod , only : elbuf_struct_, buf_mat_
-      use multi_fvm_mod , only : MULTI_FVM_STRUCT
-      use polygon_clipping_mod
-      use matparam_def_mod, only : matparam_struct_
+          use constant_mod , only : zero, em20, em10, em06, em02, fourth, third, half, one, two, pi, ep9, ep10, ep20
+          use array_mod , only : array_type, alloc_1d_array, dealloc_1d_array, dealloc_3d_array
+          use inivol_def_mod , only : inivol_struct_
+          use groupdef_mod , only : surf_, group_
+          use elbufdef_mod , only : elbuf_struct_, buf_mat_
+          use multi_fvm_mod , only : MULTI_FVM_STRUCT
+          use polygon_clipping_mod
+          use matparam_def_mod, only : matparam_struct_
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -64,81 +73,79 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
-      integer,intent(in) :: idc                                                !< inivol container
-      integer,intent(in) :: i_inivol                                           !< inivol identifier
-      integer,intent(in) :: nsurf, num_inivol, nbsubmat, sipart, nummat        !< array sizes
-      integer,intent(in) :: nixtg,nixq,numeltg,numelq, numnod, nparg, ngroup   !< array sizes
-      integer,intent(in) :: ixtg(nixtg,numeltg), ixq(nixq,numelq)              !< elems node-connectivity
-      integer,intent(in) :: iparg(nparg,ngroup)                                !< buffer for elem groups
-      integer,intent(in) :: i15b,i15h                                          !< indexes for ipart array
-      integer,intent(in) :: ipart(sipart)                                      !< buffer for parts
-      integer,intent(in) :: sbufsf                                             !< buffer size for surfaces
-      integer,intent(in) :: ngrnod                                             !< array size igrnod
-      my_real, intent(in) :: x(3,numnod)                                       !< node coordinates
-      my_real,intent(inout) :: kvol(nbsubmat,numelq+numeltg)                   !< volume fractions (for polygon clipping)
-      my_real,intent(in) :: bufsf(sbufsf)                                      !< buffer for surfaces
-      my_real,intent(in) :: GLOBAL_xyz(6)                                      !< global min,max (/surf/plane)
-      type (inivol_struct_), dimension(NUM_INIVOL), intent(inout) :: inivol    !< inivol data structure
-      type (surf_), dimension(nsurf), intent(in) :: igrsurf                    !< surface buffer
-      integer,intent(in) :: itab(numnod)                                       !< user identifier for nodes
-      type(matparam_struct_) ,dimension(nummat) ,intent(in) :: mat_param       !< modern buffer for material laws
-      type (group_)  , dimension(ngrnod)  :: igrnod                            !< data structure for groups of nodes
+          integer,intent(in) :: idc                                                !< inivol container
+          integer,intent(in) :: i_inivol                                           !< inivol identifier
+          integer,intent(in) :: nsurf, num_inivol, nbsubmat, sipart, nummat        !< array sizes
+          integer,intent(in) :: nixtg,nixq,numeltg,numelq, numnod, nparg, ngroup   !< array sizes
+          integer,intent(in) :: ixtg(nixtg,numeltg), ixq(nixq,numelq)              !< elems node-connectivity
+          integer,intent(in) :: iparg(nparg,ngroup)                                !< buffer for elem groups
+          integer,intent(in) :: i15b,i15h                                          !< indexes for ipart array
+          integer,intent(in) :: ipart(sipart)                                      !< buffer for parts
+          integer,intent(in) :: sbufsf                                             !< buffer size for surfaces
+          integer,intent(in) :: ngrnod                                             !< array size igrnod
+          real(kind=WP), intent(in) :: x(3,numnod)                                       !< node coordinates
+          real(kind=WP),intent(inout) :: kvol(nbsubmat,numelq+numeltg)                   !< volume fractions (for polygon clipping)
+          real(kind=WP),intent(in) :: bufsf(sbufsf)                                      !< buffer for surfaces
+          real(kind=WP),intent(in) :: GLOBAL_xyz(6)                                      !< global min,max (/surf/plane)
+          type (inivol_struct_), dimension(NUM_INIVOL), intent(inout) :: inivol    !< inivol data structure
+          type (surf_), dimension(nsurf), intent(in) :: igrsurf                    !< surface buffer
+          integer,intent(in) :: itab(numnod)                                       !< user identifier for nodes
+          type(matparam_struct_) ,dimension(nummat) ,intent(in) :: mat_param       !< modern buffer for material laws
+          type (group_)  , dimension(ngrnod)  :: igrnod                            !< data structure for groups of nodes
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-      my_real :: vfrac                                                           !< user volume fraction for /INIVOL option (current container)
-      my_real ratio                                                              !< ratio of area immersed inside the surface
-      my_real XYZ(6)                                                             !<box size xmin ymin zmin, xmax ymax zmax (box encompassing the user polygon)
-      my_real xyz_elem(6)                                                        !<box size for current elem
-      my_real :: coor_node(2:3)                                                  !< temporary point
-      my_real DL, DLy, DLz                                                       !< element of length for margin estimation
-      my_real :: sumvf                                                           !< sum of volume fractions
-      my_real :: vf_to_substract
-      my_real :: vfrac0(nbsubmat)                                                !< volume fraction (initial def from material law)
-      my_real :: tol
-      my_real :: YP1,ZP1,YP2,ZP2                                                 !< planar surface definition
-      my_real :: normal(3), tangent(3)                                           !< normal and tangent to the planar surface
-      my_real :: bb,cc,nn,yg,zg                                                  !< superellipse surface definition
-      my_real skw(9)                                                             !< skew data for superell transformation
-      my_real :: tmp(3)                                                          !< temporary array
-      my_real :: theta
+          real(kind=WP) :: vfrac                                                           !< user volume fraction for /INIVOL option (current container)
+          real(kind=WP) :: ratio                                                              !< ratio of area immersed inside the surface
+          real(kind=WP) :: XYZ(6)                                                             !<box size xmin ymin zmin, xmax ymax zmax (box encompassing the user polygon)
+          real(kind=WP) :: xyz_elem(6)                                                        !<box size for current elem
+          real(kind=WP) :: coor_node(2:3)                                                  !< temporary point
+          real(kind=WP) :: DL, DLy, DLz                                                       !< element of length for margin estimation
+          real(kind=WP) :: sumvf                                                           !< sum of volume fractions
+          real(kind=WP) :: vf_to_substract
+          real(kind=WP) :: vfrac0(nbsubmat)                                                !< volume fraction (initial def from material law)
+          real(kind=WP) :: tol
+          real(kind=WP) :: YP1,ZP1,YP2,ZP2                                                 !< planar surface definition
+          real(kind=WP) :: normal(3), tangent(3)                                           !< normal and tangent to the planar surface
+          real(kind=WP) :: bb,cc,nn,yg,zg                                                  !< superellipse surface definition
+          real(kind=WP) :: skw(9)                                                             !< skew data for superell transformation
+          real(kind=WP) :: tmp(3)                                                          !< temporary array
+          real(kind=WP) :: theta
+          real(kind=WP) :: midpoint(3)
 
-      integer :: iadbuf                                                          !< index for buffer bufmat
-      integer nsegsurf                                                           !< number of segments for a given 2d surface
-      integer npoints                                                            !< number of points for ordered list of nodes
-      integer ng,nel,mtn,imat,icumu,I15_,nft,ity,isolnod,invol,iad,part_id,idp   !< local variables
-      integer iseg                                                               !< loop over segments
-      integer ii,ipt                                                             !< various loops
-      integer :: idsurf,idgrnod,ireversed,isubmat                                !< user parameter for /INIVOL option (current container)
-      integer :: inod1, inod2                                                    !< node identifier of current segment
-      integer, allocatable, dimension (:) :: list_quad, list_tria                !<list of elements to retain
-      integer icur_q, icur_t                                                     !< cursor for array indexes (quad and tria)
-      integer :: iel                                                             !< elem loop for the current group
-      integer :: ielg                                                            !< global elem id
-      integer :: inod                                                            !< local node 1:4 (quad) or 1:3 (tria)
-      integer, allocatable, dimension(:) :: itag_n                               !< tag to mark relevant nodes
-      integer :: node_id(1:4)                                                    !< mesh elem connectivity
-      integer ipoly                                                              !< current polygon (loop)
-      integer :: isubmat_to_substract
-      integer :: mid                                                             !< material internal identifier
-      integer :: iter
-      integer :: iStatus                                                         !< return code from CLipping Algorithm
-      integer :: prod_tag !< product of tag for point of elem mesh               !prod > 0 => elem indise the polygon
-      integer :: sum_tag                                                         !sum = 0 => elem outside the polygon
-      integer :: iad0                                                            !< index for buffer bufsf
-      integer :: npt_superellipse                                                !< number of points for superellipse
+          integer :: nsegsurf                                                           !< number of segments for a given 2d surface
+          integer :: npoints                                                            !< number of points for ordered list of nodes
+          integer :: ng,nel,mtn,imat,icumu,I15_,nft,ity,isolnod,invol,iad,part_id,idp   !< local variables
+          integer :: iseg                                                               !< loop over segments
+          integer :: ii,ipt                                                             !< various loops
+          integer :: idsurf,idgrnod,ireversed,isubmat                                !< user parameter for /INIVOL option (current container)
+          integer :: inod1, inod2                                                    !< node identifier of current segment
+          integer, allocatable, dimension (:) :: list_quad, list_tria                !<list of elements to retain
+          integer :: icur_q, icur_t                                                     !< cursor for array indexes (quad and tria)
+          integer :: iel                                                             !< elem loop for the current group
+          integer :: ielg                                                            !< global elem id
+          integer :: inod                                                            !< local node 1:4 (quad) or 1:3 (tria)
+          integer, allocatable, dimension(:) :: itag_n                               !< tag to mark relevant nodes
+          integer :: node_id(1:4)                                                    !< mesh elem connectivity
+          integer :: ipoly                                                              !< current polygon (loop)
+          integer :: isubmat_to_substract
+          integer :: mid                                                             !< material internal identifier
+          integer :: iter
+          integer :: iStatus                                                         !< return code from CLipping Algorithm
+          integer :: sum_tag                                                         !sum = 0 => elem outside the polygon
+          integer :: iad0                                                            !< index for buffer bufsf
+          integer :: npt_superellipse                                                !< number of points for superellipse
 
-      logical :: is_quad, is_tria, is_inside
-      logical :: is_reversed
-      logical :: debug
+          logical :: is_quad, is_tria, is_inside
+          logical :: is_reversed
+          logical :: debug
 
-      type(polygon_) :: user_polygon, elem_polygon
-      type(polygon_list_) :: result_list_polygon
-      type(polygon_point_) :: point
+          type(polygon_) :: user_polygon, elem_polygon
+          type(polygon_list_) :: result_list_polygon
+          type(polygon_point_) :: point
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -152,6 +159,7 @@
           icumu     = inivol(i_inivol)%container(idc)%icumu
           nsegsurf  = 0
           npoints   = 0
+          inod1     = 0
           if(idsurf > 0) nsegsurf = igrsurf(idsurf)%nseg
           if(idgrnod > 0) npoints = igrnod(idgrnod)%nentity
           part_id   = inivol(i_inivol)%part_id
@@ -171,32 +179,32 @@
           ! SURF_TYPE = 200       : INFINITE PLANE
           if(idsurf > 0)then
             if (igrsurf(idsurf)%type == 0 ) then
-             ! POLYGON DEFINED WITH USER SEGMENTS
-             !building polygon
-             call polygon_create( user_polygon, nsegsurf+1+1)   !+1 in case of automatic closure
-             user_polygon%numpoint = nsegsurf + 1
-             user_polygon%area = zero
-             do iseg = 1,nsegsurf
-               inod1 = igrsurf(idsurf)%nodes(iseg, 1)
-               inod2 = igrsurf(idsurf)%nodes(iseg, 2)
-               user_polygon%point(iseg)%y = x(2,inod1)
-               user_polygon%point(iseg)%z = x(3,inod1)
-               xyz(2) = min (xyz(2), x(2,inod1))
-               xyz(3) = min (xyz(3), x(3,inod1))
-               xyz(5) = max (xyz(5), x(2,inod1))
-               xyz(6) = max (xyz(6), x(3,inod1))
-             end do
-             !automatic closure (if needed)
-             if( igrsurf(idsurf)%nodes(1, 1) /= igrsurf(idsurf)%nodes(nsegsurf, 2) )then
-               user_polygon%point(nsegsurf+1)%y = x(2,1)
-               user_polygon%point(nsegsurf+1)%z = x(3,1)
-               xyz(2) = min (xyz(2), x(2,inod1))
-               xyz(3) = min (xyz(3), x(3,inod1))
-               xyz(5) = max (xyz(5), x(2,inod1))
-               xyz(6) = max (xyz(6), x(3,inod1))
-             end if
+              ! POLYGON DEFINED WITH USER SEGMENTS
+              !building polygon
+              call polygon_create( user_polygon, nsegsurf+1+1)   !+1 in case of automatic closure
+              user_polygon%numpoint = nsegsurf + 1
+              user_polygon%area = zero
+              do iseg = 1,nsegsurf
+                inod1 = igrsurf(idsurf)%nodes(iseg, 1)
+                inod2 = igrsurf(idsurf)%nodes(iseg, 2)
+                user_polygon%point(iseg)%y = x(2,inod1)
+                user_polygon%point(iseg)%z = x(3,inod1)
+                xyz(2) = min (xyz(2), x(2,inod1))
+                xyz(3) = min (xyz(3), x(3,inod1))
+                xyz(5) = max (xyz(5), x(2,inod1))
+                xyz(6) = max (xyz(6), x(3,inod1))
+              end do
+              !automatic closure (if needed)
+              if( igrsurf(idsurf)%nodes(1, 1) /= igrsurf(idsurf)%nodes(nsegsurf, 2) )then
+                user_polygon%point(nsegsurf+1)%y = x(2,1)
+                user_polygon%point(nsegsurf+1)%z = x(3,1)
+                xyz(2) = min (xyz(2), x(2,inod1))
+                xyz(3) = min (xyz(3), x(3,inod1))
+                xyz(5) = max (xyz(5), x(2,inod1))
+                xyz(6) = max (xyz(6), x(3,inod1))
+              end if
 
-            elseif(igrsurf(idsurf)%type == 200)then
+            else if(igrsurf(idsurf)%type == 200)then
               iad0 = igrsurf(idsurf)%iad_bufr
               !xp1 = bufsf(iad0+1)
               yp1 = bufsf(iad0+2)
@@ -221,11 +229,20 @@
               tangent(1)=0
               tangent(2)=normal(3)
               tangent(3)=-normal(2)
+              ! midpoint
+              midpoint(1) = zero
+              midpoint(2) = half*(GLOBAL_xyz(5)+GLOBAL_xyz(2))
+              midpoint(3) = half*(GLOBAL_xyz(6)+GLOBAL_xyz(3))
+              ! project midpoint to user surface. New basis.
+              ! more convenient to have a basis point in the middle of the user mesh to build a corresponnding polygonal box
+              theta = normal(2)*(yp1 - midpoint(2)) + normal(3)*(zp1 - midpoint(3))
+              yp1 = midpoint(2) + theta * normal(2)
+              zp1 = midpoint(3) + theta * normal(3)
               !building corresponding polygon (box)
               call polygon_create( user_polygon, 4+1)
               user_polygon%numpoint = 4 + 1
               user_polygon%area = zero
-              DL=(one+fourth)*max(abs(GLOBAL_xyz(5)-GLOBAL_xyz(2)),abs(GLOBAL_xyz(6)-GLOBAL_xyz(3)))
+              DL=two*max(abs(GLOBAL_xyz(5)-GLOBAL_xyz(2)),abs(GLOBAL_xyz(6)-GLOBAL_xyz(3)))
               user_polygon%point(1)%y = YP1 + half*DL*tangent(2)
               user_polygon%point(1)%z = ZP1 + half*DL*tangent(3)
               user_polygon%point(2)%y = user_polygon%point(1)%y + DL*normal(2)
@@ -241,13 +258,13 @@
               xyz(6) = max(user_polygon%point(1)%z,user_polygon%point(2)%z,user_polygon%point(3)%z,user_polygon%point(4)%z)
               if(debug)then
                 print *, "box (/surf/plane)"
-                write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,user_polygon%point(1)%y ,user_polygon%point(1)%z
-                write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,user_polygon%point(2)%y ,user_polygon%point(2)%z
-                write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,user_polygon%point(3)%y ,user_polygon%point(3)%z
-                write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,user_polygon%point(4)%y ,user_polygon%point(4)%z
-              endif
+                write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,user_polygon%point(1)%y ,user_polygon%point(1)%z
+                write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,user_polygon%point(2)%y ,user_polygon%point(2)%z
+                write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,user_polygon%point(3)%y ,user_polygon%point(3)%z
+                write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,user_polygon%point(4)%y ,user_polygon%point(4)%z
+              end if
 
-            elseif(igrsurf(idsurf)%type == 101)then
+            else if(igrsurf(idsurf)%type == 101)then
               iad0 = igrsurf(idsurf)%iad_bufr
               !aa = bufsf(iad0+1)
               bb = bufsf(iad0+2)
@@ -291,33 +308,35 @@
                 xyz(3) = min (xyz(3), user_polygon%point(ii)%z)
                 xyz(5) = max (xyz(5), user_polygon%point(ii)%y)
                 xyz(6) = max (xyz(6), user_polygon%point(ii)%z)
-                if(debug)write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,user_polygon%point(ii)%y ,user_polygon%point(ii)%z
+                if(debug)write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,user_polygon%point(ii)%y ,user_polygon%point(ii)%z
               end do
               nsegsurf = npt_superellipse
 
-            endif ! igrsurf(idsurf)%type
+            end if ! igrsurf(idsurf)%type
 
-          elseif(idgrnod > 0)then
-             ! ORDERED LIST OF NODES (2d only, pre-condition only verified by Reader)
-             !building polygon
-             call polygon_create( user_polygon, npoints+1)   !+1 in case of automatic closure
-             user_polygon%numpoint = npoints+1
-             user_polygon%area = zero
-             nsegsurf = npoints
-             do ipt = 1, igrnod(idgrnod)%nentity
-               inod1 = igrnod(idgrnod)%entity(ipt)
-               user_polygon%point(ipt)%y = x(2,inod1)
-               user_polygon%point(ipt)%z = x(3,inod1)
-               xyz(2) = min (xyz(2), x(2,inod1))
-               xyz(3) = min (xyz(3), x(3,inod1))
-               xyz(5) = max (xyz(5), x(2,inod1))
-               xyz(6) = max (xyz(6), x(3,inod1))
-             end do
+          else if(idgrnod > 0)then
+            ! ORDERED LIST OF NODES (2d only, pre-condition only verified by Reader)
+            !building polygon
+            call polygon_create( user_polygon, npoints+1)   !+1 in case of automatic closure
+            user_polygon%numpoint = npoints+1
+            user_polygon%area = zero
+            nsegsurf = npoints
+            do ipt = 1, igrnod(idgrnod)%nentity
+              inod1 = igrnod(idgrnod)%entity(ipt)
+              user_polygon%point(ipt)%y = x(2,inod1)
+              user_polygon%point(ipt)%z = x(3,inod1)
+              xyz(2) = min (xyz(2), x(2,inod1))
+              xyz(3) = min (xyz(3), x(3,inod1))
+              xyz(5) = max (xyz(5), x(2,inod1))
+              xyz(6) = max (xyz(6), x(3,inod1))
+            end do
           end if ! idsurf>0 or idgrnod>0
 
           !last node
-          user_polygon%point(nsegsurf+1)%y = user_polygon%point(1)%y
-          user_polygon%point(nsegsurf+1)%z = user_polygon%point(1)%z
+          if(size(user_polygon%point,1) > nsegsurf) then
+            user_polygon%point(nsegsurf+1)%y = user_polygon%point(1)%y
+            user_polygon%point(nsegsurf+1)%z = user_polygon%point(1)%z
+          end if
           !margin Y-dir
           DLy = xyz(5)-xyz(2)
           xyz(2) = xyz(2) - max(em10,em02*DLy)
@@ -354,14 +373,14 @@
               imat = ixtg(1,1+nft)
               i15_=i15h
               is_tria = .true.
-            elseif(ity == 2)then
+            else if(ity == 2)then
               imat = ixq(1,1+nft)
               i15_=i15b
               is_quad = .true.
             else
               i15_ = 0
               cycle
-            endif
+            end if
             i15_ = i15_ -1
             ! list elem inside the box. Skip the other (outside the polygon)
             if(is_quad)then
@@ -380,7 +399,7 @@
                   end do
                 end if
               end do
-            elseif(is_tria)then
+            else if(is_tria)then
               do iel = 1, nel
                 ielg = iel + nft
                 idp = ipart(i15_+ielg)
@@ -393,11 +412,11 @@
                         itag_n(ixtg(inod,ielg)) = 1
                       end if
                     end if
-                  enddo
+                  end do
                 end if
               end do
             end if
-          enddo ! next element group ng
+          end do ! next element group ng
 
           ! --- EXACT CRITERION : RETAIN ONLY NODES INSIDE  (computation done only if node is inside the box, which means if node is retaines by pre-criterion)
           do ii=1,numnod
@@ -437,14 +456,14 @@
               imat = ixtg(1,1+nft)
               i15_=i15h
               is_tria = .true.
-            elseif(ity == 2)then
+            else if(ity == 2)then
               imat = ixq(1,1+nft)
               i15_=i15b
               is_quad = .true.
             else
               i15_ = 0
               cycle
-            endif
+            end if
             i15_ = i15_ -1
 
             !volume fraction as defined by user material law
@@ -466,59 +485,10 @@
                     !sum_tag == 0 : elem is outside (may be considered as inside if is_reversed is true)
                     ! reversed option (Iopt)
                     if(is_reversed .and. sum_tag == 4)then
-                       cycle
-                    elseif(.not.is_reversed .and. sum_tag == 0)then
-                       cycle
+                      cycle
+                    else if(.not.is_reversed .and. sum_tag == 0)then
+                      cycle
                     else
-                    end if
-                     ratio = one
-                     if(icumu == 0)kvol(isubmat,ielg) = zero
-                     kvol(isubmat,ielg) = kvol(isubmat,ielg) + ratio*vfrac !100% inside
-                    ! if added volume ratio makes that sum is > 1, then substract from previous filling
-                    if(icumu == -1)then
-                      sumvf = sum(kvol(1:nbsubmat,ielg))
-                      if (sumvf > one)then
-                        if(idc == 1)then
-                          ! substract from existing submat (default one)
-                          ! pre-condition : sum (vf)= 1.0
-                          isubmat_to_substract = max(1,maxloc(vfrac0(1:nbsubmat),1))
-                          vf_to_substract = sumvf-one
-                          kvol(isubmat_to_substract,ielg) = &
-                            kvol(isubmat_to_substract,ielg) - vf_to_substract * vfrac0(isubmat_to_substract)
-                        elseif(idc > 1)then
-                         ! substract from previous step
-                         isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
-                         vf_to_substract = sumvf-one
-                         vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
-                         kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
-                        end if
-                      end if
-                    end if
-                    cycle ! no volume fraction to fill
-                  else
-                    ! clipping required to calculate ratio inside the polygon
-                    icur_q = icur_q +1
-                    list_quad(icur_q) = ielg
-                  end if
-                end if
-              end do
-            elseif(is_tria)then
-              do iel = 1, nel
-                ielg = iel + nft
-                idp = ipart(i15_+ielg)
-                if(idp == part_id)then
-                  node_id(1) =  ixq(2,ielg)
-                  node_id(2) =  ixq(3,ielg)
-                  node_id(3) =  ixq(4,ielg)
-                  sum_tag = itag_n(node_id(1))+itag_n(node_id(2))+itag_n(node_id(3))
-                  if(sum_tag == 3 .or. sum_tag == 0)then
-                    !sum_tag == 3 : elem is inside  (may be considered as outside if is_reversed is true)
-                    !sum_tag == 0 : elem is outside (may be considered as inside if is_reversed is true)
-                    ! reversed option (Iopt)
-                    if(is_reversed .and. prod_tag > 0)then
-                       cycle
-                    elseif(.not.is_reversed .and. sum_tag == 0)then
-                       cycle
                     end if
                     ratio = one
                     if(icumu == 0)kvol(isubmat,ielg) = zero
@@ -534,12 +504,61 @@
                           vf_to_substract = sumvf-one
                           kvol(isubmat_to_substract,ielg) = &
                             kvol(isubmat_to_substract,ielg) - vf_to_substract * vfrac0(isubmat_to_substract)
-                        elseif(idc > 1)then
-                         ! substract from previous step
-                         isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
-                         vf_to_substract = sumvf-one
-                         vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
-                         kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
+                        else if(idc > 1)then
+                          ! substract from previous step
+                          isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
+                          vf_to_substract = sumvf-one
+                          vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
+                          kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
+                        end if
+                      end if
+                    end if
+                    cycle ! no volume fraction to fill
+                  else
+                    ! clipping required to calculate ratio inside the polygon
+                    icur_q = icur_q +1
+                    list_quad(icur_q) = ielg
+                  end if
+                end if
+              end do
+            else if(is_tria)then
+              do iel = 1, nel
+                ielg = iel + nft
+                idp = ipart(i15_+ielg)
+                if(idp == part_id)then
+                  node_id(1) =  ixq(2,ielg)
+                  node_id(2) =  ixq(3,ielg)
+                  node_id(3) =  ixq(4,ielg)
+                  sum_tag = itag_n(node_id(1))+itag_n(node_id(2))+itag_n(node_id(3))
+                  if(sum_tag == 3 .or. sum_tag == 0)then
+                    !sum_tag == 3 : elem is inside  (may be considered as outside if is_reversed is true)
+                    !sum_tag == 0 : elem is outside (may be considered as inside if is_reversed is true)
+                    ! reversed option (Iopt)
+                    if(is_reversed)then
+                      cycle
+                    else if(.not.is_reversed .and. sum_tag == 0)then
+                      cycle
+                    end if
+                    ratio = one
+                    if(icumu == 0)kvol(isubmat,ielg) = zero
+                    kvol(isubmat,ielg) = kvol(isubmat,ielg) + ratio*vfrac !100% inside
+                    ! if added volume ratio makes that sum is > 1, then substract from previous filling
+                    if(icumu == -1)then
+                      sumvf = sum(kvol(1:nbsubmat,ielg))
+                      if (sumvf > one)then
+                        if(idc == 1)then
+                          ! substract from existing submat (default one)
+                          ! pre-condition : sum (vf)= 1.0
+                          isubmat_to_substract = max(1,maxloc(vfrac0(1:nbsubmat),1))
+                          vf_to_substract = sumvf-one
+                          kvol(isubmat_to_substract,ielg) = &
+                            kvol(isubmat_to_substract,ielg) - vf_to_substract * vfrac0(isubmat_to_substract)
+                        else if(idc > 1)then
+                          ! substract from previous step
+                          isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
+                          vf_to_substract = sumvf-one
+                          vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
+                          kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
                         end if
                       end if
                     end if
@@ -552,19 +571,19 @@
                 end if
               end do
             end if
-          enddo ! next element group ng
+          end do ! next element group ng
 
           ! ---RATIO WITH POLYGONAL CLIPPING
           !      list_quad and list_tria are listing elems which required polygonal clipping since
           !      they are partially cut by user polygon
           call polygon_SetClockWise( user_polygon )
-            if(debug)then
-             write (*,*)"  --> user polygon  "
-             do ii = 1, user_polygon%numpoint
-               write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,user_polygon%point(ii)%y ,user_polygon%point(ii)%z  !HM TCL SCRIPT TO CHECK USER POLYGON ON SCREEN
-             end do
-               write (*,*)"   "
-            end if
+          if(debug)then
+            write (*,*)"  --> user polygon  "
+            do ii = 1, user_polygon%numpoint
+              write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,user_polygon%point(ii)%y ,user_polygon%point(ii)%z  !HM TCL SCRIPT TO CHECK USER POLYGON ON SCREEN
+            end do
+            write (*,*)"   "
+          end if
           !
           ! --- QUAD CLIPPING
           call polygon_create(elem_polygon, 5)
@@ -579,23 +598,23 @@
             elem_polygon%numpoint = 5
             ! already oriented Y->Z
             call polygon_SetClockWise( elem_polygon )  !cen be removed if we already computed the area, then just set %area=...
-             if(debug)then
+            if(debug)then
               write (*,*)"  current elem  ", ixq(7,ielg)
               !HM TCL SCRIPT TO CHECK ELEM ON SCREEN
-              write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,elem_polygon%point(1)%y ,elem_polygon%point(1)%z
-              write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,elem_polygon%point(2)%y ,elem_polygon%point(2)%z
-              write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,elem_polygon%point(3)%y ,elem_polygon%point(3)%z
-              write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,elem_polygon%point(4)%y ,elem_polygon%point(4)%z
-             end if
+              write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,elem_polygon%point(1)%y ,elem_polygon%point(1)%z
+              write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,elem_polygon%point(2)%y ,elem_polygon%point(2)%z
+              write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,elem_polygon%point(3)%y ,elem_polygon%point(3)%z
+              write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,elem_polygon%point(4)%y ,elem_polygon%point(4)%z
+            end if
             !diagonal : max L1 norm
-            xyz_elem(2) =                  elem_polygon%point(1)%y   ; xyz_elem(3) =                  elem_polygon%point(1)%z   ;
-            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(2)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(2)%z ) ;
-            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(3)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(3)%z ) ;
-            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(4)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(4)%z ) ;
-            xyz_elem(5) =                  elem_polygon%point(1)%y   ; xyz_elem(6) =                  elem_polygon%point(1)%z   ;
-            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(2)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(2)%z ) ;
-            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(3)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(3)%z ) ;
-            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(4)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(4)%z ) ;
+            xyz_elem(2) =                  elem_polygon%point(1)%y   ; xyz_elem(3) =                  elem_polygon%point(1)%z
+            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(2)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(2)%z )
+            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(3)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(3)%z )
+            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(4)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(4)%z )
+            xyz_elem(5) =                  elem_polygon%point(1)%y   ; xyz_elem(6) =                  elem_polygon%point(1)%z
+            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(2)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(2)%z )
+            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(3)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(3)%z )
+            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(4)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(4)%z )
             DLy = xyz_elem(5)-xyz_elem(2) !Y-dir
             DLz = xyz_elem(6)-xyz_elem(3) !Z-dir
             elem_polygon%diag = max(DLy,Dlz)       !strictly positive by construction
@@ -603,7 +622,7 @@
             ! clipping between user polygon and current quad
             iter=0
             iStatus = -1
-             tol = em06*elem_polygon%diag
+            tol = em06*elem_polygon%diag
             do while (iStatus /= 0 .and. iter < 10)
               !tolerance (to avoid vertice on any edge and avoid loops)
               tol=2*tol
@@ -633,19 +652,19 @@
                       vf_to_substract = sumvf-one
                       kvol(isubmat_to_substract,ielg) = &
                         kvol(isubmat_to_substract,ielg) - vf_to_substract * vfrac0(isubmat_to_substract)
-                    elseif(idc > 1)then
-                     ! substract from previous step
-                     isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
-                     vf_to_substract = sumvf-one
-                     vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
-                     kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
+                    else if(idc > 1)then
+                      ! substract from previous step
+                      isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
+                      vf_to_substract = sumvf-one
+                      vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
+                      kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
                     end if
                   end if
                 end if
                 if(debug)print *, "isubmat,quad partially inside",isubmat,ixq(7,ielg),kvol(isubmat,ielg)
-              enddo
+              end do
             else
-               ! degenerated case. Check if elem is fully outside/inside by testing centroid.
+              ! degenerated case. Check if elem is fully outside/inside by testing centroid.
               point%y=fourth*sum(elem_polygon%point(1:4)%y)
               point%z=fourth*sum(elem_polygon%point(1:4)%z)
               is_inside = polygon_is_point_inside (user_polygon, point)
@@ -658,7 +677,7 @@
               end if
               if(is_inside.and.is_reversed) then
                 ratio=one
-              elseif(.not.is_inside .and. is_reversed)then
+              else if(.not.is_inside .and. is_reversed)then
                 ratio=one
               else
                 cycle !nothing to do
@@ -676,17 +695,17 @@
                     vf_to_substract = sumvf-one
                     kvol(isubmat_to_substract,ielg) = &
                       kvol(isubmat_to_substract,ielg) - vf_to_substract * vfrac0(isubmat_to_substract)
-                  elseif(idc > 1)then
-                   ! substract from previous step
-                   isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
-                   vf_to_substract = sumvf-one
-                   vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
-                   kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
+                  else if(idc > 1)then
+                    ! substract from previous step
+                    isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
+                    vf_to_substract = sumvf-one
+                    vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
+                    kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
                   end if
                 end if
               end if
             end if
-          enddo
+          end do
           call polygon_destroy(elem_polygon)
 
           ! --- TRIA CLIPPING
@@ -701,20 +720,20 @@
             elem_polygon%numpoint = 4
             ! already oriented Y->Z
             call polygon_SetClockWise( elem_polygon )  !cen be removed if we already computed the area, then just set %area=...
-             if(debug)then
+            if(debug)then
               write (*,*)"  current elem  "
               !HM TCL SCRIPT TO CHECK ELEM ON SCREEN
-              write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,elem_polygon%point(1)%y ,elem_polygon%point(1)%z
-              write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,elem_polygon%point(2)%y ,elem_polygon%point(2)%z
-              write (*,FMT='(A,3F45.35)') "  *createnode ",0.0,elem_polygon%point(3)%y ,elem_polygon%point(3)%z
-             end if
+              write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,elem_polygon%point(1)%y ,elem_polygon%point(1)%z
+              write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,elem_polygon%point(2)%y ,elem_polygon%point(2)%z
+              write (*,FMT="(A,3F45.35)") "  *createnode ",0.0,elem_polygon%point(3)%y ,elem_polygon%point(3)%z
+            end if
             !diagonal : max L1 norm
-            xyz_elem(2) =                  elem_polygon%point(1)%y   ; xyz_elem(3) =                  elem_polygon%point(1)%z   ;
-            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(2)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(2)%z ) ;
-            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(3)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(3)%z ) ;
-            xyz_elem(5) =                  elem_polygon%point(1)%y   ; xyz_elem(6) =                  elem_polygon%point(1)%z   ;
-            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(2)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(2)%z ) ;
-            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(3)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(3)%z ) ;
+            xyz_elem(2) =                  elem_polygon%point(1)%y   ; xyz_elem(3) =                  elem_polygon%point(1)%z
+            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(2)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(2)%z )
+            xyz_elem(2) = min(xyz_elem(2), elem_polygon%point(3)%y ) ; xyz_elem(3) = min(xyz_elem(3), elem_polygon%point(3)%z )
+            xyz_elem(5) =                  elem_polygon%point(1)%y   ; xyz_elem(6) =                  elem_polygon%point(1)%z
+            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(2)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(2)%z )
+            xyz_elem(5) = max(xyz_elem(5), elem_polygon%point(3)%y ) ; xyz_elem(6) = max(xyz_elem(6), elem_polygon%point(3)%z )
             DLy = xyz_elem(5)-xyz_elem(2) !Y-dir
             DLz = xyz_elem(6)-xyz_elem(3) !Z-dir
             elem_polygon%diag = max(DLy,Dlz)       !strictly positive by construction
@@ -722,7 +741,7 @@
             ! clipping between user polygon and current quad
             iter=0
             iStatus = -1
-             tol = em06*elem_polygon%diag
+            tol = em06*elem_polygon%diag
             do while (iStatus /= 0 .and. iter < 10)
               !tolerance (to avoid vertice on any edge and avoid loops)
               tol=2*tol
@@ -742,7 +761,7 @@
                 if(is_reversed)ratio = one - ratio
                 kvol(isubmat,ielg) = kvol(isubmat,ielg) + vfrac * ratio
                 if(debug)print *, "isubmat,quad partially inside",isubmat,ixq(7,ielg),kvol(isubmat,ielg)
-              enddo
+              end do
               ! if added volume ratio makes that sum is > 1, then substract from previous filling
               if(icumu == -1)then
                 sumvf = sum(kvol(1:nbsubmat,ielg))
@@ -754,17 +773,17 @@
                     vf_to_substract = sumvf-one
                     kvol(isubmat_to_substract,ielg) = &
                       kvol(isubmat_to_substract,ielg) - vf_to_substract * vfrac0(isubmat_to_substract)
-                  elseif(idc > 1)then
-                   ! substract from previous step
-                   isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
-                   vf_to_substract = sumvf-one
-                   vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
-                   kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
+                  else if(idc > 1)then
+                    ! substract from previous step
+                    isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
+                    vf_to_substract = sumvf-one
+                    vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
+                    kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
                   end if
                 end if
               end if
             else
-               ! degenerated case. Check if elem is fully outside/inside by testing centroid.
+              ! degenerated case. Check if elem is fully outside/inside by testing centroid.
               point%y=third*sum(elem_polygon%point(1:4)%y)
               point%z=third*sum(elem_polygon%point(1:4)%z)
               is_inside = polygon_is_point_inside (user_polygon, point)
@@ -777,7 +796,7 @@
               end if
               if(is_inside.and.is_reversed) then
                 ratio=one
-              elseif(.not.is_inside .and. is_reversed)then
+              else if(.not.is_inside .and. is_reversed)then
                 ratio=one
               else
                 cycle !nothing to do
@@ -795,28 +814,29 @@
                     vf_to_substract = sumvf-one
                     kvol(isubmat_to_substract,ielg) = &
                       kvol(isubmat_to_substract,ielg) - vf_to_substract * vfrac0(isubmat_to_substract)
-                  elseif(idc > 1)then
-                   ! substract from previous step
-                   isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
-                   vf_to_substract = sumvf-one
-                   vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
-                   kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
+                  else if(idc > 1)then
+                    ! substract from previous step
+                    isubmat_to_substract = inivol(i_inivol)%container(idc-1)%submat_id
+                    vf_to_substract = sumvf-one
+                    vf_to_substract = min(vf_to_substract, kvol(isubmat_to_substract,ielg))
+                    kvol(isubmat_to_substract,ielg) = kvol(isubmat_to_substract,ielg)-vf_to_substract
                   end if
                 end if
               end if
             end if
-          enddo
+          end do
           call polygon_destroy(elem_polygon)
 
 
-     ! --- deallocate
-      if(allocated(itag_n))deallocate(itag_n)
-      if(allocated(list_quad))deallocate(list_quad)
-      if(allocated(list_tria))deallocate(list_tria)
-      call polygon_destroy(user_polygon)
-      call polygon_destroy(elem_polygon)
+          ! --- deallocate
+          if(allocated(itag_n))deallocate(itag_n)
+          if(allocated(list_quad))deallocate(list_quad)
+          if(allocated(list_tria))deallocate(list_tria)
+          call polygon_destroy(user_polygon)
+          call polygon_destroy(elem_polygon)
 
-    end subroutine init_inivol_2D_polygons
+        end subroutine init_inivol_2D_polygons
+      end module init_inivol_2D_polygons_mod
 
 
 

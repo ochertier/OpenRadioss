@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    admthke             ../engine/source/model/remesh/admthke.F
-      !||--- called by ------------------------------------------------------
-      !||    admerr              ../engine/source/model/remesh/admerr.F
-      !||    err_thk             ../engine/source/elements/shell/err_thk.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_exch_nodarea   ../engine/source/mpi/anim/spmd_exch_nodarea.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    remesh_mod          ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    admthke             ../engine/source/model/remesh/admthke.F
+!||--- called by ------------------------------------------------------
+!||    admerr              ../engine/source/model/remesh/admerr.F
+!||    err_thk             ../engine/source/elements/shell/err_thk.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_exch_nodarea   ../engine/source/mpi/anim/spmd_exch_nodarea.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    remesh_mod          ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE ADMTHKE(
      .       IXC     ,IXTG    ,X       ,IPARG   ,ELBUF_TAB,
      .       IPART   ,IPARTC  ,IPARTTG ,IAD_ELEM,FR_ELEM ,
@@ -41,7 +42,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE REMESH_MOD
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixc,nixtg        
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,7 +55,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "scr05_c.inc"
 #include      "vect01_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
@@ -554,13 +555,10 @@ C
         END DO
 
       END DO
-C
-      IF(IMACH==3)THEN
-        LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-        CALL SPMD_EXCH_NODAREA(AREA_NOD,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
-c        LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-        CALL SPMD_EXCH_NODAREA(THICK_NOD,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
-      END IF
+      
+      LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
+      CALL SPMD_EXCH_NODAREA(AREA_NOD,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
+      CALL SPMD_EXCH_NODAREA(THICK_NOD,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
 
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,23 +21,24 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    c_ixfloc               ../starter/source/restart/ddsplit/c_ixfloc.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    iface2                 ../starter/source/ale/ale3d/iface.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c_ixfloc               ../starter/source/restart/ddsplit/c_ixfloc.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    iface2                 ../starter/source/ale/ale3d/iface.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE C_IXFLOC(NUMEL,IXSF,IXQF,IXTGF,NSVOIS,
      +                    NQVOIS,NTGVOIS,PROC,IPARG,CEP,CEL,
      +                    ALE_CONNECTIVITY,ee_connect_l,IXS,IXQ,IXTG,NODLOCAL,NUMELS_L,NUMELQ_L,NUMELTG_L,MULTI_FVM,
-     +                    ID_GLOBAL_VOIS,INDX_S,INDX_Q,INDX_TG,FACE_ELM_S,FACE_ELM_Q,FACE_ELM_TG,FACE_VOIS)
+     +                    ID_GLOBAL_VOIS,INDX_S,INDX_Q,INDX_TG,FACE_ELM_S,FACE_ELM_Q,FACE_ELM_TG,FACE_VOIS,ISHADOW)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE ALE_CONNECTIVITY_MOD
+      use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,7 +52,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NSVOIS, NQVOIS, NTGVOIS, PROC, NUMEL, NSEGFL_L,
+      INTEGER NSVOIS, NQVOIS, NTGVOIS, PROC, NUMEL,
      .        NUMELS_L,NUMELQ_L,NUMELTG_L,
      .        IXSF(NIXS,NSVOIS) ,IXQF(NIXQ,NQVOIS),IXTGF(NIXTG,NTGVOIS),
      .        IPARG(NPARG,*),CEP(*),CEL(*),
@@ -68,11 +69,12 @@ C-----------------------------------------------
       INTEGER, DIMENSION(3*NUMELTG,*), INTENT(in) :: FACE_ELM_TG
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TYPE(t_connectivity_ext1), INTENT(INOUT) :: ee_connect_l
+      LOGICAL, INTENT(IN) :: ISHADOW !< shadowing option for detonators (Eikonal equation solver)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, N, NG, IFS, IFQ, IFTG,IE_LOC, IV_LOC
-      INTEGER ILAW,JTUR,JTHE,ITY,IE,NFT,NEL,IV,PROC2,NFT_LOC,IAD1, LGTH, IAD2
+      INTEGER I, J, K, NG, IFS, IFQ, IFTG,IE_LOC, IV_LOC
+      INTEGER JTUR,JTHE,ITY,IE,NFT,NEL,IV,PROC2,NFT_LOC,IAD1, LGTH, IAD2
       INTEGER NUMEL_L, TMP, IALEUL
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGE, nb_connect_l
       LOGICAL IS_HEXA,IS_QUAD,IS_TRIA
@@ -107,7 +109,7 @@ C-----------------------------------------------
             IF(ITY == 2)IS_QUAD=.TRUE.
             IF(ITY == 7 .AND. N2D > 0)IS_TRIA=.TRUE.
             IF(IS_HEXA .OR. IS_QUAD .OR. IS_TRIA)THEN !skip shell, sh3n, and other elem types
-              IF (IALEUL /= 0) THEN
+              IF (IALEUL /= 0 .OR. ISHADOW) THEN
                 DO I = 1, NEL
                   ! Index of the element
                   IE = I + NFT
@@ -163,7 +165,7 @@ C   IVOIS
                  PROC2 = CEP(IV)
                  IV_LOC = CEL(IV)
                  IF(PROC2/=PROC) THEN
-C   element frontiere
+C   boundary element
                    IF(TAGE(IV)==0) THEN
                      IFS = IFS + 1
                      TAGE(IV) = NUMELS_L+IFS
@@ -181,20 +183,20 @@ C   recopie IXS + chgt no local des noeuds
 C   ivois     
                    ee_connect_l%connected(IAD2) = TAGE(IV)
                    
-                   ID_GLOBAL_VOIS( (IE_LOC-1)*6+J ) = IXS(NIXS,IV) ! pas sur le proc courant
+                   ID_GLOBAL_VOIS( (IE_LOC-1)*6+J ) = IXS(NIXS,IV) ! not on the current proc
                    DO K=1,INDX_S(IE)
                         IF( IXS(NIXS,IV)==FACE_ELM_S(6*(IE-1)+K,2) ) THEN
-                            FACE_VOIS( (IE_LOC-1)*6+J ) = FACE_ELM_S(6*(IE-1)+K,1) ! pas sur le proc courant
+                            FACE_VOIS( (IE_LOC-1)*6+J ) = FACE_ELM_S(6*(IE-1)+K,1) ! not on the current proc
                         ENDIF                     
                    ENDDO
                  ELSE
 C   element interne
                    ee_connect_l%connected(IAD2) = IV_LOC
-                   ID_GLOBAL_VOIS( (IE_LOC-1)*6+J ) = IXS(NIXS,IV) ! sur le proc courant
+                   ID_GLOBAL_VOIS( (IE_LOC-1)*6+J ) = IXS(NIXS,IV) ! on the current proc
                  ENDIF
                ELSE
                  ee_connect_l%connected(IAD2) = IV
-                 ID_GLOBAL_VOIS( (IE_LOC-1)*6+J ) = 0  ! pas de voisin
+                 ID_GLOBAL_VOIS( (IE_LOC-1)*6+J ) = 0  ! no neighbor
                ENDIF
                ee_connect_l%type(IAD2) = ALE_CONNECTIVITY%ee_connect%type(IAD1 + J - 1)
                ee_connect_l%iface2(IAD2) = ALE_CONNECTIVITY%ee_connect%iface2(IAD1 + J - 1)  
@@ -217,7 +219,7 @@ C   IVOIS
                  PROC2  = CEP(IV)
                  IV_LOC = CEL(IV)
                  IF(PROC2/=PROC) THEN
-C   element frontiere
+C   boundary element
                    IF(TAGE(IV)==0) THEN
                      IFQ = IFQ + 1
                      TAGE(IV) = NUMELQ_L+IFQ
@@ -237,7 +239,7 @@ C   ivois
                    ID_GLOBAL_VOIS( (IE_LOC-1)*4+J ) = IXQ(NIXQ,IV)
                    DO K=1,INDX_Q(IE)
                         IF( IXQ(NIXQ,IV)==FACE_ELM_Q(4*(IE-1)+K,2) ) THEN
-                            FACE_VOIS( (IE_LOC-1)*4+J ) = FACE_ELM_Q(4*(IE-1)+K,1) ! pas sur le proc courant
+                            FACE_VOIS( (IE_LOC-1)*4+J ) = FACE_ELM_Q(4*(IE-1)+K,1) ! not on the current proc
                         ENDIF                       
                    ENDDO
                  ELSE
@@ -270,7 +272,7 @@ C   IVOIS
                  PROC2  = CEP(IV)
                  IV_LOC = CEL(IV)
                  IF(PROC2/=PROC) THEN
-C   element frontiere
+C   boundary element
                    IF(TAGE(IV)==0) THEN
                      IFTG = IFTG + 1
                      TAGE(IV) = NUMELTG_L+IFTG
@@ -291,7 +293,7 @@ C   ivois
 
                    DO K=1,INDX_TG(IE)
                         IF( IXTG(NIXTG,IV)==FACE_ELM_TG(3*(IE-1)+K,2) ) THEN
-                            FACE_VOIS( (IE_LOC-1)*3+J ) = FACE_ELM_TG(3*(IE-1)+K,1) ! pas sur le proc courant
+                            FACE_VOIS( (IE_LOC-1)*3+J ) = FACE_ELM_TG(3*(IE-1)+K,1) ! not on the current proc
                         ENDIF                      
                    ENDDO
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,44 +20,46 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7main_tri                   ../engine/source/interfaces/intsort/i7main_tri.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_tripi                    ../engine/source/implicit/imp_int_k.F
-      !||    inttri                       ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                       ../engine/source/output/message/message.F
-      !||    arret                        ../engine/source/system/arret.F
-      !||    check_sorting_criteria       ../engine/source/interfaces/intsort/check_sorting_criteria.F90
-      !||    i18xsave                     ../engine/source/interfaces/int18/i18xsave.F
-      !||    i7buce                       ../engine/source/interfaces/intsort/i7buce.F
-      !||    i7buce_vox                   ../engine/source/interfaces/intsort/i7buce.F
-      !||    i7trc                        ../engine/source/interfaces/intsort/i7trc.F
-      !||    i7xsave                      ../engine/source/interfaces/intsort/i7xsave.F
-      !||    imp_rnumcd                   ../engine/source/implicit/imp_int_k.F
-      !||    my_barrier                   ../engine/source/system/machine.F
-      !||    spmd_get_inacti7             ../engine/source/mpi/interfaces/send_cand.F
-      !||    spmd_rnumcd                  ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    spmd_tri18_151vox            ../engine/source/mpi/interfaces/spmd_int.F
-      !||    spmd_tri7gat                 ../engine/source/mpi/interfaces/spmd_int.F
-      !||    spmd_tri7vox0                ../engine/source/mpi/interfaces/spmd_int.F
-      !||    spmd_tri7vox_optimized       ../engine/source/mpi/interfaces/spmd_tri7vox_optimized.F
-      !||    startime                     ../engine/source/system/timer_mod.F90
-      !||    stoptime                     ../engine/source/system/timer_mod.F90
-      !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
-      !||--- uses       -----------------------------------------------------
-      !||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
-      !||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
-      !||    inter_sorting_mod            ../engine/share/modules/inter_sorting_mod.F
-      !||    message_mod                  ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    timer_mod                    ../engine/source/system/timer_mod.F90
-      !||    tri7box                      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i7main_tri                   ../engine/source/interfaces/intsort/i7main_tri.F
+!||--- called by ------------------------------------------------------
+!||    imp_tripi                    ../engine/source/implicit/imp_int_k.F
+!||    inttri                       ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                       ../engine/source/output/message/message.F
+!||    arret                        ../engine/source/system/arret.F
+!||    check_sorting_criteria       ../engine/source/interfaces/intsort/check_sorting_criteria.F90
+!||    i18xsave                     ../engine/source/interfaces/int18/i18xsave.F
+!||    i7buce                       ../engine/source/interfaces/intsort/i7buce.F
+!||    i7buce_vox                   ../engine/source/interfaces/intsort/i7buce.F
+!||    i7trc                        ../engine/source/interfaces/intsort/i7trc.F
+!||    i7xsave                      ../engine/source/interfaces/intsort/i7xsave.F
+!||    imp_rnumcd                   ../engine/source/implicit/imp_int_k.F
+!||    my_barrier                   ../engine/source/system/machine.F
+!||    spmd_get_inacti7             ../engine/source/mpi/interfaces/send_cand.F
+!||    spmd_rnumcd                  ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    spmd_tri18_151vox            ../engine/source/mpi/interfaces/spmd_int.F
+!||    spmd_tri7gat                 ../engine/source/mpi/interfaces/spmd_int.F
+!||    spmd_tri7vox0                ../engine/source/mpi/interfaces/spmd_int.F
+!||    spmd_tri7vox_optimized       ../engine/source/mpi/interfaces/spmd_tri7vox_optimized.F
+!||    startime                     ../engine/source/system/timer_mod.F90
+!||    stoptime                     ../engine/source/system/timer_mod.F90
+!||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
+!||--- uses       -----------------------------------------------------
+!||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
+!||    element_mod                  ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    h3d_mod                      ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod                ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    inter_sorting_mod            ../engine/share/modules/inter_sorting_mod.F
+!||    message_mod                  ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+!||    timer_mod                    ../engine/source/system/timer_mod.F90
+!||    tri7box                      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I7MAIN_TRI(TIMERS,
      1                  IPARI   ,X       ,V       ,
-     2                  MS      ,NIN     ,ITASK   ,MWAG    ,WEIGHT  ,
+     2                  MS      ,NIN     ,ITASK   ,WEIGHT  ,
      3                  ISENDTO ,IRCVFROM,RETRI   ,IAD_ELEM,FR_ELEM ,
      4                  ITAB    ,KINET   ,TEMP    ,NRTM_T  ,RENUM   ,
      5                  NSNFIOLD,ESHIFT  ,NUM_IMP ,IND_IMP ,NODNX_SMS,
@@ -74,6 +76,7 @@ C-----------------------------------------------
       USE INTER_SORTING_MOD
       use check_sorting_criteria_mod , only : check_sorting_criteria
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -90,7 +93,7 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "task_c.inc"
 #include      "timeri_c.inc"
-C common pour variable globale en memoire partagee
+C common block for global variables in shared memory
       COMMON /I7MAINC/BMINMA,CURV_MAX_MAX,RESULT,NSNR,NSNROLD,I_MEMG,NMN_G
       INTEGER RESULT,NSNR,NSNROLD,I_MEMG,NMN_G
       my_real 
@@ -102,7 +105,7 @@ C-----------------------------------------------
       INTEGER NIN ,ITASK, RETRI, NRTM_T,ESHIFT,
      .        NUM_IMP ,IND_IMP(*),
      .        ITAB(*), KINET(*),
-     .        IPARI(NPARI,NINTER),  MWAG(*),
+     .        IPARI(NPARI,NINTER),
      .        ISENDTO(NINTER+1,*),IRCVFROM(NINTER+1,*),
      .        WEIGHT(*), IAD_ELEM(2,*) ,FR_ELEM(*),
      .        RENUM(*), NSNFIOLD(NSPMD), NODNX_SMS(*), IXS(NIXS, *)
@@ -119,7 +122,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
      .        LOC_PROC,
-     .        I, IP0, IP1, IP2, IP21, I_SK_OLD, I_STOK1, 
+     .        I, IP0, IP2, IP21, I_SK_OLD, I_STOK1, 
      .        ADD1, NB_N_B, NOINT, INACTI, MULTIMP, IGAP, IFQ, ITIED
       INTEGER 
      .        ILD, NCONT, NCONTACT, INACTII, INACIMP, INTTH,
@@ -205,12 +208,21 @@ C
       CURV_MAX_MAX = ZERO
 C
 C -------------------------------------------------------------
-C     STOCKAGE DES ANCIENS CANDIDATS AVEC PENE INITIALE
-C     OU AVEC DU FILTRAGE DE FROTTEMENT
+C     STORAGE OF OLD CANDIDATES WITH INITIAL PENETRATION
+C     OR WITH FRICTION FILTERING
 C -------------------------------------------------------------
 C
-C Barriere dans tous les cas pour bminma [et cur_max_max]
+C Barrier in all cases for bminma [and cur_max_max]
 C
+      IF(ITASK==0)THEN
+        IF(.NOT. ALLOCATED(INTBUF_TAB%CAND_A)) THEN
+          ALLOCATE(INTBUF_TAB%CAND_A(NSNROLD+NSN+3))   
+        ELSEIF(SIZE(INTBUF_TAB%CAND_A)<NSNROLD+NSN+3) THEN
+          DEALLOCATE(INTBUF_TAB%CAND_A)
+          ALLOCATE(INTBUF_TAB%CAND_A(NSN+NSNROLD+3))
+        ENDIF
+      ENDIF
+
       CALL MY_BARRIER
 C
       IF(INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.IFQ>0.OR.
@@ -224,16 +236,15 @@ C
             INACIMP = 1
           ENDIF
           IP0 = 1
-          IP1 = IP0 + NSN + NSNROLD + 3
-C MWA = MWAG SUR TASK 0
+C MWA = MWAG ON TASK 0
           I_SK_OLD = INTBUF_TAB%I_STOK(1)
           CALL I7TRC(
      1      NSN+NSNROLD      ,I_SK_OLD         ,INTBUF_TAB%CAND_N,INTBUF_TAB%CAND_E,
      2      INTBUF_TAB%CAND_P,INTBUF_TAB%FTSAVX,INTBUF_TAB%FTSAVY,INTBUF_TAB%FTSAVZ,
-     3      MWAG(IP0)        ,INTBUF_TAB%IFPEN ,INACTI           ,IFQ              ,
+     3      INTBUF_TAB%CAND_A        ,INTBUF_TAB%IFPEN ,INACTI           ,IFQ              ,
      4      NUM_IMP          ,IND_IMP          ,INTBUF_TAB%STFNS ,NIN              ,
      5      NSN ,ITIED,INTBUF_TAB%CAND_F )
-C stockage INACTI en negatif
+C store INACTI as negative
           IF(I_SK_OLD==0)INACTI=-ABS(INACTI)
           INTBUF_TAB%I_STOK(1)=I_SK_OLD
           IF(INACTII/=7.AND.INACIMP>0)THEN
@@ -250,9 +261,9 @@ C stockage INACTI en negatif
         INTBUF_TAB%I_STOK(1)=0
       ENDIF
 C -------------------------------------------------------------
-C     CALCUL BORNE DOMAINE REMONTE DANS I7XSAVE
+C     DOMAIN BOUNDARY CALCULATION RETURNED IN I7XSAVE
 C -------------------------------------------------------------
-C eshift : decalage sur cand_e
+C eshift: offset on cand_e
       IF(TYPE18)THEN
         CALL I18XSAVE(
      1         X            ,INTBUF_TAB%NSV ,INTBUF_TAB%MSR,NSN  ,NMN ,
@@ -286,9 +297,9 @@ C eshift : decalage sur cand_e
 #include "lockoff.inc"
 
       RESULT = 0
-C BARRIER II_STOK et RESULT
+C BARRIER II_STOK and RESULT
       CALL MY_BARRIER
-C a conserver pour cas inacti est modifie sur p0
+C to keep for case where inacti is modified on p0
       INACTI=IPARI(22,NIN)
       IF(ITASK==0)THEN
         IF(ABS(BMINMA(6)-BMINMA(3))>2*EP30.OR.
@@ -311,7 +322,6 @@ C mean value m by direction
         MX=BMINMA(7)/MAX(NMN_G,1)
         MY=BMINMA(8)/MAX(NMN_G,1)
         MZ=BMINMA(9)/MAX(NMN_G,1)
-c        print*,noint,'m=',mx,my,mz,NMN,NRTM
 C standard deviation by direction
 C        DX=SQRT(BMINMA(10)/MAX(NMN,1)-MX**2)
 C        DY=SQRT(BMINMA(11)/MAX(NMN,1)-MY**2)
@@ -371,7 +381,7 @@ C
 
         IF(ITASK==0)THEN
 C
-C recuperation des noeuds remote NSNR stockes dans XREM
+C retrieval of remote nodes NSNR stored in XREM
 C    
            IF (MULTI_FVM%IS_USED .AND. NTY == 7 .AND. INACTI == 7) THEN
 C     Interface type 18 and law151
@@ -405,7 +415,7 @@ C     Interface type 18 and law151
 
            ENDIF
 C
-C renumerotation locale des anciens candidats
+C local renumbering of old candidates
 C
           IF(INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.
      +       IFQ>0.OR.NUM_IMP>0.OR.ITIED/=0)THEN
@@ -422,7 +432,7 @@ C
       ILD = 0
       NB_N_B = 1
 C
-C Barrier comm spmd_tri7box + BMINMA + Retour I7BUCE
+C Barrier comm spmd_tri7box + BMINMA + Return I7BUCE
 C     IF(ITASK == 0) THEN
 c       IF(INTBUF_TAB%METRIC%CYCLE0 == 10000) THEN
 c         INTBUF_TAB%METRIC%CYCLE0 = 0
@@ -460,7 +470,7 @@ C
      1 X      ,INTBUF_TAB%IRECTM(1+4*ESHIFT),INTBUF_TAB%NSV  ,INACTI    ,INTBUF_TAB%CAND_P,
      2 NMN_G  ,NRTM_T                       ,NSN     ,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
      3 GAP    ,NOINT       ,INTBUF_TAB%I_STOK(1) ,NCONTACT ,BMINMA ,
-     4 TZINF  ,MAXBOX      ,MINBOX         ,MWAG         ,CURV_MAX  ,
+     4 TZINF  ,MAXBOX      ,MINBOX         ,INTBUF_TAB%CAND_A,CURV_MAX  ,
      6 NB_N_B ,ESHIFT      ,ILD            ,IFQ    ,INTBUF_TAB%IFPEN,
      8 INTBUF_TAB%STFNS,NIN ,INTBUF_TAB%STFM(1+ESHIFT),IPARI(21,NIN),INTBUF_TAB%GAP_S,
      A NSNR   ,NCONT  ,RENUM  ,NSNROLD  ,INTBUF_TAB%GAP_M(1+ESHIFT),
@@ -474,7 +484,7 @@ C
      1 X      ,INTBUF_TAB%IRECTM(1+4*ESHIFT),INTBUF_TAB%NSV  ,INACTI    ,INTBUF_TAB%CAND_P,
      2 NMN_G  ,NRTM_T                       ,NSN     ,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
      3 GAP    ,NOINT       ,INTBUF_TAB%I_STOK(1) ,NCONTACT ,BMINMA ,
-     4 TZINF  ,MAXBOX      ,MINBOX         ,MWAG         ,CURV_MAX  ,
+     4 TZINF  ,MAXBOX      ,MINBOX         ,INTBUF_TAB%CAND_A,CURV_MAX  ,
      6 NB_N_B ,ESHIFT      ,ILD            ,IFQ    ,INTBUF_TAB%IFPEN,
      8 INTBUF_TAB%STFNS,NIN ,INTBUF_TAB%STFM(1+ESHIFT),IPARI(21,NIN),INTBUF_TAB%GAP_S,
      A NSNR   ,NCONT  ,RENUM  ,NSNROLD  ,INTBUF_TAB%GAP_M(1+ESHIFT),
@@ -553,7 +563,7 @@ C--------------------------------------------------------------
       IF (RESULT/=0) THEN
         CALL MY_BARRIER
         IF (ITASK==0) THEN
-C utile si on revient
+C useful if we return
           INTBUF_TAB%I_STOK(1) = I_SK_OLD
           RESULT = 0
         ENDIF
@@ -564,9 +574,9 @@ C utile si on revient
         TZINF  = INTBUF_TAB%VARIABLES(tzinf_index)
         GOTO 50
       ENDIF
-C mise a - de dist temporairement pour reperage dans partie frontiere
+C temporarily set dist to negative for identification in frontier part
       IF(NSPMD>1)THEN
-C mono tache
+C single task
 !$OMP SINGLE
         IF (IMONM > 0) CALL STARTIME(TIMERS,26)
         INTBUF_TAB%VARIABLES(distance_index) = -INTBUF_TAB%VARIABLES(distance_index)

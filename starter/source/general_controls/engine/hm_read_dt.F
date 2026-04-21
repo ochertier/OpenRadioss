@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_dt     ../starter/source/general_controls/engine/hm_read_dt.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_dt     ../starter/source/general_controls/engine/hm_read_dt.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_DT(IGRPART)
 C-----------------------------------------------
 C   M o d u l e s
@@ -199,7 +199,7 @@ C
      .                         IGRPART(IDTGRS)%ID
             END IF
           ELSE
-C--         /DT/CST_AMS >- automatic element selection
+C- /DT /CST_AMS>- Automatic election
             DT_CRIT = DTMINS / MAX(EM20,DTFAC1(11))
             IF(IDTGRS<=0)THEN
               WRITE(IOUT,2108) DTFACS,DTMINS,TOL_SMS,

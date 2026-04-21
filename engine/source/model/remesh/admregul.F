@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    admregul       ../engine/source/model/remesh/admregul.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    admmap3        ../engine/source/model/remesh/admmap3.F
-      !||    admmap4        ../engine/source/model/remesh/admmap4.F
-      !||    my_barrier     ../engine/source/system/machine.F
-      !||    my_orders      ../common_source/tools/sort/my_orders.c
-      !||    sync_data      ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    remesh_mod     ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    admregul       ../engine/source/model/remesh/admregul.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    admmap3        ../engine/source/model/remesh/admmap3.F
+!||    admmap4        ../engine/source/model/remesh/admmap4.F
+!||    my_barrier     ../engine/source/system/machine.F
+!||    my_orders      ../common_source/tools/sort/my_orders.c
+!||    sync_data      ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+!||    remesh_mod     ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE ADMREGUL(IXC  ,IPARTC  ,IXTG ,IPARTTG,IPART,
      .                    ITASK,IPARG   ,X    ,MS     ,IN   ,
      .                    ELBUF_TAB,NODFT  ,NODLT ,IGEO   ,IPM  ,
@@ -45,6 +47,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE REMESH_MOD
       USE ELBUFDEF_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,7 +71,7 @@ C-----------------------------------------------
      .        IPART(LIPART1,*),ITASK,IPARG(NPARG,*),
      .        NODFT, NODLT, IGEO(NPROPGI,*), IPM(NPROPMI,*),
      .        SH4TREE(KSH4TREE,*),SH3TREE(KSH3TREE,*)
-      my_real ,INTENT(IN) :: ITHERM_FE
+      integer ,INTENT(IN) :: ITHERM_FE
       my_real
      .        X(3,*),MS(*),IN(*),MSC(*), INC(*),
      .        MSTG(*), INTG(*), PTG(3,*), MSCND(*), INCND(*),
@@ -85,13 +89,20 @@ C-----------------------------------------------
      .   MATLY,MY_NUVAR,MY_NUVARR,NUVAR,NUVARR,II,IVAR, 
      .   NA16A,NB16A,MPT,NPTM,NAM_S,NBM_S,IG,IH,IS,
      .   PTF,PTM,PTE,PTP,PTS,QTF,QTM,QTE,QTP,QTS,NPG
-      INTEGER LEVEL,NTMP,LEV,P,NI,MYLEV,IP,
-     .        KDIVIDE4(NUMELC),KDIVIDE3(NUMELTG)
-      INTEGER NSKYML, WORK(70000),
-     .        ITRI(MAX(NUMELC,NUMELTG)), INDEX(2*MAX(NUMELC,NUMELTG))
+      INTEGER LEVEL,NTMP,LEV,P,NI,MYLEV,IP
+      INTEGER NSKYML, WORK(70000)      
+      INTEGER,DIMENSION(:), ALLOCATABLE :: KDIVIDE4
+      INTEGER,DIMENSION(:), ALLOCATABLE :: KDIVIDE3
+      INTEGER,DIMENSION(:), ALLOCATABLE :: ITRI
+      INTEGER,DIMENSION(:), ALLOCATABLE :: INDEX1
       my_real
      .        MSBIG, INBIG, MCPM, MCPN
 C-----------------------------------------------
+      CALL MY_ALLOC(KDIVIDE4,NUMELC)
+      CALL MY_ALLOC(KDIVIDE3,NUMELTG)
+      CALL MY_ALLOC(ITRI,MAX(NUMELC,NUMELTG))
+      CALL MY_ALLOC(INDEX1,2*MAX(NUMELC,NUMELTG))
+
  10   CONTINUE 
 
       IF(ITASK==0) THEN
@@ -438,10 +449,10 @@ C--
         DO I = 1, NSKYMSH4
           ITRI(I) = IXC(NIXC,ABS(MSH4SKY(I)))
         ENDDO
-        CALL MY_ORDERS(0,WORK,ITRI,INDEX,NSKYMSH4,1)
+        CALL MY_ORDERS(0,WORK,ITRI,INDEX1,NSKYMSH4,1)
         IF(ISTATCND==0)THEN
           DO J = 1, NSKYMSH4
-            N=MSH4SKY(INDEX(J))
+            N=MSH4SKY(INDEX1(J))
             IF(N < 0)THEN
               N=-N
               DO K=1,4
@@ -459,7 +470,7 @@ C--
           END DO
         ELSE
           DO J = 1, NSKYMSH4
-            N=MSH4SKY(INDEX(J))
+            N=MSH4SKY(INDEX1(J))
             IF(N < 0)THEN
               N=-N
               MSBIG=MSC(N)
@@ -483,7 +494,7 @@ C--
 C
         IF(ITHERM_FE > 0)THEN
           DO J = 1, NSKYMSH4
-            N=MSH4SKY(INDEX(J))
+            N=MSH4SKY(INDEX1(J))
             IF(N < 0)THEN
               N=-N
               DO K=1,4
@@ -505,10 +516,10 @@ C--
         DO I = 1, NSKYMSH3
           ITRI(I) = IXTG(NIXTG,ABS(MSH3SKY(I)))
         ENDDO
-        CALL MY_ORDERS(0,WORK,ITRI,INDEX,NSKYMSH3,1)
+        CALL MY_ORDERS(0,WORK,ITRI,INDEX1,NSKYMSH3,1)
         IF(ISTATCND==0)THEN
           DO J = 1, NSKYMSH3
-            N=MSH3SKY(INDEX(J))
+            N=MSH3SKY(INDEX1(J))
             IF(N < 0)THEN
               N=-N
               DO K=1,3
@@ -526,7 +537,7 @@ C--
           END DO
         ELSE
           DO J = 1, NSKYMSH3
-            N=MSH3SKY(INDEX(J))
+            N=MSH3SKY(INDEX1(J))
             IF(N < 0)THEN
               N=-N
               MSBIG=MSTG(N)
@@ -550,7 +561,7 @@ C--
 C
         IF(ITHERM_FE > 0)THEN
           DO J = 1, NSKYMSH3
-            N=MSH3SKY(INDEX(J))
+            N=MSH3SKY(INDEX1(J))
             IF(N < 0)THEN
               N=-N
               DO K=1,3
@@ -568,7 +579,7 @@ C
 C
       END IF
 C
-C     compactage de LSH4ACT
+C     compaction of LSH4ACT
       IF(ITASK==0)THEN
         NTMP   =NSH4ACT
         NSH4ACT=0
@@ -582,7 +593,7 @@ C     compactage de LSH4ACT
 
       END IF
 C
-C     compactage de LSH3ACT
+C     compaction of LSH3ACT
       IF(ITASK==0)THEN
         NTMP   =NSH3ACT
         NSH3ACT=0
@@ -597,5 +608,9 @@ C     compactage de LSH3ACT
 
       GO TO 10
 C----6---------------------------------------------------------------7---------8
+      DEALLOCATE(KDIVIDE4)
+      DEALLOCATE(KDIVIDE3)
+      DEALLOCATE(ITRI)
+      DEALLOCATE(INDEX1)
       RETURN
       END     

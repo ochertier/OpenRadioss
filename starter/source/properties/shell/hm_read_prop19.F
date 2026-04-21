@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop19           ../starter/source/properties/shell/hm_read_prop19.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    arret                    ../starter/source/system/arret.F
-      !||    fretitl2                 ../starter/source/starter/freform.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop19           ../starter/source/properties/shell/hm_read_prop19.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    arret                    ../starter/source/system/arret.F
+!||    fretitl2                 ../starter/source/starter/freform.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP19(IG, IGTYP, ISTACK, GEO, IGEO, PM, IPM, UNITAB, 
      .     IDRAPEID, LSUBMODEL)
 C-----------------------------------------------
@@ -69,9 +69,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: IMID, J, DRAPE_ID, ID
-      my_real :: THICKT, FAC_GEN, PUN
-      CHARACTER(LEN = NCHARTITLE) :: TITR, TITR1, IDTITL
+      INTEGER :: IMID, J, DRAPE_ID
+      my_real ::  FAC_GEN, PUN
+      CHARACTER(LEN = NCHARTITLE) :: TITR, IDTITL
       LOGICAL :: IS_AVAILABLE, IS_ENCRYPTED, LFOUND
 C-------------------------------------------------
 C     B e g i n n i n g   o f  S u b r o u t i n e
@@ -100,7 +100,7 @@ C-------------------------------------------------
       IGEO(44) = IGEO(4) ! Used with drape for OUPT
       IF (GEO(212) == ZERO) THEN
          CALL HM_GET_FLOATV_DIM('orientangle2',FAC_GEN, IS_AVAILABLE, LSUBMODEL, UNITAB)
-         GEO(212) = NINTY * FAC_GEN ! default value   
+         GEO(212) = NINETY * FAC_GEN ! default value   
       ENDIF
 
       IF (IS_ENCRYPTED) THEN

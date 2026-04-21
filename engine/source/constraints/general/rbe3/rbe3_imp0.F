@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rbe3_imp0    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe3      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3_imp1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3cl       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_imp0    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe3      ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3_imp1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3cl       ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE RBE3_IMP0(
      1                    IRBE3  ,LRBE3 ,FRBE3  ,X     ,SKEW   ,
      2                    ISS3   ,IKC   ,NDOF   ,IDDL  ,IADK   ,
@@ -57,8 +57,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, M, NS ,NML, IAD,JJ,IROT,IADS,MAX_M,IROTG,
-     .        JT(3,NRBE3),JR(3,NRBE3),NM,NN,NSJ,IADJ
+      INTEGER N, NS ,NML, IAD,IROT,IADS,MAX_M,IROTG,
+     .        JT(3,NRBE3),JR(3,NRBE3),NSJ,IADJ
 C     REAL
       my_real,
      .         DIMENSION(:),ALLOCATABLE :: FDSTNB ,MDSTNB
@@ -93,15 +93,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_impi   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_int_k   ../engine/source/implicit/upd_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe3     ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3_imp1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3cl      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_impi   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_int_k   ../engine/source/implicit/upd_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe3     ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3_imp1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3cl      ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE RBE3_IMPI(
      1                    IRBE3  ,LRBE3 ,FRBE3  ,X     ,SKEW   ,
      2                    NSS3   ,ISS3  ,IKC   ,NDOF   ,IDDL   ,
@@ -130,8 +130,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, M, NS ,NML, IAD,JJ,IROT,IADS,MAX_M,IROTG,
-     .        JT(3,NRBE3),JR(3,NRBE3),NM,NN,NSJ,IADJ
+      INTEGER J, N, NS ,NML, IAD,IROT,IADS,MAX_M,IROTG,
+     .        JT(3,NRBE3),JR(3,NRBE3),IADJ
 C     REAL
       my_real,
      .         DIMENSION(:),ALLOCATABLE :: FDSTNB ,MDSTNB
@@ -168,22 +168,22 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_imp1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_imp0    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impi    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_kii      ../engine/source/implicit/imp_glob_k.F
-      !||    get_kij      ../engine/source/implicit/imp_glob_k.F
-      !||    print_wkij   ../engine/source/implicit/imp_glob_k.F
-      !||    put_kii      ../engine/source/implicit/imp_glob_k.F
-      !||    put_kij      ../engine/source/implicit/imp_glob_k.F
-      !||    updb_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    updk_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    updk_cdii    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    updk_cdij    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_imp1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_imp0    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impi    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    get_kii      ../engine/source/implicit/imp_glob_k.F
+!||    get_kij      ../engine/source/implicit/imp_glob_k.F
+!||    print_wkij   ../engine/source/implicit/imp_glob_k.F
+!||    put_kii      ../engine/source/implicit/imp_glob_k.F
+!||    put_kij      ../engine/source/implicit/imp_glob_k.F
+!||    updb_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    updk_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    updk_cdii    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    updk_cdij    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE RBE3_IMP1(NS    ,NML   ,IML   ,X      ,IROT   ,
      2                     NSJ   ,ISJ   ,JT    ,JR     ,FDSTNB ,
      3                     MDSTNB,IKC   ,NDOF  ,IDDL   ,IADK   ,
@@ -202,14 +202,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIR, I, J, J1, J2, J3, J4, K, JD, II, L, JJ,
-     .        I1,ID,NL,NI,NJ,NIDOF,ND,NDI,NDJ,NDM,NM,L1,NM1,
-     .        NIR1,IR,IP,ISTIF
+      INTEGER I, J, K,
+     .        I1,ID,NI,NJ,NIDOF,ND,NDJ,NDM,NM,
+     .        IR,IP
 C     REAL
       my_real
      .   KDD(6,6),BD(6),KII(6,6),KIJ(6,6),BI(6)
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
        IF (NDOF(NS)<=0) RETURN
 C
@@ -300,18 +300,18 @@ C          ENDIF
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_impr1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_dykv     ../engine/source/implicit/imp_dyna.F
-      !||    imp_dykv0    ../engine/source/implicit/imp_dyna.F
-      !||    upd_rhs      ../engine/source/implicit/upd_glob_k.F
-      !||    upd_rhs_fr   ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe3      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3_impb0   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3cl       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_impr1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    imp_dykv     ../engine/source/implicit/imp_dyna.F
+!||    imp_dykv0    ../engine/source/implicit/imp_dyna.F
+!||    upd_rhs      ../engine/source/implicit/upd_glob_k.F
+!||    upd_rhs_fr   ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe3      ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3_impb0   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3cl       ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE RBE3_IMPR1(
      1                    IRBE3  ,LRBE3 ,FRBE3  ,X     ,SKEW   ,
      2                    NDOF   ,IDDL  ,B      ,WEIGHT)
@@ -336,8 +336,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, M, NS ,NML, IAD,JJ,IROT,IADS,MAX_M,IROTG,
-     .        JT(3,NRBE3),JR(3,NRBE3),NM,NN,NSJ
+      INTEGER N, NS ,NML, IAD,IROT,IADS,MAX_M,IROTG,
+     .        JT(3,NRBE3),JR(3,NRBE3)
 C     REAL
       my_real,
      .         DIMENSION(:),ALLOCATABLE :: FDSTNB ,MDSTNB
@@ -368,13 +368,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_impb0   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_impr1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    updb_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_impb0   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_impr1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    updb_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE RBE3_IMPB0(NS    ,NML   ,IML   ,X      ,IROT   ,
      2                      JT    ,JR     ,FDSTNB ,MDSTNB,NDOF  ,
      3                      IDDL   ,B      )
@@ -391,14 +391,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIR, I, J, J1, J2, J3, J4, K, JD, II, L, JJ,
-     .        I1,ID,NL,NI,NJ,NIDOF,ND,NDI,NDJ,NDM,NM,L1,NM1,
-     .        NIR1,IR,IP
+      INTEGER I, J, K,
+     .        ID,NJ
 C     REAL
       my_real
      .   BD(6),BI(6)
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
        IF (NDOF(NS)<=0) RETURN
 C
@@ -426,18 +425,18 @@ C-------Update K(main node)---
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_impr2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_dykv     ../engine/source/implicit/imp_dyna.F
-      !||    imp_dykv0    ../engine/source/implicit/imp_dyna.F
-      !||    upd_rhs      ../engine/source/implicit/upd_glob_k.F
-      !||    upd_rhs_fr   ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe3      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3_impb2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3cl       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_impr2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    imp_dykv     ../engine/source/implicit/imp_dyna.F
+!||    imp_dykv0    ../engine/source/implicit/imp_dyna.F
+!||    upd_rhs      ../engine/source/implicit/upd_glob_k.F
+!||    upd_rhs_fr   ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe3      ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3_impb2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3cl       ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE RBE3_IMPR2(
      1                    IRBE3  ,LRBE3 ,FRBE3  ,X     ,SKEW   ,
      2                    NDOF   ,IDDL  ,B      ,WEIGHT,A      ,
@@ -463,8 +462,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, M, NS ,NML, IAD,JJ,IROT,IADS,MAX_M,IROTG,
-     .        JT(3,NRBE3),JR(3,NRBE3),NM,NN,NSJ
+      INTEGER N, NS ,NML, IAD,IROT,IADS,MAX_M,IROTG,
+     .        JT(3,NRBE3),JR(3,NRBE3)
 C     REAL
       my_real,
      .         DIMENSION(:),ALLOCATABLE :: FDSTNB ,MDSTNB
@@ -495,13 +494,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_impb2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_impr2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    updb_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_impb2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_impr2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    updb_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE RBE3_IMPB2(NS    ,NML   ,IML   ,X      ,IROT   ,
      2                      JT    ,JR     ,FDSTNB ,MDSTNB,NDOF  ,
      3                      IDDL   ,B     ,A    ,AR      )
@@ -523,14 +522,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIR, I, J, J1, J2, J3, J4, K, JD, II, L, JJ,
-     .        I1,ID,NL,NI,NJ,NIDOF,ND,NDI,NDJ,NDM,NM,L1,NM1,
-     .        NIR1,IR,IP
+      INTEGER I, J, K,
+     .        ID,NJ,ND
 C     REAL
       my_real
      .   BD(6),BI(6)
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
 C
        I = NS
@@ -606,11 +604,11 @@ C-------Update K(main node)---
 C
       RETURN
       END
-      !||====================================================================
-      !||    updk_bc     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2_imp1   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updk_bc     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe2_imp1   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||====================================================================
       SUBROUTINE UPDK_BC(JT,JR,K ,ISTIF)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -654,11 +652,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    updk_bc2    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2_imp1   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updk_bc2    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe2_imp1   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||====================================================================
       SUBROUTINE UPDK_BC2(JT,JR,K ,ISTIF)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -702,13 +700,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    updb_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_imp1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impb0   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impb2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updb_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_imp1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impb0   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impb2   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE UPDB_CDI(FDI,MDI,BD,BI,IROT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -746,13 +744,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    updk_cdii    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_fr1     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_frupd   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_imp1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updk_cdii    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_fr1     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_frupd   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_imp1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE UPDK_CDII(FDI,MDI,KDD,KII,IROT,ND)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -826,12 +824,12 @@ C----   FDI[KDD]MDI^t------
 C
       RETURN
       END
-      !||====================================================================
-      !||    updk_cdij   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_fr1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_imp1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updk_cdij   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_fr1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_imp1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE UPDK_CDIJ(FDI,MDI,FDJ,MDJ,KDD,KIJ,IROT,ND)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -900,12 +898,12 @@ C----   MDI[KDD]MDJ^t------
 C
       RETURN
       END
-      !||====================================================================
-      !||    updk_cdi    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_fr1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_imp1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updk_cdi    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_fr1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_imp1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE UPDK_CDI(FDI,MDI,KDD,KIJ,IROT,ND,ISYM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -921,7 +919,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,K,L
+      INTEGER I, J,K
 C     REAL
 C-------Update KIJ=[KDD]CDI---
         DO I=1,6
@@ -958,11 +956,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    updfrk_bc    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_frupd   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updfrk_bc    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_frupd   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE UPDFRK_BC(JT, K ,ISTIF)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1003,15 +1001,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_frupd   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    diag_int     ../engine/source/mpi/implicit/imp_fri.F
-      !||    updk_mv      ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    updfrk_bc    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    updk_cdii    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_frupd   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    diag_int     ../engine/source/mpi/implicit/imp_fri.F
+!||    updk_mv      ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    updfrk_bc    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    updk_cdii    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE RBE3_FRUPD(NIR   ,IML   ,FDSTNB ,MDSTNB ,NDOF  ,
      1                      JT    ,IROT  ,KSS    ,DIAG_M3)
 C-----------------------------------------------
@@ -1029,7 +1027,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,  JD,  L, JJ,NJ,ND,IROT,NS,ISTIF
+      INTEGER J, JJ,ND,IROT,ISTIF
 C     REAL
       my_real
      .   K0(6,6),KIJ(6,6)
@@ -1057,15 +1055,15 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_fr0   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_kml    ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl    ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    rbe3_fr1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3cl     ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_fr0   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_kml    ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl    ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    rbe3_fr1   ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3cl     ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE RBE3_FR0(NS    ,NML   ,IML    ,X     ,IROT   ,
      2                     JT    ,JR    ,FRBE3 ,SKEW  ,IKC    ,
      3                     NDOF  ,IADK  ,JDIK   ,DIAG_K ,LT_K ,
@@ -1088,12 +1086,11 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
 C     REAL
       my_real
      .   FDSTNB(18,NML),MDSTNB(18,NML)
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
        IF (NDOF(NS)<=0) RETURN
         CALL RBE3CL(IML  ,ISK   ,NS      ,X      ,FRBE3  ,
@@ -1106,18 +1103,18 @@ C------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_fr1     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_fr0     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    print_wkij   ../engine/source/implicit/imp_glob_k.F
-      !||    put_kmii     ../engine/source/implicit/imp_glob_k.F
-      !||    put_kmij     ../engine/source/implicit/imp_glob_k.F
-      !||    updk_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    updk_cdii    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    updk_cdij    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_fr1     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_fr0     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    print_wkij   ../engine/source/implicit/imp_glob_k.F
+!||    put_kmii     ../engine/source/implicit/imp_glob_k.F
+!||    put_kmij     ../engine/source/implicit/imp_glob_k.F
+!||    updk_cdi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    updk_cdii    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    updk_cdij    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||====================================================================
       SUBROUTINE RBE3_FR1(NS    ,NML   ,IML    ,X     ,IROT   ,
      2                     JT    ,JR    ,FDSTNB ,MDSTNB,IKC    ,
      3                     NDOF  ,IADK  ,JDIK   ,DIAG_K ,LT_K ,
@@ -1139,13 +1136,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIR, I, J, J1, J2, J3, J4, K, JD, II, L, JJ,
-     .        I1,ID,NL,NI,NJ,NIDOF,ND,NDI,NDJ,NDM,NM,L1,NM1,
-     .        NIR1,IR,IP,ISTIF,NDOFI
+      INTEGER I, J, J1, K,
+     .        I1,NJ,ND,NM,
+     .        IR,IP,NDOFI
       my_real
      .   KDD(6,6),KII(6,6)
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
        IF (NDOF(NS)<=0) RETURN
 C

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ruptint2      ../engine/source/interfaces/interf/ruptint2.F
-      !||--- called by ------------------------------------------------------
-      !||    i2rupt        ../engine/source/interfaces/interf/int2rupt.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter        ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod       ../engine/share/modules/h3d_mod.F
-      !||    uintbuf_mod   ../engine/source/user_interface/uintbuf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ruptint2      ../engine/source/interfaces/interf/ruptint2.F
+!||--- called by ------------------------------------------------------
+!||    i2rupt        ../engine/source/interfaces/interf/int2rupt.F
+!||--- calls      -----------------------------------------------------
+!||    finter        ../engine/source/tools/curve/finter.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod       ../engine/share/modules/h3d_mod.F
+!||    uintbuf_mod   ../engine/source/user_interface/uintbuf_mod.F
+!||====================================================================
       SUBROUTINE RUPTINT2(
      1             NSL     ,ISL     ,NUVAR   ,UVAR    ,USERBUF ,
      2             PROP    ,IFUNS   ,IFUNN   ,IFUNT   ,IMOD    ,
@@ -71,7 +71,7 @@ C----------------------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  IERROR,IRUPT,IRUPT0,ISECND
+      INTEGER  IRUPT,IRUPT0,ISECND
       my_real
      .   DTIM,SIGN,SIGT,SIGN1,SIGT1,AREA,DFSIGN,DFSIGT,DSIG,
      .   SIGNMAX,SIGTMAX,DNMAX,DTMAX,FACN,FACT,

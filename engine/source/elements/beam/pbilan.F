@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    pbilan                ../engine/source/elements/beam/pbilan.F
-      !||--- called by ------------------------------------------------------
-      !||    pforc3                ../engine/source/elements/beam/pforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    pbilan                ../engine/source/elements/beam/pbilan.F
+!||--- called by ------------------------------------------------------
+!||    pforc3                ../engine/source/elements/beam/pforc3.F
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod               ../engine/share/modules/h3d_mod.F
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE PBILAN(
      1   PM,      V,       EINT,    GEO,
      2   PARTSAV, IPARTP,  TANI,    FOR,
@@ -42,7 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      8   VY1G,    VY2G,    VZ1G,    VZ2G,
      9   X1G,     X2G,     Y1G,     Y2G,
      A   Z1G,     Z2G,     ITASK,   H3D_DATA,
-     B   IGRE,    SENSORS)
+     B   IGRE,    SENSORS, G_WPLA,  WPLA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -78,6 +78,8 @@ C     REAL
      .   Z1G(MVSIZ),Z2G(MVSIZ)
       TYPE(H3D_DATABASE) :: H3D_DATA
       type (sensors_),INTENT(INOUT) :: SENSORS
+      INTEGER, INTENT(IN) :: G_WPLA
+      my_real,DIMENSION(NEL*G_WPLA), INTENT(IN) :: WPLA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -192,19 +194,23 @@ C
         PARTSAV(20,M)=PARTSAV(20,M) + IZX(I)
         PARTSAV(21,M)=PARTSAV(21,M) + REI(I)
         PARTSAV(22,M)=PARTSAV(22,M) + REK(I) 
+        IF (G_WPLA > 0)  PARTSAV(29,M)=PARTSAV(29,M) + WPLA(I)
       ENDDO
 C
       IF (ANIM_FT(1) /= 0 .OR. H3D_DATA%UND_FORC /= 0) THEN
         DO I=1,NEL
+          ! Beam force
           TANI(1,I)= FOR(I,1)
           TANI(2,I)= FOR(I,2)
           TANI(3,I)= FOR(I,3)
-          TANI(4,I)= MOM(I,1)
-          TANI(5,I)= MOM(I,2) + HALF*AL(I)*FOR(I,3)
-          TANI(6,I)= MOM(I,3) - HALF*AL(I)*FOR(I,2)
-          TANI(7,I)= -MOM(I,1)
-          TANI(8,I)= -MOM(I,2) + HALF*AL(I)*FOR(I,3)
-          TANI(9,I)= -MOM(I,3) - HALF*AL(I)*FOR(I,2)
+          ! Beam Node_1 moment
+          TANI(4,I)= -MOM(I,1)
+          TANI(5,I)= -MOM(I,2) + HALF*AL(I)*FOR(I,3)
+          TANI(6,I)= -MOM(I,3) - HALF*AL(I)*FOR(I,2)
+          ! Beam Node_2 moment
+          TANI(7,I)= MOM(I,1)
+          TANI(8,I)= MOM(I,2) + HALF*AL(I)*FOR(I,3)
+          TANI(9,I)= MOM(I,3) - HALF*AL(I)*FOR(I,2)
 C          TANI(10,I)= E1X(I)
 C          TANI(11,I)= E1Y(I)
 C          TANI(12,I)= E1Z(I)

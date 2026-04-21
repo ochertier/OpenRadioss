@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    echang   ../common_source/tools/sort/echang.F
-      !||--- called by ------------------------------------------------------
-      !||    iparti   ../common_source/tools/sort/iparti.F
-      !||    triins   ../common_source/tools/sort/triins.F
-      !||====================================================================
+!||====================================================================
+!||    echang   ../common_source/tools/sort/echang.F
+!||--- called by ------------------------------------------------------
+!||    iparti   ../common_source/tools/sort/iparti.F
+!||    triins   ../common_source/tools/sort/triins.F
+!||====================================================================
       SUBROUTINE ECHANG(I,J,TAB)
 C
 C     SWITCH I and J in TAB
@@ -38,18 +38,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER I, J
+        INTEGER I, J
 C     REAL
-      my_real
-     .   TAB(*)
+        my_real
+     .     TAB(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C     REAL
-      my_real
-     .   TEMPO
-      TEMPO=TAB(I)
-      TAB(I)=TAB(J)
-      TAB(J)=TEMPO
-      RETURN
+        my_real
+     .     TEMPO
+        TEMPO=TAB(I)
+        TAB(I)=TAB(J)
+        TAB(J)=TEMPO
+        RETURN
       END

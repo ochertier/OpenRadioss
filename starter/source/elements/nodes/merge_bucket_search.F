@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    merge_bucket_search   ../starter/source/elements/nodes/merge_bucket_search.F
-      !||--- called by ------------------------------------------------------
-      !||    merge_node            ../starter/source/elements/nodes/merge_node.F
-      !||--- calls      -----------------------------------------------------
-      !||    decode_merge          ../starter/source/elements/nodes/merge_bucket_search.F
-      !||    usrtos                ../starter/source/system/sysfus.F
-      !||    usrtosc               ../starter/source/model/submodel/merge.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod           ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    merge_bucket_search   ../starter/source/elements/nodes/merge_bucket_search.F
+!||--- called by ------------------------------------------------------
+!||    merge_node            ../starter/source/elements/nodes/merge_node.F
+!||--- calls      -----------------------------------------------------
+!||    decode_merge          ../starter/source/elements/nodes/merge_bucket_search.F
+!||    usrtos                ../starter/source/system/sysfus.F
+!||    usrtosc               ../starter/source/model/submodel/merge.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MERGE_BUCKET_SEARCH(X,ITAB,ITABM1,IMERGE0,CMERGE,
      .                               DBUC,NN1,NN2,LIST1,LIST2,
      .                               DDD,FLAG,LIST1_IDMERGE,LIST1_NBMERGE,LIST2_IDMERGE,
@@ -141,7 +141,7 @@ C
       ENDDO
 C  
       IF (FLAG == 1) THEN
-C--     destinations are cnodes (NN2 = NUMCNOD)
+C- ARE CNODES destinations (NN2 = NUMCNOD)
         NUMNOD1 = NUMNOD0-NUMCNOD
         ITABC => ITAB(NUMNOD1+1:NUMNOD0)
         DO I=1,NN2
@@ -153,7 +153,7 @@ C--     destinations are cnodes (NN2 = NUMCNOD)
         ENDDO
       ELSE
         ITABC => NULL()
-C--     destinations are nodes
+C- Are Nodes
         DO I=1,NN2 
           N = LIST2(I)       
           NN  = USRTOS(ITAB(N),ITABM1)
@@ -173,10 +173,10 @@ C
      .         IPCY(NN2+NBAND)   , IPCZ(NN2+NBAND))
 
 C--------------------------------------------------
-C     CLASSEMENT DES BUCKETS X
+C     sorting of x buckets
 C--------------------------------------------------
 C 
-C---      bande NBX uniquement. 
+C--- NBX strip only. 
 C 
       DO IB=0,NBX+1
        NPX(IB)=0
@@ -195,7 +195,7 @@ C
       ENDDO
       DO N=1,NN1
         NBOX=NOBX(N)+1
-C      bande NBX uniquement.
+C      NBX strip only.
         IF(NBOX >= 1.AND.NBOX <= NBX+1)THEN
            NPX(NBOX)=NPX(NBOX)+1
            IPX(NPX(NBOX))=N       
@@ -221,7 +221,7 @@ C
       ENDDO
       DO N=1,NN2
          NBOX=NOBCX(N)+1
-C      bande NBX uniquement.
+C      NBX strip only.
          IF(NBOX >= 1.AND.NBOX <= NBX+1)THEN
            NPCX(NBOX)=NPCX(NBOX)+1
            IPCX(NPCX(NBOX))=N               
@@ -241,7 +241,7 @@ C
               DO KS=NPX(MAX(IBX-2,0))+1,NPX(MIN(IBX+1,NBX+1))
                  N  =IPX(KS)
                  NBOY=NOBY(N)+1           
-C       bande NBY uniquement.
+C       NBY band only.
                  IF(NBOY >= 1 .AND. NBOY <= NBY+1)THEN
                      NPY(NBOY)=NPY(NBOY)+1
                  ENDIF
@@ -255,7 +255,7 @@ C       bande NBY uniquement.
              DO KS=NPX(MAX(IBX-2,0))+1,NPX(MIN(IBX+1,NBX+1))
                   N  =IPX(KS)      
                   NBOY=NOBY(N)+1
-C       bande NBY uniquement.
+C       NBY band only.
                   IF(NBOY >= 1 .AND. NBOY <= NBY+1)THEN
                        NPY(NBOY)=NPY(NBOY)+1
                        IPY(NPY(NBOY))=N 
@@ -270,7 +270,7 @@ C
              DO KS=NPCX(IBX-1)+1,NPCX(IBX)
                  N  =IPCX(KS)      
                  NBOY=NOBCY(N)+1
-C       bande NBY uniquement.
+C       NBY band only.
                  IF(NBOY >= 1.AND.NBOY <= NBY+1)THEN
                      NPCY(NBOY)=NPCY(NBOY)+1
                  ENDIF
@@ -286,14 +286,14 @@ C
              DO KS=NPCX(IBX-1)+1,NPCX(IBX)
                   N  =IPCX(KS)      
                   NBOY=NOBCY(N)+1
-C       bande NBY uniquement.
+C       NBY band only.
                   IF(NBOY >= 1.AND. NBOY <= NBY+1)THEN
                      NPCY(NBOY)=NPCY(NBOY)+1
                      IPCY(NPCY(NBOY))=N         
                   ENDIF
              ENDDO
 C        
-C -- les boites suivantes z
+C -- the following boxes z
 C 
              DO IBY=1,NBY+1   
                 IBOITE = 0   
@@ -308,7 +308,7 @@ C
                   DO KS=NPY(MAX(IBY-2,0))+1,NPY(MIN(IBY+1, NBY+1))
                       N  =IPY(KS) 
                       NBOZ=NOBZ(N)+1
-C        bande NBZ uniquement.
+C        NBZ band only.
                       IF(NBOZ >= 1.AND.NBOZ <= NBZ+1)THEN
                            NPZ(NBOZ)=NPZ(NBOZ)+1
                       ENDIF
@@ -322,7 +322,7 @@ C        bande NBZ uniquement.
                   DO KS=NPY(MAX(IBY-2,0))+1,NPY(MIN(IBY+1, NBY+1))
                       N  =IPY(KS)
                       NBOZ=NOBZ(N)+1
-C        bande NBZ uniquement.
+C        NBZ band only.
                       IF(NBOZ >= 1 .AND. NBOZ <= NBZ+1)THEN
                            NPZ(NBOZ)=NPZ(NBOZ)+1
                            IPZ(NPZ(NBOZ))=N   
@@ -451,11 +451,11 @@ C--------
       RETURN
       END
 
-      !||====================================================================
-      !||    decode_merge          ../starter/source/elements/nodes/merge_bucket_search.F
-      !||--- called by ------------------------------------------------------
-      !||    merge_bucket_search   ../starter/source/elements/nodes/merge_bucket_search.F
-      !||====================================================================
+!||====================================================================
+!||    decode_merge          ../starter/source/elements/nodes/merge_bucket_search.F
+!||--- called by ------------------------------------------------------
+!||    merge_bucket_search   ../starter/source/elements/nodes/merge_bucket_search.F
+!||====================================================================
       SUBROUTINE DECODE_MERGE(CODE,NVAL,TAB,NB_MERGE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -468,7 +468,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,CODE_TEMP,BASE
+      INTEGER I,CODE_TEMP,BASE
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------

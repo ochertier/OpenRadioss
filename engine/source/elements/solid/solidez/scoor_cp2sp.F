@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    scoor_cp2sp   ../engine/source/elements/solid/solidez/scoor_cp2sp.F
-      !||--- called by ------------------------------------------------------
-      !||    s8eforc3      ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8zforc3      ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||    sforc3        ../engine/source/elements/solid/solide/sforc3.F
-      !||    szforc3       ../engine/source/elements/solid/solidez/szforc3.F
-      !||====================================================================
+!||====================================================================
+!||    scoor_cp2sp   ../engine/source/elements/solid/solidez/scoor_cp2sp.F
+!||--- called by ------------------------------------------------------
+!||    s8eforc3      ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8zforc3      ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||    sforc3        ../engine/source/elements/solid/solide/sforc3.F
+!||    szforc3       ../engine/source/elements/solid/solidez/szforc3.F
+!||====================================================================
       SUBROUTINE SCOOR_CP2SP(
      1   X0,      Y0,      Z0,      X1,
      2   X2,      X3,      X4,      X5,
@@ -61,7 +61,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I, IPT
+      INTEGER  I
 C-----------------------------------------------
         DO I=1,NEL
         X1(I)= X0(I,1) 

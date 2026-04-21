@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    bulkige3    ../starter/source/elements/ige3d/bulkigeo3.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3dinit3   ../starter/source/elements/ige3d/ig3dinit3.F
-      !||====================================================================
+!||====================================================================
+!||    bulkige3    ../starter/source/elements/ige3d/bulkigeo3.F
+!||--- called by ------------------------------------------------------
+!||    ig3dinit3   ../starter/source/elements/ige3d/ig3dinit3.F
+!||====================================================================
       SUBROUTINE BULKIGE3(
      1          VOLU    ,NCTRL   ,MAT     ,PM      ,VNIGE   ,BNIGE     ,
      2          PX      ,PY      ,PZ      ,NCTRLMAX)
@@ -48,7 +48,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N
+      INTEGER I, N
 C     REAL
       my_real
      .   AV1,CV1
@@ -66,9 +66,9 @@ C     isogeometric elements :
         ENDDO
       ENDDO
 
-CC NB : on peut repartir le volume differemment selon si les points sont dans les coins, au milieu
-cC      ou sur une arrete, avec PX,PY,PZ on peut retrouver la place de chacun
-Cc pour les elements 20 neouds, il y a 3/192 * vol aux coins et 14/192 * vol aux points milieux
+Cnote: the volume can be distributed differently depending on whether the points are at the corners, in the middle
+cor on an edge, with PX, PY, PZ you can find the position of each one
+CThis is the elements 20 neoud, there are 3/192 * flight to corners and 14/192 * Vol at the backgrounds
 C
       RETURN
       END

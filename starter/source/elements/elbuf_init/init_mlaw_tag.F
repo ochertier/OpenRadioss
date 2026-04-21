@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    init_mlaw_tag   ../starter/source/elements/elbuf_init/init_mlaw_tag.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur          ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod    ../starter/share/modules1/elbuftag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    init_mlaw_tag   ../starter/source/elements/elbuf_init/init_mlaw_tag.F
+!||--- called by ------------------------------------------------------
+!||    lectur          ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod    ../starter/share/modules1/elbuftag_mod.F
+!||====================================================================
       SUBROUTINE INIT_MLAW_TAG(MLAW_TAG,MY_SIZE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -133,7 +133,7 @@ c
             MLAW_TAG(I)%L_XST = 0      
             MLAW_TAG(I)%L_SSP = 0      
             MLAW_TAG(I)%L_Z = 0
-            MLAW_TAG(I)%L_FRAC  = 0       !    pourcentage de phase (multimat) 
+            MLAW_TAG(I)%L_FRAC  = 0       ! phase percentage (multimat)
             MLAW_TAG(I)%L_BFRAC = 0
             MLAW_TAG(I)%L_DMG = 0
             MLAW_TAG(I)%L_ABURN = 0

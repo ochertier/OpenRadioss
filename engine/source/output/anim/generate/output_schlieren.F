@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    output_schlieren       ../engine/source/output/anim/generate/output_schlieren.F
-      !||--- called by ------------------------------------------------------
-      !||    dfunc0                 ../engine/source/output/anim/generate/dfunc0.F
-      !||    dfuncc                 ../engine/source/output/anim/generate/dfuncc.F
-      !||    dfuncs                 ../engine/source/output/anim/generate/dfunc6.F
-      !||    h3d_quad_scalar_1      ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
-      !||    h3d_shell_scalar_1     ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
-      !||    h3d_solid_scalar_1     ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    output_schlieren       ../engine/source/output/anim/generate/output_schlieren.F
+!||--- called by ------------------------------------------------------
+!||    dfuncc                 ../engine/source/output/anim/generate/dfuncc.F
+!||    dfuncs                 ../engine/source/output/anim/generate/dfunc6.F
+!||    h3d_quad_scalar_1      ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
+!||    h3d_shell_scalar_1     ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
+!||    h3d_solid_scalar_1     ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    initbuf_mod            ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE OUTPUT_SCHLIEREN(
      1                     EVAR   , IX    , X          ,
      2                     IPARG  , WA_L  , ELBUF_TAB  ,ALE_CONNECTIVITY ,VOL,
@@ -86,7 +85,7 @@ C-----------------------------------------------
       INTEGER :: NEL  !< number of elems in current group
       INTEGER IV(6), IE
       my_real :: GRAD(3) , Xi(8), Yi(8), Zi(8) , SCH 
-      INTEGER :: MAT , NC(8)
+      INTEGER :: NC(8)
       my_real :: N(3,6,MVSIZ), RHO(6),  VALVOIS(6), AREA(MVSIZ), NX, A1, A2
       INTEGER :: IAD2, LGTH
 C-----------------------------------------------

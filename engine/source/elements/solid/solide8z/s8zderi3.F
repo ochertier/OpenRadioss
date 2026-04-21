@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8zderi3   ../engine/source/elements/solid/solide8z/s8zderi3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
-      !||    s8cke3     ../engine/source/elements/thickshell/solide8c/s8cke3.F
-      !||====================================================================
+!||====================================================================
+!||    s8zderi3   ../engine/source/elements/solid/solide8z/s8zderi3.F
+!||--- called by ------------------------------------------------------
+!||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
+!||    s8cke3     ../engine/source/elements/thickshell/solide8c/s8cke3.F
+!||====================================================================
       SUBROUTINE S8ZDERI3(
      1   OFFG,    OFF,     VOL,     NGL,
      2   KSI,     ETA,     ZETA,    WI,
@@ -148,7 +148,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NGL(*), I, J ,ICOR,ep
+      INTEGER NGL(*), I ,ICOR
 C     REAL
 C                                                                     12
       my_real
@@ -160,7 +160,7 @@ C                                                                     12
      .   JAC_59_68(MVSIZ), JAC_67_49(MVSIZ), JAC_48_57(MVSIZ),
      .   JAC_38_29(MVSIZ), JAC_19_37(MVSIZ), JAC_27_18(MVSIZ),
      .   JAC_26_35(MVSIZ), JAC_34_16(MVSIZ), JAC_15_24(MVSIZ),
-     .   JACI12(MVSIZ), JACI45(MVSIZ), JACI78(MVSIZ),
+     .     
      .   D1X(MVSIZ) , D2X(MVSIZ) , D3X(MVSIZ) , D4X(MVSIZ) ,
      .   D1Y(MVSIZ) , D2Y(MVSIZ) , D3Y(MVSIZ) , D4Y(MVSIZ) ,
      .   D1Z(MVSIZ) , D2Z(MVSIZ) , D3Z(MVSIZ) , D4Z(MVSIZ) ,

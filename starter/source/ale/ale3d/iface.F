@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    iface       ../starter/source/ale/ale3d/iface.F
-      !||--- called by ------------------------------------------------------
-      !||    boxassem4   ../starter/source/model/box/bigbox.F
-      !||    c_iebcs     ../starter/source/restart/ddsplit/c_iebcs.F
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||    findele     ../starter/source/boundary_conditions/ebcs/findele.F
-      !||    fvbric01    ../starter/source/airbag/fvbric01.F
-      !||    i12sol3     ../starter/source/interfaces/inter3d1/insol3.F
-      !||    iniebcs     ../starter/source/boundary_conditions/ebcs/iniebcs.F
-      !||====================================================================
+!||====================================================================
+!||    iface                             ../starter/source/ale/ale3d/iface.F
+!||--- called by ------------------------------------------------------
+!||    boxassem4                         ../starter/source/model/box/bigbox.F
+!||    c_iebcs                           ../starter/source/restart/ddsplit/c_iebcs.F
+!||    ddsplit                           ../starter/source/restart/ddsplit/ddsplit.F
+!||    ebcs_cyclic_surface_matching_2d   ../starter/source/boundary_conditions/ebcs/ebcs_cyclic_surface_matching_2d.F90
+!||    findele                           ../starter/source/boundary_conditions/ebcs/findele.F
+!||    fvbric01                          ../starter/source/airbag/fvbric01.F
+!||    i12sol3                           ../starter/source/interfaces/inter3d1/insol3.F
+!||    iniebcs                           ../starter/source/boundary_conditions/ebcs/iniebcs.F
+!||====================================================================
       INTEGER FUNCTION IFACE(IP,N)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -72,14 +73,14 @@ C-----------------------------------------------
       RETURN
       END
 
-      !||====================================================================
-      !||    iface2                   ../starter/source/ale/ale3d/iface.F
-      !||--- called by ------------------------------------------------------
-      !||    c_ixfloc                 ../starter/source/restart/ddsplit/c_ixfloc.F
-      !||    ddsplit                  ../starter/source/restart/ddsplit/ddsplit.F
-      !||    findele                  ../starter/source/boundary_conditions/ebcs/findele.F
-      !||    multi_unplug_neighbors   ../starter/source/multifluid/multi_unplug_neighbors.F
-      !||====================================================================
+!||====================================================================
+!||    iface2                   ../starter/source/ale/ale3d/iface.F
+!||--- called by ------------------------------------------------------
+!||    c_ixfloc                 ../starter/source/restart/ddsplit/c_ixfloc.F
+!||    ddsplit                  ../starter/source/restart/ddsplit/ddsplit.F
+!||    findele                  ../starter/source/boundary_conditions/ebcs/findele.F
+!||    multi_unplug_neighbors   ../starter/source/multifluid/multi_unplug_neighbors.F
+!||====================================================================
       INTEGER FUNCTION IFACE2(IP, N) 
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -110,11 +111,11 @@ C-----------------------------------------------
       ENDIF
       END 
 
-      !||====================================================================
-      !||    iface2t   ../starter/source/ale/ale3d/iface.F
-      !||--- called by ------------------------------------------------------
-      !||    findele   ../starter/source/boundary_conditions/ebcs/findele.F
-      !||====================================================================
+!||====================================================================
+!||    iface2t   ../starter/source/ale/ale3d/iface.F
+!||--- called by ------------------------------------------------------
+!||    findele   ../starter/source/boundary_conditions/ebcs/findele.F
+!||====================================================================
       INTEGER FUNCTION IFACE2T(IP, N) 
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -132,6 +133,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     S o u r c e   L i n e s
 C-----------------------------------------------       
+      IFACE2T = 0
       IF (IP(N(1))  >  0) THEN
          IF (IP(N(2))  >  0) THEN
             IFACE2T = 1

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    diffusion_mod       ../engine/share/modules/diffusion_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain             ../engine/source/ale/alemain.F
-      !||    ns_fvm_diffusion    ../engine/source/multifluid/ns_fvm_diffusion.F
-      !||    radioss2            ../engine/source/engine/radioss2.F
-      !||    resol               ../engine/source/engine/resol.F
-      !||    resol_head          ../engine/source/engine/resol_head.F
-      !||--- uses       -----------------------------------------------------
-      !||    linear_solver_mod   ../engine/share/modules/linear_solver_mod.F
-      !||    matrix_mod          ../common_source/linearalgebra/matrix_mod.F
-      !||    vector_mod          ../common_source/linearalgebra/vector_mod.F
-      !||====================================================================
+!||====================================================================
+!||    diffusion_mod       ../engine/share/modules/diffusion_mod.F
+!||--- called by ------------------------------------------------------
+!||    alemain             ../engine/source/ale/alemain.F
+!||    ns_fvm_diffusion    ../engine/source/multifluid/ns_fvm_diffusion.F
+!||    radioss2            ../engine/source/engine/radioss2.F
+!||    resol               ../engine/source/engine/resol.F
+!||    resol_head          ../engine/source/engine/resol_head.F
+!||--- uses       -----------------------------------------------------
+!||    linear_solver_mod   ../engine/share/modules/linear_solver_mod.F
+!||    matrix_mod          ../common_source/linearalgebra/matrix_mod.F
+!||    vector_mod          ../common_source/linearalgebra/vector_mod.F
+!||====================================================================
       MODULE DIFFUSION_MOD
       USE LINEAR_SOLVER_MOD
       USE MATRIX_MOD
@@ -70,19 +70,21 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !     |_____________________________|   !
 
       CONTAINS
-      !||====================================================================
-      !||    init_diffusion         ../engine/share/modules/diffusion_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    linear_solver_mod      ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    init_diffusion         ../engine/share/modules/diffusion_mod.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    linear_solver_mod      ../engine/share/modules/linear_solver_mod.F
+!||    spmd_comm_world_mod    ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE INIT_DIFFUSION(this, LINSOL, NRHS, IPARG, ALE_CONNECT)
       USE LINEAR_SOLVER_MOD
       USE ALE_CONNECTIVITY_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc" 
 C-----------------------------------------------
 C     C o m m o n   B l o c k s
@@ -111,7 +113,10 @@ C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: MAT_NZ, NG, II, NEL, ITY, MATLAW, NFT, I, JJ, KK
-      INTEGER :: GLOB_DIM, MAX_ID, IERR, IAD, LGTH
+      INTEGER :: GLOB_DIM, MAX_ID, IAD, LGTH
+#ifdef MPI
+      INTEGER IERR
+#endif
 
       this%NRHS = NRHS
 !     number of non zero values for the diffusion matrix elem <-> elem matrix
@@ -156,7 +161,7 @@ C-----------------------------------------------
 !     set rhs and matrix
       CALL this%LINEAR_SOLVER%SET_RHS(3, this%RHS)
       CALL this%LINEAR_SOLVER%SET_MATRIX(this%MAT)
-!     diffusion coefficient, outlet flag
+!     Diffusion Coefficient, Outlet Flag
       this%OUTLET_FLAGGED = .FALSE.
       IF (N2D == 0) THEN
          ALLOCATE(this%NU(NUMELS + NSVOIS))
@@ -172,15 +177,18 @@ C-----------------------------------------------
 
       END SUBROUTINE INIT_DIFFUSION
 
-      !||====================================================================
-      !||    solve_diffusion   ../engine/share/modules/diffusion_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_global_dim    ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    solve_diffusion       ../engine/share/modules/diffusion_mod.F
+!||--- calls      -----------------------------------------------------
+!||    get_global_dim        ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SOLVE_DIFFUSION(this)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc" 
       CLASS(T_DIFFUSION) :: this
       INTEGER :: GLOB_DIM
@@ -190,15 +198,18 @@ C-----------------------------------------------
       
       END SUBROUTINE SOLVE_DIFFUSION
 
-      !||====================================================================
-      !||    get_solution     ../engine/share/modules/diffusion_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_global_dim   ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_solution          ../engine/share/modules/diffusion_mod.F
+!||--- calls      -----------------------------------------------------
+!||    get_global_dim        ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE GET_SOLUTION(this, SOL, GLOB_DIM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc" 
       CLASS(T_DIFFUSION), INTENT(INOUT), TARGET :: this
       INTEGER, INTENT(OUT) :: GLOB_DIM
@@ -208,13 +219,16 @@ C-----------------------------------------------
       GLOB_DIM = this%LINEAR_SOLVER%GET_GLOBAL_DIM()
       END SUBROUTINE GET_SOLUTION
 
-      !||====================================================================
-      !||    terminate_diffusion   ../engine/share/modules/diffusion_mod.F
-      !||====================================================================
+!||====================================================================
+!||    terminate_diffusion   ../engine/share/modules/diffusion_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE TERMINATE_DIFFUSION(this)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc" 
       CLASS(T_DIFFUSION), INTENT(INOUT) :: this
       

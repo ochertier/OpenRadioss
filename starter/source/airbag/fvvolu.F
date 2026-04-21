@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvvolu     ../starter/source/airbag/fvvolu.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh0    ../starter/source/airbag/fvmesh0.F
-      !||--- calls      -----------------------------------------------------
-      !||    fvnormal   ../starter/source/airbag/fvmbag1.F
-      !||====================================================================
-      SUBROUTINE FVVOLU(IFV    ,ITYP   ,NNS    ,NNTR    ,NPOLH,
+!||====================================================================
+!||    fvvolu_mod   ../starter/source/airbag/fvvolu.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh0      ../starter/source/airbag/fvmesh0.F
+!||====================================================================
+      MODULE FVVOLU_MOD
+      CONTAINS
+!||====================================================================
+!||    fvvolu     ../starter/source/airbag/fvvolu.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh0    ../starter/source/airbag/fvmesh0.F
+!||--- calls      -----------------------------------------------------
+!||    fvnormal   ../starter/source/airbag/fvmbag1.F
+!||====================================================================
+      SUBROUTINE FVVOLU(ITYP   ,NNS    ,NNTR   ,NPOLH,
      1                  IBUF   ,IBUFA  ,ELEMA  ,TAGELA ,
      2                  X      ,IVOLU  ,RVOLU  ,
      3                  IFVNOD ,RFVNOD ,IFVTRI , 
      4                  IFVPOLY,IFVTADR,IFVPOLH, 
-     5                  IFVPADR,IDPOLH ,MPOLH  ,
+     5                  IFVPADR,MPOLH  ,
      6                  EPOLH  ,VPOLH_INI)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -49,9 +56,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IFV, ITYP, NNS, NNTR, NPOLH
+      INTEGER ITYP, NNS, NNTR, NPOLH
       INTEGER IBUF(*),   IBUFA(*),  ELEMA(3,*), TAGELA(*), 
-     .        IVOLU(*),  IDPOLH(*), IFVNOD(3,*),IFVTRI(6,*),
+     .        IVOLU(*),  IFVNOD(3,*),IFVTRI(6,*),
      .        IFVPOLY(*),IFVTADR(*),IFVPOLH(*), IFVPADR(*)
       my_real
      .        X(3,*), RVOLU(*), RFVNOD(2,*), 
@@ -71,8 +78,22 @@ C-----------------------------------------------
      .        CPAI, CPBI, CPCI, CPDI, CPEI, CPFI,
      .        RMWI, PINI, TI,   TI2,  RHOI, EFAC 
 C---------------------------------------------------
-C Noeuds des volumes finis
+C Nodes of the finite volumes
 C---------------------------------------------------
+      X1 = ZERO
+      Y1 = ZERO
+      Z1 = ZERO
+      X2 = ZERO
+      Y2 = ZERO
+      Z2 = ZERO
+      X3 = ZERO
+      Y3 = ZERO
+      Z3 = ZERO
+      NX = ZERO
+      NY = ZERO
+      NZ = ZERO
+
+
       DO I=1,NNS
          IF (IFVNOD(1,I)==1) THEN
             IEL=IFVNOD(2,I)
@@ -133,7 +154,7 @@ C
          ENDIF
       ENDDO
 C----------------------------
-C Normale, aire des triangles
+C Normal, area of the triangles
 C----------------------------
       DO I=1,NNTR
          N1=IFVTRI(1,I)
@@ -153,14 +174,14 @@ C----------------------------
          ENDIF
       ENDDO
 C----------------------
-C Volume des polyhedres
+C Volume of the polyhedra
 C----------------------
       DO I=1,NPOLH
          PVOLU(I)=ZERO
-C Boucle sur les polygones du polyhedre
+C Loop over the polygons of the polyhedra
          DO J=IFVPADR(I),IFVPADR(I+1)-1
             JJ=IFVPOLH(J)
-C Boucle sur les triangles du polygone
+C Loop over the triangles of the polygon
             DO K=IFVTADR(JJ), IFVTADR(JJ+1)-1
                KK=IFVPOLY(K)
                AREA=PAREA(KK)
@@ -213,7 +234,7 @@ C
       WRITE(IOUT,1000) IVOLU(1),NSTR,NCTR,NPOLH,NPOLH_N,VOLPH,AREAP
 C
 C---------------------------------------------------
-C Update des quantites dans les polyhedres
+C Update of quantities in the polyhedra
 C---------------------------------------------------
       CPAI =RVOLU(7)
       CPBI =RVOLU(8)
@@ -227,7 +248,7 @@ C---------------------------------------------------
       CPDI=RVOLU(56)
       CPEI=RVOLU(57)
       CPFI=RVOLU(58)
-      IF(ITYP==8) THEN
+      IF(ITYP == 8) THEN
          EFAC=EFAC+FOURTH*CPDI*TI2*TI2-CPEI/TI+ONE_FIFTH*CPFI*TI2*TI2*TI          
       ENDIF
       DO I=1,NPOLH
@@ -247,4 +268,5 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
      .       /5X,'SUM VOLUME OF FINITE VOLUMES. . . . . . .=',1PG20.13,
      .       /5X,'SUM AREA SURFACE TRIANGLES. . . . . . . .=',1PG20.13/)
       RETURN
-      END
+      END SUBROUTINE FVVOLU
+      END MODULE FVVOLU_MOD

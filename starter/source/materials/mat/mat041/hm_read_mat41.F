@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat41            ../starter/source/materials/mat/mat041/hm_read_mat41.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat41            ../starter/source/materials/mat/mat041/hm_read_mat41.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT41(UPARAM  ,MAXUPARAM ,NUPARAM ,
      .                        NUVAR    ,IFUNC     ,MAXFUNC ,NFUNC     ,STIFINT,
      .                        ID       ,TITR      ,UNITAB  ,LSUBMODEL ,PM    ,
@@ -113,7 +113,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ITER,IREAC
       my_real AR, BR, R1R, R2R, R3R, WR,
-     .        AP, BP, R1P, R2P, R3P, WP,
+     .        AP, BP, R1P, R2P, R3P, WP_COEFF,
      .        CVR, CVP,
      .        ENQ, EPSILON, FTOL, I_, B_, X_, G1, D_, Y_, CAPPA, CHI, TOL,
      .        CCRIT, G2, C_, E_, G_, Z_, Figmax, FG1max, FG2min, SHR, T,
@@ -198,7 +198,7 @@ C-----------------------------------------------
       !IREAC=2 : EXTENDED MODEL (3 TERM : ignition, growth1, growth2)
       IF(IREAC/=1 .AND. IREAC /=2)IREAC=1                                    
       WR = R3R/CVR   !SI : both units are J/m3/K (=Pa/K) ; WR is dimensionless (JWL EoS param)
-      WP = R3P/CVP   !SI : both units are J/m3/K (=Pa/K) ; WR is dimensionless (JWL EoS param)
+      WP_COEFF = R3P/CVP   !SI : both units are J/m3/K (=Pa/K) ; WR is dimensionless (JWL EoS param)
       IF (EPSILON==ZERO) EPSILON = EM3
       IF (ITER==0) ITER = 80
       IF (FTOL==ZERO) FTOL = EM5
@@ -223,7 +223,7 @@ C-----------------------------------------------
       UPARAM(10) = R1P                                                       
       UPARAM(11) = R2P                                                       
       UPARAM(12) = R3P                                                       
-      UPARAM(13) = WP                                                        
+      UPARAM(13) = WP_COEFF                                                        
       UPARAM(14) = CVR                                                       
       UPARAM(15) = CVP                                                       
       UPARAM(16) = ENQ                                                       

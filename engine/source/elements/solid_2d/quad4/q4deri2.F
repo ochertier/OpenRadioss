@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    q4deri2   ../engine/source/elements/solid_2d/quad4/q4deri2.F
-      !||--- called by ------------------------------------------------------
-      !||    q4forc2   ../engine/source/elements/solid_2d/quad4/q4forc2.F
-      !||    q4ke2     ../engine/source/elements/solid_2d/quad4/q4ke2.F
-      !||====================================================================
+!||====================================================================
+!||    q4deri2   ../engine/source/elements/solid_2d/quad4/q4deri2.F
+!||--- called by ------------------------------------------------------
+!||    q4forc2   ../engine/source/elements/solid_2d/quad4/q4forc2.F
+!||    q4ke2     ../engine/source/elements/solid_2d/quad4/q4ke2.F
+!||====================================================================
       SUBROUTINE Q4DERI2(
      1   OFFG,    OFF,     KSI,     ETA,
      2   WI,      YAVG,    Y12,     Y34,
@@ -88,9 +88,9 @@ C     REAL
      .    DNDK1,DNDK2,DNDK3,DNDK4,
      .    DNDE1,DNDE2,DNDE3,DNDE4,
      .    DYDK(MVSIZ),DYDE(MVSIZ),DZDK(MVSIZ),DZDE(MVSIZ),
-     .    DET(MVSIZ),YH(MVSIZ),ZH(MVSIZ)
+     .    DET(MVSIZ)
       my_real
-     .    QN1,QN2,QN3,QN4,YD,DETI,NU1
+     .    DETI,NU1
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------

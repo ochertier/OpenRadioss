@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat114           ../starter/source/materials/mat/mat114/hm_read_mat114.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat114           ../starter/source/materials/mat/mat114/hm_read_mat114.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT114(UPARAM   ,MAXUPARAM,NUPARAM  ,NFUNC    ,PARMAT   ,
      .                          UNITAB   ,PM       ,LSUBMODEL,ISRATE   ,MAT_ID   ,
      .                          TITR     ,IFUNC    ,MAXFUNC  ,MTAG     ,MATPARAM )
@@ -280,7 +280,7 @@ C
       XC = ZERO
 C
       IF (YOUNG > ZERO) THEN
-        IECROU = 9
+        IECROU = 12
         XK = HALF*FIVE_OVER_6*YOUNG*SAREA
       ENDIF
 C----
@@ -320,7 +320,7 @@ C
       XC = ZERO
 C
       IF (YOUNG > ZERO) THEN
-        IECROU = 9
+        IECROU = 12
         XK = HALF*FIVE_OVER_6*YOUNG*SAREA
       ENDIF
 C----
@@ -362,7 +362,7 @@ C
       XC = ZERO
 C
       IF (YOUNG > ZERO) THEN
-        IECROU = 9
+        IECROU = 12
         XK = HALF*YOUNG*ITORS
       ENDIF
 C----
@@ -398,7 +398,7 @@ C
       XC = ZERO
 C
       IF (YOUNG > ZERO) THEN
-        IECROU = 9
+        IECROU = 12
         XK = YOUNG*IBEND
       ENDIF
 C----
@@ -434,7 +434,7 @@ C
       XC = ZERO
 C
       IF (YOUNG > ZERO) THEN
-        IECROU = 9
+        IECROU = 12
         XK = YOUNG*IBEND
       ENDIF
 C----
@@ -464,7 +464,7 @@ C------------------------
       MTAG%G_TOTDEPL = 3  ! DX (DY,DZ) - total deformation (translation)
       MTAG%G_TOTROT = 3   ! RX (RY,RZ) - total deformation (rotation)
       MTAG%G_DEP_IN_TENS = 3   ! DPX  (DPY,DPZ) - max displacement in tension
-      MTAG%G_DEP_IN_COMP = 3   ! DPX2 (DPY2,DPZ2) - max displacement in compression
+      MTAG%G_DEP_IN_COMP = 3   ! DPX2 (DPY2, DPZ2) - Max Displacement in Compression
       MTAG%G_ROT_IN_TENS = 3   ! RPX (RPY,RPZ) - max rotation in tension
       MTAG%G_ROT_IN_COMP = 3   ! RPX2 (RPY2,RPY2) - max rotation in compression
       MTAG%G_POSX = 5

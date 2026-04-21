@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdk6fint_reg     ../engine/source/elements/sh3n/coquedk6/cdk6fint_reg.F
-      !||--- called by ------------------------------------------------------
-      !||    cdk6forc3        ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cdk6fint_reg     ../engine/source/elements/sh3n/coquedk6/cdk6fint_reg.F
+!||--- called by ------------------------------------------------------
+!||    cdk6forc3        ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+!||====================================================================
       SUBROUTINE CDK6FINT_REG(
      1   NLOC_DMG,VAR_REG, THK,     NEL,
      2   OFF,     AREA,    NC1,     NC2,
@@ -88,11 +88,6 @@ C-----------------------------------------------
      .  MASSTH,UNLTH,VNLTH,FNLTH
       my_real, DIMENSION(:,:), ALLOCATABLE :: 
      .  STIFNLTH,DTN
-      ! Safety coefficient for non-local stability vs mechanical stability
-      ! (it has been slightly increased vs nloc_dmg_init.F)
-      my_real, PARAMETER :: CSTA  = 40.0D0
-      ! Coefficient for non-local stability to take into account damping
-      my_real, PARAMETER :: CDAMP = 0.7D0
 c-----------------------------------------------------------------------
 c     VAR_REG :  variable a regulariser (local cumulated plastic strain)
 c     NTVAR  =  NT * VAR_REG
@@ -280,8 +275,8 @@ C
                   ENDIF
                 ENDDO
               ENDDO
+              DTNOD = DTMIN1(11)*(SQRT(CSTA))
             ENDIF
-            DTNOD = DTMIN1(11)*(SQRT(CSTA))
           ENDIF
 C
           ! Classical nodal timestep check

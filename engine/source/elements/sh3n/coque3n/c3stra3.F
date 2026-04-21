@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c3stra3       ../engine/source/elements/sh3n/coque3n/c3stra3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
-      !||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
-      !||====================================================================
+!||====================================================================
+!||    c3stra3       ../engine/source/elements/sh3n/coque3n/c3stra3.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
+!||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
+!||====================================================================
       SUBROUTINE C3STRA3(JFT   ,JLT     ,PM     ,
      2                   MAT   ,AREA    ,EXX    ,EYY    ,EXY  ,
      3                   EXZ   ,EYZ     ,KXX    ,KYY    ,KXY  , 
@@ -68,12 +68,12 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ISH(MVSIZ),
-     .        I, MX, J
+      INTEGER 
+     .        I, J
 C     REAL
       my_real
-     .   FSH(MVSIZ),
-     .   THK2 ,FAC1, FAC2, FC1P
+     .   
+     .   FAC1
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C
       IF(IEPSDOT/=0)THEN

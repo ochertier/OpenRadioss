@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps66   ../engine/source/materials/mat/mat066/sigeps66.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw      ../engine/source/materials/mat_share/mulaw.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter     ../engine/source/tools/curve/finter.F
-      !||    finter2    ../engine/source/tools/curve/vinter.F
-      !||    vinter     ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps66   ../engine/source/materials/mat/mat066/sigeps66.F
+!||--- called by ------------------------------------------------------
+!||    mulaw      ../engine/source/materials/mat_share/mulaw.F90
+!||--- calls      -----------------------------------------------------
+!||    finter     ../engine/source/tools/curve/finter.F
+!||    finter2    ../engine/source/tools/curve/vinter.F
+!||    vinter     ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE SIGEPS66(
      1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC   ,
      2     NPF    ,TF     ,TIME    ,TIMESTEP,UPARAM  ,
@@ -137,7 +137,7 @@ C        NPF,TF  : FUNCTION PARAMETER
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,J1,J2,IYLDC,IYLDT,IRATE,NCC,NCT,NFUNC,VP,IADBUF
+      INTEGER I,J,J1,J2,IRATE,NCC,NCT,NFUNC,VP,IADBUF
       INTEGER IPOS1(NEL),IAD1(NEL), ILEN1(NEL),
      .   IPOS2(NEL),IAD2(NEL), ILEN2(NEL),IFUNC(MFUNC),
      .   JJC(NEL),JJT(NEL)
@@ -187,10 +187,6 @@ C
       EC   = UPARAM(IADBUF + 15 + 2*MFUNC)
       RPCT = UPARAM(IADBUF + 16 + 2*MFUNC)
 C
-
-     
-
-
       IF (ISIGI==0) THEN
         IF(TIME==ZERO)THEN
           DO I=1,NEL
@@ -217,7 +213,9 @@ c------------------------------------------------
 c         P(I) = C1 * (RHO(I)/RHO0(I)- ONE)
           P(I) = C1T * AMU(I)
           C1T  = MAX(C1T,EC/THREE/(ONE - TWO*NU))
-          IF(P(I) <=  - RPCT * PT) THEN
+          IF(PC == ZERO .and. PT == ZERO .AND. ABS(P(I)) < EM10) THEN
+            E(I)   = EC
+          ELSEIF(P(I) <=  - RPCT * PT) THEN
             E(I)   = ET
           ELSEIF(P(I) >= RPCT *PC) THEN
             E(I)   = EC
@@ -325,7 +323,7 @@ C              ECROUISSAGE CINEMATIQUE
                YT(I) = (ONE - FISOKIN) * YT(I) + FISOKIN * Y2(I)
             ENDDO
         ENDIF
-      ELSE   ! IRATE =4 => multiples curves (tracation & compression)
+      ELSE   ! Irate = 4 => multiple curves (traction and compression)
 C----------------------------------------------------------------------
 C       compression
 C------------------------------------------------------------------------ 
@@ -493,7 +491,10 @@ C interpolation entre (tracation & compression
          DO I=1,NEL  
 c          P(I) = C1 * (RHO(I)/RHO0(I)- ONE)
           P(I) = C1(I) * AMU(I)
-          IF(P(I) <=  -PT) THEN
+          IF(PC == ZERO .AND. PT == ZERO .AND. ABS(P(I)) < EM10) THEN
+            YLD(I) = MAX(YC(I), EM20)
+            H(I)   = HC(I)
+          ELSEIF(P(I) <=  -PT) THEN
             YLD(I) = MAX(YT(I),EM20)
             H(I)   = HT(I)
           ELSEIF(P(I) >= PC) THEN

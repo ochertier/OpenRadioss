@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_lagmul_type17   ../starter/source/interfaces/int17/hm_read_inter_lagmul_type17.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_lagmul          ../starter/source/interfaces/reader/hm_read_inter_lagmul.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                        ../starter/source/output/message/message.F
-      !||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    ngr2usr                       ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_lagmul_type17   ../starter/source/interfaces/int17/hm_read_inter_lagmul_type17.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_lagmul          ../starter/source/interfaces/reader/hm_read_inter_lagmul.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                        ../starter/source/output/message/message.F
+!||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    ngr2usr                       ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_LAGMUL_TYPE17(
      .           IPARI      ,STFAC     ,FRIGAP    ,NOINT     ,
      .           IGRBRIC    ,LSUBMODEL )
@@ -59,13 +59,12 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: ISU10,ISU20,IDUM,MULTIMP,ITIED,NTYP,IS1,IS2
+      INTEGER :: ISU10,ISU20,MULTIMP,ITIED,NTYP,IS1,IS2
       my_real :: STARTT,BUMULT,STOPT,GAP,FRIC
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       LOGICAL IS_AVAILABLE
@@ -100,15 +99,10 @@ c------------------------------------------------------------
       ISU2 = NGR2USR(ISU20,INGR2USR,NGRBRIC)
 c
       BUMULT = BMUL0
-      IF (IMACH /= 3) THEN  ! SMP
-        MULTIMP=4
-      ELSE                 ! SPMD
-        MULTIMP=24
-      END IF
+      MULTIMP=24
 c
       IF (NSPMD > 1) THEN
-          CALL ANCMSG(MSGID=755,MSGTYPE=MSGERROR,ANMODE=ANINFO,
-     .                C1='TYPE 17 LAGRANGE INTERFACE')
+          CALL ANCMSG(MSGID=755,MSGTYPE=MSGERROR,ANMODE=ANINFO,C1='TYPE 17 LAGRANGE INTERFACE')
       END IF
 c------------------------------------------------------------
 c     STORAGE

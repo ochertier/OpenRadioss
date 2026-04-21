@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_fvb_gath_begin   ../engine/source/mpi/airbags/spmd_fvb.F
-      !||--- called by ------------------------------------------------------
-      !||    fvupd0                ../engine/source/airbag/fvupd.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod             ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_fvb_gath_begin   ../engine/source/mpi/airbags/spmd_fvb.F
+!||--- called by ------------------------------------------------------
+!||    fvupd0                ../engine/source/airbag/fvupd.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod             ../engine/share/modules/fvbag_mod.F
+!||====================================================================
       SUBROUTINE SPMD_FVB_GATH_BEGIN(IFV, X, XXX, XXXA, 
      .                                    V, VVV, VVVA)
 C Gather local X into XXX,XXXA,on the PMAIN of the FVM
@@ -93,7 +93,7 @@ C
             LENR=LENR+6*(ITAB(1,II)+ITAB(2,II)+ITAB(3,II))
          ENDDO
          ALLOCATE(FVSPMD(IFV)%IBUF(LENI), FVSPMD(IFV)%RBUF(LENR))
-C Reception des entiers
+C reception of integers
          II=0
          DO I=1,FVSPMD(IFV)%NSPMD-1
             II=II+1
@@ -103,7 +103,7 @@ C Reception des entiers
             CALL MPI_IRECV(FVSPMD(IFV)%IBUF(IAD), LEN, MPI_INTEGER, I,
      .                     ITAG, FVSPMD(IFV)%MPI_COMM, FVSPMD(IFV)%REQ(II), IERR)
          ENDDO
-C Reception des reels
+C reception of reals
          II=0
          DO I=1,FVSPMD(IFV)%NSPMD-1
             II=II+1
@@ -113,9 +113,9 @@ C Reception des reels
             CALL MPI_IRECV(FVSPMD(IFV)%RBUF(IAD), LEN, REAL, I, ITAG,
      .      FVSPMD(IFV)%MPI_COMM, FVSPMD(IFV)%REQ(FVSPMD(IFV)%NSPMD-1+II), IERR)
          ENDDO
-C Remplissage des tableaux de sortie XXX, XXXA, 
+C filling of output tables xxx, xxxa,
          LEN = FVSPMD(IFV)%NN_L
-C ajout noeuds internes
+C Addition Internal nodes
          LEN = LEN + FVSPMD(IFV)%NNI_L
          DO I=1,LEN
             I1=FVSPMD(IFV)%IBUF_L(1,I)
@@ -142,7 +142,7 @@ C ajout noeuds internes
          ENDDO
       ELSE IF(FVSPMD(IFV)%RANK > 0) THEN
          ITABL(1)=FVSPMD(IFV)%NN_L
-C ajout noeuds internes
+C Addition Internal nodes
          ITABL(1)=ITABL(1)+FVSPMD(IFV)%NNI_L
          ITABL(2)=FVSPMD(IFV)%NNA_L
          ITABL(3)= 0                  
@@ -210,14 +210,14 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_fvb_gath_end   ../engine/source/mpi/airbags/spmd_fvb.F
-      !||--- called by ------------------------------------------------------
-      !||    fvupd1              ../engine/source/airbag/fvupd.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod           ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_fvb_gath_end   ../engine/source/mpi/airbags/spmd_fvb.F
+!||--- called by ------------------------------------------------------
+!||    fvupd1              ../engine/source/airbag/fvupd.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod           ../engine/share/modules/fvbag_mod.F
+!||====================================================================
       SUBROUTINE SPMD_FVB_GATH_END(IFV, X, XXX, XXXA, 
      .                                    V, VVV, VVVA)
 

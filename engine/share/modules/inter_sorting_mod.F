@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,38 +20,40 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inter_sorting_mod              ../engine/share/modules/inter_sorting_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    check_coarse_grid              ../engine/source/interfaces/generic/check_coarse_grid.F
-      !||    i7main_tri                     ../engine/source/interfaces/intsort/i7main_tri.F
-      !||    inter_box_creation             ../engine/source/interfaces/generic/inter_box_creation.F
-      !||    inter_cell_color               ../engine/source/interfaces/generic/inter_cell_color.F
-      !||    inter_color_coarse_voxel       ../engine/source/interfaces/generic/inter_color_coarse_voxel.F
-      !||    inter_color_voxel              ../engine/source/interfaces/generic/inter_color_voxel.F
-      !||    inter_count_node_curv          ../engine/source/interfaces/generic/inter_count_node_curv.F
-      !||    inter_deallocate_wait          ../engine/source/interfaces/generic/inter_deallocate_wait.F
-      !||    inter_minmax_node              ../engine/source/interfaces/generic/inter_minmax_node.F
-      !||    inter_prepare_sort             ../engine/source/interfaces/generic/inter_prepare_sort.F
-      !||    inter_sort                     ../engine/source/interfaces/generic/inter_sort.F
-      !||    inter_sort_07                  ../engine/source/interfaces/int07/inter_sort_07.F
-      !||    inter_struct_init              ../engine/source/interfaces/generic/inter_struct_init.F
-      !||    inter_voxel_creation           ../engine/source/interfaces/generic/inter_voxel_creation.F
-      !||    inttri                         ../engine/source/interfaces/intsort/inttri.F
-      !||    mpp_init                       ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    resol                          ../engine/source/engine/resol.F
-      !||    resol_init                     ../engine/source/engine/resol_init.F
-      !||    spmd_box_limit_reduction       ../engine/source/mpi/interfaces/spmd_box_limit_reduction.F
-      !||    spmd_cell_exchange             ../engine/source/mpi/generic/spmd_cell_exchange.F
-      !||    spmd_cell_list_exchange        ../engine/source/mpi/interfaces/spmd_cell_list_exchange.F
-      !||    spmd_cell_size_exchange        ../engine/source/mpi/interfaces/spmd_cell_size_exchange.F
-      !||    spmd_cell_size_exchange_init   ../engine/source/mpi/interfaces/spmd_cell_size_exchange_init.F
-      !||    spmd_cell_size_post_rcv        ../engine/source/mpi/interfaces/spmd_cell_size_post_rcv.F
-      !||    spmd_coarse_cell_exchange      ../engine/source/mpi/interfaces/spmd_coarse_cell_exchange.F
-      !||    spmd_get_inacti_global         ../engine/source/mpi/interfaces/spmd_get_inacti_global.F
-      !||    spmd_split_comm_inter          ../engine/source/mpi/interfaces/spmd_split_comm_inter.F
-      !||    spmd_wait_nb                   ../engine/source/mpi/interfaces/spmd_wait_nb.F
-      !||====================================================================
+!||====================================================================
+!||    inter_sorting_mod              ../engine/share/modules/inter_sorting_mod.F
+!||--- called by ------------------------------------------------------
+!||    check_coarse_grid              ../engine/source/interfaces/generic/check_coarse_grid.F
+!||    i7main_tri                     ../engine/source/interfaces/intsort/i7main_tri.F
+!||    inter_box_creation             ../engine/source/interfaces/generic/inter_box_creation.F
+!||    inter_cell_color               ../engine/source/interfaces/generic/inter_cell_color.F
+!||    inter_color_coarse_voxel       ../engine/source/interfaces/generic/inter_color_coarse_voxel.F
+!||    inter_color_voxel              ../engine/source/interfaces/generic/inter_color_voxel.F
+!||    inter_component_bound          ../engine/source/interfaces/generic/inter_component_bound.F90
+!||    inter_count_node_curv          ../engine/source/interfaces/generic/inter_count_node_curv.F
+!||    inter_deallocate_wait          ../engine/source/interfaces/generic/inter_deallocate_wait.F
+!||    inter_init_component           ../engine/source/interfaces/generic/inter_init_component.F90
+!||    inter_init_component_list      ../engine/source/interfaces/generic/inter_init_component_list.F90
+!||    inter_prepare_sort             ../engine/source/interfaces/generic/inter_prepare_sort.F
+!||    inter_sort                     ../engine/source/interfaces/generic/inter_sort.F
+!||    inter_sort_07                  ../engine/source/interfaces/int07/inter_sort_07.F
+!||    inter_struct_init              ../engine/source/interfaces/generic/inter_struct_init.F
+!||    inter_voxel_creation           ../engine/source/interfaces/generic/inter_voxel_creation.F
+!||    inttri                         ../engine/source/interfaces/intsort/inttri.F
+!||    mpp_init                       ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    resol                          ../engine/source/engine/resol.F
+!||    resol_init                     ../engine/source/engine/resol_init.F
+!||    spmd_cell_exchange             ../engine/source/mpi/generic/spmd_cell_exchange.F
+!||    spmd_cell_list_exchange        ../engine/source/mpi/interfaces/spmd_cell_list_exchange.F
+!||    spmd_cell_size_exchange        ../engine/source/mpi/interfaces/spmd_cell_size_exchange.F
+!||    spmd_cell_size_exchange_init   ../engine/source/mpi/interfaces/spmd_cell_size_exchange_init.F
+!||    spmd_cell_size_post_rcv        ../engine/source/mpi/interfaces/spmd_cell_size_post_rcv.F
+!||    spmd_coarse_cell_exchange      ../engine/source/mpi/interfaces/spmd_coarse_cell_exchange.F
+!||    spmd_exchange_component        ../engine/source/mpi/interfaces/spmd_exch_component.F90
+!||    spmd_get_inacti_global         ../engine/source/mpi/interfaces/spmd_get_inacti_global.F
+!||    spmd_split_comm_inter          ../engine/source/mpi/interfaces/spmd_split_comm_inter.F
+!||    spmd_wait_nb                   ../engine/source/mpi/interfaces/spmd_wait_nb.F
+!||====================================================================
         MODULE INTER_SORTING_MOD
 #include      "my_real.inc"    
 !   -------------------------    
@@ -65,7 +67,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
             INTEGER :: REQUEST_INACTI   ! request for inacti communication
 
             my_real, DIMENSION(6) :: BOX_LIMIT  ! min & max positions of the grid
-            INTEGER, PARAMETER :: NB_BOX_COARSE_GRID=4
+            INTEGER, PARAMETER :: NB_BOX_COARSE_GRID=8
             INTEGER, PARAMETER :: NB_BOX_LIMIT=128
             INTEGER :: NB_CELL_X,NB_CELL_Y,NB_CELL_Z    !   number of cell of the global voxel
 
@@ -116,6 +118,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
                 INTEGER, DIMENSION(:), ALLOCATABLE :: SEND_DISPLS_NB_CELL  ! displacement for send
                 INTEGER, DIMENSION(:), ALLOCATABLE :: RCV_DISPLS_NB_CELL   ! displacement for recv
 
+                integer :: request_s_nb
+                integer :: request_r_nb
+                integer, dimension(:), allocatable :: request_s
+                integer, dimension(:), allocatable :: request_r,index_r
+
                 !   -----------------------------
                 !   exchange of cell (fine grid) : mode = 2
                 INTEGER :: REQUEST_NB_CELL                              ! request for cell size exchange
@@ -159,6 +166,45 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
                 INTEGER, DIMENSION(:), ALLOCATABLE :: REQ_SD3       ! request for Send : IREM comm
                 !   -----------------------------
             END TYPE sorting_comm_type
+
+
+            type s_list_
+              integer :: node_nb
+              integer, dimension(:), allocatable :: node
+              my_real, dimension(:), allocatable :: bound
+            end type s_list_
+            type m_list_
+              integer :: node_nb
+              integer, dimension(:), allocatable :: node
+              integer, dimension(:), allocatable :: seg 
+              my_real, dimension(:), allocatable :: bound
+            end type m_list_
+
+            type proc_comp_
+              logical :: need_comm0
+              logical :: need_comm_s
+              logical :: need_comm_r
+              integer :: remote_m_comp_nb
+              my_real, dimension(:,:), allocatable :: remote_m_comp
+              integer :: remote_s_comp_nb
+              my_real, dimension(:,:), allocatable :: remote_s_comp
+              my_real, dimension(:), allocatable :: remote_comp
+            end type proc_comp_
+            type component_
+              integer :: s_comp_nb
+              integer :: m_comp_nb
+              integer :: total_m_remote_comp_nb
+              integer :: total_s_remote_comp_nb
+              integer :: request_s_nb
+              integer :: request_r_nb
+              integer, dimension(:), allocatable :: request_s
+              integer, dimension(:), allocatable :: request_r
+              integer, dimension(:), allocatable :: index_r
+              my_real, dimension(:), allocatable :: s_buffer_comp
+              type(s_list_), dimension(:), allocatable :: s_list
+              type(m_list_), dimension(:), allocatable :: m_list
+              type(proc_comp_), dimension(:), allocatable :: proc_comp
+            end type component_
               
 !   -------------------------    
         END MODULE INTER_SORTING_MOD

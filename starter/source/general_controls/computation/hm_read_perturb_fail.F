@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_perturb_fail   ../starter/source/general_controls/computation/hm_read_perturb_fail.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_perturb        ../starter/source/general_controls/computation/hm_read_perturb.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    plot_distrib           ../starter/source/general_controls/computation/plot_distrib.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_perturb_fail   ../starter/source/general_controls/computation/hm_read_perturb_fail.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_perturb        ../starter/source/general_controls/computation/hm_read_perturb.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    plot_distrib           ../starter/source/general_controls/computation/plot_distrib.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PERTURB_FAIL(MAT_PARAM,
      .      IPART    ,RNOISE   ,IPARTC ,IPARTG    ,IPARTSP  ,
      .      IGRPART  ,IPARTS   ,PERTURB   ,IDPERTURB,
@@ -92,7 +92,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:),   ALLOCATABLE :: A_SEED
       my_real
      . MEAN,STDEV,MEAN_INPUT,SD_INPUT,MAX_DISTRIB,TEMP,MIN_VALUE,
-     . MAX_VALUE,INTERV,VALUE,MAX_VALUE1,MINVAL,MAXVAL,BID
+     . MAX_VALUE,MINVAL,MAXVAL
       my_real, DIMENSION(:), ALLOCATABLE :: ARRAY
       CHARACTER(LEN=NCHARTITLE)::TITR
       CHARACTER*100 KEY1,KEY2

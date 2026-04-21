@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,44 +20,47 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sphprep              ../engine/source/elements/sph/sphprep.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier           ../engine/source/system/machine.F
-      !||    soltosph_on1         ../engine/source/elements/sph/soltosph_on1.F
-      !||    soltosph_on12        ../engine/source/elements/sph/soltosph_on1.F
-      !||    soltosph_on2         ../engine/source/elements/sph/soltosph_on2.F
-      !||    spadasm              ../engine/source/elements/sph/spadasm.F
-      !||    spadasm0             ../engine/source/elements/sph/spadasm.F
-      !||    spclasv              ../engine/source/elements/sph/spclasv.F
-      !||    spcompl              ../engine/source/elements/sph/spcompl.F
-      !||    spechan              ../engine/source/elements/sph/spechan.F
-      !||    sphtri               ../engine/source/elements/sph/sphtri.F
-      !||    sphtri0              ../engine/source/elements/sph/sphtri0.F
-      !||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
-      !||    spmd_barrier         ../engine/source/mpi/generic/spmd_barrier.F
-      !||    spmd_min_max         ../engine/source/mpi/anim/spmd_min_max.F
-      !||    spmd_spamaj          ../engine/source/mpi/sph/spmd_spamaj.F
-      !||    spmd_sphgat          ../engine/source/mpi/sph/spmd_sphgat.F
-      !||    spmd_sphgetisph      ../engine/source/mpi/elements/spmd_sph.F
-      !||    spmd_sphgetv         ../engine/source/mpi/sph/spmd_sphgetv.F
-      !||    spmd_sphgetx         ../engine/source/mpi/elements/spmd_sph.F
-      !||    sponof1              ../engine/source/elements/sph/sponof1.F
-      !||    sponof2              ../engine/source/elements/sph/sponof2.F
-      !||    spsym_alloc          ../engine/source/elements/sph/spsym_alloc.F
-      !||    spsymp               ../engine/source/elements/sph/spsym.F
-      !||    startime             ../engine/source/system/timer_mod.F90
-      !||    stoptime             ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||    sph_struct_mod       ../engine/share/modules/sph_struct_mod.F
-      !||    sph_work_mod         ../common_source/modules/mat_elem/sph_work.F90
-      !||    timer_mod            ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sphprep              ../engine/source/elements/sph/sphprep.F
+!||--- called by ------------------------------------------------------
+!||    resol                ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier           ../engine/source/system/machine.F
+!||    soltosph_on1         ../engine/source/elements/sph/soltosph_on1.F
+!||    soltosph_on12        ../engine/source/elements/sph/soltosph_on1.F
+!||    soltosph_on2         ../engine/source/elements/sph/soltosph_on2.F
+!||    spadasm              ../engine/source/elements/sph/spadasm.F
+!||    spadasm0             ../engine/source/elements/sph/spadasm.F
+!||    spclasv              ../engine/source/elements/sph/spclasv.F
+!||    spcompl              ../engine/source/elements/sph/spcompl.F
+!||    spechan              ../engine/source/elements/sph/spechan.F
+!||    sph_crit_voxel       ../engine/source/elements/sph/sph_crit_voxel.F90
+!||    sphtri               ../engine/source/elements/sph/sphtri.F
+!||    sphtri0              ../engine/source/elements/sph/sphtri0.F
+!||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
+!||    spmd_barrier         ../engine/source/mpi/spmd_mod.F90
+!||    spmd_spamaj          ../engine/source/mpi/sph/spmd_spamaj.F
+!||    spmd_sphgat          ../engine/source/mpi/sph/spmd_sphgat.F
+!||    spmd_sphgetisph      ../engine/source/mpi/elements/spmd_sph.F
+!||    spmd_sphgetv         ../engine/source/mpi/sph/spmd_sphgetv.F
+!||    spmd_sphgetx         ../engine/source/mpi/elements/spmd_sph.F
+!||    sponof1              ../engine/source/elements/sph/sponof1.F
+!||    sponof2              ../engine/source/elements/sph/sponof2.F
+!||    spsym_alloc          ../engine/source/elements/sph/spsym_alloc.F
+!||    spsymp               ../engine/source/elements/sph/spsym.F
+!||    startime             ../engine/source/system/timer_mod.F90
+!||    stoptime             ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod          ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+!||    message_mod          ../engine/share/message_module/message_mod.F
+!||    sph_crit_voxel_mod   ../engine/source/elements/sph/sph_crit_voxel.F90
+!||    sph_struct_mod       ../engine/share/modules/sph_struct_mod.F
+!||    sph_work_mod         ../common_source/modules/mat_elem/sph_work.F90
+!||    spmd_mod             ../engine/source/mpi/spmd_mod.F90
+!||    timer_mod            ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE SPHPREP(TIMERS,
      1    PM      ,GEO     ,X       ,V       ,MS      ,
      2    ELBUF_TAB,WA      ,PLD     ,BUFMAT  ,PARTSAV ,
@@ -80,6 +83,9 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SPH_STRUCT_MOD
+      USE spmd_mod
+      USE sph_crit_voxel_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -139,15 +145,20 @@ C-----------------------------------------------
       INTEGER I,N,NG,JFT,JLT,K,NELEM,NEL,OFFSET,
      .   ISORTSP,INOD,JNOD,J,NVOIS,M,IREDUCE,NS,
      .   KVNORM,IPRT,NSP2SORTF,NSP2SORTL,
-     .   ISORTSPG,IERROR
+     .   ISORTSPG,IERROR,NBK,VOXSIZ,IRUNN_BISG
       my_real
      .       DX,DY,DZ,
      .       DXMIN,DXMAX,DYMIN,DYMAX,DZMIN,DZMAX,MAJORD,
      .       DXMINL,DXMAXL,DYMINL,DYMAXL,DZMINL,DZMAXL,
      .       DSX,DSY,DSZ,MAXDS,MAJORDS,SPALINR,MYSPATRUE,
      .       XMAX,YMAX,ZMAX, DMAX, BUFTMP(6),DBUC, BMINMA
+      my_real   
+     .       XMIN,YMIN,ZMIN,DIAM_MAX,MAJORD_VOX,
+     .       XMINL,YMINL,ZMINL,XMAXL,YMAXL,ZMAXL,DIAM_MAXL,
+     .       TMP1(13),TMPO(13)
 C-----------------------------------------------
-      SAVE ISORTSPG,DXMIN,DXMAX,DYMIN,DYMAX,DZMIN,DZMAX
+      SAVE   ISORTSPG,DXMIN,DXMAX,DYMIN,DYMAX,DZMIN,DZMAX,
+     .       XMIN,YMIN,ZMIN,XMAX,YMAX,ZMAX,DIAM_MAX
 C=======================================================================
       KVNORM=16*NUMSPH+1
 C
@@ -180,7 +191,7 @@ C      /---------------/
             ENDIF
           ENDDO
         ELSE
-C         Traitement des INLETS.
+C         Processing of INLETS.
           CALL SPONOF1(X ,V       ,D       ,MS      ,SPBUF   ,
      2           ITAB    ,KXSP    ,IXSP    ,NOD2SP  ,NPC     ,
      3           PLD     ,IPARG   ,ELBUF_TAB,ISPHIO  ,VSPHIO  ,
@@ -197,7 +208,7 @@ C         Traitement des INLETS.
         ENDIF
 
 C-----------------------------------------------
-C  Communication Retri en SPMD (fin du cycle precedent) sur tache0
+C  Communication retri in SPMD (end of the previous cycle) on a stain0
 C-----------------------------------------------
 C
 c globalize ISPHBUC
@@ -213,7 +224,15 @@ C
         DZMIN= EP20
         DXMAX=-EP20
         DYMAX=-EP20
-        DZMAX=-EP20     
+        DZMAX=-EP20  
+C        
+        XMIN = EP20
+        YMIN = EP20
+        ZMIN = EP20
+        XMAX =-EP20
+        YMAX =-EP20
+        ZMAX =-EP20
+        DIAM_MAX = -EP20   
       END IF
 C-----------------------------------------------
 C
@@ -222,10 +241,10 @@ C
       NSP2SORTF = 1 + ITASK*NSP2SORT / NTHREAD
       NSP2SORTL = (ITASK+1)*NSP2SORT / NTHREAD
 C
-      ISORTSP=ISPHBUC
+      ISORTSP=ISPHBUC 
 C
       IF(ISORTSP==0)THEN
-C       echange des particules reelles/symetriques si traversee.
+C       Exchange of real/symmetrical particles if crossed.
         CALL SPECHAN(
      1   X       ,V       ,MS      ,SPBUF   ,ITAB      ,
      2   KXSP    ,IXSP    ,NOD2SP  ,ISPCOND ,XFRAME    ,
@@ -236,7 +255,16 @@ C       echange des particules reelles/symetriques si traversee.
         DZMINL= EP20
         DXMAXL=-EP20
         DYMAXL=-EP20
-        DZMAXL=-EP20     
+        DZMAXL=-EP20             
+C
+        XMINL = EP20
+        YMINL = EP20
+        ZMINL = EP20
+        XMAXL =-EP20
+        YMAXL =-EP20
+        ZMAXL =-EP20
+        DIAM_MAXL = -EP20
+C
         DO NS=NSP2SORTF,NSP2SORTL
           N=WSP2SORT(NS)
           INOD=KXSP(3,N)
@@ -249,6 +277,14 @@ C       echange des particules reelles/symetriques si traversee.
           DXMAXL=MAX(DXMAXL,DX)
           DYMAXL=MAX(DYMAXL,DY)
           DZMAXL=MAX(DZMAXL,DZ)
+C
+          XMINL=MIN(XMINL,X(1,INOD))
+          YMINL=MIN(YMINL,X(2,INOD))
+          ZMINL=MIN(ZMINL,X(3,INOD))
+          XMAXL=MAX(XMAXL,X(1,INOD))
+          YMAXL=MAX(YMAXL,X(2,INOD))
+          ZMAXL=MAX(ZMAXL,X(3,INOD))
+          DIAM_MAXL = MAX(DIAM_MAXL, SPBUF(1,N))
         ENDDO
 C
         DO N=ITASK+1,NBGAUGE,NTHREAD
@@ -262,16 +298,31 @@ C
             DXMAXL=MAX(DXMAXL,DX)
             DYMAXL=MAX(DYMAXL,DY)
             DZMAXL=MAX(DZMAXL,DZ)
+C
+            XMINL=MIN(XMINL,GAUGE(2,N))
+            YMINL=MIN(YMINL,GAUGE(3,N))
+            ZMINL=MIN(ZMINL,GAUGE(4,N))
+            XMAXL=MAX(XMAXL,GAUGE(2,N))
+            YMAXL=MAX(YMAXL,GAUGE(3,N))
+            ZMAXL=MAX(ZMAXL,GAUGE(4,N))
+            DIAM_MAXL = MAX(DIAM_MAXL, SPBUF(1,N))
           END IF
         END DO
 C
-#include      "lockon.inc"
+#include      "lockon.inc"              
         DXMIN=MIN(DXMIN,DXMINL)
         DYMIN=MIN(DYMIN,DYMINL)
         DZMIN=MIN(DZMIN,DZMINL)
         DXMAX=MAX(DXMAX,DXMAXL)
         DYMAX=MAX(DYMAX,DYMAXL)
-        DZMAX=MAX(DZMAX,DZMAXL)
+        DZMAX=MAX(DZMAX,DZMAXL)     
+        XMIN=MIN(XMIN,XMINL)   
+        YMIN=MIN(YMIN,YMINL)
+        ZMIN=MIN(ZMIN,ZMINL)
+        XMAX=MAX(XMAX,XMAXL)
+        YMAX=MAX(YMAX,YMAXL)
+        ZMAX=MAX(ZMAX,ZMAXL)
+        DIAM_MAX=MAX(DIAM_MAX,DIAM_MAXL)
 #include      "lockoff.inc"
 C-----------------------------------------------
 C  Communication Min/Max en SPMD
@@ -281,7 +332,33 @@ C
 C
         IF(ITASK==0)THEN
           IF(NSPMD>1)THEN
-            CALL SPMD_MIN_MAX(DXMIN,DYMIN,DZMIN,DXMAX,DYMAX,DZMAX)
+            TMP1(1)  = -DXMIN
+            TMP1(2)  = -DYMIN
+            TMP1(3)  = -DZMIN
+            TMP1(4)  = -XMIN
+            TMP1(5)  = -YMIN
+            TMP1(6)  = -ZMIN
+            TMP1(7)  = DXMAX
+            TMP1(8)  = DYMAX
+            TMP1(9)  = DZMAX
+            TMP1(10) = XMAX
+            TMP1(11) = YMAX
+            TMP1(12) = ZMAX
+            TMP1(13) = DIAM_MAX
+            CALL SPMD_ALLREDUCE(TMP1,TMPO,13,SPMD_MAX)
+            DXMIN = -TMPO(1)
+            DYMIN = -TMPO(2)
+            DZMIN = -TMPO(3)
+            XMIN  = -TMPO(4)
+            YMIN  = -TMPO(5)
+            ZMIN  = -TMPO(6)
+            DXMAX =  TMPO(7)
+            DYMAX =  TMPO(8)
+            DZMAX =  TMPO(9)
+            XMAX  =  TMPO(10)
+            YMAX  =  TMPO(11)
+            ZMAX  =  TMPO(12)
+            DIAM_MAX = TMPO(13)
           END IF   
 C
           DX=DXMAX-DXMIN
@@ -299,34 +376,68 @@ C
           ENDDO
 10        CONTINUE
 C-----------------------------------------------
-C  Communication Retri en SPMD sur tache0
+C  PTMD RETRI COMMUNICAT
 C-----------------------------------------------
           IF(NSPMD>1)THEN
             CALL SPMD_ALLGLOB_ISUM9(ISORTSP,1)
             IF(ISORTSP>1)ISORTSP=1
           END IF
+          ISORTSPG = ISORTSP
+        ENDIF       
+C   
+        CALL MY_BARRIER
+        IF (ITASK/= 0) ISORTSP = ISORTSPG 
+C 
+C-----------------------------------------------
+C  Use of voxels to improve evaluation of majord for sorting criteria
+C-----------------------------------------------
+        IF (ISORTSP==1) THEN
+          NBK = SPH_WORK%voxel_nb      
+          VOXSIZ = 7*NBK*NBK*NBK
+          call sph_crit_voxel(xmax     ,ymax     ,zmax      ,xmin      ,ymin    ,
+     1                        zmin     ,diam_max ,voxsiz    ,majord_vox,nbk     ,
+     2                        nsp2sortf,nsp2sortl,itask     ,nbgauge   ,nthread ,
+     3                        lgauge   ,numels   ,spbuf     ,wsp2sort  ,kxsp    ,
+     4                        nisp     ,nspbuf   ,numsph    ,x         ,numnod  ,
+     5                        llgauge  ,gauge    ,nspmd     ,sph_work%voxel)  
 C
-        ENDIF    ! fin tache 0
+          IF (ITASK==0) THEN
+            ISORTSP=0
+            DO NS=1,NSP2SORT
+              N=WSP2SORT(NS)
+              IF(SPALINR*SPBUF(8,N)-majord_vox<=SPBUF(1,N))THEN
+               ISORTSP=1
+               EXIT
+              ENDIF
+            ENDDO
+            IF(NSPMD>1)THEN
+              CALL SPMD_ALLGLOB_ISUM9(ISORTSP,1)
+              IF(ISORTSP>1)ISORTSP=1
+            END IF
+          ENDIF   
+          
+        ENDIF     
+C
       ENDIF ! IF(ISORTSP==0)THEN
 C   
       IF(ITASK==0)THEN
         ISPHRED=0
         ISORTSPG = ISORTSP
-      ENDIF    
+      ENDIF        
 C   
       IREDUCE=0
 C    /---------------/      
       CALL MY_BARRIER
 C    /---------------/
 
-      IF (ITASK/= 0) ISORTSP = ISORTSPG
+      IF (ITASK/= 0) ISORTSP = ISORTSPG 
 
       SPH_WORK%WREDUCE(1+ITASK*NUMSPH/NTHREAD:(ITASK+1)*NUMSPH/NTHREAD)=0
       
 C    /---------------/
       CALL MY_BARRIER
 C    /---------------/
-      IF(ITASK==0)CALL STARTIME(TIMERS,90)
+      IF(ITASK==0)CALL STARTIME(TIMERS,90) 
       IF(ISORTSP==1)THEN
           IF(ISPMD==0.and.ITASK == 0)THEN
             WRITE(ISTDO,*)
@@ -341,7 +452,7 @@ C
 C
           SPATRUE=SPASORT
 C
-C init DBUC, MIN/MAX + recherche cell remote si spmd 
+C init DBUC, MIN/MAX + search remote cell if spmd 
           CALL SPHTRI0(TIMERS, X   ,SPBUF,KXSP,WSP2SORT,BMINMA ,DMAX,
      2                 NSP2SORTF,NSP2SORTL,NSP2SORT,ITASK, DBUC)
 C
@@ -351,7 +462,7 @@ C
      1      CALL SPHTRI(X       ,SPBUF   ,KXSP   ,IXSP  ,NOD2SP,
      2                  IREDUCE ,WSP2SORT ,BMINMA ,NSP2SORTF,NSP2SORTL,
      3                  ITASK   ,SPH_WORK%WREDUCE ,LGAUGE ,GAUGE    )
-C barriere a la fin de sptrivox (necessaire pour IREDUCE global)
+C barrier at the end of sptrivox (necessary for global IREDUCE)
 
 #include "lockon.inc"
           ISPHRED=MAX(ISPHRED,IREDUCE)
@@ -369,7 +480,7 @@ C
                 CALL STOPTIME(TIMERS,95)
               END IF
               CALL STARTIME(TIMERS,91)
-C Compactage des structures spmd pour cell remote + renumerotation IXSP + maj IREDUCE
+C Compacting of SPMD structures for Cell Remote + Renumerotation IXSP + Maj Ireduce
 C            
               CALL SPMD_SPHGAT(KXSP,IXSP,WSP2SORT,ISPHRED,LGAUGE)
               CALL STOPTIME(TIMERS,91)
@@ -409,7 +520,7 @@ C
             END IF
             CALL STARTIME(TIMERS,91)
 C
-C Envoi liste des cellules remotes actives courantes et reception V, M, RHO pour cellules remotes actives
+C Send List of current active Remotes cells and reception V, M, RHO for active remote cells
 C
             CALL SPMD_SPHGETV(KXSP ,SPBUF, V, MS, ISORTSP ,IPARTSP)
 C
@@ -422,7 +533,7 @@ C
      2    VSPSYM   ,WSP2SORT ,DMAX   ,ITASK   ,WSMCOMP  ,
      3    MYSPATRUE,SPBUF    ,KXSP)
 
-C Synchro sur echange SPMD et var partagee IREDUCE, MYSPATRUE, NSPHSYM
+C Synchro on SPMD and Var Share Ireduce, Myspatrue, NSPHSYM Exchange
 C    /---------------/
         CALL MY_BARRIER
 C    /---------------/
@@ -453,7 +564,7 @@ C
               CALL STOPTIME(TIMERS,95)
             END IF
             CALL STARTIME(TIMERS,91)
-C Maj globale de ISPHRED et SPATRUE apres SPSYMP (SPATRUE inutile)
+C Global majred majred and spatrue after SPSYMP (unnecessary spat)
 C
             CALL SPMD_SPAMAJ(ISPHRED,SPATRUE)
 C
@@ -466,10 +577,10 @@ C      /---------------/
 C
         IREDUCE  =ISPHRED
         MYSPATRUE=SPATRUE
-C       re-tri voisins (voisins vrais, voisins dans la zone de securite).
+C       re-sort neighbors (true neighbors, neighbors in the safety zone).
         CALL SPCLASV(X     ,SPBUF ,KXSP    ,IXSP   ,NOD2SP   ,
-     1         ISPSYM,XSPSYM%BUF,WSP2SORT ,ITASK  ,MYSPATRUE,
-     2         IREDUCE,SPH_WORK%WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
+     1               ISPSYM,XSPSYM%BUF,WSP2SORT ,ITASK  ,MYSPATRUE,
+     2               IREDUCE,SPH_WORK%WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
 C
 C      /---------------/
         CALL MY_BARRIER
@@ -510,7 +621,7 @@ C
               CALL STOPTIME(TIMERS,95)
             END IF
             CALL STARTIME(TIMERS,91)
-C Maj globale de ISPHRED et SPATRUE apres SPCLASV (ISPHRED inutile) 
+C Global majred majred and spclasv (isphred useless) 
 C
             CALL SPMD_SPAMAJ(ISPHRED,SPATRUE)
 C
@@ -530,13 +641,13 @@ C
           IF(ITASK==0) THEN
 C
             CALL STARTIME(TIMERS,92)
-C Reception X cellules remotes
+C Reception x Remotes cells
 C
             CALL SPMD_SPHGETX(KXSP, SPBUF ,X ,IPARTSP)
 C
             CALL STOPTIME(TIMERS,92)
           END IF 
-C Synchro sur echange SPMD
+C Synchronization on SPMD exchange
 C         /---------------/
           CALL MY_BARRIER
 C         /---------------/
@@ -545,35 +656,43 @@ C
 C  Alloc SPSYM arrays in case of RESTART or /RERUN 
         IF ((NCYCLE==0).OR.(IRUNN_BIS>1).OR.(MCHECK/=0)) THEN
           IF (ITASK==0) THEN
-            ALLOCATE(XSPSYM%BUF(3*NSPHSYM),STAT=IERROR)
-            IF(IERROR==0) XSPSYM%BUF = 0
-            ALLOCATE(VSPSYM%BUF(3*NSPHSYM),STAT=IERROR)
-            IF(IERROR==0) VSPSYM%BUF = 0
-            ALLOCATE(WSMCOMP%BUF(6*NSPHSYM),STAT=IERROR)
-            IF(IERROR==0) WSMCOMP%BUF = 0
-            IRUNN_BIS = 0
+            IF(.NOT. ASSOCIATED(XSPSYM%BUF)) THEN
+              ALLOCATE(XSPSYM%BUF(3*NSPHSYM),STAT=IERROR)
+              IF(IERROR==0) XSPSYM%BUF = 0
+            ENDIF 
+            IF(.NOT. ASSOCIATED(VSPSYM%BUF)) THEN
+              ALLOCATE(VSPSYM%BUF(3*NSPHSYM),STAT=IERROR)
+              IF(IERROR==0) VSPSYM%BUF = 0
+            ENDIF
+            IF(.NOT. ASSOCIATED(WSMCOMP%BUF)) THEN
+              ALLOCATE(WSMCOMP%BUF(6*NSPHSYM),STAT=IERROR)
+              IF(IERROR==0) WSMCOMP%BUF = 0
+            ENDIF
+            IRUNN_BISG = 0
           ENDIF
 C        /---------------/
           CALL MY_BARRIER
 C        /---------------/    
+          IRUNN_BIS = IRUNN_BISG
+C
         ENDIF
 C
-C MAJ XSPSYM avant SPCLASV mais apres SPMD_SPHGETX
+C MAJ XSPSYM BEFORE SPCLASV but after SPMD_SPHGETX
 C
         CALL SPADASM0(
      1             X       ,V       ,MS      ,SPBUF   ,ITAB    ,
      2             KXSP    ,IXSP    ,NOD2SP  ,ISPCOND ,ISPSYM  ,
      3             XFRAME  ,XSPSYM%BUF  ,WSP2SORT ,ITASK   )
-C Synchro sur XSPSYM
+C Synchronization on XSPSYM
 C      /---------------/
         CALL MY_BARRIER
 C      /---------------/
-C       re-tri voisins (voisins vrais, voisins dans la zone de securite).
+C       re-sort neighbors (true neighbors, neighbors in the safety zone).
         IREDUCE  =0
         MYSPATRUE=ZERO
         CALL SPCLASV(X     ,SPBUF ,KXSP    ,IXSP   ,NOD2SP  ,
      1               ISPSYM,XSPSYM%BUF,WSP2SORT ,ITASK  ,MYSPATRUE,
-     2         IREDUCE,SPH_WORK%WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
+     2               IREDUCE,SPH_WORK%WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
 C      /---------------/
         CALL MY_BARRIER
 C      /---------------/
@@ -582,7 +701,7 @@ C
           IF(ITASK==0) THEN
 C
             CALL STARTIME(TIMERS,92)
-C Envoi liste des cellules remotes actives courantes et reception V, M, RHO pour cellules remotes actives
+C Send List of current active Remotes cells and reception V, M, RHO for active remote cells
 C
             CALL SPMD_SPHGETV(KXSP ,SPBUF, V, MS, ISORTSP ,IPARTSP)
 C
@@ -594,7 +713,7 @@ C        /---------------/
 C       /---------------/
         END IF 
 C
-C Actualisation des particules symetriques : MAJ VSPSYM apres SPMD_SPHGETV
+C Updating symmetrical particles: Maj vSpsym after SPMD_SPHGETV
 C
         CALL SPADASM(
      1             X       ,V       ,MS      ,SPBUF   ,ITAB    ,
@@ -609,7 +728,7 @@ C
       ENDIF
 C
 C-----------------------------------------------
-C       Traitement des OUTLETS.
+C       Processing of OUTLETS.
 C-----------------------------------------------
       IF(ITASK==0)THEN
         IF(NSPHIO/=0)THEN
@@ -651,11 +770,11 @@ C      /---------------/
         CALL MY_BARRIER
 C      /---------------/
 C       Wake up particles from solids (wake up groups)
-        NSPHACT=0
+        NSPHACT=0 
         CALL SOLTOSPH_ON2(
      . X      ,SPBUF    ,KXSP   ,IPARTSP ,ELBUF_TAB,
      . IPARG  ,NGROUNC ,IGROUNC ,ITASK   ,IXSP     ,
-     . NOD2SP ,SOL2SPH ,WASPACT )
+     . NOD2SP ,SOL2SPH ,WASPACT )  
 C
       ELSE
         NSPHACT=NSP2SORT
@@ -667,7 +786,7 @@ C    /---------------/
 C    /---------------/
 C
 C-----------------------------------------------
-C     CORRECTION DES NOYAUX.
+C     KERNEL CORRECTION.
 C-----------------------------------------------
       CALL SPCOMPL(
      1    X       ,V       ,MS       ,SPBUF  ,ITAB    ,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_msgfile           ../starter/source/output/message/read_msgfile.F
-      !||--- called by ------------------------------------------------------
-      !||    execargcheck           ../starter/source/starter/execargcheck.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    arret                  ../starter/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_msgfile           ../starter/source/output/message/read_msgfile.F
+!||--- called by ------------------------------------------------------
+!||    execargcheck           ../starter/source/starter/execargcheck.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE READ_MSGFILE(LENI,INPUTR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -65,7 +65,7 @@ C
         CALL ARRET(2)
         RETURN
       ENDIF
-C lecture du fichier ...
+C reading the file ...
       NBLINE=0
       NBLINETOT=0
    10 READ(ISTDEML,'(A)',END=20,ERR=910) ERRMSGLINE

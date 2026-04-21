@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    q4coor2   ../engine/source/elements/solid_2d/quad4/q4coor2.F
-      !||--- called by ------------------------------------------------------
-      !||    q4forc2   ../engine/source/elements/solid_2d/quad4/q4forc2.F
-      !||====================================================================
+!||====================================================================
+!||    q4coor2   ../engine/source/elements/solid_2d/quad4/q4coor2.F
+!||--- called by ------------------------------------------------------
+!||    q4forc2   ../engine/source/elements/solid_2d/quad4/q4forc2.F
+!||====================================================================
       SUBROUTINE Q4COOR2(
      1   X,       NCP,     Y1,      Y2,
      2   Y3,      Y4,      Z1,      Z2,
@@ -63,7 +63,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,IV
+      INTEGER I
       my_real
      .   VYG(MVSIZ)
 C-----------------------------------------------
@@ -78,7 +78,7 @@ C-----------------------------------------------
       END DO
 C
 C----------------------------
-C     COORDONNEES NODALES
+C     NODE COORDINATES
 C----------------------------
       DO I=1,NEL
       Y1(I)=X(2,NC1(I))

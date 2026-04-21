@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mat121c_nice   ../engine/source/materials/mat/mat121/mat121c_nice.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps121c     ../engine/source/materials/mat/mat121/sigeps121c.F
-      !||--- calls      -----------------------------------------------------
-      !||    vinter2        ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    mat121c_nice   ../engine/source/materials/mat/mat121/mat121c_nice.F
+!||--- called by ------------------------------------------------------
+!||    sigeps121c     ../engine/source/materials/mat/mat121/sigeps121c.F
+!||--- calls      -----------------------------------------------------
+!||    vinter2        ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE MAT121C_NICE(
      1         NEL     ,NGL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
      2         TF      ,TIMESTEP,TIME    ,UPARAM  ,UVAR    ,RHO     ,PLA     ,
@@ -73,11 +73,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .   AFILTR,Xscale_SIG0,Yscale_SIG0,Xscale_YOUN,Yscale_YOUN,
      .   Xscale_TANG,Yscale_TANG
       my_real
-     .   DPDT,DLAM,DDEP,DEPXX,DEPYY,DEVEPSPXX,DEVEPSPYY,DEVEPSPZZ,TREPSP,
-     .   NORMXX,NORMYY,NORMXY,DENOM,DFDSIG2,DPDT_NL,DEPSDT,DPHI,DTINV
+     .   DLAM,DEVEPSPXX,DEVEPSPYY,DEVEPSPZZ,TREPSP,
+     .   NORMXX,NORMYY,NORMXY,DFDSIG2,DEPSDT,DPHI,DTINV
       my_real, DIMENSION(NEL) ::
      .   SXX,SYY,SZZ,SXY,SIGVM,YLD,HARDP,PHI,DEZZ,YLD0,DYLD0DEPSD,PHI0,
-     .   DYOUNDEPSD,DTANGDEPSD,TRSIG,DPHI_DLAM,TEST,DPXX,DPYY,DPXY,
+     .   DYOUNDEPSD,DTANGDEPSD,TRSIG,DPHI_DLAM,DPXX,DPYY,DPXY,
      .   DSIGXX,DSIGYY,DSIGXY
 c
       !=======================================================================
@@ -96,9 +96,18 @@ c
       Ivisc        = NINT(UPARAM(12)) ! Viscosity formulation      
       ! Strain-rate filtering (if Ivisc = 0)
       AFILTR       = MIN(ONE, UPARAM(14)*TIMESTEP)
+!
+      if (ivisc == 0) epsd(1:nel) = uvar(1:nel,2)
+!      
       ! Initial yield stress vs strain-rate curve
-      Xscale_SIG0  = UPARAM(16) ! Strain-rate scale factor
-      Yscale_SIG0  = UPARAM(17) ! Initial yield stress scale factor
+      IF (IFUNC(1) > 0) THEN
+        Xscale_SIG0  = UPARAM(16) ! Strain-rate scale factor
+        Yscale_SIG0  = UPARAM(17) ! Initial yield stress scale factor
+        YLD0(1:NEL)  = ZERO
+      ELSE
+        YLD0(1:NEL)  = UPARAM(17) ! Constant yield stress
+        DYLD0DEPSD(1:NEL) = ZERO
+      ENDIF
       ! Young modulus vs strain-rate curve
       Xscale_YOUN  = UPARAM(18) ! Strain-rate scale factor
       Yscale_YOUN  = UPARAM(19) ! Young modulus scale factor
@@ -108,19 +117,20 @@ c
         Yscale_TANG  = UPARAM(21) ! Tangent modulus scale factor 
         TANG(1:NEL)  = ZERO
       ELSE
-        TANG(1:NEL)  = UPARAM(21) ! Constant tangent modulus
+        TANG(1:NEL)  = UPARAM(21) ! Constant Tangent Modulus
+        DTANGDEPSD(1:NEL) = ZERO
       ENDIF
-      DTINV          = ONE/MAX(TIMESTEP,EM20) ! Inverse of timestep
+      DTINV = ONE/MAX(TIMESTEP,EM20) ! Inverse of timestep
 c      
       ! Recovering internal variables
       DO I=1,NEL
         IF (OFF(I) < EM01) OFF(I) = ZERO
-        IF (OFF(I) < ONE)   OFF(I) = OFF(I)*FOUR_OVER_5
+        IF (OFF(I) <  ONE) OFF(I) = OFF(I)*FOUR_OVER_5
         ! User inputs
         PHI0(I)       = UVAR(I,1) ! Previous yield function value
         ! Standard inputs
         DPLA(I)       = ZERO ! Initialization of the plastic strain increment
-        ET(I)         = ONE   ! Initialization of hourglass coefficient
+        ET(I)         = ONE  ! Initialization of hourglass coefficient
         HARDP(I)      = ZERO ! Initialization of hourglass coefficient
         DEZZ(I)       = ZERO ! Initialization of the strain increment in Z direction
         DPXX(I)       = ZERO ! Initialization of the XX plastic strain increment
@@ -143,6 +153,7 @@ c
      .                        TWO*(EPSPXY(I)**2))
           DEPSDT    = SQRT(DEPSDT)
           EPSD(I)   = AFILTR * DEPSDT + (ONE - AFILTR) * EPSD(I)
+          UVAR(I,2) = EPSD(I)
         ENDDO
       ELSE
         ! Reset plastic strain-rate
@@ -150,11 +161,14 @@ c
       ENDIF   
 c   
       ! Compute the initial yield stress
-      IPOS(1:NEL) = 1
-      IAD (1:NEL) = NPF(IFUNC(1)) / 2 + 1
-      ILEN(1:NEL) = NPF(IFUNC(1)+1) / 2 - IAD(1:NEL) - IPOS(1:NEL)
-      CALL VINTER2(TF,IAD,IPOS,ILEN,NEL,EPSD/Xscale_SIG0,DYLD0DEPSD,YLD0)
-      YLD0(1:NEL) = Yscale_SIG0*YLD0(1:NEL)
+      IF (IFUNC(1) > 0) THEN
+        IPOS(1:NEL) = 1
+        IAD (1:NEL) = NPF(IFUNC(1)) / 2 + 1
+        ILEN(1:NEL) = NPF(IFUNC(1)+1) / 2 - IAD(1:NEL) - IPOS(1:NEL)
+        CALL VINTER2(TF,IAD,IPOS,ILEN,NEL,EPSD/Xscale_SIG0,DYLD0DEPSD,YLD0)
+        YLD0(1:NEL) = Yscale_SIG0*YLD0(1:NEL)
+        DYLD0DEPSD(1:NEL) = Yscale_SIG0*DYLD0DEPSD(1:NEL)
+      ENDIF
       IF (Ivisc == 1) THEN
         IF (UVAR(1,2) == ZERO) THEN 
           DYLD0DEPSD(1:NEL) = Yscale_SIG0*DYLD0DEPSD(1:NEL)

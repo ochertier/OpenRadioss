@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intbuf_ini_starter   ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit              ../starter/source/restart/ddsplit/ddsplit.F
-      !||    lectur               ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod          ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    intbuf_ini_starter   ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit              ../starter/source/restart/ddsplit/ddsplit.F
+!||    lectur               ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod          ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INTBUF_INI_STARTER(INTBUF_TAB, IPARI, NUMN, 
      .                              I11FLAG, FLAG_ALLOCATE, PROC ,INTBUF_FRIC_TAB )
 C-----------------------------------------------
@@ -68,7 +68,7 @@ C-----------------------------------------------
      .        FLAGREMNODE,NRTSE,NADMSR,IEDGE4,NRTM_FE,NRTM_IGE,NRTS_FE,
      .        NRTS_IGE,NSN_FE,NSN_IGE,NMN_FE,NMN_IGE,INTFRIC,NREMNOR,IVIS2,
      .        NEDGE,INTNITSCHE,ITHK,IFLAGLOADP,NREMNODE_EDG,NREMNODE_E2S,
-     .        ISTIF_MSDT,IDEL_SOLID
+     .        ISTIF_MSDT,IDEL_SOLID,NEDGE_1D,NMN_1D
 C-----------------------------------------------
 
       DO NIN = 1,NINTER 
@@ -193,6 +193,7 @@ C=======================================================================
         INTBUF_TAB(NIN)%S_REMNODE_E2S  = 0 
         INTBUF_TAB(NIN)%S_IELEM_M      = 0 
         INTBUF_TAB(NIN)%S_PROC_MVOISIN = 0 
+        INTBUF_TAB(NIN)%S_MSR_1D = 0 
 
 !type2
         INTBUF_TAB(NIN)%S_MSEGTYP2     = 0
@@ -350,6 +351,10 @@ C=======================================================================
         INTBUF_TAB(NIN)%S_STIFMSDT_S    = 0 
         INTBUF_TAB(NIN)%S_STIFMSDT_M    = 0 
         INTBUF_TAB(NIN)%S_STIFMSDT_EDG  = 0 
+        INTBUF_TAB(NIN)%S_PENE_OLD_E  = 0
+        INTBUF_TAB(NIN)%S_STIF_OLD_E  = 0
+        INTBUF_TAB(NIN)%S_PENE_OLD_E2S  = 0
+        INTBUF_TAB(NIN)%S_STIF_OLD_E2S  = 0
 ! FRICTION INTERFACE
         INTBUF_TAB(NIN)%S_IPARTFRICS   = 0
         INTBUF_TAB(NIN)%S_IPARTFRICM   = 0
@@ -436,6 +441,8 @@ C   T25 transient gap for main side
         
         ISTIF_MSDT = IPARI(97,NIN)
         IDEL_SOLID = IPARI(100,NIN)
+        NEDGE_1D = IPARI(101,NIN)
+        NMN_1D = IPARI(104,NIN)
 
         
 
@@ -1211,7 +1218,10 @@ C----   size real arrays
           IF(IGAP>=1)THEN
             INTBUF_TAB(NIN)%S_THKNOD0   = NSN 
           ENDIF
-
+          IF (INTFRIC/=0) THEN
+            INTBUF_TAB(NIN)%S_IPARTFRICS  = NSN 
+            INTBUF_TAB(NIN)%S_IPARTFRICM  = NRTM 
+          ENDIF
 C=======================================================================
         ELSEIF (ITYP == 22) THEN
 C=======================================================================
@@ -1476,6 +1486,8 @@ C           ilev=1: SURFACE1; 2: SURFACE1/SURFACE2; 3: NODE/SURFACE
             INTBUF_TAB(NIN)%S_CANDM_E2E = MULTIMPE*NCONTE
             INTBUF_TAB(NIN)%S_CANDS_E2E = MULTIMPE*NCONTE
             INTBUF_TAB(NIN)%S_CAND_P    = MULTIMPE*NCONTE
+            INTBUF_TAB(NIN)%S_PENE_OLD_E = MULTIMPE*NCONTE
+            INTBUF_TAB(NIN)%S_STIF_OLD_E = MULTIMPE*NCONTE
 C           IF(INACTI==5) INTBUF_TAB(NIN)%S_CAND_P    = MULTIMPE*NCONTE
 C           WRITE(6,*) NCONTE
 C           WRITE(6,*) __FILE__,NIN," S_CAND_P",INTBUF_TAB(NIN)%S_CAND_P 
@@ -1492,8 +1504,11 @@ C           IF(INACTI==5) INTBUF_TAB(NIN)%S_CAND_PS   = 4*MULTIMPS*NCONTE
             INTBUF_TAB(NIN)%S_FTSAVX_E2S   = 4*MULTIMPS*NCONTE 
             INTBUF_TAB(NIN)%S_FTSAVY_E2S   = 4*MULTIMPS*NCONTE 
             INTBUF_TAB(NIN)%S_FTSAVZ_E2S   = 4*MULTIMPS*NCONTE 
+            INTBUF_TAB(NIN)%S_PENE_OLD_E2S = 4*MULTIMPS*NCONTE 
+            INTBUF_TAB(NIN)%S_STIF_OLD_E2S = 4*MULTIMPS*NCONTE 
             IF (IFQ /= 0)INTBUF_TAB(NIN)%S_IFPEN_E = MULTIMPE*NCONTE 
             IF (IFQ /= 0)INTBUF_TAB(NIN)%S_IFPEN_E2S = MULTIMPS*NCONTE 
+            IF (NEDGE_1D >0 ) INTBUF_TAB(NIN)%S_MSR_1D = NMN_1D
           ELSE 
             INTBUF_TAB(NIN)%S_CANDM_E2E = 0
             INTBUF_TAB(NIN)%S_CANDS_E2E = 0
@@ -1509,6 +1524,10 @@ C           IF(INACTI==5) INTBUF_TAB(NIN)%S_CAND_PS   = 4*MULTIMPS*NCONTE
             INTBUF_TAB(NIN)%S_FTSAVZ_E2S   = 0
             INTBUF_TAB(NIN)%S_IFPEN_E  = 0
             INTBUF_TAB(NIN)%S_IFPEN_E2S  = 0
+            INTBUF_TAB(NIN)%S_PENE_OLD_E = 0
+            INTBUF_TAB(NIN)%S_STIF_OLD_E = 0
+            INTBUF_TAB(NIN)%S_PENE_OLD_E2S = 0
+            INTBUF_TAB(NIN)%S_STIF_OLD_E2S = 0
           ENDIF
           INTBUF_TAB(NIN)%S_GAPE      = NEDGE
           IF(IGAP==3) INTBUF_TAB(NIN)%S_GAP_E_L   = NEDGE
@@ -1543,7 +1562,7 @@ C----   size real arrays
             INTBUF_TAB(NIN)%S_GAP_SL  = NSN
           ENDIF
           INTBUF_TAB(NIN)%S_STFM     = NRTM 
-          INTBUF_TAB(NIN)%S_XSAV     = 3*MIN(NUMN,NSN+NMN) 
+          INTBUF_TAB(NIN)%S_XSAV     = 3*MIN(NUMN,NSN+NMN+NMN_1D) 
           INTBUF_TAB(NIN)%S_GAPN_M   = NMN 
           INTBUF_TAB(NIN)%S_CRIT     = 12 
           IF (MFROT/=0)INTBUF_TAB(NIN)%S_FRIC_P   = 10 
@@ -1815,8 +1834,8 @@ C---------to be cleaned later
           INTBUF_TAB(NIN)%LBOUND(1:INTBUF_TAB(NIN)%S_LBOUND) = 0 
           CALL MY_ALLOC(INTBUF_TAB(NIN)%ACTNOR,INTBUF_TAB(NIN)%S_ACTNOR)
           INTBUF_TAB(NIN)%ACTNOR(1:INTBUF_TAB(NIN)%S_ACTNOR) = 0 
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%FARM,INTBUF_TAB(NIN)%S_FARM) !KD(18)
-          INTBUF_TAB(NIN)%FARM(1:INTBUF_TAB(NIN)%S_FARM) = 0 
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%FARM,INTBUF_TAB(NIN)%S_FARM) !KD(18)
+!         INTBUF_TAB(NIN)%FARM(1:INTBUF_TAB(NIN)%S_FARM) = 0 
           CALL MY_ALLOC(INTBUF_TAB(NIN)%ADSKYN,INTBUF_TAB(NIN)%S_ADSKYN)
           INTBUF_TAB(NIN)%ADSKYN(1:INTBUF_TAB(NIN)%S_ADSKYN) = 0 
           CALL MY_ALLOC(INTBUF_TAB(NIN)%IADNOR,INTBUF_TAB(NIN)%S_IADNOR)
@@ -1844,7 +1863,9 @@ C---------to be cleaned later
           CALL MY_ALLOC(INTBUF_TAB(NIN)%IELEM_M,INTBUF_TAB(NIN)%S_IELEM_M) 
           INTBUF_TAB(NIN)%IELEM_M(1:INTBUF_TAB(NIN)%S_IELEM_M) = 0              
           CALL MY_ALLOC(INTBUF_TAB(NIN)%PROC_MVOISIN,INTBUF_TAB(NIN)%S_PROC_MVOISIN) 
-          INTBUF_TAB(NIN)%PROC_MVOISIN(1:INTBUF_TAB(NIN)%S_PROC_MVOISIN) = 0            
+          INTBUF_TAB(NIN)%PROC_MVOISIN(1:INTBUF_TAB(NIN)%S_PROC_MVOISIN) = 0 
+          CALL MY_ALLOC(INTBUF_TAB(NIN)%MSR_1D,INTBUF_TAB(NIN)%S_MSR_1D) 
+          INTBUF_TAB(NIN)%MSR_1D(1:INTBUF_TAB(NIN)%S_MSR_1D) = 0               
 !type7 11 19 24 25 : friction parts
           CALL MY_ALLOC(INTBUF_TAB(NIN)%IPARTFRICS,INTBUF_TAB(NIN)%S_IPARTFRICS) 
           INTBUF_TAB(NIN)%IPARTFRICS(1:INTBUF_TAB(NIN)%S_IPARTFRICS) = 0 
@@ -1928,6 +1949,11 @@ C=======================================================================
           INTBUF_TAB(NIN)%GAP_ML(1:INTBUF_TAB(NIN)%S_GAP_ML) = 0
           CALL MY_ALLOC(INTBUF_TAB(NIN)%CAND_P,INTBUF_TAB(NIN)%S_CAND_P ) !JD(18)
           INTBUF_TAB(NIN)%CAND_P(1:INTBUF_TAB(NIN)%S_CAND_P) = 0
+          CALL MY_ALLOC(INTBUF_TAB(NIN)%PENE_OLD_E,INTBUF_TAB(NIN)%S_PENE_OLD_E ) 
+          INTBUF_TAB(NIN)%PENE_OLD_E(1:INTBUF_TAB(NIN)%S_PENE_OLD_E) = 0
+          CALL MY_ALLOC(INTBUF_TAB(NIN)%STIF_OLD_E,INTBUF_TAB(NIN)%S_STIF_OLD_E ) 
+          INTBUF_TAB(NIN)%STIF_OLD_E(1:INTBUF_TAB(NIN)%S_STIF_OLD_E) = 0
+
           CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVX,INTBUF_TAB(NIN)%S_FTSAVX ) !JD(27)
           INTBUF_TAB(NIN)%FTSAVX(1:INTBUF_TAB(NIN)%S_FTSAVX) = 0
           CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVY,INTBUF_TAB(NIN)%S_FTSAVY ) !JD(28)
@@ -1935,18 +1961,18 @@ C=======================================================================
           CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVZ,INTBUF_TAB(NIN)%S_FTSAVZ ) !JD(29)
           INTBUF_TAB(NIN)%FTSAVZ(1:INTBUF_TAB(NIN)%S_FTSAVZ) = 0
 C
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVX_E,INTBUF_TAB(NIN)%S_FTSAVX_E ) 
-          INTBUF_TAB(NIN)%FTSAVX_E(1:INTBUF_TAB(NIN)%S_FTSAVX_E) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVY_E,INTBUF_TAB(NIN)%S_FTSAVY_E ) 
-          INTBUF_TAB(NIN)%FTSAVY_E(1:INTBUF_TAB(NIN)%S_FTSAVY_E) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVZ_E,INTBUF_TAB(NIN)%S_FTSAVZ _E) 
-          INTBUF_TAB(NIN)%FTSAVZ_E(1:INTBUF_TAB(NIN)%S_FTSAVZ_E) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVX_E2S,INTBUF_TAB(NIN)%S_FTSAVX_E2S ) 
-          INTBUF_TAB(NIN)%FTSAVX_E2S(1:INTBUF_TAB(NIN)%S_FTSAVX_E2S) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVY_E2S,INTBUF_TAB(NIN)%S_FTSAVY_E2S ) 
-          INTBUF_TAB(NIN)%FTSAVY_E2S(1:INTBUF_TAB(NIN)%S_FTSAVY_E2S) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVZ_E2S,INTBUF_TAB(NIN)%S_FTSAVZ _E2S) 
-          INTBUF_TAB(NIN)%FTSAVZ_E2S(1:INTBUF_TAB(NIN)%S_FTSAVZ_E2S) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVX_E,INTBUF_TAB(NIN)%S_FTSAVX_E ) 
+!         INTBUF_TAB(NIN)%FTSAVX_E(1:INTBUF_TAB(NIN)%S_FTSAVX_E) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVY_E,INTBUF_TAB(NIN)%S_FTSAVY_E ) 
+!         INTBUF_TAB(NIN)%FTSAVY_E(1:INTBUF_TAB(NIN)%S_FTSAVY_E) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVZ_E,INTBUF_TAB(NIN)%S_FTSAVZ _E) 
+!         INTBUF_TAB(NIN)%FTSAVZ_E(1:INTBUF_TAB(NIN)%S_FTSAVZ_E) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVX_E2S,INTBUF_TAB(NIN)%S_FTSAVX_E2S ) 
+!         INTBUF_TAB(NIN)%FTSAVX_E2S(1:INTBUF_TAB(NIN)%S_FTSAVX_E2S) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVY_E2S,INTBUF_TAB(NIN)%S_FTSAVY_E2S ) 
+!         INTBUF_TAB(NIN)%FTSAVY_E2S(1:INTBUF_TAB(NIN)%S_FTSAVY_E2S) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%FTSAVZ_E2S,INTBUF_TAB(NIN)%S_FTSAVZ _E2S) 
+!         INTBUF_TAB(NIN)%FTSAVZ_E2S(1:INTBUF_TAB(NIN)%S_FTSAVZ_E2S) = 0
 C
           CALL MY_ALLOC(INTBUF_TAB(NIN)%RIGE,INTBUF_TAB(NIN)%S_RIGE )
           INTBUF_TAB(NIN)%RIGE(1:INTBUF_TAB(NIN)%S_RIGE) = 0
@@ -2090,22 +2116,22 @@ C----------to be cleaned
           CALL MY_ALLOC(INTBUF_TAB(NIN)%DELTA_PMAX_DGAP,INTBUF_TAB(NIN)%S_DELTA_PMAX_DGAP ) !JD(39)
           INTBUF_TAB(NIN)%DELTA_PMAX_DGAP(1:INTBUF_TAB(NIN)%S_DELTA_PMAX_DGAP) = 0
 !type25
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%EDGE_BISECTOR,INTBUF_TAB(NIN)%S_EDGE_BISECTOR)
-          INTBUF_TAB(NIN)%EDGE_BISECTOR(1:INTBUF_TAB(NIN)%S_EDGE_BISECTOR) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%E2S_NOD_NORMAL,INTBUF_TAB(NIN)%S_E2S_NOD_NORMAL)
-          INTBUF_TAB(NIN)%E2S_NOD_NORMAL(1:INTBUF_TAB(NIN)%S_E2S_NOD_NORMAL )= 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%E2S_ACTNOR,INTBUF_TAB(NIN)%S_E2S_ACTNOR)
-          INTBUF_TAB(NIN)%E2S_ACTNOR(1:INTBUF_TAB(NIN)%S_E2S_ACTNOR )= 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%PENM,INTBUF_TAB(NIN)%S_PENM)
-          INTBUF_TAB(NIN)%PENM(1:INTBUF_TAB(NIN)%S_PENM) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%DISTM,INTBUF_TAB(NIN)%S_DISTM)
-          INTBUF_TAB(NIN)%DISTM(1:INTBUF_TAB(NIN)%S_DISTM) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%LBM,INTBUF_TAB(NIN)%S_LBM)
-          INTBUF_TAB(NIN)%LBM(1:INTBUF_TAB(NIN)%S_LBM) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%LCM,INTBUF_TAB(NIN)%S_LCM)
-          INTBUF_TAB(NIN)%LCM(1:INTBUF_TAB(NIN)%S_LCM) = 0
-          CALL MY_ALLOC(INTBUF_TAB(NIN)%VTX_BISECTOR,INTBUF_TAB(NIN)%S_VTX_BISECTOR)
-          INTBUF_TAB(NIN)%VTX_BISECTOR(1:INTBUF_TAB(NIN)%S_VTX_BISECTOR) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%EDGE_BISECTOR,INTBUF_TAB(NIN)%S_EDGE_BISECTOR)
+!         INTBUF_TAB(NIN)%EDGE_BISECTOR(1:INTBUF_TAB(NIN)%S_EDGE_BISECTOR) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%E2S_NOD_NORMAL,INTBUF_TAB(NIN)%S_E2S_NOD_NORMAL)
+!         INTBUF_TAB(NIN)%E2S_NOD_NORMAL(1:INTBUF_TAB(NIN)%S_E2S_NOD_NORMAL )= 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%E2S_ACTNOR,INTBUF_TAB(NIN)%S_E2S_ACTNOR)
+!         INTBUF_TAB(NIN)%E2S_ACTNOR(1:INTBUF_TAB(NIN)%S_E2S_ACTNOR )= 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%PENM,INTBUF_TAB(NIN)%S_PENM)
+!         INTBUF_TAB(NIN)%PENM(1:INTBUF_TAB(NIN)%S_PENM) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%DISTM,INTBUF_TAB(NIN)%S_DISTM)
+!         INTBUF_TAB(NIN)%DISTM(1:INTBUF_TAB(NIN)%S_DISTM) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%LBM,INTBUF_TAB(NIN)%S_LBM)
+!         INTBUF_TAB(NIN)%LBM(1:INTBUF_TAB(NIN)%S_LBM) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%LCM,INTBUF_TAB(NIN)%S_LCM)
+!         INTBUF_TAB(NIN)%LCM(1:INTBUF_TAB(NIN)%S_LCM) = 0
+!         CALL MY_ALLOC(INTBUF_TAB(NIN)%VTX_BISECTOR,INTBUF_TAB(NIN)%S_VTX_BISECTOR)
+!         INTBUF_TAB(NIN)%VTX_BISECTOR(1:INTBUF_TAB(NIN)%S_VTX_BISECTOR) = 0
           CALL MY_ALLOC(INTBUF_TAB(NIN)%CAND_PS,INTBUF_TAB(NIN)%S_CAND_PS ) !JD(18)
           INTBUF_TAB(NIN)%CAND_PS(1:INTBUF_TAB(NIN)%S_CAND_PS) = 0
           CALL MY_ALLOC(INTBUF_TAB(NIN)%GAPE,INTBUF_TAB(NIN)%S_GAPE ) !JD(18)
@@ -2120,6 +2146,10 @@ C----------to be cleaned
           INTBUF_TAB(NIN)%STIFMSDT_M(1:INTBUF_TAB(NIN)%S_STIFMSDT_M) = 0
           CALL MY_ALLOC(INTBUF_TAB(NIN)%STIFMSDT_EDG,INTBUF_TAB(NIN)%S_STIFMSDT_EDG )
           INTBUF_TAB(NIN)%STIFMSDT_EDG(1:INTBUF_TAB(NIN)%S_STIFMSDT_EDG) = 0
+          CALL MY_ALLOC(INTBUF_TAB(NIN)%PENE_OLD_E2S,INTBUF_TAB(NIN)%S_PENE_OLD_E2S ) 
+          INTBUF_TAB(NIN)%PENE_OLD_E2S(1:INTBUF_TAB(NIN)%S_PENE_OLD_E2S) = 0
+          CALL MY_ALLOC(INTBUF_TAB(NIN)%STIF_OLD_E2S,INTBUF_TAB(NIN)%S_STIF_OLD_E2S ) 
+          INTBUF_TAB(NIN)%STIF_OLD_E2S(1:INTBUF_TAB(NIN)%S_STIF_OLD_E2S) = 0
 !type2
           CALL MY_ALLOC(INTBUF_TAB(NIN)%CSTS_BIS,INTBUF_TAB(NIN)%S_CSTS_BIS)
           INTBUF_TAB(NIN)%CSTS_BIS(1:INTBUF_TAB(NIN)%S_CSTS_BIS) = 0
@@ -2138,12 +2168,12 @@ C-----
       RETURN
 
       END SUBROUTINE INTBUF_INI_STARTER
-      !||====================================================================
-      !||    int8_ini        ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur          ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    int8_ini        ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
+!||--- called by ------------------------------------------------------
+!||    lectur          ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INT8_INI(INTBUF_TAB, IPARI, NBT8)
 C-----------------------------------------------
 C   M o d u l e s

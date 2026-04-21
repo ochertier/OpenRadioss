@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C damage ladefeze  delamination model ------
-      !||====================================================================
-      !||    delm01law        ../engine/source/properties/composite_options/stack/delm01law.F
-      !||--- called by ------------------------------------------------------
-      !||    delamination     ../engine/source/properties/composite_options/stack/delamination.F
-      !||--- uses       -----------------------------------------------------
-      !||    fail_param_mod   ../common_source/modules/mat_elem/fail_param_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    delm01law        ../engine/source/properties/composite_options/stack/delm01law.F
+!||--- called by ------------------------------------------------------
+!||    delamination     ../engine/source/properties/composite_options/stack/delamination.F
+!||--- uses       -----------------------------------------------------
+!||    fail_param_mod   ../common_source/modules/mat_elem/fail_param_mod.F90
+!||====================================================================
       SUBROUTINE DELM01LAW(FAIL    ,
      1     NEL    ,NUVAR   ,TIME   ,TIMESTEP ,
      2     NGL    ,IPLY    ,
@@ -101,13 +101,13 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
-     .   I,J,IDEL,IDEL_L,IFLAG(MVSIZ),INDX(MVSIZ),NINDX,   
+     .   I,J,INDX(MVSIZ),NINDX,   
      .   JST(MVSIZ),IR,JJ,
      .   NINDX0,INDX0(MVSIZ)        
       my_real 
      .   K1(MVSIZ),K2(MVSIZ),K3(MVSIZ),K(MVSIZ),
      .   A(MVSIZ),GAMA1(MVSIZ),GAMA2(MVSIZ),
-     .   Y0(MVSIZ),YC(MVSIZ),TMAX(MVSIZ),FAC,
+     .   Y0(MVSIZ),YC(MVSIZ),FAC,
      .   DAM, YD1,YD2,YD3,CC,DELTA,W,YD,SIG, DAM0
 C--------------------------------------------------------------
 C

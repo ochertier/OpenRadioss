@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_type22   ../starter/source/interfaces/int22/hm_read_inter_type22.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_type22   ../starter/source/interfaces/int22/hm_read_inter_type22.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
        SUBROUTINE HM_READ_INTER_TYPE22(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,
      2        IGRNOD     ,IGRSURF    ,IGRBRIC    ,IGRSH3N   ,IGRTRUSS ,
@@ -77,19 +76,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=NCHARTITLE) ::  TITR1
-      INTEGER I,J, NTYP, IBID,INACTI,IGSTI, IVIS2,ILEV,INTKG,
-     .    IS1, IS2, IGAP,MULTIMP,IFQ, KK,II,I22GRSH3N,I22GRNOD,
-     .    IDELKEEP,INTTH,I22LEN1,I22GRTRUS,I22GRNOD2,I22GRNOD3
-      my_real
-     .    FRIC,GAP,STARTT,BUMULT,STOPT,VISC,VISCF,RATIO22_
-      LOGICAL LOGI1, LOGI2, LOGI_I22GRSH3N, LOGI_I22GRTRUS,LOGI_I22GRNOD
+      INTEGER J, NTYP, IBID,INACTI,IGSTI, IVIS2,ILEV,INTKG,
+     .        IS1, IS2, IGAP,MULTIMP,I22GRSH3N,I22GRNOD,
+     .        INTTH,I22LEN1,I22GRTRUS,I22GRNOD2,I22GRNOD3
+      my_real :: FRIC,GAP,STARTT,BUMULT,STOPT,VISC,VISCF,RATIO22_
+      LOGICAL LOGI_I22GRSH3N, LOGI_I22GRTRUS,LOGI_I22GRNOD
       LOGICAL IS_AVAILABLE
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER USR2SYS,SUR2USR,NGR2USR
+      INTEGER NGR2USR
 C=======================================================================
 C     READING ALE INTERFACE /INTER/TYPE22
 C=======================================================================
@@ -98,13 +95,10 @@ C Initializations
       IS2=0
       ILEV=0
       INTKG =0
-C
       NTYP = 22
       IPARI(15)=NOINT
       IPARI(7)=NTYP
-      
       IS_AVAILABLE=.FALSE.
-
 C------------------------------------------------------------
 C  Card1 
 C------------------------------------------------------------
@@ -131,7 +125,7 @@ C
          ISU2=NGR2USR(ISU2,INGR2USR,NSURF)
        ENDIF                                   
                                                
-       !common value : IOUTP22                 
+       !Common Value: ioutp22                 
        IF(IOUTP22==0)THEN                    
          IOUTP22=1                             
        ELSEIF(IOUTP22/=1)THEN                
@@ -228,9 +222,9 @@ C
         !IGR3SHN flag
         !
         !     IGRN(1,I) : IDENTIFICATEUR DE GROUP
-        !     IGRN(2,I) : NOMBRE DE NOEUDS
-        !     IGRN(3,I) : ADRESSE DES NOEUDS DANS IBUFSSG
-        !     IGRN(4,I) : TYPE (0 POUR NOEUDS, 1 BRIC, 2 QUAD, 3 SHELL, 
+        !     IGRN(2,I) : NUMBER OF NODES
+        ! IGRN(3,I) : ADDRESS OF NODES IN IBUFSSG
+        !     IGRN(4,I) : TYPE (0 FOR NODES, 1 BRIC, 2 QUAD, 3 SHELL, 
         !                         4 TRUSS, 5 BEAM, 6 SPRINGS,7 SHELL_3N)
         !        
         LOGI_I22GRSH3N = .FALSE.
@@ -389,7 +383,7 @@ C--------------------------------------------------------------
       ENDIF
 C
 C--------------------------------------------------------------
- 1000 FORMAT(/1X,'  INTERFACE NUMBER :',I10,1X,A)
+
 C------------
       RETURN
 

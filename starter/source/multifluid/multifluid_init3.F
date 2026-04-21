@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multifluid_init3       ../starter/source/multifluid/multifluid_init3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    aturi3                 ../starter/source/ale/ale3d/aturi3.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    m5in3                  ../starter/source/initial_conditions/detonation/m5in3.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    scoor3                 ../starter/source/elements/solid/solide/scoor3.F
-      !||    sderi3                 ../starter/source/elements/solid/solide/sderi3.F
-      !||    sdlen3                 ../starter/source/elements/solid/solide/sdlen3.F
-      !||    sjac_i                 ../starter/source/elements/solid/solide/sderi3.F
-      !||    smass3                 ../starter/source/elements/solid/solide/smass3.F
-      !||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
-      !||    srcoor3                ../starter/source/elements/solid/solide/srcoor3.F
-      !||    sveok3                 ../starter/source/elements/solid/solide/sveok3.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    multifluid_init3       ../starter/source/multifluid/multifluid_init3.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    aturi3                 ../starter/source/ale/ale3d/aturi3.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    m5in3                  ../starter/source/initial_conditions/detonation/m5in3.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    scoor3                 ../starter/source/elements/solid/solide/scoor3.F
+!||    sderi3                 ../starter/source/elements/solid/solide/sderi3.F
+!||    sdlen3                 ../starter/source/elements/solid/solide/sdlen3.F
+!||    sjac_i                 ../starter/source/elements/solid/solide/sderi3.F
+!||    smass3                 ../starter/source/elements/solid/solide/smass3.F
+!||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
+!||    srcoor3                ../starter/source/elements/solid/solide/srcoor3.F
+!||    sveok3                 ../starter/source/elements/solid/solide/sveok3.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MULTIFLUID_INIT3(ELBUF_STR,MAS      ,IXS    ,PM      ,X       ,
      .     GEO      ,ALE_CONNECTIVITY   ,IPARG_GR,
      .     DTELEM    ,SIGI     ,NEL    ,SKEW    ,IGEO    ,
@@ -68,6 +68,7 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -93,7 +94,7 @@ C-----------------------------------------------
       INTEGER IXS(NIXS,*),IPARG(NPARG,NGROUP),
      .     IPARG_GR(NPARG),IPARTS(*),IGEO(NPROPGI,*),
      .     IPM(NPROPMI,NUMMAT),IPART(LIPART1,*),PTSOL(*),
-     .     NG,NDDIM, NSIGI ,NVC,NEL,IUSER, NSIGS, NPF(*),
+     .     NG, NSIGI ,NVC,NEL,IUSER, NSIGS, NPF(*),
      .     STRSGLOB(*),STRAGLOB(*),FAIL_INI(*), 
      .     KXSP(NISP,*), IPARTSP(*), NOD2SP(*), SOL2SPH(2,*), IRST(3,*)
       my_real
@@ -118,14 +119,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,J, NF1, NCC, IBID, JHBE, IREP,IGTYP, NUVAR,NUVARR,IDEF,
+      INTEGER I, NF1, IBID, JHBE, IREP,IGTYP, NUVAR, IDEF,
      .     IPT,LVLOC,IPID1,NPTR,NPTS,NPTT,NLAY,
-     .     NSPHDIR, NCELF, NCELL,L_PLA
+     .      L_PLA
       INTEGER MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ),
      .     IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),IX4(MVSIZ),
      .     IX5(MVSIZ),IX6(MVSIZ),IX7(MVSIZ),IX8(MVSIZ)
       my_real
-     .     V8LOC(51,MVSIZ),VOLU(MVSIZ),DTX(MVSIZ),
+     .     VOLU(MVSIZ),DTX(MVSIZ),
      .     X1(MVSIZ),X2(MVSIZ),X3(MVSIZ),X4(MVSIZ),X5(MVSIZ),X6(MVSIZ),
      .     X7(MVSIZ),X8(MVSIZ),Y1(MVSIZ),Y2(MVSIZ),Y3(MVSIZ),Y4(MVSIZ),
      .     Y5(MVSIZ),Y6(MVSIZ),Y7(MVSIZ),Y8(MVSIZ),Z1(MVSIZ),Z2(MVSIZ),
@@ -141,6 +142,7 @@ C-----------------------------------------------
      .     PY1(MVSIZ),PY2(MVSIZ),PY3(MVSIZ),PY4(MVSIZ),
      .     PZ1(MVSIZ),PZ2(MVSIZ),PZ3(MVSIZ),PZ4(MVSIZ),
      .     RHOF(MVSIZ),ALPHA(MVSIZ), DELTAX(MVSIZ), AIRE(MVSIZ), DUMMY, PRES, VFRAC
+      my_real :: TEMPEL(NEL)
       my_real
      .     BID, FV, STI
       DOUBLE PRECISION
@@ -159,9 +161,6 @@ C-----------------------------------------------
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
       TYPE(BUF_MAT_) ,POINTER :: MBUF
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
-      my_real,
-     .     DIMENSION(:), POINTER  :: UVARF   
-      INTEGER :: NODE1, NODE2, NODE3, NODE4, NODE5, NODE6, NODE7, NODE8
 C-----------------------------------------------
 C     S o u r c e  L i n e s
 C=======================================================================
@@ -184,6 +183,7 @@ C     ???
       NPTS  =  ELBUF_STR%NPTS
       NPTT  =  ELBUF_STR%NPTT
 
+      TEMPEL(:) = ZERO
       DO I=1,NEL
          RHOCP(I) =  PM(69,IXS(1,NFT+I))
          TEMP0(I) =  PM(79,IXS(1,NFT+I))
@@ -244,7 +244,7 @@ C     Orthotropy
      .     RX   ,RY   ,RZ   ,SX   ,SY   ,SZ   ,TX   ,TY   ,TZ   ,
      .     E1X  ,E1Y  ,E1Z  ,E2X  ,E2Y  ,E2Z  ,E3X  ,E3Y  ,E3Z  ,
      .     F1X  ,F1Y  ,F1Z  ,F2X  ,F2Y  ,F2Z  ,NSIGI,SIGSP,NSIGS,
-     .     SIGI ,IXS  ,X    ,JHBE ,PTSOL,NEL  ,IPARG_GR(28))
+     .     SIGI ,IXS  ,X    ,JHBE ,PTSOL,NEL  ,IPARG_GR(28),JCVT)
 C     
 C-----------
       CALL SVEOK3(NVC,8, IX1, IX2, IX3, IX4, IX5, IX6, IX7, IX8)
@@ -288,7 +288,7 @@ C     Fill partial volumes
      5        MAT      ,IPM    ,NSIGS     ,NUMSOL    ,PTSOL  ,
      6        IPT      ,NGL    ,NPF       ,TF        ,BUFMAT ,
      7        GBUF     ,LBUF   ,MBUF      ,ELBUF_STR ,ILOADP ,
-     8        FACLOAD, DELTAX)
+     8        FACLOAD, DELTAX  ,TEMPEL    ,MAT_PARAM )
      
          VFRAC = MAT_PARAM( IXS(1,1+NFT) )%MULTIMAT%VFRAC(ILAY)
          PRES  = PM(104, MAT_PARAM( IXS(1,1+NFT) )%MULTIMAT%MID(ILAY))
@@ -304,7 +304,7 @@ C     Fill partial volumes
                ENDIF
                ERROR_THROWN = .TRUE.
             ENDIF
-            CALL M5IN3(PM, MAT,  IPM(1, IXS(1,1+NFT)), DETONATORS, LBUF%TB, NGL, IPARG, X, IXS, NIXS)
+            CALL M5IN3(PM, MAT,  IPM(1, IXS(1,1+NFT)), DETONATORS, LBUF%TB, IPARG, X, IXS, NIXS)
          ENDIF
          IF (MATLAW == 6) THEN
             IF (PM(24, MAT(1)) > ZERO) THEN

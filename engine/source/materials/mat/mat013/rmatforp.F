@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rmatforp          ../engine/source/materials/mat/mat013/rmatforp.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    rmatpon           ../engine/source/materials/mat/mat013/rmatpon.F
-      !||    spmd_exch_a_rm6   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rm6.F
-      !||    startime          ../engine/source/system/timer_mod.F90
-      !||    stoptime          ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    timer_mod         ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    rmatforp          ../engine/source/materials/mat/mat013/rmatforp.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    rmatpon           ../engine/source/materials/mat/mat013/rmatpon.F
+!||    spmd_exch_a_rm6   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rm6.F
+!||    startime          ../engine/source/system/timer_mod.F90
+!||    stoptime          ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    timer_mod         ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE RMATFORP(TIMERS,
      1   A       ,AR       ,X        ,VR     ,IN     ,
      2   STIFN   ,STIFR    ,IRBY     ,LNRBY  ,RBY    , 
@@ -70,7 +70,7 @@ C-----------------------------------------------
       INTEGER  K,M
 
 C-------------------------------------
-C Traitement rigid material  
+C Processing rigid material
 C-------------------------------------
 
 !$OMP SINGLE
@@ -107,7 +107,7 @@ C
 
         END IF
 C
-C Traitement fin parith/on multi-thread
+C End of parith/on multi-thread processing
 C
 
 !$OMP DO SCHEDULE(DYNAMIC,1)

@@ -13,12 +13,13 @@
   * [Build environment using cmd DOS shell](#build-environment-using-cmd-dos-shell)
   * [Build environment using Visual Studio](#build-environment-using-visual-studio-2022)
 * [How to build OpenRadioss](#how-to-build-openradioss)
-  * [Build defaults](#build-defaults)
   * [Get the source](#get-the-source)
+  * [Choose the right architecture](#choose-the-right-architecture)
   * [Building on Linux](#building-on-linux)
   * [Building on Linux Arm64](#building-on-linux-arm64)
   * [Build OpenRadioss on Windows with cmd Shell](#build-openradioss-on-windows-with-cmd-shell)
   * [Build OpenRadioss with Visual Studio](#build-openradioss-with-visual-studio)
+  * [Build OpenRadioss with Open_Reader](#build-openradioss-with-open_reader)
 * [How to build OpenRadioss on Linux with Container using Apptainer](#how-to-build-openradioss-on-linux-with-container-using-apptainer)
 * [How to debug with Visual Studio](./doc/Visual_Studio_Debugger.md)
 * [Notes on third party libraries](#notes-on-third-party-libraries)
@@ -215,7 +216,6 @@ This chapter explains how to setup Windows on different build configuration
 
 * Compiler environment
 * OpenRadioss build environment using cmd.exe
-* OpenRadioss build using cygwin
 * OpenRadioss build environment using Visual Studio.
 
 ### Compiler environment
@@ -238,7 +238,7 @@ This chapter explains how to setup Windows on different build configuration
 
    **Notes:**
 
-   * Intel OneAPI plugin for Visual Studio is recommended to use Intel OneAPI in Visual Studio 2019
+   * Intel OneAPI plugin for Visual Studio is recommended to use Intel OneAPI in Visual Studio 2022
    * Choose the default directory to install Intel oneAPI
 
 4. Install Git
@@ -267,7 +267,7 @@ The Git Bash tool is not needed, but can be installed.
 ### Build environment using cmd DOS shell
 
 Building using cmd.exe is using cmake.exe and ninja.exe
-Both are shipped with Visual Studio 2019.
+Both are shipped with Visual Studio 2022.
 
 1. Setup the compiler
    Load compiler settings in cmd.exe using following command :
@@ -301,9 +301,44 @@ Both are shipped with Visual Studio 2019.
 
 See [here](./CONTRIBUTING.md) if you want to contribute to OpenRadioss.
 
-### Build defaults
+### Choose the right architecture
 
-The default for Radioss builds are:
+Architecture settings are designed to give best performance for OpenRadioss
+on the different processors.
+
+Choose the architecture depending on your hardware and Operating system:
+
+#### Linux Operating system / X86-64 : Intel/AMD processors
+
+| CPU type                                                             | Compiler                                             | -arch setting       |
+| -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------- |
+| All CPUs                                                             | GFortran compiler                                    | -arch=linux64_gf    |
+| Intel/AMD with AVX-2: All AMD, INTEL Haswell processors or higher)   | Intel OneAPI 2025.0 or higher                        | -arch=linux64_ifx   |
+| Intel/AMD with AVX-512: AMD Genoa, AMD Turin, INTEL Xeon Silver/Gold/Platinium processors) | Intel OneAPI 2025.0 or higher                        | -arch=linux64_ifx   |
+| All CPUs                                                             | Intel OneAPI 2024.2 or older / ifort legacy compiler | -arch=linux64_ifort |
+| All CPUs                                                             | AMD AOCC                                             | -arch=linux64_AOCC  |
+
+#### Linux Operating system / ARM processors
+
+| CPU type                                                             | Compiler                                             | -arch setting       |
+| -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------- |
+| All CPUs                                                             | ArmFlang 24.04 or higher                             | -arch=linuxa64      |
+| All CPUs                                                             | GFortran compiler                                    | -arch=linux64a_gf   |
+
+#### Windows Operating system
+
+| CPU type                                                             | Compiler                                             | -arch setting       |
+| -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------- |
+| Intel/AMD with AVX-2: All AMD, INTEL Haswell processors or higher)   | Intel OneAPI 2025.0 or higher                        | -arch=win64         |
+|  Intel/AMD with AVX-512: AMD Genoa, AMD Turin, INTEL Xeon Silver/Gold/Platinium processors) | Intel OneAPI 2025.0 or higher                        | -arch=win64         |
+| Intel CPUs without AVX-2 (Intel Ivy Bridge or older)                 | Intel OneAPI 2025.0 or higher                        | -arch=win64_sse3    |
+| All CPUs                                                             | Intel OneAPI 2024.2 or older / ifort legacy compiler | -arch=win64_ifort   |
+
+#### Build defaults
+
+#### Defaults when building OpenRadioss
+
+The default for OpenRadioss builds are:
 
 * Linux with with Gfortran : Optimized for release usage
 * Windows with Intel Compiler : Optimized for release usage
@@ -312,6 +347,14 @@ Recommendations for developers are to build OpenRadioss with :
 
 * Address Sanitizer for Linux / Gfortran : -debug=asan
 * Check Bounds executable for Windows users : -debug=chkb
+
+#### OpenRadioss releases
+
+OpenRadioss releases packs different executables for Linux & Windows.
+Those bellongs to the most commonly used architectures:
+
+* Linux X64 : linux64_gf
+* Windows : win64
 
 ### Building on Linux
 
@@ -525,7 +568,7 @@ Recommendations for developers are to build OpenRadioss with :
 
   Execution Control
 
-  * `-nt=N` use N threads to fasten build
+  * `-nt=N` use N threads for faster build
   * `-verbose`: compilation process is in Verbose mode
   * `-clean`: deletes compilation files and execution.
 
@@ -701,7 +744,7 @@ Recommendations for developers are to build OpenRadioss with :
 ### Build OpenRadioss with Visual Studio
 
 This sections assumes, that Intel OneAPI Compiler was successfully installed.
-Procedure was tested on Visual Studio 2019 and Visual Studio 2022
+Procedure was tested on Visual Studio 2022
 
 * Launch Visual Studio
 
@@ -720,6 +763,35 @@ Procedure was tested on Visual Studio 2019 and Visual Studio 2022
 * Launch in Menu : [Build]:[Build All]
 
 * OpenRadioss binaries are copied in **OpenRadioss/exec** directory
+
+### Build OpenRadioss with Open_Reader
+
+Compiler installation is same than for Starter.
+No further installation task is need.
+
+To build Starter with Open_Reader, add: **-open_reader** to build command line:
+
+* On Linux
+
+      ./build_linux.sh -arch=linux64_gf -open_reader
+
+* On Windows
+
+      build_windows.bat  -arch=win64 -open_reader
+
+The built library will be copied in exec directory.
+Starter is linked against this library
+
+To execute Starter with Open_Reader set PATH (for Windows) or  LD_LIBRARY (for Linux):
+
+* On Linux
+
+      export LD_LIBRARY_PATH=[PATH to OpenRadioss clone]/exec:$LD_LIBRARY_PATH
+
+* On Windows
+
+      set PATH=[PATH to OpenRadioss clone]\exec:%PATH%
+
 
 ## How to build OpenRadioss on Linux with Container using Apptainer
 

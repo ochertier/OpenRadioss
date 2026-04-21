@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    ani_txt     ../engine/source/output/anim/generate/ani_txt.F
-      !||--- called by ------------------------------------------------------
-      !||    genani      ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_c_c   ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    ani_txt     ../engine/source/output/anim/generate/ani_txt.F
+!||--- called by ------------------------------------------------------
+!||    genani      ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    write_c_c   ../common_source/tools/input_output/write_routines.c
+!||====================================================================
       SUBROUTINE ANI_TXT(TEXT,LEN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -41,7 +41,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER CTEXT(81),I
+      INTEGER CTEXT(81)
 C
       CTEXT(1    :MIN(LEN,80)) = ICHAR(TEXT(1:MIN(LEN,80)))
       CTEXT(LEN+1:81 ) = 0
@@ -51,13 +51,13 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    ani_txt50   ../engine/source/output/anim/generate/ani_txt.F
-      !||--- called by ------------------------------------------------------
-      !||    genani      ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_c_c   ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    ani_txt50   ../engine/source/output/anim/generate/ani_txt.F
+!||--- called by ------------------------------------------------------
+!||    genani      ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    write_c_c   ../common_source/tools/input_output/write_routines.c
+!||====================================================================
       SUBROUTINE ANI_TXT50(TEXT,LEN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -71,12 +71,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER CTEXT(81),I
-C
+      INTEGER CTEXT(81)
 
       CTEXT(1    :LEN) = ICHAR(TEXT(1:LEN))
       CTEXT(LEN+1:81 ) = 0
-C
       CALL WRITE_C_C(CTEXT,50)
 C
       RETURN

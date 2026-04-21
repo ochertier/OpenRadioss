@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c_fxbody1   ../starter/source/restart/ddsplit/c_fxbody.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||====================================================================
+!||====================================================================
+!||    c_fxbody1   ../starter/source/restart/ddsplit/c_fxbody.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||====================================================================
       SUBROUTINE C_FXBODY1(
      .   FXBIPM   , FXBNOD  , NODLOCAL, IPARG   , FXBELM,
      .   LENNOD_L , LENMOD_L, LENELM_L, LENSIG_L, PROC  ,
@@ -84,7 +84,7 @@ C Modes
          ELSEIF (IFILE==1) THEN
             LENMOD_L=LENMOD_L+NSNI_L*(NME+NMOD)
          ENDIF
-C Champs de contraintes
+C Constraint fields
          AELM=FXBIPM(19,NFX)
          NELS=FXBIPM(21,NFX)
          NELC=FXBIPM(22,NFX)
@@ -154,13 +154,13 @@ C Gravite
 C
       RETURN
       END
-      !||====================================================================
-      !||    c_fxbody2   ../starter/source/restart/ddsplit/c_fxbody.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal      ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    c_fxbody2   ../starter/source/restart/ddsplit/c_fxbody.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal      ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE C_FXBODY2(
      .   FXBIPM   , FXBNOD  , NODLOCAL, IPARG   , FXBELM ,
      .   FXBNOD_L , FXBMOD_L, FXBELM_L, FXBSIG_L, PROC   ,
@@ -344,7 +344,7 @@ C Modes
          ENDIF
          FXBIPM_L(32,NFX)=IRCM_L
 C
-Champs de contrainte modaux
+CModal constraint fields
          ASIG=FXBIPM(20,NFX)
          IRCS=FXBIPM(31,NFX)
          NELS=FXBIPM(21,NFX)
@@ -695,7 +695,7 @@ C Gravite
             IADG_L=IADG_L+2+NNO_L
          ENDDO
          AGRVI_L=AGRVI_L+IADG_L
-C Identification du PMAIN
+C Identification of PMAIN
          NMAX=0
          PMAIN=1
          DO P=1,NSPMD
@@ -724,11 +724,11 @@ C Identification du PMAIN
 C
       RETURN
       END
-      !||====================================================================
-      !||    c_fxbody3   ../starter/source/restart/ddsplit/c_fxbody.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||====================================================================
+!||====================================================================
+!||    c_fxbody3   ../starter/source/restart/ddsplit/c_fxbody.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||====================================================================
       SUBROUTINE C_FXBODY3(
      .     LENGLM_L, LENCP_L  , LENLM_L , LENFLS_L, LENDLS_L,
      .     LENMCD_L, LENGRVR_L, FXBIPM_L, PROC    )
@@ -789,11 +789,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    c_fxbody4   ../starter/source/restart/ddsplit/c_fxbody.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||====================================================================
+!||====================================================================
+!||    c_fxbody4   ../starter/source/restart/ddsplit/c_fxbody.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||====================================================================
       SUBROUTINE C_FXBODY4(
      .     FXBGLM   , FXBCPM  , FXBCPS  , FXBLM   , FXBFLS  ,
      .     FXBDLS   , FXBGRVR , FXBIPM  , PROC    , FXBGLM_L,

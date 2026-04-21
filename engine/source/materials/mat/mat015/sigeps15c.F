@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps15c   ../engine/source/materials/mat/mat015/sigeps15c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    m15cplrc    ../engine/source/materials/mat/mat015/m15cplrc.F
-      !||    m15crak     ../engine/source/materials/mat/mat015/m15crak.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps15c   ../engine/source/materials/mat/mat015/sigeps15c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    m15cplrc    ../engine/source/materials/mat/mat015/m15cplrc.F
+!||    m15crak     ../engine/source/materials/mat/mat015/m15crak.F
+!||====================================================================
       SUBROUTINE SIGEPS15C(
      1                 JFT    ,JLT    ,PM     ,DAMT   ,
-     3                 IMAT   ,SHF    ,NGL    ,EPSPL  ,DMG_FLAG,
-     7                 ILAYER ,NEL    ,ISRATE ,PLA    ,SIGDMG  ,
+     3                 IMAT   ,SHF    ,NGL    ,DMG_FLAG,
+     7                 ILAYER ,NEL    ,PLA    ,SIGDMG ,
+     .                 ISRATE ,ASRATE ,EPSD_PG,EPSD   ,
      A                 DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX  ,
      7                 SIGOXX ,SIGOYY ,SIGOXY ,SIGOYZ ,SIGOZX  ,
      8                 SIGNXX ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX  ,
@@ -53,14 +54,16 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ILAYER,JFT,JLT,IMAT,NEL,DMG_FLAG,ISRATE
       INTEGER NGL(MVSIZ)
-C     REAL
       my_real
-     .   PM(NPROPM,*),SHF(*),EPSPL(*),SIGDMG(MVSIZ,5)
+     .   PM(NPROPM,*),SHF(*),SIGDMG(MVSIZ,5)
       my_real
      .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
      .   DEPSZX(MVSIZ),PLA(NEL),SIGOXX(NEL),SIGOYY(NEL),SIGOXY(NEL),
      .   SIGOYZ(NEL),SIGOZX(NEL),SIGNXX(NEL),SIGNYY(NEL),SIGNXY(NEL),
      .   SIGNYZ(NEL),SIGNZX(NEL),SIGR(NEL,6),DAMT(NEL,2),TSAIWU(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN)    :: EPSD_PG  ! global element strain rate
+      my_real, DIMENSION(NEL), INTENT(INOUT) :: EPSD     ! lbuf%epsd
+      my_real, INTENT(IN)    :: ASRATE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -75,12 +78,12 @@ C     PLASTICITE AUX POINTS D'INTEGRATION
 C-----------------------
 C     CONTRAINTES PLASTIQUEMENT ADMISSIBLES
 C-----------------------
-      CALL M15CPLRC(JFT    ,JLT    ,PM     ,PLA    ,
+      CALL M15CPLRC(NEL    ,PM     ,PLA    ,
      2              IMAT   ,DAMT   ,SHF    ,NGL    ,SIGE  ,
      3              DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX,
      4              SIGOXX ,SIGOYY ,SIGOXY ,SIGOYZ ,SIGOZX,
      5              SIGNXX ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX,
-     6              EPSPL  ,ISRATE ,NEL    ,TSAIWU )
+     6              EPSD_PG,EPSD   ,ISRATE ,ASRATE ,TSAIWU )
 !
       DMG_FLAG = 2
 !

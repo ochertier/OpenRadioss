@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    ige3dbilan            ../engine/source/elements/ige3d/ige3dbilan.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3duforc3            ../engine/source/elements/ige3d/ig3duforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ige3dbilan            ../engine/source/elements/ige3d/ige3dbilan.F
+!||--- called by ------------------------------------------------------
+!||    ig3duforc3            ../engine/source/elements/ige3d/ig3duforc3.F
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE IGE3DBILAN(PARTSAV,EINT,RHO,VOL,
      .                      VX, VY, VZ,IPARTS,VOL0,
      .                      GRESAV,GRTH,IGRTH,
@@ -70,7 +70,7 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   VXA(MVSIZ), VYA(MVSIZ) , VZA(MVSIZ), 
-     .   VA2(MVSIZ), XMAS(MVSIZ), RBIDON(1),
+     .   VA2(MVSIZ), XMAS(MVSIZ),
      .   OFF(MVSIZ), EI(MVSIZ) , EK(MVSIZ),
      .   XM(MVSIZ) , YM(MVSIZ) , ZM(MVSIZ),
      .   XX(MVSIZ) , YY(MVSIZ) , ZZ(MVSIZ),
@@ -82,9 +82,9 @@ C     REAL
      .   IXY(MVSIZ), IYZ(MVSIZ), IZX(MVSIZ),
      .   REI(MVSIZ), REK(MVSIZ),OFF_L(MVSIZ)
 C-----------------------------------------------
-      FLAG = IPARG(80) ! Flag pour sorties additionnelles
+      FLAG = IPARG(80) ! Flag for additional outputs
 C-----------------------------------------------
-C     CALCUL BILAN SORTIES DEF 
+C     CALCULATION BILAN SORTIES DEF 
 C-----------------------------------------------
       DO I=LFT,LLT
         VXA(I) = ZERO
@@ -129,7 +129,7 @@ C
       ENDDO
 C
 C-----------------------------------------------
-C     CALCUL BILAN SORTIES ADDITIONNELLES 
+C     CALCULATION BILAN SORTIES ADDITIONNELLES 
 C-----------------------------------------------
       IF(FLAG==1) THEN
         DO I=LFT,LLT

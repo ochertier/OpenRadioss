@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,33 +20,33 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10init3               ../starter/source/elements/solid/solide10/s10init3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    failini                ../starter/source/elements/solid/solide/failini.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    s10coor3               ../starter/source/elements/solid/solide10/s10coor3.F
-      !||    s10deri3               ../starter/source/elements/solid/solide10/s10deri3.F
-      !||    s10len3                ../starter/source/elements/solid/solide10/s10len3.F
-      !||    s10mass3               ../starter/source/elements/solid/solide10/s10mass3.F
-      !||    s10msi                 ../starter/source/elements/solid/solide10/s10mass3.F
-      !||    sboltini               ../starter/source/loads/bolt/sboltini.F
-      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
-      !||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
-      !||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
-      !||    sreploc3               ../starter/source/elements/solid/solide/sreploc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
-      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s10init3               ../starter/source/elements/solid/solide10/s10init3.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    failini                ../starter/source/elements/solid/solide/failini.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    s10coor3               ../starter/source/elements/solid/solide10/s10coor3.F
+!||    s10deri3               ../starter/source/elements/solid/solide10/s10deri3.F
+!||    s10len3                ../starter/source/elements/solid/solide10/s10len3.F
+!||    s10mass3               ../starter/source/elements/solid/solide10/s10mass3.F
+!||    s10msi                 ../starter/source/elements/solid/solide10/s10mass3.F
+!||    sboltini               ../starter/source/loads/bolt/sboltini.F
+!||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+!||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
+!||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
+!||    sreploc3               ../starter/source/elements/solid/solide/sreploc3.F
+!||--- uses       -----------------------------------------------------
+!||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
+!||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S10INIT3(ELBUF_STR,
      1    MAS     ,IXS     ,PM      ,X      ,
      2    DETONATORS,GEO     ,VEUL    ,ALE_CONNECTIVITY ,IPARG    ,
@@ -72,6 +72,7 @@ C-----------------------------------------------
       USE DEFAULTS_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -115,15 +116,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IP,NF1,NF2,IBID,IGTYP,NUVAR,IREP,NCC,IDEF,JHBE,IPID
+      INTEGER I,J,IP,NF1,NF2,IGTYP,NUVAR,IREP,NCC,IDEF,JHBE,IPID
       INTEGER ID,NPTR,NPTS,NPTT,NLAY,L_PLA,L_SIGB,IBOLTP,IINT,IMAS_DS
       CHARACTER(LEN=NCHARTITLE)::TITR
       INTEGER NC(MVSIZ,10),MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ)
       DOUBLE PRECISION
      .   XX(MVSIZ,10), YY(MVSIZ,10), ZZ(MVSIZ,10) 
       my_real
-     .   BID, FV,
-     .   V8LOC(51,MVSIZ), VOLU(MVSIZ), MASS(MVSIZ),VOLG(MVSIZ),
+     .    FV,
+     .   VOLU(MVSIZ), MASS(MVSIZ),VOLG(MVSIZ),
      .   VOLP(MVSIZ,5), STI(MVSIZ),DELTAX(MVSIZ),DELTAX2(MVSIZ),
      .   VX(MVSIZ,10), VY(MVSIZ,10), VZ(MVSIZ,10),
      .   PX(MVSIZ,10,5),PY(MVSIZ,10,5),PZ(MVSIZ,10,5),
@@ -134,6 +135,7 @@ C-----------------------------------------------
      .   E2Y(MVSIZ),E2Z(MVSIZ),E3X(MVSIZ),E3Y(MVSIZ),E3Z(MVSIZ),
      .   NX(MVSIZ,10,5), WIP(5,5) ,ALPH(5,5),BETA(5,5),MASSCP(MVSIZ),
      .   RHOCP(MVSIZ),TEMP0(MVSIZ), AIRE(MVSIZ), DTX(MVSIZ)
+      my_real :: TEMPEL(NEL)
 C
 C-----------------------------------------------
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -207,9 +209,9 @@ c
      .         RX   ,RY   ,RZ   ,SX   ,SY   ,SZ   ,TX   ,TY   ,TZ   ,
      .         E1X  ,E1Y  ,E1Z  ,E2X  ,E2Y  ,E2Z  ,E3X  ,E3Y  ,E3Z  ,
      .         RX   ,RY   ,RZ   ,SX   ,SY   ,SZ   ,NSIGI,SIGSP,NSIGS,
-     .         SIGI ,IXS  ,X    ,JHBE ,PTSOL,NEL  ,IPARG(28))
+     .         SIGI ,IXS  ,X    ,JHBE ,PTSOL,NEL  ,IPARG(28),JCVT)
 C----------------------------------------
-C     INITIALISATION DE LA THERMIQUE 
+C     INITIALIZATION OF THERMAL CONDITIONS
 C----------------------------------------
       IF(JTHE < 0) THEN
        DO I=LFT,LLT
@@ -237,6 +239,16 @@ C
           ENDDO
         ENDIF
         IF(JTHE /=0) CALL ATHERI(MAT,PM,LBUF%TEMP)
+        IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+          TEMPEL(1:NEL) = ZERO
+          DO J = 1,10                                             
+            DO I=1,NEL                                          
+              TEMPEL(I)= TEMPEL(I) +  NX(I,J,IP)*TEMP(NC(I,J))       
+            ENDDO                                                 
+          ENDDO                                                   
+        ELSE
+          TEMPEL(1:NEL) = TEMP0(1:NEL)
+        END IF
 
         CALL MATINI(PM       ,IXS      ,NIXS       ,X        ,
      .              GEO      ,ALE_CONNECTIVITY    ,DETONATORS,IPARG     ,
@@ -245,23 +257,23 @@ C
      .              MAT      ,IPM      ,NSIGS    ,NUMSOL     ,PTSOL  ,
      .              IP       ,NGL      ,NPF      ,TF         ,BUFMAT ,
      .              GBUF     ,LBUF     ,MBUF     ,ELBUF_STR  ,ILOADP ,
-     .              FACLOAD, DELTAX)
+     .              FACLOAD, DELTAX    ,TEMPEL   ,MAT_PARAM )
 C------------------------------------------
-C       CALCUL DES DT ELEMENTAIRES
+C       CALCULATION OF ELEMENTARY TIMESTEPS
 C------------------------------------------
       AIRE(:) = ZERO
       CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,
      .     LBUF%EINT ,LBUF%TEMP ,LBUF%DELTAX ,LBUF%RK ,LBUF%RE ,BUFMAT, DELTAX, AIRE, 
      .     VOLU, DTX , IGEO,IGTYP)
 C----------------------------------------
-C     INITIALISATION DES MASSES
+C     INITIALIZATION OF MASSES
 C----------------------------------------
         CALL S10MSI(LBUF%RHO,MASS,VOLU,DTELEM(NFT+1),STI,
      .   LBUF%OFF,LBUF%SIG ,LBUF%EINT ,
      .   GBUF%OFF,GBUF%SIG,GBUF%EINT,GBUF%RHO,WIP(NPT,IP),
      .   MASSCP  ,RHOCP   ,GBUF%FILL,NEL, DTX)
 C---------------------------------------------------------
-C  INITIALATION DES CONTRAINTES
+C  INITIALIZATION OF STRESSES
 C---------------------------------------------------------
 
          IF(MTN>=28)THEN
@@ -312,7 +324,7 @@ C
      1                 GBUF%BPRELD,NEL  ,IXS  ,NIXS ,VPRELOAD, IFLAG_BPRELOAD)
         ENDIF
 C----------------------------------------
-C     INITIALISATION DES MASSES
+C     [TO
 C----------------------------------------
       CALL S10MASS3(MASS,MAS,PARTSAV,IPARTS(NF1),MSS(1,NF1),VOLU,
      .              XX  ,YY ,ZZ     ,VX         ,VY         ,VZ  ,
@@ -327,8 +339,8 @@ C----------------------------------------
      .             SIGI,NSIGS,IXS,NIXS,PTSOL,
      .             RNOISE,PERTURB,MAT_PARAM)
 C------------------------------------------
-C     assemblage des Volumes nodaux et Modules nodaux
-C     (pour rigidites d'interface)
+C     Assembly of nodal volumes and nodal modules
+C     (for interface stiffnesses)
 C------------------------------------------
       IF(I7STIFS/=0)THEN
         NCC=10

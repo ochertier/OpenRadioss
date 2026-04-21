@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sgrtails               ../starter/source/elements/solid/solide/sgrtails.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    arret                  ../starter/source/system/arret.F
-      !||    cpp_reorder_elements   ../starter/source/spmd/cpp_reorder_elements.cpp
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    init_mat_keyword       ../starter/source/materials/mat/init_mat_keyword.F
-      !||    zeroin                 ../starter/source/system/zeroin.F
-      !||--- uses       -----------------------------------------------------
-      !||    cluster_mod            ../starter/share/modules1/cluster_mod.F
-      !||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sgrtails               ../starter/source/elements/solid/solide/sgrtails.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||    cpp_reorder_elements   ../starter/source/spmd/cpp_reorder_elements.cpp
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    init_mat_keyword       ../starter/source/materials/mat/init_mat_keyword.F
+!||    zeroin                 ../starter/source/system/zeroin.F
+!||--- uses       -----------------------------------------------------
+!||    cluster_mod            ../starter/share/modules1/cluster_mod.F
+!||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+!||====================================================================
       SUBROUTINE SGRTAILS(
      1       IXS           ,PM      ,IPARG       , GEO     ,
      2       EADD          ,ND      ,IPARTS      , DD_IAD  ,
@@ -47,7 +47,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6       IPM           ,NOD2ELS ,ISOLOFF     , ISOLNOD1,
      7       TAGPRT_SMS    ,INIVOL  ,SPH2SOL     , SOL2SPH , SOL2SPH_TYP,
      8       IFLAG_BPRELOAD,CLUSTERS,MATPARAM_TAB, RNOISE  ,
-     9       PRINT_FLAG)
+     9       PRINT_FLAG    ,DAMP_RANGE_PART,IPRELOAD_FUN)
 C-----------------------------------------------
 C   A n a l y s e   M o d u l e
 C-----------------------------------------------
@@ -61,6 +61,8 @@ C-----------------------------------------------
       USE INIVOL_DEF_MOD , ONLY : INIVOL_STRUCT_, NUM_INIVOL
       USE QA_OUT_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE ALE_MOD , ONLY : ALE
+      use element_mod , only : nixs
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -71,7 +73,7 @@ C     GEO(NPROPG,NUMGEO)   ARRAY: PROPERTY PARAMETERS (real)         E
 C     IGEO(NPROPGI,NUMGEO) ARRAY: PROPERTY PARAMETERS (integer)      E
 C     IPARG(NPARG,NGROUP)  ARRAY: GROUP PARAMETERS (itneger)         E/S
 C     EADD(NUMELS)         ARRAY: IDAM indexes / checkboard            S
-C     DD_IAD               ARRAY: DE LA DD EN SUPER GROUPES            S
+C     DD_IAD               ARRAY: FROM DD IN SUPER GROUPS              S
 C     IPARTS                                                         E/S
 C     INUM(13,NUMELS)      ARRAY:WORKING                             E/S
 C     INDEX(NUMELS)        ARRAY:WORKING                             E/S
@@ -107,9 +109,11 @@ C-----------------------------------------------
      .        TAGPRT_SMS(*),SPH2SOL(*),
      .        SOL2SPH(2,*),SOL2SPH_TYP(*),IFLAG_BPRELOAD(*)
       INTEGER, INTENT(IN) :: IDDLEVEL
-      INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
+      INTEGER, INTENT(IN) :: PRINT_FLAG                 !< flag to print the element group data
+      INTEGER, INTENT(IN) :: DAMP_RANGE_PART(NPART)     !< flag to compute the damping range
       TYPE(MATPARAM_STRUCT_) , TARGET, DIMENSION(NUMMAT),INTENT(IN) :: MATPARAM_TAB
       MY_REAL  PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO), RNOISE(NPERTURB,NUMELS)
+      INTEGER, DIMENSION(2,NUMPRELOAD),INTENT(IN) :: IPRELOAD_FUN
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
@@ -122,11 +126,11 @@ C-----------------------------------------------
      .   NGR1, MLN, NG, ISSN, ISSN_, N, MID, PID, II,ILOC,IL,NEL, NE1,IREP,IINT,
      .   P, NEL_PREC, IGT, JHBE, I, IKSNOD0,NB,IEOS,NLAY,
      .   MODE, WORK(70000), NN, J, NPTR,NPTS,NPTT,NPG,
-     .   IPLAST,NUVARP, IALEL, INEG, JIVF,ICPRE,ICSTR,
+     .   IPLAST,NUVARP, INEG, JIVF,ICPRE,ICSTR,
      .   IFAIL,IMATVIS,NLY,NL,ILAW,IM,IPMAT,ITET4,ITET10,
      .   NGP(NSPMD+1),JJ,IFAILMODEL,NFAIL,ISVIS,IVISC,IMAT,
      .   INUM_R2R(1+R2R_SIU*NUMELS),IPARTSPH,IPARTR2R,MFT,IBOLTP,ICP0,ISM0,
-     .   IPERT,STAT,ITSH,IT10,ICPT10,JALE_FROM_MAT,JALE_FROM_PROP
+     .   IPERT,STAT,ITSH,IT10,ICPT10,JALE_FROM_MAT,JALE_FROM_PROP,IDAMP_FREQ_RANGE
        DATA IPMAT /100/
        INTEGER, DIMENSION(:), ALLOCATABLE :: INDEXS2
       INTEGER ID
@@ -138,7 +142,7 @@ C-----------------------------------------------
       LOGICAL lFOUND
       INTEGER :: NB_NODES, LDIM, OFFSET
 C--------------------------------------------------------------
-C         BORNAGE DES GROUPES DE MVSIZ
+C         GROUPING BY MVSIZ GROUPS
 C--------------------------------------------------------------
       CALL MY_ALLOC(INDEXS2,NUMELS)
       nullify(MATPARAM)
@@ -154,13 +158,13 @@ C
         ALLOCATE(XNUM_RNOISE(0,0))
       ENDIF
 C
-C phase 1 : domain decomposition
+C Phase 1: Domain Decomposition
 C
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
 C     NSPGROUP = NSPGROUP + ND
       NFT = 0  
-C initialisation dd_iad
+C initialization dd_iad
       DO N=1,ND
        DO P=1,NSPMD+1
          DD_IAD(P,NSPGROUP+N) = 0
@@ -337,7 +341,7 @@ C
          ENDDO
         ENDIF
 C
-C RENUMEROTATION POUR SPH CONVERSION
+C RENUMBERING FOR SPH CONVERSION
 C
         IF(NSPHSOL /= 0 .AND. NFT < NUMELS8)THEN
 C
@@ -370,7 +374,7 @@ C
         ENDDO
         DD_IAD(1,NSPGROUP+N) = 1
 C          
-C maj CEP
+C update CEP
 C
         DO I = 1, NEL
           INDEX(I) = CEP(NFT+INDEX(I))          
@@ -382,7 +386,7 @@ C
       ENDDO
        
 C
-C RENUMEROTATION POUR SURFACES
+C RENUMBERING FOR SURFACES
 C
       DO I=1,NSURF
         NN=IGRSURF(I)%NSEG
@@ -392,7 +396,7 @@ C
         ENDDO
       ENDDO
 C
-C RENUMEROTATION POUR GROUPES DE SOLIDES
+C RENUMBERING FOR SOLID GROUPS
 C
       DO I=1,NGRBRIC
         NN=IGRBRIC(I)%NENTITY
@@ -401,7 +405,7 @@ C
         ENDDO
       ENDDO
 C
-C RENUMEROTATION POUR SPH CONVERSION
+C RENUMBERING FOR SPH CONVERSION
 C
       IF(NSPHSOL /= 0)THEN
         DO I=1,NUMSPH
@@ -409,7 +413,7 @@ C
         ENDDO
       END IF
 C
-C renumerotation CONNECTIVITE INVERSE
+C renumbering INVERSE CONNECTIVITY
 C
       DO I=1,8*NUMELS+6*NUMELS10+12*NUMELS20+8*NUMELS16
         IF(NOD2ELS(I) /= 0)NOD2ELS(I)=ITR1(NOD2ELS(I))
@@ -433,8 +437,8 @@ C
 !   -----------------------
 
 C
-C phase 2 : bornage en groupe de mvsiz
-C ngroup est global, iparg est global mais organise en fonction de dd
+C phase 2 : grouping by MVSIZ groups
+C ngroup is global, iparg is global but organized according to dd
 C
 
       INEG =  0
@@ -455,6 +459,8 @@ C ngroup global
           II = EADD(N)+NFT
           MID = IXS(1,II)
           PID = IXS(NIXS-1,II)
+C damping frequency range apply to group
+          IDAMP_FREQ_RANGE = DAMP_RANGE_PART(IPARTS(II))
 C Bolt preloading
           IBOLTP=0
           IF (NPRELOAD > 0) THEN
@@ -465,8 +471,8 @@ C Bolt preloading
           ID = IGEO(1,PID)
           CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,PID),LTITR)
           IKSNOD0=ISOLNOD(II)          
-C on peut avoir besoin de isolnod en cas de retour a la d.d.
-C de plus ISOLNOD remis a 0 real dans lectur
+C we may need isolnod in case of return to the d.d.
+C moreover ISOLNOD reset to 0 real in lectur
           NPT=1
           JIVF=0
           NUVARP=0
@@ -489,7 +495,7 @@ C de plus ISOLNOD remis a 0 real dans lectur
           ITET4 = 0
           ITET10 = 0
 C-------------------------
-C         PARAMETRE GROUPE
+C         GROUP PARAMETER
           IF (PID/=0) THEN
             IREP   = IGEO(6,PID)
             JHBE   = IGEO(10,PID)
@@ -507,7 +513,7 @@ c
             IPARTSPH=IGEO(38,PID)          
 C            
             IF ((ISSN == 10.OR.ISSN == 11).AND.(IGT == 14.OR.IGT == 6)) THEN
-               IF (IKSNOD0/=4 .AND. IKSNOD0/=8.AND. IKSNOD0/=10 ) THEN
+               IF (IKSNOD0/=4 .AND. IKSNOD0/=8.AND. IKSNOD0/=10 .AND. IKSNOD0/=6) THEN
                   CALL ANCMSG(MSGID=1159,
      .                    MSGTYPE=MSGERROR,
      .                    ANMODE=ANINFO_BLIND_2,
@@ -607,7 +613,9 @@ c
             IF(MLN /= 14 .AND. MLN /= 12 .AND. MLN /= 25  .AND.
      .         MLN /= 28 .AND. MLN /= 50 .AND. MLN /= 68  .AND. 
      .         MLN /= 53 .AND. MLN /= 93 .AND. MLN /= 107 .AND.
-     .         MLN /= 112.AND. MLN /= 122 .AND. MLN /= 127 .AND. MLN /= 128) THEN
+     .         MLN /= 112.AND. MLN /= 122 .AND. MTN /= 123 .AND. 
+     .         MLN /= 125 .AND. MLN /= 127 .AND. MLN /= 128 .AND.
+     .         MLN /= 130 .AND. MLN /= 132) THEN
 
             CALL ANCMSG(MSGID=1225,
      .                  MSGTYPE=MSGWARNING,
@@ -630,6 +638,18 @@ C
      .                  PRMOD=MSG_CUMU)
           ENDIF
 C
+          !< Compatibility of ITET4 = 3 with /MAT/LAW88 is not supported
+    !       IF ((MLN == 88).AND.(ITET4 == 3)) THEN
+    !         ITET4 = 0
+    !         CALL ANCMSG(MSGID=3123,
+    !  .                  MSGTYPE=MSGWARNING,
+    !  .                  ANMODE=ANINFO_BLIND_2,
+    !  .                  I1=ID,
+    !  .                  C1=TITR,
+    !  .                  I2=MLN,
+    !  .                  PRMOD=MSG_CUMU)
+    !       ENDIF
+C
           IFAIL = 0
           NFAIL = 0
           IF (IGT == 22) THEN                   
@@ -644,7 +664,7 @@ C
 c
           IF (NFAIL > 0)THEN
             IFAIL = 1
-            IF(MLN /= 24 .AND. MLN /= 25 .AND. MLN < 28) THEN
+            IF(MLN /= 25 .AND. MLN < 28) THEN
                DO J=1,NFAIL  
                   IFAILMODEL = IPM(111 + 15*(J - 1) ,MID)
                   IF  (IFAILMODEL == 10 .OR. IFAILMODEL == 4 
@@ -694,6 +714,29 @@ C foam + air
           ELSEIF(JALE == 3 .AND. MLN == 77) THEN
             JLAG=1          
           ENDIF
+C Multidomains - JALE of JEUL is set to 0 for dupplicated parts with void material
+          IF (NSUBDOM>0) THEN
+            IF (IPARTR2R == 0) THEN
+              IF (JALE > 0) JALE = 0
+              IF (JEUL > 0) JEUL = 0
+            ENDIF  
+          ENDIF
+
+
+          !ALE REZONING/REMAPING : number of MAT/EOS variables to treat (used by staggered scheme only : arezon.F)
+          !  With ALE framework, since the Mesh is arbitrary, the variable must be updated to map thei expected location and not follow the arbitrary mesh displacement
+          !  this numbering here will be used in arezon.F to loop over variables to rezon/remap
+          IF(JALE == 1)THEN
+            ALE%REZON%NUM_NUVAR_MAT = MAX(ALE%REZON%NUM_NUVAR_MAT, MATPARAM%REZON%NUM_NUVAR_MAT)
+            ALE%REZON%NUM_NUVAR_EOS = MAX(ALE%REZON%NUM_NUVAR_EOS, MATPARAM%REZON%NUM_NUVAR_EOS)
+          ENDIF
+
+          !ALE UVAR REZONING  (81:MAT,  82:EOS)
+          IF(JALE == 1)THEN
+            IPARG(81,NGROUP) = MATPARAM%REZON%NUM_NUVAR_MAT
+            IPARG(82,NGROUP) = MATPARAM%REZON%NUM_NUVAR_EOS
+          ENDIF
+C
           IF(MLN/=50)JTUR=NINT(PM(70,MID)) 
           JTHE=NINT(PM(71,MID))
 C     Multifluid law
@@ -728,14 +771,14 @@ C---add ICPRE auto for thick-shell
 C-------compressible       
               CASE(1)                                             
                ICPRE = 0        
-C-------uncompressible       
+C------       
               CASE(2)                                             
                ICPRE = 1
 C--------elasto-plastic       
               CASE(3)                                             
                ICPRE = 2
              END SELECT 
-C--------message out       
+C------- Out message       
              IF (ICPRE>0) CALL ANCMSG(MSGID=1741,
      .                      MSGTYPE=MSGINFO,
      .                      ANMODE=ANINFO_BLIND_2,
@@ -761,14 +804,14 @@ C
 C-------compressible       
              CASE(1)                                             
               ICPRE = 3        
-C-------uncompressible       
+C------       
              CASE(2)                                             
               ICPRE = 1
 C--------elasto-plastic       
              CASE(3)                                             
               ICPRE = 2
             END SELECT 
-C--------message out       
+C------- Out message       
                 CALL ANCMSG(MSGID=1741,
      .                      MSGTYPE=MSGINFO,
      .                      ANMODE=ANINFO_BLIND_2,
@@ -801,7 +844,7 @@ C                IF (MATPARAM%COMPRESSIBILITY==2) ISSN = 10
              END IF
 C---  ISMSTR=12 for law1     
              IF (MLN == 1.AND.JHBE/=16) ISSN = 12
-C--------message out       
+C------- Out message       
                 CALL ANCMSG(MSGID=1742,
      .                      MSGTYPE=MSGINFO,
      .                      ANMODE=ANINFO_BLIND_2,
@@ -814,7 +857,7 @@ C----- Iframe automatic JCVT=2 excpeting law58&fluide
            IF (JCVT<0) THEN
             JCVT = 0 
             IF (IKSNOD0==8.AND.JLAG>0.AND.MLN/=68) JCVT = 1
-C--------message out       
+C------- Out message       
             ISM0 = JCVT+1
                 CALL ANCMSG(MSGID=1764,
      .                      MSGTYPE=MSGINFO,
@@ -833,7 +876,7 @@ C---add ICPRE auto for T10, firsly limited by Large Strain
 C-------compressible       
               CASE(1)                                             
                ICPRE = 3        
-C-------uncompressible       
+C------       
               CASE(2)                                             
                ICPRE = 1
                IF (MLN == 1.OR.MLN == 92) ICPRE = 3
@@ -842,7 +885,7 @@ C--------elasto-plastic
                ICPRE = 2
                IF (ICPT10==3) ICPRE = 3 
              END SELECT 
-C--------message out       
+C------- Out message       
              IF (ICPRE ==1 .OR. ICPRE ==2)  CALL ANCMSG(
      .                      MSGID=1741,
      .                      MSGTYPE=MSGINFO,
@@ -865,7 +908,7 @@ c
      .                      I2=MLN,
      .                      PRMOD=MSG_CUMU)
 C--------------------
-C TEST COMPATIBILITE
+C COMPATIBILITY TEST
 C--------------------
 
           !---------------------------------!
@@ -961,7 +1004,7 @@ C
           JCVT = 0       
           ENDIF
 c          IF (JHBE == 14 .AND. (IKSNOD0 == 16 .OR. IKSNOD0 == 20)) THEN
-          IF (JHBE /= 16 .AND. (IKSNOD0 == 16 .OR. IKSNOD0 == 20)) THEN
+          IF (JHBE /= 16 .AND. IKSNOD0 == 20) THEN
             CALL ANCMSG(MSGID=860,
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,
@@ -1005,7 +1048,7 @@ c          IF (JHBE == 14 .AND. (IKSNOD0 == 16 .OR. IKSNOD0 == 20)) THEN
            ENDIF
             JHBE = 0
           ENDIF
-          IF (JHBE == 24 .AND. IKSNOD0 /= 8) THEN
+          IF (JHBE == 24 .AND. IKSNOD0 /= 8.AND. IKSNOD0 /= 6) THEN  
            IF(IKSNOD0 /= 4.AND.IKSNOD0 /= 10)THEN
             CALL ANCMSG(MSGID=758,
      .                  MSGTYPE=MSGWARNING,
@@ -1026,7 +1069,16 @@ c          IF (JHBE == 14 .AND. (IKSNOD0 == 16 .OR. IKSNOD0 == 20)) THEN
      .                  I2=JHBE,
      .                  I3=IGT)
           ENDIF
-          IF (JHBE/=15 .AND. IKSNOD0==6 ) THEN
+          IF (IKSNOD0==16 .AND. IGT/=20 ) THEN
+            CALL ANCMSG(MSGID=3116,
+     .                  MSGTYPE=MSGERROR,
+     .                  ANMODE=ANINFO_BLIND_1,
+     .                  I1=ID,
+     .                  C1=TITR,
+     .                  I2=IGT)
+          ENDIF
+          IF (JHBE/=15 .AND. 
+     .    (IGT == 20 .OR. IGT == 21 .OR. IGT == 22 ).AND. IKSNOD0==6 ) THEN
             CALL ANCMSG(MSGID=639,
      .                  MSGTYPE=MSGERROR,
      .                  ANMODE=ANINFO_BLIND_1,
@@ -1088,7 +1140,7 @@ C--------elasto-plastic (not large plasticity)
              CASE(21,22,23,24,27,52,79,81,84)                                             
               ICPRE = 2
 C--------orhtotropic,composite (P isn't calculated independently)           
-             CASE(12,14,15,25,28,50,53,68,76,93,107,112,127)                                             
+             CASE(12,14,15,25,28,50,53,68,76,93,107,112,123,125,127, 132)                                             
               ICPRE = 0
             END SELECT 
            IF (ICP0 ==3) THEN
@@ -1392,7 +1444,7 @@ C-------
      .                      C1=TITR)
         ENDIF
 C-------------------------------------------------
-C STOCKAGE IPARG
+C IPARG STORAGE
 C-------------------------------------------------
           IPARG(1,NGROUP) = MLN
           IPARG(2,NGROUP) = NE1
@@ -1420,7 +1472,7 @@ C-------------------------------------------------
           IPARG(28,NGROUP)= IKSNOD0
           IPARG(29,NGROUP)= IPLAST
           IPARG(34,NGROUP)= NINT(PM(10,MID))
-C reperage groupe/processeur
+C group/processor identification
           IPARG(32,NGROUP)= P-1
           IPARG(33,NGROUP)= JCLOS
           IPARG(35,NGROUP)= IREP
@@ -1436,7 +1488,7 @@ C reperage groupe/processeur
             IPARG(41,NGROUP)=ITET4
           ENDIF
           IF(MLN/=25.AND.MLN<28)THEN
-          IPARG(44,NGROUP)= ISTRAIN
+            IPARG(44,NGROUP)= ISTRAIN
           ELSEIF(MLN>=28)THEN
            ISTRAIN=2
            IPARG(44,NGROUP)=ISTRAIN
@@ -1474,17 +1526,23 @@ C         flag for vis stress
           IPARG(62,NGROUP)= PID  ! property number
           IPARG(69,NGROUP)= IPARTSPH
 C         flag for group of duplicated elements in multidomains
-          IF (NSUBDOM>0) IPARG(77,NGROUP)= IPARTR2R
+          IF (NSUBDOM>0) IPARG(77,NGROUP)= IPARTR2R 
 C         flag for bolt preloading
           IPARG(72,NGROUP)= IBOLTP
+          IF (IBOLTP>0) THEN 
+            IPARG(67,NGROUP)= IPRELOAD_FUN(1,IBOLTP)
+            IPARG(68,NGROUP)= IPRELOAD_FUN(2,IBOLTP)
+          END IF
 C
 C         Formulation level for the solid elements time step computation
           IPARG(73,NGROUP)=IPM(252,MID)
           IPARG(74,NGROUP)=ITET10
 c         non-local variable regularization flag for failure models
           IPARG(78,NGROUP) = MATPARAM%NLOC   ! NLOC_FAIL
+c         id of damping frequency range apply to group
+          IPARG(93,NGROUP) = IDAMP_FREQ_RANGE
 C------------------------------------------------------
-C LONGUEUR BUFFER
+C BUFFER LENGTH
 C------------------------------------------------------
           IF (NPG > 1) NPG = NPG + 1
           IF (NPG == 1 .AND. JHBE == 15) NPG = NPG + 1
@@ -1494,7 +1552,7 @@ C
          NGP(P)=NGROUP-NGP(P)
         ENDIF
        ENDDO
-C DD_IAD => nb groupes par sous domaine
+C Dd_iad => nb groups per sub domain
        NGP(NSPMD+1)=0
        DO P = 1, NSPMD
          NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)
@@ -1506,7 +1564,7 @@ C
 
       NSPGROUP = NSPGROUP + ND
 C
-C Traitement CFD sur MID negatif sur tous les solides si ineg=1
+C CFD treatment on negative MID on all solids if ineg=1
 C
       IF (INEG == 1) THEN
         DO I = 1, NUMELS
@@ -1563,6 +1621,10 @@ c-----------
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,
      .                  PRMOD=MSG_PRINT)
+      CALL ANCMSG(MSGID=3123,
+     .                  MSGTYPE=MSGWARNING,
+     .                  ANMODE=ANINFO_BLIND_2,
+     .                  PRMOD=MSG_PRINT)     
       CALL ANCMSG(MSGID=1573,
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,

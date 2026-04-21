@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #define TO1D(i,j,k,s1,s2) i+(j-1)*s1+(k-1)*s1*s2
-      !||====================================================================
-      !||    spmd_i25front_init   ../engine/source/mpi/interfaces/spmd_i25front.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    i25free_bound        ../engine/source/interfaces/int25/i25free_bound.F
-      !||    spmd_comm_split      ../engine/source/mpi/generic/spmd_comm_split.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||    tri7box              ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i25front_init    ../engine/source/mpi/interfaces/spmd_i25front.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    i25free_bound         ../engine/source/interfaces/int25/i25free_bound.F
+!||    spmd_comm_split       ../engine/source/mpi/generic/spmd_comm_split.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod         ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_I25FRONT_INIT(ITAB,MAIN_PROC,INTBUF_TAB,IPARI)
 C============================================================================
 C   M o d u l e s
@@ -42,6 +44,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -67,10 +70,10 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       TYPE(int_pointer), DIMENSION(NINTER,NSPMD) :: SEND_BUF,RECV_BUF
       INTEGER, DIMENSION(NINTER,NSPMD) :: SIZ_SEND_BUF,SIZ_RECV_BUF
-      INTEGER :: I,J,K,L,II,NIN,ITY,P,UID
+      INTEGER :: I,K,L,II,NIN,ITY,P,UID
       INTEGER :: IERROR
       INTEGER :: COLOR,KEY,NEDGE
-      INTEGER :: IED,IE,JE,WGT,NRTM,NSN
+      INTEGER :: IED,IE,NRTM,NSN
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: TAB
 #ifdef MPI
       INTEGER :: STATUS(MPI_STATUS_SIZE), MSGTYP, REQ_S(NSPMD),REQ_R(NSPMD)
@@ -81,6 +84,8 @@ C-----------------------------------------------
       NINTER25E = 0
       DO NIN = 1,NINTER
         INTBUF_TAB(NIN)%MPI_COMM = MPI_COMM_NULL
+        INTBUF_TAB(NIN)%RANK = -1
+        INTBUF_TAB(NIN)%NSPMD = 0
         INTBUF_TAB(NIN)%NB_INTERNAL_EDGES = 0
         INTBUF_TAB(NIN)%NB_BOUNDARY_EDGES_LOCAL = 0
         INTBUF_TAB(NIN)%NB_BOUNDARY_EDGES_REMOTE = 0
@@ -295,17 +300,19 @@ c                WRITE(6,*) "found at ",K
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_i25front_nor   ../engine/source/mpi/interfaces/spmd_i25front.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri              ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||    mpi_commod          ../engine/share/modules/mpi_comm_mod.F
-      !||    tri25ebox           ../engine/share/modules/tri25ebox.F
-      !||    tri7box             ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i25front_nor     ../engine/source/mpi/interfaces/spmd_i25front.F
+!||--- called by ------------------------------------------------------
+!||    inttri                ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod         ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    mpi_commod            ../engine/share/modules/mpi_comm_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri25ebox             ../engine/share/modules/tri25ebox.F
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_I25FRONT_NOR(IPARI,
      . INTBUF_TAB,
      . INTLIST25,
@@ -330,6 +337,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -512,7 +520,7 @@ C               ELSE
 C                 WRITE(6,*) "IM=",IM 
 C                 CALL FLUSH(6)
 C                 ASSERT(.FALSE.)
-C C               STOP
+C c'estop
 C               END IF
 C C====================================================
 

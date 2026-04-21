@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    law69_upd                ../starter/source/materials/mat/mat069/law69_upd.F
-      !||--- called by ------------------------------------------------------
-      !||    updmat                   ../starter/source/materials/updmat.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    arret                    ../starter/source/system/arret.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    law69_nlsqf              ../starter/source/materials/tools/nlsqf.F
-      !||    law69_nlsqf_auto         ../starter/source/materials/tools/law69_nlsqf_auto.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    table_mod                ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    law69_upd              ../starter/source/materials/mat/mat069/law69_upd.F
+!||--- called by ------------------------------------------------------
+!||    updmat                 ../starter/source/materials/updmat.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||    law69_nlsqf            ../starter/source/materials/tools/nlsqf.F
+!||    law69_nlsqf_auto       ../starter/source/materials/tools/law69_nlsqf_auto.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE LAW69_UPD(IOUT,TITR    ,MAT_ID,UPARAM,NFUNC,NFUNCT,
      .                      IFUNC, FUNC_ID,NPC   ,PLD   ,PM,IPM, GAMA_INF)
 C-----------------------------------------------
@@ -68,7 +67,7 @@ C-----------------------------------------------
 
 c
       INTEGER N_NETWORK,N,K,ITEST,ICHECK,II,JJ,NSTART,IC1,IC2,NOGD,NDATA,NMULA,
-     .        TAB,NMUAL,IFLAG,IS,I,INDX,LAWID, ITAG
+     .        TAB,NMUAL,IFLAG,IS,I,INDX,LAWID, ITAG,IS_ENCRYPTED
       my_real
      .   MU(5),AL(5),LAM_MIN,LAM_MAX,STRAIN_MIN,STRAIN_MAX,
      .   D11,D22,D12,LAM1,LAM2,LAM3,LAM12,INVD1,INVD2
@@ -78,21 +77,19 @@ c
      .   AMULA(2),MUAL(10),DY
       my_real , DIMENSION(:), ALLOCATABLE :: STRESS,STRETCH
       INTEGER , DIMENSION(:), ALLOCATABLE :: ITAB_ON_A,INDEX
-!      
-      LOGICAL  IS_ENCRYPTED         
+!             
 C==================================================================== 
 C=======================================================================
 !       IDENTIFICATION
 !====================================================================       
-       IS_ENCRYPTED = .FALSE.
-       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
+
        IF(IFUNC(2) == 0 )  RETURN
 C      
        NMUAL = 2*UPARAM(18)
        IFLAG = NINT(UPARAM(13))
        ICHECK = NINT(UPARAM(19))
        NSTART = NINT(UPARAM(20))
-       ERRTOL = UPARAM(21)
+       IS_ENCRYPTED = NINT(UPARAM(21))
        ERRTOL = FIVEEM3 
 C      
        IC1 = NPC(IFUNC(2))
@@ -157,23 +154,20 @@ C  check if the curve is monotonic
          MUAL(2*II-1)=FIVE                                
          MUAL(2*II)=TWO                                  
        ENDDO 
-!       
-       IF(IS_ENCRYPTED)THEN
-          WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
-       ELSE 
-         WRITE(IOUT,277)    
-         WRITE(IOUT,270)TRIM(TITR),MAT_ID
-       ENDIF  
+!      
+        WRITE(IOUT,277)  
+        WRITE(IOUT,270)TRIM(TITR),MAT_ID  
+        IF(IS_ENCRYPTED > 0) WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
 !       
        IF (IFLAG == 1 .OR. IFLAG == 2) THEN
            LAWID = IFLAG 
            CALL LAW69_NLSQF(LAWID,STRETCH,STRESS,10,NMUAL,NOGD,MUAL,
-     $                             ICHECK, NSTART, ERRTOL,MAT_ID,TITR)
+     $                             ICHECK, NSTART, ERRTOL,MAT_ID,TITR,IS_ENCRYPTED)
        ELSEIF(IFLAG == -1) THEN
            LAWID = 2
            IF(ITAG == 0) ICHECK = ABS(ICHECK)
            CALL LAW69_NLSQF_AUTO(LAWID,STRETCH,STRESS,10,NMUAL,NOGD,MUAL,
-     $                             ICHECK, NSTART, ERRTOL,MAT_ID,TITR)
+     $                             ICHECK, NSTART, ERRTOL,MAT_ID,TITR,IS_ENCRYPTED)
            UPARAM(18) = NMUAL / 2    
        ENDIF
        DEALLOCATE (STRETCH)                                                  
@@ -184,7 +178,7 @@ C  check if the curve is monotonic
            UPARAM(II+5)=MUAL(2*II)                                      
            GS=GS + MUAL(2*II-1)*MUAL(2*II)                                     
          ENDDO 
-         IF(.NOT.IS_ENCRYPTED) WRITE(IOUT,100)  MAT_ID
+         IF(IS_ENCRYPTED == 0) WRITE(IOUT,100)  MAT_ID
        ELSE 
          DO II=1,5                                                           
            UPARAM(II)=MUAL(2*II-1)                                      
@@ -211,7 +205,7 @@ C     Formulation for solid elements time step computation.
        PM(105) = GS/(RBULK + TWO_THIRD*G)       
        
 C                                                        
-      IF(.NOT.IS_ENCRYPTED) THEN 
+      IF(IS_ENCRYPTED == 0) THEN 
          IF (LAWID /= 2) THEN                                      
            WRITE(IOUT,278)                                                   
      &  UPARAM(1),UPARAM(2),UPARAM(3),UPARAM(4),         

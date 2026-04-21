@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fe_close   ../engine/source/elements/solid/solide/fe_close.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3     ../engine/source/elements/solid/solide/sforc3.F
-      !||    szforc3    ../engine/source/elements/solid/solidez/szforc3.F
-      !||====================================================================
+!||====================================================================
+!||    fe_close   ../engine/source/elements/solid/solide/fe_close.F
+!||--- called by ------------------------------------------------------
+!||    sforc3     ../engine/source/elements/solid/solide/sforc3.F
+!||    szforc3    ../engine/source/elements/solid/solidez/szforc3.F
+!||====================================================================
       SUBROUTINE FE_CLOSE(
      1   HH,      RHO,     VOLN,    VX1,
      2   VX2,     VX3,     VX4,     VX5,

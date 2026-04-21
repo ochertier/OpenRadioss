@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_create_datatype                  ../engine/source/output/h3d/h3d_build_fortran/h3d_create_datatype.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                               ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    c_h3d_create_oned_eroded             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_oned.cpp
-      !||    c_h3d_create_quad_eroded             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_quad.cpp
-      !||    c_h3d_create_shell_eroded            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_shell.cpp
-      !||    c_h3d_create_shell_tensor_datatype   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_shell_tensor_datatype.cpp
-      !||    c_h3d_create_skin_eroded             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_skin.cpp
-      !||    c_h3d_create_solid_eroded            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_solid.cpp
-      !||    c_h3d_create_sph_eroded              ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_sph.cpp
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                              ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_create_datatype                  ../engine/source/output/h3d/h3d_build_fortran/h3d_create_datatype.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                               ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    c_h3d_create_oned_eroded             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_oned.cpp
+!||    c_h3d_create_quad_eroded             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_quad.cpp
+!||    c_h3d_create_shell_eroded            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_shell.cpp
+!||    c_h3d_create_shell_tensor_datatype   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_shell_tensor_datatype.cpp
+!||    c_h3d_create_skin_eroded             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_skin.cpp
+!||    c_h3d_create_solid_eroded            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_solid.cpp
+!||    c_h3d_create_sph_eroded              ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_sph.cpp
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                              ../engine/share/modules/h3d_mod.F
+!||====================================================================
       SUBROUTINE H3D_CREATE_DATATYPE(H3D_DATA,IPARI)
 C-----------------------------------------------
 C   M o d u l e s
@@ -56,8 +56,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-        INTEGER I,J,II,IUS,IPT,ILAY,CPT_CS_DATA,INTER_ID
-        CHARACTER MES*80,CHINFO*10
+        INTEGER I, INTER_ID
 C-----------------------------------------------
         DO I=1,H3D_DATA%N_OUTP_H3D
           IF(H3D_DATA%OUTPUT_LIST(I)%OK == 1 )  THEN

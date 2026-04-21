@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    scderi3       ../engine/source/elements/thickshell/solidec/scderi3.F
-      !||--- called by ------------------------------------------------------
-      !||    scforc3       ../engine/source/elements/thickshell/solidec/scforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    scderi3       ../engine/source/elements/thickshell/solidec/scderi3.F
+!||--- called by ------------------------------------------------------
+!||    scforc3       ../engine/source/elements/thickshell/solidec/scforc3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SCDERI3(
      1   OFF,     DET,     NGL,     X1,
      2   X2,      X3,      X4,      X5,
@@ -166,115 +166,54 @@ C
        AREA(I) = ONE_OVER_64*JAC_19_37(I)
        DET(I)=ONE_OVER_64*(JAC1(I)*JAC_59_68(I)+JAC2(I)*JAC_67_49(I)+JAC3(I)*JAC_48_57(I))
       ENDDO
-C
-      IF(IDTMIN(1)==1)THEN
+!  /NEGVOL/
         ICOR = 0
         DO I=1,NEL
           IF(OFF(I) ==ZERO)THEN
             AREA(I) = ONE
             DET(I)=ONE
-          ELSEIF((DET(I)<=VOLMIN).OR.(DET(I)<=ZERO)
-     .           .OR.(AREA(I)<=ZERO))THEN
+          ELSEIF(DET(I)<=ZERO.OR.AREA(I)<=ZERO)THEN
             ICOR = 1
           ENDIF
         ENDDO
-        IF (ICOR>0) THEN
-          DO I=1,NEL
-           IF(OFF(I)/=ZERO)THEN
-             IF(DET(I)<=VOLMIN)THEN
-              AREA(I) = ONE
-              DET(I)=ONE
-              OFF(I)=ZERO
-#include "lockon.inc"
-                WRITE(ISTDO,2000) NGL(I)
-                WRITE(IOUT ,2000) NGL(I)
-#include "lockoff.inc"
-            ELSEIF(DET(I)<=ZERO.OR.(AREA(I)<=ZERO))THEN
-              CALL ANCMSG(MSGID=166,ANMODE=ANINFO,
-     .                    I1=NGL(I))
-             MSTOP = 1
-            ENDIF
-           ENDIF
-          ENDDO
-        ENDIF
-      ELSEIF(IDTMIN(1)==2)THEN
-        ICOR = 0
-        DO I=1,NEL
-          IF(OFF(I) ==ZERO)THEN
-            AREA(I) = ONE
-            DET(I)=ONE
-          ELSEIF((DET(I)<=VOLMIN).OR.(DET(I)<=ZERO)
-     .           .OR.(AREA(I)<=ZERO))THEN
-            ICOR=1
-          ENDIF
-        ENDDO
-        IF (ICOR>0) THEN
-          DO I=1,NEL
-            IF((OFF(I)/=0.).AND.
-     .         (DET(I)<=VOLMIN.OR.DET(I)<=ZERO)
-     .           .OR.(AREA(I)<=ZERO))THEN
-              AREA(I) = ONE
-              DET(I)=ONE
-              OFF(I)=ZERO
-#include "lockon.inc"
-                WRITE(ISTDO,2000) NGL(I)
-                WRITE(IOUT ,2000) NGL(I)
-#include "lockoff.inc"
-            ENDIF
-          ENDDO
-        ENDIF
-      ELSEIF (ISMSTR /=4 ) THEN
-        ICOR = 0
-        DO I=1,NEL
-          IF(OFF(I) ==ZERO)THEN
-            DET(I)=ONE
-          ELSEIF((DET(I)<=VOLMIN).OR.(AREA(I)<=ZERO))THEN
-            ICOR = 1
-          ENDIF
-        ENDDO
-        IF (ICOR>0) THEN
-        DO I=1,NEL
-          IF(OFF(I) == ZERO)THEN
-            DET(I)=ONE
-            AREA(I) = ONE
-          ELSEIF(OFFG(I) > ONE)THEN
-            
-          ELSEIF((DET(I)<=VOLMIN).OR.(AREA(I)<=ZERO))THEN
-            NNEGA=NNEGA+1
-              INDEX(NNEGA)=I
-#include "lockon.inc"
-            WRITE(ISTDO,3000) NGL(I)
-            WRITE(IOUT ,3000) NGL(I)
-#include "lockoff.inc"
-          ENDIF
-        ENDDO
+        IF (ICOR>0.AND.ISMSTR<10) THEN
           IF (INEG_V==0) THEN
-           CALL ANCMSG(MSGID=280,ANMODE=ANINFO)
+            DO I=1,NEL
+             IF((DET(I)<=ZERO.OR.AREA(I)<=ZERO).AND.OFFG(I) <= ONE.AND.OFFG(I) /= ZERO)THEN
+              DET(I)=ONE
+              OFF(I)=ZERO
+              OFFG(I)=ZERO
+#include "lockon.inc"
+              CALL ANCMSG(MSGID=280,ANMODE=ANINFO,I1=NGL(I))
+#include "lockoff.inc"
+             END IF
+            END DO
            MSTOP = 1
-          ENDIF
-        END IF !(ICOR>0) THEN
-      ELSE
-        ICOR = 0
-        DO I=1,NEL
-          IF(OFF(I) ==ZERO)THEN
-            DET(I)=ONE
-            AREA(I) = ONE
-          ELSEIF(DET(I)<=ZERO)THEN
-            ICOR=1
-          ENDIF
-        ENDDO
-        IF (ICOR>0) THEN
-          DO I=1,NEL
-           IF(OFF(I)/=ZERO)THEN
-            IF(DET(I)<=ZERO)THEN
-              CALL ANCMSG(MSGID=166,ANMODE=ANINFO,
-     .                    I1=NGL(I))
-              MSTOP = 1
-            ENDIF
-           ENDIF
-          ENDDO
-        ENDIF
-      ENDIF
+          ELSE IF (INEG_V==2) THEN  !deletion
+            DO I=1,NEL
+             IF((DET(I)<=ZERO.OR.AREA(I)<=ZERO).AND.OFFG(I) <= ONE.AND.OFFG(I) /= ZERO)THEN
+              DET(I)=ONE
+              OFF(I)=ZERO
+              OFFG(I)=ZERO
+#include "lockon.inc"
+              CALL ANCMSG(MSGID=318,ANMODE=ANINFO,I1=NGL(I))
+#include "lockoff.inc"
+              IDEL7NOK = 1
+             END IF
+            END DO
+          ELSE ! switch to small strain
+            DO I=1,NEL
+             IF((DET(I)<=ZERO.OR.AREA(I)<=ZERO).AND.OFFG(I) <= ONE.AND.OFFG(I) /= ZERO)THEN
+               NNEGA=NNEGA+1
+               INDEX(NNEGA)=I
+#include "lockon.inc"
+               CALL ANCMSG(MSGID=259,ANMODE=ANINFO,I1=NGL(I))
+#include "lockoff.inc"
+             END IF
+            END DO
+          END IF
+      END IF !(ICOR>0) THEN
+!      
 C      
       IF (NNEGA>0) THEN
 #include "vectorize.inc"
@@ -439,8 +378,5 @@ C
        ENDDO
 C-----------
       RETURN
- 2000 FORMAT(/' ZERO OR NEGATIVE VOLUME : DELETE 3D-ELEMENT NB',I10/)
- 3000 FORMAT(/' ZERO OR NEGATIVE VOLUME : 3D-ELEMENT NB:',I10/,
-     +    ' SOLID-SHELL ELEMENT IS SWITCHED TO SMALL STRAIN OPTION'/) 
 C-----------
       END

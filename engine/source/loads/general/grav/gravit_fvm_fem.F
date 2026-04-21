@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    gravit_fvm_fem        ../engine/source/loads/general/grav/gravit_fvm_fem.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
-      !||    my_barrier            ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod               ../common_source/modules/ale/ale_mod.F
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    gravit_fvm_fem        ../engine/source/loads/general/grav/gravit_fvm_fem.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    finter                ../engine/source/tools/curve/finter.F
+!||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
+!||    my_barrier            ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod               ../common_source/modules/ale/ale_mod.F
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE GRAVIT_FVM_FEM(IGRV  ,AGRV   ,NPC   ,TF   ,A     ,
      2                          V     ,X      ,SKEW  ,MS   ,SENSOR_TAB,
      3                          WEIGHT,IB     ,ITASK ,NALE ,NSENSOR , PYTHON, WFEXT)
@@ -62,7 +62,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER, INTENT(IN) :: NALE(ALE%GLOBAL%SNALE)
-      INTEGER NPC(*),NDDIM,NVDIM
+      INTEGER NPC(*)
       INTEGER IGRV(NIGRV,*),IB(*)
       INTEGER WEIGHT(*), ITASK
       my_real AGRV(LFACGRV,*), TF(*), A(3,*), V(3,*), MS(*), X(3,*), SKEW(LSKEW,*)
@@ -73,7 +73,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NL, N1, ISK, N2, IFUNC, K1, K2, K3, ISENS,K,NN, IAD,J, IADF, IADL, ISMOOTH
-      my_real NX, NY, NZ, AXI, A0, AA, VV, FX, FY, FZ, AX, DYDX, TS, GAMA, WFEXTT,FCX,FCY
+      my_real AXI, A0, AA, VV, DYDX, TS, GAMA, WFEXTT,FCX,FCY
       my_real, EXTERNAL :: FINTER,FINTER_SMOOTH
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -170,9 +170,8 @@ C       /---------------/
 C       /---------------/
       END DO
 C
-#include "atomic.inc"
+!$OMP ATOMIC
       WFEXT = WFEXT + WFEXTT
-#include "atomend.inc"
 C
       RETURN
       END

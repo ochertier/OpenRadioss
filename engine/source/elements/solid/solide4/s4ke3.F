@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s4ke3          ../engine/source/elements/solid/solide4/s4ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
-      !||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_s4       ../engine/source/implicit/assem_s4.F
-      !||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
-      !||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
-      !||    morthlock3     ../engine/source/elements/solid/solide4/morthlock3.F
-      !||    s4coork        ../engine/source/elements/solid/solide4/s4coork.F
-      !||    s4cumg3        ../engine/source/elements/solid/solide4/s4cumg3.F
-      !||    s4derit3       ../engine/source/elements/solid/solide4/s4derit3.F
-      !||    s4kgeo3        ../engine/source/elements/solid/solide4/s4kgeo3.F
-      !||    s8eoff         ../engine/source/elements/solid/solide8/s8eoff.F
-      !||    sorthdir3      ../engine/source/elements/solid/solide/sorthdir3.F
-      !||    sreploc3       ../engine/source/elements/solid/solide/sreploc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s4ke3          ../engine/source/elements/solid/solide4/s4ke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
+!||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_s4       ../engine/source/implicit/assem_s4.F
+!||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
+!||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
+!||    morthlock3     ../engine/source/elements/solid/solide4/morthlock3.F
+!||    s4coork        ../engine/source/elements/solid/solide4/s4coork.F
+!||    s4cumg3        ../engine/source/elements/solid/solide4/s4cumg3.F
+!||    s4derit3       ../engine/source/elements/solid/solide4/s4derit3.F
+!||    s4kgeo3        ../engine/source/elements/solid/solide4/s4kgeo3.F
+!||    s8eoff         ../engine/source/elements/solid/solide8/s8eoff.F
+!||    sorthdir3      ../engine/source/elements/solid/solide/sorthdir3.F
+!||    sreploc3       ../engine/source/elements/solid/solide/sreploc3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE S4KE3(
      1   PM,      GEO,     IXS,     X,
      2   GBUF,    ETAG,    IDDL,    NDOF,
@@ -47,6 +48,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      4   NEL,     IPM,     IGEO,    IKGEO,
      5   BUFMAT,  NFT,     MTN,     ISMSTR,
      6   JHBE,    IREP,    ISORTH,  IFORMDT)
+      use element_mod , only : nixs
 C----------------------------------------------- 
 C   M o d u l e s
 C-----------------------------------------------
@@ -89,8 +91,8 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LCO, NF1, IFLAG, NB3S, I,IS,IAD0,IBID,NBGAMA,IBID1
-      INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),PID,IADBUF,IKORTH
+      INTEGER  NF1, I,IBID,IBID1
+      INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),IADBUF,IKORTH
       my_real
      . RX(MVSIZ) , RY(MVSIZ) , RZ(MVSIZ) ,
      . SX(MVSIZ) , SY(MVSIZ) , SZ(MVSIZ) ,

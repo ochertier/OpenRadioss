@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,89 +25,78 @@
 ! ==================================================================================================
 !! \brief read therm_param data structure from restart file
 !! \details
-      !||====================================================================
-      !||    read_therpmaram_mod   ../engine/source/output/restart/read_thermparam.F90
-      !||--- called by ------------------------------------------------------
-      !||    read_matparam         ../engine/source/output/restart/read_matparam.F
-      !||====================================================================
+!||====================================================================
+!||    read_therpmaram_mod   ../engine/source/output/restart/read_thermparam.F90
+!||--- called by ------------------------------------------------------
+!||    read_matparam         ../engine/source/output/restart/read_matparam.F
+!||====================================================================
       module read_therpmaram_mod
+      implicit none
       contains
 
-      !||====================================================================
-      !||    read_thermparam   ../engine/source/output/restart/read_thermparam.F90
-      !||--- called by ------------------------------------------------------
-      !||    read_matparam     ../engine/source/output/restart/read_matparam.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db           ../common_source/tools/input_output/read_db.F
-      !||    read_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    therm_param_mod   ../common_source/modules/mat_elem/therm_param_mod.F90
-      !||====================================================================
-      subroutine read_thermparam(therm)
+!||====================================================================
+!||    read_thermparam   ../engine/source/output/restart/read_thermparam.F90
+!||--- called by ------------------------------------------------------
+!||    read_matparam     ../engine/source/output/restart/read_matparam.F
+!||--- calls      -----------------------------------------------------
+!||    read_db           ../common_source/tools/input_output/read_db.F
+!||    read_i_c          ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    precision_mod     ../common_source/modules/precision_mod.F90
+!||    therm_param_mod   ../common_source/modules/mat_elem/therm_param_mod.F90
+!||====================================================================
+        subroutine read_thermparam(therm)
 ! --------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! --------------------------------------------------------------------------------------------------
-      use therm_param_mod
+          use therm_param_mod
+          use precision_mod, only : WP
 ! --------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! --------------------------------------------------------------------------------------------------
-      implicit none
-! --------------------------------------------------------------------------------------------------
-!                                                   Included files
-! --------------------------------------------------------------------------------------------------
-#include "my_real.inc"
+          implicit none
 ! --------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! --------------------------------------------------------------------------------------------------
-      type(therm_param_) ,intent(inout)    :: therm
+          type(therm_param_) ,intent(inout)    :: therm
 ! --------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! --------------------------------------------------------------------------------------------------
-      integer :: iad,ifix,rfix
-      integer ,dimension(:) ,allocatable :: ibuf
-      my_real ,dimension(:) ,allocatable :: rbuf
+          integer :: ifix,rfix
+          integer ,dimension(:) ,allocatable :: ibuf
+          real(kind=WP) ,dimension(:) ,allocatable :: rbuf
 ! --------------------------------------------------------------------------------------------------
 !                                                   Body
 ! --------------------------------------------------------------------------------------------------
-      ! read integer parameters
-      ifix = 2
-      allocate (ibuf(ifix))
-      call read_i_c(ibuf,ifix)
+          ! read integer parameters
+          ifix = 2
+          allocate (ibuf(ifix))
+          call read_i_c(ibuf,ifix)
 !
-      iad = 1
-        therm%iform = ibuf(iad)
-      iad = iad+1
-        therm%func_thexp = ibuf(iad)
+          therm%iform      = ibuf(1)
+          therm%func_thexp = ibuf(2)
 !
-      deallocate(ibuf)
+          deallocate(ibuf)
 
-      ! read real value parameters
-      rfix = 9
-      allocate (rbuf(rfix))
-      call read_db(rbuf,rfix)
+          ! read real value parameters
+          rfix = 10
+          allocate (rbuf(rfix))
+          call read_db(rbuf,rfix)
 !
-      iad = 1
-        therm%tref        = rbuf(iad)
-      iad = iad+1
-        therm%tmelt       = rbuf(iad)
-      iad = iad+1
-        therm%rhocp       = rbuf(iad)
-      iad = iad+1
-        therm%as          = rbuf(iad)
-      iad = iad+1
-        therm%bs          = rbuf(iad)
-      iad = iad+1
-        therm%al          = rbuf(iad)
-      iad = iad+1
-        therm%bl          = rbuf(iad)
-      iad = iad+1
-        therm%efrac       = rbuf(iad)
-      iad = iad+1
-        therm%scale_thexp = rbuf(iad)
+          therm%tini        = rbuf(1)
+          therm%tref        = rbuf(2)
+          therm%tmelt       = rbuf(3)
+          therm%rhocp       = rbuf(4)
+          therm%as          = rbuf(5)
+          therm%bs          = rbuf(6)
+          therm%al          = rbuf(7)
+          therm%bl          = rbuf(8)
+          therm%efrac       = rbuf(9)
+          therm%scale_thexp = rbuf(10)
 !
-      deallocate(rbuf)
+          deallocate(rbuf)
 !-----------
-      return
-      end
+          return
+        end subroutine read_thermparam
 
       end module read_therpmaram_mod

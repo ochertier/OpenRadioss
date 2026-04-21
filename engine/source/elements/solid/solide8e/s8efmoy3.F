@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8efmoy3   ../engine/source/elements/solid/solide8e/s8efmoy3.F
-      !||--- called by ------------------------------------------------------
-      !||    q4forc2    ../engine/source/elements/solid_2d/quad4/q4forc2.F
-      !||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8sforc3   ../engine/source/elements/solid/solide8s/s8sforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s8efmoy3   ../engine/source/elements/solid/solide8e/s8efmoy3.F
+!||--- called by ------------------------------------------------------
+!||    q4forc2    ../engine/source/elements/solid_2d/quad4/q4forc2.F
+!||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8sforc3   ../engine/source/elements/solid/solide8s/s8sforc3.F
+!||====================================================================
       SUBROUTINE S8EFMOY3(
      1   SIGOR,   VOL,     QVIS,    PP,
      2   EINT,    RHO,     Q,       DEFP,
@@ -35,7 +35,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5   STI,     STIN,    ICP,     OFF,
      6   VOL0,    VOL0G,   G_PLA,   G_EPSD,
      7   EINTTH,  EINTTHM, IEXPAN,  NEL,
-     8   CONDE,   CONDEN,  SVIS  ,NODADT_THERM)
+     8   CONDE,   CONDEN,  SVIS  ,NODADT_THERM,
+     9   G_WPLA,  L_WPLA,  G_WPLA_FLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,15 +62,18 @@ C-----------------------------------------------
      .   VOLG(*),STI(*),STIN(*),OFF(*),VOL0(*),VOL0G(*),
      .   EINTTH(*),EINTTHM(*),CONDE(*),CONDEN(*)
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
+      INTEGER, INTENT(IN) :: G_WPLA_FLAG
+      my_real,DIMENSION(NEL*G_WPLA_FLAG), INTENT(INOUT) :: G_WPLA
+      my_real,DIMENSION(NEL*G_WPLA_FLAG), INTENT(IN) :: L_WPLA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
 C     REAL
       my_real
      .   P,FAC(MVSIZ),FAC2(MVSIZ)
 C-----------------------------------------------
-C   - post-traitement-valeur moyenne au sens a'=(_/  a dv ) /v
+C   -Average post-processing in the sense A '= (_ / a dv) / V
       DO I=1,NEL
          FAC(I) = OFF(I)*VOL(I)/VOLG(I)
          FAC2(I) = VOL(I)/VOLG(I)
@@ -79,10 +83,11 @@ C   - post-traitement-valeur moyenne au sens a'=(_/  a dv ) /v
          SIGM(I,4) = SIGM(I,4) + FAC(I) * SIGOR(I,4)
          SIGM(I,5) = SIGM(I,5) + FAC(I) * SIGOR(I,5)
          SIGM(I,6) = SIGM(I,6) + FAC(I) * SIGOR(I,6)
-         RHOM(I)   = RHOM(I)   + FAC2(I) * RHO(I)
-         EINTM(I)  = EINTM(I)  + EINT(I)*VOL0(I)/VOL0G(I)
+         RHOM(I)   = RHOM(I)   + FAC2(I)* RHO(I)
+         EINTM(I)  = EINTM(I)  + EINT(I)* VOL0(I)/VOL0G(I)
+         IF (G_WPLA_FLAG > 0)  G_WPLA(I) = G_WPLA(I) + L_WPLA(I)
          QM(I)     = QM(I)     + FAC(I) * Q(I)
-         STIN(I)     = STIN(I)     + STI(I)
+         STIN(I)   = STIN(I)   + STI(I)
       ENDDO
 C
       IF(NODADT_THERM == 1) THEN

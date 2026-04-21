@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thpout_count   ../engine/source/output/th/thpout_count.F
-      !||--- called by ------------------------------------------------------
-      !||    init_th        ../engine/source/output/th/init_th.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar           ../engine/source/input/nvar.F
-      !||====================================================================
+!||====================================================================
+!||    thpout_count   ../engine/source/output/th/thpout_count.F
+!||--- called by ------------------------------------------------------
+!||    init_th        ../engine/source/output/th/init_th.F
+!||====================================================================
       SUBROUTINE THPOUT_COUNT(NTHGRP2, ITHGRP, WA_SIZE, INDEX_WA_POUT, IPARG,
      .                        ITHBUF ,SITHBUF)
 C-----------------------------------------------
@@ -52,7 +50,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL :: BOOL
-      INTEGER II,I,J,K,L,N,IP,IH,NG,ITY,MTE,LWA,NEL,NFT,KK(3)
+      INTEGER II,I,J,K,N,IP,IH,NG,ITY,MTE,NEL,NFT,KK(3)
       INTEGER :: J_FIRST,NITER,IAD,NN,IADV,NVAR,ITYP,IJK
       INTEGER, DIMENSION(NTHGRP2) :: INDEX_POUT
 C-----------------------------------------------

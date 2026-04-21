@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_line_from_surface_ext   ../starter/source/model/sets/create_line_from_surface_ext.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_line_from_surface_ext   ../starter/source/model/sets/create_line_from_surface_ext.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod                    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CREATE_LINE_FROM_SURFACE_EXT(CLAUSE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -44,8 +44,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,K,J1,J2,SIZEMAX,NSEG,IEXT,NSEG_EDGE_EXT,
-     .        NSEG_EDGE_ALL,NSEG_SURF,LINE_NENTITY
+      INTEGER I,K,J1,J2,SIZEMAX,NSEG,NSEG_EDGE_EXT,
+     .        NSEG_SURF,LINE_NENTITY
       INTEGER IWORK(70000),IPERM(4)
 !
       DATA IPERM /2,3,4,1/

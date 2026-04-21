@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8sav12    ../engine/source/elements/solid/solide/s8sav12.F
-      !||--- called by ------------------------------------------------------
-      !||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||    sforc3     ../engine/source/elements/solid/solide/sforc3.F
-      !||    szforc3    ../engine/source/elements/solid/solidez/szforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s8sav12    ../engine/source/elements/solid/solide/s8sav12.F
+!||--- called by ------------------------------------------------------
+!||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||    sforc3     ../engine/source/elements/solid/solide/sforc3.F
+!||    szforc3    ../engine/source/elements/solid/solidez/szforc3.F
+!||====================================================================
       SUBROUTINE S8SAV12(
      1   OFFG,    OFFG0,   SAV,     X,
      2   XDP,     NC1,     NC2,     NC3,
@@ -132,7 +132,7 @@ C
           ZD8(I)=X(3,NC8(I))  
         ENDDO      
       ENDIF
-C   -----attention, format is different to Ismstr=10,11
+C   -----note: format is different to Ismstr=10,11
         DO I=1,NEL
           IF(OFFG(I)/=OFFG0(I).AND.ABS(OFFG(I)) > ONE )THEN
            SAV(I,1)=XD1(I)-XD8(I)

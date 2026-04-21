@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_sorting_efric   ../engine/source/mpi/interfaces/spmd_exch_sorting_efric.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri                    ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                    ../engine/source/output/message/message.F
-      !||    arret                     ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                   ../engine/share/modules/h3d_mod.F
-      !||    message_mod               ../engine/share/message_module/message_mod.F
-      !||    outputs_mod               ../common_source/modules/outputs_mod.F
-      !||    tri25ebox                 ../engine/share/modules/tri25ebox.F
-      !||    tri7box                   ../engine/share/modules/tri7box.F
-      !||====================================================================
-      SUBROUTINE SPMD_EXCH_SORTING_EFRIC(
+!||====================================================================
+!||    spmd_exch_sorting_efric   ../engine/source/mpi/interfaces/spmd_exch_sorting_efric.F
+!||--- called by ------------------------------------------------------
+!||    inttri                    ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                    ../engine/source/output/message/message.F
+!||    arret                     ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                   ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod             ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod               ../engine/share/message_module/message_mod.F
+!||    output_mod                ../common_source/modules/output/output_mod.F90
+!||    spmd_comm_world_mod       ../engine/source/mpi/spmd_comm_world.F90
+!||    tri25ebox                 ../engine/share/modules/tri25ebox.F
+!||    tri7box                   ../engine/share/modules/tri7box.F
+!||====================================================================
+      SUBROUTINE SPMD_EXCH_SORTING_EFRIC(OUTPUT,
      1    IPARI   ,INTLIST ,NBINTC  ,ISLEN7 ,IRLEN7  ,
      2    IRLEN7T ,ISLEN7T ,IRLEN20 ,ISLEN20,IRLEN20T,
      3    ISLEN20T,INTBUF_TAB,H3D_DATA  )
@@ -45,8 +47,9 @@ C-----------------------------------------------
       USE TRI25EBOX
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
-      USE OUTPUTS_MOD
+      USE OUTPUT_MOD
       USE H3D_MOD
+      USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,6 +68,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE (OUTPUT_) :: OUTPUT
       INTEGER  , INTENT(IN) ::  
      .        NBINTC,ISLEN7, IRLEN7,IRLEN7T, ISLEN7T,       
      .        IRLEN20, ISLEN20, IRLEN20T, ISLEN20T,
@@ -77,14 +81,13 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER P, L, ADD, LL, NB, LEN, SIZ, LOC_PROC, II,
-     .        NIN, IDEB, N, MSGTYP, IERROR, NI, NOD, I,
+     . NIN, IDEB, N, MSGTYP, IERROR, NOD, I,
      .        NTY, IALLOCS, IALLOCR, MSGOFF,INTERFRIC,
      .        NBEFRIC,
      .        STATUS(MPI_STATUS_SIZE),DEBUT(NINTER),
      .        ADDS(NSPMD+1), ADDR(NSPMD+1),
      .        REQ_SI(NSPMD),REQ_RI(NSPMD),INTSORT(NBINTC)
       DATA MSGOFF/190/
-      LOGICAL ITEST
       my_real DIST
       my_real       ,DIMENSION(:), ALLOCATABLE :: BBUFS, BBUFR
       LOGICAL :: IS_EFRIC_COM_NEEDED
@@ -236,8 +239,8 @@ C
                       N = NINT(BBUFR(L+LEN*(I-1)))
                       NOD = INTBUF_TAB(NIN)%NSV(N) 
                       IF(NOD<=NUMNOD)THEN
-                        IF(INTERFRIC>0)  EFRIC(INTERFRIC,NOD)= EFRIC(INTERFRIC,NOD)+ BBUFR(L+LEN*(I-1)+1)
-                        IF(H3D_DATA%N_SCAL_CSE_FRIC>0) EFRICG(NOD)= EFRICG(NOD)+ BBUFR(L+LEN*(I-1)+2)
+                        IF(INTERFRIC>0)  OUTPUT%DATA%EFRIC(INTERFRIC,NOD)= OUTPUT%DATA%EFRIC(INTERFRIC,NOD)+ BBUFR(L+LEN*(I-1)+1)
+                        IF(H3D_DATA%N_SCAL_CSE_FRIC>0) OUTPUT%DATA%EFRICG(NOD)= OUTPUT%DATA%EFRICG(NOD)+ BBUFR(L+LEN*(I-1)+2)
                       ENDIF
 
                     ENDDO

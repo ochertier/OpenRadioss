@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,17 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    inepri    ../engine/source/constraints/general/rbody/inepri.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_rby   ../engine/source/coupling/rad2rad/r2r_init.F
-      !||    rbyact    ../engine/source/constraints/general/rbody/rbyact.F
-      !||--- calls      -----------------------------------------------------
-      !||    valpr     ../engine/source/constraints/general/rbody/valpr.F
-      !||====================================================================
+!||====================================================================
+!||    inepri    ../engine/source/constraints/general/rbody/inepri.F
+!||--- called by ------------------------------------------------------
+!||    r2r_rby   ../engine/source/coupling/rad2rad/r2r_init.F
+!||    rbyact    ../engine/source/constraints/general/rbody/rbyact.F
+!||--- calls      -----------------------------------------------------
+!||    valpr     ../engine/source/constraints/general/rbody/valpr.F
+!||====================================================================
       SUBROUTINE INEPRI(XI,BM)
 C------------------------------------
-C     CALCUL INERTIES ET REPERE PRINCIPAL
+C     INERTIA CALCULATION AND PRINCIPAL FRAME
 C------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

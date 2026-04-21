@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    telesc                   ../engine/source/constraints/general/cyl_joint/telesc.F
-      !||--- called by ------------------------------------------------------
-      !||    cjoint                   ../engine/source/constraints/general/cyl_joint/cjoint.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier               ../engine/source/system/machine.F
-      !||    spmd_allreduce_db_comm   ../engine/source/mpi/generic/spmd_allreduce_db_comm.F
-      !||    sum_6_float              ../engine/source/system/parit.F
-      !||--- uses       -----------------------------------------------------
-      !||    joint_mod                ../engine/share/modules/joint_mod.F
-      !||====================================================================
+!||====================================================================
+!||    telesc           ../engine/source/constraints/general/cyl_joint/telesc.F
+!||--- called by ------------------------------------------------------
+!||    cjoint           ../engine/source/constraints/general/cyl_joint/cjoint.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier       ../engine/source/system/machine.F
+!||    sum_6_float      ../engine/source/system/parit.F
+!||--- uses       -----------------------------------------------------
+!||    joint_mod        ../engine/share/modules/joint_mod.F
+!||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
         SUBROUTINE TELESC(N_JOINT,A,AR,V,VR,X,FS,MS,IN,ITASK)
 !$COMMENT
 !       TELESC description
@@ -47,6 +47,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !        - all the processor (weight = 1 or 0) computes the acc / ... of the secondary nodes        
 !       
 !$ENDCOMMENT
+        USE SPMD_MOD
         USE JOINT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -70,7 +71,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER NSN, NA, NB, I, N
+        INTEGER  NA, NB, I, N
 C     REAL
         my_real :: N1,N2,N3,S,XX, YY, ZZ, RR,A0
         my_real :: MASSE, INER 
@@ -197,7 +198,7 @@ C
         VZZ_6(1:6,ITASK+1) = ZERO  
 
 C----------------------------
-C     CALCUL DU CDG + MASSE
+C     calculation of the center of gravity and mass
 C----------------------------
 !       partial reduction of masse / XCDG / YCDG / ZCDG
 !           --> done by the processor with weight = 1
@@ -244,7 +245,7 @@ C----------------------------
             ENDIF
             BUF_R(1:24) = ZERO
             IF(NSPMD>1) THEN    
-                CALL SPMD_ALLREDUCE_DB_COMM(BUF_S,BUF_R,4*6,"SUM",CYL_JOIN(N_JOINT)%COMM_MPI%COMM)
+                CALL SPMD_ALLREDUCE(BUF_S,BUF_R,24,SPMD_SUM,CYL_JOIN(N_JOINT)%COMM_MPI%COMM)
             ELSE
                 BUF_R(1:24) = BUF_S(1:24)
             ENDIF
@@ -376,7 +377,7 @@ C----------------------------
             ENDIF
 
             IF(NSPMD>1) THEN
-                CALL SPMD_ALLREDUCE_DB_COMM(BUF_S,BUF_R,13*6,"SUM",CYL_JOIN(N_JOINT)%COMM_MPI%COMM)
+                CALL SPMD_ALLREDUCE(BUF_S,BUF_R,13*6,SPMD_SUM,CYL_JOIN(N_JOINT)%COMM_MPI%COMM)
             ELSE
                 BUF_R(1:78) = BUF_S(1:78)
             ENDIF

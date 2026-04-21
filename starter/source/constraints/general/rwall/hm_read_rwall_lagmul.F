@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,37 +20,37 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_rwall_lagmul   ../starter/source/constraints/general/rwall/hm_read_rwall_lagmul.F
-      !||--- called by ------------------------------------------------------
-      !||    read_rwall             ../starter/source/constraints/general/rwall/read_rwall.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    anodset                ../starter/source/output/analyse/analyse_node.c
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    kinset                 ../starter/source/constraints/general/kinset.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||    remove_nd              ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    subrotpoint            ../starter/source/model/submodel/subrot.F
-      !||    subrotvect             ../starter/source/model/submodel/subrot.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_rwall_lagmul   ../starter/source/constraints/general/rwall/hm_read_rwall_lagmul.F
+!||--- called by ------------------------------------------------------
+!||    read_rwall             ../starter/source/constraints/general/rwall/read_rwall.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    anodset                ../starter/source/output/analyse/analyse_node.c
+!||    fretitl                ../starter/source/starter/freform.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    kinset                 ../starter/source/constraints/general/kinset.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||    remove_nd              ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    subrotpoint            ../starter/source/model/submodel/subrot.F
+!||    subrotvect             ../starter/source/model/submodel/subrot.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_RWALL_LAGMUL(RWL     ,NPRW    ,LPRW    ,IFI     ,MS      ,
      .                                V       ,ITAB    ,ITABM1  ,X       ,IKINE   ,
      .                                IGRNOD  ,MFI     ,IMERGE  ,UNITAB  ,IDDLEVEL,
      .                               LSUBMODEL,RTRANS  ,NOM_OPT ,ITAGND  ,NCHLAGM , 
      .                                K       ,OFFS    ,IKINE1LAG) 
 C-------------------------------------
-C     LECTURE MUR RIGIDE
+C     READING MUR RIGIDE
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -97,14 +97,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, ITYP, ITIED, NSL, NUSER, MSR, J, I,
-     .   L, IGU,IGU2, IGRS, NOSYS, IFQ, JC, UID,
-     .   IFLAGUNIT,SUB_ID, SUB_INDEX
-      my_real
-     .   DIST, FRIC, DIAM, XMAS, VX, VY, VZ, XM1, YM1, ZM1,
-     .   XN, X1, Y1, Z1, DISN, X2, Y2, Z2, X3, FREQ, ALPHA, FAC_M_R2R
+      INTEGER N, ITYP, ITIED, NSL, NUSER, MSR, J, I,L, IGU,IGU2, IGRS, NOSYS, IFQ, JC, UID,IFLAGUNIT,SUB_ID, SUB_INDEX
+      my_real :: DIST, FRIC, DIAM, XMAS, VX, VY, VZ, XM1, YM1, ZM1
+      my_real :: XN, X1, Y1, Z1, DISN, X2, X3, FREQ, ALPHA, FAC_M_R2R
       CHARACTER MESS*40
-      CHARACTER(LEN=NCHARKEY) :: OPT
       CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL :: IS_AVAILABLE
 C-----------------------------------------------

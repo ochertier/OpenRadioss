@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sdlensh8   ../engine/source/elements/thickshell/solide8c/sdlensh8.F
-      !||--- called by ------------------------------------------------------
-      !||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    clsys3     ../engine/source/output/h3d/h3d_results/h3d_shell_tensor.F
-      !||====================================================================
+!||====================================================================
+!||    sdlensh8   ../engine/source/elements/thickshell/solide8c/sdlensh8.F
+!||--- called by ------------------------------------------------------
+!||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
+!||--- calls      -----------------------------------------------------
+!||    clsys3     ../engine/source/output/h3d/h3d_results/h3d_shell_tensor.F
+!||====================================================================
       SUBROUTINE SDLENSH8(
      1   VOLN,    LLSH, AREA, X1,      X2,
      2   X3,      X4,      X5,      X6,
@@ -59,7 +59,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N
+      INTEGER I
       my_real
      .   RX(MVSIZ),RY(MVSIZ),RZ(MVSIZ),SX(MVSIZ),SY(MVSIZ),SZ(MVSIZ),
      .   VQ(3,3,MVSIZ), LXYZ0(3),DETA1(MVSIZ),XX,YY,ZZ,
@@ -67,10 +67,10 @@ C-----------------------------------------------
      .   YL3(MVSIZ),YL4(MVSIZ),ZL1(MVSIZ),
      .   XN(MVSIZ,4) , YN(MVSIZ,4) , ZN(MVSIZ,4) 
       my_real
-     .   AL1,AL2,LL(MVSIZ),COREL(2,4)
+     .   AL1,AL2,COREL(2,4)
       my_real
-     .   X13,X24,Y13,Y24,L13,L24,C1,C2,THKLY,POSLY,
-     .   FAC,VISCE,RX1,RY1,SX1,SY1,S1,FAC1,FAC2,FACI,FAC11,FACDT
+     .   X13,X24,Y13,Y24,L13,L24,C1,C2,
+     .   FAC,RX1,RY1,SX1,SY1,S1,FAC1,FAC2,FACI,FACDT
 C=======================================================================
         SELECT CASE(ICS)
           CASE (1)

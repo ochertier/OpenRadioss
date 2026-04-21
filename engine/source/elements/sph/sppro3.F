@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sppro3     ../engine/source/elements/sph/sppro3.F
-      !||--- called by ------------------------------------------------------
-      !||    sptrivox   ../engine/source/elements/sph/sptrivox.F
-      !||--- calls      -----------------------------------------------------
-      !||    myqsort    ../common_source/tools/sort/myqsort.F
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox     ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    sppro3     ../engine/source/elements/sph/sppro3.F
+!||--- called by ------------------------------------------------------
+!||    sptrivox   ../engine/source/elements/sph/sptrivox.F
+!||--- calls      -----------------------------------------------------
+!||    myqsort    ../common_source/tools/sort/myqsort.F
+!||--- uses       -----------------------------------------------------
+!||    sphbox     ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPPRO3(IL    ,KXSP ,IXSP ,NOD2SP,JVOIS,
      .                  JSTOR,JPERM ,DVOIS,IREDUCE,KREDUCE,
      .                  KXSPR,IXSPR,TAB_DK)
@@ -60,19 +60,19 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J, KB, JB, NSBT, IB, IL, MM1, MM2, KM, MM, MG,
-     .   JJL, NFT, LLT, JL, JG, JLO, LL1, LL2, LL, LG, N, NN,
-     .   NVOIS, KL, K, JK, L, NVOIS1, NVOIS2, IERROR 
+      INTEGER    IL,
+     .     JG,
+     .   NVOIS, K, JK, NVOIS1, NVOIS2, IERROR 
 C     REAL
       my_real
-     .   CMS2(MVSIZ),XJJ, YJJ, ZJJ,DK, DL
+     .     DK
       my_real, DIMENSION(:), ALLOCATABLE :: DSTOR
 
 
         IF(IL <= NUMSPH.AND.IL > 0)THEN 
 C-----------------
-C       TRI DE LA LISTE, GARDE LES KVOISPH PREMIERS 
-C       (COEF DE SECURITE CROISSANT).
+C       SORT THE LIST, KEEP THE FIRST KVOISPH
+C       (INCREASING SAFETY COEFFICIENT).
 
 C-----------------
             NVOIS=KXSP(5,IL)
@@ -92,7 +92,7 @@ C-----------------
                 DK=DVOIS(KVOISPH)
                 TAB_DK(IL) = DK
 C-----------------
-C Choix des cellules a conserver tq distance < DK pour eviter pb de parith/on
+C Choice of cells to keep such that distance < DK to avoid parallelization problems
                       NVOIS=0
                       DO K=1,KXSP(5,IL)
                           IF(DVOIS(K)<DK)THEN
@@ -117,12 +117,12 @@ C-----------------
                 IXSP(K,IL)=JG
             ENDDO
 C-----------------------------------------------------------
-        ELSEIF(IL > NUMSPH)THEN        ! traitement pour cell remote inutile
+        ELSEIF(IL > NUMSPH)THEN        ! Treatment for unnecessary remote
 C-----------------
             XSPHR(1,IL-NUMSPH) = -ABS(XSPHR(1,IL-NUMSPH)) ! reperage cell remote utile
 C
-C       TRI DE LA LISTE, GARDE LES KVOISPH PREMIERS 
-C       (COEF DE SECURITE CROISSANT).
+C       SORT THE LIST, KEEP THE FIRST KVOISPH
+C       (INCREASING SAFETY COEFFICIENT).
 C-----------------
 ! Get the DK of the original cell
             DK = DKR(IL - NUMSPH) 
@@ -130,7 +130,7 @@ C-----------------
             IF(DK>=ZERO) THEN
                 IF(NVOIS>KVOISPH) THEN
 C-----------------
-C Choix des cellules a conserver tq distance < DK pour eviter pb de parith/on
+C Choice of cells to keep such that distance < DK to avoid parallelization problems
                     NVOIS=KXSPR(IL-NUMSPH)
                     CALL MYQSORT(NVOIS,DVOIS,JPERM,IERROR)
                     DO K=1,NVOIS
@@ -178,8 +178,8 @@ C
 Cf gauges IL=-NUMSPH-...
             IL=ABS(IL)
 C-----------------
-C       TRI DE LA LISTE, GARDE LES KVOISPH PREMIERS 
-C       (COEF DE SECURITE CROISSANT).
+C       SORT THE LIST, KEEP THE FIRST KVOISPH
+C       (INCREASING SAFETY COEFFICIENT).
 
 C-----------------
             NVOIS=KXSP(5,IL)
@@ -194,7 +194,7 @@ C-----------------
                 ENDDO
                 DK=DVOIS(KVOISPH)
 C-----------------
-C Choix des cellules a conserver tq distance < DK pour eviter pb de parith/on
+C Choice of cells to keep such that distance < DK to avoid parallelization problems
                       NVOIS=0
                       DO K=1,KXSP(5,IL)
                           IF(DVOIS(K)<DK)THEN

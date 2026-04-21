@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_deleted_surf_edge     ../engine/source/mpi/interfaces/spmd_exch_deleted_surf_edge.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    find_edge_from_remote_proc      ../engine/source/interfaces/interf/find_edge_from_remote_proc.F
-      !||    find_surface_from_remote_proc   ../engine/source/interfaces/interf/find_surface_from_remote_proc.F
-      !||--- uses       -----------------------------------------------------
-      !||    array_mod                       ../common_source/modules/array_mod.F
-      !||    nodal_arrays_mod                ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||    shooting_node_mod               ../engine/share/modules/shooting_node_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_deleted_surf_edge     ../engine/source/mpi/interfaces/spmd_exch_deleted_surf_edge.F
+!||--- called by ------------------------------------------------------
+!||    resol                           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    find_edge_from_remote_proc      ../engine/source/interfaces/interf/find_edge_from_remote_proc.F
+!||    find_surface_from_remote_proc   ../engine/source/interfaces/interf/find_surface_from_remote_proc.F
+!||--- uses       -----------------------------------------------------
+!||    array_mod                       ../common_source/modules/array_mod.F
+!||    element_mod                     ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod                   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    nodal_arrays_mod                ../common_source/modules/nodal_arrays.F90
+!||    shooting_node_mod               ../engine/share/modules/shooting_node_mod.F90
+!||    spmd_comm_world_mod             ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
         SUBROUTINE SPMD_EXCH_DELETED_SURF_EDGE( IAD_ELEM,NODES,SHOOT_STRUCT,INTBUF_TAB,NEWFRONT,
      .                                          IPARI,GEO,
      .                                          IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
@@ -49,9 +52,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
         USE ARRAY_MOD
         USE SHOOTING_NODE_MOD
         USE INTBUFDEF_MOD 
+        use element_mod , only : nixs,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g

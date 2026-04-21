@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    epxle3       ../engine/source/elements/solid/solide/epxle3.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3       ../engine/source/elements/solid/solide/sforc3.F
-      !||    szforc3      ../engine/source/elements/solid/solidez/szforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod      ../common_source/modules/ale/ale_mod.F
-      !||    alefvm_mod   ../common_source/modules/ale/alefvm_mod.F
-      !||====================================================================
+!||====================================================================
+!||    epxle3       ../engine/source/elements/solid/solide/epxle3.F
+!||--- called by ------------------------------------------------------
+!||    sforc3       ../engine/source/elements/solid/solide/sforc3.F
+!||    szforc3      ../engine/source/elements/solid/solidez/szforc3.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod      ../common_source/modules/ale/ale_mod.F
+!||    alefvm_mod   ../common_source/modules/ale/alefvm_mod.F
+!||====================================================================
       SUBROUTINE EPXLE3(
      1   VOL,     VEUL,    X1,      X2,
      2   X3,      X4,      X5,      X6,

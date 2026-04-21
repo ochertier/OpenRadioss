@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tensorc              ../engine/source/output/anim/generate/tensorc.F
-      !||--- called by ------------------------------------------------------
-      !||    genani               ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_r4get_partn     ../engine/source/mpi/anim/spmd_r4get_partn.F
-      !||    uroto_tens2d         ../engine/source/materials/tools/uroto_tens2d.F
-      !||    uroto_tens2d_aniso   ../engine/source/materials/tools/uroto_tens2d_aniso.F
-      !||    write_r_c            ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    matparam_def_mod     ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    my_alloc_mod         ../common_source/tools/memory/my_alloc.F90
-      !||    stack_mod            ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    tensorc              ../engine/source/output/anim/generate/tensorc.F
+!||--- called by ------------------------------------------------------
+!||    genani               ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    layini               ../engine/source/elements/shell/coque/layini.F
+!||    spmd_r4get_partn     ../engine/source/mpi/anim/spmd_r4get_partn.F
+!||    uroto_tens2d         ../engine/source/materials/tools/uroto_tens2d.F
+!||    uroto_tens2d_aniso   ../engine/source/materials/tools/uroto_tens2d_aniso.F
+!||    write_r_c            ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    drape_mod            ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod          ../common_source/modules/elements/element_mod.F90
+!||    matparam_def_mod     ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    my_alloc_mod         ../common_source/tools/memory/my_alloc.F90
+!||    stack_mod            ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE TENSORC(ELBUF_TAB,IPARG ,ITENS ,INVERT,NELCUT,
-     2                   EL2FA    ,NBF   ,TENS  ,EPSDOT,IADP  ,
-     3                   NBF_L    ,NBPART,IADG  ,X     ,IXC   ,
-     4                   IGEO     ,IXTG  ,IPM   ,STACK ,MAT_PARAM)
+     .                   EL2FA    ,NBF   ,TENS  ,EPSDOT,IADP  ,
+     .                   NBF_L    ,NBPART,IADG  ,X     ,IXC   ,
+     .                   IGEO     ,IXTG  ,IPM   ,STACK ,MAT_PARAM,
+     .                   GEO      ,DRAPE_SH4N, DRAPE_SH3N, DRAPEG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,6 +50,8 @@ C-----------------------------------------------
       USE STACK_MOD
       USE MATPARAM_DEF_MOD
       USE MY_ALLOC_MOD
+      USE DRAPE_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,11 +75,14 @@ C-----------------------------------------------
      .   NELCUT,NBF,IADP(*),NBF_L,NBPART,IADG(NSPMD,*),
      .   IXTG(NIXTG,*),IPM(NPROPMI,*)
 C     REAL
-      my_real
-     .   TENS(3,*),EPSDOT(6,*),X(3,*)
+      my_real TENS(3,*),EPSDOT(6,*),X(3,*)
+      my_real, INTENT(IN) :: GEO(NPROPG,NUMGEO)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
+      TYPE (DRAPE_) , INTENT(IN) :: DRAPE_SH4N(NUMELC_DRAPE)
+      TYPE (DRAPE_) , INTENT(IN) :: DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE (DRAPEG_), INTENT(IN) :: DRAPEG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -85,8 +94,8 @@ C     REAL
      .        N,J,LLT,MLW,ISTRAIN,IL,IR,IS,IT,NPTR,NPTS,NLAY,
      .        IPID,I1,I2,NS1,NS2,ISTRE,INPUT_ERROR,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,NNI,N0,
-     .        IHBE,IREP,BUF,NPG,K,ISROT,NUVARV,IVISC,
-     .        IPMAT,IGTYP,MATLY,ISUBSTACK,IIGEO,IADI,IPMAT_IPLY,
+     .        IHBE,BUF,NPG,K,ISROT,NUVARV,IVISC,
+     .        IPMAT,IGTYP,ISUBSTACK,IIGEO,IADI,IPMAT_IPLY,IXFEM,IXLAY,
      .        NPT_ALL,NPTT,ILAY,IUS,ID_PLY,IPLY,IPANG,IPPOS,IPTHK,JJ(8),
      .        IDX,IDX_MSTRESS,IDX_IDPLY_MSTRESS,IGMAT,IDRAPE,IDIR,IMAT,MAT_ORTH
       INTEGER PID(MVSIZ),MAT(MVSIZ)
@@ -95,11 +104,15 @@ C
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF 
-      TYPE(L_BUFEL_DIR_) ,POINTER :: LBUF_DIR
+ 
 C
-      my_real,
-     .   DIMENSION(:), POINTER :: DIR_A,DIR_B
+      my_real, DIMENSION(:), POINTER :: DIR_A,DIR_B
       REAL,DIMENSION(:),ALLOCATABLE :: WA
+      !
+      INTEGER :: NLAY_MAX,LAYNPT_MAX,NUMEL_DRAPE,SEDRAPE
+      INTEGER, DIMENSION(:)  , ALLOCATABLE :: MATLY   !!  MATLY(MVSIZ*LAY_MAX)
+      my_real, DIMENSION(:)  , ALLOCATABLE :: THKLY   !!  THKLY(MVSIZ*LAY_MAX*LAYNPT_MAX)
+      my_real, DIMENSION(:,:), ALLOCATABLE :: POSLY,THK_LY
 C-----------------------------------------------
       CALL MY_ALLOC(WA,3*NBF_L)
 !
@@ -170,10 +183,20 @@ C
               N0 = 0
               NNI = NN4
               IF (IHBE == 11) NPG = 4
+              IPID = IXC(6,NFT+1)
+              DO I=LFT,LLT
+                MAT(I)=IXC(1,NFT+I)
+                PID(I)=IXC(6,NFT+I)
+              ENDDO
             ELSE
               N0 = NUMELC
               NNI = NN5
               IF (IHBE == 11) NPG = 3
+              IPID = IXTG(5,NFT+1)
+              DO I=LFT,LLT
+                MAT(I)=IXTG(1,NFT+I)
+                PID(I)=IXTG(5,NFT+I)
+              ENDDO
             ENDIF
 c
             DO I=LFT,LLT                   
@@ -185,6 +208,7 @@ c
 C
             IF (MLW == 0) GOTO 490
 C
+            INPUT_ERROR = 0
             A1    = ZERO
             A2    = ZERO
             A3    = ZERO         
@@ -192,7 +216,44 @@ C
             IPT   = 1
             NPT   = IABS(IPARG(6,NG))
             MPT   = MAX(1,NPT)
-            INPUT_ERROR = 0
+!
+            LAYNPT_MAX = 1
+            IF (IGTYP == 51 .OR. IGTYP == 52) THEN
+              DO ILAY=1,NLAY
+                LAYNPT_MAX = MAX(LAYNPT_MAX ,ELBUF_TAB(NG)%BUFLY(ILAY)%NPTT)
+              ENDDO  
+            ENDIF
+            IXFEM = 0 
+            IXLAY = 0 
+            NLAY_MAX = MAX(NLAY,NPT)
+            ALLOCATE(MATLY(MVSIZ*NLAY_MAX))
+            ALLOCATE(THKLY(MVSIZ*NLAY_MAX*LAYNPT_MAX))
+            ALLOCATE(POSLY(MVSIZ,NLAY_MAX*LAYNPT_MAX))
+            ALLOCATE(THK_LY(NEL ,NLAY_MAX*LAYNPT_MAX))
+            MATLY(:) = 0
+            THKLY(:) = ZERO
+            POSLY(:,:)  = ZERO
+            THK_LY(:,:) = ZERO
+            ! computing position of slice or Ply
+            IF (ITY == 7) THEN
+              NUMEL_DRAPE = NUMELTG_DRAPE
+              SEDRAPE     = STDRAPE
+              CALL LAYINI(
+     .             ELBUF_TAB(NG),1   ,NEL            ,GEO    ,IGEO       ,
+     .             MAT      ,PID    ,THKLY           ,MATLY  ,POSLY      ,
+     .             IGTYP    ,IXFEM  ,IXLAY           ,NLAY   ,NPT        ,
+     .             ISUBSTACK,STACK  ,DRAPE_SH3N      ,NFT    ,GBUF%THK   ,
+     .             NEL      ,THK_LY ,DRAPEG%INDX_SH3N,SEDRAPE,NUMEL_DRAPE)
+             ELSE ! ITY = 3
+               NUMEL_DRAPE = NUMELC_DRAPE  
+               SEDRAPE     = SCDRAPE
+               CALL LAYINI(
+     .              ELBUF_TAB(NG),1  ,NEL             ,GEO    ,IGEO       ,
+     .              MAT      ,PID    ,THKLY           ,MATLY  ,POSLY      ,  
+     .              IGTYP    ,IXFEM  ,IXLAY           ,NLAY   ,NPT        ,  
+     .              ISUBSTACK,STACK  ,DRAPE_SH4N      ,NFT    ,GBUF%THK   ,    
+     .              NEL      ,THK_LY ,DRAPEG%INDX_SH4N,SEDRAPE,NUMEL_DRAPE)     
+            ENDIF 
 C
             IF (IGTYP == 51 .OR. IGTYP == 52) THEN
               NPT_ALL = 0
@@ -344,7 +405,7 @@ C-----
                 A2  = ZERO
               ENDIF
 C------------------------
-C        STRAIN
+C             STRAIN
 C------------------------
             ELSEIF (ITENS == 5) THEN  ! membrane
               ISTRE = 0
@@ -385,6 +446,10 @@ C------------------------
               IF ((ITENS - 200 > MPT) .OR. IGTYP == 51 .OR. IGTYP == 52 .OR. IGTYP == 17) THEN
                 A1 = ZERO
                 A2 = ZERO
+              ELSE IF (IGTYP == 11) THEN
+                IPT = ITENS-200
+                A1  = ONE
+                A2  = POSLY(1,IPT)
               ELSE
                 A1 = ONE
                 A2 = HALF*(((2*IPT-ONE)/MPT)-ONE)
@@ -429,7 +494,7 @@ c                      A2 = STACK%GEO(IPPOS+J,ISUBSTACK)
             ELSEIF (ITENS > 1610 + 3*MX_PLY_ANIM  .AND. 
      .              ITENS < 1711 + 3*MX_PLY_ANIM) THEN
 !-------------------
-              ! STRAI/ILAY/UPPER -> UPPER strain within each layer (PID51,52)
+              ! STRAIN/ILAY/UPPER -> UPPER strain within each layer (PID51,52)
 !-------------------
               ISTRE = 0
               A1 = ZERO
@@ -536,7 +601,7 @@ c                      A2 = STACK%GEO(IPPOS+J,ISUBSTACK)
                 ENDIF ! IF (IL <= NLAY)
               ENDIF ! IF (IGTYP == 51 .OR. IGTYP == 52)
 C------------------------
-C        STRAIN RATE
+C           STRAIN RATE
 C------------------------
             ELSEIF (ITENS == 91) THEN
               ISTRE = 2
@@ -709,25 +774,12 @@ c                      A2 = STACK%GEO(IPPOS+J,ISUBSTACK)
             !next available animation file
             ENDIF  !  IF (ITENS == 1)
 c-----------------------------------------------------------
+c-----------------------------------------------------------
+!
             IF (ISTRE == 1) THEN
 C------------------------
 C             STRESS
 C------------------------
-              IF (ITY == 3) THEN
-                IPID = IXC(6,NFT+1)
-                DO I=LFT,LLT
-                  MAT(I)=IXC(1,NFT+I)
-                  PID(I)=IXC(6,NFT+I)
-                ENDDO
-              ELSE  ! ITY == 7
-                IPID = IXTG(5,NFT+1)
-                DO I=LFT,LLT
-                  MAT(I)=IXTG(1,NFT+I)
-                  PID(I)=IXTG(5,NFT+I)
-                ENDDO
-              ENDIF
-c
-              IREP = IGEO(6,IPID)
               IVISC = 0
 
 C----------        
@@ -1355,7 +1407,7 @@ C--------
 C------------------------
             ELSEIF (ISTRE == 2) THEN
 C---------
-C          STRAIN RATE
+C             STRAIN RATE
 C---------
 c------------------------------------
               DO I=LFT,LLT
@@ -1378,11 +1430,13 @@ c------------------------------------
             ENDIF  !   (STRESS) ISTRE == 1 
           ENDIF   ! IF (MLW /= 13)
         ENDIF    ! IF(ITY == 2)
-
 c
+        IF(ALLOCATED(MATLY))  DEALLOCATE(MATLY)
+        IF(ALLOCATED(THKLY))  DEALLOCATE(THKLY)
+        IF(ALLOCATED(POSLY))  DEALLOCATE(POSLY)
+        IF(ALLOCATED(THK_LY)) DEALLOCATE(THK_LY)
 C-----------------------------------------------
  490  CONTINUE   ! NGROUP
- 500  CONTINUE
 C-----------------------------------------------
       IF (NSPMD == 1)THEN
         DO N=1,NBF
@@ -1411,7 +1465,7 @@ C-----------------------------------------------
             CALL WRITE_R_C(R4,3)
           ENDDO
         ELSEIF (ISPMD == 0) THEN
-C   verifier l'interet de ce qui est fait ci-dessus  !!!!!!!!!!!!!!
+C   check the usefulness of what is done above !!!!!!!!!!!!!!
           DO I=1,NELCUT
             CALL WRITE_R_C(WA(3*NBF_L-2),3)
           ENDDO
@@ -1421,21 +1475,23 @@ C
       DEALLOCATE(WA)
       RETURN
       END
-      !||====================================================================
-      !||    tencgps1       ../engine/source/output/anim/generate/tensorc.F
-      !||--- called by ------------------------------------------------------
-      !||    genani         ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    shlrotg        ../engine/source/output/anim/generate/tensor6.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tencgps1       ../engine/source/output/anim/generate/tensorc.F
+!||--- called by ------------------------------------------------------
+!||    genani         ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    shlrotg        ../engine/source/output/anim/generate/tensor6.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE TENCGPS1(ELBUF_TAB ,IPARG,ITENS,TENS1 ,TENS2  ,
      .                    X     ,IXC  ,IGEO ,IXTG  ,ITAGPS )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1462,7 +1518,7 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   OFF, FAC, A1, A2, A3, THK, EVAR(6,MVSIZ),AREA(MVSIZ)
-      INTEGER I, NG, NEL, NFT, ITY, LFT, NPT, IPT,
+      INTEGER I, NG, NEL, NFT, ITY, LFT, 
      .        N, J, LLT, MLW,K,
      .        IPID, I1, I2, IAD2, NS1, NS2  , IALEL, ISTRE,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,NNI,N0,
@@ -1582,22 +1638,24 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    tencgps2       ../engine/source/output/anim/generate/tensorc.F
-      !||--- called by ------------------------------------------------------
-      !||    genani         ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    shlrotg        ../engine/source/output/anim/generate/tensor6.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tencgps2       ../engine/source/output/anim/generate/tensorc.F
+!||--- called by ------------------------------------------------------
+!||    genani         ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    shlrotg        ../engine/source/output/anim/generate/tensor6.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE TENCGPS2(ELBUF_TAB ,IPARG,ITENS,TENS1 ,TENS2  ,
      .                    X     ,IXC  ,IGEO ,IXTG  ,GEO    ,
      .                    VGPS   )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1625,7 +1683,7 @@ C     REAL
       my_real
      .   OFF, FAC, A1, A2, A3, THK0, EVAR(6,MVSIZ),AREA(MVSIZ),
      .   VOL(MVSIZ)
-      INTEGER I, NG, NEL, NFT, ITY, LFT, NPT, IPT,
+      INTEGER I, NG, NEL, NFT, ITY, LFT, 
      .        N, J, LLT, MLW,K,
      .        IPID, I1, I2, IAD2, NS1, NS2  , IALEL, ISTRE,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,NNI,N0,

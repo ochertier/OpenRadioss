@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_mv_ca   ../engine/source/mpi/airbags/spmd_mv_ca.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol0      ../engine/source/airbag/monvol0.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_mv_ca   ../engine/source/mpi/airbags/spmd_mv_ca.F
+!||--- called by ------------------------------------------------------
+!||    monvol0      ../engine/source/airbag/monvol0.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod     ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_MV_CA(
      1   FR_MV ,IV    ,NAV    ,RVOLU   ,RVOLUV ,
      2   ICBAG ,NJET  ,IVOLUV ,RBAGVJET,IFLAG  ,ITYP,NGASES)
-C communication pression volume pour airbags communicants
+        USE SPMD_MOD
+C Communication pressure volume for communicating airbags
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,7 +61,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER LOC_PROC,I,J,II,P,L,SIZ,NB,IJ,RADVOIS,
+      INTEGER LOC_PROC,I,II,P,L,SIZ,NB,IJ,RADVOIS,
      .        MSGTYP,MSGOFF,MSGOFF2,IERROR, ICOMRC,
      .        ICOMSD(NSPMD),REQ_S(NSPMD),IGAS,
      .        STATUS(MPI_STATUS_SIZE)
@@ -83,7 +86,7 @@ C-----------------------------------------------
         END DO
         DO I=1,NAV
           II = ICBAG(1,I)
-C si pmain
+C if pmain
           IF(FR_MV(NSPMD+2,II)==LOC_PROC)THEN
             NB = NB + 1
             BUFS(L+1)=II
@@ -132,7 +135,7 @@ C
             ICOMRC = 0
             DO I=1,NAV
               II = ICBAG(1,I)
-C si pmain
+C if pmain
               IF(FR_MV(NSPMD+2,II)==P.AND.
      +           FR_MV(LOC_PROC,II)==0)THEN
                 ICOMRC = 1
@@ -176,13 +179,13 @@ C
           IF(ICOMSD(P)==1) CALL MPI_WAIT(REQ_S(P),STATUS,IERROR)
         END DO
       ELSE !IFLAG /= 1
-C cas renvoi des pressions du pmain du mv vers les processeurs traitant les mv voisins
+C case of sending pressures from the pmain of the mv to processors handling neighboring mvs
         IF(FR_MV(NSPMD+2,IV)==LOC_PROC)THEN
 C
           DO P = 1, NSPMD
             ICOMSD(P) = 0
           END DO
-C si pmain
+C if pmain
           L = 0
           DO I=1,NAV
             II = ICBAG(1,I)

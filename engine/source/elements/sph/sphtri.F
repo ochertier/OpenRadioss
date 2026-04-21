@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sphtri    ../engine/source/elements/sph/sphtri.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep   ../engine/source/elements/sph/sphprep.F
-      !||--- calls      -----------------------------------------------------
-      !||    spbuc3    ../engine/source/elements/sph/spbuc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox    ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    sphtri    ../engine/source/elements/sph/sphtri.F
+!||--- called by ------------------------------------------------------
+!||    sphprep   ../engine/source/elements/sph/sphprep.F
+!||--- calls      -----------------------------------------------------
+!||    spbuc3    ../engine/source/elements/sph/spbuc3.F
+!||--- uses       -----------------------------------------------------
+!||    sphbox    ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPHTRI(X       ,SPBUF   ,KXSP  ,IXSP  ,NOD2SP,
      2                  IREDUCE ,WSP2SORT,BMINMA,NSP2SORTF,NSP2SORTL,
      3                  ITASK   ,KREDUCE ,LGAUGE  ,GAUGE   )
@@ -53,22 +53,14 @@ C-----------------------------------------------
       INTEGER KXSP(NISP,*),IXSP(KVOISPH,*),NOD2SP(*), WSP2SORT(*),
      .        IREDUCE,NSP2SORTF,NSP2SORTL,ITASK, KREDUCE(*),
      .        LGAUGE(3,*)
-      my_real
-     .        X(3,*),SPBUF(NSPBUF,*), BMINMA(12), GAUGE(LLGAUGE,*)
+      my_real X(3,*),SPBUF(NSPBUF,*), BMINMA(12), GAUGE(LLGAUGE,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSN,IG,JG
-      INTEGER
-     .   N,INOD,JNOD,J,NVOIS,M,NCAND,NVOIS1,NVOIS2,
-     .   KL, K, L, JK, JL, IERROR, NS, SS,
-     .   MWA(15*(NUMSPH+NSPHR)),
-     .   JVOIS(NUMSPH+NSPHR), JSTOR(NUMSPH+NSPHR),
-     .   JPERM(NUMSPH+NSPHR)
-      my_real
-     .       CMS2,DMS,DMS2,
-     .       XI,YI,ZI,XJ,YJ,ZJ,D,DK,DL,
-     .       DVOIS(NUMSPH+NSPHR)    
+      INTEGER NSN,IG
+      INTEGER N, INOD, NS
+      INTEGER MWA(15*(NUMSPH+NSPHR)), JVOIS(NUMSPH+NSPHR), JSTOR(NUMSPH+NSPHR), JPERM(NUMSPH+NSPHR)
+      my_real DVOIS(NUMSPH+NSPHR)
 C-----------------------------------------------
          NSN=0
          DO NS=1,NSP2SORT

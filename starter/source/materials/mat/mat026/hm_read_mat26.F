@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat26            ../starter/source/materials/mat/mat026/hm_read_mat26.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||    mrdse2                   ../starter/source/materials/mat/mat026/mrdse2.F
-      !||    mrdse3                   ../starter/source/materials/mat/mat026/mrdse3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat26            ../starter/source/materials/mat/mat026/hm_read_mat26.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||    mrdse2                   ../starter/source/materials/mat/mat026/mrdse2.F
+!||    mrdse3                   ../starter/source/materials/mat/mat026/mrdse3.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT26(
      .              MTAG     ,PM      ,MAT_ID   ,TITR  ,IPM     ,
      .              JTHE     ,BUFMAT  ,MFI      ,IDF   ,LSUBMODEL,
@@ -80,7 +80,7 @@ C-----------------------------------------------
       INTEGER I1, MAT, NR, NT, IDR, IDT, IDP, IDE, IDQ,ILAW
       my_real
      .   YOUNG, ANU, CA, CB, CN, EPSM, SIGM, E0, CC, EPS0, CM, TMELT,
-     .   TMAX, G, C1, RHO, UNIT, STATUS, FORM, XNR, XNT, T0, P0, DPDR,
+     .   TMAX, G, C1, XNR, XNT, T0, P0, DPDR,
      .   XKL, XLAMB, ATOM, SIG, XKMAX, RHO0, DYDZ,RHOR,EPS0_UNIT
 
       CHARACTER(ncharline) ::  FILE, VIDE
@@ -306,7 +306,7 @@ C
 !----------------------
 !
 c
-C---- Definition des variables internes (stockage elementaire)
+C---- Definition of internal variables (Elementary storage)
 c
       MTAG%G_PLA   = 1    
       MTAG%G_TEMP  = 1    
@@ -316,7 +316,7 @@ c
       MTAG%L_TEMP  = 1
       MTAG%L_EPSD  = 1
       MTAG%L_SSP   = 1
-      MTAG%L_Z     = 1    ! taux ionisation
+      MTAG%L_Z     = 1    ! ionization rate
 c
       ! MATPARAM keywords
       CALL INIT_MAT_KEYWORD(MATPARAM,"INCOMPRESSIBLE")

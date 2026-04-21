@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    pgrtails               ../starter/source/elements/beam/pgrtails.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    zeroin                 ../starter/source/system/zeroin.F
-      !||--- uses       -----------------------------------------------------
-      !||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
-      !||====================================================================
+!||====================================================================
+!||    pgrtails               ../starter/source/elements/beam/pgrtails.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    zeroin                 ../starter/source/system/zeroin.F
+!||--- uses       -----------------------------------------------------
+!||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+!||====================================================================
       SUBROUTINE PGRTAILS(MAT_PARAM,
      1    IXP    ,IPARG  ,PM       ,GEO      ,
      2    EADD   ,ND     ,DD_IAD   ,IDX      ,
@@ -41,7 +41,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      4    ITR1   ,IGRSURF,IGRBEAM  ,IGEO     ,
      5    IPM    ,IPOUOFF,TAGPRT_SMS ,
      6    NOD2EL1D,PRINT_FLAG,ITAGPRLD_BEAM,
-     7    PRELOAD_A,NPRELOAD_A)
+     7    PRELOAD_A,NPRELOAD_A,IBEAM_VECTOR,RBEAM_VECTOR,XNUM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -57,9 +57,9 @@ C            A R G U M E N T S
 C-----------------------------------------------
 C     IXP(6,NUMELP)      TABLEAU CONECS+PID+MID+NOS POUTRES         E
 C     IPARG(NPARG,NGROUP)TABLEAU DES CARACTERISTIQUES DES GROUPES   E/S
-C     GEO(NPROPG,NUMGEO) TABLEAU DES CARACS DES PID                 E
+C     GEO(NPROPG,NUMGEO) ARRAY OF PID CHARACTERISTICS                 E
 C     EADD(NUMELP)       TABLEAU DES ADRESEES DANS IDAM CHGT DAMIER E
-C     DD_IAD             TABLEAU DE LA DD EN SUPER GROUPES          S
+C     DD_IAD             TABLEAU OF DD IN SUPER GROUPS          S
 C     INUM(9,NUMELP)     TABLEAU DE TRAVAIL                         E/S
 C     INDEX(NUMELP)      TABLEAU DE TRAVAIL                         E/S
 C     CEP(NUMELP)        TABLEAU DE TRAVAIL                         E/S
@@ -83,16 +83,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IDX,LB_MAX,ND
+      INTEGER IDX,ND
       INTEGER ITR1(*),IXP(6,*),IPARG(NPARG,*),EADD(*),IPARTP(*),
-     .        DD_IAD(NSPMD+1,*),CEP(*),INUM(8,*),INDEX(*),
+     .        DD_IAD(NSPMD+1,*),CEP(*),INUM(9,*),INDEX(*),
      .        IPM(NPROPMI,*),IPOUOFF(*),
      .        TAGPRT_SMS(*),NOD2EL1D(*),IGEO(NPROPGI,*)
       INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
       INTEGER, INTENT(IN) :: NPRELOAD_A
       INTEGER ,INTENT(INOUT), DIMENSION(NUMELP) :: ITAGPRLD_BEAM
+      INTEGER ,INTENT(INOUT) :: IBEAM_VECTOR(NUMELP)
       my_real
      .   PM(NPROPM,*), GEO(NPROPG,*)
+      my_real ,INTENT(INOUT) :: RBEAM_VECTOR(3,NUMELP)
+      my_real ,INTENT(INOUT) :: XNUM(3,NUMELP)
       TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBEAM)  :: IGRBEAM
@@ -113,7 +116,7 @@ C-----------------------------------------------
 C=======================================================================
       NGR1 = NGROUP + 1
 C
-C phase 1 : decompostition canonique
+C Phase 1: Canonical decomposition
 
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
@@ -128,7 +131,6 @@ C initialisation dd_iad
 
       DO N=1,ND
         NEL = EADD(N+1)-EADD(N)
-
         DO I = 1, NEL
           INDEX(I) = I
           INUM(1,I)=IPARTP(NFT+I)
@@ -139,6 +141,8 @@ C initialisation dd_iad
           INUM(6,I)=IXP(5,NFT+I)
           INUM(7,I)=IXP(6,NFT+I)
           INUM(8,I)=IPOUOFF(NFT+I)
+          INUM(9,I)=IBEAM_VECTOR(NFT+I)   
+          XNUM(1:3,I)=RBEAM_VECTOR(1:3,NFT+I)           
         ENDDO
 
         MODE=0
@@ -152,6 +156,8 @@ C initialisation dd_iad
           IXP(5,I+NFT)=INUM(6,INDEX(I))
           IXP(6,I+NFT)=INUM(7,INDEX(I))
           IPOUOFF(NFT+I)=INUM(8,INDEX(I))
+          IBEAM_VECTOR(NFT+I)=INUM(9,INDEX(I))   
+          RBEAM_VECTOR(1:3,NFT+I)=XNUM(1:3,INDEX(I))
           ITR1(NFT+INDEX(I)) = NFT+I
         ENDDO
 C REORDERING FOR ITAGPRLD_BEAM
@@ -191,10 +197,10 @@ C
         DO I = 1, NEL
           CEP(NFT+I) = INDEX(I)
         ENDDO
-        NFT = NFT + NEL
+        NFT = NFT + NEL 
       ENDDO
 C
-C RENUMEROTATION POUR SURFACES
+C RENUMBATION FOR SURFACES
 C
       DO I=1,NSURF
         NN=IGRSURF(I)%NSEG
@@ -204,7 +210,7 @@ C
         ENDDO
       ENDDO
 C
-C RENUMEROTATION POUR GROUPES DE SHELL
+C RENUMBATION FOR SHELL GROUPS
 C
       DO I=1,NGRBEAM
         NN=IGRBEAM(I)%NENTITY
@@ -228,8 +234,8 @@ C
       END DO
 C
 C-------------------------------------------------------------------------
-C phase 2 : bornage en groupe de mvsiz
-C ngroup est global, iparg est global mais organise en fonction de dd
+C Phase 2: MVSIZ Group Bounds
+C ngroup is global, iparg is global but organized according to dd
 C
       DO 300 N=1,ND
         NFT = 0
@@ -295,7 +301,7 @@ c                                        other groups using old buffer
               IPARG(9,NGROUP) = NINT(GEO(3,PID))
               IPARG(13,NGROUP) = JTHE  !beam : 0 or 1 only
               IPARG(38,NGROUP) = IGTYP
-              !---reperage groupe/processeur
+              !--- Group/processor
               IPARG(32,NGROUP)= P-1
 C             flag for group of duplicated elements in multidomains
               IF (NSUBDOM>0) IPARG(77,NGROUP)= IPARTR2R
@@ -333,7 +339,7 @@ c
             NGP(P)=NGROUP-NGP(P)
           ENDIF
         ENDDO
-        !--- DD_IAD => nb groupes par sous domaine
+        !--- dd_iad => nb groups by sub-domain
         NGP(NSPMD+1)=0
         DO P = 1, NSPMD
           NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)

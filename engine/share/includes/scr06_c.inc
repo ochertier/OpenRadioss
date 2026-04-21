@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,12 +23,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C.../SCR06/
       COMMON /SCR06/ INERI, IPLAST, IOFC0, ISHF, NCINP, 
      .               IREPORT,IH3DREADER,IHTML,
-     .               IMVW,IMVW_REF,NINTSKIDOLD,ANIMCONT
+     .               IMVW,IMVW_REF,NINTSKIDOLD
       COMMON /SCR06R/ HVISC, HELAS, HVLIN, DT12S,
      .        DMTMXS,DMNMXS,DEMXS,DMTMXK,DMNMXK,DEMXK
       INTEGER INERI, IPLAST, IOFC0, ISHF, NCINP, 
      .        IREPORT,IH3DREADER,IHTML,
-     .        IMVW,IMVW_REF,NINTSKIDOLD,ANIMCONT
+     .        IMVW,IMVW_REF,NINTSKIDOLD
       my_real 
      .        HVISC, HELAS, HVLIN, DT12S,
      .        DMTMXS,DMNMXS,DEMXS,DMTMXK,DMNMXK,DEMXK

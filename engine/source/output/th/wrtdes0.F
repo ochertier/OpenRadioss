@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    wrtdes0           ../engine/source/output/th/wrtdes0.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2             ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||    wrtdes            ../engine/source/output/th/wrtdes.F
-      !||====================================================================
+!||====================================================================
+!||    wrtdes0           ../engine/source/output/th/wrtdes0.F
+!||--- called by ------------------------------------------------------
+!||    hist2             ../engine/source/output/th/hist2.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||    wrtdes            ../engine/source/output/th/wrtdes.F
+!||====================================================================
       SUBROUTINE WRTDES0(NG,WA,II,IFORM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -40,14 +40,9 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 C-----------------------------------------------
       INTEGER NG,II,IFORM
-      my_real
-     .    WA(*)
+      my_real :: WA(*)
 C-----------------------------------------------
-c      IF (IMACH/=3) THEN
-c        CALL WRTDES(WA,WA,II,ITFORM,1)
-c      ELSE
-       IF(NSPMD > 1) CALL SPMD_GLOB_DSUM9(WA,II)
-       IF (ISPMD==0) CALL WRTDES(WA,WA,II,IFORM,1)
-c      ENDIF
+        IF(NSPMD > 1) CALL SPMD_GLOB_DSUM9(WA,II)
+        IF (ISPMD==0) CALL WRTDES(WA,WA,II,IFORM,1)
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_fail_fld         ../starter/source/materials/fail/fld/hm_read_fail_fld.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_fail             ../starter/source/materials/fail/hm_read_fail.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_fail_fld         ../starter/source/materials/fail/fld/hm_read_fail_fld.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_fail             ../starter/source/materials/fail/hm_read_fail.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_FAIL_FLD(FAIL , 
      .           MAT_ID   ,FAIL_ID  ,IRUPT    ,IXFEM    ,
-     .           LSUBMODEL,UNITAB   )
+     .           LSUBMODEL,UNITAB   ,FAIL_TAG )
 C-----------------------------------------------
 c    ROUTINE DESCRIPTION :
 c    Read FLD failure model parameters
@@ -48,6 +49,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD 
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD 
+      USE ELBUFTAG_MOD            
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,6 +68,7 @@ C-----------------------------------------------
       TYPE (SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*)  ! submodel table 
       INTEGER             ,INTENT(INOUT) :: IXFEM      ! XFEM activation flag
       TYPE (FAIL_PARAM_)  ,INTENT(INOUT) :: FAIL       ! failure model data structure
+      TYPE (FAIL_TAG_)    ,INTENT(INOUT) :: FAIL_TAG   ! failure model tag for buffer allocation
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -149,13 +152,18 @@ c---------------------------
       FAIL%NUVAR   = 3
       FAIL%NFUNC   = NFUNC
       FAIL%NTABLE  = 0
-      FAIL%NMOD    = 0
+      IF (IENG == 2) THEN 
+        FAIL%NMOD  = 3
+      ELSE
+        FAIL%NMOD  = 2
+      ENDIF
       FAIL%PTHK    = PTHKF
 c            
       ALLOCATE (FAIL%UPARAM(FAIL%NUPARAM))
       ALLOCATE (FAIL%IPARAM(FAIL%NIPARAM))
       ALLOCATE (FAIL%IFUNC (FAIL%NFUNC))
       ALLOCATE (FAIL%TABLE (FAIL%NTABLE))
+      ALLOCATE (FAIL%MODE  (FAIL%NMOD))
 c
       FAIL%IFUNC(1:NFUNC) = IFUNC(1:NFUNC)
 c
@@ -169,6 +177,15 @@ c
       FAIL%IPARAM(1) = IFAIL_SH
       FAIL%IPARAM(2) = IMARGIN
       FAIL%IPARAM(3) = IENG
+c
+      FAIL%MODE(1) = "FLDF Damage factor"
+      FAIL%MODE(2) = "FLDZ Failure zone factor"
+      IF (IENG == 2) THEN 
+        FAIL%MODE(3) = "Incremental Strains ratio Beta"
+      ENDIF
+      FAIL_TAG%LF_DAMMX = 1 + FAIL%NMOD
+      FAIL_TAG%LF_DAM   = 1 ! damage factor for ANIM output
+      FAIL_TAG%LF_INDX  = 1 ! FLD zone index for ANIM output
 c
 c--------------------------------------------------
       IF (IS_ENCRYPTED) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intal3          ../engine/source/ale/inter/intal3.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx          ../engine/source/ale/grid/alewdx.F
-      !||--- calls      -----------------------------------------------------
-      !||    i9wale          ../engine/source/interfaces/int09/i9wale.F
-      !||    int12w          ../engine/source/ale/inter/int12w.F
-      !||    intal4          ../engine/source/ale/inter/intal4.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    intal3          ../engine/source/ale/inter/intal3.F
+!||--- called by ------------------------------------------------------
+!||    alewdx          ../engine/source/ale/grid/alewdx.F
+!||--- calls      -----------------------------------------------------
+!||    i9wale          ../engine/source/interfaces/int09/i9wale.F
+!||    int12w          ../engine/source/ale/inter/int12w.F
+!||    intal4          ../engine/source/ale/inter/intal4.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INTAL3(IPARI,X        ,V      ,
      2                  A    ,VG      ,ISKEW     ,SKEW     ,ICODE  ,
      3                  IXS  ,IXQ     ,ELBUF_TAB,IPARG  ,
@@ -40,6 +42,7 @@ C   M o d u l e s
 C-----------------------------------------------
        USE ELBUFDEF_MOD           
        USE INTBUFDEF_MOD
+       use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,9 +57,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IPARI(NPARI,NINTER), ICODE(*) ,
-     .        IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ), IPARG(NPARG,NGROUP),
-     .        ISKEW(*), NALE(*)
+      INTEGER IPARI(NPARI,NINTER), ICODE(*),IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ), IPARG(NPARG,NGROUP),ISKEW(*), NALE(*)
       my_real X(3,NUMNOD), V(3,NUMNOD), A(3,NUMNOD), VG(*), SKEW(*), PM(NPROPM,NUMMAT)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
@@ -68,12 +69,10 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       DO N=1,NINTER
-       NTY   =IPARI(7,N)
+       NTY = IPARI(7,N)
        IF(NTY == 1)THEN
         IF(ISPMD == 0)THEN
-         CALL INTAL4(
-     1        IPARI(1,N),INTBUF_TAB(N),X            ,V     ,
-     2        A         ,VG           ,ICODE        ,ISKEW ,SKEW  )
+         CALL INTAL4(IPARI(1,N),INTBUF_TAB(N),V ,VG)
         END IF
        ELSEIF(NTY == 9) THEN
          CALL I9WALE(
@@ -86,9 +85,7 @@ C-----------------------------------------------
            ITIED=NINT(INTBUF_TAB(N)%VARIABLES(1))
 C Grid Velocities of secondary nodes are not interpolated
 C ONLY in case "TIED"
-         IF (ITIED  == 1 .OR. ITIED == 2) CALL INT12W(
-     1        IPARI(1,N),INTBUF_TAB(N),X            ,V     ,
-     2        A         ,VG           ,ICODE        ,ISKEW ,SKEW  )
+         IF (ITIED  == 1 .OR. ITIED == 2) CALL INT12W(IPARI(1,N),INTBUF_TAB(N),VG)
         ENDIF
        ENDIF
       ENDDO!next N

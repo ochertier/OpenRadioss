@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,10 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dichotomic_search_r_asc        ../common_source/tools/search/dichotomic_search_r_asc.F
-      !||--- called by ------------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    dichotomic_search_r_asc        ../common_source/tools/search/dichotomic_search_r_asc.F
+!||--- called by ------------------------------------------------------
+!||    pblast_parameters__air_burst   ../common_source/modules/loads/pblast_mod.F90
+!||====================================================================
       FUNCTION DICHOTOMIC_SEARCH_R_ASC(VAL, ARRAY, LEN)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -47,42 +48,42 @@ C-----------------------------------------------
         my_real, INTENT(IN) :: VAL
         INTEGER, INTENT(IN) :: LEN
         my_real, INTENT(IN) :: ARRAY(LEN)
-        INTEGER :: DICHOTOMIC_SEARCH_R_ASC        
+        INTEGER :: DICHOTOMIC_SEARCH_R_ASC
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER :: ISTART,IEND, IMID
 C-----------------------------------------------
 C   S o u r c e   L i n e s
-C-----------------------------------------------        
+C-----------------------------------------------
         ISTART = 1
         IEND = LEN
         !VAL ABOVE UPPER BOUND
         IF(ARRAY(1)>VAL)THEN
-         DICHOTOMIC_SEARCH_R_ASC = 1
-         RETURN
+          DICHOTOMIC_SEARCH_R_ASC = 1
+          RETURN
         ENDIF
         !VAL LOWER THAN LOWER BOUND
-        IF(ARRAY(LEN)<VAL)THEN        
-         DICHOTOMIC_SEARCH_R_ASC = LEN
-         RETURN
-        ENDIF        
+        IF(ARRAY(LEN)<VAL)THEN
+          DICHOTOMIC_SEARCH_R_ASC = LEN
+          RETURN
+        ENDIF
         !VAL IS BETWEEN THE BOUNDS
-        DO WHILE (ISTART+1<IEND)        
-            IMID=(IEND+ISTART)/2
-            IF(ARRAY(IMID) > VAL)THEN
-              !FOCUS ON LEFT PART
-              IEND = IMID
-            ELSEIF(ARRAY(IMID) < VAL)THEN
-              !FOCUS ON RIGHT PART
-              ISTART = IMID
-            ELSE
-              !FOUND BY CHANCE NO NEED TO ITERATE MORE
-              DICHOTOMIC_SEARCH_R_ASC = IMID
-              RETURN
-            ENDIF
-        ENDDO  
-         DICHOTOMIC_SEARCH_R_ASC = ISTART                          
-        RETURN      
+        DO WHILE (ISTART+1<IEND)
+          IMID=(IEND+ISTART)/2
+          IF(ARRAY(IMID) > VAL)THEN
+            !FOCUS ON LEFT PART
+            IEND = IMID
+          ELSEIF(ARRAY(IMID) < VAL)THEN
+            !FOCUS ON RIGHT PART
+            ISTART = IMID
+          ELSE
+            !FOUND BY CHANCE NO NEED TO ITERATE MORE
+            DICHOTOMIC_SEARCH_R_ASC = IMID
+            RETURN
+          ENDIF
+        ENDDO
+        DICHOTOMIC_SEARCH_R_ASC = ISTART
+        RETURN
       END FUNCTION DICHOTOMIC_SEARCH_R_ASC
-C-----------------------------------------------     
+C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2for27p_pen   ../engine/source/interfaces/interf/i2for27p_pen.F
-      !||--- called by ------------------------------------------------------
-      !||    i2for27p       ../engine/source/interfaces/interf/i2for27p.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2forces       ../engine/source/interfaces/interf/i2forces.F
-      !||    i2loceq        ../common_source/interf/i2loceq.F
-      !||    i2pen_rot27    ../common_source/interf/i2pen_rot.F
-      !||    i2rep          ../common_source/interf/i2rep.F
-      !||    i2sms27        ../engine/source/interfaces/interf/i2sms27.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod        ../engine/share/modules/h3d_mod.F
-      !||    outmax_mod     ../common_source/modules/outmax_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i2for27p_pen   ../engine/source/interfaces/interf/i2for27p_pen.F
+!||--- called by ------------------------------------------------------
+!||    i2for27p       ../engine/source/interfaces/interf/i2for27p.F
+!||--- calls      -----------------------------------------------------
+!||    i2forces       ../engine/source/interfaces/interf/i2forces.F
+!||    i2loceq        ../common_source/interf/i2loceq.F
+!||    i2pen_rot27    ../common_source/interf/i2pen_rot.F
+!||    i2rep          ../common_source/interf/i2rep.F
+!||    i2sms27        ../engine/source/interfaces/interf/i2sms27.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod        ../engine/share/modules/h3d_mod.F
+!||    outmax_mod     ../common_source/modules/outmax_mod.F
+!||====================================================================
       SUBROUTINE I2FOR27P_PEN(
      .            X        ,V       ,VR      ,A       ,AR      ,
      .            MS       ,IN      ,STIFN   ,STIFR   ,WEIGHT  ,            
@@ -93,21 +93,21 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   S,T,SP,SM,TP,TM,ECONTT,ECONVT,E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z,
-     .   FNORM,FLX,FLY,FLZ,FS(3),XSM,YSM,ZSM,XM,YM,ZM,
+     .   FLX,FLY,FLZ,FS(3),XSM,YSM,ZSM,XM,YM,ZM,
      .   X1,X2,X3,X4,Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,X0,Y0,Z0,XS,YS,ZS,STIFM(MVSIZ),
      .   VX1,VX2,VX3,VX4,VY1,VY2,VY3,VY4,VZ1,VZ2,VZ3,VZ4,DLX,DLY,DLZ,
-     .   VX0,VY0,VZ0,VSX,VSY,VSZ,VMX,VMY,VMZ,VX,VY,VZ,DTINV,STF,
+     .   VX0,VY0,VZ0,VSX,VSY,VSZ,VMX,VMY,VMZ,VX,VY,VZ,STF,
      .   FXV,FYV,FZV,DRX,DRY,DRZ,STBRK,DTI,MHARM,DKM,DET,B1,B2,B3,C1,C2,C3,
-     .   A1,A2,A3,MTTX,MTTY,MTTZ,DERX,DERY,DERZ,DXT,HL(4)
+     .   DXT,HL(4)
       my_real
-     .   H(4,MVSIZ),FN(3),FT(3),FX(4),FY(4),FZ(4),FMX(4),FMY(4),FMZ(4),
-     .   RX(4),RY(4),RZ(4),RM(3),RS(3),V0(3),VS(3),VM(3),
+     .   H(4,MVSIZ),FX(4),FY(4),FZ(4),FMX(4),FMY(4),FMZ(4),
+     .   RX(4),RY(4),RZ(4),RM(3),RS(3),VS(3),VM(3),
      .   STIF(MVSIZ), VIS(MVSIZ), VA(3),VB(3),VC(3),VD(3)
       my_real
      .   VRM(3),VRS(3),
-     .   VRX0,VRX1,VRX2,VRX3,VRX4,VRY0,VRY1,VRY2,VRY3,VRY4,VRZ0,VRZ1,VRZ2,VRZ3,VRZ4,
+     .   VRX1,VRX2,VRX3,VRX4,VRY1,VRY2,VRY3,VRY4,VRZ1,VRZ2,VRZ3,VRZ4,
      .   VRSX,VRSY,VRSZ,VRX,VRY,VRZ,MLX,MLY,MLZ,MX(4),MY(4),MZ(4),MRX,MRY,MRZ,FTX,FTY,FTZ,
-     .   MGX,MGY,MGZ,MSX,MSY,MSZ,MVX,MVY,MVZ,STR,VISR(MVSIZ),DKI,INHARM,VRMX,VRMY,VRMZ,
+     .   MGX,MGY,MGZ,MVX,MVY,MVZ,STR,VISR(MVSIZ),DKI,INHARM,VRMX,VRMY,VRMZ,
      .   LEN2,FAC_TRIANG 
       my_real
      .   IROT
@@ -118,6 +118,8 @@ C=======================================================================
       I0BASE = I0
 C
       NSVG(1:MVSIZ) = 0
+      VRM(1:3)=ZERO
+      VRS(1:3)=ZERO
 C----------------    
       DO KK=1,NSN,MVSIZ
 C
@@ -394,14 +396,14 @@ C
           VRY =  VRS(2) - VRM(2)
           VRZ =  VRS(3) - VRM(3)
 
-C-------------  vers increm en vitesses
+C-------------  vers increm en velocities
           DLX = VX*DT1
           DLY = VY*DT1
           DLZ = VZ*DT1
           DRX = VRX*DT1
           DRY = VRY*DT1
           DRZ = VRZ*DT1
-C-------------  DX == deplacement relatif
+C-------------- DX == Relative displacement
           DX(1,II) = DX(1,II) + DLX
           DX(2,II) = DX(2,II) + DLY
           DX(3,II) = DX(3,II) + DLZ
@@ -410,7 +412,7 @@ C-------------  DX == deplacement relatif
           DR(3,II) = DR(3,II) + DRZ
 C
 C------------------------------------------------                  
-C         Calcul de la force
+C         force calculation
 C------------------------------------------------
 C                           
           FLX = DX(1,II) * STFN(II)
@@ -461,12 +463,12 @@ C
           STIFM(K)=ZERO
 C
 C------------------------------------------------                  
-C         Calcul du Moment
+C         moment calculation
 C------------------------------------------------
 C
           IF (IROT > ZERO) THEN
 C
-C--   Secnd node shell of  spring 
+C--   Second node shell of  spring 
 C
           IF(IN(I)==ZERO.OR.IN(IX1(K))==ZERO.OR.
      .                      IN(IX2(K))==ZERO.OR.
@@ -524,7 +526,7 @@ C
 C
           ELSE
 C
-C--   Secnd node of solids
+C--   Second node of solids
 C
           MX(1:4) = ZERO
           MY(1:4) = ZERO
@@ -553,7 +555,7 @@ C
           ENDDO
 C
 C----------------------------------------------------
-C         Secnd forces/moments -> global coordinates 
+C         Second forces/moments -> global coordinates 
 C----------------------------------------------------
 C
           A(1,I) = A(1,I) - FS(1)
@@ -651,7 +653,7 @@ C------------------------------------------------
             FINI(6,II) = MLZ
           ENDIF
 C------------------------------------------------                  
-C         composantes N/T de la forces nodale -> output
+C         n/t components of the nodal forces -> output
 C------------------------------------------------                  
           HL(1:4) = H(1:4,K)
           CALL I2FORCES(X       ,FS     ,FX     ,FY      ,FZ     ,
@@ -686,7 +688,7 @@ C
           IX4(K) = IRECT(4,L)  
           STIF(K)= ZERO
           VIS(K) = ZERO
-          IF (WEIGHT(-I) == 1) THEN  ! stokage ZERO pour noeuds delete par idel2
+          IF (WEIGHT(-I) == 1) THEN  ! zero storage for nodes deleted by idel2
             I0 = I0BASE + IADX(II)
             JJ = 1                                                       
             NN = IADI2(JJ,I0)                                            
@@ -763,7 +765,7 @@ c
       ENDDO
 C----------
 #include "lockon.inc"
-      ECONT  = ECONT + ECONTT   ! Elatic Energy
+      ECONT  = ECONT + ECONTT  ! Elastic Energy
       ECONTD = ECONTD + ECONVT ! Damping Energy
       FSAV(26) = FSAV(26) + ECONTT
       FSAV(28) = FSAV(28) + ECONVT

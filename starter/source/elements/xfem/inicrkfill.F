@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inicrkfill             ../starter/source/elements/xfem/inicrkfill.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    lslocal                ../starter/source/elements/xfem/lslocal.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    inicrkfill             ../starter/source/elements/xfem/inicrkfill.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    lslocal                ../starter/source/elements/xfem/lslocal.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INICRKFILL(ELBUF_TAB,XFEM_TAB,
      .                      IXC      ,IXTG   ,IPARG    ,INICRACK,
      .                      X        ,IEL_CRK,INOD_CRK ,XREFC  ,XREFTG  ,
@@ -40,6 +40,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE OPTIONDEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,7 +70,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,K,KR,N,ID,ICRK,NXSEG,NXNOD
+      INTEGER  I, K, N, ID, ICRK, NXSEG, NXNOD
       INTEGER, DIMENSION(:,:) ,ALLOCATABLE :: NODLS
       INTEGER, DIMENSION(:,:) ,ALLOCATABLE :: TAGSKYC,TAGSKYTG
       INTEGER, DIMENSION(:)   ,ALLOCATABLE :: NTAG

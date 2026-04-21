@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    link_with_unique_main_cell   ../engine/source/interfaces/int22/link_with_unique_master_cell.F
-      !||--- called by ------------------------------------------------------
-      !||    sinit22_fvm                  ../engine/source/interfaces/int22/sinit22_fvm.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    i22bufbric_mod               ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22tri_mod                   ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    initbuf_mod                  ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    link_with_unique_main_cell   ../engine/source/interfaces/int22/link_with_unique_master_cell.F
+!||--- called by ------------------------------------------------------
+!||    sinit22_fvm                  ../engine/source/interfaces/int22/sinit22_fvm.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    i22bufbric_mod               ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22tri_mod                   ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    initbuf_mod                  ../engine/share/resol/initbuf.F
+!||====================================================================
       FUNCTION LINK_WITH_UNIQUE_MAIN_CELL (
      .                    SharedFACE, Centroid )
 C-----------------------------------------------
@@ -70,7 +70,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER   ::  IsMain, N, IPOS, LEVEL, IIP
+      INTEGER   ::    IPOS, LEVEL, IIP
       my_real   ::  SCORE(6), MAX, NextMAX, MySum
       my_real   ::  XYZmax(3)
 C-----------------------------------------------

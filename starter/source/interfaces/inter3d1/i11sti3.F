@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11sti3                 ../starter/source/interfaces/inter3d1/i11sti3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||    get_u_geo               ../starter/source/user_interface/uaccess.F
-      !||    i11coq                  ../starter/source/interfaces/inter3d1/i11coq.F
-      !||    i11fil                  ../starter/source/interfaces/inter3d1/i11coq.F
-      !||    i11gmx3                 ../starter/source/interfaces/inter3d1/i11gmx3.F
-      !||    i11sol                  ../starter/source/interfaces/inter3d1/i11sol.F
-      !||    my_exit                 ../starter/source/output/analyse/analyse.c
-      !||    norma1                  ../starter/source/interfaces/inter3d1/norma1.F
-      !||    volint                  ../starter/source/interfaces/inter3d1/volint.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                 ../starter/share/modules1/r2r_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i11sti3                 ../starter/source/interfaces/inter3d1/i11sti3.F
+!||--- called by ------------------------------------------------------
+!||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
+!||    get_u_geo               ../starter/source/user_interface/uaccess.F
+!||    i11coq                  ../starter/source/interfaces/inter3d1/i11coq.F
+!||    i11fil                  ../starter/source/interfaces/inter3d1/i11coq.F
+!||    i11gmx3                 ../starter/source/interfaces/inter3d1/i11gmx3.F
+!||    i11sol                  ../starter/source/interfaces/inter3d1/i11sol.F
+!||    my_exit                 ../starter/source/output/analyse/analyse.c
+!||    norma1                  ../starter/source/interfaces/inter3d1/norma1.F
+!||    volint                  ../starter/source/interfaces/inter3d1/volint.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||    r2r_mod                 ../starter/share/modules1/r2r_mod.F
+!||====================================================================
       SUBROUTINE I11STI3(
      1 X        ,IRECT      ,STF      ,IXS            ,PM      ,
      2 GEO      ,NRT        ,IXC      ,NINTR          ,SLSFAC  ,
@@ -70,6 +70,7 @@ C-----------------------------------------------
       USE R2R_MOD
       USE INTBUF_FRIC_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only :nixs,nixc,nixtg,nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -81,7 +82,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr08_c.inc"
 #include      "scr23_c.inc"
 #include      "r2r_c.inc"
@@ -112,7 +112,7 @@ C-----------------------------------------------
       INTEGER NDX, I, INRT, NELS, MT, JJ, JJJ, NELC, J,
      .        MG, NELTG,NELT,NELP,NELR,
      .        IGTYP, IP,N1,N2,K,T,P,R,NELX,IPGMAT,IGMAT,IE,
-     .        JJ1,JJ2,IEC,K1,K2,IPL,IPC,
+     .        JJ1,JJ2,IEC,K1,K2,IPL,
      .        IE1(50,2),IE2(50,2),ISUBSTACK,IPG,N3,N4,N5,N6,N7,N8,ICONTR
       my_real DXM, GAPMX, GAPMN, AREASS, VOL, DX,GAP1,GAPS1,GAPTMP,XL,
      .        SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
@@ -520,22 +520,7 @@ C -----Friction model ------
 C------------------------------------
         ENDIF
 
-        IF (IMACH /= 3) THEN
-          IF(NELS+NELC+NELTG+NELT+NELP+NELR+NUMELX==0.AND.SLSFAC>0.) THEN
-            IF(NINTR>0) THEN
-              CALL ANCMSG(MSGID=92,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_2,
-     .                    I1=ID,
-     .                    C1=TITR,
-     .                    I2=I)
-            ENDIF
-            IF(NINTR < 0) THEN
-              CALL ANCMSG(MSGID=93,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_2,
-     .                    I1=ID,
-     .                    C1=TITR,
-     .                    I2=I)
-            ENDIF
-          ENDIF
-        ELSEIF(NELS+NELC+NELTG+NELT+NELP+NELR+NUMELX==0.)THEN
+        IF(NELS+NELC+NELTG+NELT+NELP+NELR+NUMELX==0.)THEN
           IF(NINTR > 0) THEN
             CALL ANCMSG(MSGID=481,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_2,
      .                  I1=ID,
@@ -635,7 +620,7 @@ C---------------------------
           ENDIF
           IF ((NINTR<0) .AND. (IT19==0)) WRITE(IOUT,1300)HALF*(GAPMIN+GAP1)
         ENDIF
-C GAP MINI ET SUP DES GAPS VARIABLES
+C MIN GAP AND MAX OF VARIABLE GAPS
         IF(NINTR>0)THEN
           GAPMIN = GAP1
           GAPMAX = GAPS1
@@ -664,7 +649,7 @@ C---------------------------
       ENDIF
 C---------------------------------------------
 C
-C Calcul du gap reel a utiliser lors du critere de retri
+C Calculation of the actual gap to use during the retri criterion
 C
       IF(IGAP == 0) THEN
         GAPINF=GAPMAX

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    admfor0      ../engine/source/model/remesh/admfor0.F
-      !||--- called by ------------------------------------------------------
-      !||    resol        ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    remesh_mod   ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    admfor0        ../engine/source/model/remesh/admfor0.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+!||    remesh_mod     ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE ADMFOR0(IXC ,IPARTC,IXTG  ,IPARTTG,IPART ,
      .                 A     ,STIFN ,AR     ,STIFR ,X     ,
      .                 SH4TREE,SH3TREE,STCONT,FTHE ,CONDN ,
@@ -35,6 +38,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE REMESH_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,7 +60,7 @@ C-----------------------------------------------
       INTEGER IXC(NIXC,*), IPARTC(*), IXTG(NIXTG,*), IPARTTG(*),
      .        IPART(LIPART1,*), SH4TREE(KSH4TREE,*), SH3TREE(KSH3TREE,*)
       INTEGER ,INTENT(IN) :: NODADT_THERM
-      my_real ,INTENT(IN) :: ITHERM_FE
+      INTEGER ,INTENT(IN) :: ITHERM_FE
       my_real A(3,*), STIFN(*), AR(3,*), STIFR(*), X(3,*),
      .        STCONT(*), FTHE(*),CONDN(*)
 C-----------------------------------------------
@@ -64,13 +69,23 @@ C-----------------------------------------------
       INTEGER KN, KN1, KN2, KN3, KN4
       INTEGER N, NN, LEVEL, IP, NLEV
       INTEGER SON,M1,M2,M3,M4,MC,N1,N2,N3,N4,J,K
-      INTEGER I,LLNOD,LNOD(NUMNOD),
-     .        LE,LELT,NELT(2*(4**LEVELMAX)),LEV,NE,LELT1,LELT2,
-     .        NI,LL, LKINNOD(NUMNOD)
+      INTEGER I,LLNOD,
+     .        LE,LELT,LEV,NE,LELT1,LELT2,
+     .        NI,LL
+      INTEGER, DIMENSION(:), ALLOCATABLE :: LNOD
+      INTEGER, DIMENSION(:), ALLOCATABLE :: NELT
+      INTEGER, DIMENSION(:), ALLOCATABLE :: LKINNOD
       my_real
      .        A1,A2,A3,A4,AC,
-     .        PHI,FACM,FACI,
-     .        RNOD(NUMNOD),SNOD(NUMNOD),R,S
+     .        PHI,FACM,FACI,R,S
+      my_real, DIMENSION(:), ALLOCATABLE :: RNOD
+      my_real, DIMENSION(:), ALLOCATABLE :: SNOD
+C-----------------------------------------------
+      CALL MY_ALLOC(LNOD,NUMNOD)
+      CALL MY_ALLOC(NELT,2*(4**LEVELMAX))
+      CALL MY_ALLOC(LKINNOD,NUMNOD)
+      CALL MY_ALLOC(RNOD,NUMNOD)
+      CALL MY_ALLOC(SNOD,NUMNOD)
 C-----------------------------------------------
       LKINNOD=0
       DO LEVEL=LEVELMAX-1,0,-1
@@ -749,6 +764,11 @@ C-------
 
       END DO
 C
-C-----
+C-----      
+      DEALLOCATE(LNOD)
+      DEALLOCATE(NELT)
+      DEALLOCATE(LKINNOD)
+      DEALLOCATE(RNOD)
+      DEALLOCATE(SNOD)
       RETURN
       END     

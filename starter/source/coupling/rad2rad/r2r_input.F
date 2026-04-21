@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r2r_input        ../starter/source/coupling/rad2rad/r2r_input.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_group        ../starter/source/coupling/rad2rad/r2r_group.F
-      !||--- uses       -----------------------------------------------------
-      !||    r2r_mod          ../starter/share/modules1/r2r_mod.F
-      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
-      !||    restmod          ../starter/share/modules1/restart_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_input        ../starter/source/coupling/rad2rad/r2r_input.F
+!||--- called by ------------------------------------------------------
+!||    r2r_group        ../starter/source/coupling/rad2rad/r2r_group.F
+!||--- uses       -----------------------------------------------------
+!||    r2r_mod          ../starter/share/modules1/r2r_mod.F
+!||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+!||    restmod          ../starter/share/modules1/restart_mod.F
+!||====================================================================
       SUBROUTINE R2R_INPUT(IEXTER)
 C-----------------------------------------------
 C   M o d u l e s
@@ -188,8 +188,6 @@ C--------------------------------------------------------------C
  1360   FORMAT('/LINK/TYPE',I1,'/NLOCAL')
  1400   FORMAT('',A10)
  1500   FORMAT(  3X,10I5)
- 1600   FORMAT('   ',A10,I10)
- 1700   FORMAT('   SUBDOMAIN',I1,I10)
  1800   FORMAT(I10)
  1900   FORMAT('   ',A100)
 C-----------

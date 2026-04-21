@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps45c   ../engine/source/materials/mat/mat045/sigeps45c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter      ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps45c   ../engine/source/materials/mat/mat045/sigeps45c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    finter      ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE SIGEPS45C(
      1     NEL0    ,NUPARAM,NUVAR   ,NFUNC   ,IFUNC  ,
      2     NPF    ,NPT0    ,IPT     ,IFLAG   ,
@@ -316,7 +316,7 @@ C           IF(R<1.) ETSE(I)= H(I)/(H(I)+E(I))
 C
        ELSEIF(IFLAG(1)==1)THEN
 C-------------------------
-C     CRITERE DE VON MISES
+C     VON MISES CRITERION
 C-------------------------
          DO  I=1,NEL0
            UVAR(I,4) = MAX(ZERO,UVAR(I,4))

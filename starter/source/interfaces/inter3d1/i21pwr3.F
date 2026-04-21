@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21pwr3                ../starter/source/interfaces/inter3d1/i21pwr3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3_thkvar          ../starter/source/interfaces/inter3d1/inint3_thkvar.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i21pwr3                ../starter/source/interfaces/inter3d1/i21pwr3.F
+!||--- called by ------------------------------------------------------
+!||    inint3_thkvar          ../starter/source/interfaces/inter3d1/inint3_thkvar.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I21PWR3(ITAB,INACTI,CAND_E,CAND_N,STFN,
      1                  X     ,I_STOK,NSV   ,IWPENE,PENI,
      2                  NOINT,NTY   ,GAP_S ,MSR ,IRTLM  ,
@@ -81,28 +81,28 @@ c              IF(PENI(J)>ZERO)THEN
 c              ENDIF
               IF(INACTI/=6)THEN
                 IF(INACTI==1) THEN
-C                 DESACTIVATION DES NOEUDS
+C                 Deactivation of nodes
                   WRITE(IOUT,'(A)')'NODE STIFFNESS IS SET TO ZERO'
                   STFN(J) = ZERO
                 ELSE IF(INACTI==2) THEN
-C                 DESACTIVATION DES ELEMENTS
+C                 Deactivation of elements
                   WRITE(IOUT,'(A)')
      .              'INACTI=2 IS NOT AVAILABLE FOR INTERFACE TYPE21'
                 ELSE IF(INACTI==3) THEN
-C                 CHANGE LES COORDONNEES DES NOEUDS SECND
+C                 Changing the coordinates of the secondary nodes
                   WRITE(IOUT,'(A)')
      .              'INACTI=3 IS NOT AVAILABLE FOR INTERFACE TYPE21'
                 ELSE IF(INACTI==4) THEN
-C                 CHANGE LES COORDONNEES DES NOEUDS MAIN
+C                 Changing the coordinates of the main nodes
                   WRITE(IOUT,'(A)')
      .              'INACTI=4 IS NOT AVAILABLE FOOR INTERFACE TYPE21'
                 ELSE IF(INACTI==5) THEN
-C                 REDUCTION DU GAP 
+C                 Gap reduction
                   JWARN = 1
                 ENDIF
               ELSE
 C               INACTI==6
-C               REDUCTION DU GAP 
+C               Gap reduction
                 JWARN = 1
 C
                 PENI(J)=PENI(J)

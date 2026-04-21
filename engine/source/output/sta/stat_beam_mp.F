@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_beam_mp   ../engine/source/output/sta/stat_beam_mp.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat        ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders      ../common_source/tools/sort/my_orders.c
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    stat_beam_mp   ../engine/source/output/sta/stat_beam_mp.F
+!||--- called by ------------------------------------------------------
+!||    genstat        ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders      ../common_source/tools/sort/my_orders.c
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE STAT_BEAM_MP(ITAB   ,IPART     ,IXP   ,IPARTP   ,IPART_STATE,
      .                        NODTAG ,STAT_INDXP,IPARG ,ELBUF_TAB,IDEL       )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD 
+      USE ELBUFDEF_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixp
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,11 +64,16 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,N,JJ,IPRT0,IPRT,K,II
       INTEGER NG,NEL,NFT,LFT,LLT,ITY,IOFF
-      INTEGER NP(6*NUMELP),WORK(70000),CLEF(2,NUMELP)
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NP
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: CLEF
+      INTEGER WORK(70000)
 C
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C-----------------------------------------------
 C     BEAM
+C-----------------------------------------------
+      CALL MY_ALLOC(NP,6*NUMELP)
+      CALL MY_ALLOC(CLEF,2,NUMELP)
 C-----------------------------------------------
       JJ = 0
       II = 0
@@ -130,6 +139,9 @@ C----
         ENDIF !IF (IDEL)
       ENDDO ! DO N=1,STAT_NUMELP
 C----
+C-----------------------------------------------
+      DEALLOCATE(NP)
+      DEALLOCATE(CLEF)
 C-----------------------------------------------
       RETURN
       END

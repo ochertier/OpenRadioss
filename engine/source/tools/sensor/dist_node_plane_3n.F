@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dist_node_plane_3n   ../engine/source/tools/sensor/dist_node_plane_3n.F
-      !||--- called by ------------------------------------------------------
-      !||    sensor_dist_surf     ../engine/source/tools/sensor/sensor_dist_surf.F
-      !||====================================================================
+!||====================================================================
+!||    dist_node_plane_3n   ../engine/source/tools/sensor/dist_node_plane_3n.F
+!||--- called by ------------------------------------------------------
+!||    sensor_dist_surf     ../engine/source/tools/sensor/sensor_dist_surf.F
+!||====================================================================
         SUBROUTINE DIST_NODE_PLANE_3N (DIST,
      .             XNOD,YNOD,ZNOD,XP1,YP1,ZP1,XP2,YP2,ZP2,XP3,YP3,ZP3)
 c-----------------------------------------------------------------------

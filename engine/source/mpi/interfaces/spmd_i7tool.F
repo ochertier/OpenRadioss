@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_oldnumcd                ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    i10tri                       ../engine/source/interfaces/intsort/i10tri.F
-      !||    i20tri                       ../engine/source/interfaces/intsort/i20tri.F
-      !||    i23trivox                    ../engine/source/interfaces/intsort/i23trivox.F
-      !||    i24trivox                    ../engine/source/interfaces/intsort/i24trivox.F
-      !||    i7tri                        ../engine/source/interfaces/intsort/i7tri.F
-      !||    i7trivox                     ../engine/source/interfaces/intsort/i7trivox.F
-      !||    inter7_collision_detection   ../engine/source/interfaces/intsort/inter7_collision_detection.F90
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box                      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_oldnumcd                ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    i10tri                       ../engine/source/interfaces/intsort/i10tri.F
+!||    i20tri                       ../engine/source/interfaces/intsort/i20tri.F
+!||    i23trivox                    ../engine/source/interfaces/intsort/i23trivox.F
+!||    i24trivox                    ../engine/source/interfaces/intsort/i24trivox.F
+!||    i7tri                        ../engine/source/interfaces/intsort/i7tri.F
+!||    i7trivox                     ../engine/source/interfaces/intsort/i7trivox.F
+!||    inter7_collision_detection   ../engine/source/interfaces/intsort/inter7_collision_detection.F90
+!||--- uses       -----------------------------------------------------
+!||    tri7box                      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_OLDNUMCD(RENUM,OLDNUM,NSNR,NSNROLD,
      .           INTHEAT,IDT_THERM,NODADT_THERM) 
 C-----------------------------------------------
@@ -59,26 +59,26 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
-C ancienne numerotation des nouveaux candidats
+C old numbering of new candidates
 C
       DO I = 1, NSNR 
         OLDNUM(I) = 0
       END DO
       DO I = 1, NSNROLD
-        IF(RENUM(I)>0)        ! cas elt non penetre et non retenu
+        IF(RENUM(I)>0)        ! case non-penetrated and non-retained element
      +    OLDNUM(RENUM(I)) = I
       END DO
 C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_rnumcd20   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    i20main_tri     ../engine/source/interfaces/intsort/i20main_tri.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_rnumcd20   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    i20main_tri     ../engine/source/interfaces/intsort/i20main_tri.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box         ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_RNUMCD20(
      1   CAND_N  ,RENUM  ,II_STOK,NIN,NSN,
      2   NSNFIOLD,NSNROLD)
@@ -126,7 +126,7 @@ C-----------------------------------------------
             J = J + 1
           ELSEIF(NINT(XREM(4,J+JDEB))>
      +           NSVFI(NIN)%P(I+IDEB)) THEN
-Cas candidat non penetre et non retenu
+Case non-penetrated and non-retained candidate
             I = I + 1
           END IF
         END DO
@@ -134,7 +134,7 @@ Cas candidat non penetre et non retenu
         IDEB = IDEB + NSNFIOLD(P)
       END DO
 C
-C renumerotation des anciens candidats suivant les nouveaux no
+C renumbering of old candidates according to new numbers
 C
       DO I = 1, I_STOK
         NI = CAND_N(I)
@@ -146,16 +146,16 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    spmd_rnumcd     ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    i23main_tri     ../engine/source/interfaces/intsort/i23main_tri.F
-      !||    i24main_tri     ../engine/source/interfaces/intsort/i24main_tri.F
-      !||    i7main_tri      ../engine/source/interfaces/intsort/i7main_tri.F
-      !||    inter_sort_07   ../engine/source/interfaces/int07/inter_sort_07.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_rnumcd     ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    i23main_tri     ../engine/source/interfaces/intsort/i23main_tri.F
+!||    i24main_tri     ../engine/source/interfaces/intsort/i24main_tri.F
+!||    i7main_tri      ../engine/source/interfaces/intsort/i7main_tri.F
+!||    inter_sort_07   ../engine/source/interfaces/int07/inter_sort_07.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box         ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_RNUMCD(
      1   CAND_N  ,RENUM  ,II_STOK,NIN,NSN,
      2   NSNFIOLD,NSNROLD)
@@ -203,7 +203,7 @@ C-----------------------------------------------
             J = J + 1
           ELSEIF(IREM(1,J+JDEB)>
      +           NSVFI(NIN)%P(I+IDEB)) THEN
-Cas candidat non penetre et non retenu
+Case non-penetrated and non-retained candidate
             I = I + 1
           END IF
         END DO
@@ -211,7 +211,7 @@ Cas candidat non penetre et non retenu
         IDEB = IDEB + NSNFIOLD(P)
       END DO
 C
-C renumerotation des anciens candidats suivant les nouveaux no
+C renumbering of old candidates according to new numbers
 C
       DO I = 1, I_STOK
         NI = CAND_N(I)
@@ -226,13 +226,13 @@ C
       END
 
 C
-      !||====================================================================
-      !||    spmd_rnumcd10   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    i10main_tri     ../engine/source/interfaces/intsort/i10main_tri.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_rnumcd10   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    i10main_tri     ../engine/source/interfaces/intsort/i10main_tri.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box         ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_RNUMCD10(
      1   CAND_N  ,RENUM  ,II_STOK,NIN,NSN,
      2   NSNFIOLD,NSNROLD)
@@ -283,7 +283,7 @@ C-----------------------------------------------
             J = J + 1
           ELSEIF(IREM(1,J+JDEB)>
      +           NSVFI(NIN)%P(I+IDEB)) THEN
-Cas candidat non penetre et non retenu
+Case non-penetrated and non-retained candidate
             I = I + 1
           END IF
         END DO
@@ -292,7 +292,7 @@ Cas candidat non penetre et non retenu
         IDEB = IDEB + NSNFIOLD(P)
       END DO
 C
-C renumerotation des anciens candidats suivant les nouveaux no
+C renumbering of old candidates according to new numbers
 C
       DO I = 1, I_STOK
         NI = CAND_N(I)
@@ -310,13 +310,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    spmd_rnum25   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_tri   ../engine/source/interfaces/intsort/i25main_tri.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box       ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_rnum25   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    i25main_tri   ../engine/source/interfaces/intsort/i25main_tri.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box       ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_RNUM25(
      1   RENUM  ,NIN,NSN,NSNFIOLD,NSNROLD)
 C-----------------------------------------------
@@ -363,7 +363,7 @@ C-----------------------------------------------
             J = J + 1
           ELSEIF(IREM(1,J+JDEB)>
      +           NSVFI(NIN)%P(I+IDEB)) THEN
-Cas candidat non penetre et non retenu
+Case non-penetrated and non-retained candidate
             I = I + 1
           END IF
         END DO
@@ -374,13 +374,13 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_rnumcd11   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    i11main_tri     ../engine/source/interfaces/intsort/i11main_tri.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_rnumcd11   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    i11main_tri     ../engine/source/interfaces/intsort/i11main_tri.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box         ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_RNUMCD11(
      1   CAND_N  ,RENUM  ,II_STOK,NIN,NRTS,
      2   NSNFIOLD,NSNROLD,ADDCM,CHAINE,CAND_M,NSN4,NRTM)
@@ -429,7 +429,7 @@ C-----------------------------------------------
             J = J + 1
           ELSEIF(IREM(1,J+JDEB)>
      +           NSVFI(NIN)%P(I+IDEB)) THEN
-Cas candidat non penetre et non retenu
+Case non-penetrated and non-retained candidate
             I = I + 1
           END IF
         END DO
@@ -437,7 +437,7 @@ Cas candidat non penetre et non retenu
         IDEB = IDEB + NSNFIOLD(P)
       END DO
 C
-C renumerotation des anciens candidats suivant les nouveaux no
+C renumbering of old candidates according to new numbers
 C
       DO I = 1, I_STOK
         NI = CAND_N(I)
@@ -461,19 +461,19 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_fiadd_poff    ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_poff   ../engine/source/mpi/forces/spmd_i7fcom_poff.F
-      !||--- calls      -----------------------------------------------------
-      !||    ibcoff             ../engine/source/interfaces/interf/ibcoff.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod           ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod      ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    parameters_mod     ../common_source/modules/interfaces/parameters_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD_POFF(
+!||====================================================================
+!||    spmd_fiadd_poff    ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_poff   ../engine/source/mpi/forces/spmd_i7fcom_poff.F
+!||--- calls      -----------------------------------------------------
+!||    ibcoff             ../engine/source/interfaces/interf/ibcoff.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod            ../engine/share/modules/h3d_mod.F
+!||    multi_fvm_mod      ../common_source/modules/ale/multi_fvm_mod.F90
+!||    output_mod         ../common_source/modules/output/output_mod.F90
+!||    parameters_mod     ../common_source/modules/interfaces/parameters_mod.F
+!||====================================================================
+      SUBROUTINE SPMD_FIADD_POFF(OUTPUT,
      1       NB    ,LEN     ,BUFR   ,NSV    ,A       ,
      2       STIFN ,VISCN   ,IBC    ,ISECIN ,NOINT   ,
      3       IBAG  ,ICODT   ,SECFCUM,NSTRF  ,ICONTACT,
@@ -486,7 +486,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
       USE MULTI_FVM_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
       USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -507,6 +507,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout) :: OUTPUT
       INTEGER NB, LEN, IBC  ,ISECIN  ,IBAG , NOINT, INACTI,
      .        NSV(*), ICODT(*), NSTRF(*),ICONTACT(*),
      .        TAGNCONT(NLOADP_HYD_INTER,*),KLOADPINTER(*),LOADPINTER(*),
@@ -582,7 +583,7 @@ C     following i7for3 & i10for3 process on secondary nodes
 C     
          IF (INCONV == 1) THEN
             IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .           ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .           ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .           (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .          .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C     Anim FCONT
@@ -606,16 +607,6 @@ C------------For /LOAD/PRESSURE tag nodes in contact-------------
                  TAGNCONT(PPL,NOD) = 1
               ENDDO
             ENDDO
-         ENDIF
-C------------For outputting total contact area------------
-         IF(INTCAREA > 0) THEN
-           FSAV29 = ZERO
-           DO I = 1, NB
-              N = NINT(BUFR(1,I))
-              NOD = NSV(N)
-              FSAV29 = FSAV29 + PARAMETERS%INTAREAN(NOD)
-            ENDDO
-            FSAV(29) = FSAV(29) + FSAV29
          ENDIF
 C     
          IF(ISECIN>0)THEN
@@ -647,7 +638,7 @@ C     Sections
          ENDIF
 C     
          IF((IBAG/=0.AND.INACTI/=7).OR.
-     .        (IADM/=0).OR.(IDAMP_RDOF/=0)) THEN ! attention conflit inacti=7 et ibag=3
+     .        (IADM/=0).OR.(IDAMP_RDOF/=0)) THEN ! warning conflict inacti=7 and ibag=3
 C     Airbags IBAG
             DO I = 1, NB
                IF(BUFR(2,I)/=ZERO.OR.BUFR(3,I)/=ZERO.OR.
@@ -676,15 +667,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_fiadd11_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_poff    ../engine/source/mpi/forces/spmd_i7fcom_poff.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod            ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod             ../engine/share/modules/h3d_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD11_POFF(
+!||====================================================================
+!||    spmd_fiadd11_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_poff    ../engine/source/mpi/forces/spmd_i7fcom_poff.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod             ../engine/share/modules/h3d_mod.F
+!||    output_mod          ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE SPMD_FIADD11_POFF(OUTPUT,
      1       NB    ,LEN     ,BUFR   ,IRECTS ,A       ,
      2       STIFN ,VISCN   ,IBC    ,ISECIN ,NOINT   ,
      3       IBAG  ,ICODT   ,SECFCUM,NSTRF  ,ICONTACT,
@@ -694,7 +685,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -714,6 +705,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout) :: OUTPUT
       INTEGER NB, LEN, IBC  ,ISECIN  ,IBAG , NOINT,INTTH,
      .        IRECTS(2,*), ICODT(*), NSTRF(*),ICONTACT(*),
      .        TAGNCONT(NLOADP_HYD_INTER,*),
@@ -843,11 +835,11 @@ C-----------------------------------------------
        ENDIF
       ENDIF
 C
-C suite traitement i11for3 sur noeud secnd
+C continue i11for3 processing on secondary node
 C
       IF(INCONV == 1) THEN
        IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -981,15 +973,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_fiadd17_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_poff    ../engine/source/mpi/forces/spmd_i7fcom_poff.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod            ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod             ../engine/share/modules/h3d_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD17_POFF(
+!||====================================================================
+!||    spmd_fiadd17_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_poff    ../engine/source/mpi/forces/spmd_i7fcom_poff.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    h3d_mod             ../engine/share/modules/h3d_mod.F
+!||    output_mod          ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE SPMD_FIADD17_POFF(OUTPUT,
      1       NB    ,LEN   ,BUFR   ,NELEMS ,A     ,
      2       STIFN ,FCONT ,IXS    ,IXS16  ,FROTS ,
      3       H3D_DATA)
@@ -997,7 +990,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
+      use element_mod , only :nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1013,6 +1007,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout) :: OUTPUT
       INTEGER NB, LEN, NN,
      .        NELEMS(*), IXS(NIXS,*)  ,IXS16(8,*)
       my_real
@@ -1118,10 +1113,10 @@ C
           FROTS(4,NN) = FROTS(4,NN) + BUFR(69,I)                       
         ENDDO
 C
-C suite traitement i11for3 sur noeud secnd
+C continue i11for3 processing on secondary node
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -1199,18 +1194,18 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_fiadd20_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_poff    ../engine/source/mpi/forces/spmd_i7fcom_poff.F
-      !||--- calls      -----------------------------------------------------
-      !||    getdpdaanc          ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    ibcoff              ../engine/source/interfaces/interf/ibcoff.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod            ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod             ../engine/share/modules/h3d_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD20_POFF(
+!||====================================================================
+!||    spmd_fiadd20_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_poff    ../engine/source/mpi/forces/spmd_i7fcom_poff.F
+!||--- calls      -----------------------------------------------------
+!||    getdpdaanc          ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    ibcoff              ../engine/source/interfaces/interf/ibcoff.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod             ../engine/share/modules/h3d_mod.F
+!||    output_mod          ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE SPMD_FIADD20_POFF(OUTPUT,
      1       NB    ,LEN     ,BUFR   ,NSV    ,A       ,
      2       STIFN ,VISCN   ,IBC    ,ISECIN ,NOINT   ,
      3       IBAG  ,ICODT   ,SECFCUM,NSTRF  ,ICONTACT,
@@ -1220,7 +1215,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1240,6 +1235,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout) :: OUTPUT
       INTEGER NB, LEN, IBC  ,ISECIN  ,IBAG , NOINT, INACTI,
      .        NSV(*), ICODT(*), NSTRF(*), NLG(*),
      .        ICONTACT(*), IADM,INTTH
@@ -1400,7 +1396,7 @@ C
 C following i7for3 & i10for3 process on secondary nodes
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .    .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -1442,7 +1438,7 @@ C Sections
       ENDIF
 C
       IF((IBAG/=0.AND.INACTI/=7).OR.
-     .   IADM/=0)THEN ! attention conflit inacti=7 et ibag=3
+     .   IADM/=0)THEN ! warning conflict inacti=7 and ibag=3
 C Airbags IBAG
         DO I = 1, NB
           IF(BUFR(2,I)/=ZERO.OR.BUFR(3,I)/=ZERO.OR.
@@ -1470,17 +1466,17 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_fiadd20e_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_poff     ../engine/source/mpi/forces/spmd_i7fcom_poff.F
-      !||--- calls      -----------------------------------------------------
-      !||    getdpdaanc           ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod             ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod              ../engine/share/modules/h3d_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD20E_POFF(
+!||====================================================================
+!||    spmd_fiadd20e_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_poff     ../engine/source/mpi/forces/spmd_i7fcom_poff.F
+!||--- calls      -----------------------------------------------------
+!||    getdpdaanc           ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod              ../engine/share/modules/h3d_mod.F
+!||    output_mod           ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE SPMD_FIADD20E_POFF(OUTPUT,
      1       NB    ,LEN     ,BUFR   ,IXLINS ,A       ,
      2       STIFN ,VISCN   ,IBC    ,ISECIN ,NOINT   ,
      3       IBAG  ,ICODT   ,SECFCUM,NSTRF  ,ICONTACT,
@@ -1489,7 +1485,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1509,6 +1505,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout)  :: OUTPUT
       INTEGER NB, LEN, IBC  ,ISECIN  ,IBAG , NOINT,
      .        IXLINS(2,*), ICODT(*), NSTRF(*),
      .        ICONTACT(*), NLG(*)
@@ -1656,10 +1653,10 @@ C Traitement interface type20
        ENDIF
 C
 C
-C suite traitement i7for3 et i10for3 sur noeud secnd
+C continue i7for3 and i10for3 processing on secondary node
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .    .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -1779,21 +1776,21 @@ C
       END
 C
 C
-      !||====================================================================
-      !||    spmd_fiadd_pon    ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../engine/source/output/message/message.F
-      !||    arret             ../engine/source/system/arret.F
-      !||    ibcoff            ../engine/source/interfaces/interf/ibcoff.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod          ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod           ../engine/share/modules/h3d_mod.F
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||    parameters_mod    ../common_source/modules/interfaces/parameters_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD_PON(
+!||====================================================================
+!||    spmd_fiadd_pon    ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg            ../engine/source/output/message/message.F
+!||    arret             ../engine/source/system/arret.F
+!||    ibcoff            ../engine/source/interfaces/interf/ibcoff.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod           ../engine/share/modules/h3d_mod.F
+!||    message_mod       ../engine/share/message_module/message_mod.F
+!||    output_mod        ../common_source/modules/output/output_mod.F90
+!||    parameters_mod    ../common_source/modules/interfaces/parameters_mod.F
+!||====================================================================
+      SUBROUTINE SPMD_FIADD_PON(OUTPUT,
      1       NB     ,LEN    ,BUFR   ,NSV     ,FSKYI,
      2       ISKY   ,IBC    ,ISECIN ,NOINT   ,IBAG ,
      3       ICODT  ,SECFCUM,NSTRF  ,ICONTACT,FCONT,
@@ -1805,7 +1802,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
       USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1826,6 +1823,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout) :: OUTPUT
       INTEGER NB, LEN, IBC  ,ISECIN  ,IBAG , NOINT, INACTI,NIN,
      .        NSV(*), ISKY(*), ICODT(*), NSTRF(*),ICONTACT(*),
      .        TAGNCONT(NLOADP_HYD_INTER,*),KLOADPINTER(*),LOADPINTER(*),
@@ -1896,10 +1894,10 @@ C
 
 
 C
-C suite traitement i7for3 et i10for3 sur noeud secnd
+C continue i7for3 and i10for3 processing on secondary node
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -1925,15 +1923,15 @@ C------------For /LOAD/PRESSURE tag nodes in contact-------------
          ENDDO
        ENDIF
 C------------For outputting total contact area------------
-         IF(INTCAREA > 0) THEN
-           FSAV29 = ZERO
-           DO I = 1, NB
-              N = NINT(BUFR(1,I))
-              NOD = NSV(N)
-              FSAV29 = FSAV29 + PARAMETERS%INTAREAN(NOD)
-            ENDDO
-            FSAV(29) = FSAV(29) + FSAV29
-         ENDIF
+c         IF(INTCAREA > 0) THEN
+c           FSAV29 = ZERO
+c           DO I = 1, NB
+c              N = NINT(BUFR(1,I))
+c              NOD = NSV(N)
+c              FSAV29 = FSAV29 + PARAMETERS%INTAREAN(NOD)
+c            ENDDO
+c            FSAV(29) = FSAV(29) + FSAV29
+c         ENDIF
 C 
 C
       IF(ISECIN>0)THEN
@@ -1965,7 +1963,7 @@ C Sections
       ENDIF
 C
       IF((IBAG/=0.AND.INACTI/=7).OR.
-     .   (IADM/=0).OR.(IDAMP_RDOF/=0))THEN ! attention conflit inacti=7 et ibag=3
+     .   (IADM/=0).OR.(IDAMP_RDOF/=0))THEN ! warning conflict inacti=7 and ibag=3
 C Airbags IBAG   
         DO I = 1, NB
           IF(BUFR(2,I)/=ZERO.OR.BUFR(3,I)/=ZERO.OR.
@@ -1992,20 +1990,20 @@ C Boundary cond.
 C
       RETURN
       END
-      !||====================================================================
-      !||    spmd_fiadd20f_pon   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon     ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg              ../engine/source/output/message/message.F
-      !||    arret               ../engine/source/system/arret.F
-      !||    ibcoff              ../engine/source/interfaces/interf/ibcoff.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod            ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod             ../engine/share/modules/h3d_mod.F
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD20F_PON(
+!||====================================================================
+!||    spmd_fiadd20f_pon   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon     ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg              ../engine/source/output/message/message.F
+!||    arret               ../engine/source/system/arret.F
+!||    ibcoff              ../engine/source/interfaces/interf/ibcoff.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod             ../engine/share/modules/h3d_mod.F
+!||    message_mod         ../engine/share/message_module/message_mod.F
+!||    output_mod          ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE SPMD_FIADD20F_PON(OUTPUT,
      1       NB     ,LEN    ,BUFR   ,NSV     ,FSKYI,
      2       ISKY   ,IBC    ,ISECIN ,NOINT   ,IBAG ,
      3       ICODT  ,SECFCUM,NSTRF  ,ICONTACT,FCONT,
@@ -2016,7 +2014,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2036,6 +2034,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout) :: OUTPUT
       INTEGER NB, LEN, IBC  ,ISECIN  ,IBAG , NOINT, INACTI,
      .        NSV(*), ISKY(*), ICODT(*), NSTRF(*), NLG(*),
      .        ICONTACT(*), IADM,INTTH
@@ -2082,7 +2081,7 @@ C
          ENDDO
        ENDIF
 C
-C --- interface type 7 + la thermique
+C --- interface type 7 + thermal
 C
       ELSE
        IF(KDTINT==0)THEN
@@ -2113,10 +2112,10 @@ C
         ENDIF
        ENDIF       
 C
-C suite traitement i7for3 et i10for3 sur noeud secnd
+C continue i7for3 and i10for3 processing on secondary node
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -2158,7 +2157,7 @@ C Sections
       ENDIF
 C
       IF((IBAG/=0.AND.INACTI/=7).OR.
-     .   IADM/=0)THEN ! attention conflit inacti=7 et ibag=3
+     .   IADM/=0)THEN ! warning conflict inacti=7 and ibag=3
 C Airbags IBAG
         DO I = 1, NB
           IF(BUFR(2,I)/=ZERO.OR.BUFR(3,I)/=ZERO.OR.
@@ -2186,19 +2185,19 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    spmd_fiadd11_pon   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon    ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../engine/source/output/message/message.F
-      !||    arret              ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod           ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD11_PON(
+!||====================================================================
+!||    spmd_fiadd11_pon   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon    ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg             ../engine/source/output/message/message.F
+!||    arret              ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod            ../engine/share/modules/h3d_mod.F
+!||    message_mod        ../engine/share/message_module/message_mod.F
+!||    output_mod         ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE SPMD_FIADD11_PON(OUTPUT,
      1       NB     ,LEN    ,BUFR  ,IRECTS  ,FSKYI,
      2       ISKY   ,IBC    ,ISECIN,NOINT   ,IBAG ,
      3       ICODT  ,SECFCUM,NSTRF ,ICONTACT,FCONT,
@@ -2210,7 +2209,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2230,6 +2229,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(output_), intent(inout) :: OUTPUT
       INTEGER NB, LEN, IBC  ,ISECIN  ,IBAG , NOINT,INTTH,NIN,
      .        IRECTS(2,*), ISKY(*), ICODT(*), NSTRF(*),
      .        ICONTACT(*), 
@@ -2389,10 +2389,10 @@ C-----------------------------------------------
        ENDIF
       ENDIF
 C
-C suite traitement i11for3 sur noeud secnd
+C continue i11for3 processing on secondary node
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -2526,19 +2526,19 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_fiadd20fe_pon   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon      ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg               ../engine/source/output/message/message.F
-      !||    arret                ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod             ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod              ../engine/share/modules/h3d_mod.F
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD20FE_PON(
+!||====================================================================
+!||    spmd_fiadd20fe_pon   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon      ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg               ../engine/source/output/message/message.F
+!||    arret                ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod              ../engine/share/modules/h3d_mod.F
+!||    message_mod          ../engine/share/message_module/message_mod.F
+!||    output_mod           ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE SPMD_FIADD20FE_PON(OUTPUT,
      1       NB     ,LEN    ,BUFR  ,IRECTS  ,FSKYI,
      2       ISKY   ,IBC    ,ISECIN,NOINT   ,IBAG ,
      3       ICODT  ,SECFCUM,NSTRF ,ICONTACT,FCONT,
@@ -2548,7 +2548,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2568,6 +2568,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER NB, LEN, IBC  ,ISECIN  ,IBAG , NOINT,
      .        IRECTS(2,*), ISKY(*), ICODT(*), NSTRF(*),
      .        ICONTACT(*),NLG(*)
@@ -2628,10 +2629,10 @@ C-----------------------------------------------
         ENDDO
       ENDIF
 C
-C suite traitement i11for3 sur noeud secnd
+C continue i11for3 processing on secondary node
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -2750,22 +2751,24 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_fiadd17_pon   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon    ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod           ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||====================================================================
-      SUBROUTINE SPMD_FIADD17_PON(
+!||====================================================================
+!||    spmd_fiadd17_pon   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon    ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    h3d_mod            ../engine/share/modules/h3d_mod.F
+!||    output_mod         ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE SPMD_FIADD17_PON(OUTPUT,
      1       NB     ,LEN    ,BUFR  ,NELEMS ,FSKYI ,
      2       ISKY   ,FCONT  ,IXS   ,IXS16  ,H3D_DATA  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2783,6 +2786,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER NB, LEN, 
      .        NELEMS(*), ISKY(*), IXS(NIXS,*), IXS16(8,*)
       my_real BUFR(LEN,*),
@@ -2818,7 +2822,7 @@ C
 C following i11for3 process on secondary nodes
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .   ((TT>=OUTPUT%TANIM .AND. TT<=OUTPUT%TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -2842,26 +2846,28 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    mpp_init                     ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    resol_init                   ../engine/source/engine/resol_init.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                       ../engine/source/output/message/message.F
-      !||    my_orders                    ../common_source/tools/sort/my_orders.c
-      !||    spmd_ibcast                  ../engine/source/mpi/generic/spmd_ibcast.F
-      !||    spmd_split_comm              ../engine/source/mpi/init/spmd_split_comm.F
-      !||    spmd_split_comm_inter        ../engine/source/mpi/interfaces/spmd_split_comm_inter.F
-      !||    spmd_split_comm_joint        ../engine/source/mpi/init/spmd_split_comm_joint.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
-      !||    inter_sorting_mod            ../engine/share/modules/inter_sorting_mod.F
-      !||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
-      !||    message_mod                  ../engine/share/message_module/message_mod.F
-      !||    sensor_mod                   ../common_source/modules/sensor_mod.F90
-      !||    tri25ebox                    ../engine/share/modules/tri25ebox.F
-      !||    tri7box                      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    mpp_init                     ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    resol_init                   ../engine/source/engine/resol_init.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                       ../engine/source/output/message/message.F
+!||    my_orders                    ../common_source/tools/sort/my_orders.c
+!||    spmd_ibcast                  ../engine/source/mpi/generic/spmd_ibcast.F
+!||    spmd_split_comm              ../engine/source/mpi/init/spmd_split_comm.F
+!||    spmd_split_comm_inter        ../engine/source/mpi/interfaces/spmd_split_comm_inter.F
+!||    spmd_split_comm_joint        ../engine/source/mpi/init/spmd_split_comm_joint.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
+!||    intbufdef_mod                ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    inter_sorting_mod            ../engine/share/modules/inter_sorting_mod.F
+!||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
+!||    message_mod                  ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod                 ../common_source/tools/memory/my_alloc.F90
+!||    sensor_mod                   ../common_source/modules/sensor_mod.F90
+!||    tri25ebox                    ../engine/share/modules/tri25ebox.F
+!||    tri7box                      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE MPP_INIT(
      1   IPARI   ,ISENDTO ,IRCVFROM,INTLIST ,NBINTC  ,
      2   ISIZXV  ,ILENXV  ,IAD_ELEM,I2SIZE  ,ITASK   ,
@@ -2883,6 +2889,7 @@ C-----------------------------------------------
       USE INTERFACE_MODIFICATION_MOD
       USE INTER_SORTING_MOD
       USE SENSOR_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2900,7 +2907,7 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "warn_c.inc"
 #include      "tabsiz_c.inc"
-C commun local a spmd_init et spmd_ring_mmx
+C common local to spmd_init and spmd_ring_mmx
        COMMON /RING/IRECVF,ISENDT,IRING
        INTEGER IRECVF,ISENDT,IRING
 C-----------------------------------------------
@@ -2919,7 +2926,7 @@ C-----------------------------------------------
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(sorting_comm_type), DIMENSION(NINTER), INTENT(inout) :: SORT_COMM   ! structure for interface sorting comm
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
-      LOGICAL, INTENT(inout) :: NEED_COMM_INT25_SOLID_EROSION !< boolean, true if the proc needs to comm some values related to interface type 25 with solid erosion
+      LOGICAL, DIMENSION(NSPMD), INTENT(inout) :: NEED_COMM_INT25_SOLID_EROSION !< boolean, true if the proc needs to comm some values related to interface type 25 with solid erosion
       INTEGER, INTENT(inout) :: COMM_INT25_SOLID_EROSION !< integer, sub-communicator related to interface type 25 with solid erosion
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
@@ -2929,16 +2936,30 @@ C-----------------------------------------------
       INTEGER I, J, K, NSN, NMN, ITYP, IERROR, IERROR1, KK, NIN, P,
      .        SCPMAX1,ISD,IRC,MY_RANK,LAST, IGE, IGN, NME, NMES,INTTH,
      .        NRTM, NRTS, NLINM, NLINS,NSNE, NMNE,N,M,
-     .        WORK(70000),INDX(2*NINTER), PPAR(NINTER),
-     .        INDP(2*NSPMD),NNP(NSPMD),RANK(NSPMD),IRBODY(NUMNOD),
-     .        INDB(2*NRBYKIN),NNSN(NRBYKIN),
-     .        ITY,NOINT,INACTI,ISENS,INTERACT
+     .        WORK(70000),ITY,NOINT,INACTI,ISENS,INTERACT,NEDGE_1D
+      INTEGER,DIMENSION(:), ALLOCATABLE:: INDX
+      INTEGER,DIMENSION(:), ALLOCATABLE:: PPAR
+      INTEGER,DIMENSION(:), ALLOCATABLE:: INDP
+      INTEGER,DIMENSION(:), ALLOCATABLE:: NNP
+      INTEGER,DIMENSION(:), ALLOCATABLE:: RANK
+      INTEGER,DIMENSION(:), ALLOCATABLE:: IRBODY
+      INTEGER,DIMENSION(:), ALLOCATABLE:: INDB
+      INTEGER,DIMENSION(:), ALLOCATABLE:: NNSN
       my_real STARTT, STOPT,TS
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
+      CALL MY_ALLOC(INDX,2*NINTER)
+      CALL MY_ALLOC(PPAR,NINTER)
+      CALL MY_ALLOC(INDP,2*NSPMD)
+      CALL MY_ALLOC(NNP,NSPMD)
+      CALL MY_ALLOC(RANK,NSPMD)
+      CALL MY_ALLOC(IRBODY,NUMNOD)
+      CALL MY_ALLOC(INDB,2*NRBYKIN)
+      CALL MY_ALLOC(NNSN,NRBYKIN)
+C-----------------------------------------------
 C
-C iexicodt : flag pour envoi icodt en cours de run
+C iexicodt : flag for sending icodt during run
         IEXICODT = 0
 C
         LINDIDEL = 0
@@ -2955,7 +2976,7 @@ C
 C
         !-----------------------------------------------        
         IF(NINTER/=0) THEN
-C Cas INACTI = 5, 6 ou 7 + TSTART
+C Case INACTI = 5, 6 or 7 + TSTART
          ALLOCATE(NSNFI_FLAG(NINTER))
          NSNFI_FLAG(1:NINTER)=0 
 
@@ -3031,7 +3052,7 @@ C
                 ELSEIF(ITYP==20)THEN
                   LINDIDEL = LINDIDEL+NRTM
                   LBUFIDEL = LBUFIDEL+4*NRTM+4
-C partie edge
+C Edge part
                   NLINS  = IPARI(51,I)                                   
                   NLINM  = IPARI(52,I)                                   
                   LINDIDEL = LINDIDEL+NLINM+NLINS
@@ -3049,19 +3070,19 @@ C
      .          ITYP==11.OR.ITYP==23.OR.ITYP==24.OR.
      .          ITYP==25) THEN
               NSN = IPARI(5,I)
-              NMN = IPARI(6,I)               
-              IF(NSN/=0) THEN
-                ISENDTO(I,ISPMD+1)=NSN
+              NMN = IPARI(6,I)       
+              NEDGE_1D = IPARI(101,I)                           
+              IF(NSN+NEDGE_1D/=0) THEN
+                ISENDTO(I,ISPMD+1)=NSN +NEDGE_1D
                 ISENDTO(I,NSPMD+1)=ISENDTO(I,NSPMD+1)+1
-                ISENDTO(NINTER+1,ISPMD+1)=ISENDTO(NINTER+1,ISPMD+1)+NSN
+                ISENDTO(NINTER+1,ISPMD+1)=ISENDTO(NINTER+1,ISPMD+1)+NSN +NEDGE_1D
               ENDIF
-              IF(NMN/=0) THEN
-                IRCVFROM(I,ISPMD+1) = NMN
+              IF(NMN+NEDGE_1D/=0) THEN
+                IRCVFROM(I,ISPMD+1) = NMN +NEDGE_1D
                 IRCVFROM(I,NSPMD+1)=IRCVFROM(I,NSPMD+1)+1
                 IRCVFROM(NINTER+1,ISPMD+1)=IRCVFROM(NINTER+1,ISPMD+1)
-     +                                    +NMN
+     +                                    +NMN +NEDGE_1D
               ENDIF
-
 
             ELSEIF(ITYP==17)THEN
               IF(IPARI(33,I)==0)THEN
@@ -3086,7 +3107,7 @@ C
             ELSEIF(ITYP==20)THEN
               NSN  = IPARI(5,I)
               NMN = IPARI(6,I)  
-C partie edge rajoutee             
+C Edge part added             
               NSNE   = IPARI(55,I)                                   
               NMNE   = IPARI(56,I)                                   
               IF(NSN+NSNE/=0) THEN
@@ -3168,7 +3189,7 @@ C
           ENDDO
         ENDIF
 C
-C preparation pour comm dans spmd_icrit
+C preparation for communication in spmd_icrit
 C
         DO K=1,NSPMD
           NNP(K) = IRCVFROM(NINTER+1,K) + ISENDTO(NINTER+1,K)
@@ -3189,17 +3210,17 @@ C
               IRECVF = LAST
             END IF
           END IF
-          IF(MY_RANK==NSPMD)THEN         ! DERNIER PROC DU RING
+          IF(MY_RANK==NSPMD)THEN         ! LAST PROC OF THE RING
             IF(IRECVF/=0) ISENDT = -1      ! -1 : ENVOI A TS LE MONDE (SI COMM NECESSAIRE)
-          ELSE ! PROCESSEUR DANS LE RING
+          ELSE ! PROCESSOR IN THE RING
             ISENDT = INDP(MY_RANK+1)
           END IF
           IF(NSPMD>1) THEN
-            IF(NNP(INDP(NSPMD-1))>0)IRING= INDP(NSPMD) ! IRING = NO DU DERNIER PROCESSEUR DS LE RING (OU 0 SI PAS DE RING NECESSAIRE) 
+            IF(NNP(INDP(NSPMD-1))>0)IRING= INDP(NSPMD) ! IRING = NO OF THE LAST PROCESSOR IN THE RING (OR 0 IF NO RING NECESSARY)
           END IF
         END IF
 C
-C longueur comm routine SPMD_SD_XV
+C length com routine SPMD_SD_XV
 C
         ISIZXV = 0
         DO I = 1, NSPMD
@@ -3212,7 +3233,7 @@ C comm w
 
         IF(IDTMIN(11)==3.OR.IDTMIN(10)==3) ILENXV = ILENXV + 2
 C
-C longueur comm routine EXCH_A_INT2_PON
+C length com routine exch_a_int2_pon
 C
         IF(IRODDL==0) THEN
           I2SIZE = 5
@@ -3220,7 +3241,7 @@ C
           I2SIZE = 10
         ENDIF
 C
-C longueur comm routine I7XVCOM et I7FCOM
+C Comm routine length i7 xcom and i7 xcom
 C
         ISLEN7 = 0
         IRLEN7 = 0
@@ -3246,7 +3267,7 @@ C
           NIN = INTLIST(I)
           ITYP = IPARI(7,NIN)
           INTTH = IPARI(47,NIN)
-C type 7 ou 10
+C type 7 or 10
           IF(ITYP==7 .OR.ITYP==10.OR.
      .       ITYP==23.OR.ITYP==22.OR.ITYP==24.OR.
      .       ITYP==25)THEN
@@ -3351,32 +3372,42 @@ C
       CALL SPMD_SPLIT_COMM(
      .  IRCVFROM(NINTER+1,ISPMD+1)+ISENDTO(NINTER+1,ISPMD+1),COMM_CONT)
 
-      IF(NINTER/=0) CALL SPMD_SPLIT_COMM_INTER( NBINTC,INTLIST,IPARI,ISENDTO,IRCVFROM,SORT_COMM,
+      IF(NINTER/=0) CALL SPMD_SPLIT_COMM_INTER( INTBUF_TAB, NBINTC,INTLIST,IPARI,ISENDTO,IRCVFROM,SORT_COMM,
      .                                          NEED_COMM_INT25_SOLID_EROSION,COMM_INT25_SOLID_EROSION )
 
 !     Create CJOINT communicator
       CALL SPMD_SPLIT_COMM_JOINT()
+
+      DEALLOCATE(INDX)
+      DEALLOCATE(PPAR)
+      DEALLOCATE(INDP)
+      DEALLOCATE(NNP)
+      DEALLOCATE(RANK)
+      DEALLOCATE(IRBODY)
+      DEALLOCATE(INDB)
+      DEALLOCATE(NNSN)
+
       RETURN
       END
-      !||====================================================================
-      !||    spmd_initfi                  ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb                       ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                       ../engine/source/output/message/message.F
-      !||    arret                        ../engine/source/system/arret.F
-      !||    read_db                      ../common_source/tools/input_output/read_db.F
-      !||    read_i_c                     ../common_source/tools/input_output/write_routtines.c
-      !||    read_r_c                     ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
-      !||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
-      !||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
-      !||    message_mod                  ../engine/share/message_module/message_mod.F
-      !||    parameters_mod               ../common_source/modules/interfaces/parameters_mod.F
-      !||    tri25ebox                    ../engine/share/modules/tri25ebox.F
-      !||    tri7box                      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_initfi                  ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    rdresb                       ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                       ../engine/source/output/message/message.F
+!||    arret                        ../engine/source/system/arret.F
+!||    read_db                      ../common_source/tools/input_output/read_db.F
+!||    read_i_c                     ../common_source/tools/input_output/write_routines.c
+!||    read_r_c                     ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                      ../engine/share/modules/h3d_mod.F
+!||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
+!||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
+!||    message_mod                  ../engine/share/message_module/message_mod.F
+!||    parameters_mod               ../common_source/modules/interfaces/parameters_mod.F
+!||    tri25ebox                    ../engine/share/modules/tri25ebox.F
+!||    tri7box                      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_INITFI(IPARI,IFLAG,H3D_DATA,PARAMETERS,IDT_THERM,INTHEAT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3425,7 +3456,7 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
       IF(IFLAG==1) THEN
-C init Pointeur + lecture partie entiere
+C Init Pointer + Reading Wait
        IF(NINTER/=0) THEN
         IERROR = 0
         ALLOCATE(NSVFI(NINTER),STAT=IERROR1)
@@ -3933,7 +3964,7 @@ C
           CALL ARRET(2)
         ENDIF
 C
-C allocation et lecture strutures interfaces sur fichier restart (partie entiere)
+C Allocation and reading Strings Interfaces on Restart file (integer part)
 C
         NBINTC = 0
         DO I =1, NINTER
@@ -4294,7 +4325,12 @@ C
                     STIF_MSDT_FI(I)%P(1:LENR)=ZERO
                  ENDIF
 
-                 IF(PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) THEN
+                 IF(ITYP == 25.AND.PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) THEN
+                   ALLOCATE(INTAREANFI(I)%P(LENR),STAT=IERROR1)
+                   IERROR = IERROR + IERROR1
+                   INTAREANFI(I)%P(1:LENR) =ZERO
+                ENDIF
+                 IF(ITYP == 24.AND.PARAMETERS%INTCAREA > 0) THEN
                    ALLOCATE(INTAREANFI(I)%P(LENR),STAT=IERROR1)
                    IERROR = IERROR + IERROR1
                    INTAREANFI(I)%P(1:LENR) =ZERO
@@ -4426,7 +4462,7 @@ C fin type11
                END IF
 C fin type 17
               END IF
-C cas LENR = 0, on a pas besoin de tableau ISKYFI et FSKYFI
+C Lenr case = 0, we don't need an iskyfi and fskyfi table
             ELSE
               NLSKYFI(I) = 0
             ENDIF
@@ -4569,7 +4605,7 @@ C
                   CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
                   CALL ARRET(2)
                 END IF
-C cas LENR = 0, on a pas besoin de tableau ISKYFI et FSKYFI
+C Lenr case = 0, we don't need an iskyfi and fskyfi table
               ELSE
                 NLSKYFIE(I) = 0
               END IF
@@ -4587,7 +4623,6 @@ C cas LENR = 0, on a pas besoin de tableau ISKYFI et FSKYFI
 
                 CALL READ_I_C(NSNSIE(I)%P(1),NSPMD)
                 CALL READ_I_C(NSNFIE(I)%P(1),NSPMD)
-
                 LENS_EDGE = 0
                 LENR_EDGE = 0
                 DO P = 1, NSPMD
@@ -4625,8 +4660,11 @@ C
                 ENDIF
                 IF(LENR_EDGE>0) THEN
                   ALLOCATE(NSVFIE(I)%P(LENR_EDGE)) 
+
                   ALLOCATE(ITAFIE(I)%P(LENR_EDGE*2))
+
                   ALLOCATE(LEDGE_FIE(I)%P(E_LEDGE_SIZE,LENR_EDGE)) 
+
                   ALLOCATE(XFIE(I)%P(3,LENR_EDGE*2)) 
                   ALLOCATE(VFIE(I)%P(3,LENR_EDGE*2)) 
                   ALLOCATE(MSFIE(I)%P(LENR_EDGE*2)) 
@@ -4647,7 +4685,7 @@ C
                   CALL READ_I_C(LEDGE_FIE(I)%P,E_LEDGE_SIZE*LENR_EDGE)
                   IPARI(69,I) = LENR_EDGE
                   IF(INTFRIC > 0) THEN
-                     ALLOCATE(IPARTFRIC_FIE(I)%P(LENR),STAT=IERROR1)
+                     ALLOCATE(IPARTFRIC_FIE(I)%P(LENR_EDGE),STAT=IERROR1)
                      CALL READ_I_C(IPARTFRIC_FIE(I)%P,LENR_EDGE)
                   ENDIF
                   IF(IPARI(97,I) > 0) THEN
@@ -4662,7 +4700,7 @@ C
 C
 C
             IF(IPARI(36,I)>0.AND.IPARI(7,I)/=17) THEN
-C structure output sous interfaces
+C Output structure under interfaces
               IERROR = 0
               ALLOCATE(NISUBSFI(I)%P(NSPMD),STAT=IERROR1)
               IERROR = IERROR + IERROR1
@@ -4701,7 +4739,7 @@ C structure output sous interfaces
                 CALL ARRET(2)
               END IF               
 C =================== EDGES TO EDGE
-C structure output sous interfaces
+C Output structure under interfaces
               IF(IPARI(7,I) == 25 .AND. IPARI(58,I) > 0) THEN
                 IERROR = 0
                 ALLOCATE(NISUBSFIE(I)%P(NSPMD),STAT=IERROR1)
@@ -4841,12 +4879,12 @@ C
            ENDIF
           ENDIF
         ENDDO
-C allocation buffer echanges => remplace par alloc dynamique ds les echanges
+C Buffer Allocation Exchanges => replaced by Dynamic Alloc in the exchanges
        ENDIF
 C
        
       ELSE
-C iflag = 2 lecture partie reelle
+C Iflag = 2 Reading part Reel
        IF(NINTER/=0) THEN
         DO I =1, NINTER
           ITYP = IPARI(7,I)
@@ -4918,9 +4956,9 @@ C
               END IF
             END IF
           END IF
-C Int 20 specifique
+C Int 20 Specifique
           IF(ITYP==20)THEN
-C rajout ancrage
+C Addition anchoring
             IF(LENR>0) THEN
               CALL READ_DB(DAANC6FI(I)%P(1,1,1),3*6*LENR)
               CALL READ_DB(DXANCFI(I)%P(1,1),3*LENR)
@@ -4935,7 +4973,7 @@ C rajout ancrage
                 CALL READ_DB(DIAG_SMSFI(I)%P(1),LENR)
               ENDIF 
             END IF
-C rajout partie edge
+C Edge part addition
             LENR = 0
             DO P = 1, NSPMD
               LENR = LENR + NSNFIE(I)%P(P)
@@ -4972,8 +5010,11 @@ C rajout partie edge
               IF(IPARI(97,I) > 0) THEN
                  CALL READ_DB(STIF_MSDT_FI(I)%P(1),LENR) ! stif based on mass and dt
               ENDIF
-              IF(PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) THEN
-                 CALL READ_DB(INTAREANFI(I)%P(1),LENR) ! Area of seconday node
+              IF(ITYP==25.AND.PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) THEN
+                 CALL READ_DB(INTAREANFI(I)%P(1),LENR) ! Area of secondary node
+              ENDIF
+              IF(ITYP==24.AND.PARAMETERS%INTCAREA > 0) THEN
+                 CALL READ_DB(INTAREANFI(I)%P(1),LENR) ! Area of secondary node
               ENDIF
           ENDIF  ! fin partie type 24 & 25
 C
@@ -5074,22 +5115,23 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_savefi                  ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    wrrestp                      ../engine/source/output/restart/wrrestp.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_db                     ../common_source/tools/input_output/write_db.F
-      !||    write_i_c                    ../common_source/tools/input_output/write_routtines.c
-      !||    write_r_c                    ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
-      !||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
-      !||    parameters_mod               ../common_source/modules/interfaces/parameters_mod.F
-      !||    sensor_mod                   ../common_source/modules/sensor_mod.F90
-      !||    tri25ebox                    ../engine/share/modules/tri25ebox.F
-      !||    tri7box                      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_savefi                  ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    wrrestp                      ../engine/source/output/restart/wrrestp.F
+!||--- calls      -----------------------------------------------------
+!||    write_db                     ../common_source/tools/input_output/write_db.F
+!||    write_i_c                    ../common_source/tools/input_output/write_routines.c
+!||    write_r_c                    ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod                ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
+!||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
+!||    parameters_mod               ../common_source/modules/interfaces/parameters_mod.F
+!||    sensor_mod                   ../common_source/modules/sensor_mod.F90
+!||    tri25ebox                    ../engine/share/modules/tri25ebox.F
+!||    tri7box                      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_SAVEFI(IPARI, IFLAG,INTBUF_TAB,NSENSOR,SENSOR_TAB,PARAMETERS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -5135,11 +5177,11 @@ C-----------------------------------------------
 C Global init of variable
       IEDGE4=0
 C
-C Sauvegarde Structure interfaces sur restart
+C Building Structure Interfaces on Restart
 C
       IF(IFLAG==1) THEN
         IF(NINTER/=0) THEN
-C ecriture strutures interfaces sur fichier restart (partie entiere)
+C Writing Structures Interfaces on Restart file (integer part)
           DO I =1, NINTER
             ITYP = IPARI(7,I)
             IF(ITYP==7.OR.
@@ -5359,7 +5401,7 @@ C
                   END IF
                 END IF
 C =================== EDGES TO EDGE
-C structure output sous interfaces
+C Output structure under interfaces
                 IF(IPARI(7,I) == 25 .AND. IPARI(58,I) > 0) THEN
                   CALL WRITE_I_C(NISUBSFIE(I)%P(1),NSPMD)
                   LENI = 0
@@ -5417,7 +5459,7 @@ C
       ELSE ! WRITE REAL
 
         IF(NINTER/=0) THEN
-C ecriture strutures interfaces sur fichier restart (partie reelle)
+C Writing Structures Interfaces on Restart file (real part)
           DO I =1, NINTER
             ITYP = IPARI(7,I)
             IGAP = IPARI(21,I)
@@ -5511,9 +5553,9 @@ C
                 END IF
               END IF
             END IF
-C type20 specifique
+C SPECIFIC TYPE20
             IF(ITYP==20)THEN
-C rajout ancrage
+C Addition anchoring
               IF(LENR>0) THEN
                 CALL WRITE_DB(DAANC6FI(I)%P(1,1,1),3*6*LENR)
                 CALL WRITE_DB(DXANCFI(I)%P(1,1),3*LENR)
@@ -5564,8 +5606,9 @@ C
                 CALL WRITE_DB(PENE_OLDFI(I)%P(1,1),5*LENR)
                 CALL WRITE_DB(STIF_OLDFI(I)%P(1,1),2*LENR)
                 IF(IPARI(97,I) > 0) CALL WRITE_DB(STIF_MSDT_FI(I)%P(1),LENR) ! stif based on mass and dt
-                IF(PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) CALL WRITE_DB(INTAREANFI(I)%P(1),LENR) ! output carea th (only case NISUB)
               ENDIF  ! fin partie type 24 & 25
+              IF(ITYP==25.AND.PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) CALL WRITE_DB(INTAREANFI(I)%P(1),LENR) ! output carea th (only case NISUB)
+              IF(ITYP==24.AND.PARAMETERS%INTCAREA > 0) CALL WRITE_DB(INTAREANFI(I)%P(1),LENR) ! output carea th 
 C             
               IF (ITYP==24) THEN
                 IF(IDTMINS==2)THEN
@@ -5634,12 +5677,12 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sortint           ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i21fthecom   ../engine/source/mpi/interfaces/send_cand.F
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    sortint           ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i21fthecom   ../engine/source/mpi/interfaces/send_cand.F
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE SORTINT(N,ISKY,INDEX)  
 C
 C-----------------------------------------------
@@ -5659,7 +5702,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C   test sur n=0
+C   test on n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -5707,9 +5750,9 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sorti7   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||====================================================================
+!||====================================================================
+!||    sorti7   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||====================================================================
       SUBROUTINE SORTI7(N,ISKY,FSKYI,FTHESKYI,NFSKYI)
 C
 C-----------------------------------------------
@@ -5731,7 +5774,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C   test sur n=0
+C   test on n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -5869,9 +5912,9 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sorti7t   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||====================================================================
+!||====================================================================
+!||    sorti7t   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||====================================================================
       SUBROUTINE SORTI7T(N,ISKY,FSKYI,FTHESKYI,CONDNSKYI,NFSKYI)
 C
 C-----------------------------------------------
@@ -5893,7 +5936,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C   test sur n=0
+C   test on n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6041,12 +6084,12 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sorti20             ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i17frots_pon   ../engine/source/mpi/interfaces/spmd_i17frots_pon.F
-      !||    spmd_i7fcom_pon     ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    sorti20             ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i17frots_pon   ../engine/source/mpi/interfaces/spmd_i17frots_pon.F
+!||    spmd_i7fcom_pon     ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE SORTI20(N,ISKY,FSKYI,NFSKYI)
 C
 C-----------------------------------------------
@@ -6068,7 +6111,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C   test sur n=0
+C   test on n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6195,13 +6238,13 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    intcontp            ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i17frots_pon   ../engine/source/mpi/interfaces/spmd_i17frots_pon.F
-      !||    spmd_i21fthecom     ../engine/source/mpi/interfaces/send_cand.F
-      !||    spmd_i7fcom_pon     ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    intcontp            ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i17frots_pon   ../engine/source/mpi/interfaces/spmd_i17frots_pon.F
+!||    spmd_i21fthecom     ../engine/source/mpi/interfaces/send_cand.F
+!||    spmd_i7fcom_pon     ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE INTCONTP(N,ISKY,NSNFI,ISIZENV,NSNFITOT,LEN)
 C
 C-----------------------------------------------
@@ -6249,11 +6292,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    addcomi20         ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    addcomi20         ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE ADDCOMI20(NSNFI,NSVFI,ISIZENV,LENI20)
 C
 C-----------------------------------------------
@@ -6281,7 +6324,7 @@ C      IDEB = 0
       DO P = 1, NSPMD
         NB = NSNFI(P)
         ISIZENV(1,P) = ISIZENV(1,P) + NB*LENI20
-C envoi tjrs mais peut etre optimise
+C always send but maybe optimistic
 C        DO N = 1, NB
 C          IF(NSVFI(IDEB+N)<0) THEN
 C            ISIZENV(P) = ISIZENV(P) + LENI20
@@ -6293,11 +6336,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sorti11           ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    sorti11           ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE SORTI11(N,ISKY,FSKYI,NFSKYI)
 C
 C-----------------------------------------------
@@ -6320,7 +6363,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C   test sur n=0
+C   test on n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6501,11 +6544,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sorti11t          ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    sorti11t          ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE SORTI11T(N,ISKY,FSKYI,FTHESKYI,NFSKYI)
 C
 C-----------------------------------------------
@@ -6529,7 +6572,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C   test sur n=0
+C   test on n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6722,11 +6765,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sorti11tt         ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    sorti11tt         ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE SORTI11TT(N,ISKY,FSKYI,FTHESKYI,CONDNSKYI,NFSKYI)
 C
 C-----------------------------------------------
@@ -6750,7 +6793,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C   test sur n=0
+C   test on n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6955,11 +6998,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sorti17           ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||====================================================================
+!||====================================================================
+!||    sorti17           ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||====================================================================
       SUBROUTINE SORTI17(N,ISKY,FSKYI)
 C
 C-----------------------------------------------
@@ -7037,12 +7080,12 @@ C
       END
 
 
-      !||====================================================================
-      !||    putdpzero         ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||    spmd_i7xvcom2     ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
-      !||====================================================================
+!||====================================================================
+!||    putdpzero         ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_i7fcom_pon   ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||    spmd_i7xvcom2     ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
+!||====================================================================
       SUBROUTINE PUTDPZERO(ZZ,BUF,IRESP,INC)
 C
 C-----------------------------------------------
@@ -7062,8 +7105,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C si double precision, on compacte 18 valeurs dp
-C si simple precision, on compacte 18 valeurs dp soit 36 sp
+C If double precision, we compact 18 DP values
+C If simple precision, we compact 18 DP values or 36 SP
       INC = 18
       IF(IRESP==0) THEN
         DO I = 1,INC
@@ -7080,11 +7123,11 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    adddp            ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_exch_da20   ../engine/source/mpi/interfaces/spmd_exch_da20.F
-      !||====================================================================
+!||====================================================================
+!||    adddp            ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_exch_da20   ../engine/source/mpi/interfaces/spmd_exch_da20.F
+!||====================================================================
       SUBROUTINE ADDDP(DAANC6,DAANC6L,LEN)
 C
 C-----------------------------------------------
@@ -7109,7 +7152,7 @@ C-----------------------------------------------
       DO I = 1,LEN
         DATMP(I) = DAANC6(I) + DAANC6L(I)
       END DO
-C 2 boucles pour eviter pb alignement entier dp sur pgi
+C 2 loops to avoid integer dp alignment problem on pgi
       DO I = 1,LEN
         DAANC6(I) = DATMP(I)
       END DO
@@ -7117,11 +7160,11 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    conversion7     ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_tri20box   ../engine/source/mpi/interfaces/spmd_tri20box.F
-      !||====================================================================
+!||====================================================================
+!||    conversion7     ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_tri20box   ../engine/source/mpi/interfaces/spmd_tri20box.F
+!||====================================================================
       SUBROUTINE CONVERSION7(XREM,XREM_DP,IREM,SIZ,LEN)
 C
 C-----------------------------------------------
@@ -7154,12 +7197,12 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    conversion11     ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_tri20boxe   ../engine/source/mpi/interfaces/spmd_tri20boxe.F
-      !||    spmd_tri22vox    ../engine/source/mpi/interfaces/spmd_tri22vox.F
-      !||====================================================================
+!||====================================================================
+!||    conversion11     ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_tri20boxe   ../engine/source/mpi/interfaces/spmd_tri20boxe.F
+!||    spmd_tri22vox    ../engine/source/mpi/interfaces/spmd_tri22vox.F
+!||====================================================================
       SUBROUTINE CONVERSION11(XREM,XREM_DP,IREM,SIZ,LEN)
 C
 C-----------------------------------------------
@@ -7192,18 +7235,18 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    upgrade_rem_2ry   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../engine/source/output/message/message.F
-      !||    arret             ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||    tri25ebox         ../engine/share/modules/tri25ebox.F
-      !||    tri7box           ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    upgrade_rem_2ry   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg            ../engine/source/output/message/message.F
+!||    arret             ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod       ../engine/share/message_module/message_mod.F
+!||    tri25ebox         ../engine/share/modules/tri25ebox.F
+!||    tri7box           ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE UPGRADE_REM_2RY(IPARI,COUNT_REMSLV,COUNT_REMSLVE,NODADT_THERM)
       USE TRI7BOX
       USE TRI25EBOX
@@ -7320,16 +7363,16 @@ C            ALLOCATE(FSKYFIE(NI)%P(8,LSKYFI),STAT=IERROR1)
       RETURN
       END
 
-      !||====================================================================
-      !||    getdpdaanc           ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_exch_da20       ../engine/source/mpi/interfaces/spmd_exch_da20.F
-      !||    spmd_fiadd20_poff    ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    spmd_fiadd20_pon     ../engine/source/mpi/interfaces/spmd_i20tool.F
-      !||    spmd_fiadd20e_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    spmd_fiadd20e_pon    ../engine/source/mpi/interfaces/spmd_i20tool.F
-      !||    spmd_i7xvcom2        ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
-      !||====================================================================
+!||====================================================================
+!||    getdpdaanc           ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_exch_da20       ../engine/source/mpi/interfaces/spmd_exch_da20.F
+!||    spmd_fiadd20_poff    ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    spmd_fiadd20_pon     ../engine/source/mpi/interfaces/spmd_i20tool.F
+!||    spmd_fiadd20e_poff   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    spmd_fiadd20e_pon    ../engine/source/mpi/interfaces/spmd_i20tool.F
+!||    spmd_i7xvcom2        ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
+!||====================================================================
       SUBROUTINE GETDPDAANC(DAANC6,BUF,IRESP,INC)
 C
 C-----------------------------------------------
@@ -7349,8 +7392,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C si double precision, on compacte 18 valeurs dp
-C si simple precision, on compacte 18 valeurs dp soit 36 sp
+C If double precision, we compact 18 DP values
+C If simple precision, we compact 18 DP values or 36 SP
       INC = 18*(1+IRESP)
       DO I = 1,INC
         DAANC6(I) = BUF(I)
@@ -7360,14 +7403,14 @@ C
       END
 
 
-      !||====================================================================
-      !||    putdpdaanc         ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_exch_da20     ../engine/source/mpi/interfaces/spmd_exch_da20.F
-      !||    spmd_i7fcom_poff   ../engine/source/mpi/forces/spmd_i7fcom_poff.F
-      !||    spmd_i7fcom_pon    ../engine/source/mpi/forces/spmd_i7fcom_pon.F
-      !||    spmd_i7xvcom2      ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
-      !||====================================================================
+!||====================================================================
+!||    putdpdaanc         ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- called by ------------------------------------------------------
+!||    spmd_exch_da20     ../engine/source/mpi/interfaces/spmd_exch_da20.F
+!||    spmd_i7fcom_poff   ../engine/source/mpi/forces/spmd_i7fcom_poff.F
+!||    spmd_i7fcom_pon    ../engine/source/mpi/forces/spmd_i7fcom_pon.F
+!||    spmd_i7xvcom2      ../engine/source/mpi/interfaces/spmd_i7xvcom2.F
+!||====================================================================
       SUBROUTINE PUTDPDAANC(DAANC6,BUF,IRESP,INC)
 C
 C-----------------------------------------------
@@ -7387,8 +7430,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C si double precision, on compacte 18 valeurs dp
-C si simple precision, on compacte 18 valeurs dp soit 36 sp
+C If double precision, we compact 18 DP values
+C If simple precision, we compact 18 DP values or 36 SP
       INC = 18*(1+IRESP)
       DO I = 1,INC
         BUF(I) = DAANC6(I)

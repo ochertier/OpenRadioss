@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,36 +20,39 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rbe3t1               ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    asp2_rbe3            ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    ass_rbe3             ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    dmi_rbe3             ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    foat_to_6_float      ../engine/source/system/parit.F
-      !||    prerbe3              ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    prerbe3p             ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3f                ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3poff             ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    spmd_exch_rbe3       ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3.F
-      !||    spmd_exch_rbe3_pon   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3_pon.F
-      !||    zero1                ../engine/source/system/zero.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod              ../engine/share/modules/h3d_mod.F
-      !||    nodal_arrays_mod     ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||    rbe3_mod             ../common_source/modules/constraints/rbe3_mod.F90
-      !||====================================================================
-      SUBROUTINE RBE3T1(RBE3  ,NODES    ,SKEW ,
+!||====================================================================
+!||    rbe3t1               ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    resol                ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    asp2_rbe3            ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    ass_rbe3             ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    dmi_rbe3             ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    prerbe3              ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    prerbe3p             ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3f                ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3pen_init         ../engine/source/constraints/general/rbe3/rbe3pen_init.F90
+!||    rbe3poff             ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    spmd_exch_rbe3       ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3.F
+!||    spmd_exch_rbe3_pon   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3_pon.F
+!||    zero1                ../engine/source/system/zero.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod              ../engine/share/modules/h3d_mod.F
+!||    nodal_arrays_mod     ../common_source/modules/nodal_arrays.F90
+!||    rbe3_mod             ../common_source/modules/constraints/rbe3_mod.F90
+!||    rbe3pen_init_mod     ../engine/source/constraints/general/rbe3/rbe3pen_init.F90
+!||====================================================================
+      SUBROUTINE RBE3T1(RBE3  ,NODES    ,SKEW  ,
      *                  DMAST ,ADM      ,DINERT,
-     *                  ADI   ,H3D_DATA )
+     *                  ADI   ,H3D_DATA , DT1  ,
+     *                  TT    ,IMPL_S   )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
       USE rbe3_mod
       use nodal_arrays_mod
+      use rbe3pen_init_mod, only: RBE3PEN_INIT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,7 +62,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 #include      "parit_c.inc"
@@ -69,20 +71,21 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C     REAL
       my_real SKEW(*)   !< Skew Array
-      my_real DMAST
+      my_real DMAST,DT1,TT
       my_real ADM(*)
       my_real DINERT
       my_real ADI(*)    !< Animation buffer
+      INTEGER, INTENT(IN) :: IMPL_S
       TYPE (RBE3_),INTENT(INOUT) :: RBE3
       TYPE (H3D_DATABASE) :: H3D_DATA
       TYPE(NODAL_ARRAYS_), INTENT(INOUT) :: NODES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, MAX_M,JT(3,NRBE3),JR(3,NRBE3),IERR,NMT,
+      INTEGER  J, N, MAX_M,JT(3,NRBE3),JR(3,NRBE3),NMT,
      .        IADA,IADMS,IADFN,IADAR,IADIN,IADFR,IADM0,IADI0,IADL,
-     .        IPA,IPMS,IPFN,IPAR,IPIN,IPFR,NMP,IADLP,NS,NML,ICOM,
-     .        IADLP1,IADM1,IADI1,NMT0,IADMP(SLRBE3/2),IML(SLRBE3/2)
+     .        IPA,IPMS,IPFN,IPAR,IPIN,IPFR,NMP,IADLP,NS,ICOM,
+     .        NMT0,IADMP(SLRBE3/2),IML(SLRBE3/2),IPEN,IPARITF
       INTEGER IROTG_LOC   !< Local Max of IROT Flags keep for compatibility
 C======================================================================|
       I7KGLO = 1
@@ -92,7 +95,9 @@ C======================================================================|
       ICOM = RBE3%mpi%IAD_RBE3(NSPMD+1)-RBE3%mpi%IAD_RBE3(1)   !< Flag for SPMD communication
       
       IF (NMT0>0) THEN
+       IF (NCYCLE==0) CALL RBE3PEN_INIT(NODES%X,NODES%MS,NODES%IN,NODES%STIFN ,NODES%STIFR,NUMNOD,RBE3,TT,IMPL_S)
        CALL PRERBE3P(RBE3%IRBE3 ,RBE3%LRBE3 ,IADMP ,IML   , NMT   )
+       IPARITF = 1 ! fix to P/ON anyway after issue of P/OFF w/ mass increasing
        IADA=1
        IADMS=IADA+3*NMT
        IADFN=IADMS+NMT
@@ -108,18 +113,7 @@ C======================================================================|
        IADL=IADFR+NMT
 C       ALLOCATE(RSUM(IADL),STAT=IERR)
        CALL ZERO1(RBE3%RRBE3,IADL)
-       CALL RBE3F(RBE3%IRBE3 ,RBE3%LRBE3 ,NODES%X    ,NODES%A     ,NODES%AR    ,
-     1           NODES%MS    ,NODES%IN    ,RBE3%FRBE3,SKEW  ,NODES%WEIGHT,
-     2           NODES%STIFN ,NODES%STIFR ,JT   ,JR    ,RBE3%IROTG ,
-     3           MAX_M ,RBE3%RRBE3(IADA),RBE3%RRBE3(IADAR) ,RBE3%RRBE3(IADMS),
-     4           RBE3%RRBE3(IADIN),RBE3%RRBE3(IADFN),RBE3%RRBE3(IADFR),NMT0  ,
-     5           IADMP )
-C
-       IF (NSPMD>1.AND.IPARIT==0) THEN
-            CALL RBE3POFF(RBE3%IRBE3 ,RBE3%LRBE3 ,NODES%A ,NODES%MS ,NODES%WEIGHT,
-     1                    NODES%AR    ,NODES%IN    ,NODES%STIFN,NODES%STIFR )
-       END IF
-       IF (IPARIT>0.AND.IMACH==3) THEN
+! P/ON part       
         NMP = 6*NMT
         IPA=1
         IPMS=IPA+3*NMP
@@ -134,16 +128,22 @@ C
          IPFR=IPIN
         ENDIF
         IADLP=IPFR+NMP
-C         version spmd p/on
-C   RSUM_PON=ZERO
-        CALL FOAT_TO_6_FLOAT(1  ,NMT*3  ,RBE3%RRBE3(IADA) ,RBE3%RRBE3_PON(IPA) )
-        CALL FOAT_TO_6_FLOAT(1  ,NMT    ,RBE3%RRBE3(IADMS),RBE3%RRBE3_PON(IPMS))
-        CALL FOAT_TO_6_FLOAT(1  ,NMT    ,RBE3%RRBE3(IADFN),RBE3%RRBE3_PON(IPFN))
-        IF (RBE3%IROTG>0) THEN
-         CALL FOAT_TO_6_FLOAT(1  ,NMT*3  ,RBE3%RRBE3(IADAR) ,RBE3%RRBE3_PON(IPAR))
-         CALL FOAT_TO_6_FLOAT(1  ,NMT    ,RBE3%RRBE3(IADIN),RBE3%RRBE3_PON(IPIN))
-         CALL FOAT_TO_6_FLOAT(1  ,NMT    ,RBE3%RRBE3(IADFR),RBE3%RRBE3_PON(IPFR))
-        ENDIF
+        RBE3%RRBE3_PON = ZERO
+       CALL RBE3F(RBE3%IRBE3 ,RBE3%LRBE3 ,NODES%X    ,NODES%A     ,NODES%AR    ,
+     1           NODES%MS    ,NODES%IN    ,RBE3%FRBE3,SKEW  ,NODES%WEIGHT,
+     2           NODES%STIFN ,NODES%STIFR ,JT   ,JR    ,RBE3%IROTG ,
+     3           MAX_M ,RBE3%RRBE3(IADA),RBE3%RRBE3(IADAR) ,RBE3%RRBE3(IADMS),
+     4           RBE3%RRBE3(IADIN),RBE3%RRBE3(IADFN),RBE3%RRBE3(IADFR),NMT0  ,
+     5           IADMP ,RBE3%pen,NODES%V,NODES%VR,NMT ,DT1 ,IRODDL ,
+     6           RBE3%RRBE3_PON(IPA),RBE3%RRBE3_PON(IPAR),RBE3%RRBE3_PON(IPMS),
+     7           RBE3%RRBE3_PON(IPIN),RBE3%RRBE3_PON(IPFN),RBE3%RRBE3_PON(IPFR),
+     8           IPARITF)
+C
+       IF (NSPMD>1.AND.IPARITF==0) THEN
+            CALL RBE3POFF(RBE3%IRBE3 ,RBE3%LRBE3 ,NODES%A ,NODES%MS ,NODES%WEIGHT,
+     1                    NODES%AR    ,NODES%IN    ,NODES%STIFN,NODES%STIFR )
+       END IF
+       IF (IPARITF>0) THEN
         IF (ICOM>0) THEN
             CALL SPMD_EXCH_RBE3_PON(
      .       RBE3%RRBE3_PON(IPA),RBE3%RRBE3_PON(IPAR),RBE3%RRBE3_PON(IPMS),RBE3%RRBE3_PON(IPIN),
@@ -163,7 +163,7 @@ C-----------------A-=A*W+DA-----
      1                NODES%IN ,NODES%WEIGHT,NODES%STIFN ,NODES%STIFR ,RBE3%RRBE3(IADA),
      2                RBE3%RRBE3(IADAR) ,RBE3%RRBE3(IADMS), RBE3%RRBE3(IADIN),
      3                RBE3%RRBE3(IADFN) ,RBE3%RRBE3(IADFR),NMT   ,IML  ,RBE3%IROTG)
-        IF (IPARIT==0.AND.ICOM>0) THEN
+        IF (IPARITF==0.AND.ICOM>0) THEN
             CALL SPMD_EXCH_RBE3(
      .       NODES%A    ,NODES%AR   ,NODES%MS      ,NODES%IN     ,NODES%STIFN,
      .       NODES%STIFR,rbe3%mpi%FR_RBE3 ,RBE3%mpi%IAD_RBE3   ,RBE3%mpi%IAD_RBE3(NSPMD+1),rbe3%irotg_sz,
@@ -184,7 +184,8 @@ C
 C---  reset of secnd nodes forces is necessary w/AMS
       DO N=1,NRBE3
         NS  = RBE3%IRBE3(3,N)
-        IF(NS/=0) THEN
+        IPEN= RBE3%IRBE3(9,N)
+        IF(NS/=0.AND.IPEN<=0) THEN
           IF (NODES%WEIGHT(NS)/=0) THEN
             DO J = 1,3
               IF(JT(J,N)/=0)NODES%A(J,NS)=ZERO
@@ -195,11 +196,11 @@ C---  reset of secnd nodes forces is necessary w/AMS
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe3poff   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3t1     ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3poff   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3t1     ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE RBE3POFF(IRBE3 ,LRBE3 ,A    ,MS    ,WEIGHT,
      1                    AR    ,IN    ,STIFN,STIFR )
 C-----------------------------------------------
@@ -221,7 +222,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, NML, IAD,IROT,M,NS
+      INTEGER I, N, NML, IAD,IROT,M,NS
 C-----------------------------------------------
       DO N=1,NRBE3
         IAD = IRBE3(1,N)
@@ -253,19 +254,32 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    rbe3f       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3t1      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- calls      -----------------------------------------------------
-      !||    mfac_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3cl      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3f             ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3t1            ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float   ../engine/source/system/parit.F
+!||    mfac_rbe3         ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3cl            ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3f_pen         ../engine/source/constraints/general/rbe3/rbe3f_pen.F90
+!||--- uses       -----------------------------------------------------
+!||    rbe3_mod          ../common_source/modules/constraints/rbe3_mod.F90
+!||    rbe3f_pen_mod     ../engine/source/constraints/general/rbe3/rbe3f_pen.F90
+!||====================================================================
       SUBROUTINE RBE3F(IRBE3 ,LRBE3 ,X    ,A     ,AR    ,
      1                 MS    ,IN    ,FRBE3,SKEW  ,WEIGHT,
      2                 STIFN ,STIFR ,JT   ,JR    ,IROTG ,
      3                 MAX_M ,AM    ,ARM  ,MSM   ,INM   ,
-     4                 STIFNM,STIFRM,NMT0 ,IADMP )
+     4                 STIFNM,STIFRM,NMT0 ,IADMP ,PEN   ,
+     5                 V     ,VR    ,NMT  ,DT1   ,IRODDL,
+     6                 AM_P  ,ARM_P ,MSM_P,INM_P ,STIFNM_P,
+     7                STIFRM_P,IPARIT)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE rbe3_mod
+      USE rbe3f_pen_mod, only : RBE3F_PEN
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -280,33 +294,265 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRBE3(NRBE3L,*),LRBE3(*),WEIGHT(*)
       INTEGER MAX_M,IROTG,JT(3,*),JR(3,*),NMT0,IADMP(*)
+      INTEGER, INTENT(IN) :: NMT ! dimension of AM,STIFNM...
+      INTEGER, INTENT(IN) :: IRODDL,IPARIT
 C     REAL
       my_real
      .   X(3,*), A(3,*), AR(3,*), MS(*), IN(*), FRBE3(*),SKEW(*),
      .   STIFN(*) ,STIFR(*), AM(3,*), ARM(3,*), MSM(*), INM(*),
-     .   STIFNM(*) ,STIFRM(*)
+     .   STIFNM(*) ,STIFRM(*), V(3,*), VR(3,*)
+      my_real, INTENT(IN) :: DT1
+      TYPE (RBE3_pen), INTENT(INOUT) :: PEN
+      DOUBLE PRECISION
+     .        AM_P(6,3,NMT), ARM_P(6,3,NMT), MSM_P(6,NMT), INM_P(6,NMT),
+     .        STIFNM_P(6,NMT), STIFRM_P(6,NMT)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, NS ,NML, IAD,JJ,IROT,IADS,NM,NN,K,IMOD,IADF
+      INTEGER I, J, N, NS ,NML, IAD,IROT,IADS,NN,K,IMOD,IADF,
+     .        IPEN,N_P,ICOLINE
 C     REAL
       my_real
      .     FNS(3),MNS(3),MSS(3),INS(3),STN(3),STR(3),FSUM,MSUM,
      .     FMAX,SMAX,MMAX,SFD,SMD,F2MAX
       my_real,
      .         DIMENSION(:,:,:),ALLOCATABLE :: FDSTNB ,MDSTNB
+      my_real, DIMENSION(:,:), ALLOCATABLE :: AMP ,ARMP
+      my_real, DIMENSION(:), ALLOCATABLE   :: MSMP ,INMP,STIFNMP,STIFRMP
+      DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE     :: R1_6, R2_6
+      DOUBLE PRECISION, DIMENSION(:,:,:), ALLOCATABLE   :: RR_6
 
 C======================================================================|
       IADS = NMT0
-      ALLOCATE(FDSTNB(3,6,MAX_M))
-      IF (IROTG>0) ALLOCATE(MDSTNB(3,6,MAX_M))
+      IF (MAX_M>0) THEN
+        ALLOCATE(FDSTNB(3,6,MAX_M))
+        IF (IROTG>0) ALLOCATE(MDSTNB(3,6,MAX_M))
+      END IF
+      ALLOCATE(AMP(3,MAX_M))
+      ALLOCATE(MSMP(MAX_M))
+      ALLOCATE(STIFNMP(MAX_M))
+      IF (IROTG>0) THEN
+        ALLOCATE(ARMP(3,MAX_M))
+        ALLOCATE(INMP(MAX_M))
+        ALLOCATE(STIFRMP(MAX_M))
+      END IF
+      IF (IPARIT>0) THEN
+        IF (MAX_M>0) THEN
+          ALLOCATE(RR_6(6,3,MAX_M))
+          ALLOCATE(R1_6(6,MAX_M))
+          ALLOCATE(R2_6(6,MAX_M))
+        END IF 
+        DO N=1,NRBE3
+          IAD = IRBE3(1,N)
+          NS  = IRBE3(3,N)
+          NML = IRBE3(5,N)
+          IROT =IRBE3(6,N)
+          IMOD =IRBE3(8,N)
+          IPEN =IRBE3(9,N)
+         IF (NS==0.OR.IPEN>0) CYCLE
+         IF (WEIGHT(NS)==1) THEN
+          CALL RBE3CL(LRBE3(IAD+1),LRBE3(IADS+IAD+1),NS     ,X      ,
+     .                FRBE3(6*IAD+1),SKEW    ,NML     ,IROT   ,FDSTNB ,
+     .                MDSTNB  ,IRBE3(2,N))
+            DO J = 1,3
+             NN = JT(J,N)*WEIGHT(NS)
+             FNS(J) = A(J,NS)*NN
+             MSS(J) = MS(NS)*NN/3
+             STN(J) = STIFN(NS)*NN
+            END DO
+           AMP = ZERO
+           MSMP = ZERO
+           STIFNMP = ZERO
+C---not to add supplementary mass globally
+           IF (IMOD <=3) THEN
+             CALL MFAC_RBE3(FDSTNB,MDSTNB,NML  ,IROTG,SFD ,SMD)
+             DO I=1,NML
+               DO J = 1,3
+                FSUM = FDSTNB(J,1,I)+FDSTNB(J,2,I)+FDSTNB(J,3,I)
+                MSMP(I) = MSMP(I) + ABS(FSUM)*MSS(J)*SFD
+              END DO
+             END DO
+           ELSEIF (IMOD ==4) THEN
+             DO I=1,NML
+               IADF =6*(IAD+I-1)
+               DO J = 1,3
+                MSMP(I) = MSMP(I)+FRBE3(IADF+J)*MSS(J)
+               END DO
+             END DO
+           END IF
+          DO I=1,NML
+            DO J = 1,3
+              AMP(1:3,I) = AMP(1:3,I)+FDSTNB(1:3,J,I)*FNS(J)
+            END DO
+C-----IMOD=4  STIFNM might be over_estimated but safe         
+             SMAX = ZERO
+            DO J = 1,3
+             FMAX=ABS(FDSTNB(J,1,I))+ABS(FDSTNB(J,2,I))+ABS(FDSTNB(J,3,I))
+             F2MAX=FDSTNB(J,1,I)*FDSTNB(J,1,I)+FDSTNB(J,2,I)*FDSTNB(J,2,I)+
+     .             FDSTNB(J,3,I)*FDSTNB(J,3,I)
+             SMAX = MAX(SMAX,MAX(FMAX,F2MAX)*STN(J))
+            END DO
+             STIFNMP(I) = SMAX
+          ENDDO
+          IF ((JR(1,N)+JR(2,N)+JR(3,N))>0) THEN
+             DO J = 1,3
+                 NN = JR(J,N)*WEIGHT(NS)
+                 MNS(J) = AR(J,NS)*NN
+                 INS(J) = IN(NS)*NN/3
+                 STR(J) = STIFR(NS)*NN
+             END DO
+             DO I=1,NML
+               DO J = 1,3
+                  AMP(1:3,I) = AMP(1:3,I)+FDSTNB(1:3,J+3,I)*MNS(J)
+               END DO
+               SMAX = ZERO
+               DO J = 1,3
+!       FSUM = FDSTNB(J,J+3,I)
+                 FSUM = FDSTNB(J,4,I)+FDSTNB(J,5,I)+FDSTNB(J,6,I)
+                 MSMP(I) =MSMP(I)+ABS(FSUM)*INS(J)
+                 FMAX=ABS(FDSTNB(J,4,I))+ABS(FDSTNB(J,5,I))+ABS(FDSTNB(J,6,I))
+                 F2MAX=FDSTNB(J,4,I)*FDSTNB(J,4,I)+FDSTNB(J,5,I)*FDSTNB(J,5,I)+
+     .              FDSTNB(J,6,I)*FDSTNB(J,6,I)
+                 SMAX = MAX(SMAX,MAX(FMAX,F2MAX)*STR(J))
+               END DO
+               STIFNMP(I) = STIFNM(I)+SMAX
+             END DO
+          ENDIF
+          CALL FOAT_TO_6_FLOAT(1  ,NML*3  ,AMP    ,RR_6 )
+          CALL FOAT_TO_6_FLOAT(1  ,NML    ,MSMP   ,R1_6 )
+          CALL FOAT_TO_6_FLOAT(1  ,NML    ,STIFNMP,R2_6 )
+          DO I=1,NML
+             K = IADMP(IAD+I)
+             DO J = 1,6
+               AM_P(J,1:3,K) = AM_P(J,1:3,K)+RR_6(J,1:3,I) 
+               MSM_P(J,K) = MSM_P(J,K)+R1_6(J,I) 
+               STIFNM_P(J,K) = STIFNM_P(J,K)+R2_6(J,I) 
+             END DO
+          END DO
+          IF (IROT>0) THEN
+            ARMP = ZERO
+            INMP = ZERO
+            STIFRMP = ZERO
+            DO I=1,NML
+              DO J = 1,3
+                ARMP(1:3,I) = ARMP(1:3,I)+MDSTNB(1:3,J,I)*FNS(J)
+              END DO
+              SMAX = ZERO
+              DO J = 1,3
+                MSUM = MDSTNB(J,1,I)+MDSTNB(J,2,I)+MDSTNB(J,3,I)
+                IF (IMOD /=4) INMP(I) = INMP(I)+ABS(MSUM)*MSS(J)
+                MMAX=ABS(MDSTNB(J,1,I))+ABS(MDSTNB(J,2,I))+ABS(MDSTNB(J,3,I))
+                SMAX = MAX(SMAX,MMAX*STN(J))
+              END DO
+              STIFRMP(I) = STIFRMP(I)+SMAX
+            END DO
+           IF ((JR(1,N)+JR(2,N)+JR(3,N))>0) THEN
+             IF (IMOD <=3) THEN
+               DO I=1,NML
+                 DO J = 1,3
+                  MSUM = MDSTNB(J,4,I)+MDSTNB(J,5,I)+MDSTNB(J,6,I)
+                  INMP(I) = INMP(I)+ABS(MSUM)*INS(J)*SMD
+                 END DO
+               ENDDO
+             ELSEIF (IMOD ==4) THEN
+               DO I=1,NML
+                 IADF =6*(IAD+I-1)
+                 DO J = 1,3
+                  INMP(I) = INMP(I)+FRBE3(IADF+J+3)*INS(J)
+                 END DO
+               END DO
+             END IF
+             DO I=1,NML
+               DO J = 1,3
+                  ARMP(1:3,I) =ARMP(1:3,I)+MDSTNB(1:3,J+3,I)*MNS(J)
+               END DO
+              SMAX = ZERO
+              DO J = 1,3
+                MMAX=ABS(MDSTNB(J,4,I))+ABS(MDSTNB(J,5,I))+ABS(MDSTNB(J,6,I))
+                SMAX = MAX(SMAX,MMAX*STR(J))
+              END DO
+              STIFRMP(I) = STIFRMP(I)+SMAX
+             END DO
+           END IF ! (JR(1,N)
+           CALL FOAT_TO_6_FLOAT(1  ,NML*3  ,ARMP   ,RR_6 )
+           CALL FOAT_TO_6_FLOAT(1  ,NML    ,INMP   ,R1_6 )
+           CALL FOAT_TO_6_FLOAT(1  ,NML    ,STIFRMP,R2_6 )
+           DO I=1,NML
+              K = IADMP(IAD+I)
+              DO J = 1,6
+                ARM_P(J,1:3,K) = ARM_P(J,1:3,K)+RR_6(J,1:3,I) 
+                INM_P(J,K) = INM_P(J,K)+R1_6(J,I) 
+                STIFRM_P(J,K) = STIFRM_P(J,K)+R2_6(J,I) 
+              END DO
+           END DO
+          END IF !(IROT>0) THEN
+! 
+          STIFN(NS) = EM20
+          IF ((JR(1,N)+JR(2,N)+JR(3,N))>0) STIFR(NS) = EM20
+         END IF !(WEIGHT(NS)==1) THEN
+        END DO
+!     penalty formulation
+        N_P = 0
+        DO N=1,NRBE3
+          IAD = IRBE3(1,N)
+          NS  = IRBE3(3,N)
+          NML = IRBE3(5,N)
+          IROT =IRBE3(6,N)
+          IMOD =IRBE3(8,N)
+          IPEN =IRBE3(9,N)
+          IF (NS==0.OR.IPEN<=0) CYCLE
+            N_P = N_P +1 
+            AMP = ZERO
+            STIFNMP = ZERO
+            IF (IROT>0) THEN
+              ARMP = ZERO
+              STIFRMP = ZERO
+            END IF 
+            CALL RBE3F_PEN(                                       
+     .            NS      ,NUMNOD      ,DT1           ,IRODDL    ,         
+     .            NML     ,LRBE3(IAD+1),LRBE3(IADS+IAD+1),IN     ,        
+     .            A       ,AR          ,AMP         ,ARMP        ,         
+     .            STIFN   ,STIFR       ,STIFNMP     ,STIFRMP     ,         
+     .            V       ,VR          ,FRBE3(6*IAD+1),X         ,         
+     .           LSKEW    ,NUMSKW      ,SKEW          ,
+     .           PEN%RRBE3PEN_F(1,N_P) ,PEN%RRBE3PEN_STF(1,N_P) ,         
+     .           PEN%RRBE3PEN_FAC(N_P) ,PEN%RRBE3PEN_VI(N_P)    ,
+     .           PEN%RRBE3PEN_M(1,N_P) ,ICOLINE )
+          IF (WEIGHT(NS)==1) THEN ! moved to here for a(,ns) compute  w/ WEIGHT(NS)=0
+            CALL FOAT_TO_6_FLOAT(1  ,NML*3  ,AMP    ,RR_6 )
+            CALL FOAT_TO_6_FLOAT(1  ,NML    ,STIFNMP,R2_6 )
+            DO I=1,NML
+               K = IADMP(IAD+I)
+               DO J = 1,6
+                 AM_P(J,1:3,K) = AM_P(J,1:3,K)+RR_6(J,1:3,I) 
+                 STIFNM_P(J,K) = STIFNM_P(J,K)+R2_6(J,I) 
+               END DO
+            END DO
+            IF (ICOLINE>0) THEN
+              CALL FOAT_TO_6_FLOAT(1  ,NML*3  ,ARMP   ,RR_6 )
+              CALL FOAT_TO_6_FLOAT(1  ,NML    ,STIFRMP,R2_6 )
+              DO I=1,NML
+                 K = IADMP(IAD+I)
+                 DO J = 1,6
+                   ARM_P(J,1:3,K) = ARM_P(J,1:3,K)+RR_6(J,1:3,I) 
+                   STIFRM_P(J,K) = STIFRM_P(J,K)+R2_6(J,I) 
+                 END DO
+              END DO
+            END IF 
+          END IF ! (WEIGHT(NS)==1) T
+        END DO
+        DEALLOCATE(RR_6)
+        DEALLOCATE(R1_6)
+        DEALLOCATE(R2_6)
+      ELSE !P/OFF as before
       DO N=1,NRBE3
         IAD = IRBE3(1,N)
         NS  = IRBE3(3,N)
         NML = IRBE3(5,N)
         IROT =IRBE3(6,N)
         IMOD =IRBE3(8,N)
-       IF (NS>0) THEN
+        IPEN =IRBE3(9,N)
+       IF (NS==0.OR.IPEN>0) CYCLE
        IF (WEIGHT(NS)==1) THEN
         CALL RBE3CL(LRBE3(IAD+1),LRBE3(IADS+IAD+1),NS     ,X      ,
      .              FRBE3(6*IAD+1),SKEW    ,NML     ,IROT   ,FDSTNB ,
@@ -436,19 +682,70 @@ C  MS(NS) = ZERO
           STIFN(NS) = EM20
         IF ((JR(1,N)+JR(2,N)+JR(3,N))>0) STIFR(NS) = EM20
        ENDIF
-       END IF ! IF (NS>0) THEN
+!       END IF ! IF (NS>0) THEN
       ENDDO
+!     penalty formulation
+      N_P = 0
+      DO N=1,NRBE3
+        IAD = IRBE3(1,N)
+        NS  = IRBE3(3,N)
+        NML = IRBE3(5,N)
+        IROT =IRBE3(6,N)
+        IMOD =IRBE3(8,N)
+        IPEN =IRBE3(9,N)
+        IF (NS==0.OR.IPEN<=0) CYCLE
+            N_P = N_P +1 
+            AMP = ZERO
+            STIFNMP = ZERO
+            IF (IROT>0) THEN
+              ARMP = ZERO
+              STIFRMP = ZERO
+            END IF 
+            CALL RBE3F_PEN(                                       
+     .            NS      ,NUMNOD      ,DT1           ,IRODDL    ,         
+     .            NML     ,LRBE3(IAD+1),LRBE3(IADS+IAD+1),IN     ,        
+     .            A       ,AR          ,AMP         ,ARMP        ,         
+     .            STIFN   ,STIFR       ,STIFNMP     ,STIFRMP     ,         
+     .            V       ,VR          ,FRBE3(6*IAD+1),X         ,         
+     .           LSKEW    ,NUMSKW      ,SKEW          ,
+     .           PEN%RRBE3PEN_F(1,N_P) ,PEN%RRBE3PEN_STF(1,N_P) ,         
+     .           PEN%RRBE3PEN_FAC(N_P) ,PEN%RRBE3PEN_VI(N_P)    ,
+     .           PEN%RRBE3PEN_M(1,N_P) ,ICOLINE )
+        IF (WEIGHT(NS)==1) THEN !moved here as case p/on
+            DO I=1,NML
+               K = IADMP(IAD+I)
+               AM(1:3,K) = AM(1:3,K)+AMP(1:3,I) 
+               STIFNM(K) = STIFNM(K)+STIFNMP(I) 
+            END DO
+            IF (ICOLINE>0) THEN
+              DO I=1,NML
+                 K = IADMP(IAD+I)
+                 ARM(1:3,K) = ARM(1:3,K)+ARMP(1:3,I) 
+                 STIFRM(K) = STIFRM(K)+STIFRMP(I) 
+              END DO
+            END IF 
+        ENDIF
+      ENDDO
+      END IF !(IPARIT>0) THEN
 C
       DEALLOCATE(FDSTNB)
       IF (IROTG>0) DEALLOCATE(MDSTNB)
+      DEALLOCATE(AMP)
+      DEALLOCATE(MSMP)
+      DEALLOCATE(STIFNMP)
+      IF (IROTG>0) THEN
+        DEALLOCATE(ARMP)
+        DEALLOCATE(INMP)
+        DEALLOCATE(STIFRMP)
+      END IF
 C---
       RETURN
       END
-      !||====================================================================
-      !||    ass_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3t1     ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    ass_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3t1     ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE ASS_RBE3(IRBE3 ,LRBE3 ,A     ,AR    ,MS    ,
      1                    IN    ,WEIGHT,STIFN ,STIFR ,DA    ,
      2                    DAR   ,DMS   ,DIN   ,DSTIFN,DSTIFR,
@@ -474,7 +771,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, NS ,NML, IAD,JJ,IROT,M
+      INTEGER I, N, NS ,NML, IAD,IROT,M,IPEN
 C     REAL
 C======================================================================|
 #include    "vectorize.inc"
@@ -502,8 +799,9 @@ C
         IAD = IRBE3(1,N)
         NS  = IRBE3(3,N)
         NML = IRBE3(5,N)
-          IROT =IRBE3(6,N)
-        IF (NS==0.OR.WEIGHT(NS)==0) CYCLE
+        IROT= IRBE3(6,N)
+        IPEN= IRBE3(9,N)
+        IF (NS==0.OR.WEIGHT(NS)==0.OR.IPEN>0) CYCLE
         DO I=IAD+1,IAD+NML
          M = LRBE3(I)
            A(1,M) = A(1,M) + DA(1,I)
@@ -526,9 +824,9 @@ C
 C---
       RETURN
       END
-      !||====================================================================
-      !||    asp0_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    asp0_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE ASP0_RBE3(IRBE3 ,LRBE3 ,A     ,AR    ,MS    ,
      1                     IN    ,WEIGHT,STIFN ,STIFR ,DA    ,
      2                     DAR   ,DMS   ,DIN   ,DSTIFN,DSTIFR)
@@ -553,7 +851,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, NS ,NML, IAD,JJ,IROT,M,ITAG(NUMNOD)
+      INTEGER I, N, NS ,NML, IAD,IROT,M,ITAG(NUMNOD)
 C     REAL
 C======================================================================|
       DO N =1,NUMNOD
@@ -605,9 +903,9 @@ C
 C---
       RETURN
       END
-      !||====================================================================
-      !||    asp1_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    asp1_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE ASP1_RBE3(IRBE3 ,LRBE3 ,A     ,AR    ,MS    ,
      1                     IN    ,WEIGHT,STIFN ,STIFR ,DA    ,
      2                     DAR   ,DMS   ,DIN   ,DSTIFN,DSTIFR)
@@ -633,7 +931,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, NS ,NML, IAD,JJ,IROT,M
+      INTEGER I, J, N, NS ,NML, IAD,IROT,M
 C     REAL
 C======================================================================|
       DO N=1,NRBE3
@@ -696,11 +994,11 @@ C
 C---
       RETURN
       END
-      !||====================================================================
-      !||    asp2_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3t1      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    asp2_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3t1      ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE ASP2_RBE3(IRBE3 ,LRBE3 ,A     ,AR    ,MS    ,
      1                     IN    ,WEIGHT,STIFN ,STIFR ,DA    ,
      2                     DAR   ,DMS   ,DIN   ,DSTIFN,DSTIFR,
@@ -726,10 +1024,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, NS ,NML, IAD,JJ,M
+      INTEGER I, J ,M
 C     REAL
       my_real
-     .   MS1,AX,AY,AZ
+     .   AX,AY,AZ
 C======================================================================|
 #include    "vectorize.inc"
        DO I=1,NMT
@@ -770,13 +1068,13 @@ C    MS1 = MS1 + DMS(J,I)
 C---
       RETURN
       END
-      !||====================================================================
-      !||    dmi_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3t1     ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod    ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dmi_rbe3   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3t1     ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod    ../engine/share/modules/h3d_mod.F
+!||====================================================================
       SUBROUTINE DMI_RBE3(NMT   ,LRBE3 ,MS0   ,IN0   ,DMS   ,
      1                    DIN   ,DMAST ,ADM   ,DINERT,ADI   ,
      2                    IROTG ,IRBE3 ,MS    ,IN    ,WEIGHT,
@@ -809,7 +1107,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J ,M,N,NS,NML,IAD,K,IROT
+      INTEGER  J ,M,N,NS,NML,IAD,K,IROT,IPEN
 C     REAL
       my_real
      .   MNS,DMAS0
@@ -821,22 +1119,18 @@ C----accumulated secnd masses---
         IAD = IRBE3(1,N)
         NS  = IRBE3(3,N)
         NML = IRBE3(5,N)
-        IF (NS>0) THEN
+        IPEN= IRBE3(9,N)
+        IF (NS>0.AND.IPEN<=0) THEN
           IF (WEIGHT(NS)==1) THEN
             IF (NML>0) MNS= MNS+MS(NS)*WEIGHT(NS)
-c         DO J = 1,NML
-c    K = IADMP(IAD+J)
-c          DMS(K) = DMS(K) -MNS
-c   ENDDO
             MS(NS) = ZERO
-              IF (IRODDL/=0) IN(NS) = ZERO
+            IF (IRODDL/=0) IN(NS) = ZERO
           ENDIF
         ENDIF
       ENDDO
 C
        DMAS0 = -MNS
        DO J=1,NMT
-C         DMS(J)= MAX(ZERO,DMS(J))
         DMAS0 = DMAS0 + DMS(J)
        ENDDO
        DMAST = DMAST + MAX(ZERO,DMAS0)
@@ -855,7 +1149,8 @@ C-------output only when real added mass happened: debug usage
         IAD = IRBE3(1,N)
         NS  = IRBE3(3,N)
         NML = IRBE3(5,N)
-        IF (NS>0) THEN
+        IPEN= IRBE3(9,N)
+        IF (NS>0.AND.IPEN<=0) THEN
           IF (WEIGHT(NS)==1) THEN
              DO J = 1,NML
                M = LRBE3(IAD+J)
@@ -872,8 +1167,9 @@ C-------output only when real added mass happened: debug usage
         IAD = IRBE3(1,N)
         NS  = IRBE3(3,N)
         NML = IRBE3(5,N)
-          IROT =IRBE3(6,N)
-        IF (NS>0.AND.IROT>0.AND.WEIGHT(NS)==1) THEN
+        IROT= IRBE3(6,N)
+        IPEN= IRBE3(9,N)
+        IF (NS>0.AND.IROT>0.AND.WEIGHT(NS)==1.AND.IPEN<=0) THEN
          DO J = 1,NML
           M = LRBE3(IAD+J)
           K = IADMP(IAD+J)
@@ -886,21 +1182,21 @@ C-------output only when real added mass happened: debug usage
 C---
       RETURN
       END
-      !||====================================================================
-      !||    prerbe3          ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_imp0        ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impd        ../engine/source/constraints/general/rbe3/rbe3v.F
-      !||    rbe3_impi        ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impr1       ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impr2       ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3t1           ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3v            ../engine/source/constraints/general/rbe3/rbe3v.F
-      !||    sms_rbe3_nodxi   ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3_prec    ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3t1       ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3t2       ../engine/source/ams/sms_rbe3.F
-      !||====================================================================
+!||====================================================================
+!||    prerbe3          ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_imp0        ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impd        ../engine/source/constraints/general/rbe3/rbe3v.F
+!||    rbe3_impi        ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impr1       ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impr2       ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3t1           ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3v            ../engine/source/constraints/general/rbe3/rbe3v.F
+!||    sms_rbe3_nodxi   ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3_prec    ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3t1       ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3t2       ../engine/source/ams/sms_rbe3.F
+!||====================================================================
       SUBROUTINE PRERBE3(IRBE3 ,MAX_M , IROTG,JT  ,JR   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -919,14 +1215,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N,NML,IC,ICT,ICR,IROT
+      INTEGER  J, N,NML,IC,ICT,ICR,IROT
 C======================================================================|
       MAX_M=0
       IROTG=0
       DO N=1,NRBE3
               NML = IRBE3(5,N)
               IROT =IRBE3(6,N)
-        MAX_M=MAX(MAX_M,NML)
+        MAX_M=MAX(MAX_M,NML) ! add if (ipen==0)
         IROTG=MAX(IROTG,IROT)
               IC=IRBE3(4,N)
         ICT=IC/512
@@ -978,22 +1274,21 @@ C======================================================================|
            JR(3,N)=1
        END SELECT
       ENDDO
-C      IF (IMACH==3.AND.MAXPROC>1) CALL SPMD_MAX_I(IROTG)
 C---
       RETURN
       END
-      !||====================================================================
-      !||    prerbe3fr   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    diag_int    ../engine/source/mpi/implicit/imp_fri.F
-      !||    fr_u2dd     ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp3_a2b    ../engine/source/airbag/monv_imp0.F
-      !||    imp3_u2x    ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr      ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_kml     ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl     ../engine/source/mpi/implicit/imp_fri.F
-      !||    updk_mv     ../engine/source/airbag/monv_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    prerbe3fr   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    diag_int    ../engine/source/mpi/implicit/imp_fri.F
+!||    fr_u2dd     ../engine/source/mpi/implicit/imp_fri.F
+!||    imp3_a2b    ../engine/source/airbag/monv_imp0.F
+!||    imp3_u2x    ../engine/source/airbag/monv_imp0.F
+!||    upd_fr      ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_kml     ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl     ../engine/source/mpi/implicit/imp_fri.F
+!||    updk_mv     ../engine/source/airbag/monv_imp0.F
+!||====================================================================
       SUBROUTINE PRERBE3FR(IRBE3 ,N    ,JT  ,JR   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1011,7 +1306,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, NML,IC,ICT,ICR
+      INTEGER  J,IC,ICT,ICR
 C======================================================================|
           IC=IRBE3(4,N)
         ICT=IC/512
@@ -1065,31 +1360,31 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe3cl        ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    id_mvini      ../engine/source/airbag/monv_imp0.F
-      !||    iddl_int      ../engine/source/mpi/implicit/imp_fri.F
-      !||    rbe3_fr0      ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_imp0     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impd     ../engine/source/constraints/general/rbe3/rbe3v.F
-      !||    rbe3_impi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impr1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_impr2    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||    rbe3_mint     ../engine/source/implicit/imp_int_k.F
-      !||    rbe3f         ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3v         ../engine/source/constraints/general/rbe3/rbe3v.F
-      !||    sms_rbe3_1    ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3t2    ../engine/source/ams/sms_rbe3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    invert        ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3uf        ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3um        ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    zero1         ../engine/source/system/zero.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3cl        ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    id_mvini      ../engine/source/airbag/monv_imp0.F
+!||    iddl_int      ../engine/source/mpi/implicit/imp_fri.F
+!||    rbe3_fr0      ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_imp0     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impd     ../engine/source/constraints/general/rbe3/rbe3v.F
+!||    rbe3_impi     ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impr1    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_impr2    ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||    rbe3_mint     ../engine/source/implicit/imp_int_k.F
+!||    rbe3f         ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3v         ../engine/source/constraints/general/rbe3/rbe3v.F
+!||    sms_rbe3_1    ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3t2    ../engine/source/ams/sms_rbe3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    invert        ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3uf        ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3um        ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    zero1         ../engine/source/system/zero.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE RBE3CL(INRBE3  ,ILRBE3  ,NS     ,XYZ    ,FRBE3   ,
      .                  SKEW    ,NG      ,IROT   ,FDSTNB ,MDSTNB  ,ID )
 C-----------------------------------------------
@@ -1116,7 +1411,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K,N, M ,NML, IAD,JJ,KG,NSNGLR,IELSUB,IERR,ng1
+      INTEGER I, J, K ,KG,NSNGLR,IELSUB,IERR
 C     REAL
       my_real
      *        TW(3,NG), RW(3,NG),
@@ -1136,7 +1431,7 @@ C     REAL
      *                 TMUFX(3), TMUFY(3), TMUFZ(3),
      *                 TFUMX(3), TFUMY(3), TFUMZ(3),
      *                 TMUMX(3), TMUMY(3), TMUMZ(3),
-     *                 A(6,6), C(6,6), T(3,3)
+     *                 A(6,6), C(6,6)
 C
 C     INITIALIZATION
 C
@@ -1431,9 +1726,9 @@ C
       RETURN
       END
 C----------------------------
-      !||====================================================================
-      !||    wrrinf   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    wrrinf   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE WRRINF(TITLE,R,N)
 #include      "implicit_f.inc"
 c  !DECLARATIONS
@@ -1446,13 +1741,13 @@ C----------------------------
       print *, TITLE,(R(I),I=1,N)
       RETURN
       END
-      !||====================================================================
-      !||    rbe3uf   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3cl   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- calls      -----------------------------------------------------
-      !||    zero1    ../engine/source/system/zero.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3uf   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3cl   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- calls      -----------------------------------------------------
+!||    zero1    ../engine/source/system/zero.F
+!||====================================================================
       SUBROUTINE RBE3UF(INRBE3,ILRBE3,EL,TW,XYZ,REFPT,
      *                  FUFXLC,FUFYLC,FUFZLC,
      *                  FUFX,FUFY,FUFZ,MUFX,MUFY,MUFZ,
@@ -1564,13 +1859,13 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    rbe3um   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3cl   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- calls      -----------------------------------------------------
-      !||    zero1    ../engine/source/system/zero.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3um   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3cl   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- calls      -----------------------------------------------------
+!||    zero1    ../engine/source/system/zero.F
+!||====================================================================
       SUBROUTINE RBE3UM(INRBE3,ILRBE3,EL,TW,RW,XYZ,REFPT,CGMX,CGMY,CGMZ,
      *                  FUMXLC,FUMYLC,FUMZLC,MXLC,MYLC,MZLC,
      *                  FUMX,FUMY,FUMZ,MX,MY,MZ,MUMX,MUMY,MUMZ,
@@ -1748,11 +2043,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    invert   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3cl   ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    invert   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3cl   ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
        SUBROUTINE INVERT(MATRIX, INVERSE, N, ERRORFLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1767,7 +2062,7 @@ c  !DECLARATIONS
      *     , INTENT(OUT), DIMENSION(N,N) :: INVERSE !INVERTED MATRIX
 
           LOGICAL :: FLAG = .TRUE.
-          INTEGER :: I, J, K, L
+          INTEGER :: I, J, K
       my_real
      *     :: M
       my_real
@@ -1850,12 +2145,12 @@ c  !STORE ANSWER
           ERRORFLAG = 0
         RETURN
         END SUBROUTINE INVERT
-      !||====================================================================
-      !||    rbe3frf    ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3frf    ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
+!||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
+!||====================================================================
       SUBROUTINE RBE3FRF(NML   ,IML   ,NS    ,A     ,AR    ,
      *                   FDSTNB,MDSTNB,JT    ,JR    ,IROT  )
 C-----------------------------------------------
@@ -1872,7 +2167,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N,M
+      INTEGER I, J,M
 C     REAL
       my_real
      .        FNS(3),MNS(3)
@@ -1924,14 +2219,14 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    prerbe3p        ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3t1          ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    sms_rbe3_prec   ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3t1      ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3t2      ../engine/source/ams/sms_rbe3.F
-      !||====================================================================
+!||====================================================================
+!||    prerbe3p        ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3t1          ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    sms_rbe3_prec   ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3t1      ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3t2      ../engine/source/ams/sms_rbe3.F
+!||====================================================================
       SUBROUTINE PRERBE3P(IRBE3 ,LRBE3 ,AD_M , IML  ,NMT   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1950,7 +2245,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N,M,IAD,NS,NML,ITAG(NUMNOD)
+      INTEGER I, N,M,IAD,NS,NML,ITAG(NUMNOD)
 C NMT: number (no doublon) of main nodes,AD(M): index from NMT0->NMT
 C======================================================================|
       DO N =1,NUMNOD
@@ -1976,15 +2271,15 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    prerbe3p0      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
-      !||    rbe3_mod       ../common_source/modules/constraints/rbe3_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    prerbe3p0      ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+!||    rbe3_mod       ../common_source/modules/constraints/rbe3_mod.F90
+!||====================================================================
       SUBROUTINE PRERBE3P0(RBE3)
       use rbe3_mod
       use my_alloc_mod
@@ -2047,12 +2342,12 @@ C---
       DEALLOCATE(ITAG)
       RETURN
       END
-      !||====================================================================
-      !||    mfac_rbe3    ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3f        ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    sms_rbe3_1   ../engine/source/ams/sms_rbe3.F
-      !||====================================================================
+!||====================================================================
+!||    mfac_rbe3    ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- called by ------------------------------------------------------
+!||    rbe3f        ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    sms_rbe3_1   ../engine/source/ams/sms_rbe3.F
+!||====================================================================
       SUBROUTINE MFAC_RBE3(FDSTNB,MDSTNB,NML ,IROT,SF,SM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_wrt_crk_xyznor   ../engine/source/mpi/anim/spmd_wrt_crk_xyznor.F
-      !||--- called by ------------------------------------------------------
-      !||    xyznor_crk            ../engine/source/output/anim/generate/xyznor_crk.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_s_c             ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_wrt_crk_xyznor   ../engine/source/mpi/anim/spmd_wrt_crk_xyznor.F
+!||--- called by ------------------------------------------------------
+!||    xyznor_crk            ../engine/source/output/anim/generate/xyznor_crk.F
+!||--- calls      -----------------------------------------------------
+!||    write_s_c             ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_WRT_CRK_XYZNOR(ICRK,XNORM,NUM)
 C-----------------------------------------------
       USE CRACKXFEM_MOD        
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -55,11 +57,11 @@ C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR,MSGOFF,EMPL
-      INTEGER SIZ,MSGTYP,I,K,NG,NREC,MSGOFF2,SI,MSGTYP2,SIZ0
+      INTEGER SIZ,MSGTYP,I,K,NREC,MSGOFF2,SIZ0
 C
       INTEGER,DIMENSION(:,:),ALLOCATABLE ::  RNGLOB,IBUF
  
-C   Tableau utilise par proc 0
+C   Table used by Pro 0
       my_real
      .   S3000,S,XN1,XN2,XN3,IXNN
 C-----------------------------------------------         
@@ -91,9 +93,9 @@ C           S = SQRT(XNORM(1,I)**2 + XNORM(2,I)**2 + XNORM(3,I)**2)
            IBUF(4,SIZ) = XN3
         END DO
 C
-C   a cause de la version simple precision, on ne peux pas metre l'entier
-C   dans le buffer flottant car on n a que 2puiss 24 bits dispo ~ 16 Million
-C   de noeuds au max
+C   Because of the simple precision version, we cannot put the integer
+C   In the floating buffer because there are only 2 24 bits available ~ 16 million
+C   maximum number of nodes
 
          MSGTYP = MSGOFF2
          CALL MPI_SEND(IBUF,4*SIZ,MPI_INTEGER,IT_SPMD(1),MSGTYP,

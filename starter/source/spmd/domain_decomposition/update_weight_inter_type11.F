@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    update_weight_inter_type11   ../starter/source/spmd/domain_decomposition/update_weight_inter_type11.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                       ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_cand_mod               ../starter/share/modules1/inter_cand_mod.F
-      !||====================================================================
+!||====================================================================
+!||    update_weight_inter_type11   ../starter/source/spmd/domain_decomposition/update_weight_inter_type11.F
+!||--- called by ------------------------------------------------------
+!||    inint3                       ../starter/source/interfaces/inter3d1/inint3.F
+!||--- uses       -----------------------------------------------------
+!||    inter_cand_mod               ../starter/share/modules1/inter_cand_mod.F
+!||====================================================================
         SUBROUTINE UPDATE_WEIGHT_INTER_TYPE11(NELEMINT,INTERFACE_ID,NRTS,NRTM,IFIEND,
      .                                       IRECTM,IRECTS,I_STOK,CAND_E,CAND_N,
      .                                       INTER_CAND)

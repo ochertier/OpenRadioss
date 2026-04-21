@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,35 +20,37 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_shell_scalar             ../engine/source/output/h3d/h3d_results/h3d_shell_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                       ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_shell_scalar_1           ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
-      !||    schlieren_buffer_gathering   ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod                  ../engine/share/resol/initbuf.F
-      !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
-      !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
-      !||    stack_mod                    ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_shell_scalar             ../engine/source/output/h3d/h3d_results/h3d_shell_scalar.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                       ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_shell_scalar_1           ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
+!||    schlieren_buffer_gathering   ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
+!||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod                  ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod                  ../engine/share/resol/initbuf.F
+!||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+!||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
+!||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
+!||    stack_mod                    ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE H3D_SHELL_SCALAR(
-     .                  ELBUF_TAB   ,SHELL_SCALAR,IPARG       ,GEO        ,
-     .                  IXC         ,IXTG      ,PM          ,BUFMAT     ,
+     .                  ELBUF_TAB   ,SHELL_STACK   ,IPARG       ,GEO   ,
+     .                  IXC         ,IXTG          ,PM          ,BUFMAT, 
      .                  EHOUR       ,
      .                  IPM         ,IGEO      ,THKE      ,ERR_THK_SH4 ,ERR_THK_SH3,
      .                  X         ,V         ,W           ,ALE_CONNECT,
      .                  NERCVOIS  ,NESDVOIS  ,LERCVOIS    ,LESDVOIS,
-     .                  STACK       ,ID_ELEM   ,ITY_ELEM  ,
+     .                  STACK       ,ID_ELEM   ,ITY_ELEM  , 
      .                  IS_WRITTEN_SHELL,IPARTC,IPARTTG   ,LAYER_INPUT ,IPT_INPUT  ,
      .                  PLY_INPUT   ,IUVAR_INPUT,H3D_PART  ,KEYWORD    ,ITHERM     ,
      .                  D           , MULTI_FVM ,IDMDS    ,IMDSVAR     ,MDS_MATID  ,
-     .                  ID          ,MODE      ,MAT_PARAM )
+     .                  ID          ,MODE      ,MAT_PARAM ,H3D_LIGHT   ,MAX_SHELL_STACKSIZE,
+     .                  SHELL_STACKSIZE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -60,6 +62,7 @@ C-----------------------------------------------
         USE ALE_CONNECTIVITY_MOD
         USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
         USE MATPARAM_DEF_MOD
+        use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,8 +81,11 @@ C SNERCVOIS, SNESDVOIS, SLERCVOIS, SLESDVOIS
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        INTEGER, INTENT(IN) :: MAX_SHELL_STACKSIZE
+        REAL(KIND=4),DIMENSION(MAX_SHELL_STACKSIZE) :: SHELL_STACK
+        INTEGER , INTENT(INOUT) :: SHELL_STACKSIZE
         my_real
-     .     SHELL_SCALAR(*),X(3,NUMNOD),V(3,NUMNOD),W(3,NUMNOD),D(3,NUMNOD),THKE(*),EHOUR(*),GEO(NPROPG,NUMGEO),
+     .     X(3,NUMNOD),V(3,NUMNOD),W(3,NUMNOD),D(3,NUMNOD),THKE(*),EHOUR(*),GEO(NPROPG,NUMGEO),
      .     PM(NPROPM,NUMMAT),ERR_THK_SH4(NUMELC), ERR_THK_SH3(NUMELTG)
         INTEGER, INTENT(IN) :: ITHERM
         INTEGER IPARG(NPARG,NGROUP),IXC(NIXC,NUMELC),IXTG(NIXTG,NUMELTG),
@@ -96,16 +102,18 @@ C-----------------------------------------------
         TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
         INTEGER ,INTENT(IN) :: MODE
         TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
+        INTEGER ,INTENT(IN) :: H3D_LIGHT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER II,NG
+        my_real, DIMENSION(1) :: SCALAR_RESULTS
+        INTEGER NG
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-        DO II=1,NUMELC+NUMELTG
-          IS_WRITTEN_SHELL(II) = 0
-        ENDDO
+c        DO II=1,NUMELC+NUMELTG
+c          IS_WRITTEN_SHELL(II) = 0
+c        ENDDO
 C-----------------------------------------------
 
         !-------------------------------------------------------!
@@ -123,7 +131,7 @@ C-----------------------------------------------
         !-------------------------------------------------------!
         DO NG=1,NGROUP
           CALL H3D_SHELL_SCALAR_1(.FALSE.,
-     .                     ELBUF_TAB   ,SHELL_SCALAR,IPARG       ,GEO        ,
+     .                     ELBUF_TAB   ,SCALAR_RESULTS,IPARG       ,GEO        ,
      .                     IXC       ,IXTG      ,PM          ,BUFMAT     ,
      .                     EHOUR       ,
      .                     IPM         ,IGEO      ,THKE      ,ERR_THK_SH4 ,ERR_THK_SH3,
@@ -132,7 +140,8 @@ C-----------------------------------------------
      .                     IS_WRITTEN_SHELL,IPARTC,IPARTTG   ,LAYER_INPUT ,IPT_INPUT  ,
      .                     PLY_INPUT   ,IUVAR_INPUT,H3D_PART  ,KEYWORD    ,
      .                     D           ,NG         ,MULTI_FVM,IDMDS       ,IMDSVAR    ,
-     .                     MDS_MATID   ,ID         ,MODE     ,MAT_PARAM   )
+     .                     MDS_MATID   ,ID         ,MODE     ,MAT_PARAM   ,
+     .                     H3D_LIGHT   ,SHELL_STACK ,MAX_SHELL_STACKSIZE,SHELL_STACKSIZE)
 
         ENDDO
 C-----------------------------------------------

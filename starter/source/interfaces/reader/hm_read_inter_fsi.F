@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_interfaces     ../starter/source/interfaces/reader/hm_read_interfaces.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    hm_read_inter_type01   ../starter/source/interfaces/int01/hm_read_inter_type01.F
-      !||    hm_read_inter_type09   ../starter/source/interfaces/int09/hm_read_inter_type09.F
-      !||    hm_read_inter_type12   ../starter/source/interfaces/int12/hm_read_inter_type12.F
-      !||    hm_read_inter_type18   ../starter/source/interfaces/int18/hm_read_inter_type18.F
-      !||    hm_read_inter_type22   ../starter/source/interfaces/int22/hm_read_inter_type22.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_interfaces     ../starter/source/interfaces/reader/hm_read_interfaces.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl                ../starter/source/starter/freform.F
+!||    hm_read_inter_type01   ../starter/source/interfaces/int01/hm_read_inter_type01.F
+!||    hm_read_inter_type09   ../starter/source/interfaces/int09/hm_read_inter_type09.F
+!||    hm_read_inter_type12   ../starter/source/interfaces/int12/hm_read_inter_type12.F
+!||    hm_read_inter_type18   ../starter/source/interfaces/int18/hm_read_inter_type18.F
+!||    hm_read_inter_type22   ../starter/source/interfaces/int22/hm_read_inter_type22.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_FSI(
      1        IPARI     ,STFAC   ,FRIGAP    ,XFILTR    , FRIC_P   ,
      2        IGRNOD    ,IGRSURF ,ILAGM     ,UNITAB    , NI       ,
@@ -91,7 +91,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,L,NTYP,UID,IFLAGUNIT,FLAG_FMT,FLAG_FMT_TMP,IERR1,SUB_ID,IFIX_TMP
+      INTEGER NTYP
       CHARACTER(len=ncharkey) :: KEY
 C-----------------------------------------------
 C   S o u r c e   L i n e s

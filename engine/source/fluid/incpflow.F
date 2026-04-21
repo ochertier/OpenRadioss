@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    incpflow              ../engine/source/fluid/incpflow.F
-      !||--- called by ------------------------------------------------------
-      !||    flow0                 ../engine/source/fluid/flow0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bemsolv               ../engine/source/fluid/bemsolv.F
-      !||    bemsolvp              ../engine/source/fluid/bemsolvp.F
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
-      !||    spmd_fl_sum           ../engine/source/mpi/generic/spmd_fl_sum.F
-      !||    trgrad                ../engine/source/fluid/incpflow.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    incpflow              ../engine/source/fluid/incpflow.F
+!||--- called by ------------------------------------------------------
+!||    flow0                 ../engine/source/fluid/flow0.F
+!||--- calls      -----------------------------------------------------
+!||    bemsolv               ../engine/source/fluid/bemsolv.F
+!||    bemsolvp              ../engine/source/fluid/bemsolvp.F
+!||    finter                ../engine/source/tools/curve/finter.F
+!||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
+!||    spmd_fl_sum           ../engine/source/mpi/generic/spmd_fl_sum.F
+!||    trgrad                ../engine/source/fluid/incpflow.F
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE INCPFLOW(NNO   , NEL   , NINOUT , NNI    , IFLOW  ,
      .                    IBUF  , ELEM  , IINOUT , IBUFI  , IBUFR  ,
      .                    IBUFC , IBUFL , RFLOW  , PHI    , PRES   ,
@@ -80,14 +80,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ILVOUT, I, II, NNO_L, III, LENBUF, PP, NNO_L2, J, 
-     .        IBUFL2(NNO), JJ, N1, N2, N3, NN1, NN2, NN3, NNRP, NNCP,
+      INTEGER ILVOUT, I, II, NNO_L, III, LENBUF, J,
+     . N1, N2, N3, NN1, NN2, NN3, NNRP, NNCP,
      .        CR_LOC_GLOB(NNO), CR_GLOB_LOC(NNO), CC_LOC_GLOB(NNO),
      .        CC_GLOB_LOC(NNO), NREIP, NCEIP, NEP, NR1, NR2, NR3, NC1,
      .        NC2, NC3, CREI_LOC_GLOB(NEL), CCEI_LOC_GLOB(NEL), 
      .        CE_LOC_GLOB(NEL), CE_GLOB_LOC(NEL), NPROW, NPCOL, NBLOC,
-     .        IFORM, IFREE, ISENS, IFUNC, IIO, NERP, IC, NNI_L2,
-     .        IBUFIL2(NNI), ITEST, ITAGNI(NNI), NNI_L, IFT, ILT, IR, NL,
+     . IFORM, IFREE, ISENS, IFUNC, IIO, NERP, IC,
+     . ITEST, ITAGNI(NNI), NNI_L, IFT, ILT, IR, NL,
      .        IFPA, IFPRES, NELF, LELF(NEL), K, IAD, IAD2, IFVINI
       my_real DTSUB, TL, XL(3,NNO+NNI), VL(3,NNO+NNI), X1, Y1, Z1, X2,
      .        Y2, Z2, X3, Y3, Z3, X12, Y12, Z12, X13, Y13, Z13, X23, 
@@ -172,7 +172,7 @@ C Subcycling
          ENDIF 
       ENDIF  
 C---------------------------------------------------
-C 0- Preliminaires
+C 0- Preliminaries
 C---------------------------------------------------
 C coordinates and local velocities SPMD
       IF (NSPMD == 1) THEN
@@ -1216,11 +1216,11 @@ C---------------------------------------------------
 
       RETURN
       END
-      !||====================================================================
-      !||    trgrad     ../engine/source/fluid/incpflow.F
-      !||--- called by ------------------------------------------------------
-      !||    incpflow   ../engine/source/fluid/incpflow.F
-      !||====================================================================
+!||====================================================================
+!||    trgrad     ../engine/source/fluid/incpflow.F
+!||--- called by ------------------------------------------------------
+!||    incpflow   ../engine/source/fluid/incpflow.F
+!||====================================================================
       SUBROUTINE TRGRAD(X1  , X2  , X3 , Y1 , Y2  ,
      .                  Y3  , Z1  , Z2 , Z3 , PHI1,
      .                  PHI2, PHI3, GRX, GRY, GRZ )

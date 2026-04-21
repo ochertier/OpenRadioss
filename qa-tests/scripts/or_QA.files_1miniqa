@@ -2,6 +2,8 @@
 #  qafile (group miniqa) : QA.files_miniqa
 #
 unsetenv DO_QA
+# Used by 1.89 (FUNCT_PYTHON) only for the moment
+setenv RUN_QA 1
 
 ##TOLERANCES :
 ##----------
@@ -432,7 +434,7 @@ extract	../miniqa/LOIS/LOI68/cisaillement/test1/input_51/data/ref.extract
 local	IENERGY     Diff_Tolerance	0.0029
 local	KENERGYT	Abs_Tolerance	0.0002
 local	KENERGYR	Abs_Tolerance	8.0e-05
-local	EXTWORK	Diff_Tolerance	0.032
+local	EXTWORK	Diff_Tolerance	0.0035
 local   ERROR           Abs_Tolerance   0.2
 if precision == sp local IENERGY Diff_Tolerance 0.007
 if precision == sp local KENERGYT Diff_Tolerance 0.0265
@@ -1058,4 +1060,47 @@ if precision == sp local TIME Diff_Tolerance 0.021
 if precision == sp local IENERGY Diff_Tolerance 0.03
 if precision == sp local KENERGYT Diff_Tolerance 0.06
 if precision == sp local EXTWORK Diff_Tolerance 0.03
+go -engine
+#--------------------------------------------------------------------------------
+#1.89
+test aa
+## path=miniqa/PYTHON/FUNCT_PYTHON/data
+keywords funct_python
+input ../miniqa/PYTHON/FUNCT_PYTHON/data/test_torsion_orthstrain_shell_0000.rad
+execute -starter
+input ../miniqa/PYTHON/FUNCT_PYTHON/data/test_torsion_orthstrain_shell_0001.rad
+extract ../miniqa/PYTHON/FUNCT_PYTHON/data/ref.extract
+go -engine
+
+#--------------------------------------------------------------------------------
+#1.90
+test aa
+## path=miniqa/INTERF/INT_25/hexa8/data/
+keywords int25 miniqa
+input ../miniqa/INTERF/INT_25/hexa8/data/model_00_0000.rad
+execute -starter
+input ../miniqa/INTERF/INT_25/hexa8/data/model_00_0001.rad
+extract ../miniqa/INTERF/INT_25/hexa8/data/ref.extract
+local   CYCLE   Int_Tolerance   1000
+local   TIME    Diff_Tolerance  0.13537505548158
+local   TSTEP   Diff_Tolerance  0.0590138674884438
+local   ERROR   Diff_Tolerance  0.0769230769230769
+local   IENERGY Diff_Tolerance  0.0164430982258763
+local   EXTWORK Diff_Tolerance  0.0214030915576694
+go -engine
+
+#--------------------------------------------------------------------------------
+#1.91
+test aa
+## path=miniqa/INTERF/INT_25/tetra4/data/
+keywords int25 miniqa
+input ../miniqa/INTERF/INT_25/tetra4/data/model_00_0000.rad
+execute -starter
+input ../miniqa/INTERF/INT_25/tetra4/data/model_00_0001.rad
+extract ../miniqa/INTERF/INT_25/tetra4/data/ref.extract
+local   TIME    Diff_Tolerance  0.00104755918709405
+local   TSTEP   Diff_Tolerance  0.00101010101010103
+local   ERROR   Diff_Tolerance  0.110526315789474
+local   IENERGY Diff_Tolerance  0.0299039780521263
+local   EXTWORK Diff_Tolerance  0.0314423922603342
 go -engine

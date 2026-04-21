@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_elt_clause      ../starter/source/model/sets/create_element_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                 ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    check_eltyp            ../starter/source/model/sets/check_eltyp.F
-      !||    create_elt_box         ../starter/source/model/sets/create_elt_box.F
-      !||    create_elt_list        ../starter/source/model/sets/create_element_clause.F
-      !||    create_elt_list_g      ../starter/source/model/sets/create_element_clause.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_elt_clause      ../starter/source/model/sets/create_element_clause.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                 ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    check_eltyp            ../starter/source/model/sets/check_eltyp.F
+!||    create_elt_box         ../starter/source/model/sets/create_elt_box.F
+!||    create_elt_list        ../starter/source/model/sets/create_element_clause.F
+!||    create_elt_list_g      ../starter/source/model/sets/create_element_clause.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_ELT_CLAUSE( CLAUSE,ELTYP,
      *                              MAP,    MAPSIZE,
      *                              JCLAUSE,Opt_G,IS_AVAILABLE ,LSUBMODEL,OPT_B,
@@ -129,20 +129,20 @@ C-----------------------------------------------
         ENDIF
 C-----------------------------------------------
       END     
-      !||====================================================================
-      !||    create_elt_list_g           ../starter/source/model/sets/create_element_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_elt_clause           ../starter/source/model/sets/create_element_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    copy_list_in_cause          ../starter/source/model/sets/create_element_clause.F
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_elt_list_g           ../starter/source/model/sets/create_element_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_elt_clause           ../starter/source/model/sets/create_element_clause.F
+!||--- calls      -----------------------------------------------------
+!||    copy_list_in_cause          ../starter/source/model/sets/create_element_clause.F
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_ELT_LIST_G(
      .               CLAUSE,ELTYP , MAP,    MAPSIZE,  JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -189,7 +189,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IDS,IDS_MAX,GENE_MAX,K,E,E1
+      INTEGER GENE_MAX,K,E,E1
       INTEGER START_GENE,END_GENE,INCR_GENE,ESTART,ESTOP,STACK,STACK_ONE,NB_RESULT
 !-
       INTEGER, ALLOCATABLE, DIMENSION(:) :: ELT_READ_TMP,
@@ -251,22 +251,22 @@ C-------------------------
       IF (ALLOCATED(RESULT)) DEALLOCATE (RESULT)
 C-------------------------
       END
-      !||====================================================================
-      !||    create_elt_list             ../starter/source/model/sets/create_element_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_elt_clause           ../starter/source/model/sets/create_element_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                      ../starter/source/output/message/message.F
-      !||    copy_list_in_cause          ../starter/source/model/sets/create_element_clause.F
-      !||    get_elt_name                ../starter/source/model/sets/create_element_clause.F
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_elt_list             ../starter/source/model/sets/create_element_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_elt_clause           ../starter/source/model/sets/create_element_clause.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                      ../starter/source/output/message/message.F
+!||    copy_list_in_cause          ../starter/source/model/sets/create_element_clause.F
+!||    get_elt_name                ../starter/source/model/sets/create_element_clause.F
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_ELT_LIST(
      .               CLAUSE,ELTYP,MAP,MAPSIZE,JCLAUSE,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -315,7 +315,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       CHARACTER (LEN=20) :: ELEMENT_NAME
-      INTEGER I,IDS,SYSID,NINDX,LIST_SIZE,IDS_MAX,ELTP,ELT
+      INTEGER I,IDS,NINDX,LIST_SIZE,IDS_MAX,ELTP,ELT
       INTEGER IWORK(70000)
 !
       INTEGER, ALLOCATABLE, DIMENSION(:) :: ELT_READ_TMP,SORTED_LIST,IDX
@@ -392,14 +392,14 @@ C-------------------------
       END
 
 
-      !||====================================================================
-      !||    copy_list_in_cause   ../starter/source/model/sets/create_element_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_elt_box       ../starter/source/model/sets/create_elt_box.F
-      !||    create_elt_list      ../starter/source/model/sets/create_element_clause.F
-      !||    create_elt_list_g    ../starter/source/model/sets/create_element_clause.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    copy_list_in_cause   ../starter/source/model/sets/create_element_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_elt_box       ../starter/source/model/sets/create_elt_box.F
+!||    create_elt_list      ../starter/source/model/sets/create_element_clause.F
+!||    create_elt_list_g    ../starter/source/model/sets/create_element_clause.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE COPY_LIST_IN_CAUSE(CLAUSE,ELTYP,SORTED_LIST,LIST_SIZE)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -535,11 +535,11 @@ c
 !---
       END
 
-      !||====================================================================
-      !||    get_elt_name      ../starter/source/model/sets/create_element_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_elt_list   ../starter/source/model/sets/create_element_clause.F
-      !||====================================================================
+!||====================================================================
+!||    get_elt_name      ../starter/source/model/sets/create_element_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_elt_list   ../starter/source/model/sets/create_element_clause.F
+!||====================================================================
       SUBROUTINE GET_ELT_NAME(ELTYP, ELEMENT_NAME)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :

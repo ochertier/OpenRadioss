@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8ejacit3   ../engine/source/elements/solid/solide8e/s8ejacit3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8eforc3    ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s8ejacit3   ../engine/source/elements/solid/solide8e/s8ejacit3.F
+!||--- called by ------------------------------------------------------
+!||    s8eforc3    ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||====================================================================
       SUBROUTINE S8EJACIT3(
      1   VOLDP,   KSI,     ETA,     ZETA,
      2   WI,      AJP1,    AJP2,    AJP3,
@@ -65,7 +65,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J ,ICOR
+      INTEGER I
 C     REAL
 C                                                                     12
       my_real
@@ -75,8 +75,7 @@ C                                                                     12
      .   AJ7(MVSIZ),AJ8(MVSIZ),AJ9(MVSIZ),
      .   JAC_59_68(MVSIZ), JAC_67_49(MVSIZ), JAC_48_57(MVSIZ),
      .   JAC_38_29(MVSIZ), JAC_19_37(MVSIZ), JAC_27_18(MVSIZ),
-     .   JAC_26_35(MVSIZ), JAC_34_16(MVSIZ), JAC_15_24(MVSIZ),
-     .   AJ12(MVSIZ), AJ45(MVSIZ), AJ78(MVSIZ)
+     .   JAC_26_35(MVSIZ), JAC_34_16(MVSIZ), JAC_15_24(MVSIZ)
       DOUBLE PRECISION 
      .   DETDP
 C-----------------------------------------------

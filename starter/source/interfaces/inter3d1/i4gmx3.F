@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    i4gmx3    ../starter/source/interfaces/inter3d1/i4gmx3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20sti3   ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||    i21gap3   ../starter/source/interfaces/inter3d1/i21gap3.F
-      !||    i23gap3   ../starter/source/interfaces/inter3d1/i23gap3.F
-      !||    i24gapm   ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    i25gapm   ../starter/source/interfaces/inter3d1/i25sti3.F
-      !||    i7sti3    ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||====================================================================
+!||====================================================================
+!||    i4gmx3    ../starter/source/interfaces/inter3d1/i4gmx3.F
+!||--- called by ------------------------------------------------------
+!||    i20sti3   ../starter/source/interfaces/inter3d1/i20sti3.F
+!||    i21gap3   ../starter/source/interfaces/inter3d1/i21gap3.F
+!||    i23gap3   ../starter/source/interfaces/inter3d1/i23gap3.F
+!||    i24gapm   ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    i25gapm   ../starter/source/interfaces/inter3d1/i25sti3.F
+!||    i7sti3    ../starter/source/interfaces/inter3d1/i7sti3.F
+!||====================================================================
       SUBROUTINE I4GMX3(X,IRECT,I,GAPMAX)
 C
 C-----------------------------------------------
@@ -55,7 +55,7 @@ C-----------------------------------------------
 C
       DATA JPERM/2,3,4,1/
 C-----------------------------------------------------------------
-C     LONGUEUR MINI DES COTES DE SEGMENT (CALCUL DU GAP MAX)
+C     MINIMUM LENGTH OF SEGMENT SIDES (CALCULATION OF MAX GAP)
 C-----------------------------------------------------------------
       DO JJ=1,4
         N1=IRECT(JJ,I)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop10             ../starter/source/properties/shell/hm_read_prop10.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties         ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    fretitl2                   ../starter/source/starter/freform.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    subrotvect                 ../starter/source/model/submodel/subrot.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod               ../starter/source/modules/defaults_mod.F90
-      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop10             ../starter/source/properties/shell/hm_read_prop10.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties         ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    fretitl2                   ../starter/source/starter/freform.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    subrotvect                 ../starter/source/model/submodel/subrot.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod               ../starter/source/modules/defaults_mod.F90
+!||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP10(IGTYP , GEO   ,  IGEO   ,PROP_TAG  ,UNITAB ,
      .                   RTRANS,LSUBMODEL,IDTITL ,IG     ,SUB_ID   ,ISKN   ,
      .                   DEFAULTS_SHELL)
@@ -80,15 +80,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, ISMSTR, NIP, J,
-     .   ISHEAR, IP, ISTRAIN,IHBE,IPLAST,ITHK,IBID,IDF,IHBEOUTP,K,N,
-     .   IUNIT,ISEN,ISS,PID1,IPID1, IHBE_OLD,NSTACK,IGMAT,NN,NUMS
+      INTEGER I, ISMSTR, J,
+     .   ISHEAR, ISTRAIN,IHBE,IPLAST,ITHK,IHBEOUTP,K,
+     .   ISS,IGMAT
       INTEGER ISH3N,ISROT,SUB_ID,NLY,IRP,IDSK,ISK,IUN
-      INTEGER NLYMAX,N1,M1,N2, N3, IPANG,IPTHK,IPPOS,IPWEIGHT,IPOS
-      INTEGER    IHBE_D,IPLA_D,ISTR_D,ITHK_D,ISHEA_D,ISST_D,
+      INTEGER NLYMAX,N1,M1, IPANG,IPTHK,IPPOS,IPWEIGHT,IPOS
+      INTEGER    IHBE_D,IPLA_D,ITHK_D,ISHEA_D,ISST_D,
      .           ISH3N_D, ISTRA_D,NPTS_D,IDRIL_D
       my_real
-     .    ANGL,PUN,CVIS,RBID,VX,VY,VZ,
+     .    PUN,CVIS,VX,VY,VZ,
      .    PTHK, AN, PHI_I,THK10,ZSHIFT
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
       CHARACTER(LEN=NCHARTITLE) :: TITR
@@ -128,7 +128,7 @@ C fixing flag and removed from input
 C HIDDEN FLAGS
 C----------------------
         ISHEAR = 0
-C CVIS USED in coquez routines
+C Cvis used in shell routines
         CVIS = ONE
 
 
@@ -201,10 +201,9 @@ C---------IHBE,ISH3N-------------
      .                 C1=IDTITL)
            IHBE=24
          ENDIF         
-C    Double stockage temporaire - 
+C    Temporary double storage - 
          IGEO(10)=IHBE
          GEO(171)=IHBE
-C------don't know if still useful         
          IF(IHBE==2)THEN
            GEO(171)=0
          ELSEIF(IHBE>=3.AND.IHBE<100.AND.IHBE/=4)THEN

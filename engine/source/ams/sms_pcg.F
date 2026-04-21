@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,49 +20,50 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_pcg            ../engine/source/ams/sms_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier         ../engine/source/system/machine.F
-      !||    sms_admesh_1       ../engine/source/ams/sms_admesh.F
-      !||    sms_admesh_2       ../engine/source/ams/sms_admesh.F
-      !||    sms_bcs            ../engine/source/ams/sms_bcs.F
-      !||    sms_bcscyc         ../engine/source/ams/sms_bcscyc.F
-      !||    sms_check          ../engine/source/ams/sms_fsa_inv.F
-      !||    sms_cjoint_1       ../engine/source/ams/sms_cjoint.F
-      !||    sms_fixvel         ../engine/source/ams/sms_fixvel.F
-      !||    sms_inisi          ../engine/source/ams/sms_proj.F
-      !||    sms_inist          ../engine/source/ams/sms_proj.F
-      !||    sms_inix           ../engine/source/ams/sms_proj.F
-      !||    sms_mav_lt         ../engine/source/ams/sms_pcg.F
-      !||    sms_pro_p          ../engine/source/ams/sms_proj.F
-      !||    sms_rbe3_prec      ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3t1         ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3t2         ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe_accl       ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe_cnds       ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe_corr       ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe_prec       ../engine/source/ams/sms_rbe2.F
-      !||    sms_rgwal_0        ../engine/source/ams/sms_rgwal0.F
-      !||    sms_rlink10        ../engine/source/ams/sms_rlink.F
-      !||    sms_rlink11        ../engine/source/ams/sms_rlink.F
-      !||    sms_updst          ../engine/source/ams/sms_proj.F
-      !||    spmd_exch_a_rb6    ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
-      !||    spmd_glob_dpsum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_glob_dsum9    ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_rbcast        ../engine/source/mpi/generic/spmd_rbcast.F
-      !||    startime           ../engine/source/system/timer_mod.F90
-      !||    stoptime           ../engine/source/system/timer_mod.F90
-      !||    sum_6_float        ../engine/source/system/parit.F
-      !||--- uses       -----------------------------------------------------
-      !||    ams_work_mod       ../engine/source/modules/ams_work_mod.F90
-      !||    intstamp_mod       ../engine/share/modules/intstamp_mod.F
-      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
-      !||    sms_pcg_proj       ../engine/share/modules/sms_mod.F
-      !||    timer_mod          ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sms_pcg            ../engine/source/ams/sms_pcg.F
+!||--- called by ------------------------------------------------------
+!||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier         ../engine/source/system/machine.F
+!||    sms_admesh_1       ../engine/source/ams/sms_admesh.F
+!||    sms_admesh_2       ../engine/source/ams/sms_admesh.F
+!||    sms_bcs            ../engine/source/ams/sms_bcs.F
+!||    sms_bcscyc         ../engine/source/ams/sms_bcscyc.F
+!||    sms_check          ../engine/source/ams/sms_fsa_inv.F
+!||    sms_cjoint_1       ../engine/source/ams/sms_cjoint.F
+!||    sms_fixvel         ../engine/source/ams/sms_fixvel.F
+!||    sms_inisi          ../engine/source/ams/sms_proj.F
+!||    sms_inist          ../engine/source/ams/sms_proj.F
+!||    sms_inix           ../engine/source/ams/sms_proj.F
+!||    sms_mav_lt         ../engine/source/ams/sms_pcg.F
+!||    sms_pro_p          ../engine/source/ams/sms_proj.F
+!||    sms_rbe3_prec      ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3t1         ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3t2         ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe_accl       ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe_cnds       ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe_corr       ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe_prec       ../engine/source/ams/sms_rbe2.F
+!||    sms_rgwal_0        ../engine/source/ams/sms_rgwal0.F
+!||    sms_rlink10        ../engine/source/ams/sms_rlink.F
+!||    sms_rlink11        ../engine/source/ams/sms_rlink.F
+!||    sms_updst          ../engine/source/ams/sms_proj.F
+!||    spmd_exch_a_rb6    ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
+!||    spmd_glob_dpsum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_glob_dsum9    ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_rbcast        ../engine/source/mpi/generic/spmd_rbcast.F
+!||    startime           ../engine/source/system/timer_mod.F90
+!||    stoptime           ../engine/source/system/timer_mod.F90
+!||    sum_6_float        ../engine/source/system/parit.F
+!||--- uses       -----------------------------------------------------
+!||    ams_work_mod       ../engine/source/modules/ams_work_mod.F90
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    intstamp_mod       ../engine/share/modules/intstamp_mod.F
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||    sms_pcg_proj       ../engine/share/modules/sms_mod.F
+!||    timer_mod          ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE SMS_PCG(TIMERS, NODFT ,NODLT    ,NNZ      ,IADK     ,
      2                JDIK      ,DIAG_SMS ,LT_K     ,R        ,ISP     ,
      3                X_SMS     ,P_SMS    ,Z_SMS    ,Y_SMS    ,PREC_SMS,
@@ -97,6 +98,7 @@ C-----------------------------------------------
         USE SENSOR_MOD
         USE SMS_PCG_PROJ
         USE ams_work_mod
+        use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -147,6 +149,7 @@ C----------resol [M]{X}={F}---------
      .           FR_RBY6(*),IAD_RBY(*), TAGSLV_RBY_SMS(*),R3SIZE,
      .           NODFT2_SMS,NODLT2_SMS,INDX2_SMS(*),NODII_SMS(*),
      .           IBCSCYC(*) ,LBCSCYC(*)
+C     REAL
         my_real
      .    DIAG_SMS(*), LT_K(*) ,R(3,*),
      .    X_SMS(3,*), P_SMS(3,*), Y_SMS(3,*), Z_SMS(3,*), PREC_SMS(*),
@@ -168,7 +171,7 @@ C----------resol [M]{X}={F}---------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I, IT, TOTIT, NLIM, N, L, K, LLT, IDOWN, J, IFLAG, IACT,
+        INTEGER I, IT, TOTIT, NLIM, N, L, K, LLT, IDOWN, IFLAG, IACT, 
      .          NCPRIA, M, MSR, IAD, NSN, KI, NRBDIM
         my_real
      .     ALPHA, BETA, TOLN,
@@ -197,7 +200,7 @@ C------X(I)=ZERO--------
 C
 C warning : PREC_SMS == DIAG_SMS at THIS STAGE
 C
-C comment faire rbody secnd de rbe (cf diag) ?
+C How to make RBE RBED RBODY (Cf DIAG)?
         IF(NRBE2+R2SIZE+NRBE3/=0)THEN
           DO N=NODFT1_SMS,NODLT1_SMS
             I=INDX1_SMS(N)
@@ -798,7 +801,7 @@ C
             G0_SMS  =G6SMS(1)+G6SMS(2)+G6SMS(3)+
      .               G6SMS(4)+G6SMS(5)+G6SMS(6)
           END IF
-        ELSEIF(ITASK==0)THEN     ! communication sur un seul thread
+        ELSEIF(ITASK==0)THEN     ! communication on a single thread
           IF(IPARIT==0)THEN
             IF(IMONM>0) CALL STARTIME(TIMERS,63)
             RBUF(1)=RES0_SMS
@@ -1101,7 +1104,7 @@ C
             S_SMS=S6SMS(1)+S6SMS(2)+S6SMS(3)+
      .            S6SMS(4)+S6SMS(5)+S6SMS(6)
           END IF
-        ELSEIF(ITASK==0)THEN     ! communication sur un seul thread
+        ELSEIF(ITASK==0)THEN     ! communication on a single thread
           IF(IPARIT==0)THEN
             IF(IMONM>0.AND.ITASK==0)CALL STARTIME(TIMERS,63)
             CALL SPMD_GLOB_DSUM9(S_SMS,1)
@@ -1269,7 +1272,7 @@ C
             G1_SMS =G6SMS(1)+G6SMS(2)+G6SMS(3)+
      .              G6SMS(4)+G6SMS(5)+G6SMS(6)
           END IF
-        ELSEIF(ITASK==0)THEN     ! communication sur un seul thread
+        ELSEIF(ITASK==0)THEN     ! communication on a single thread
           IF(IPARIT==0)THEN
             IF(IMONM>0) CALL STARTIME(TIMERS,63)
             RBUF(1)=RES1_SMS
@@ -1676,23 +1679,24 @@ C--------------------------------------------
         RETURN
       END
 C-------------produit {w}=[K]{v} using full matrix K ----
-      !||====================================================================
-      !||    sms_mav_lt         ../engine/source/ams/sms_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_encin_2        ../engine/source/ams/sms_encin_2.F
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||    sms_pcg            ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    foat_to_6_float    ../engine/source/system/parit.F
-      !||    my_barrier         ../engine/source/system/machine.F
-      !||    spmd_exch_sms      ../engine/source/mpi/ams/spmd_exch_sms.F
-      !||    spmd_exch_sms6     ../engine/source/mpi/ams/spmd_exch_sms6.F
-      !||    spmd_vfi_sms       ../engine/source/mpi/ams/spmd_vfi_sms.F
-      !||    startime           ../engine/source/system/timer_mod.F90
-      !||    stoptime           ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    timer_mod          ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sms_mav_lt         ../engine/source/ams/sms_pcg.F
+!||--- called by ------------------------------------------------------
+!||    sms_encin_2        ../engine/source/ams/sms_encin_2.F
+!||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
+!||    sms_pcg            ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float    ../engine/source/system/parit.F
+!||    my_barrier         ../engine/source/system/machine.F
+!||    spmd_exch_sms      ../engine/source/mpi/ams/spmd_exch_sms.F
+!||    spmd_exch_sms6     ../engine/source/mpi/ams/spmd_exch_sms6.F
+!||    spmd_vfi_sms       ../engine/source/mpi/ams/spmd_vfi_sms.F
+!||    startime           ../engine/source/system/timer_mod.F90
+!||    stoptime           ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
+!||    timer_mod          ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE SMS_MAV_LT(TIMERS, NODFT  ,NODLT ,NUMNOD ,IADL  ,JDIL  ,
      2                      ITASK  ,DIAG_K ,LT_K  ,V      ,W     ,
      3              NODFT1_SMS,NODLT1_SMS,INDX1_SMS,NODNX_SMS,IAD_ELEM ,
@@ -1701,7 +1705,11 @@ C-------------produit {w}=[K]{v} using full matrix K ----
      6              LIST_RMS  ,MSKYI_FI_SMS,VFI    ,IMV      ,MV      ,
      7              MV6       ,MW6         ,NODFT2_SMS,NODLT2_SMS,INDX2_SMS,
      8              NODII_SMS )
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
         USE TIMER_MOD
+        USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1736,14 +1744,18 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER I,J,K,I3,I2,I1,K3,K2,K1,N, LOC_PROC, M, KK,
      .          KMV,KMV3,KMV2,KMV1
-        INTEGER SIZE, LENR, JAD, DIR, L, LLT,
+        INTEGER SIZE, LENR, L, 
      .          IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .          REQ_R(NSPMD),REQ_S(NSPMD)
         my_real
      .     L_K
-        my_real
-     .          RBUF(3*(FR_RMS(NSPMD+1)+FR_SMS(NSPMD+1))),
-     .          SBUF(3*(FR_RMS(NSPMD+1)+FR_SMS(NSPMD+1)))
+        my_real, DIMENSION(:),ALLOCATABLE :: RBUF
+        my_real, DIMENSION(:),ALLOCATABLE :: SBUF
+C-----------------------------------------------
+        IF (ITASK == 0)THEN
+           CALL MY_ALLOC(RBUF,3*(FR_RMS(NSPMD+1)+FR_SMS(NSPMD+1)))
+           CALL MY_ALLOC(SBUF,3*(FR_RMS(NSPMD+1)+FR_SMS(NSPMD+1)))
+        ENDIF
 C-----------------------------
 
 C
@@ -1753,7 +1765,7 @@ C
 C
             CALL MY_BARRIER
 C
-            IF(ITASK==0)THEN   ! comm sur 1er thread
+            IF(ITASK==0)THEN   ! communication on the first thread
 C
               SIZE = 3
               IF(IMONM>0) CALL STARTIME(TIMERS,65)
@@ -1883,7 +1895,7 @@ c           W(K1) = W(K1) +L_K*V(I1)
 C
           IF(NSPMD>1) THEN
 C
-            IF(ITASK==0)THEN   ! comm sur 1er thread
+            IF(ITASK==0)THEN   ! communication on the first thread
               IF(IMONM>0)CALL STOPTIME(TIMERS,64)
 C
               SIZE = 3
@@ -1952,7 +1964,7 @@ C
 C
               CALL MY_BARRIER
 C
-              IF(ITASK==0)THEN   ! comm sur 1er thread
+              IF(ITASK==0)THEN   ! communication on the first thread
                 IF(IMONM>0)CALL STOPTIME(TIMERS,64)
 C
                 SIZE = 3
@@ -2091,7 +2103,7 @@ C
 C
               CALL MY_BARRIER
 C
-              IF(ITASK==0)THEN   ! comm sur 1er thread
+              IF(ITASK==0)THEN   ! communication on the first thread
                 IF(IMONM>0)CALL STOPTIME(TIMERS,64)
 C
                 SIZE = 3
@@ -2214,7 +2226,7 @@ C
 C
               CALL MY_BARRIER
 C
-              IF(ITASK==0)THEN   ! comm sur 1er thread
+              IF(ITASK==0)THEN   ! communication on the first thread
                 IF(IMONM>0)CALL STOPTIME(TIMERS,64)
 C
                 SIZE = 3
@@ -2255,7 +2267,7 @@ C
 C
           CALL MY_BARRIER
 C
-          IF(ITASK==0)THEN   ! comm sur 1er thread
+          IF(ITASK==0)THEN   ! communication on the first thread
             IF(IMONM>0)CALL STOPTIME(TIMERS,64)
 C
             IF(NSPMD > 1)THEN
@@ -2271,6 +2283,11 @@ C BARRIER before RETURN
           CALL MY_BARRIER
 C
         END IF
+
+        IF (ITASK==0)THEN
+          DEALLOCATE(RBUF)
+          DEALLOCATE(SBUF)
+        ENDIF
 C--------------------------------------------
         RETURN
       END
@@ -2492,20 +2509,20 @@ CC--------------------------------------------
 C        RETURN
 C      END
 C-------------product {w}=[K]{v}, v(numnod) using full matrix K ----
-      !||====================================================================
-      !||    sms_mav_lt2       ../engine/source/ams/sms_pcg.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_inist         ../engine/source/ams/sms_proj.F
-      !||--- calls      -----------------------------------------------------
-      !||    foat_to_6_float   ../engine/source/system/parit.F
-      !||    my_barrier        ../engine/source/system/machine.F
-      !||    spmd_exch_sms     ../engine/source/mpi/ams/spmd_exch_sms.F
-      !||    spmd_fi_sms       ../engine/source/mpi/ams/spmd_fi_sms.F
-      !||    startime          ../engine/source/system/timer_mod.F90
-      !||    stoptime          ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    timer_mod         ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sms_mav_lt2       ../engine/source/ams/sms_pcg.F
+!||--- called by ------------------------------------------------------
+!||    sms_inist         ../engine/source/ams/sms_proj.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float   ../engine/source/system/parit.F
+!||    my_barrier        ../engine/source/system/machine.F
+!||    spmd_exch_sms     ../engine/source/mpi/ams/spmd_exch_sms.F
+!||    spmd_fi_sms       ../engine/source/mpi/ams/spmd_fi_sms.F
+!||    startime          ../engine/source/system/timer_mod.F90
+!||    stoptime          ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    timer_mod         ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE SMS_MAV_LT2(TIMERS, NODFT  ,NODLT ,NUMNOD ,IADL  ,JDIL  ,
      2                      ITASK  ,DIAG_K ,LT_K  ,V      ,W     ,
      3              NODFT1_SMS,NODLT1_SMS,INDX1_SMS,NODNX_SMS,IAD_ELEM ,
@@ -2545,7 +2562,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER I,J,K,N, LOC_PROC, M, KK, KMV
-        INTEGER SIZE, LENR, JAD, DIR, L, LLT
+        INTEGER SIZE, LENR, L
         my_real
      .     L_K
 C-----------------------------
@@ -2592,7 +2609,7 @@ C
 C
             CALL MY_BARRIER
 C
-            IF(ITASK==0)THEN   ! comm sur 1er thread
+            IF(ITASK==0)THEN   ! communication on the first thread
 C
               SIZE = 1
               IF(IMONM>0) CALL STARTIME(TIMERS,65)
@@ -2718,7 +2735,7 @@ C
 C
           CALL MY_BARRIER
 C
-          IF(ITASK==0)THEN   ! comm sur 1er thread
+          IF(ITASK==0)THEN   ! communication on the first thread
 C
             SIZE = 1
             LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)

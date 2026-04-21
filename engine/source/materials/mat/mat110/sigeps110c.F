@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps110c               ../engine/source/materials/mat/mat110/sigeps110c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc                   ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    sigeps110c_lite_newton   ../engine/source/materials/mat/mat110/sigeps110c_lite_newton.F
-      !||    sigeps110c_lite_nice     ../engine/source/materials/mat/mat110/sigeps110c_lite_nice.F
-      !||    sigeps110c_newton        ../engine/source/materials/mat/mat110/sigeps110c_newton.F
-      !||    sigeps110c_nice          ../engine/source/materials/mat/mat110/sigeps110c_nice.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod      ../engine/share/modules/table_mod.F
-      !||    table_mod                ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps110c               ../engine/source/materials/mat/mat110/sigeps110c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc                   ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    sigeps110c_lite_newton   ../engine/source/materials/mat/mat110/sigeps110c_lite_newton.F
+!||    sigeps110c_lite_nice     ../engine/source/materials/mat/mat110/sigeps110c_lite_nice.F
+!||    sigeps110c_newton        ../engine/source/materials/mat/mat110/sigeps110c_newton.F
+!||    sigeps110c_nice          ../engine/source/materials/mat/mat110/sigeps110c_nice.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod      ../engine/share/modules/table_mod.F
+!||    table_mod                ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE SIGEPS110C(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,NPF     , 
      2     TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFF     ,
@@ -43,7 +43,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,THKLY   ,
      7     THK     ,SIGY    ,ET      ,TEMPEL  ,TEMP    ,SEQ     ,
      8     TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,
-     9     SIGA    ,INLOC   ,DPLANL  ,EPSPL   ,LOFF    ,IOFF_DUCT)
+     9     SIGA    ,INLOC   ,DPLANL  ,LOFF    ,IOFF_DUCT)
       !=======================================================================
       !      Modules
       !=======================================================================
@@ -80,7 +80,7 @@ c
      .   SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX
 c
       my_real ,DIMENSION(NEL), INTENT(INOUT)       :: 
-     .   PLA,DPLA,OFF,THK,TEMP,SEQ,EPSPL
+     .   PLA,DPLA,OFF,THK,TEMP,SEQ
       my_real ,DIMENSION(NEL,NUVAR), INTENT(INOUT) :: 
      .   UVAR
       my_real ,DIMENSION(NEL,3)     ,INTENT(INOUT) :: 
@@ -167,11 +167,7 @@ c--------------------------
      A           SIGA    ,INLOC   ,DPLANL  ,LOFF    )
           END SELECT    
         END SELECT
-
-        ! Copy the strain rate for failure criteria
-        EPSPL(1:NEL) = EPSP(1:NEL)
         ! Ductile failure activation
         IOFF_DUCT(1:NEL) = 1
 c--------------------------
-c-----------
       END

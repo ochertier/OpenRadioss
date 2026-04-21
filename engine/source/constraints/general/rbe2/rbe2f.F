@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rbe2t1               ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe2              ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    rbe2_s               ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    rbe2f                ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    rbe2fl               ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    spmd_exch_rbe2_pon   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe2_pon.F
-      !||    spmd_max_i           ../engine/source/mpi/implicit/imp_spmd.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2t1               ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    resol                ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe2              ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    rbe2_s               ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    rbe2f                ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    rbe2fl               ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    spmd_exch_rbe2_pon   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe2_pon.F
+!||    spmd_max_i           ../engine/source/mpi/implicit/imp_spmd.F
+!||====================================================================
       SUBROUTINE RBE2T1(IRBE2 ,LRBE2 ,X      ,A      ,AR     ,
      1                  MS    ,IN    ,SKEW   ,WEIGHT ,IAD_RBE2,
      2                  FR_RBE2M,NMRBE2,STIFN ,STIFR  ,R2SIZE)
@@ -57,8 +57,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, JT(3,NRBE2),JR(3,NRBE2),IERR,IAD,
-     .        NS,NML,ICOM,ISK,M,K,ID,NSN,MID,IROT,NHI,IRAD
+      INTEGER  J, N, JT(3,NRBE2),JR(3,NRBE2),IAD,
+     .        ICOM,ISK,M,K,NSN,MID,NHI,IRAD
 C     REAL
       DOUBLE PRECISION
      .   FRBE2M6(3,6,NMRBE2),MRBE2M6(3,6,NMRBE2),
@@ -121,13 +121,13 @@ C
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe2f             ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2t1            ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- calls      -----------------------------------------------------
-      !||    foat_to_6_float   ../engine/source/system/parit.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2f             ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    rbe2t1            ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float   ../engine/source/system/parit.F
+!||====================================================================
       SUBROUTINE RBE2F(NSL   ,ISL   ,X     ,A     ,AR    ,
      1                 MS    ,IN    ,WEIGHT,JT    ,JR    ,
      2                 F6    ,M6    ,STIFN ,STIFR ,STIF6 ,
@@ -148,7 +148,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, NS ,JTW(3),JRW(3),K,IJT,IJR
+      INTEGER I, J, NS ,JTW(3),JRW(3),K,IJT,IJR
 C     REAL
       my_real
      .     RX, RY, RZ,AS(3,NSL),STIS(NSL),DD,FX,FY,FZ
@@ -265,16 +265,16 @@ C---  partial depending dof will add more mass w/ /DT/NODA w.r.t. RBODY
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe2fl            ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2t1            ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- calls      -----------------------------------------------------
-      !||    cdi_bcn           ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    cdi_bcn1          ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    foat_to_6_float   ../engine/source/system/parit.F
-      !||    rbe2flsn          ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2fl            ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    rbe2t1            ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- calls      -----------------------------------------------------
+!||    cdi_bcn           ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    cdi_bcn1          ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    foat_to_6_float   ../engine/source/system/parit.F
+!||    rbe2flsn          ../engine/source/constraints/general/rbe2/rbe2f.F
+!||====================================================================
       SUBROUTINE RBE2FL(NSL   ,ISL   ,X     ,A     ,AR    ,
      1                  MS    ,IN    ,WEIGHT,JT    ,JR    ,
      2                  F6    ,M6    ,STIFN ,STIFR ,STIF6 ,
@@ -298,7 +298,7 @@ C-----------------------------------------------
       INTEGER I, J, NS ,K,IC,JT1(3),JR1(3),IJT,IJR,JJ
 C     REAL
       my_real
-     .     RX, RY, RZ,AS(3,NSL),AAR(3),LARM(3),LAS(3,NSL),
+     .     RX, RY, RZ,AS(3,NSL),AAR(3),LAS(3,NSL),
      .     STIS(NSL),DD,CDT(9),CDR(9),CDTR(9),AA
       DOUBLE PRECISION
      .   AS6(6,3,NSL),STIS6(6,NSL)
@@ -417,9 +417,9 @@ C---  reset of secnd nodes forces is necessary w/AMS
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe2_poff   ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2_poff   ../engine/source/constraints/general/rbe2/rbe2f.F
+!||====================================================================
       SUBROUTINE RBE2_POFF(IRBE2 ,A     ,AR    ,MS    ,IN    ,
      1                     STIFN ,STIFR ,WEIGHT,JR    ,IH    )
 C-----------------------------------------------
@@ -441,7 +441,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, K, N, NS ,NML, IAD,JJ,IROT,M
+      INTEGER   N ,IROT,M
 C     REAL
 C======================================================================|
 #include    "vectorize.inc"
@@ -463,11 +463,11 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe2_s   ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2t1   ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2_s   ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    rbe2t1   ../engine/source/constraints/general/rbe2/rbe2f.F
+!||====================================================================
       SUBROUTINE RBE2_S(IRBE2 ,A     ,AR    ,MS    ,IN    ,
      1                  STIFN ,STIFR ,WEIGHT,F6    ,M6    ,
      2                  ST6   ,SR6   ,JR    ,NMRBE2,IH    )
@@ -492,7 +492,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, K, N, NS ,NML, IAD,JJ,M,MID,IROT,IRAD
+      INTEGER  K, N ,M,MID,IROT,IRAD
 C     REAL
 C======================================================================|
 #include    "vectorize.inc"
@@ -521,23 +521,23 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    prerbe2          ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2_imp0        ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    rbe2_impd        ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    rbe2_impi        ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    rbe2_impr1       ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    rbe2cor          ../engine/source/constraints/general/rbody/rgbcor.F
-      !||    rbe2t1           ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    rbe2v            ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    sms_diag_rbe2    ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe2_nodxi   ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe_accl     ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe_cnds     ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe_corr     ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe_prec     ../engine/source/ams/sms_rbe2.F
-      !||====================================================================
+!||====================================================================
+!||    prerbe2          ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    rbe2_imp0        ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    rbe2_impd        ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    rbe2_impi        ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    rbe2_impr1       ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    rbe2cor          ../engine/source/constraints/general/rbody/rgbcor.F
+!||    rbe2t1           ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    rbe2v            ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    sms_diag_rbe2    ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe2_nodxi   ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe_accl     ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe_cnds     ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe_corr     ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe_prec     ../engine/source/ams/sms_rbe2.F
+!||====================================================================
       SUBROUTINE PRERBE2(IRBE2 ,JT  ,JR   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -557,7 +557,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N,NML,IC,ICT,ICR,IROT
+      INTEGER  J, N,IC,ICT,ICR
 C======================================================================|
       DO N=1,NRBE2
           IC=IRBE2(4,N)
@@ -614,11 +614,11 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe2_init    ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    resol_init   ../engine/source/engine/resol_init.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2_init    ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    resol_init   ../engine/source/engine/resol_init.F
+!||====================================================================
       SUBROUTINE RBE2_INIT(IRBE2 ,LRBE2,NMRBE2,FR_RBE2,FR_RBE2M,NFR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -637,7 +637,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, M,N,ITAG(NUMNOD),IAD,IH(NRBE2),NSL,NS,NIH
+      INTEGER   M,N,ITAG(NUMNOD),IH(NRBE2),NIH
 C======================================================================|
       NMRBE2 = 0
       IF (NRBE2==0) RETURN
@@ -691,16 +691,16 @@ C---
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe2frf      ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    imp3_a2b     ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr       ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    cdi_bcn      ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    cdi_bcn1     ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    rbe2flsnfr   ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2frf      ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    imp3_a2b     ../engine/source/airbag/monv_imp0.F
+!||    upd_fr       ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    cdi_bcn      ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    cdi_bcn1     ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    rbe2flsnfr   ../engine/source/constraints/general/rbe2/rbe2f.F
+!||====================================================================
       SUBROUTINE RBE2FRF(NS    ,M     ,A     ,AR    ,JT    ,
      1                   JR    ,X     ,ISK   ,SKEW0 ,IRAD  )
 C-----------------------------------------------
@@ -721,10 +721,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N,K,JT1(3),JR1(3),IC
+      INTEGER   K,JT1(3),JR1(3),IC
 C     REAL
       my_real
-     .       RX,RY,RZ,FX,FY,FZ, SKEW(LSKEW),CDT(9),CDR(9),CDTR(9),AAR(3)
+     .       RX,RY,RZ, SKEW(LSKEW),CDT(9),CDR(9),CDTR(9),AAR(3)
 C======================================================================|
           IF (ISK>1) THEN
            DO K=1,9
@@ -772,14 +772,14 @@ C
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe2flsn   ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2fl     ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- calls      -----------------------------------------------------
-      !||    dir_rbe2   ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    l_dir      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2flsn   ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    rbe2fl     ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- calls      -----------------------------------------------------
+!||    dir_rbe2   ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    l_dir      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE RBE2FLSN(NSL   ,ISL  ,A     ,WEIGHT,ICT    ,
      2                    SKEW  )
 C-----------------------------------------------
@@ -795,7 +795,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,J1,L,NS
+      INTEGER I,J,K,J1,NS
       my_real
      .   EJ(3),EJ1(3),S,EA,EB
 C----------------100-------------------------
@@ -917,14 +917,14 @@ C-------------------110---------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe2flsnfr   ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2frf      ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- calls      -----------------------------------------------------
-      !||    dir_rbe2     ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    l_dir        ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2flsnfr   ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    rbe2frf      ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- calls      -----------------------------------------------------
+!||    dir_rbe2     ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    l_dir        ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE RBE2FLSNFR(NS   ,A     ,ICT    ,SKEW  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -939,7 +939,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,J1,L
+      INTEGER J,K,J1
       my_real
      .   EJ(3),EJ1(3),S,EA,EB
 C----------------100-------------------------
@@ -1043,18 +1043,18 @@ C----------------110-------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    prerbe2fr   ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||--- called by ------------------------------------------------------
-      !||    diag_int    ../engine/source/mpi/implicit/imp_fri.F
-      !||    fr_u2dd     ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp3_a2b    ../engine/source/airbag/monv_imp0.F
-      !||    imp3_u2x    ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr      ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_kml     ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl     ../engine/source/mpi/implicit/imp_fri.F
-      !||    updk_mv     ../engine/source/airbag/monv_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    prerbe2fr   ../engine/source/constraints/general/rbe2/rbe2f.F
+!||--- called by ------------------------------------------------------
+!||    diag_int    ../engine/source/mpi/implicit/imp_fri.F
+!||    fr_u2dd     ../engine/source/mpi/implicit/imp_fri.F
+!||    imp3_a2b    ../engine/source/airbag/monv_imp0.F
+!||    imp3_u2x    ../engine/source/airbag/monv_imp0.F
+!||    upd_fr      ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_kml     ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl     ../engine/source/mpi/implicit/imp_fri.F
+!||    updk_mv     ../engine/source/airbag/monv_imp0.F
+!||====================================================================
       SUBROUTINE PRERBE2FR(IC    ,JT  ,JR   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1067,7 +1067,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, NML,ICT,ICR
+      INTEGER  J,ICT,ICR
 C======================================================================|
 C  IC=IRBE2(4,N)
         ICT=IC/512

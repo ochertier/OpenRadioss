@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,14 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inter_offset_itag_mod   ../starter/source/elements/shell/shell_offset/inter_offset_itag.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                  ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    inter_offset_itag_mod   ../starter/source/elements/shell/shell_offset/inter_offset_itag.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                  ../starter/source/starter/lectur.F
+!||====================================================================
       module inter_offset_itag_mod
+
+      implicit none
 
       contains
 ! ======================================================================================================================
@@ -35,12 +37,12 @@
 !=======================================================================================================================
 !!\brief This subroutine tag the shells used for contact : Option DEF_SHELL / IOFFSET=1
 !=======================================================================================================================
-      !||====================================================================
-      !||    inter_offset_itag   ../starter/source/elements/shell/shell_offset/inter_offset_itag.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur              ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    inter_offset_itag   ../starter/source/elements/shell/shell_offset/inter_offset_itag.F90
+!||--- called by ------------------------------------------------------
+!||    lectur              ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
         subroutine inter_offset_itag(                                          &
           ninter,    ipari,      npari,       igrsurf,            &
           nsurf,   numelc,    numeltg,        itagsh)
@@ -52,24 +54,20 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
-! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           integer, intent (in   )                          :: ninter           !< number of interface
-          integer, intent (in   )                          :: npari            !< 1er dim of ipari
+          integer, intent (in   )                          :: npari            !< first dimension of ipari
           integer, intent (in   )                          :: nsurf            !< number of surface
           integer, intent (in   )                          :: numelc           !< number shell 4n element
           integer, intent (in   )                          :: numeltg          !< number shell 3n element
           integer, intent (in   ) ,dimension(npari,ninter) :: ipari            !< interface array
-          integer, intent (inout),dimension(numelc+numeltg):: itagsh           !< < shell w/ offset
+          integer, intent (inout),dimension(numelc+numeltg):: itagsh           !< < shell with offset
           type (surf_)   ,       dimension(nsurf) ,target  :: igrsurf          !< surf array
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i,j,n,ni,ntyp,isu1,isu2,ilev,ie,etyp
+          integer :: j,ni,ntyp,isu1,isu2,ilev,ie,etyp
           integer, dimension(:), allocatable   :: intage
 !
 ! ----------------------------------------------------------------------------------------------------------------------

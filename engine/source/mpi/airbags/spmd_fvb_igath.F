@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_fvb_igath   ../engine/source/mpi/airbags/spmd_fvb_igath.F
-      !||--- called by ------------------------------------------------------
-      !||    fv_up_switch     ../engine/source/airbag/fv_up_switch.F
-      !||    fvbag1           ../engine/source/airbag/fvbag1.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod        ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_fvb_igath   ../engine/source/mpi/airbags/spmd_fvb_igath.F
+!||--- called by ------------------------------------------------------
+!||    fv_up_switch     ../engine/source/airbag/fv_up_switch.F
+!||    fvbag1           ../engine/source/airbag/fvbag1.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod        ../engine/share/modules/fvbag_mod.F
+!||====================================================================
       SUBROUTINE SPMD_FVB_IGATH(IFV, ITABS, ITABG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -62,7 +62,7 @@ C-----------------------------------------------
       DATA MSGOFF/205/
 C
       IF (FVSPMD(IFV)%RANK == 0) THEN
-C Reception des longueurs
+C reception of lengths
          II=0
          DO I=1,FVSPMD(IFV)%NSPMD - 1
             II=II+1
@@ -81,7 +81,7 @@ C
             LEN=LEN+2*ITAB(II)
          ENDDO
          ALLOCATE(IBUF(LEN))
-C Reception des entiers
+C reception of integers
          II=0
          DO I=1,FVSPMD(IFV)%NSPMD-1
             II=II+1
@@ -91,7 +91,7 @@ C Reception des entiers
             CALL MPI_IRECV(IBUF(IAD), LEN, MPI_INTEGER, I,
      .                     ITAG, FVSPMD(IFV)%MPI_COMM, REQ(II), IERR)
          ENDDO
-C Remplissage du tableau de sortie ITABG
+C filling of the output array itabg
          DO I=1,FVSPMD(IFV)%NN_L+FVSPMD(IFV)%NNI_L
             I1=FVSPMD(IFV)%IBUF_L(1,I)
             I2=FVSPMD(IFV)%IBUF_L(2,I)

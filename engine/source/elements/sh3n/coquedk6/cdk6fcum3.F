@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdk6fcum3   ../engine/source/elements/sh3n/coquedk6/cdk6fcum3.F
-      !||--- called by ------------------------------------------------------
-      !||    cdk6forc3   ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
-      !||====================================================================
+!||====================================================================
+!||    cdk6fcum3   ../engine/source/elements/sh3n/coquedk6/cdk6fcum3.F
+!||--- called by ------------------------------------------------------
+!||    cdk6forc3   ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
+!||====================================================================
       SUBROUTINE CDK6FCUM3(JFT,JLT,
      1              R11,R12,R13,R21,R22,R23,R31,R32,R33,
      1              F11,F12,F13,F21,F22,F23,F31,F32,F33,
@@ -47,7 +47,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
       my_real LX,LY,LZ
 C-----------------------------------------------
 C   L o c a l Coordinate-> Global 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dmasanic       ../engine/source/output/anim/generate/dmasanic.F
-      !||--- called by ------------------------------------------------------
-      !||    genani         ../engine/source/output/anim/generate/genani.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    stack_mod      ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dmasanic       ../engine/source/output/anim/generate/dmasanic.F
+!||--- called by ------------------------------------------------------
+!||    genani         ../engine/source/output/anim/generate/genani.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    stack_mod      ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE DMASANIC(ELBUF_TAB,X   ,D    ,GEO  ,IPARG,
      .                    IXQ  ,IXC  ,IXTG ,MAS  ,PM   ,
      .                    EL2FA,NBF  ,IGEO,STACK)
@@ -35,7 +36,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD 
-      USE STACK_MOD           
+      USE STACK_MOD
+      use element_mod , only : nixq,nixc,nixtg       
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,7 +47,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
@@ -66,14 +67,14 @@ C     REAL
       my_real
      .   OFF, P, VONM2, VONM, S1, S2, S12, S3, VALUE,THK0,A0,AL0,
      .   RHO0,XX1,XX2,XX3,YY1,YY2,YY3,ZZ1,ZZ2,ZZ3
-      INTEGER I, NG, NEL, NFT, IAD, ITY, LFT, NPT, ISS, ISC,
+      INTEGER I, NG, NEL, NFT, IAD, ITY, LFT, NPT, 
      .        IADD, N, J, LLT, MLW, 
      .        ISTRAIN,NN, K1, K2,JTURB,MT,JALE, IMID, IALEL,IPID,
      .        N1,N2,N3,N4,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,
      .        OFFSET,NEL_OLD,ITY_OLD,NFT_FA,N_FA
-      INTEGER ISUBSTACK,NTHK,IADR,IIGEO,IGTYP
-      REAL R4
+      INTEGER ISUBSTACK, IGTYP
+ 
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       NN1 = 1
@@ -95,7 +96,7 @@ C
         NEL   =IPARG(2,NG)
         ITY   =IPARG(5,NG)
         NPT   =IABS(IPARG(6,NG))
-        IF (IMACH==3.AND.ISPMD==0) THEN
+        IF (ISPMD==0) THEN
           IF (ITY/=ITY_OLD) THEN
             NEL_OLD = 0
             ITY_OLD= ITY
@@ -107,7 +108,7 @@ C
         IAD   =IPARG(4,NG)
         LFT=1
         LLT=NEL
-        IF (IMACH==3.AND.ISPMD==0) THEN
+        IF (ISPMD==0) THEN
             NFT_FA = NEL_OLD - NEL 
         ELSE
             NFT_FA = NFT
@@ -243,7 +244,7 @@ C
         ELSE
         ENDIF
 C-----------------------------------------------
-C       FIN DE BOUCLE SUR LES OFFSET
+C       end of loop over offsets
 C-----------------------------------------------
  490  CONTINUE
 C-----------------------------------------------

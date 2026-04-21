@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spclasv   ../starter/source/elements/sph/spclasv.F
-      !||--- called by ------------------------------------------------------
-      !||    sptri     ../starter/source/elements/sph/sptri.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spclasv   ../starter/source/elements/sph/spclasv.F
+!||--- called by ------------------------------------------------------
+!||    sptri     ../starter/source/elements/sph/sptri.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SPCLASV(X      ,SPBUF ,KXSP   ,IXSP   ,NOD2SP    ,
      1                   WASPACT,MYSPATRUE,IREDUCE,KREDUCE)
 C-----------------------------------------------
@@ -98,8 +98,8 @@ C
 C
 C--- Closest neighbor is stored for tensile instability treatment --
 C
-         IF (NSPBUF==14) THEN
-           SPBUF(14,N)=TWO*SQRT(DVOIS(1))
+         IF (NSPBUF==15) THEN
+           SPBUF(15,N)=TWO*SQRT(DVOIS(1))
          ENDIF
 C
         END DO
@@ -107,7 +107,7 @@ C-----------------------------------------------
         LVOIRED = 0
         IF(IREDUCE==0)GO TO 100
 C-------------------------------------------
-C       tri voisins / ne garder que LVOISPH voisins effectifs
+C       Tri neighboring / keep only lvoisph neighbors effective
 C
         DO NS=1,NSPHACT
          N=WASPACT(NS)

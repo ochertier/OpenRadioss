@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r23forc3           ../engine/source/elements/spring/r23forc3.F
-      !||--- called by ------------------------------------------------------
-      !||    forint             ../engine/source/elements/forint.F
-      !||--- calls      -----------------------------------------------------
-      !||    r23law108          ../engine/source/elements/spring/r23law108.F
-      !||    r23law113          ../engine/source/elements/spring/r23law113.F
-      !||    r23law114          ../engine/source/elements/spring/r23law114.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||    python_funct_mod   ../common_source/modules/python_mod.F90
-      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
-      !||    table_mod          ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r23forc3           ../engine/source/elements/spring/r23forc3.F
+!||--- called by ------------------------------------------------------
+!||    forint             ../engine/source/elements/forint.F
+!||--- calls      -----------------------------------------------------
+!||    r23law108          ../engine/source/elements/spring/r23law108.F
+!||    r23law113          ../engine/source/elements/spring/r23law113.F
+!||    r23law114          ../engine/source/elements/spring/r23law114.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    h3d_mod            ../engine/share/modules/h3d_mod.F
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||    table_mod          ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE R23FORC3(PYTHON,
      1   ELBUF_STR,            JFT,                  JLT,                  NEL,
      2   MTN,                  IGEO,                 GEO,                  IPM,
@@ -62,6 +63,7 @@ C-----------------------------------------------
       USE TABLE_MOD
       USE H3D_MOD
       USE SENSOR_MOD
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -153,7 +155,8 @@ C=======================================================================
      D   MY1,       MY2,       MZ1,       MZ2,
      E   GRESAV,    GRTH,      IGRTH,     MSRT,
      F   DMELRT,    H3D_DATA,  JSMS,      IGRE,
-     G   NFT,       PRELD1,    STF_F,     STF )
+     G   NFT,       PRELD1,    STF_F,     STF,
+     H   SANIN,     IRESP,     SNPC)
 
        ELSEIF(MTN == 114) THEN
          ! seatbelt_element

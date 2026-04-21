@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecdamp        ../engine/source/input/lecdamp.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../engine/source/input/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||    ngr2usr        ../engine/source/input/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecdamp        ../engine/source/input/lecdamp.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../engine/source/input/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../engine/source/output/message/message.F
+!||    arret          ../engine/source/system/arret.F
+!||    ngr2usr        ../engine/source/input/freform.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||    message_mod    ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LECDAMP(ND, DAMPR, IGRNOD)
 C-----------------------------------------------
 C   M o d u l e s
@@ -86,7 +86,7 @@ C-----------------------------------------------
           ENDIF
           DAMPA0 = 0.
           DAMPB0 = 0.
-          READ (IIN,'(I8,2E16.9,I8)') IDNEW,DAMPA0,DAMPB0,NGR
+          READ (IIN,'(I10,2E16.9,I8)') IDNEW,DAMPA0,DAMPB0,NGR
           IF (MCHECK==0) THEN
             IDAMPG = NGR2USR(NGR,IGRNOD,NGRNOD)
             IF (IDAMPG==0) NGR = 0
@@ -211,11 +211,6 @@ C
 C
  2000  FORMAT(' RAYLEIGH DAMPING'  /
      .  '  NUMBER OF NEW DAMPING PARAMETERS. . . . . . =' ,I8 /)
- 2050  FORMAT(' ** ERROR:  INPUT ERROR IN OPTION DAMP',/
-     .'    WRONG NUMBER OF DAMPING PARAMETERS FOR /DAMP/ID NUMBER:',
-     .   I10/)
- 2100  FORMAT(' ** ERROR:  INPUT ERROR IN OPTION DAMP',/
-     .        '    /DAMP/ID NUMBER:',I10,' NOT FOUND'/)
  2200  FORMAT('DAMPING ID . . . . . . . . . . . . .',I10
      .        /5X,'ALPHA. . . . . . . . . . . . . .',1PG20.13
      .        /5X,'BETA . . . . . . . . . . . . . .',1PG20.13

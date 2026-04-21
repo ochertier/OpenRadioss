@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cuserini4              ../starter/source/elements/shell/coqueba/cuserini4.F
-      !||--- called by ------------------------------------------------------
-      !||    cbainit3               ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cdkinit3               ../starter/source/elements/sh3n/coquedk/cdkinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cuserini4              ../starter/source/elements/shell/coqueba/cuserini4.F
+!||--- called by ------------------------------------------------------
+!||    cbainit3               ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cdkinit3               ../starter/source/elements/sh3n/coquedk/cdkinit3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CUSERINI4(ELBUF_STR,
      1           JFT    ,JLT    ,NFT   ,NEL    ,ISTRAIN ,
      2           SIGSH  ,NSIGSH ,NUMEL ,IX     ,NIX     ,

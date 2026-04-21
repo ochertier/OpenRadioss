@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,10 +21,10 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_sync_mmxg        ../engine/source/mpi/interfaces/spmd_sync_mmxg.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_sync_mmxg        ../engine/source/mpi/interfaces/spmd_sync_mmxg.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SPMD_SYNC_MMXG(
      1    ISENDTO,IRCVFROM,NEWFRONT,XSLV_L,XMSR_L,
      2    VSLV_L ,VMSR_L  ,INTLIST ,NINTC ,TZINF ,
@@ -57,8 +57,8 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER LOC_PROC,IERROR,I_LEN,myop,
-     .        KK, L, J, NIN, REQ,
-     .        STATUS(MPI_STATUS_SIZE),type_reduc
+     .        KK, L, J, NIN,
+     .        type_reduc
       PARAMETER (I_LEN = 46)
       my_real
      .        SBUF(NINTC*I_LEN), RBUF(NINTC*I_LEN)
@@ -107,7 +107,7 @@ C
         IF(IPARI(7,NIN)/=17)THEN
 C NEWFRONT
           SBUF(L+1) = NEWFRONT(NIN)
-        ELSE     ! interface 17 avec courbure
+        ELSE     ! interface 17 with curvature
 C SIZE
           SBUF(L+1) = SIZE_T(NIN)
         END IF
@@ -162,7 +162,7 @@ C Unpack results
            L = L + 6
            IF(IPARI(7,NIN)/=17)THEN
              NEWFRONT(NIN) = NINT(RBUF(L+1))
-           ELSE     ! interface 17 avec courbure
+           ELSE     ! interface 17 with curvature
              SIZE_T(NIN) = RBUF(L+1)
            END IF
            L = L + 1

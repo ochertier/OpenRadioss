@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,36 +22,39 @@
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 !===================================================================================================
 
-      !||====================================================================
-      !||    random_walk_def_mod        ../common_source/modules/random_walk_def_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    c3init3                    ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cbainit3                   ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cinit3                     ../starter/source/elements/shell/coque/cinit3.F
-      !||    fractal_dmg_init           ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
-      !||    fractal_elem_renum         ../starter/source/materials/fail/fractal/fractal_elem_spmd_renum.F90
-      !||    fractal_element_neighbor   ../starter/source/materials/fail/fractal/fractal_element_neighbor.F90
-      !||    initia                     ../starter/source/elements/initia/initia.F
-      !||    lectur                     ../engine/source/input/lectur.F
-      !||    random_walk_dmg            ../starter/source/materials/fail/fractal/random_walk_dmg.F90
-      !||    updfail                    ../starter/source/materials/updfail.F90
-      !||====================================================================
+!||====================================================================
+!||    random_walk_def_mod        ../common_source/modules/random_walk_def_mod.F90
+!||--- called by ------------------------------------------------------
+!||    c3init3                    ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cbainit3                   ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cinit3                     ../starter/source/elements/shell/coque/cinit3.F
+!||    fractal_dmg_init           ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
+!||    fractal_elem_renum         ../starter/source/materials/fail/fractal/fractal_elem_spmd_renum.F90
+!||    fractal_element_neighbor   ../starter/source/materials/fail/fractal/fractal_element_neighbor.F90
+!||    initia                     ../starter/source/elements/initia/initia.F
+!||    lectur                     ../engine/source/input/lectur.F
+!||    random_walk_dmg            ../starter/source/materials/fail/fractal/random_walk_dmg.F90
+!||    updfail                    ../starter/source/materials/updfail.F90
+!||--- uses       -----------------------------------------------------
+!||    precision_mod              ../common_source/modules/precision_mod.F90
+!||====================================================================
       module random_walk_def_mod
 
 ! ======================================================================================================================
 !! \brief data structure for random walk algorithm used in fractal damage initialization
 !! \details
 ! ======================================================================================================================
+        use precision_mod, only : WP
         implicit none
+        private :: WP
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 
         type random_walk_
           integer :: id                                   ! element id
           integer :: elnum                                ! element number
           integer :: nix                                  ! number of edge connexions (3/4)
-          my_real :: damage                               ! damage value
+          real(kind=WP) :: damage                               ! damage value
           integer, dimension(:), allocatable :: neighbor  ! neighbor element list (nix)
         end type random_walk_
 

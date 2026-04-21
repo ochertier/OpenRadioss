@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,15 +22,15 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
 C
-      !||====================================================================
-      !||    inisrf         ../starter/source/constraints/general/rbody/inisrf.F
-      !||--- called by ------------------------------------------------------
-      !||    initia         ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inisrf         ../starter/source/constraints/general/rbody/inisrf.F
+!||--- called by ------------------------------------------------------
+!||    initia         ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INISRF(X,V,VR,NPBY,RBY,IGRSURF,BUFSF)
 C-----------------------------------------------
 C   M o d u l e s
@@ -38,11 +38,10 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
 C=======================================================================
-C    * Verifie qu'il n'y a pas deux RIGID BODIES (.../... deux conditions
-C      cinematiques)
-C    qui definissent le mvt de la meme Surface.
-C    * Initialise la position et les vitesses du point ou calculer les forces
-C      dans les interfaces.
+C    * Verifies that there are not two RIGID BODIES (or two kinematic
+C      conditions) which define the movement of the same surface.
+C    * Initializes the position and velocities of the point where forces are calculated
+C      in the interfaces.
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

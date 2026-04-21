@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    convecoff        ../engine/source/constraints/thermic/convecoff.F
-      !||--- called by ------------------------------------------------------
-      !||    desacti          ../engine/source/elements/desacti.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    convecoff        ../engine/source/constraints/thermic/convecoff.F
+!||--- called by ------------------------------------------------------
+!||    desacti          ../engine/source/elements/desacti.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||====================================================================
       SUBROUTINE CONVECOFF(IBCV, FCONV, IPARG, IGROUPS, ELBUF_TAB, GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -59,7 +59,7 @@ C-----------------------------------------------
       my_real, DIMENSION(:), POINTER :: OFFG
 C======================================================================|
 C------------------------------------------------
-C   ACTIVATION/DESACTIVATION DE LA CONVECTION
+C   activation/deactivation of convection
 C------------------------------------------------
       DO N=1,GLOB_THERM%NUMCONV
          IF (IBCV(7,N) == 1) THEN

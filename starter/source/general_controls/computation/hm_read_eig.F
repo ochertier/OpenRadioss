@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_preread_eig         ../starter/source/general_controls/computation/hm_read_eig.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    random_mod             ../starter/share/modules1/random_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_preread_eig         ../starter/source/general_controls/computation/hm_read_eig.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    random_mod             ../starter/share/modules1/random_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_PREREAD_EIG(IGRNOD   ,NNT   ,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -64,7 +64,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IE,N, IG, IGU1, IGU2, NNI, ID,  NM,M, SUB_INDEX
+      INTEGER I, IE, IG, IGU1, IGU2, NNI, ID, SUB_INDEX
       CHARACTER(LEN=NCHARTITLE)::TITR
       CHARACTER(LEN=NCHARKEY)::KEY
       CHARACTER :: MESS*40
@@ -131,26 +131,26 @@ C
 C-----------------------
       RETURN
       END SUBROUTINE HM_PREREAD_EIG
-      !||====================================================================
-      !||    hm_read_eig            ../starter/source/general_controls/computation/hm_read_eig.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    eigrline               ../starter/source/general_controls/computation/hm_read_eig.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    random_mod             ../starter/share/modules1/random_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_eig            ../starter/source/general_controls/computation/hm_read_eig.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    eigrline               ../starter/source/general_controls/computation/hm_read_eig.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    random_mod             ../starter/share/modules1/random_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_EIG(EIGIPM, EIGIBUF, EIGRPM, IGRNOD   ,ITABM1   ,
      .                       UNITAB, LSUBMODEL)
 C-----------------------------------------------
@@ -546,10 +546,6 @@ C-----------------------
      .            C2=NWLINE)
       RETURN
 C      
-2000  FORMAT(/
-     .       /
-     . '      EIGEN AND STATIC MODES COMPUTATION '/
-     . '      ---------------------------------- '/)
 2100  FORMAT( /5X,'EIGENPROBLEM ID ',I10,1X,A
      .       /10X,'TYPE             ',A33
      .       /10X,'NUMBER OF EIGENMODES                    ',I10
@@ -564,13 +560,13 @@ C
 2110  FORMAT(  9X,10I9)
 2111  FORMAT( 10X,'INTERFACE NODES ')
       END SUBROUTINE HM_READ_EIG
-      !||====================================================================
-      !||    eigrline               ../starter/source/general_controls/computation/hm_read_eig.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_eig            ../starter/source/general_controls/computation/hm_read_eig.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    eigrline               ../starter/source/general_controls/computation/hm_read_eig.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_eig            ../starter/source/general_controls/computation/hm_read_eig.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE EIGRLINE(IFIC, NWLINE, ID,TITR)                     
 C-----------------------------------------------
 C   M o d u l e s

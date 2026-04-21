@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    aleno               ../starter/source/airbag/fvmbag1.F
-      !||--- called by ------------------------------------------------------
-      !||    init_monvol         ../starter/source/airbag/init_monvol.F
-      !||--- uses       -----------------------------------------------------
-      !||    monvol_struct_mod   ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    aleno               ../starter/source/airbag/fvmbag1.F
+!||--- called by ------------------------------------------------------
+!||    init_monvol         ../starter/source/airbag/init_monvol.F
+!||--- uses       -----------------------------------------------------
+!||    monvol_struct_mod   ../starter/share/modules1/monvol_struct_mod.F
+!||====================================================================
       SUBROUTINE ALENO(NN  , SURF_NODES, NNB, ITABINV,
      2                 TAGE, TAGVENT ,TAGNODBR, T_MONVOLN)
 C-----------------------------------------------
@@ -51,17 +51,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ITAG(NUMNOD), I, I1, I2, I3, I4, IAD1,
-     .        J,K,KK,NA,NB,NC,NA2,NC2,
-     .        IADC, IADFIN, JAD1, NALL, NODESURF(4*NN)
-C
-      INTEGER IADCH(NUMNOD),CHAIN(2,4*NN),NEXT(4*NN),
-     .        IP2(0:3),INVP2(15)
+      INTEGER ITAG(NUMNOD),IAD1,I,I1,I2,I3,I4,J,K,KK,NA,NB,NC,NC2,IADC, IADFIN, JAD1, NALL, NODESURF(4*NN)
+      INTEGER IADCH(NUMNOD),CHAIN(2,4*NN),NEXT(4*NN),IP2(0:3),INVP2(15)
 C-----------------------------------------------
 C
-C elimination des elements doubles
+C removing duplicated
 C
-
       DO I=1,NUMNOD
         IADCH(I)=0
         ITAG(I)=0
@@ -78,7 +73,7 @@ C
         ENDDO
       ENDDO
 
-C construction liste chaine connectivites inverses (noeuds/elts)
+C Construction List Converse Connectivitis Channel (nodes/yelts)
 
       IAD1=1
       IADFIN = 1
@@ -117,13 +112,13 @@ C
       INVP2(14)=1
 C
 
-C  Recherche elts doubles
+C  Listing duplicated
 
       IAD1=1
       DO I=1,NN
         NA=0
         NALL=1
-C tag noeuds 1er elt
+C tag nodes of 1st element
         DO K = 0,3
           J = NODESURF(IAD1+K)
           IF(K == 3) THEN
@@ -144,13 +139,13 @@ C
           END IF
           IF(J == 0) CYCLE
           IADC = IADCH(J)
-C boucle sur les elts connecte au noeud k+1 du 1er elt
+C loop on the elements connected to node k+1 of the 1st element
           DO WHILE (IADC /= 0)
             NC=0
             NB=0
             JAD1=CHAIN(1,IADC)
             IF(JAD1 /= IAD1) THEN
-C Denombrement des tags des noeuds du 2eme elt
+C Counting of the tags of the nodes of the 2nd element
               DO KK = 0,3
                 J = NODESURF(JAD1+KK)
                 IF(KK == 3) THEN
@@ -164,16 +159,16 @@ C Denombrement des tags des noeuds du 2eme elt
               NC2 = NC
               NC = NC / 100
               NC2 = NC2 - 100*NC
-C test pour 2 triangles ou 2 quadrangles avec ts les noeuds communs
+C test for 2 triangles or 2 quadrangles with all common nodes
               IF(NC == NA .and. NA == NB)THEN
                 TAGE(I)=5
-C test pour 2 elts (2 quadrangles ou 1 triangle et 1 quadrangle) avec 3 noeuds communs
+C test for 2 elements (2 quadrangles or 1 triangle and 1 quadrangle) with 3 common nodes
               ELSEIF(NC == 3)THEN
                 IF(NA == 4)THEN
-C le 1er est un quadrangle
+C the 1st is a quadrangle
                   TAGE(I)=INVP2(NC2) ! tag numero noeud libre
                 ELSE
-C le 1er est un triangle
+C the 1st is a triangle
                   TAGE(I)=5
                 ENDIF
               ENDIF
@@ -202,7 +197,7 @@ C le 1er est un triangle
         END IF
       END DO
 
-c fin elimination des elements doubles
+c End elimination of double elements
 
       DO I=1,NUMNOD
         ITAG(I)=0
@@ -265,160 +260,16 @@ c fin elimination des elements doubles
 C
       RETURN
       END
-      !||====================================================================
-      !||    aletg               ../starter/source/airbag/fvmbag1.F
-      !||--- uses       -----------------------------------------------------
-      !||    monvol_struct_mod   ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
-      SUBROUTINE ALETG(T_MONVOLN, ELEM_ID, NN, SURF, NTG,
-     .     ITABINV, TAGE, NNO)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE GROUPDEF_MOD
-      USE MONVOL_STRUCT_MOD
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NN, NTG, NNO
-      INTEGER ITABINV(*), TAGE(*)
-      INTEGER, INTENT(INOUT) :: ELEM_ID(*)
-      TYPE(SURF_), INTENT(IN) :: SURF
-      TYPE(MONVOL_STRUCT_), INTENT(INOUT) :: T_MONVOLN
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER I, I1, I2, I3, I4, IAD1
-      INTEGER, DIMENSION(:, :), ALLOCATABLE :: TBEMTG
-C
-      ALLOCATE(TBEMTG(3, 2 * NN))
-      TBEMTG(1:3, 1:2 * NN) = 0
-      NTG=0
-      DO I=1,NN
-        IF(TAGE(I) == 5)CYCLE
-        I1=SURF%NODES(I,1)
-        I2=SURF%NODES(I,2)
-        I3=SURF%NODES(I,3)
-        I4=SURF%NODES(I,4)
-        IF(I3 == I4) I4 = 0
-        IF(TAGE(I) == 0)THEN
-          IF (I4==0) THEN
-C conservation du triangle
-            NTG=NTG+1
-            TBEMTG(1,NTG)=ITABINV(I1)
-            TBEMTG(2,NTG)=ITABINV(I2)
-            TBEMTG(3,NTG)=ITABINV(I3)
-            ELEM_ID(NTG) = SURF%ELEM(I)
-          ELSE
-C decoupage du quadrangle en 2 triangles
-            NTG=NTG+1
-            TBEMTG(1,NTG)=ITABINV(I1)
-            TBEMTG(2,NTG)=ITABINV(I2)
-            TBEMTG(3,NTG)=ITABINV(I4)
-            ELEM_ID(NTG) = SURF%ELEM(I)
-            IF (ITABINV(I4)/=ITABINV(I3)) THEN
-              NTG=NTG+1
-              TBEMTG(1,NTG)=ITABINV(I2)
-              TBEMTG(2,NTG)=ITABINV(I3)
-              TBEMTG(3,NTG)=ITABINV(I4)
-              ELEM_ID(NTG) = SURF%ELEM(I)
-            ENDIF
-          ENDIF
-C Remplacement du quadrangle en 1 triangle en conservant le noeud libre et ses 2 noeuds adjacents
-        ELSEIF(TAGE(I) == 1)THEN
-          NTG=NTG+1
-          TBEMTG(1,NTG)=ITABINV(I1)
-          TBEMTG(2,NTG)=ITABINV(I2)
-          TBEMTG(3,NTG)=ITABINV(I4)
-          ELEM_ID(NTG) = SURF%ELEM(I)
-        ELSEIF(TAGE(I) == 2)THEN
-          NTG=NTG+1
-          TBEMTG(1,NTG)=ITABINV(I2)
-          TBEMTG(2,NTG)=ITABINV(I3)
-          TBEMTG(3,NTG)=ITABINV(I1)
-          ELEM_ID(NTG) = SURF%ELEM(I)
-        ELSEIF(TAGE(I) == 3)THEN
-          NTG=NTG+1
-          TBEMTG(1,NTG)=ITABINV(I3)
-          TBEMTG(2,NTG)=ITABINV(I4)
-          TBEMTG(3,NTG)=ITABINV(I2)
-          ELEM_ID(NTG) = SURF%ELEM(I)
-        ELSEIF(TAGE(I) == 4)THEN
-          NTG=NTG+1
-          TBEMTG(1,NTG)=ITABINV(I4)
-          TBEMTG(2,NTG)=ITABINV(I1)
-          TBEMTG(3,NTG)=ITABINV(I3)
-          ELEM_ID(NTG) = SURF%ELEM(I)
-        ENDIF
-      ENDDO
-      T_MONVOLN%NTG = NTG
-      ALLOCATE(T_MONVOLN%ELEM(3, NTG))
-      DO I = 1, NTG
-        T_MONVOLN%ELEM(1:3, I) = TBEMTG(1:3, I)
-      ENDDO
-C
-      DEALLOCATE(TBEMTG)
-      RETURN
-      END
-      !||====================================================================
-      !||    fvbag_tagele   ../starter/source/airbag/fvmbag1.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
-      SUBROUTINE FVBAG_TAGELE(ELEM_ID, NN, SURF)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE GROUPDEF_MOD
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NN
-      INTEGER, INTENT(INOUT) :: ELEM_ID(*)
-      TYPE(SURF_), INTENT(IN) :: SURF
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER I, I1, I2, I3, I4, IAD1, NTG
-C
-      NTG=0
-      DO I=1,NN
-        I1=SURF%NODES(I,1)
-        I2=SURF%NODES(I,2)
-        I3=SURF%NODES(I,3)
-        I4=SURF%NODES(I,4)
-        IF(I3 == I4) I4 = 0
-        IF (I4==0) THEN
-C     conservation du triangle
-          NTG=NTG+1
-          ELEM_ID(NTG) = SURF%ELEM(I)
-        ELSE
-C     decoupage du quadrangle en 2 triangles
-          NTG=NTG+1
-          ELEM_ID(NTG) = SURF%ELEM(I)
-          NTG=NTG+1
-          ELEM_ID(NTG) = SURF%ELEM(I)
-        ENDIF
-      ENDDO
-C
-      RETURN
-      END
-      !||====================================================================
-      !||    fvverif                ../starter/source/airbag/fvmbag1.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh0                ../starter/source/airbag/fvmesh0.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+
+!||====================================================================
+!||    fvverif                ../starter/source/airbag/fvmbag1.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh0                ../starter/source/airbag/fvmesh0.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FVVERIF(NELA, ELEMA, X    , MONVID,
      .     VX3 , VY3  , VZ3  , VX1   , VY1,
      .     VZ1 , XB0  , YB0  , ZB0   ,
@@ -446,7 +297,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, ITAG(NUMNOD), IAD1, I1, I2, I3, I4, ISH34
+      INTEGER I, ITAG(NUMNOD), I1, I2, I3
       my_real
      .        NORM, SS, VX2, VY2, VZ2, LXMAX, LYMAX, XX, YY, ZZ, XL, YL,
      .        LZMAX, ZL, LX_OLD, LY_OLD, LZ_OLD
@@ -484,7 +335,7 @@ C-----------------------------------------------
       VX2=VY3*VZ1-VZ3*VY1
       VY2=VZ3*VX1-VX3*VZ1
       VZ2=VX3*VY1-VY3*VX1
-C Limites de l'airbag dans les directions de decoupage
+C Limits of the airbag in the cutting directions
       DO I=1,NUMNOD
         ITAG(I)=0
       ENDDO
@@ -566,14 +417,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    fvnodi                ../starter/source/airbag/fvmbag1.F
-      !||--- called by ------------------------------------------------------
-      !||    init_monvol           ../starter/source/airbag/init_monvol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    monvol_struct_mod     ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvnodi                ../starter/source/airbag/fvmbag1.F
+!||--- called by ------------------------------------------------------
+!||    init_monvol           ../starter/source/airbag/init_monvol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    monvol_struct_mod     ../starter/share/modules1/monvol_struct_mod.F
+!||====================================================================
       SUBROUTINE FVNODI(NN, SURF_NODES, NNB, ITABINV, T_MONVOLN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -598,9 +449,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I1, I2, I3, I4, IAD1, NNS
+      INTEGER I, I1, I2, I3, I4, NNS
       INTEGER, DIMENSION(:), ALLOCATABLE :: BUFNODE
-      INTEGER :: IFOUND
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAG, ITAG_SURFEXT, ITABINV_SURFEXT
       INTEGER(8) :: VEC_PTR_SURFINT
 
@@ -668,88 +518,14 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    fvtgi               ../starter/source/airbag/fvmbag1.F
-      !||--- uses       -----------------------------------------------------
-      !||    monvol_struct_mod   ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
-      SUBROUTINE FVTGI(T_MONVOLN, ELEM_Id, NN, SURF, NTG, ITABINV)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE GROUPDEF_MOD
-      USE MONVOL_STRUCT_MOD
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NN, NTG
-      INTEGER ITABINV(*),ELEM_ID(*)
-      TYPE(SURF_), INTENT(IN) :: SURF
-      TYPE(MONVOL_STRUCT_), INTENT(INOUT) :: T_MONVOLN
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER I, I1, I2, I3, I4, IAD1, J
-      INTEGER, DIMENSION(:, :), ALLOCATABLE :: ELEMTG, BUFELEM
-      ALLOCATE(ELEMTG(3, 2 * NN), BUFELEM(3, T_MONVOLN%NTG))
-      DO I = 1, T_MONVOLN%NTG
-        BUFELEM(1:3, I) = T_MONVOLN%ELEM(1:3, I)
-      ENDDO
-      DEALLOCATE(T_MONVOLN%ELEM)
-C
-      NTG=0
-      DO I=1,NN
-        I1=SURF%NODES(I,1)
-        I2=SURF%NODES(I,2)
-        I3=SURF%NODES(I,3)
-        I4=SURF%NODES(I,4)
-        IF(I3 == I4) I4 = 0
-        IF (I4==0) THEN
-C conservation du triangle
-          NTG=NTG+1
-          ELEMTG(1,NTG)=ITABINV(I1)
-          ELEMTG(2,NTG)=ITABINV(I2)
-          ELEMTG(3,NTG)=ITABINV(I3)
-          ELEM_ID(NTG) = SURF%ELEM(I)
-        ELSE
-C decoupage du quadrangle en 2 triangles
-          NTG=NTG+1
-          ELEMTG(1,NTG)=ITABINV(I1)
-          ELEMTG(2,NTG)=ITABINV(I2)
-          ELEMTG(3,NTG)=ITABINV(I3)
-          ELEM_ID(NTG) = SURF%ELEM(I)
-          IF (ITABINV(I4)/=ITABINV(I3)) THEN
-            NTG=NTG+1
-            ELEMTG(1,NTG)=ITABINV(I1)
-            ELEMTG(2,NTG)=ITABINV(I3)
-            ELEMTG(3,NTG)=ITABINV(I4)
-            ELEM_ID(NTG) = SURF%ELEM(I)
-          ENDIF
-        ENDIF
-      ENDDO
-      T_MONVOLN%NTGI = NTG
-      ALLOCATE(T_MONVOLN%ELEM(3, T_MONVOLN%NTG + T_MONVOLN%NTGI))
-      DO I = 1, T_MONVOLN%NTG
-        T_MONVOLN%ELEM(1:3, I) = BUFELEM(1:3, I)
-      ENDDO
-      DO I = 1, T_MONVOLN%NTGI
-        T_MONVOLN%ELEM(1:3, I + T_MONVOLN%NTG) = ELEMTG(1:3, I)
-      ENDDO
-C
-      DEALLOCATE(ELEMTG, BUFELEM)
-      RETURN
-      END
-      !||====================================================================
-      !||    fvnodbr     ../starter/source/airbag/fvmbag1.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh0     ../starter/source/airbag/fvmesh0.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod   ../starter/share/modules1/fvbag_mod.F
-      !||====================================================================
+
+!||====================================================================
+!||    fvnodbr     ../starter/source/airbag/fvmbag1.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh0     ../starter/source/airbag/fvmesh0.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod   ../starter/share/modules1/fvbag_mod.F
+!||====================================================================
       SUBROUTINE FVNODBR(IBUFA, NNA, NNFV, IFV, NB_NODE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -787,15 +563,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    fvnormal   ../starter/source/airbag/fvmbag1.F
-      !||--- called by ------------------------------------------------------
-      !||    fvbric1    ../starter/source/airbag/fvbric1.F
-      !||    fvelarea   ../starter/source/airbag/fvelarea.F
-      !||    fvlength   ../starter/source/airbag/fvlength.F
-      !||    fvmesh1    ../starter/source/airbag/fvmesh.F
-      !||    fvvolu     ../starter/source/airbag/fvvolu.F
-      !||====================================================================
+!||====================================================================
+!||    fvnormal   ../starter/source/airbag/fvmbag1.F
+!||--- called by ------------------------------------------------------
+!||    fvbric1    ../starter/source/airbag/fvbric1.F
+!||    fvelarea   ../starter/source/airbag/fvelarea.F
+!||    fvlength   ../starter/source/airbag/fvlength.F
+!||    fvmesh1    ../starter/source/airbag/fvmesh.F
+!||    fvvolu     ../starter/source/airbag/fvvolu.F
+!||====================================================================
       SUBROUTINE FVNORMAL(X, N1, N2, N3, N4, NX, NY, NZ)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -805,8 +581,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N1, N2, N3, N4
-      my_real
-     .        X(3,*), NX, NY, NZ
+      my_real X(3,*), NX, NY, NZ
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

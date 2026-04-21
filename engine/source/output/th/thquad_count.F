@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thquad_count   ../engine/source/output/th/thquad_count.F
-      !||--- called by ------------------------------------------------------
-      !||    init_th        ../engine/source/output/th/init_th.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar           ../engine/source/input/nvar.F
-      !||====================================================================
+!||====================================================================
+!||    thquad_count   ../engine/source/output/th/thquad_count.F
+!||--- called by ------------------------------------------------------
+!||    init_th        ../engine/source/output/th/init_th.F
+!||====================================================================
       SUBROUTINE THQUAD_COUNT(NTHGRP2 ,ITHGRP,WA_SIZE,INDEX_WA_QUAD,
      1                        IPARG,ITHBUF,SITHBUF  )
 C-----------------------------------------------
@@ -41,7 +39,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
@@ -56,9 +53,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER II, KRK, LL, I, J, K, L ,N, IH, IP, NG, MTE, NUVAR,
-     .   NC1, NC2, NC3, NC4,  NEL, MTN1,KK(6),IJ,NPTR,NPTS,
-     .   IR,IS
+      INTEGER II, I, J, K, N, IH, IP, NG, MTE, NUVAR, 
+     . NEL
       LOGICAL :: BOOL
       INTEGER :: J_FIRST,NITER,IADB,NN,IADV,NVAR,ITYP,IJK
       INTEGER, DIMENSION(NTHGRP2) :: INDEX_QUAD
@@ -106,13 +102,11 @@ C
 C
             IF (K==N)THEN
                 IH=IH+1
-                IF (IMACH==3) THEN
-C recherche du ii correct
-                    II = ((IH-1) - IADB)*NVAR
-                    DO WHILE((ITHBUF(IH+NN)/=ISPMD).AND.(IH<IADB+NN))
-                        IH = IH + 1
-                    ENDDO
-                ENDIF
+C search for the correct ii
+                II = ((IH-1) - IADB)*NVAR
+                DO WHILE((ITHBUF(IH+NN)/=ISPMD).AND.(IH<IADB+NN))
+                    IH = IH + 1
+                ENDDO
                 IF (IH > IADB+NN) GOTO 666
                 WA_SIZE = WA_SIZE + NVAR + 1
             ENDIF

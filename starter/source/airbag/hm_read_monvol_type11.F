@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,32 +20,38 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_monvol_type11        ../starter/source/airbag/hm_read_monvol_type11.F
-      !||--- called by ------------------------------------------------------
-      !||    read_monvol                  ../starter/source/airbag/read_monvol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                       ../starter/source/output/message/message.F
-      !||    freerr                       ../starter/source/starter/freform.F
-      !||    hm_get_float_array_index     ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv                ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index       ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                  ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string_index          ../starter/source/devtools/hm_reader/hm_get_string_index.F
-      !||    monvol_check_surfclose       ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_check_venthole_surf   ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_compute_volume        ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_orient_surf           ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_reverse_normals       ../starter/share/modules1/monvol_struct_mod.F
-      !||    origin                       ../starter/source/model/remesh/build_admesh.F
-      !||    usr2sys                      ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                  ../starter/share/message_module/message_mod.F
-      !||    monvol_struct_mod            ../starter/share/modules1/monvol_struct_mod.F
-      !||    submodel_mod                 ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_monvol_type11_mod   ../starter/source/airbag/hm_read_monvol_type11.F
+!||--- called by ------------------------------------------------------
+!||    read_monvol                 ../starter/source/airbag/read_monvol.F
+!||====================================================================
+      MODULE HM_READ_MONVOL_TYPE11_MOD
+      CONTAINS
+!||====================================================================
+!||    hm_read_monvol_type11        ../starter/source/airbag/hm_read_monvol_type11.F
+!||--- called by ------------------------------------------------------
+!||    read_monvol                  ../starter/source/airbag/read_monvol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                       ../starter/source/output/message/message.F
+!||    freerr                       ../starter/source/starter/freform.F
+!||    hm_get_float_array_index     ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv                ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index       ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                  ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string_index          ../starter/source/devtools/hm_reader/hm_get_string_index.F
+!||    monvol_check_surfclose       ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_check_venthole_surf   ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_compute_volume        ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_orient_surf           ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_reverse_normals       ../starter/share/modules1/monvol_struct_mod.F
+!||    usr2sys                      ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                  ../starter/share/message_module/message_mod.F
+!||    monvol_struct_mod            ../starter/share/modules1/monvol_struct_mod.F
+!||    submodel_mod                 ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MONVOL_TYPE11(T_MONVOLN, IPM, IGEO, ITABM1, 
-     .     SENSORS, NPT, PLD, IFRAME, XFRAME, IGRBRIC,
+     .     SENSORS, XFRAME, IGRBRIC,
      .     UNITAB, LUID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG, 
      .     LSUBMODEL)
 C-----------------------------------------------
@@ -61,6 +67,7 @@ C-----------------------------------------------
       USE MONVOL_STRUCT_MOD
       USE SUBMODEL_MOD
       USE SENSOR_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -80,10 +87,10 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(UNIT_TYPE_), INTENT(IN) :: UNITAB
-      INTEGER, INTENT(IN) :: LUID, IPM(NPROPMI, NUMMAT), IGEO(NPROPGI, NUMGEO), ITABM1(NUMNOD), IFRAME(LISKN,NUMFRAM+1), NPT(*)
+      INTEGER, INTENT(IN) :: LUID, IPM(NPROPMI, NUMMAT), IGEO(NPROPGI, NUMGEO), ITABM1(NUMNOD)
       INTEGER, INTENT(IN) :: NPC(*), ITAB(NUMNOD), IXC(NIXC, NUMELC), IXTG(NIXTG, NUMELTG)
       my_real, INTENT(IN) :: X(3, NUMNOD), GEO(NPROPG, NUMGEO), PM(NPROPM, NUMMAT),
-     .     XFRAME(NXFRAME, NUMFRAM+1), PLD(2, *)
+     .     XFRAME(NXFRAME, NUMFRAM+1)
       TYPE (SURF_), INTENT(INOUT), DIMENSION(NSURF) :: IGRSURF
       TYPE(MONVOL_STRUCT_), INTENT(INOUT) :: T_MONVOLN
       TYPE (GROUP_)  , DIMENSION(NGRBRIC), INTENT(IN) :: IGRBRIC
@@ -118,12 +125,12 @@ C-----------------------------------------------
       my_real :: MI, RHOI, TI2, ESPECI, CPA, CPB, CPC, CPD, CPE, CPF, MW_TMP, RMWG, 
      .     CPG, CVG, GAMA, SHOL
       LOGICAL lFOUND
-      INTEGER KFRAME, IMESH_ALL, NSWITCH, ISWITCH, NBX, NBY, NBZ, IBRIC
+      INTEGER IMESH_ALL, NSWITCH, ISWITCH, NBX, NBY, NBZ, IBRIC
       INTEGER IREF, IGMERG, ILVOUT, NLAYER, NFACMAX, NPPMAX, IFVANI
-      INTEGER I1,I2,I3, I4, IGBRIC, NBRIC, NN, ISH34
+      INTEGER I1,I2,I3, I4, NBRIC, NN, ISH34
       my_real TSWITCH, PSWITCH, LX, LY, LZ, CNMERG, QA, QB, PTOLE,HMIN, CFL_COEF, DTMIN, SJET, CGMERG
       my_real NX, NY, NZ, XX, YY, ZZ, X13, Y13, Z13, X24, Y24, Z24
-      my_real ORIGX, ORIGY, ORIGZ, DIR2X, DIR2Y, DIR2Z, DIR, DS, DIRX, DIRY, DIRZ, TMP
+      my_real ORIGX, ORIGY, ORIGZ, DIR2X, DIR2Y, DIR2Z, DIR, DS, DIRX, DIRY, DIRZ
       INTEGER :: KMESH,ID_DT_OPTION, IH3D_FLAG
       LOGICAL :: IS_AVAILABLE
 C-----------------------------------------------
@@ -137,6 +144,8 @@ C-----------------------------------------------
       MESS = 'MONITORED VOLUME DEFINITION             '        
       lFOUND=.FALSE.
       ID_DT_OPTION=2
+      RMWI = ZERO
+
 C     =======
 C     Reading
 C     =======
@@ -201,7 +210,7 @@ C     =======
          ALLOCATE(T_MONVOLN%RBAGHOL(NRBHOL, NVENT))
          T_MONVOLN%RBAGHOL(1:NRBHOL, 1:NVENT) = ZERO
       ENDIF
-      IF (NVENT > 0) THEN
+!     IF (NVENT > 0) THEN
          ALLOCATE(IPVENT(NVENT), IFVENT(NVENT), AVENT(NVENT), BVENT(NVENT))
          ALLOCATE(TVENT(NVENT), TSTOPE(NVENT), DPDEF(NVENT), DTPDEF(NVENT),
      .        IDTPDEF(NVENT))
@@ -211,7 +220,7 @@ C     =======
      .        FPORP1(NVENT), FPORA1(NVENT))
          ALLOCATE(IBLOCKAGE(NVENT), CLEAK(NVENT))
          ALLOCATE(IVDP(NVENT), FVDP(NVENT))
-      ENDIF
+!     ENDIF
       IF (NVENTHOLES > 0) THEN
          DO II = 1, NVENTHOLES
             VENTTITLE = ''
@@ -1131,7 +1140,6 @@ C     ===================
       IF (ALLOCATED(FPA)) DEALLOCATE(FPA)     
       IF (ALLOCATED(FPZ)) DEALLOCATE(FPZ)     
       IF (ALLOCATED(I_INJSYS)) DEALLOCATE(I_INJSYS)  
-      IF (NVENT > 0) THEN
          DEALLOCATE(IPVENT, IFVENT, AVENT, BVENT)
          DEALLOCATE(TVENT, TSTOPE, DPDEF, DTPDEF,
      .        IDTPDEF)
@@ -1141,7 +1149,6 @@ C     ===================
      .        FPORP1, FPORA1)
          DEALLOCATE(IBLOCKAGE, CLEAK)
          DEALLOCATE(IVDP, FVDP)
-      ENDIF
 C-----------------------------------------------
 C     E n d   o f   s o u r c e
 C-----------------------------------------------
@@ -1169,9 +1176,6 @@ C-----------------------------------------------
  1401 FORMAT(
      .     5X,'INITIAL THERMODYNAMIC EQUILIBRIUM IS SET AT TIME 0'
      .     /5X,'--------------------------------------------------'/)
- 1402 FORMAT(
-     .     5X,'INITIAL THERMODYNAMIC EQUILIBRIUM IS SET AT INJECTION TIME'
-     .     /5X,'----------------------------------------------------------'/)
  1404 FORMAT(
      .     5X,'THERMODYNAMIC EQUILIBRIUM IS SET EVERY CYCLE UP TO INJECTION TIME'/)
  1405 FORMAT(
@@ -1197,8 +1201,6 @@ C-----------------------------------------------
      .     5X,'INJECTOR. . . . . . . . . . . . . . . .=',I10,
      .     /10X,'INJECTOR NUMBER . . . . . . . . . . . .=',I10,
      .     /10X,'SENSOR NUMBER . . . . . . . . . . . . .=',I10)
- 1435 FORMAT(15X,'TIME FUNCTION FOR INCOMING GAS VELOCITY=',I10,
-     .     /15X,'SCALE FACTOR FOR INCOMING GAS VELOCITY.=',1PG20.13)
  1442 FORMAT(
      .     /15X,'MIXTURE CHARACTERISTICS                 ',
      .     /15X,'AT BEGINNING OF INJECTION               ',
@@ -1214,44 +1216,11 @@ C-----------------------------------------------
  1445 FORMAT(
      .     15X,'INFLATOR SURFACE ID . . . . . . . . . .=',I10,
      .     /15X,'INITIAL SURFACE OF INFLATOR . . . . . .=',1PG20.13)
- 1455 FORMAT(
-     .     /10X,'JETTING OPTION. . . . . . . . . . . . .=',I10,
-     .     /10X,'----------------------------------------')
- 1460 FORMAT(
-     .     15X,'CONICAL JET . . . . . . . . . . . . . .',
-     .     /15X,'NODE NUMBER DEFINING INJECTION CENTER .=',I10,
-     .     /15X,'NODE NUMBER DEFINING INJECTION AXIS . .=',I10,
-     .     /15X,'JETTING PRESSURE TIME CURVE NUMBER. . .=',I10,
-     .     /15X,'JETTING PRESSURE THETA CURVE NUMBER . .=',I10,
-     .     /15X,'JETTING PRESSURE DIST. CURVE NUMBER . .=',I10,
-     .     /15X,'TIME FUNCTION SCALE FACTOR          . .=',1PG20.13,
-     .     /15X,'THETA FUNCTION SCALE FACTOR         . .=',1PG20.13,
-     .     /15X,'DIST FUNCTION SCALE FACTOR          . .=',1PG20.13/)
- 1461 FORMAT(
-     .     15X,'DIHEDRAL JET. . . . . . . . . . . . . .',
-     .     /15X,'NODE NUMBER DEFINING INJECTION CENTER .=',I10,
-     .     /15X,'NODE NUMBER DEFINING INJECTION AXIS . .=',I10,
-     .     /15X,'NODE NUMBER DEFINING BASE LINE. . . . .=',I10,
-     .     /15X,'JETTING PRESSURE TIME CURVE NUMBER. . .=',I10,
-     .     /15X,'JETTING PRESSURE THETA CURVE NUMBER . .=',I10,
-     .     /15X,'JETTING PRESSURE DIST. CURVE NUMBER . .=',I10,
-     .     /15X,'TIME FUNCTION SCALE FACTOR          . .=',1PG20.13, 
-     .     /15X,'THETA FUNCTION SCALE FACTOR         . .=',1PG20.13,
-     .     /15X,'DIST FUNCTION SCALE FACTOR          . .=',1PG20.13)
  1470 FORMAT(
      .     /5X,'VENT HOLES AND POROUS FABRIC SURFACES   ',
      .     /5X,'-------------------------------------   ',
      .     /5X,'NUMBER OF VENT HOLES AND POROUS SURFACES . .=',I10,
      .     /5X,'INJECTION TIME TINJ. . . . . . . . . . . . .=',1PG20.13)
- 1471 FORMAT(
-     .     5X,'VENTING START TIME SHIFT . . . . . . . . . .=',I10,
-     .     /5X,'  0 : NO SHIFT',
-     .     /5X,'  1 : JETTING FUNCTIONS ARE SHIFTED BY INJECTION TIME',
-     .     /5X,'  2 : JETTING AND VENTING FUNCTIONS ARE SHIFTED BY',
-     .     /5X,'      INJECTION TIME TINJ',
-     .     /5X,'  3 : JETTING AND VENTING FUNCTIONS ARE SHIFTED',
-     .     /5X,'      BY TINJ FOR JETTING FUNCTIONS',
-     .     /5X,'      BY TINJ+TSTART FOR VENTING FUNCTIONS')
  1472 FORMAT(
      .     / 5X,'VENT HOLE NUMBER. . . . . . . . . . . .=',I10,
      .     /15X,'VENT HOLE SURFACE ID. . . . . . . . . .=',I10)
@@ -1344,45 +1313,7 @@ C-----------------------------------------------
      .     /15X,'        SCALE FACTOR. . . . . . . . . .=',1PG20.13)
  1700 FORMAT(5X,'FVMBAG PARAMETERS                       ',
      .     /5X,'-----------------                       ')
- 1704 FORMAT(15X,'AIRBAG CUTTING FRAME:                   ')
- 1705 FORMAT(15X,'FRAME NUMBER. . . . . . . . . . . . . .=',I10)
  1706 FORMAT(15X,'MESH HOLES. . . . . . . . . . . . . . .=',I10)
- 1710 FORMAT(15X,'   ORIGIN X COORDINATE. . . . . . . . .=',1PG20.13,
-     .     /15X,'   ORIGIN Y COORDINATE. . . . . . . . .=',1PG20.13,
-     .     /15X,'   ORIGIN Z COORDINATE. . . . . . . . .=',1PG20.13,
-     .     /15X,'   DIRECTION 1 X COORDINATE . . . . . .=',1PG20.13,
-     .     /15X,'   DIRECTION 1 Y COORDINATE . . . . . .=',1PG20.13,
-     .     /15X,'   DIRECTION 1 Z COORDINATE . . . . . .=',1PG20.13,
-     .     /15X,'   DIRECTION 3 X COORDINATE . . . . . .=',1PG20.13,
-     .     /15X,'   DIRECTION 3 Y COORDINATE . . . . . .=',1PG20.13,
-     .     /15X,'   DIRECTION 3 Z COORDINATE . . . . . .=',1PG20.13,
-     .     /15X,'CUTTING LENGTH IN LOCAL DIRECTION 1 . .=',1PG20.13,
-     .     /15X,'CUTTING LENGTH IN LOCAL DIRECTION 2 . .=',1PG20.13,
-     .     /15X,'CUTTING LENGTH IN LOCAL DIRECTION 3 . .=',1PG20.13,
-     .     /15X,'NUMBER OF CELLS IN LOCAL DIRECTION 1. .=',I10,
-     .     /15X,'NUMBER OF CELLS IN LOCAL DIRECTION 2. .=',I10,
-     .     /15X,'NUMBER OF CELLS IN LOCAL DIRECTION 3. .=',I10,
-     .     /15X,'ADDITIONAL BRICK GROUP NUMBER . . . . .=',I10,
-     .     /15X,'INTERNAL SURFACE ID. .  . . . . . . . .=',I10,
-     .     /15X,'FLAG FOR MESH ON REFERENCE METRICS. . .=',I10,
-     .     /15X,'CELL MERGING STRATEGY:                  ',
-     .     /15X,'   GLOBAL MERGING TYPE. . . . . . . . .=',I10,
-     .     /15X,'   GLOBAL MERGING COEFFICIENT . . . . .=',1PG20.13,
-     .     /15X,'   NEIGHBORHOOD MERGING COEFFICIENT . .=',1PG20.13,
-     .     /15X,'TOLERANCE FOR SMALL SEGMENT REMOVAL . .=',1PG20.13,
-     .     /15X,'QUADRATIC BULK VISCOSITY. . . . . . . .=',1PG20.13,
-     .     /15X,'LINEAR BULK VISCOSITY . . . . . . . . .=',1PG20.13,
-     .     /15X,'MINIMUM HEIGHT. . . . . . . . . . . . .=',1PG20.13,
-     .     /15X,'DT SCALE FACTOR . . . . . . . . . . . .=',1PG20.13,
-     .     /15X,'MINIMUM TIMESTEP. . . . . . . . . . . .=',1PG20.13,
-     .     /15X,'OUTPUT LEVEL. . . . . . . . . . . . . .=',I10,
-     .     /15X,'MEMORY PARAMETERS:                      ',
-     .     /15X,'   ESTIMATED NUMBER OF AIRBAG LAYERS. .=',I10,
-     .     /15X,'   ESTIMATED MAXIMUM NUMBER OF AIRBAG   ',
-     .     /15X,'       FACETS PER CUTTING CELL. . . . .=',I10,
-     .     /15X,'   ESTIMATED MAXIMUM NUMBER OF POINTS   ',
-     .     /15X,'       PER POLYGON. . . . . . . . . . .=',I10,
-     .     /15X,  'FLAG FOR ANIMATION FILE A000. . . . . .=',I10)
  1789 FORMAT(15X, 'SWITCH OPTION (ISWITCH). . . . . . . . =',I10)
  1790 FORMAT(15X, '       = 1 SWITCH TO UNIFORM PRESSURE')
  1791 FORMAT(15X, '       = 2 MERGE TO SINGLE FV INSIDE EACH CHAMBER') 
@@ -1402,3 +1333,4 @@ C-----------------------------------------------
      .     /5X,'   IH3D_FLAG (H3D OUTPUT). . . . . . . .=', I10)
       
       END SUBROUTINE HM_READ_MONVOL_TYPE11
+      END MODULE HM_READ_MONVOL_TYPE11_MOD

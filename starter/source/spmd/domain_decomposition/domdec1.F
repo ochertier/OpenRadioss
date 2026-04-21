@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    domdec1   ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur    ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    dd_ani    ../starter/source/output/anim/dd_ani.F
-      !||    dd_fr     ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||    dd_fr_2   ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||    dd_frx    ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||    nlocal    ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    domdec1       ../starter/source/spmd/domain_decomposition/domdec1.F
+!||--- called by ------------------------------------------------------
+!||    lectur        ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    dd_ani        ../starter/source/output/anim/dd_ani.F
+!||    dd_fr         ../starter/source/spmd/domain_decomposition/domdec1.F
+!||    dd_fr_2       ../starter/source/spmd/domain_decomposition/domdec1.F
+!||    dd_frx        ../starter/source/spmd/domain_decomposition/domdec1.F
+!||    nlocal        ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE DOMDEC1(
      1     IPARG ,IXS   ,IXQ        ,IXC   ,IXT    ,
      2     IXP   ,IXR   ,IXTG  ,DD_IAD ,
@@ -41,7 +42,7 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-
+      use element_mod , only : nixs,nixq,nixc,nixp,nixt,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,7 +54,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "vect01_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr12_c.inc"
 #include      "param_c.inc"
 #include      "scr23_c.inc"
@@ -69,8 +69,7 @@ C-----------------------------------------------
      .        DD_IAD_PREV(NSPMD+1,*),
      .        IXS10(6,*),IXS20(12,*),IXS16(8,*), IXTG6(4,*),
      .        KXX(NIXX,*), IXX(*), KXSP(NISP,*), IXSP(*), CEPSP(*)
-      my_real
-     .        X(3,NUMNOD)
+      my_real :: X(3,NUMNOD)
 C-----------------------------------------------
 C   F u n c t i o n
 C-----------------------------------------------
@@ -92,7 +91,7 @@ C
         ENDDO
       ENDDO
 C                
-C phase 2 : frontiere 
+C phase 2 : boundary
 C
       DO NG=1,NGROUP
         ITY = IPARG(5,NG)
@@ -156,7 +155,7 @@ C
           ICON = 3
           DIM = 4
           IF(ICNOD==6)THEN
-C shift de 1 sur ixtg6
+C shift of 1 on ixtg6
             CALL DD_FR(
      .          IXTG6(4,1+NFT-NUMELTG+NUMELTG6),P,NEL,
      .          ICON,DIM)
@@ -164,36 +163,16 @@ C shift de 1 sur ixtg6
         ELSE IF(ITY==51) THEN
           ICON = 1
           DIM  = NISP
-C kxsp decale pour retrouver KXSP(3) = no noeud
+C kxsp shifted to retrieve KXSP(3) = node id
           CALL DD_FR(KXSP(2,NFT+1),P,NEL,ICON,DIM)
         ELSE IF(ITY==100) THEN
           DIM = NIXX 
           CALL DD_FRX(KXX(1,NFT+1),IXX,P,NEL,DIM)
         ENDIF        
       END DO
-c      IF(NUMSPH>0)THEN
-c        DO PP = 1, NSPMD
-c          DO P = 1, NSPMD
-c            DOMAINE(PP,P) = 0
-c          END DO
-c        END DO
-c        DO I = 1, NUMSPH
-c          N = KXSP(3,I)
-c          PP = CEPSP(I)+1
-c          DO P = 1, NSPMD
-c            IF(MOD(FRONT(N,P),10)==1) THEN
-c              DOMAINE(PP,P) = DOMAINE(PP,P) + 1
-c            END IF
-c          END DO
-c       END DO
-c       DO P = 1, NSPMD
-c         print *,P,'value :',(DOMAINE(P,PP),PP=1,NSPMD)
-c       END DO
-c      END IF
 
-C              3) Ecrire le fichier Anim de la DD
-C  a condition que imach==3 !
-      IF (IMACH==3.AND.DECANI==1.AND.ANIM_VERS<40) THEN
+C              3) ANIM file for domain decomposition
+      IF (DECANI==1.AND.ANIM_VERS<40) THEN
         CALL DD_ANI(X     ,IXS   ,IXQ  ,IXC  ,
      .              IXT   ,IXP   ,IXR  ,IXTG ,
      .              IPARG ,KXSP  ,IXSP )
@@ -202,13 +181,13 @@ C  a condition que imach==3 !
       RETURN
       END
 
-      !||====================================================================
-      !||    dd_fr        ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||--- called by ------------------------------------------------------
-      !||    domdec1      ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus   ../starter/source/spmd/node/frontplus.F
-      !||====================================================================
+!||====================================================================
+!||    dd_fr        ../starter/source/spmd/domain_decomposition/domdec1.F
+!||--- called by ------------------------------------------------------
+!||    domdec1      ../starter/source/spmd/domain_decomposition/domdec1.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus   ../starter/source/spmd/node/frontplus.F
+!||====================================================================
       SUBROUTINE DD_FR(IX,P,NEL,ICON,DIM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -221,7 +200,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ICON,NEL,DIM,P,K,CPT
+      INTEGER ICON,NEL,DIM,P
       INTEGER IX(DIM,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -230,8 +209,8 @@ C-----------------------------------------------
 C-----------------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------------
-C         Phase de comptage des noeuds frontieres
-C         determiner les noeuds utilises
+C         Phase of counting boundary nodes
+C         determine the used nodes
 C         mettre a 1 la FRONTIERE(sd) correspondante
       DO I=1,ICON
         DO J=1,NEL
@@ -245,13 +224,13 @@ C         mettre a 1 la FRONTIERE(sd) correspondante
       RETURN
       END
 
-      !||====================================================================
-      !||    dd_frx       ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||--- called by ------------------------------------------------------
-      !||    domdec1      ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus   ../starter/source/spmd/node/frontplus.F
-      !||====================================================================
+!||====================================================================
+!||    dd_frx       ../starter/source/spmd/domain_decomposition/domdec1.F
+!||--- called by ------------------------------------------------------
+!||    domdec1      ../starter/source/spmd/domain_decomposition/domdec1.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus   ../starter/source/spmd/node/frontplus.F
+!||====================================================================
       SUBROUTINE DD_FRX(KXX,IXX,P,NEL,DIM)
 C
 C-----------------------------------------------
@@ -274,8 +253,8 @@ C-----------------------------------------------
 C-----------------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------------
-C         Phase de comptage des noeuds frontieres
-C         determiner les noeuds utilises
+C         Phase of counting boundary nodes
+C         determine the used nodes
 C         mettre a 1 la FRONTIERE(sd) correspondante
       DO I=1,NEL
           ICON = KXX(3,I)
@@ -290,13 +269,13 @@ C         mettre a 1 la FRONTIERE(sd) correspondante
 
       RETURN
       END
-      !||====================================================================
-      !||    dd_fr_2      ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||--- called by ------------------------------------------------------
-      !||    domdec1      ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus   ../starter/source/spmd/node/frontplus.F
-      !||====================================================================
+!||====================================================================
+!||    dd_fr_2      ../starter/source/spmd/domain_decomposition/domdec1.F
+!||--- called by ------------------------------------------------------
+!||    domdec1      ../starter/source/spmd/domain_decomposition/domdec1.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus   ../starter/source/spmd/node/frontplus.F
+!||====================================================================
       SUBROUTINE DD_FR_2(IX,P,NEL,ICON,DIM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -318,8 +297,8 @@ C-----------------------------------------------
 C-----------------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------------
-C         Phase de comptage des noeuds frontieres
-C         determiner les noeuds utilises
+C         Phase of counting boundary nodes
+C         determine the used nodes
 C         mettre a 1 la FRONTIERE(sd) correspondante
       DO I=1,ICON
         DO J=1,NEL

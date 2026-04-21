@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    w_iskewsp   ../starter/source/restart/ddsplit/w_iskewsp.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    w_iskewsp   ../starter/source/restart/ddsplit/w_iskewsp.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE W_ISKEWSP(ISKEW,NODGLOB,NUMNOD_L,NUMSPH_L,CEPSP,PROC,LEN_IA)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -65,7 +65,7 @@ C
 C
       DO I = 1, NUMNOD_L
         ISK = ISKEW(NODGLOB(I))
-        IF(ISK<=NUMSKW+1)THEN     ! no skew classique
+        IF(ISK<=NUMSKW+1)THEN     ! Classic no skew
           ITMP(I) = ISK
         ELSEIF(ISK <= NUMSKW+NUMSPH+1 .AND.NSPCOND > 0 .AND. NUMSPH > 0 )THEN                      ! no skew sph
           NG = ISK-NUMSKW-1

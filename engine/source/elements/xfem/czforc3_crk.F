@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,47 +20,48 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    czforc3_crk      ../engine/source/elements/xfem/czforc3_crk.F
-      !||--- called by ------------------------------------------------------
-      !||    forintc          ../engine/source/elements/forintc.F
-      !||--- calls      -----------------------------------------------------
-      !||    cbilan           ../engine/source/elements/shell/coque/cbilan.F
-      !||    ccoor3z_crk      ../engine/source/elements/xfem/ccoor3z_crk.F
-      !||    cmain3           ../engine/source/materials/mat_share/cmain3.F
-      !||    cncoef3b         ../engine/source/elements/sh3n/coquedk/cncoef3.F
-      !||    cncoefort        ../engine/source/elements/sh3n/coquedk/cncoef3.F
-      !||    cndt3            ../engine/source/elements/sh3n/coquedk/cndt3.F
-      !||    cupdtn3_crk      ../engine/source/elements/xfem/xfemfsky.F
-      !||    czcorc1          ../engine/source/elements/shell/coquez/czcorc.F
-      !||    czdef            ../engine/source/elements/shell/coquez/czdef.F
-      !||    czdefrz          ../engine/source/elements/shell/coquez/czdef.F
-      !||    czfintce         ../engine/source/elements/shell/coquez/czfintce.F
-      !||    czfintcrz        ../engine/source/elements/shell/coquez/czfintce.F
-      !||    czfintn1         ../engine/source/elements/shell/coquez/czfintn.F
-      !||    czfintn_or       ../engine/source/elements/shell/coquez/czfintn.F
-      !||    czfintnm         ../engine/source/elements/shell/coquez/czfintn.F
-      !||    czfintnrz_or     ../engine/source/elements/shell/coquez/czfintn.F
-      !||    czproj1          ../engine/source/elements/shell/coquez/czproj.F
-      !||    czstra3          ../engine/source/elements/shell/coquez/czstra3.F
-      !||    startime         ../engine/source/system/timer_mod.F90
-      !||    stoptime         ../engine/source/system/timer_mod.F90
-      !||    tempcg           ../engine/source/materials/mat_share/tempcg.F
-      !||    thermc           ../engine/source/materials/mat_share/thermc.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod    ../engine/share/modules/crackxfem_mod.F
-      !||    drape_mod        ../engine/share/modules/drape_mod.F
-      !||    dt_mod           ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    failwave_mod     ../common_source/modules/failwave_mod.F
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||    stack_mod        ../engine/share/modules/stack_mod.F
-      !||    table_mod        ../engine/share/modules/table_mod.F
-      !||    timer_mod        ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    czforc3_crk      ../engine/source/elements/xfem/czforc3_crk.F
+!||--- called by ------------------------------------------------------
+!||    forintc          ../engine/source/elements/forintc.F
+!||--- calls      -----------------------------------------------------
+!||    cbilan           ../engine/source/elements/shell/coque/cbilan.F
+!||    ccoor3z_crk      ../engine/source/elements/xfem/ccoor3z_crk.F
+!||    cmain3           ../engine/source/materials/mat_share/cmain3.F
+!||    cncoef3b         ../engine/source/elements/sh3n/coquedk/cncoef3.F
+!||    cncoefort        ../engine/source/elements/sh3n/coquedk/cncoef3.F
+!||    cndt3            ../engine/source/elements/sh3n/coquedk/cndt3.F
+!||    cupdtn3_crk      ../engine/source/elements/xfem/xfemfsky.F
+!||    czcorc1          ../engine/source/elements/shell/coquez/czcorc.F
+!||    czdef            ../engine/source/elements/shell/coquez/czdef.F
+!||    czdefrz          ../engine/source/elements/shell/coquez/czdef.F
+!||    czfintce         ../engine/source/elements/shell/coquez/czfintce.F
+!||    czfintcrz        ../engine/source/elements/shell/coquez/czfintce.F
+!||    czfintn1         ../engine/source/elements/shell/coquez/czfintn.F
+!||    czfintn_or       ../engine/source/elements/shell/coquez/czfintn.F
+!||    czfintnm         ../engine/source/elements/shell/coquez/czfintn.F
+!||    czfintnrz_or     ../engine/source/elements/shell/coquez/czfintn.F
+!||    czproj1          ../engine/source/elements/shell/coquez/czproj.F
+!||    czstra3          ../engine/source/elements/shell/coquez/czstra3.F
+!||    startime         ../engine/source/system/timer_mod.F90
+!||    stoptime         ../engine/source/system/timer_mod.F90
+!||    tempcg           ../engine/source/materials/mat_share/tempcg.F
+!||    thermc           ../engine/source/materials/mat_share/thermc.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod    ../engine/share/modules/crackxfem_mod.F
+!||    drape_mod        ../engine/share/modules/drape_mod.F
+!||    dt_mod           ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||    failwave_mod     ../common_source/modules/failwave_mod.F
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||    stack_mod        ../engine/share/modules/stack_mod.F
+!||    table_mod        ../engine/share/modules/table_mod.F
+!||    timer_mod        ../engine/source/system/timer_mod.F90
+!||====================================================================
        SUBROUTINE CZFORC3_CRK(TIMERS, XFEM_STR   ,
      1            JFT    ,JLT    ,NFT    ,ITYPTST,
      2            IPARI  ,MTN    ,IPRI   ,ITHK   ,NELTST ,
@@ -86,7 +87,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      O            NODEDGE,CRKEDGE, STACK ,DRAPE_SH4N,NLOC_DMG,
      P            INDX_DRAPE, IGRE ,DT, NCYCLE,SNPC,  STF  ,
      P            GLOB_THERM  ,IDEL7NOK ,USERL_AVAIL,
-     Q            MAXFUNC ,SBUFMAT)
+     Q            MAXFUNC ,SBUFMAT,IPART     ,LIPART1)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -102,6 +103,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE DT_MOD
       use glob_therm_mod
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -138,7 +140,10 @@ C-----------------------------------------------
      .        IPARG(*),IXFEM,INOD_CRK(*),IEL_CRK(*),IADC_CRK(4,*),
      .        ELCUTC(2,*),NODEDGE(2,*),INDX_DRAPE(SCDRAPE)
       INTEGER, INTENT(IN) :: IGRE, NCYCLE
-C     REAL OU REAL*8
+      integer, intent(in) :: LIPART1      
+      INTEGER, DIMENSION(LIPART1, NPART), INTENT(IN)     :: IPART
+     
+C     REAL OR REAL*8
       my_real
      .   F11(MVSIZ),F12(MVSIZ),F13(MVSIZ),F14(MVSIZ),
      .   F21(MVSIZ),F22(MVSIZ),F23(MVSIZ),F24(MVSIZ),
@@ -174,14 +179,14 @@ C   L O C A L   V A R I A B L E S
 C--------------------------------
       LOGICAL PLAT(MVSIZ)
       INTEGER 
-     .   I,J,NEL,MX,NNOD,NPG,IBID,ISROT,IXLAY,NXLAY,NLAYER,NPTT,
-     .   IR,IS,IT,IPT,NG,L_DIRA,L_DIRB,J1,J2,IXFEM2,IPTHK,
+     .   I,NEL,NNOD,NPG,IBID,ISROT,IXLAY,NXLAY,NLAYER,NPTT,
+     .   IR,IS,IT,NG,L_DIRA,L_DIRB,J1,J2,IXFEM2,IPTHK,
      .   IORTH,ILEV,IGMAT,IGTYP,IREP,IMAT,
      .   ACTIFXFEM, SEDRAPE,NUMEL_DRAPE
       INTEGER  MAT(MVSIZ),PID(MVSIZ),NGL(MVSIZ),FWAVE(MVSIZ)
       PARAMETER (NNOD = 4)
       my_real 
-     .  RH0(MVSIZ),LL(MVSIZ),VL13(MVSIZ,3),VL24(MVSIZ,3),VLHI(MVSIZ,3),
+     .  LL(MVSIZ),VL13(MVSIZ,3),VL24(MVSIZ,3),VLHI(MVSIZ,3),
      .  RLXYZ(MVSIZ,8),X13(MVSIZ),X24(MVSIZ),Y13(MVSIZ),Y24(MVSIZ),
      .  MX13(MVSIZ),MX23(MVSIZ),MX34(MVSIZ),MY13(MVSIZ),MY23(MVSIZ),
      .  MY34(MVSIZ),Z1(MVSIZ),Z2(MVSIZ)
@@ -233,6 +238,7 @@ C---
       TARGET :: DIRA,DIRB
 !     variables for heat transfer
       my_real, dimension(mvsiz) :: fheat
+      my_real, dimension(mvsiz) :: ssp_eq
 !
 C---
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -289,7 +295,7 @@ C
       NXLAY  = XFEM_STR%NLAY
       NLAYER = 1    ! only one current xfem layer passes to the cmain3 & mulawc
 C-----------------------------------------
-      IXFEM2 = 1               ! flag pour CZCORC1 et BILAN
+      IXFEM2 = 1               ! flag for CZCORC1 and BALANCE
 C
       ALLOCATE(ELCRKINI(NXLAY*NEL))
       ALLOCATE(DIR1_CRK(NXLAY*NEL))
@@ -381,7 +387,7 @@ c
           HOURGG => GBUF%HOURG
         ENDIF
 c
-C       ! calcul coords + vit des elements fantoms au lieu de std
+C       !Coords + Calculation + lives of ghost elements instead of STD
         CALL CCOOR3Z_CRK(JFT  ,JLT  ,NFT  ,IEL_CRK,IADC_CRK,
      2                   VL1  ,VL2  ,VL3  ,VL4    ,VRL1    ,
      3                   VRL2 ,VRL3 ,VRL4 ,X1G    ,X2G     ,
@@ -438,7 +444,7 @@ C
      4                 DRAPE_SH4N ,NFT  ,NEL    ,INDX_DRAPE , THKE,
      5                 SEDRAPE,NUMEL_DRAPE , MAT_ELEM)           
 C----------------------------------
-C     CALCUL VITESSE DE DEFORMATION 
+C     STRAIN RATE CALCULATION
 C----------------------------------
         CALL CZDEF(JFT     ,JLT  ,AREA ,A_I  ,VL13   ,VL24  ,
      2             VLHI    ,RLXYZ,VDEF ,DHG  ,X13    ,
@@ -454,7 +460,7 @@ C----------------------------------
      5                 VRLZ )
         ENDIF
 C----------------------------------
-C     CALCUL DES DEFORMATIONS 
+C     STRAIN CALCULATION
 C----------------------------------
         CALL CZSTRA3(JFT    ,JLT    ,NFT, VDEF,STRAG    ,
      2               EXX    ,EYY    ,EXY, EXZ ,EYZ      ,  
@@ -503,11 +509,12 @@ C-----------------------------
      R       INDX_DRAPE, THKE     ,SEDRAPE     ,NUMEL_DRAPE,DT   ,
      Q       NCYCLE    ,SNPC      ,STF         ,NXLAYMAX  ,IDEL7NOK  ,
      S       USERL_AVAIL ,MAXFUNC ,NPTTOT      ,SBUFMAT   ,SDIR_A    ,
-     T       SDIR_B   )
+     T       SDIR_B   ,GBUF%FOR_G ,SSP_EQ ,
+     X       IPART    ,LIPART1    ,IPARTC  )
 C-----------------------------
         IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 C--------------------------
-C     BILANS PAR MATERIAU
+C     BALANCES BY MATERIAL
 C--------------------------
         IF (IPRI == 1)
      1    CALL CBILAN(
@@ -523,7 +530,8 @@ C--------------------------
      A   Y2G,      Y3G,      Y4G,      Z1G,
      B   Z2G,      Z3G,      Z4G,      IXFEM2,
      C   IEXPAN,   EINTTH,   ITASK,    GBUF%VOL,
-     D   ACTIFXFEM,IGRE,SENSORS)
+     D   ACTIFXFEM,IGRE,SENSORS,NEL,GBUF%G_WPLA,
+     E   GBUF%WPLA )
 C
         CALL CNDT3(
      1             JFT    ,JLT    ,OFF    , DT2T   ,AMU   ,
@@ -533,7 +541,7 @@ C
      5             IOFC   ,NNOD   ,AREA   , G      ,SHF   ,
      6             MSC    ,DMELC  ,JSMS   , BID    ,IGTYP ,
      7             IGMAT  ,A11R   ,GBUF%G_DT, GBUF%DT,MTN   ,
-     8             PM     ,MAT(JFT),NEL     ,ZOFFSET)
+     8             PM     ,MAT(JFT),NEL     ,ZOFFSET,SSP_EQ)
         CALL CZFINTCE(JFT  ,JLT  ,THK0 ,THK02,A_I    ,X13    ,
      2                X24  ,Y13  ,Y24  ,Z1   ,MX23   ,MX13   ,
      3                MX34 ,MY13 ,MY23 ,MY34 ,FORG   ,MOMG   ,
@@ -594,7 +602,7 @@ C
      8               Z1     ,LXYZ   ,DD     ,DB     ,LXYZ ,
      9               ISROT  ,DIZ    ,VMZ    )
 C-------------------------
-c     Thermique des coques 
+c     Shell thermal
 C--------------------------
 C
         IF (JTHE /= 0) THEN
@@ -610,7 +618,7 @@ C
         ENDIF 
 C
 C--------------------------
-C     ASSEMBLAGE des forces dans les adresses sky des noeuds phantomes
+C     FORCE ASSEMBLY in the sky addresses of phantom nodes
 C--------------------------
         IF (IPARIT == 1)
      .    CALL CUPDTN3_CRK(

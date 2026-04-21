@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r2r_void               ../starter/source/coupling/rad2rad/r2r_void.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    init_mat_weight        ../starter/source/user_interface/set_dd_mat_weight.F
-      !||--- uses       -----------------------------------------------------
-      !||    ddweights_mod          ../starter/share/modules1/ddweights_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    restmod                ../starter/share/modules1/restart_mod.F
-      !||    stack_var_mod          ../starter/share/modules1/stack_var_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_void               ../starter/source/coupling/rad2rad/r2r_void.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl                ../starter/source/starter/freform.F
+!||    init_mat_weight        ../starter/source/user_interface/set_dd_mat_weight.F
+!||--- uses       -----------------------------------------------------
+!||    ddweights_mod          ../starter/share/modules1/ddweights_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    restmod                ../starter/share/modules1/restart_mod.F
+!||    stack_var_mod          ../starter/share/modules1/stack_var_mod.F
+!||====================================================================
       SUBROUTINE R2R_VOID(IPARTL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -66,18 +66,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER STAT,I,J,LEN1,LEN2,NUM,LL,P,N,ANA,
-     .          MAT_ID,K,ADD,COMPT,NB_PART,F2,IGTYP,L,PID,COMPT_STACK_TOT,COMPT_STACK,
-     .          COMPT_STACK_REMOV
+        INTEGER :: STAT,I,J,LEN1,LEN2,NUM,P,N
+        INTEGER :: K,ADD,COMPT,NB_PART,F2,IGTYP,L,PID,COMPT_STACK_TOT,COMPT_STACK
+        INTEGER :: COMPT_STACK_REMOV,COMPT_PCOMP_TOT,COMPT_PCOMP,COMPT_PCOMP_REMOV
         INTEGER, DIMENSION(:), ALLOCATABLE :: NUMGEOSTACK1_TEMP,NUMGEOSTACK2_TEMP
         INTEGER, DIMENSION(:,:), ALLOCATABLE :: IPM_TEMP,IGEO_TEMP
         CHARACTER(LEN=NCHARTITLE) TITR
-        my_real
-     .      ALPHAI
-        my_real
-     .         , DIMENSION(:,:), ALLOCATABLE :: PM_TEMP,GEO_TEMP
-        my_real
-     .         , DIMENSION(:,:,:), ALLOCATABLE :: DDW_TEMP
+        my_real :: ALPHAI
+        my_real, DIMENSION(:,:), ALLOCATABLE :: PM_TEMP,GEO_TEMP
+        my_real, DIMENSION(:,:,:), ALLOCATABLE :: DDW_TEMP
 C-----------------------------------------------
 
         NUMMAT0 = NUMMAT
@@ -85,9 +82,7 @@ C-----------------------------------------------
 
 C---------filling of array PM_R2R--------------------------------C
         ALLOCATE (PM_R2R(NUMMAT+NPART+1),STAT=stat)
-        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
-     .                           C1='PM_R2R')
+        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='PM_R2R')
         DO I=1,NUMMAT
           PM_R2R(I) = PM(NPROPM*(I-1)+20)
         END DO
@@ -121,16 +116,20 @@ C---------tag of external parts-----------------------------------C
 
 C--------------------------------------------------------------C
         COMPT = 0
+        COMPT_PCOMP_TOT = 0
+        COMPT_PCOMP_REMOV = 0
         COMPT_STACK_TOT = 0
         COMPT_STACK_REMOV = 0
         IPART_PCOMPP = 0
+        IPART_STACK = 0
 C
         DO K=1,NPART
           IPART_R2R(1,K) = IPARTL(1,K) !mat_id
           IPART_R2R(2,K) = IPARTL(5,K) !user_mat_id
           IPART_R2R(3,K) = 0
           IGTYP = IGEO(NPROPGI*(IPARTL(2,K)-1)+11)
-          IF (IGTYP==52) COMPT_STACK_TOT = COMPT_STACK_TOT + 1
+          IF (IGTYP==51) COMPT_STACK_TOT = COMPT_STACK_TOT + 1
+          IF (IGTYP==52) COMPT_PCOMP_TOT = COMPT_PCOMP_TOT + 1
           IPART_R2R(4,K) = IPARTL(2,K) !prop_id
           IF (TAG_PART(K)==1) THEN
             COMPT=COMPT+1
@@ -140,13 +139,19 @@ C-- Multilayer shells to be changed to void
             ELSEIF (IGTYP.EQ.52) THEN
 C-- /PROP/PCOMP shells to be changed to void
               TAG_PART(K) = 3
-              COMPT_STACK_REMOV = COMPT_STACK_REMOV + 1
+              COMPT_PCOMP_REMOV = COMPT_PCOMP_REMOV + 1
+            ELSEIF (IGTYP.EQ.51) THEN
+C-- /PROP/TYPE51 shells to be changed to void
+              TAG_PART(K) = 4         
+              COMPT_STACK_REMOV = COMPT_STACK_REMOV + 1                
             ENDIF
           ENDIF
         END DO
 
+        COMPT_PCOMP = COMPT_PCOMP_TOT - COMPT_PCOMP_REMOV
+        IF (COMPT_PCOMP > 0) IPART_PCOMPP = 1
         COMPT_STACK = COMPT_STACK_TOT - COMPT_STACK_REMOV
-        IF (COMPT_STACK > 0) IPART_PCOMPP = 1
+        IF (COMPT_STACK > 0) IPART_STACK = 1
 
         IF (COMPT==0) GOTO 150
 
@@ -157,17 +162,11 @@ C---------Allocation of temporary arrays ----------------------C
         NB_PART = COMPT
 
         ALLOCATE (IPM_TEMP(NPROPMI,NUMMAT+NB_PART),STAT=stat)
-        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
-     .                           C1='IPM_TEMP')
+        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='IPM_TEMP')
         ALLOCATE (PM_TEMP(NPROPM,NUMMAT+NB_PART),STAT=stat)
-        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
-     .                           C1='PM_TEMP')
+        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='PM_TEMP')
         ALLOCATE (DDW_TEMP(2,2,NUMMAT+NB_PART+1),STAT=stat)
-        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
-     .                           C1='DDW_TEMP')
+        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='DDW_TEMP')
 
         IPM_TEMP(:,:)=0
         PM_TEMP(:,:)=0
@@ -215,7 +214,7 @@ C---------------Creation of new void materials -------------------C
             NUM = NUM+1
             NUMMAT = NUMMAT+1
 C
-            IF ((TAG_PART(K) == 1).OR.(TAG_PART(K) == 3)) THEN
+            IF ((TAG_PART(K)==1).OR.(TAG_PART(K)==3).OR.(TAG_PART(K) == 4)) THEN
 C--> standard elements
               F2 = IPARTL(1,K)
               PM_TEMP(1,NUMMAT)= 1e-20
@@ -277,13 +276,9 @@ C----------------Reallocation and filling of IPM and PM-----------C
 
         DEALLOCATE(IPM,PM,DDWEIGHTS)
         ALLOCATE (IPM(LEN1),STAT=stat)
-        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
-     .                           C1='IPM')
+        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO, MSGTYPE=MSGERROR, C1='IPM')
         ALLOCATE (PM(LEN2),STAT=stat)
-        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
-     .                           C1='PM')
+        IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO, MSGTYPE=MSGERROR, C1='PM')
         CALL INIT_MAT_WEIGHT(NUMMAT)
 
         DO I=1,NUMMAT
@@ -374,6 +369,8 @@ C
 C---------------Affectation of new shell property--------------C
             IPARTL(6,K)= NUM
             IPARTL(2,K)= NUMGEO
+C---------------IGEO(125) used to keep track of multidomiasn void property        
+            IGEO_TEMP(125,NUMGEO)=1
 
 C---------------Reallocation and filling of IGEO and GEO------C
 
@@ -439,14 +436,14 @@ C-----------
         RETURN
       END SUBROUTINE R2R_VOID
 
-      !||====================================================================
-      !||    r2r_void_1d             ../starter/source/coupling/rad2rad/r2r_void.F
-      !||--- called by ------------------------------------------------------
-      !||    tag_elem_void_r2r_lin   ../starter/source/coupling/rad2rad/tagelem_r2r.F
-      !||--- uses       -----------------------------------------------------
-      !||    r2r_mod                 ../starter/share/modules1/r2r_mod.F
-      !||    restmod                 ../starter/share/modules1/restart_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_void_1d             ../starter/source/coupling/rad2rad/r2r_void.F
+!||--- called by ------------------------------------------------------
+!||    tag_elem_void_r2r_lin   ../starter/source/coupling/rad2rad/tagelem_r2r.F
+!||--- uses       -----------------------------------------------------
+!||    r2r_mod                 ../starter/share/modules1/r2r_mod.F
+!||    restmod                 ../starter/share/modules1/restart_mod.F
+!||====================================================================
       SUBROUTINE R2R_VOID_1D(ID_PART,IPARTL)
 C-----------------------------------------------
 C   M o d u l e s

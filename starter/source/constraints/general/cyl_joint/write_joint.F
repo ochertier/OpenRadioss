@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    write_joint   ../starter/source/constraints/general/cyl_joint/write_joint.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    joint_mod     ../starter/share/modules1/joint_mod.F
-      !||====================================================================
+!||====================================================================
+!||    write_joint   ../starter/source/constraints/general/cyl_joint/write_joint.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    joint_mod     ../starter/share/modules1/joint_mod.F
+!||====================================================================
             SUBROUTINE WRITE_JOINT(LJOINT,CEP,CEL,PROC,
      +                   NODLOCAL,LJOINT_L,LEN_IA,NUMNOD_L)
 !$COMMENT
@@ -57,7 +57,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER N,NN,K,J,P,I,NUMBER_MAIN_NODE,IS_SMS_AVAILABLE
+        INTEGER N, K, P, I, IS_SMS_AVAILABLE
         INTEGER, DIMENSION(:), ALLOCATABLE :: BUF_W
         INTEGER, DIMENSION(NSPMD) :: NB_NODE_WEIGHT
         INTEGER, DIMENSION(2) :: MAIN_NODE

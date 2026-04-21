@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    damping_rby_spmdset_mod   ../starter/source/general_controls/damping/damping_rby_spmdset.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                    ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    damping_rby_spmdset_mod   ../starter/source/general_controls/damping/damping_rby_spmdset.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                    ../starter/source/starter/lectur.F
+!||====================================================================
       module damping_rby_spmdset_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
@@ -35,19 +36,23 @@
 !\brief This subroutine stick main node of ridid body on procs where damping nodes are present
 !=======================================================================================================================
 !
-      !||====================================================================
-      !||    damping_rby_spmdset   ../starter/source/general_controls/damping/damping_rby_spmdset.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmdset               ../starter/source/constraints/general/rbody/spmdset.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    damping_rby_spmdset   ../starter/source/general_controls/damping/damping_rby_spmdset.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../starter/source/output/message/message.F
+!||    spmdset               ../starter/source/constraints/general/rbody/spmdset.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../starter/share/message_module/message_mod.F
+!||====================================================================
         subroutine damping_rby_spmdset(igrnod,ngrnod,ndamp,nrdamp,dampr,nnpby,nrbody,npby,nrbmerge)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use GROUPDEF_MOD , only: GROUP_
+          USE MESSAGE_MOD
+          USE PRECISION_MOD, ONLY : WP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -55,7 +60,6 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -67,11 +71,11 @@
           integer,                                   intent(in) :: nrbody                      !< number of rigid bodies
           integer,                                   intent(in) :: npby(nnpby,nrbody)          !< main structure for rigid bodies
           integer,                                   intent(in) :: nrbmerge                    !< nb or rigid body merge
-          my_real,                                intent(inout) :: dampr(nrdamp,ndamp)         !< main structure for option /DAMP
+          real(kind=WP),                                intent(inout) :: dampr(nrdamp,ndamp)         !< main structure for option /DAMP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer :: nd,igr,isk,id_rby,id_rby_user,j
+          integer :: nd,igr,id_rby,id_rby_user,j,id_damp
 ! ----------------------------------------------------------------------------------------------------------------------
 !
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -80,35 +84,46 @@
 !
 !         Rbody id replaced by id or main rigid body in case of rigid body merge
 !
-          if (nrbmerge > 0) then
-            do nd=1,ndamp
-              id_rby_user = nint(dampr(25,nd))
-              if (id_rby_user > 0) then
-                do j=1,nrbody
-                  if (id_rby_user == npby(6,j)) then
+          do nd=1,ndamp
+            id_damp = nint(dampr(1,nd))
+            id_rby_user = nint(dampr(25,nd))
+            if (id_rby_user > 0) then
+              id_rby = 0
+              do j=1,nrbody
+                if (id_rby_user == npby(6,j)) then
+                  if (nrbmerge == 0) then
+                    id_rby = j
+                  else
                     if (npby(12,j)==0) then
                       !         main rbody
                       id_rby = j
                     else
                       !         secondary rbody - switch to main
                       id_rby = npby(13,j)
-                    endif
-                  endif
-                enddo
-                dampr(25,nd) = id_rby
-              endif
-            enddo
-          endif
+                    end if
+                  end if
+                end if
+              end do
+              if (id_rby == 0) then!  rbody not found
+                call ancmsg(msgid=3048,                   &
+                  msgtype=msgerror,             &
+                  anmode=aninfo,                &
+                  i1=id_damp,                   &
+                  i2=id_rby_user)
+              end if
+              dampr(25,nd) = id_rby
+            end if
+          end do
 !
-!         Stick main node of rigid body on pioc in damped nodes are present
+!         Stick main node of rigid body on proc in damped nodes are present
 !
           do nd=1,ndamp
             id_rby = nint(dampr(25,nd))
             if (id_rby > 0) then
               igr   = nint(dampr(2,nd))
               call spmdset(id_rby,npby,nnpby,igrnod(igr)%entity,igrnod(igr)%nentity,0)
-            endif
-          enddo
+            end if
+          end do
 !
 ! ----------------------------------------------------------------------------------------------------------------------
         end subroutine damping_rby_spmdset

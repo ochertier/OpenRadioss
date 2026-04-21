@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    smallgeo3     ../engine/source/elements/solid/solide/smallgeo3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3      ../engine/source/elements/solid/solide10/s10forc3.F
-      !||    s4forc3       ../engine/source/elements/solid/solide4/s4forc3.F
-      !||    s8eforc3      ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8zforc3      ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||    sforc3        ../engine/source/elements/solid/solide/sforc3.F
-      !||    szforc3       ../engine/source/elements/solid/solidez/szforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    dt_mod        ../engine/source/modules/dt_mod.F
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    smallgeo3     ../engine/source/elements/solid/solide/smallgeo3.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3      ../engine/source/elements/solid/solide10/s10forc3.F
+!||    s4forc3       ../engine/source/elements/solid/solide4/s4forc3.F
+!||    s6zforc3      ../engine/source/elements/solid/solide6z/s6zforc3.F90
+!||    s8eforc3      ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8zforc3      ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||    sforc3        ../engine/source/elements/solid/solide/sforc3.F
+!||    szforc3       ../engine/source/elements/solid/solidez/szforc3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    dt_mod        ../engine/source/modules/dt_mod.F
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SMALLGEO3(
      1   NGL,     OFFG,    VOLG,    DELTAX,
      2   VOLG0,   ITET,    NEL,     ISMSTR,DT  )
@@ -67,7 +68,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,ICOUNT,LIST(MVSIZ)
       my_real
-     .   TET_COLLA(MVSIZ),COEF,DEF_V,AL,MIN_ASPECT,MIN_DEFV
+     .   TET_COLLA(MVSIZ),COEF,DEF_V,MIN_ASPECT,MIN_DEFV
 C---------------------------------------------
       MIN_ASPECT = DT%BRICK_CST_COL_MIN
       MIN_DEFV = DT%BRICK_CST_DEFV_MIN

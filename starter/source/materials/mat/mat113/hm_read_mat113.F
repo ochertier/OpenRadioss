@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat113           ../starter/source/materials/mat/mat113/hm_read_mat113.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat113           ../starter/source/materials/mat/mat113/hm_read_mat113.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT113(UPARAM   ,MAXUPARAM,NUPARAM  ,NFUNC    ,PARMAT   ,
      .                          UNITAB   ,PM       ,LSUBMODEL,ISRATE   ,MAT_ID   ,
      .                          TITR     ,IFUNC    ,MAXFUNC  ,MTAG     ,MATPARAM )
@@ -77,8 +77,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
        INTEGER J, IFUNC1, IFUNC2,IFUNC3, IECROU, IFUNC4, IG,
      .         IFAIL,ILENG,IFAIL2,FLGCHK,ILAW,
-     .         I1,I2,I3,I4,I5,I6,I7,I8,I9,I10,I11,I12,I13,I14,
-     .         IF1,IF2,IF3,IF4,IF5,IFUNC5
+     .         I1,I2,I3,I4,I5,I6,I7,I8,I9,I10,I11,I12,I13,
+     .         IF1,IF2,IF3,IF4,IF5,IFUNC5,SIZ_ARRAY_COMP
 C     REAL
       my_real
      .   A, B, D, E, F, XK, XC, DN, DX, FWV, LSCALE,
@@ -96,6 +96,7 @@ C=======================================================================
       ASRATE = ZERO
       CC(1:6) = ZERO
       FLGCHK = 0
+      SIZ_ARRAY_COMP = 0
 c------------------------------------------
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
 c------------------------------------------
@@ -174,7 +175,7 @@ c-------------------------------------------------------------------------------
      .               I1=IG,
      .               C1=TITR)
       ENDIF
-      IF (IECROU == 6 .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
+      IF (((IECROU==6).OR.(IECROU==9)) .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
          CALL ANCMSG(MSGID=1057,
      .               MSGTYPE=MSGERROR,
      .               ANMODE=ANINFO_BLIND_1,
@@ -282,9 +283,10 @@ C     for interface stifness
       CHECK(13,1)  = IECROU+PUN
 C      
 C--   If H=6 - 
-      IF (IECROU == 6) THEN
+      IF ((IECROU==6).OR.(IECROU==9)) THEN
         UPARAM(4) = 6
       ENDIF
+      IF (IECROU==9) SIZ_ARRAY_COMP = 6      
 C
       IF1 = 0
       IF2 = 6
@@ -371,7 +373,7 @@ C
      .               I1=IG,
      .               C1=TITR)
       ENDIF
-      IF (IECROU == 6 .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
+      IF (((IECROU==6).OR.(IECROU==9)) .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
          CALL ANCMSG(MSGID=1057,
      .               MSGTYPE=MSGERROR,
      .               ANMODE=ANINFO_BLIND_1,
@@ -464,9 +466,10 @@ C     for interface stifness
       CHECK(12,2)  = XC
       CHECK(13,2)  = IECROU+PUN
 C--   If H=6 - additional internal variables must be stored in UVAR - 
-      IF (IECROU == 6) THEN
+      IF ((IECROU==6).OR.(IECROU==9)) THEN
         UPARAM(4) = 6
       ENDIF
+      IF (IECROU==9) SIZ_ARRAY_COMP = 6      
 C
       IFUNC(2) = IFUNC1
       IFUNC(IF2 + 2) = IFUNC2
@@ -547,7 +550,7 @@ C----
      .               I1=IG,
      .               C1=TITR)
       ENDIF
-      IF (IECROU == 6 .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
+      IF (((IECROU==6).OR.(IECROU==9)) .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
          CALL ANCMSG(MSGID=1057,
      .               MSGTYPE=MSGERROR,
      .               ANMODE=ANINFO_BLIND_1,
@@ -639,9 +642,10 @@ CC     for interface stifness
       CHECK(12,3)  = XC
       CHECK(13,3)  = IECROU+PUN      
 C--   If H=6 - additional internal variables must be stored in UVAR 
-      IF (IECROU == 6) THEN
-       UPARAM(4) = 6
+      IF ((IECROU==6).OR.(IECROU==9)) THEN
+        UPARAM(4) = 6
       ENDIF
+      IF (IECROU==9) SIZ_ARRAY_COMP = 6
 C
       IFUNC(3) = IFUNC1
       IFUNC(IF2 + 3) = IFUNC2
@@ -724,7 +728,7 @@ C----
      .               I1=IG,
      .               C1=TITR)
       ENDIF
-      IF (IECROU == 6 .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
+      IF (((IECROU==6).OR.(IECROU==9)) .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
          CALL ANCMSG(MSGID=1057,
      .               MSGTYPE=MSGERROR,
      .               ANMODE=ANINFO_BLIND_1,
@@ -815,9 +819,10 @@ C
       CHECK(12,4)  = XC
       CHECK(13,4)  = IECROU+PUN
 C--   If H=6 - additional internal variables must be stored in UVAR - 
-      IF (IECROU == 6) THEN
+      IF ((IECROU==6).OR.(IECROU==9)) THEN
         UPARAM(4) = 6
       ENDIF
+      IF (IECROU==9) SIZ_ARRAY_COMP = 6
 C
       IFUNC(4) = IFUNC1
       IFUNC(IF2 + 4) = IFUNC2
@@ -896,7 +901,7 @@ C----
      .               I1=IG,
      .               C1=TITR)
       ENDIF
-      IF (IECROU == 6 .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
+      IF (((IECROU==6).OR.(IECROU==9)) .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
          CALL ANCMSG(MSGID=1057,
      .               MSGTYPE=MSGERROR,
      .               ANMODE=ANINFO_BLIND_1,
@@ -972,9 +977,10 @@ C----
       UPARAM(I12 + 5)  = XC
       UPARAM(I13 + 5)  = IECROU+PUN  
 C--   If H=6 - additional internal variables must be stored in UVAR - 
-      IF (IECROU == 6) THEN
-         UPARAM(4) = 6
+      IF ((IECROU==6).OR.(IECROU==9)) THEN
+        UPARAM(4) = 6
       ENDIF
+      IF (IECROU==9) SIZ_ARRAY_COMP = 6
       
       CHECK(1,5)   = A   ! nupa=4
       CHECK(2,5)   = B
@@ -1067,7 +1073,7 @@ C----
      .               I1=IG,
      .               C1=TITR)
       ENDIF
-      IF (IECROU == 6 .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
+      IF (((IECROU==6).OR.(IECROU==9)) .AND. (IFUNC1 == 0 .OR. IFUNC3 == 0)) THEN
          CALL ANCMSG(MSGID=1057,
      .               MSGTYPE=MSGERROR,
      .               ANMODE=ANINFO_BLIND_1,
@@ -1159,9 +1165,10 @@ C---
       CHECK(12,6)  = XC
       CHECK(13,6)  = IECROU+PUN
 C--   If H=6 - additional internal variables must be stored in UVAR - 
-      IF (IECROU == 6) THEN
+      IF ((IECROU==6).OR.(IECROU==9)) THEN
         UPARAM(4) = 6
       ENDIF
+      IF (IECROU==9) SIZ_ARRAY_COMP = 6
 C
       IFUNC(6) = IFUNC1
       IFUNC(IF2 + 6) = IFUNC2
@@ -1308,13 +1315,16 @@ C----! NUPARAM = 88 = 4 + 14*6
       UPARAM(NUPARAM + 28) = ASRATE
 C      
       NUPARAM = NUPARAM  + 28
+C      
+C---! Force offset for iecr=9  - (4 + 14*6) + 28 + 6
+      NUPARAM = NUPARAM  + 6
 C   
 C------------------------
 C------------------------
       MTAG%G_TOTDEPL = 3  ! DX (DY,DZ) - total deformation (translation)
       MTAG%G_TOTROT = 3   ! RX (RY,RZ) - total deformation (rotation)
       MTAG%G_DEP_IN_TENS = 3   ! DPX  (DPY,DPZ) - max displacement in tension
-      MTAG%G_DEP_IN_COMP = 3   ! DPX2 (DPY2,DPZ2) - max displacement in compression
+      MTAG%G_DEP_IN_COMP = 3   ! DPX2 (DPY2, DPZ2) - Max Displacement in Compression
       MTAG%G_ROT_IN_TENS = 3   ! RPX (RPY,RPZ) - max rotation in tension
       MTAG%G_ROT_IN_COMP = 3   ! RPX2 (RPY2,RPY2) - max rotation in compression
       MTAG%G_POSX = 6
@@ -1329,6 +1339,8 @@ C------------------------
       MTAG%G_MASS = 1
       PARMAT(4) = ISRATE
       PARMAT(5) = ASRATE
+      MTAG%G_YIELD_IN_COMP = SIZ_ARRAY_COMP   ! Yield in compression - H=9
+      MTAG%G_XXOLD_IN_COMP = SIZ_ARRAY_COMP   ! Previous Displacement in Compression
 C------------------------
       ! Properties compatibility
       CALL INIT_MAT_KEYWORD(MATPARAM,"SPRING_MATERIAL")
@@ -1347,19 +1359,6 @@ c-----------
      & 5X,'MATERIAL LAW . . . . . . . . . . . . . =',I10/)
  1300 FORMAT(
      & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/)      
- 1800 FORMAT(
-     & 5X,'SPRING MATERIAL SET (BEAM TYPE)'/,
-     & 5X,'-------------------------------'/,
-     & 5X,'MATERIAL SET NUMBER . . . . . . . . . .=',I10/,
-     & 5X,'SPRING MASS . . . . . . . . . . . . . .=',1PG20.13/,
-     & 5X,'SPRING INERTIA. . . . . . . . . . . . .=',1PG20.13/,
-     & 5X,'SKEW FRAME NUMBER (0:GLOBAL). . . . . .=',I10/,
-     & 5X,'SENSOR NUMBER (0:NOT USED). . . . . . .=',I10/,
-     & 5X,'SENSOR FLAG (0:ACTIV 1:DEACT 2:BOTH). .=',I10/,
-     & 5X,'FAILURE FLAG (0:UNCOUPLED 1:COUPLED). .=',I10/,
-     & 5X,'UNIT LENGTH FLAG. . . . . . . . . . . .=',I10/,
-     & 5X,'IF=1 UNIT LENGTH MASS,STIFFNESS AND INPUT',/,
-     & 5X,'     CURVE ARE STRAIN DEPENDING',/)
  1810 FORMAT(
      & 5X,A,/,
      & 5X,'SPRING STIFFNESS. . . . . . . . . . . .=',1PG20.13/,

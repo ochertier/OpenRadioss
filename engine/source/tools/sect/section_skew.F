@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    section_skew   ../engine/source/tools/sect/section_skew.F
-      !||--- called by ------------------------------------------------------
-      !||    section        ../engine/source/tools/sect/section.F
-      !||    section_3n     ../engine/source/tools/sect/section_3n.F
-      !||    section_c      ../engine/source/tools/sect/section_c.F
-      !||    section_p      ../engine/source/tools/sect/section_p.F
-      !||    section_r      ../engine/source/tools/sect/section_r.F
-      !||    section_s      ../engine/source/tools/sect/section_s.F
-      !||    section_s4     ../engine/source/tools/sect/section_s4.F
-      !||    section_s6     ../engine/source/tools/sect/section_s6.F
-      !||    section_t      ../engine/source/tools/sect/section_t.F
-      !||====================================================================
+!||====================================================================
+!||    section_skew   ../engine/source/tools/sect/section_skew.F
+!||--- called by ------------------------------------------------------
+!||    section        ../engine/source/tools/sect/section.F
+!||    section_3n     ../engine/source/tools/sect/section_3n.F
+!||    section_c      ../engine/source/tools/sect/section_c.F
+!||    section_p      ../engine/source/tools/sect/section_p.F
+!||    section_r      ../engine/source/tools/sect/section_r.F
+!||    section_s      ../engine/source/tools/sect/section_s.F
+!||    section_s4     ../engine/source/tools/sect/section_s4.F
+!||    section_s6     ../engine/source/tools/sect/section_s6.F
+!||    section_t      ../engine/source/tools/sect/section_t.F
+!||====================================================================
       SUBROUTINE SECTION_SKEW(
      1   N1 ,N2 ,N3 ,X , XXC, YYC, ZZC,
      2   XX4, YY4, ZZ4, XX5, YY5, ZZ5, XX6, YY6, ZZ6,
@@ -56,12 +56,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, N
-      my_real XX1, YY1, ZZ1, XX2, YY2, ZZ2, XX3, YY3, ZZ3,
-     .        AL4, AL6, AL5, D13, MAS, X1N, Y1N, Z1N
-C
-C
+      my_real XX1, YY1, ZZ1, XX2, YY2, ZZ2, XX3, YY3, ZZ3, AL4, AL6, AL5, D13, MAS, X1N, Y1N, Z1N
+C-----------------------------------------------
+C   B o d y
+C-----------------------------------------------
       IF(IFRAM<10)THEN
-C      CALCUL DES MOMEMTS/REPERE N1 N2 N3
+C      MOMENTUM (SKEW N1 N2 N3)
        XX1=X(1,N1)
        YY1=X(2,N1)
        ZZ1=X(3,N1)
@@ -101,7 +101,7 @@ C
        ZZN=ZZ6
 C
        ELSEIF (N1/=0) THEN
-C      CALCUL DES MOMEMTS/REPERE GLOBAL
+C      MOMENTUM / GLOBAL SYSTEM
        XX4=X(1,N2)-X(1,N1)
        YY4=X(2,N2)-X(2,N1)
        ZZ4=X(3,N2)-X(3,N1)
@@ -141,7 +141,7 @@ C
 C
       ENDIF
 C
-C     CALCUL DE L'ORIGINE DU REPERE
+C     ORIGIN CALCULATION
 C
       IF(IFRAM==0)THEN
         D13=(XX3-XX1)*XX4+(YY3-YY1)*YY4+(ZZ3-ZZ1)*ZZ4
@@ -166,7 +166,7 @@ C
         XXC=0.
         YYC=0.
         ZZC=0.
-C   attention : il faut penser a maj de X avant forint
+C   Please note: you have to think of Maj of x before Forint
         DO I=1,NNOD
           N=NOD(I)
           XXC=XXC+X(1,N)
@@ -181,7 +181,7 @@ C   attention : il faut penser a maj de X avant forint
         YYC=0.
         ZZC=0.
         MAS=1.E-30
-C   attention : il faut penser a maj de X & M avant forint
+C   Please note: you have to think of Maj of X & before me forge
         DO I=1,NNOD
           N=NOD(I)
           XXC=XXC+X(1,N)*MS(N)

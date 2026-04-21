@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,86 +20,90 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    szforc3                ../engine/source/elements/solid/solidez/szforc3.F
-      !||--- called by ------------------------------------------------------
-      !||    forint                 ../engine/source/elements/forint.F
-      !||--- calls      -----------------------------------------------------
-      !||    amass3                 ../engine/source/elements/solid/solide/amass3.F
-      !||    amass3p                ../engine/source/elements/solid/solide/amass3p.F
-      !||    amomt3                 ../engine/source/elements/solid/solide/amomt3.F
-      !||    boltst                 ../engine/source/elements/solid/solide/boltst.F
-      !||    check_off_ale          ../engine/source/elements/solid/solide/check_off_ale.F
-      !||    emomt3b                ../engine/source/elements/solid/solide/emomt3b.F
-      !||    epxle3                 ../engine/source/elements/solid/solide/epxle3.F
-      !||    fe_close               ../engine/source/elements/solid/solide/fe_close.F
-      !||    mmain                  ../engine/source/materials/mat_share/mmain.F90
-      !||    mod_close              ../engine/source/elements/solid/solide/mod_close.F
-      !||    nsvis_sm12             ../engine/source/elements/solid/solide10/nsvis_sm12.F
-      !||    s11defo3               ../engine/source/elements/solid/solide/s11defo3.F
-      !||    s8for_distor           ../engine/source/elements/solid/solide/s8for_distor.F
-      !||    s8get_x3               ../engine/source/elements/solid/solide/s8get_x3.F
-      !||    s8sav12                ../engine/source/elements/solid/solide/s8sav12.F
-      !||    s8sav3                 ../engine/source/elements/solid/solide/s8sav3.F
-      !||    s8upd11t12             ../engine/source/elements/solid/solide/s8upd11t12.F
-      !||    scoor_cp2sp            ../engine/source/elements/solid/solidez/scoor_cp2sp.F
-      !||    scumu3                 ../engine/source/elements/solid/solide/scumu3.F
-      !||    scumu3p                ../engine/source/elements/solid/solide/scumu3p.F
-      !||    sdefo3                 ../engine/source/elements/solid/solide/sdefo3.F
-      !||    sdefot3                ../engine/source/elements/solid/solide/sdefot3.F
-      !||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
-      !||    sdlen3                 ../engine/source/elements/solid/solide/sdlen3.F
-      !||    sdlen8                 ../engine/source/elements/solid/solidez/sdlen8.F
-      !||    sdlen_sms              ../engine/source/elements/solid/solidez/sdlen_sms.F
-      !||    sdlenmax               ../engine/source/elements/solid/solide/sdlenmax.F
-      !||    sfillopt               ../engine/source/elements/solid/solide/sfillopt.F
-      !||    sfint3                 ../engine/source/elements/solid/solide/sfint3.F
-      !||    sfint_reg              ../engine/source/elements/solid/solide/sfint_reg.F
-      !||    sgcoor3                ../engine/source/elements/solid/solide/sgcoor3.F
-      !||    sgeodel3               ../engine/source/elements/solid/solide/sgeodel3.F
-      !||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
-      !||    smallgeo3              ../engine/source/elements/solid/solide/smallgeo3.F
-      !||    sordeft3               ../engine/source/elements/solid/solidez/sordeft3.F
-      !||    srbilan                ../engine/source/elements/solid/solide/srbilan.F
-      !||    srcoor3                ../engine/source/elements/solid/solide/srcoor3.F
-      !||    srho3                  ../engine/source/elements/solid/solide/srho3.F
-      !||    srmalla11              ../engine/source/elements/solid/solide/srmalla11.F
-      !||    srmalla3               ../engine/source/elements/solid/solide/srmall3.F
-      !||    sroto3                 ../engine/source/elements/solid/solidez/sroto3.F
-      !||    srrota3                ../engine/source/elements/solid/solide/srrota3.F
-      !||    srrotadp               ../engine/source/elements/solid/solide/srrotadp.F
-      !||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
-      !||    startime               ../engine/source/system/timer_mod.F90
-      !||    stherm                 ../engine/source/elements/solid/solide/stherm.F
-      !||    stoptime               ../engine/source/system/timer_mod.F90
-      !||    storth3                ../engine/source/elements/solid/solidez/storth3.F
-      !||    szderi3                ../engine/source/elements/solid/solidez/szderi3.F
-      !||    szderit3               ../engine/source/elements/solid/solidez/szderi3.F
-      !||    szderito3              ../engine/source/elements/solid/solidez/szderi3.F
-      !||    szhour3                ../engine/source/elements/solid/solidez/szhour3.F
-      !||    szhour3_or             ../engine/source/elements/solid/solidez/szhour3_or.F
-      !||    szhour_ctl             ../engine/source/elements/solid/solidez/szhour_ctl.F
-      !||    szordef3               ../engine/source/elements/solid/solidez/szordef3.F
-      !||    sztorth3               ../engine/source/elements/solid/solidez/sztorth3.F
-      !||    visc_et                ../engine/source/elements/solid/solidez/visc_et.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    dt_mod                 ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
-      !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
-      !||    output_mod             ../common_source/modules/output/output_mod.F90
-      !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    table_mod              ../engine/share/modules/table_mod.F
-      !||    timer_mod              ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE SZFORC3(TIMERS,ELBUF_TAB,NG      ,
+!||====================================================================
+!||    szforc3                ../engine/source/elements/solid/solidez/szforc3.F
+!||--- called by ------------------------------------------------------
+!||    forint                 ../engine/source/elements/forint.F
+!||--- calls      -----------------------------------------------------
+!||    amass3                 ../engine/source/elements/solid/solide/amass3.F
+!||    amass3p                ../engine/source/elements/solid/solide/amass3p.F
+!||    amomt3                 ../engine/source/elements/solid/solide/amomt3.F
+!||    boltst                 ../engine/source/elements/solid/solide/boltst.F
+!||    check_off_ale          ../engine/source/elements/solid/solide/check_off_ale.F
+!||    degenes8               ../engine/source/elements/solid/solide/degenes8.F
+!||    emomt3b                ../engine/source/elements/solid/solide/emomt3b.F
+!||    epxle3                 ../engine/source/elements/solid/solide/epxle3.F
+!||    fe_close               ../engine/source/elements/solid/solide/fe_close.F
+!||    mmain                  ../engine/source/materials/mat_share/mmain.F90
+!||    mod_close              ../engine/source/elements/solid/solide/mod_close.F
+!||    nsvis_sm12             ../engine/source/elements/solid/solide10/nsvis_sm12.F
+!||    s11defo3               ../engine/source/elements/solid/solide/s11defo3.F
+!||    s8for_distor           ../engine/source/elements/solid/solide/s8for_distor.F
+!||    s8get_x3               ../engine/source/elements/solid/solide/s8get_x3.F
+!||    s8sav12                ../engine/source/elements/solid/solide/s8sav12.F
+!||    s8sav3                 ../engine/source/elements/solid/solide/s8sav3.F
+!||    s8upd11t12             ../engine/source/elements/solid/solide/s8upd11t12.F
+!||    scoor_cp2sp            ../engine/source/elements/solid/solidez/scoor_cp2sp.F
+!||    scumu3                 ../engine/source/elements/solid/solide/scumu3.F
+!||    scumu3p                ../engine/source/elements/solid/solide/scumu3p.F
+!||    sdefo3                 ../engine/source/elements/solid/solide/sdefo3.F
+!||    sdefot3                ../engine/source/elements/solid/solide/sdefot3.F
+!||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
+!||    sdlen3                 ../engine/source/elements/solid/solide/sdlen3.F
+!||    sdlen8                 ../engine/source/elements/solid/solidez/sdlen8.F
+!||    sdlen_sms              ../engine/source/elements/solid/solidez/sdlen_sms.F
+!||    sdlenmax               ../engine/source/elements/solid/solide/sdlenmax.F
+!||    sfillopt               ../engine/source/elements/solid/solide/sfillopt.F
+!||    sfint3                 ../engine/source/elements/solid/solide/sfint3.F
+!||    sfint_reg              ../engine/source/elements/solid/solide/sfint_reg.F
+!||    sgcoor3                ../engine/source/elements/solid/solide/sgcoor3.F
+!||    sgeodel3               ../engine/source/elements/solid/solide/sgeodel3.F
+!||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
+!||    smallgeo3              ../engine/source/elements/solid/solide/smallgeo3.F
+!||    sordeft3               ../engine/source/elements/solid/solidez/sordeft3.F
+!||    srbilan                ../engine/source/elements/solid/solide/srbilan.F
+!||    srcoor3                ../engine/source/elements/solid/solide/srcoor3.F
+!||    srho3                  ../engine/source/elements/solid/solide/srho3.F
+!||    srmalla11              ../engine/source/elements/solid/solide/srmalla11.F
+!||    srmalla3               ../engine/source/elements/solid/solide/srmall3.F
+!||    sroto3                 ../engine/source/elements/solid/solidez/sroto3.F
+!||    srrota3                ../engine/source/elements/solid/solide/srrota3.F
+!||    srrotadp               ../engine/source/elements/solid/solide/srrotadp.F
+!||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
+!||    startime               ../engine/source/system/timer_mod.F90
+!||    stherm                 ../engine/source/elements/solid/solide/stherm.F
+!||    stoptime               ../engine/source/system/timer_mod.F90
+!||    storth3                ../engine/source/elements/solid/solidez/storth3.F
+!||    sz_dt1                 ../engine/source/elements/solid/solidez/sz_dt1.F90
+!||    szderi3                ../engine/source/elements/solid/solidez/szderi3.F
+!||    szderit3               ../engine/source/elements/solid/solidez/szderi3.F
+!||    szderito3              ../engine/source/elements/solid/solidez/szderi3.F
+!||    szhour3                ../engine/source/elements/solid/solidez/szhour3.F
+!||    szhour3_or             ../engine/source/elements/solid/solidez/szhour3_or.F
+!||    szhour_ctl             ../engine/source/elements/solid/solidez/szhour_ctl.F
+!||    szordef3               ../engine/source/elements/solid/solidez/szordef3.F
+!||    sztorth3               ../engine/source/elements/solid/solidez/sztorth3.F
+!||    visc_et                ../engine/source/elements/solid/solidez/visc_et.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    ale_mod                ../common_source/modules/ale/ale_mod.F
+!||    dt_mod                 ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
+!||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    sz_dt1_mod             ../engine/source/elements/solid/solidez/sz_dt1.F90
+!||    table_mod              ../engine/share/modules/table_mod.F
+!||    timer_mod              ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE SZFORC3(TIMERS,  ELBUF_TAB,NG      ,
      1                   PM       ,GEO     ,IXS     ,X      ,
-     2                   A        ,V       ,MS      ,W      ,FLUX   ,
+     2                   A        ,V       ,MS      ,W      ,
      3                   FLU1     ,VEUL      ,FV      ,ALE_CONNECT    ,IPARG    ,
      4                   TF       ,NPF     ,BUFMAT  ,PARTSAV,
      5                   DT2T     ,NELTST  ,ITYPTST ,STIFN  ,FSKY   ,
@@ -123,6 +127,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TIMER_MOD
+      USE OUTPUT_MOD, only : OUTPUT_
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -131,11 +136,12 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE ALE_MOD
       USE DT_MOD
-      USE OUTPUT_MOD
       USE ELBUFDEF_MOD
       USE SDISTOR_INI_MOD, ONLY : SDISTOR_INI
       use glob_therm_mod
       USE SENSOR_MOD
+      USE sz_dt1_mod, only : sz_dt1
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -180,13 +186,14 @@ C-----------------------------------------------
       INTEGER NELTST,ITYPTST,OFFSET,NEL ,ICP,
      .        NVC,ISTRAIN,IEXPAN,NG,NPTS,IOUTPRT,NALE(*),H3D_STRAIN
 
+C     ENSURE DOUBLE-PRECISION (64-BIT) FLOATING-POINT CALCULATIONS, EVEN WHEN COMPILING IN SINGLE-PRECISION MODE.
       DOUBLE PRECISION 
      .        XDP(3,*)
       my_real
      .   DT2T
       my_real
      .   PM(NPROPM,NUMMAT), GEO(NPROPG,*), X(*), A(*), V(3,*), MS(*), W(*), 
-     .   FLUX(6,*), FSKYM(*),
+     .   FSKYM(*),
      .   FLU1(*), VEUL(*), FV(*), TF(*), BUFMAT(*),
      .   PARTSAV(*),STIFN(*), FSKY(*),EANI(*),MSNF(*),
      .   F11(MVSIZ),F21(MVSIZ),F31(MVSIZ),
@@ -230,6 +237,7 @@ C-----------------------------------------------
      . VDX(MVSIZ) , VDY(MVSIZ) , VDZ(MVSIZ),SSP_EQ(MVSIZ),AIRE(MVSIZ),
      . CONDE(MVSIZ),DIVDE(MVSIZ),DELTAXI(MVSIZ)
                  
+C     ENSURE DOUBLE-PRECISION (64-BIT) FLOATING-POINT CALCULATIONS, EVEN WHEN COMPILING IN SINGLE-PRECISION MODE.  
       DOUBLE PRECISION 
      .   XD1(MVSIZ), XD2(MVSIZ), XD3(MVSIZ), XD4(MVSIZ),
      .   XD5(MVSIZ), XD6(MVSIZ), XD7(MVSIZ), XD8(MVSIZ),
@@ -247,7 +255,7 @@ C
       my_real
      .   MUVOID(MVSIZ),FAC_NU,NU_SP,NU0,DN
 C-----
-C 8-nodes solid connectivities
+C 8-nodes Solid Connectivities
       INTEGER NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ), 
      .        NC5(MVSIZ), NC6(MVSIZ), NC7(MVSIZ), NC8(MVSIZ)
       my_real
@@ -306,7 +314,7 @@ C 8-nodes solid connectivities
      .  XGXYA(MVSIZ),XGYZA(MVSIZ),XGZXA(MVSIZ),
      .  XGXA2(MVSIZ),XGYA2(MVSIZ),XGZA2(MVSIZ),
      .  STI_C(MVSIZ),LL(MVSIZ),L_MAX(MVSIZ),FLD(MVSIZ),
-     .  CNS2,RHO0_1,NU,C1,CAQ,FQMAX
+     .  CNS2,RHO0_1,NU,FQMAX
       my_real, dimension(mvsiz) :: fheat
       my_real ,DIMENSION(:), POINTER :: EINT
 C-----
@@ -315,15 +323,17 @@ C-----
 C-----
 C----- 
 C     IBOLTP : flag bolt preloading
-      INTEGER IBOLTP,NBPRELD,IMAT,ISM12_11,NN_DEL,PID,ISCTL,ISTAB(MVSIZ)
+      INTEGER IBOLTP,NBPRELD,IMAT,ISM12_11,NN_DEL,PID,ISCTL,ISTAB(MVSIZ),IDEGE(MVSIZ)
       my_real, DIMENSION(:), ALLOCATABLE :: VAR_REG
-      my_real :: NL_NBNOD
       my_real, DIMENSION(:), POINTER :: BPRELD,DNL
-      my_real :: P(MVSIZ)
+      my_real :: P(MVSIZ), OFFG11(MVSIZ)
       INTEGER SZ_IX
+      integer :: fake_size = 0
+      my_real, dimension(1) :: fake_array          
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C=======================================================================
+      
       GBUF => ELBUF_TAB(NG)%GBUF
       LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)
       ISM12_11 = ELBUF_TAB(NG)%BUFLY(1)%L_SIGL
@@ -375,6 +385,9 @@ C Gather nodal variables and compute rotation
      .   XDP, X0 , Y0 , Z0 , NEL, XGXA, XGYA, XGZA,
      .   XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,IPARG(1,NG),
      .   GBUF%GAMA_R) 
+
+
+
 C
       NN_DEL = 0
       PID  = NGEO(1)
@@ -394,12 +407,15 @@ C
       ICP0=MAT_ELEM%MAT_PARAM(IMAT)%COMPRESSIBILITY
       FAC_NU = ONE
       NU0 = PM(21,IMAT)
+      NU_SP = ONE
       IF (IDT1SOL == 1.AND.(MTN==1.OR.ICP0 ==3)) THEN
         NU_SP=SQRT((ONE-NU0)/(ONE+NU0))
-        FAC_NU = NU_SP/ZEP9
+        NU_SP = MIN(ONE,NU_SP/ZEP9)
+        FAC_NU=(ONE-TWO*NU0)/(ONE-NU0)
       END IF
       ISCTL = IGEO(97,PID)
 C Total strain Pij are in global system for ISMSTR=10,12 and in local system for ISMSTR=11
+   
       IF ((ISMSTR >= 10.AND.ISMSTR <= 12).AND.JLAG > 0) THEN
         CALL SGCOOR3(
      1   TT,        8,         X,         IXS(1,NF1),
@@ -407,6 +423,9 @@ C Total strain Pij are in global system for ISMSTR=10,12 and in local system for
      3   VY0,       VZ0,       GBUF%SMSTR,D,
      4   GBUF%OFF,  OFFG0,     NEL,       XDP,
      5   MTN,       ISMSTR)
+
+
+     
         IF (ISMSTR == 11) THEN
         CALL SRROTADP(
      1   R11,     R12,     R13,     R21,
@@ -445,12 +464,14 @@ C Total strain Pij are in global system for ISMSTR=10,12 and in local system for
      .    JAC1,JAC2,JAC3,
      .    JAC4,JAC5,JAC6,JAC9,JLAG)
         ELSE
+          
           CALL SZDERITO3(
      1   OFF,       VOLN,      PX1,       PX2,
      2   PX3,       PX4,       PY1,       PY2,
      3   PY3,       PY4,       PZ1,       PZ2,
      4   PZ3,       PZ4,       GBUF%JAC_I,NEL,
      5   JLAG)
+
         END IF
          CALL SDEFOT3(
      1   PX1,     PX2,     PX3,     PX4,
@@ -465,6 +486,7 @@ C Total strain Pij are in global system for ISMSTR=10,12 and in local system for
      A   MFXX,    MFXY,    MFXZ,    MFYX,
      B   MFYY,    MFYZ,    MFZX,    MFZY,
      C   MFZZ,    NEL)
+
 c
         IF (ISMSTR==10.OR.ISMSTR==12.OR.ISORTH/=0) THEN
           CALL SZTORTH3(LFT,LLT,ISORTH,NEL,
@@ -474,6 +496,7 @@ c
      .         MFZX, MFZY, MFZZ,
      .         G1X, G1Y, G1Z, G2X, G2Y, G2Z, G3X, G3Y, G3Z)
         ENDIF
+
       ENDIF   !  ISMSTR==10.AND.JLAG>0
 C-----------
 C
@@ -580,6 +603,12 @@ C         Possible mix of elts computing DELTAX like in sdlen3 & sdlen8
      L   N5Z,     N6Z,     NEL,     NFT,
      M   JHBE)
       ENDIF
+! dt1/brick for elastoplastic laws (including law1)
+        CALL SZ_DT1(
+     1   PX1,     PX2,     PX3,     PX4,     
+     2   PY1,     PY2,     PY3,     PY4,     
+     3   PZ1,     PZ2,     PZ3,     PZ4,  
+     4   FAC_NU,DELTAXI,   NEL )
 c
       IF (JALE+JEUL > 0 .AND. MTN == 11) THEN
         CALL S11DEFO3(
@@ -591,7 +620,7 @@ c
      6   WZZ,        BUFMAT,     NEL,        NFT,
      7   IPM,        NUMMAT,     NUMELS+NSVOIS)
       ELSE
-        CALL SDEFO3(
+        CALL SDEFO3(OUTPUT%DATA%FANI_CELL,
      1   PX1,     PX2,     PX3,     PX4,
      2   PY1,     PY2,     PY3,     PY4,
      3   PZ1,     PZ2,     PZ3,     PZ4,
@@ -625,20 +654,31 @@ C
       DIVDE(1:NEL) = DT1*(DXX(1:NEL)+ DYY(1:NEL)+ DZZ(1:NEL))  
       CALL SRHO3(
      1   PM,         GBUF%VOL,   GBUF%RHO,   GBUF%EINT,
-     2   DIVDE,      FLUX(1,NF1),FLU1(NF1),  VOLN,
+     2   DIVDE,      fake_array,FLU1(NF1),  VOLN,
      3   DVOL,       NGL,        MXT,        OFF,
      4   IBID,       GBUF%TAG22, VOLDP,      LBUF%VOL0DP,
      5   AMU,        GBUF%OFF,   NEL,        MTN,
-     6   JALE,       ISMSTR,     JEUL,       JLAG)
+     6   JALE,       ISMSTR,     JEUL,       JLAG,
+     .   fake_size,fake_size,0)
 C
 C Extract stresses + small strain
        CALL SRMALLA3(GBUF%SIG,S1,S2,S3,S4,S5,S6,
      .             GBUF%OFF,OFF,NEL)
-       CALL SRMALLA11(
-     1   GBUF%SMSTR,GBUF%OFF,  WXX,       WYY,
+      IF (ISMSTR == 11.OR.ISMSTR == 12) THEN
+        CALL DEGENES8(IXS(1,NF1),IDEGE,   NEL)
+        DO I=1,NEL
+          IF (IDEGE(I) == 0) THEN
+             OFFG11(I) = GBUF%OFF(I)
+          ELSE 
+             OFFG11(I) = ZERO
+          END IF
+        END DO
+        CALL SRMALLA11(
+     1   GBUF%SMSTR,OFFG11  ,  WXX,       WYY,
      2   WZZ,       R11,       R12,       R13,
      3   R21,       R22,       R23,       R31,
      4   R32,       R33,       NEL,       ISMSTR)
+      END IF  !(ISMSTR == 11.OR.ISMSTR == 12) THEN
 C
 C  Update reference configuration (possible future change to small strain option)
 C  Total strain option doesn't change the reference configuration
@@ -663,7 +703,8 @@ C Element temperature
         ENDDO
       ENDIF
 C
-       DELTAXI(1:NEL) = FAC_NU*DELTAX(1:NEL)   
+      DELTAXI(1:NEL) = DELTAX(1:NEL)   
+      IF (FAC_NU<ONE) DELTAXI(1:NEL) = MAX(DELTAXI(1:NEL),NU_SP*DELTAX(1:NEL))   
 C-----------------------------------------------------------------------
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
       ILAY = 1 
@@ -679,28 +720,30 @@ c===========================================================================
         L_NLOC = NLOC_DMG%L_NLOC
         DNL  => NLOC_DMG%DNL(1:L_NLOC) ! DNL = non local variable increment
         DO I=1,NEL
-          ! Recover non-local d.o.fs position
-          INOD(1:8) = 0
-          IPOS(1:8) = 0
-          DO J = 1,ELBUF_TAB(NG)%NLOCS%NL_ISOLNOD(I)
-            INOD(J) = NLOC_DMG%IDXI(ELBUF_TAB(NG)%NLOCS%NL_SOLNOD(J,I))
+          INOD(1) = NLOC_DMG%IDXI(NC1(I))
+          INOD(2) = NLOC_DMG%IDXI(NC2(I))
+          INOD(3) = NLOC_DMG%IDXI(NC3(I))
+          INOD(4) = NLOC_DMG%IDXI(NC4(I))
+          INOD(5) = NLOC_DMG%IDXI(NC5(I))
+          INOD(6) = NLOC_DMG%IDXI(NC6(I))
+          INOD(7) = NLOC_DMG%IDXI(NC7(I))
+          INOD(8) = NLOC_DMG%IDXI(NC8(I))
+          DO J = 1, 8
             IPOS(J) = NLOC_DMG%POSI(INOD(J))
           ENDDO
-          ! Computation of non-local variable at intg. point
-          VAR_REG(I) = ZERO
-          NL_NBNOD = ELBUF_TAB(NG)%NLOCS%NL_ISOLNOD(I)
-          DO J = 1, ELBUF_TAB(NG)%NLOCS%NL_ISOLNOD(I)
-            VAR_REG(I) = VAR_REG(I) + DNL(IPOS(J))/NL_NBNOD
-          ENDDO
+          VAR_REG(I) = DNL(IPOS(1)) + DNL(IPOS(2)) + DNL(IPOS(3)) + DNL(IPOS(4)) 
+     .               + DNL(IPOS(5)) + DNL(IPOS(6)) + DNL(IPOS(7)) + DNL(IPOS(8))
+          VAR_REG(I) = VAR_REG(I)*ONE_OVER_8
         ENDDO
       ENDIF
 c===========================================================================
 C
       IF(IBOLTP /= 0) CALL BOLTST(IP    ,BPRELD    ,LBUF%SIG  ,TT     ,NEL   ,
-     .                            NPT   ,SENSORS%NSENSOR,SENSORS%SENSOR_TAB)
+     .                            NPT   ,SENSORS%NSENSOR,SENSORS%SENSOR_TAB,
+     .                            IPARG(67,NG),IPARG(68,NG))
 C
 C Compute stresses according to the material law
-      CALL MMAIN(TIMERS,
+      CALL MMAIN(TIMERS, OUTPUT,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -735,7 +778,7 @@ C Compute stresses according to the material law
      .   numgeo,      numnod,      numels,      
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, impl_s,
-     .   idyna,       DT          ,fheat     )
+     .   idyna,       DT          ,fheat     ,sensors)
 
       IF (ISTRAIN == 1)THEN 
         CALL SSTRA3(
@@ -807,7 +850,7 @@ C Balance thermal material
      .         GRESAV,GRTH,IGRTH,GBUF%OFF,IEXPAN,GBUF%EINTTH,
      .         GBUF%FILL, XGXA, XGYA, XGZA,
      .         XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG),
-     .         SENSORS)
+     .         SENSORS,NEL,GBUF%G_WPLA,GBUF%WPLA)
         ENDIF
         RETURN
       ENDIF
@@ -990,7 +1033,8 @@ C ALE or EULER : update momentum transport forces
      X   IPARG(1,NG),IXS,        GBUF%TAG22, NC1,
      Y   NC2,        NC3,        NC4,        NC5,
      Z   NC6,        NC7,        NC8,        NALE,
-     1   NEL,        NFT,        MTN,        IPM)
+     1   NEL,        NFT,        MTN,        IPM,
+     .  fake_size, fake_size)
       ELSEIF(JEUL == 1 .AND. INTEG8 == 1)THEN
 C
 C Does not include upwind SUPG or TG
@@ -1018,7 +1062,7 @@ C Does not include upwind SUPG or TG
      L   VY7,               VY8,               VZ1,               VZ2,
      M   VZ3,               VZ4,               VZ5,               VZ6,
      N   VZ7,               VZ8,               IPARG(1,NG),       NEL,
-     O   MTN,               IPM)
+     O   MTN,               IPM,fake_size, fake_size,nft)
       ENDIF
 
         IF(JEUL+JALE/=0) CALL CHECK_OFF_ALE(F11,F21,F31,F12,F22,
@@ -1055,7 +1099,7 @@ C Energy, momentum, mass balance per part in case of output
      .       GRESAV,GRTH,IGRTH,GBUF%OFF,IEXPAN,GBUF%EINTTH,
      .       GBUF%FILL, XGXA, XGYA, XGZA,
      .       XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG),
-     .       SENSORS)                                  
+     .       SENSORS,NEL,GBUF%G_WPLA,GBUF%WPLA)                                 
       ENDIF
 C
 C Compute nodal internal forces
@@ -1087,36 +1131,36 @@ c===========================================================================
       IF (INLOC > 0) THEN  
         CALL SFINT_REG(
      1    NLOC_DMG ,VAR_REG  ,NEL      ,OFF      ,
-     2    VOLN     ,ELBUF_TAB(NG)%NLOCS,GBUF%VOL ,
-     3    PX1      ,PX2      ,PX3      ,PX4      ,     
-     4    PY1      ,PY2      ,PY3      ,PY4      ,
-     5    PZ1      ,PZ2      ,PZ3      ,PZ4      ,
-     6    IMAT     ,ITASK    ,DT2T     ,NFT      )
+     2    VOLN     ,NC1      ,NC2      ,NC3      ,
+     3    NC4      ,NC5      ,NC6      ,NC7      ,
+     4    NC8      ,PX1      ,PX2      ,PX3      ,
+     5    PX4      ,PY1      ,PY2      ,PY3      ,
+     6    PY4      ,PZ1      ,PZ2      ,PZ3      ,
+     7    PZ4      ,IMAT     ,ITASK    ,DT2T     ,
+     8    GBUF%VOL ,NFT      )
       ENDIF    
 c===========================================================================  
 C
 C Finite element heat transfert
       IF (JTHE < 0) THEN
-        IMAT = MXT(1)
         IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
-          CALL STHERM(
-     1         PM,      IMAT,    VOLN,    NC1,
-     2         NC2,     NC3,     NC4,     NC5,
-     3         NC6,     NC7,     NC8,     PX1,
-     4         PX2,     PX3,     PX4,     PY1,
-     5         PY2,     PY3,     PY4,     PZ1,
-     6         PZ2,     PZ3,     PZ4,     DT1,
-     7         TEMP,    TEMPEL,  FHEAT,   THEM,
-     8         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
-     9         GBUF%VOL,NEL     ,NUMNOD ,GLOB_THERM%THEACCFACT)
+          CALL STHERM(MAT_ELEM%MAT_PARAM(IMAT),
+     1         VOLN,    NC1,     NC2,     NC3,     NC4,
+     2         NC5,     NC6,     NC7,     NC8,     PX1,
+     3         PX2,     PX3,     PX4,     PY1,
+     4         PY2,     PY3,     PY4,     PZ1,
+     5         PZ2,     PZ3,     PZ4,     DT1,
+     6         TEMP,    TEMPEL,  FHEAT,   THEM,
+     7         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
+     8         GBUF%VOL,NEL     ,NUMNOD ,GLOB_THERM%THEACCFACT)
+     9         
          ELSE
-          CALL STHERM(
-     1         PM,      IMAT,    VOLN,    NC1,
-     2         NC2,     NC3,     NC4,     NC5,
-     3         NC6,     NC7,     NC8,     PX1,
-     4         PX2,     PX3,     PX4,     PY1,
-     5         PY2,     PY3,     PY4,     PZ1,
-     6         PZ2,     PZ3,     PZ4,     DT1,
+          CALL STHERM(MAT_ELEM%MAT_PARAM(IMAT),
+     1         VOLN,    NC1,     NC2,     NC3,     NC4,
+     2         NC5,     NC6,     NC7,     NC8,     PX1,
+     3         PX2,     PX3,     PX4,     PY1,
+     4         PY2,     PY3,     PY4,     PZ1,
+     5         PZ2,     PZ3,     PZ4,     DT1,
      7         TEMP,    TEMPEL,  DIE,     THEM,
      8         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
      9         GBUF%VOL,NEL     ,NUMNOD ,GLOB_THERM%THEACCFACT)
@@ -1144,10 +1188,9 @@ C----------------------------
      3                GBUF%SIG ,GBUF%RHO ,CXX        ,OFF     ,       
      4                GBUF%OFF ,LL       ,VOLN       ,FLD     ,       
      5                CNS2     ,FQMAX    )
-C        get actual configuration from x(3,*) for small strain option
-!      xj now is the current config in global sys, xx0 is in global sys excepting ismstr=11 
-         IF (ISMSTR == 1.OR.ISMSTR >= 11) 
-     .     CALL S8GET_X3(      
+C        
+!      x,v sould be in global sys 
+          CALL S8GET_X3(      
      .     NC1,      NC2,      NC3,      NC4,
      .     NC5,      NC6,      NC7,      NC8,
      .      X1,       X2,       X3,       X4,      

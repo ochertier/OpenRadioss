@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,47 +20,49 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s16forc3               ../engine/source/elements/thickshell/solide16/s16forc3.F
-      !||--- called by ------------------------------------------------------
-      !||    forint                 ../engine/source/elements/forint.F
-      !||--- calls      -----------------------------------------------------
-      !||    mmain                  ../engine/source/materials/mat_share/mmain.F90
-      !||    s16bilan               ../engine/source/elements/thickshell/solide16/s16bilan.F
-      !||    s16deri3               ../engine/source/elements/thickshell/solide16/s16deri3.F
-      !||    s16rst                 ../engine/source/elements/thickshell/solide16/s16rst.F
-      !||    s16sigp3               ../engine/source/elements/thickshell/solide16/s16sigp3.F
-      !||    s16sigs3               ../engine/source/elements/thickshell/solide16/s16sigs3.F
-      !||    s20coor3               ../engine/source/elements/solid/solide20/s20coor3.F
-      !||    s20cumu3               ../engine/source/elements/solid/solide20/s20cumu3.F
-      !||    s20cumu3p              ../engine/source/elements/solid/solide20/s20cumu3p.F
-      !||    s20defo3               ../engine/source/elements/solid/solide20/s20defo3.F
-      !||    s20fint3               ../engine/source/elements/solid/solide20/s20fint3.F
-      !||    s20tempcg              ../engine/source/elements/solid/solide20/s20tempcg.F
-      !||    s20therm               ../engine/source/elements/solid/solide20/s20therm.F
-      !||    sdlensh2               ../engine/source/elements/thickshell/solidec/sdlensh2.F
-      !||    smalla3                ../engine/source/elements/solid/solide/smalla3.F
-      !||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
-      !||    srho3                  ../engine/source/elements/solid/solide/srho3.F
-      !||    srota3                 ../engine/source/elements/solid/solide/srota3.F
-      !||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
-      !||    sxfillopt              ../engine/source/elements/solid/solide10/sxfillopt.F
-      !||    tshgeodel3             ../engine/source/elements/thickshell/solidec/tshgeodel3.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    dt_mod                 ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
-      !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    table_mod              ../engine/share/modules/table_mod.F
-      !||    timer_mod              ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE S16FORC3(TIMERS, ELBUF_TAB,NG      ,
+!||====================================================================
+!||    s16forc3               ../engine/source/elements/thickshell/solide16/s16forc3.F
+!||--- called by ------------------------------------------------------
+!||    forint                 ../engine/source/elements/forint.F
+!||--- calls      -----------------------------------------------------
+!||    mmain                  ../engine/source/materials/mat_share/mmain.F90
+!||    s16bilan               ../engine/source/elements/thickshell/solide16/s16bilan.F
+!||    s16deri3               ../engine/source/elements/thickshell/solide16/s16deri3.F
+!||    s16rst                 ../engine/source/elements/thickshell/solide16/s16rst.F
+!||    s16sigp3               ../engine/source/elements/thickshell/solide16/s16sigp3.F
+!||    s16sigs3               ../engine/source/elements/thickshell/solide16/s16sigs3.F
+!||    s20coor3               ../engine/source/elements/solid/solide20/s20coor3.F
+!||    s20cumu3               ../engine/source/elements/solid/solide20/s20cumu3.F
+!||    s20cumu3p              ../engine/source/elements/solid/solide20/s20cumu3p.F
+!||    s20defo3               ../engine/source/elements/solid/solide20/s20defo3.F
+!||    s20fint3               ../engine/source/elements/solid/solide20/s20fint3.F
+!||    s20tempcg              ../engine/source/elements/solid/solide20/s20tempcg.F
+!||    s20therm               ../engine/source/elements/solid/solide20/s20therm.F
+!||    sdlensh2               ../engine/source/elements/thickshell/solidec/sdlensh2.F
+!||    smalla3                ../engine/source/elements/solid/solide/smalla3.F
+!||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
+!||    srho3                  ../engine/source/elements/solid/solide/srho3.F
+!||    srota3                 ../engine/source/elements/solid/solide/srota3.F
+!||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
+!||    sxfillopt              ../engine/source/elements/solid/solide10/sxfillopt.F
+!||    tshgeodel3             ../engine/source/elements/thickshell/solidec/tshgeodel3.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    dt_mod                 ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
+!||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    table_mod              ../engine/share/modules/table_mod.F
+!||    timer_mod              ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE S16FORC3(TIMERS, OUTPUT, ELBUF_TAB,NG      ,
      1                    PM       ,GEO     ,IXS    ,X       ,
-     2                    A        ,V       ,MS     ,W       ,FLUX    ,
+     2                    A        ,V       ,MS     ,W       ,
      3                    FLU1     ,VEUL    ,FV     ,ALE_CONNECT   ,IPARG   ,
      4                    TF       ,NPF     ,BUFMAT ,PARTSAV ,NLOC_DMG,
      5                    DT2T     ,NELTST  ,ITYPTST,STIFN   ,FSKY    ,
@@ -85,6 +87,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TIMER_MOD
+      USE OUTPUT_MOD, only : OUTPUT_
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -94,6 +97,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       use glob_therm_mod
       USE SENSOR_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -121,6 +125,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER,INTENT(IN) :: SNPC
       INTEGER,INTENT(IN) :: STF
       INTEGER, INTENT(IN) :: SBUFMAT
@@ -143,7 +148,7 @@ C-----------------------------------------------
      .   DT2T
       my_real
      .   PM(NPROPM,*), GEO(NPROPG,*), X(*), A(*), V(*), MS(*), W(*), 
-     .   FLUX(6,*),FLU1(*), VEUL(*), FV(*), TF(*), 
+     .   FLU1(*), VEUL(*), FV(*), TF(*), 
      .   BUFMAT(*),PARTSAV(*),STIFN(*), FSKY(*),EANI(*)
       my_real
      .  FX(MVSIZ,NPE),FY(MVSIZ,NPE),FZ(MVSIZ,NPE),
@@ -171,8 +176,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,N,LCO, NF1, IFLAG, IL, IR, IS, IT, NF2,L_PLA,IMAT,
-     .        IP,NLAY,NPTT,NPTS,NPTR,ICO,IBID,IBIDON(1),MX,II(6),PID,CURRENT_LAYER
+      INTEGER I,N, NF1, IFLAG, IL, IR, IS, IT, NF2,L_PLA,IMAT,
+     .        IP,NLAY,NPTT,NPTS,NPTR,IBID,IBIDON(1),II(6),PID,CURRENT_LAYER
 
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),IPERM1(NPE),IPERM2(NPE)
       my_real
@@ -185,21 +190,21 @@ C-----------------------------------------------
      . VDX(MVSIZ),VDY(MVSIZ),VDZ(MVSIZ),SSP_EQ(MVSIZ),
      . AIRE(MVSIZ),CONDE(MVSIZ),CONDEG(MVSIZ,NPE),DIVDE(MVSIZ)
 
-      ! Variables utilisees en argument par les materiaux.
+      ! variables used as arguments by the materials.
       my_real
      .   STI(MVSIZ), WXX(MVSIZ) , WYY(MVSIZ) , WZZ(MVSIZ)
-      ! Variables utilisees en argument par les materiaux si SPH uniquement.
+      ! Variables used in argument by materials if SPH only.
       my_real
      .   MUVOID(MVSIZ)
 
       !  Variables void MMAIN 
       my_real
      . SIGY(MVSIZ),ET(MVSIZ),GAMA(MVSIZ,6),
-     . R1_FREE(MVSIZ),R3_FREE(MVSIZ),R4_FREE(MVSIZ),
+     . R1_FREE(MVSIZ),R3_FREE(MVSIZ),
      . TEMPEL(MVSIZ),DIE(MVSIZ),THEM(MVSIZ,NPE),AREA(MVSIZ),LLSH(MVSIZ)
       my_real, dimension(mvsiz) :: fheat
      
-      ! Variables utilisees dans les routines solides uniquement (en arguments).
+      ! variables used only in solid routines (as arguments).
       INTEGER NC(MVSIZ,NPE),NN_DEL,IPRES,SZ_IX
       my_real
      .  OFF(MVSIZ) , RHOO(MVSIZ),NI(NPE,NIPMAX),
@@ -210,6 +215,8 @@ C-----------------------------------------------
       my_real VARNL(NEL)
       DOUBLE PRECISION 
      .   VOLDP(MVSIZ,NIPMAX)
+      integer :: fake_size = 0
+      my_real, dimension(1) :: fake_array    
 C-----------------------------------------------
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
@@ -494,7 +501,7 @@ C-----------
      9   IT,                VOLDP(1,IP),       NEL)
             ENDIF
             !--------------------------
-            ! SOUS INTEGRATION DE SIGS
+            ! SUB-INTEGRATION OF SIGS
             !-------------------------
             DO I=1,NEL
               AA         = ONE / SQRT(SX(I,IP)*SX(I,IP) + SY(I,IP)*SY(I,IP) +SZ(I,IP)*SZ(I,IP))
@@ -579,11 +586,12 @@ C
          DIVDE(1:NEL) = DT1*(DXX(1:NEL)+ DYY(1:NEL)+ DZZ(1:NEL))   
          CALL SRHO3(
      1   PM,         LBUF%VOL,   LBUF%RHO,   LBUF%EINT,
-     2   DIVDE,      FLUX(1,NF1),FLU1(NF1),  VOLN,
+     2   DIVDE,      fake_array,FLU1(NF1),  VOLN,
      3   DVOL,       NGL,        MXT,        OFF,
      4   0,          GBUF%TAG22, VOLDP(1,IP),LBUF%VOL0DP,
      5   AMU,        GBUF%OFF,   NEL,        MTN,
-     6   JALE,       ISMSTR,     JEUL,       JLAG)
+     6   JALE,       ISMSTR,     JEUL,       JLAG,
+     .   fake_size,fake_size,0)
      
          CALL SROTA3(
      1   LBUF%SIG,S1,      S2,      S3,
@@ -608,7 +616,7 @@ C
       !------------------------------------------------------
       !     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
       !------------------------------------------------------
-         CALL MMAIN(TIMERS,
+         CALL MMAIN(TIMERS, OUTPUT,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -643,7 +651,7 @@ C
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, impl_s,
-     .   idyna,       DT,         fheat   , OPT_MTN=MTN, OPT_JCVT=JCVT,
+     .   idyna,       DT,         fheat   , sensors, OPT_MTN=MTN, OPT_JCVT=JCVT,
      .   OPT_ISORTH=ISORTH,OPT_ISORTHG=ISORTHG)
 c
       IF (ISTRAIN == 1)THEN 
@@ -680,7 +688,8 @@ C
      6   GBUF%EINT, GBUF%RHO,  GBUF%QVIS, GBUF%PLA,
      7   WI,        VOLG,      LBUF%VOL,  GBUF%VOL,
      8   L_PLA,     NEL,       CONDE,     DELTAX,
-     9   CONDEG,    ISRAT,     SVIS      ,GLOB_THERM%NODADT_THERM)
+     9   CONDEG,    ISRAT,     SVIS      ,GLOB_THERM%NODADT_THERM,
+     A  GBUF%WPLA, LBUF%WPLA,   GBUF%G_WPLA )
       !-------------------------
       !    finite element heat transfert  
       !--------------------------
@@ -719,7 +728,7 @@ C
      .                  LLSH,GEO(1,PID),NN_DEL,DT ,NEL )
       ENDIF
       !--------------------------
-      !     BILANS PAR MATERIAU
+      ! balances by material
       !--------------------------
       IFLAG=MOD(NCYCLE,NCPRI)
       IF(IOUTPRT>0)THEN
@@ -727,7 +736,7 @@ C
      .             VX     ,VY       ,VZ      ,IPARTS     ,GRESAV    ,
      .             GRTH   ,IGRTH    ,IEXPAN  ,GBUF%EINTTH, GBUF%FILL,
      .             XX     ,YY       ,ZZ      ,ITASK      ,IPARG(1,NG),
-     .             GBUF%OFF,SENSORS)
+     .             GBUF%OFF,SENSORS,NEL,GBUF%G_WPLA,GBUF%WPLA)
       ENDIF
 C
 c-----------------------------

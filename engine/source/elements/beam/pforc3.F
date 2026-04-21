@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,38 +20,39 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    pforc3              ../engine/source/elements/beam/pforc3.F
-      !||--- called by ------------------------------------------------------
-      !||    forint              ../engine/source/elements/forint.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter              ../engine/source/tools/curve/finter.F
-      !||    main_beam18         ../engine/source/elements/beam/main_beam18.F
-      !||    main_beam3          ../engine/source/elements/beam/main_beam3.F
-      !||    pbilan              ../engine/source/elements/beam/pbilan.F
-      !||    pcoor3              ../engine/source/elements/beam/pcoor3.F
-      !||    pcurv3              ../engine/source/elements/beam/pcurv3.F
-      !||    pdamp3              ../engine/source/elements/beam/pdamp3.F
-      !||    pdefo3              ../engine/source/elements/beam/pdefo3.F
-      !||    pdlen3              ../engine/source/elements/beam/pdlen3.F
-      !||    pevec3              ../engine/source/elements/beam/pevec3.F
-      !||    pfcum3              ../engine/source/elements/beam/pfcum3.F
-      !||    pfcum3p             ../engine/source/elements/beam/pfcum3p.F
-      !||    pfint3              ../engine/source/elements/beam/pfint3.F
-      !||    pmcum3              ../engine/source/elements/beam/pmcum3.F
-      !||    pmcum3p             ../engine/source/elements/beam/pmcum3p.F
-      !||    ppxpy3              ../engine/source/elements/beam/ppxpy3.F
-      !||    preload_axial       ../engine/source/elements/spring/preload_axial.F90
-      !||    thermexppg          ../engine/source/elements/beam/thermexpp.F
-      !||    thermexppi          ../engine/source/elements/beam/thermexpp.F
-      !||--- uses       -----------------------------------------------------
-      !||    dt_mod              ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_mod             ../engine/share/modules/h3d_mod.F
-      !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
-      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    pforc3              ../engine/source/elements/beam/pforc3.F
+!||--- called by ------------------------------------------------------
+!||    forint              ../engine/source/elements/forint.F
+!||--- calls      -----------------------------------------------------
+!||    finter              ../engine/source/tools/curve/finter.F
+!||    main_beam18         ../engine/source/elements/beam/main_beam18.F
+!||    main_beam3          ../engine/source/elements/beam/main_beam3.F
+!||    pbilan              ../engine/source/elements/beam/pbilan.F
+!||    pcoor3              ../engine/source/elements/beam/pcoor3.F
+!||    pcurv3              ../engine/source/elements/beam/pcurv3.F
+!||    pdamp3              ../engine/source/elements/beam/pdamp3.F
+!||    pdefo3              ../engine/source/elements/beam/pdefo3.F
+!||    pdlen3              ../engine/source/elements/beam/pdlen3.F
+!||    pevec3              ../engine/source/elements/beam/pevec3.F
+!||    pfcum3              ../engine/source/elements/beam/pfcum3.F
+!||    pfcum3p             ../engine/source/elements/beam/pfcum3p.F
+!||    pfint3              ../engine/source/elements/beam/pfint3.F
+!||    pmcum3              ../engine/source/elements/beam/pmcum3.F
+!||    pmcum3p             ../engine/source/elements/beam/pmcum3p.F
+!||    ppxpy3              ../engine/source/elements/beam/ppxpy3.F
+!||    preload_axial       ../engine/source/elements/spring/preload_axial.F90
+!||    thermexppg          ../engine/source/elements/beam/thermexpp.F
+!||    thermexppi          ../engine/source/elements/beam/thermexpp.F
+!||--- uses       -----------------------------------------------------
+!||    dt_mod              ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    h3d_mod             ../engine/share/modules/h3d_mod.F
+!||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
+!||    sensor_mod          ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE PFORC3(
      1           ELBUF_STR,JFT      ,JLT      ,NEL      ,
      2           MTN      ,ISMSTR   ,PM       ,NCC      ,
@@ -71,7 +72,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      G           SBUFMAT  ,SNPC     ,STF      ,NUMMAT   ,
      H           NUMGEO   ,IOUT     ,ISTDO    ,IDEL7NOK ,
      I           IDYNA    ,IMCONV   ,IMPL_S   ,MAT_PARAM,
-     J           PRELD1   ,STF_F    ,DT       ,SENSORS)
+     J           PRELD1   ,STF_F    ,DT       ,SENSORS  ,
+     H           NTABLE   ,TABLE    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -81,6 +83,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE DT_MOD
       USE SENSOR_MOD
+      use element_mod , only : nixp
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -111,6 +114,8 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN) :: IDYNA
       INTEGER ,INTENT(IN) :: IMCONV
       INTEGER ,INTENT(INOUT) :: IDEL7NOK
+      INTEGER,INTENT(IN) :: NTABLE
+      TYPE(TTABLE), DIMENSION(NTABLE), INTENT(INOUT)    :: TABLE      ! TABLE DATA   
       INTEGER NCC(NIXP,*),IADP(2,*),IPARTP(*),IGEO(NPROPGI,*),
      .        IPM(NPROPMI,*),NPF(*),GRTH(*),IGRTH(*)
       INTEGER JFT,JLT,NELTST,ITYPTST,OFFSET,NEL,JTHE,
@@ -134,8 +139,8 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IFLAG,IGTYP,NUPARAM,NUVAR,NFUNC,IFUNC_ALPHA,IMAT
-      INTEGER MAT(MVSIZ),PID(MVSIZ),NGL(MVSIZ),IFUNC(100),
+      INTEGER I, IFLAG, IGTYP, NUVAR, IFUNC_ALPHA, IMAT
+      INTEGER MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ), 
      .   NC1(MVSIZ),NC2(MVSIZ),NC3(MVSIZ),IPT
       my_real 
      .   STI(MVSIZ),STIR(MVSIZ),OFF(MVSIZ),AL(MVSIZ),EXX(MVSIZ),
@@ -154,15 +159,18 @@ C-----------------------------------------------
      .   FSCAL_ALPHA,ETH(MVSIZ),DEINTTH,ALPHA,DF,VL12(MVSIZ),DTINV
 C
       my_real ::  KC,PHIX, CA,CB, AREA, FPHI(MVSIZ,2),DIE(MVSIZ)
-      my_real ,DIMENSION(NEL) ::  SIGX,SAPT
+      my_real ,DIMENSION(NEL) ::  SIGX,SAPT,VECNUL
       my_real ,DIMENSION(:) ,POINTER :: UVAR
+      my_real ,DIMENSION(:) ,POINTER :: EL_TEMP
       TYPE(G_BUFEL_) ,POINTER :: GBUF
-      TYPE(BUF_LAY_) ,POINTER :: BUFLY
+ 
+      TARGET :: TEMPEL,VECNUL
 C-----------------------------------------------      
        my_real FINTER 
       EXTERNAL FINTER
-C-----------------------------------------------
+C===============================================================================
       GBUF => ELBUF_STR%GBUF
+          vecnul(:) = zero          
 C-----------------------------------------------
       CALL PCOOR3(
      1   X,       NCC,     MAT,     PID,
@@ -170,6 +178,9 @@ C-----------------------------------------------
      3   X1,      X2,      X3,      Y1,
      4   Y2,      Y3,      Z1,      Z2,
      5   Z3,      NEL)
+      IGTYP = IGEO(11,PID(1))
+      IMAT  = MAT(1)
+
       CALL PEVEC3(
      1   GBUF%SKEW,R,        AL,       NC1,
      2   NC2,      NC3,      X1,       X2,
@@ -179,9 +190,7 @@ C-----------------------------------------------
      6   RZ2G,     E1X,      E1Y,      E1Z,
      7   E2X,      E2Y,      E2Z,      E3X,
      8   E3Y,      E3Z,      NEL)
-      IF (ISMSTR /= 0) CALL PPXPY3(
-     1   GBUF%LENGTH,AL,         NEL)
-      IGTYP = IGEO(11,PID(1))
+      IF (ISMSTR /= 0) CALL PPXPY3(GBUF%LENGTH,AL,NEL)
       CALL PDLEN3(
      1   JFT,      JLT,      PM,       GEO,
      2   GBUF%OFF, DT2T,     NELTST,   ITYPTST,
@@ -206,9 +215,6 @@ C-----------------------------------------------
      7   E2Y,     E2Z,     E3X,     E3Y,
      8   E3Z,     PID,     NEL)
 C---
-      IMAT = MAT(1)
-      NUPARAM = IPM(9,MAT(1))
-C---
       DIE(1:NEL)   = ZERO
       IF (JTHE > 0) THEN 
          DO I=1,NEL 
@@ -222,15 +228,31 @@ C---
         DTEMP(1:NEL) = TEMPEL(1:NEL) - GBUF%TEMP(1:NEL)
         GBUF%TEMP(1:NEL) = TEMPEL(1:NEL)
 c      
+        IFUNC_ALPHA = MAT_PARAM(IMAT)%THERM%FUNC_THEXP
+        FSCAL_ALPHA = MAT_PARAM(IMAT)%THERM%SCALE_THEXP
         DO I=1,NEL 
-          IFUNC_ALPHA = IPM(219, MAT(I))
-          FSCAL_ALPHA = PM(191, MAT(I))
-          ALPHA = FSCAL_ALPHA*FINTER(IFUNC_ALPHA,TEMPEL(I),NPF,TF,DF)
+          ALPHA  = FSCAL_ALPHA * FINTER(IFUNC_ALPHA,TEMPEL(I),NPF,TF,DF)
           ETH(I) = ALPHA*DTEMP(I)
           DEINTTH = - HALF*GBUF%FOR(I)*ETH(I)*AL(I)*OFF(I) 
           GBUF%EINTTH(I) = GBUF%EINTTH(I)  + DEINTTH
         ENDDO 
       ENDIF   
+!
+      if (jthe /= 0) then
+        el_temp => tempel(1:nel)
+      else if (igtyp == 3) then
+        if (elbuf_str%gbuf%g_temp > 0) then
+          el_temp => elbuf_str%gbuf%temp
+        else
+          el_temp => vecnul(1:nel)
+        end if
+      else if (igtyp == 18) then
+        if (elbuf_str%bufly(1)%l_temp > 0) then
+          el_temp => elbuf_str%bufly(1)%lbuf(1,1,1)%temp
+        else
+          el_temp => vecnul(1:nel)
+        endif
+      endif
 C---
       IF (IGTYP == 3) THEN
         ! beams type 3 (global integration)
@@ -239,7 +261,7 @@ C---
 
         CALL MAIN_BEAM3(
      .       ELBUF_STR,NEL      ,MTN      ,JTHE     ,IFAIL    ,
-     .       IPM      ,PM       ,GEO      ,TEMPEL   ,OFF      ,
+     .       IPM      ,PM       ,GEO      ,EL_TEMP  ,OFF      ,
      .       MAT      ,PID      ,NGL      ,TT       ,DT1      ,
      .       AL       ,NPF      ,TF       ,EXX      ,EXY      ,
      .       EXZ      ,KXX      ,KYY      ,KZZ      ,F1       ,
@@ -247,7 +269,8 @@ C---
      .       BUFMAT   ,NPROPG   ,NPROPMI  ,NPROPM   ,NUMMAT   ,
      .       NUMGEO   ,SBUFMAT  ,SNPC     ,STF      ,IOUT     ,
      .       ISTDO    ,NUVAR    ,UVAR     ,GBUF%EPSD,IMAT   ,
-     .       GBUF%FOR ,GBUF%MOM ,GBUF%EINT,ISMSTR   ,MAT_PARAM(IMAT))
+     .       GBUF%FOR ,GBUF%MOM ,GBUF%EINT,ISMSTR   ,MAT_PARAM(IMAT),
+     .       NTABLE   ,TABLE ) 
 C----
       ELSEIF (IGTYP == 18) THEN  
         ! beams type 18 (integration points in the section)
@@ -258,11 +281,12 @@ C----
      4       GBUF%EINT ,AL          ,GBUF%EPSD ,BUFMAT   ,NPF     ,       
      5       TF        ,EXX         ,EXY       ,EXZ      ,KXX     ,       
      6       KYY       ,KZZ         ,F1        ,F2       ,F3      ,       
-     7       M1        ,M2          ,M3        ,JTHE     ,TEMPEL  ,       
+     7       M1        ,M2          ,M3        ,JTHE     ,EL_TEMP ,       
      8       IFAIL     ,SBUFMAT     ,SNPC      ,STF      ,NUMMAT  ,       
      9       NUMGEO    ,IOUT        ,ISTDO     ,NPROPMI  ,NPROPM  ,
      A       NPROPG    ,TT          ,DT1       ,IDEL7NOK ,ISIGI   ,
-     B       IMCONV    ,ISMSTR      ,MAT_PARAM(IMAT))                                               
+     B       IMCONV    ,ISMSTR      ,MAT_PARAM(IMAT),
+     C       NTABLE    ,TABLE )                                             
       ENDIF
 c---------------------------
 c     element damping
@@ -275,7 +299,7 @@ c---------------------------
 c-----------------------------------------------------------------------  
 c     Thermal expansion
 c-----------------------------------------------------------------------  
-      IF(JTHE > 0) THEN 
+      IF (JTHE > 0) THEN 
         IF (IEXPAN > 0) THEN
           IF (IGTYP == 3) THEN   
             CALL THERMEXPPG(NEL    ,MAT       ,PID          ,PM     ,GEO  ,
@@ -294,11 +318,11 @@ C
           ENDDO
         ENDIF
         DO I=1,NEL 
-          DIE(I) = (GBUF%EINT(I) + GBUF%EINT(NEL + I) - DIE(I))*PM(90,MAT(I))
+          DIE(I) = (GBUF%EINT(I)+GBUF%EINT(NEL+I)-DIE(I)) * MAT_PARAM(IMAT)%THERM%EFRAC
         ENDDO
       ENDIF            
 C--------------------------
-C     BILANS PAR MATERIAU
+C     BALANCES BY MATERIAL
 C--------------------------
       IFLAG = MOD(NCYCLE,NCPRI)
       IF (IOUTPRT > 0)     
@@ -313,7 +337,7 @@ C--------------------------
      8   VY1G,     VY2G,     VZ1G,     VZ2G,
      9   X1,       X2,       Y1,       Y2,
      A   Z1,       Z2,       ITASK,    H3D_DATA,
-     B   IGRE,     SENSORS)
+     B   IGRE,     SENSORS,GBUF%G_WPLA,GBUF%WPLA)
 C-------------------------
 C     /PRELOAD/AXIAL
 C-------------------------
@@ -347,22 +371,22 @@ C----------------------------
      .            F31      ,F32      ,M11     ,M12        ,M21,
      .            M22      ,M31      ,M32     )
 C-------------------------
-c     Thermique des coques 
+c     Thermal flux 
 C--------------------------
 C
-       IF (JTHE > 0) THEN
+      IF (JTHE > 0) THEN
         DO I=1,NEL
-          CA = PM(75,MAT(I))
-          CB = PM(76,MAT(I))
-          AREA =GEO(1,PID(I)) 
+          CA = MAT_PARAM(IMAT)%THERM%AS
+          CB = MAT_PARAM(IMAT)%THERM%BS
+          AREA = GEO(1,PID(I)) 
           KC = (CA + CB*TEMPEL(I))*DT2T *AREA/AL(I)   
           PHIX = KC*(TEMP(NC2(I)) - TEMP(NC1(I)))
 C
-C force thermique nodale
+C         nodal thermal force
 C
           FPHI(I,1) = HALF * DIE(I) + PHIX ! 
           FPHI(I,2) = HALF * DIE(I) - PHIX
-         ENDDO
+        ENDDO
       ENDIF     
 C-------------------------
 C     ASSEMBLAGE

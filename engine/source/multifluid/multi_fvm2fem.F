@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_fvm2fem   ../engine/source/multifluid/multi_fvm2fem.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain         ../engine/source/ale/alemain.F
-      !||--- calls      -----------------------------------------------------
-      !||    a4mass3         ../engine/source/elements/solid/solide4/a4mass3.F
-      !||    a4mass3p        ../engine/source/elements/solid/solide4/a4mass3p.F
-      !||    amass3          ../engine/source/elements/solid/solide/amass3.F
-      !||    amass3p         ../engine/source/elements/solid/solide/amass3p.F
-      !||    initbuf         ../engine/share/resol/initbuf.F
-      !||    s4cumu3         ../engine/source/elements/solid/solide4/s4cumu3.F
-      !||    s4cumu3p        ../engine/source/elements/solid/solide4/s4cumu3p.F
-      !||    scumu3          ../engine/source/elements/solid/solide/scumu3.F
-      !||    scumu3p         ../engine/source/elements/solid/solide/scumu3p.F
-      !||    snorm3          ../engine/source/multifluid/snorm3.F
-      !||    snorm3t         ../engine/source/multifluid/snorm3t.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod     ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    multi_fvm2fem   ../engine/source/multifluid/multi_fvm2fem.F
+!||--- called by ------------------------------------------------------
+!||    alemain         ../engine/source/ale/alemain.F
+!||--- calls      -----------------------------------------------------
+!||    a4mass3         ../engine/source/elements/solid/solide4/a4mass3.F
+!||    a4mass3p        ../engine/source/elements/solid/solide4/a4mass3p.F
+!||    amass3          ../engine/source/elements/solid/solide/amass3.F
+!||    amass3p         ../engine/source/elements/solid/solide/amass3p.F
+!||    initbuf         ../engine/share/resol/initbuf.F
+!||    s4cumu3         ../engine/source/elements/solid/solide4/s4cumu3.F
+!||    s4cumu3p        ../engine/source/elements/solid/solide4/s4cumu3p.F
+!||    scumu3          ../engine/source/elements/solid/solide/scumu3.F
+!||    scumu3p         ../engine/source/elements/solid/solide/scumu3p.F
+!||    snorm3          ../engine/source/multifluid/snorm3.F
+!||    snorm3t         ../engine/source/multifluid/snorm3t.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod     ../engine/share/resol/initbuf.F
+!||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
+!||====================================================================
       SUBROUTINE MULTI_FVM2FEM(TIMESTEP, ELBUF_TAB, ITASK, 
      .     IXS, IXQ, IPARG, XGRID, ACCELE, VEL, WGRID, MS, MSNF, VEUL,
      .     STIFN, FSKY, IADS, FSKYM, 
@@ -51,6 +52,7 @@ C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD 
       USE MULTI_FVM_MOD
+      use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -173,7 +175,7 @@ C     HEXA CASE
                      F16(:) = ZERO ; F26(:) = ZERO ; F36(:) = ZERO
                      F17(:) = ZERO ; F27(:) = ZERO ; F37(:) = ZERO
                      F18(:) = ZERO ; F28(:) = ZERO ; F38(:) = ZERO
-C     Assemblage des forces nodales
+C     Assembly of nodal forces
                      DO II = LFT, LLT
                         I = II + NFT
                         NC1(II) = IXS(2, I)
@@ -245,7 +247,7 @@ C     Node 8
                      ENDDO
                      
 C--------------------------
-C     UPDATE DES MASSES
+C     UPDATE OF MASSES
 C----------------------------
                      IF(IPARIT == 0)THEN
                         CALL AMASS3(
@@ -321,7 +323,7 @@ C-----------------------------------------------
                      F14(:) = ZERO ; F24(:) = ZERO ; F34(:) = ZERO
                      DMASS1(:) = ZERO ; DMASS2(:) = ZERO ; DMASS3(:) = ZERO ; DMASS4(:) = ZERO
 
-C     Assemblage des forces nodales
+C     Assembly of nodal forces
                         DO II = LFT, LLT
                            I = II + NFT
                            NC1(II) = IXS(2, I)
@@ -360,7 +362,7 @@ C     Node 4
      .                          (NORM(3, 4, II) * SURF(4, II) + NORM(3, 2, II) * SURF(2, II) + NORM(3, 6, II) * SURF(6, II))
                      ENDDO
 C--------------------------
-C     UPDATE DES MASSES
+C     UPDATE OF MASSES
 C----------------------------
                      IF (IPARIT == 0) THEN
                         CALL A4MASS3(
@@ -405,9 +407,9 @@ C-----------
       RETURN
       END SUBROUTINE MULTI_FVM2FEM
 
-      !||====================================================================
-      !||    vector_prod   ../engine/source/multifluid/multi_fvm2fem.F
-      !||====================================================================
+!||====================================================================
+!||    vector_prod   ../engine/source/multifluid/multi_fvm2fem.F
+!||====================================================================
       SUBROUTINE VECTOR_PROD(X, Y, RES, FAC)
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    c_ibmpc   ../starter/source/restart/ddsplit/c_ibmpc.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit   ../starter/source/restart/ddsplit/ddsplit.F
-      !||====================================================================
+!||====================================================================
+!||    c_ibmpc   ../starter/source/restart/ddsplit/c_ibmpc.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit   ../starter/source/restart/ddsplit/ddsplit.F
+!||====================================================================
       SUBROUTINE C_IBMPC(IMPCNC,IMPCNN,IMPCDL,IMPCSKW,DD_LAGF)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -44,7 +44,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, P, NUMC, KF, J, ISK
 C
-      P = 1   ! uniquement sur p0 pour le moment
+      P = 1   ! only on p0 for the moment
       KF = 0
       DO I=1,NUMMPC
         DD_LAGF(1,P) = DD_LAGF(1,P) + 1

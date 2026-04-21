@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_tag_scnd   ../engine/source/mpi/elements/spmd_exch_tag_scnd.F
-      !||--- called by ------------------------------------------------------
-      !||    cndmasi2_dim         ../engine/source/elements/solid/solide10/s10cndf.F
-      !||    s10cndi2_ini         ../engine/source/elements/solid/solide10/s10cndf.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_tag_scnd    ../engine/source/mpi/elements/spmd_exch_tag_scnd.F
+!||--- called by ------------------------------------------------------
+!||    cndmasi2_dim          ../engine/source/elements/solid/solide10/s10cndf.F
+!||    s10cndi2_ini          ../engine/source/elements/solid/solide10/s10cndf.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_TAG_SCND(
      1            ITAGND   ,FR_CNDS,IAD_CNDS, LCOMM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -51,10 +54,10 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,LOC_PROC,NOD,I,J,L,IDEB,IAD,LEN,
-     .        NBINDEX,INDEX,MSGOFF,SIZ,IERROR,
+      INTEGER MSGTYP,LOC_PROC,NOD,I,J,L,
+     .        MSGOFF,SIZ,IERROR,
      .        STATUS(MPI_STATUS_SIZE),
-     .        REQ_S(NSPMD),REQ_R(NSPMD),INDEXI(NSPMD)
+     .        REQ_S(NSPMD),REQ_R(NSPMD)
       DATA MSGOFF/1179/
       INTEGER
      .        SBUF(LCOMM),RBUF(LCOMM)

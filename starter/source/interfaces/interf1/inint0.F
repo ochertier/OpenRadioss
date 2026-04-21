@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    inint0   ../starter/source/interfaces/interf1/inint0.F
-      !||--- called by ------------------------------------------------------
-      !||    iniend   ../starter/source/interfaces/inter3d1/iniend.F
-      !||    inint2   ../starter/source/interfaces/inter2d1/inint2.F
-      !||    inint3   ../starter/source/interfaces/inter3d1/inint3.F
-      !||====================================================================
+!||====================================================================
+!||    inint0   ../starter/source/interfaces/interf1/inint0.F
+!||--- called by ------------------------------------------------------
+!||    iniend   ../starter/source/interfaces/inter3d1/iniend.F
+!||    inint2   ../starter/source/interfaces/inter2d1/inint2.F
+!||    inint3   ../starter/source/interfaces/inter3d1/inint3.F
+!||====================================================================
       SUBROUTINE ININT0(X,IRECT,NSEG,NOD2SEG,NSV,MSR,ILOC,NMN,NSN,NRT, SIRECT, S_N2SEG)
 C-----------------------------------------------------------------------
 C
@@ -62,8 +62,8 @@ C   S o u r c e   L i n e s
 C-----------------------------------------------
       KK = 0
 C  
-C   Compute nearest secnd node from main node (stored in ILOC)
-C      inter type1 : main<->secnd ; nearest main node (lag) from ale node (ale)
+C   Compute nearest second node from main node (stored in ILOC)
+C      inter type1 : main<->second ; nearest main node (lag) from ale node (ale)
       DO II=1,NMN
          I=MSR(II)
          LOWER_DIST = EP20
@@ -77,8 +77,8 @@ C      inter type1 : main<->secnd ; nearest main node (lag) from ale node (ale)
          ENDDO
       ENDDO
 C  
-C   Compute NOD2SEG : List of Connected Segments to secnd nodes
-C       inter1 : main <-> secnd ; connected main segment to main nodes (lag)
+C   Compute NOD2SEG : List of Connected Segments to second nodes
+C       inter1 : main <-> second ; connected main segment to main nodes (lag)
       DO I=1,NRT
          DO J=1,4
            IF(IRECT(J,I) /= 0) THEN

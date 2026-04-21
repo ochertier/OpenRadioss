@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s6cfint_reg      ../engine/source/elements/thickshell/solide6c/s6cfint_reg.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cforc3         ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s6cfint_reg      ../engine/source/elements/thickshell/solide6c/s6cfint_reg.F
+!||--- called by ------------------------------------------------------
+!||    s6cforc3         ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+!||====================================================================
       SUBROUTINE S6CFINT_REG(
      1   NLOC_DMG,VAR_REG, NEL,     OFF,
      2   VOL,     NC1,     NC2,     NC3,
@@ -104,11 +104,7 @@ C-----------------------------------------------
      . MASSTH,UNLTH,VNLTH,FNLTH
       my_real, DIMENSION(:,:), ALLOCATABLE :: 
      . STIFNLTH,DTN
-      ! Safety coefficient for non-local stability vs mechanical stability
-      ! (it has been slightly increased vs nloc_dmg_init.F)
-      my_real, PARAMETER :: CSTA  = 40.0D0
-      ! Coefficient for non-local stability to take into account damping
-      my_real, PARAMETER :: CDAMP = 0.7D0
+      my_real, target :: nothing(1)
       my_real
      . ZS(10,9)      
       ! Position of nodes in the thickshell thickness
@@ -150,6 +146,7 @@ C-----------------------------------------------
      9 0.491001129763160,0.735741735638020,0.936320479015252,
      9 1.               /
 C=======================================================================
+      STIFNL => nothing
       L2     = NLOC_DMG%LEN(IMAT)**2
       XI     = NLOC_DMG%DAMP(IMAT)
       NNOD   = NLOC_DMG%NNOD
@@ -367,8 +364,8 @@ C
                   ENDIF
                 ENDDO
               ENDDO
+              DTNOD = DTMIN1(11)*(SQRT(CSTA))
             ENDIF
-            DTNOD = DTMIN1(11)*(SQRT(CSTA))
           ENDIF
 C
           ! Classical nodal timestep check

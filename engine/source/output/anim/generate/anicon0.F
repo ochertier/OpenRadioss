@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    anicon0       ../engine/source/output/anim/generate/anicon0.F
-      !||--- called by ------------------------------------------------------
-      !||    sortie_main   ../engine/source/output/sortie_main.F
-      !||====================================================================
+!||====================================================================
+!||    anicon0       ../engine/source/output/anim/generate/anicon0.F
+!||--- called by ------------------------------------------------------
+!||    sortie_main   ../engine/source/output/sortie_main.F
+!||====================================================================
       SUBROUTINE ANICON0(CONT, N)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -36,7 +36,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real  CONT(3,*)
       INTEGER N
-      INTEGER I, J
+      INTEGER I
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------

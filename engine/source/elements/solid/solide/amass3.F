@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    amass3           ../engine/source/elements/solid/solide/amass3.F
-      !||--- called by ------------------------------------------------------
-      !||    multi_fvm2fem    ../engine/source/multifluid/multi_fvm2fem.F
-      !||    sforc3           ../engine/source/elements/solid/solide/sforc3.F
-      !||    szforc3          ../engine/source/elements/solid/solidez/szforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    i22bufbric_mod   ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||====================================================================
+!||====================================================================
+!||    amass3           ../engine/source/elements/solid/solide/amass3.F
+!||--- called by ------------------------------------------------------
+!||    multi_fvm2fem    ../engine/source/multifluid/multi_fvm2fem.F
+!||    sforc3           ../engine/source/elements/solid/solide/sforc3.F
+!||    szforc3          ../engine/source/elements/solid/solidez/szforc3.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||    i22bufbric_mod   ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||====================================================================
       SUBROUTINE AMASS3(
      1   MS,      RHO,     VOLGP,   TAG22,
      2   VOLU,    NC1,     NC2,     NC3,
@@ -39,6 +40,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE I22BUFBRIC_MOD 
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

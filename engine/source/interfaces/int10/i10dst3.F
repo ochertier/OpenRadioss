@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i10dst3    ../engine/source/interfaces/int10/i10dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i10mainf   ../engine/source/interfaces/int10/i10mainf.F
-      !||====================================================================
+!||====================================================================
+!||    i10dst3    ../engine/source/interfaces/int10/i10dst3.F
+!||--- called by ------------------------------------------------------
+!||    i10mainf   ../engine/source/interfaces/int10/i10mainf.F
+!||====================================================================
       SUBROUTINE I10DST3(
      1                  JLT    ,CAND_N ,CAND_E ,CN_LOC ,CE_LOC ,
      2                  X1     ,X2     ,X3     ,X4     ,Y1     ,
@@ -73,7 +73,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IG
+      INTEGER I
       my_real
      .     X0(MVSIZ), Y0(MVSIZ), Z0(MVSIZ),
      .     AL1(MVSIZ),  AL2(MVSIZ),  AL3(MVSIZ), AL4(MVSIZ),
@@ -334,13 +334,13 @@ C
         P4(I) = NX4(I)*NX4(I) + NY4(I)*NY4(I) +NZ4(I)*NZ4(I)
         D4 = MAX(ZERO, GAP2 - P4(I))
 C !!!!!!!!!!!!!!!!!!!!!!!
-C  PENE2 = GAP^2 - DIST^2 UTILISE POUR TESTER SI NON NUL
+C  PENE2 = GAP^2 - DIST^2 USED TO TEST IF NON-NULL
 C!!!!!!!!!!!!!!!!!!!!!!!!
         PENE2(I) = MAX(D1,D2,D3,D4)
 C
        ENDDO
 C---------------------
-C      MAJ CAND_F sur PENE et STIF et recompactage
+C      UPDATE CAND_F on PENE and STIF and recompaction
 C---------------------
 C 
       IF(IDTMINS < 2)THEN
@@ -362,7 +362,7 @@ C
           IX2(JLT_NEW)  = IX2(I)
           IX3(JLT_NEW)  = IX3(I)
           IX4(JLT_NEW)  = IX4(I)
-C   rajout specifique type 10
+C   Specific addition type 10
           X1(JLT_NEW)  = X1(I)
           X2(JLT_NEW)  = X2(I)
           X3(JLT_NEW)  = X3(I)
@@ -489,7 +489,7 @@ C ---------
           IX2(JLT_NEW)  = IX2(I)
           IX3(JLT_NEW)  = IX3(I)
           IX4(JLT_NEW)  = IX4(I)
-C   rajout specifique type 10
+C   Specific addition type 10
           X1(JLT_NEW)  = X1(I)
           X2(JLT_NEW)  = X2(I)
           X3(JLT_NEW)  = X3(I)

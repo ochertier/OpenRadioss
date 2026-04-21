@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_impacc         ../starter/source/constraints/general/impvel/hm_read_impacc.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    kinset                 ../starter/source/constraints/general/kinset.F
-      !||    nodgrnr5               ../starter/source/starter/freform.F
-      !||    udouble                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_impacc         ../starter/source/constraints/general/impvel/hm_read_impacc.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    kinset                 ../starter/source/constraints/general/kinset.F
+!||    nodgrnr5               ../starter/source/starter/freform.F
+!||    udouble                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_IMPACC(
      .           FAC      ,IBFV     ,NFXVEL0  ,ITAB     ,ITABM1   ,
      .           IKINE    ,IGRNOD   ,ISKN     ,UNITAB   ,LSUBMODEL,
@@ -81,7 +81,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,UID,IACC,FCT_ID,INP_ID,SENS_ID,GRN,NACC,
+      INTEGER J,ID,UID,IACC,FCT_ID,INP_ID,SENS_ID,GRN,NACC,
      .        NOSKEW,NOFRAME,NUM0,NN,I_VDA,INOD,NODID,IGS,
      .        L_XYZ,SUBID,NOSUB,NODENUM(NFXVEL0)
       INTEGER ,DIMENSION(3*NUMNOD) :: IKINE1
@@ -210,7 +210,7 @@ c--------------------------------------------------
           IBFV(3,I_VDA)  = FCT_ID
           IBFV(4,I_VDA)  = SENS_ID
           IBFV(5,I_VDA)  = 0
-          IBFV(6,I_VDA)  = 0  ! init dans lecrby (si vitesse de rotation sur main)
+          IBFV(6,I_VDA)  = 0  ! initialization in lecrby (if rotation velocity on main)
           IBFV(7,I_VDA)  = 0
           IBFV(8,I_VDA)  = 0
           IBFV(9,I_VDA)  = NOFRAME

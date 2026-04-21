@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop27           ../starter/source/properties/spring/hm_read_prop27.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop27           ../starter/source/properties/spring/hm_read_prop27.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP27(GEO      ,IGEO     ,PROP_TAG ,IGTYP    ,IG       ,
      .                          UNITAB   ,LSUBMODEL)
 C-----------------------------------------------
@@ -66,7 +66,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IFUNC,IFUNC2,ISENS,IFL,IFAIL,J,ILENG,ITENS,Fsmooth
+      INTEGER IFUNC,IFUNC2,ISENS,IFL,IFAIL,ILENG,ITENS,Fsmooth
 C     REAL
       my_real
      .   MASS,STIFF,DAMP,GAP,MIN_RUP,MAX_RUP,
@@ -209,7 +209,7 @@ C-----------------------------
       PROP_TAG(IGTYP)%G_LENGTH      = 1  ! X0 (AL0) - total length
       PROP_TAG(IGTYP)%G_TOTDEPL     = 1  ! DX - total deformation (translation)
       PROP_TAG(IGTYP)%G_DEP_IN_TENS = 1  ! DPX  (DPY,DPZ) - max displacement in tension
-      PROP_TAG(IGTYP)%G_DEP_IN_COMP = 1  ! DPX2 (DPY2,DPZ2) - max displacement in compression
+      PROP_TAG(IGTYP)%G_DEP_IN_COMP = 1  ! DPX2 (DPY2, DPZ2) - Max Displacement in Compression
       PROP_TAG(IGTYP)%G_POSX        = 5
       PROP_TAG(IGTYP)%G_LENGTH_ERR  = 1
       PROP_TAG(IGTYP)%G_NUVAR       = MAX(PROP_TAG(IGTYP)%G_NUVAR,NINT(GEO(25))) ! additional internal variables for h=6

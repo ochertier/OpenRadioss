@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c3eoff   ../engine/source/elements/sh3n/coque3n/c3eoff.F
-      !||--- called by ------------------------------------------------------
-      !||    c3ke3    ../engine/source/elements/sh3n/coque3n/c3ke3.F
-      !||====================================================================
+!||====================================================================
+!||    c3eoff        ../engine/source/elements/sh3n/coque3n/c3eoff.F
+!||--- called by ------------------------------------------------------
+!||    c3ke3         ../engine/source/elements/sh3n/coque3n/c3ke3.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod   ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE C3EOFF(JFT , JLT , IXTG, ETAG, OFF)
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -36,14 +39,13 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER JFT, JLT, IXTG(NIXTG,*), ETAG(*)
-      my_real
-     .        OFF(*)
+      INTEGER :: JFT, JLT, IXTG(NIXTG,*), ETAG(*)
+      my_real :: OFF(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IEL, I, N1, N2, N3, NALL  
-C
+      INTEGER IEL, N1, N2, N3, NALL
+
       DO IEL=JFT,JLT
          N1=IXTG(2,IEL)
          N2=IXTG(3,IEL)
@@ -51,7 +53,7 @@ C
          NALL=ETAG(N1)*ETAG(N2)*ETAG(N3)
          OFF(IEL)=MIN(NALL,1)
       ENDDO
-C
+
       RETURN
       END
       

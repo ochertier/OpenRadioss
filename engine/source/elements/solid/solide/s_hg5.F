@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s_hg5    ../engine/source/elements/solid/solide/s_hg5.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3   ../engine/source/elements/solid/solide/sforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s_hg5    ../engine/source/elements/solid/solide/s_hg5.F
+!||--- called by ------------------------------------------------------
+!||    sforc3   ../engine/source/elements/solid/solide/sforc3.F
+!||====================================================================
       SUBROUTINE S_HG5(
      1   PM,      RHO,     OFF,     VX1,
      2   VX2,     VX3,     VX4,     VX5,
@@ -98,16 +98,16 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, FLUID,MX, J, II, IC, JST(MVSIZ+1)
+      INTEGER I,MX, J, II, IC, JST(MVSIZ+1)
 C     REAL
       my_real
-     .   CAQ(MVSIZ), FCL(MVSIZ), FCQ(MVSIZ),EHOU(MVSIZ),
-     .   H11(MVSIZ), H12(MVSIZ), H13(MVSIZ), H14(MVSIZ),
-     .   H15(MVSIZ), H16(MVSIZ), H17(MVSIZ), H18(MVSIZ),
-     .   H21(MVSIZ), H22(MVSIZ), H23(MVSIZ), H24(MVSIZ),
-     .   H25(MVSIZ), H26(MVSIZ), H27(MVSIZ), H28(MVSIZ),
-     .   H31(MVSIZ), H32(MVSIZ), H33(MVSIZ), H34(MVSIZ),
-     .   H35(MVSIZ), H36(MVSIZ), H37(MVSIZ), H38(MVSIZ),
+     .   CAQ(MVSIZ), FCL(MVSIZ),EHOU(MVSIZ),
+     .      
+     .      
+     .      
+     .      
+     .      
+     .      
      .   HX1(MVSIZ), HX2(MVSIZ), HX3(MVSIZ), HX4(MVSIZ),
      .   HY1(MVSIZ), HY2(MVSIZ), HY3(MVSIZ), HY4(MVSIZ),
      .   HZ1(MVSIZ), HZ2(MVSIZ), HZ3(MVSIZ), HZ4(MVSIZ),
@@ -120,7 +120,9 @@ C     REAL
      .   G52(MVSIZ),G62(MVSIZ),G72(MVSIZ),G82(MVSIZ),
      .   G13(MVSIZ),G23(MVSIZ),G33(MVSIZ),G43(MVSIZ),
      .   G53(MVSIZ),G63(MVSIZ),G73(MVSIZ),G83(MVSIZ),
-     .   E0,G0,C1,NU,EHOURT ,QH,LAMG,SFAC,FDAMP,DT05,LAMGT(MVSIZ),F_ET(MVSIZ)  
+     .   E0,G0,C1,NU,EHOURT ,QH,LAMG,SFAC,DT05,
+     .   LAMGT(MVSIZ),F_ET(MVSIZ),F_STI(MVSIZ),E_MAX,S_MAX,FAC1,SFAC1,
+     .   F_GT(MVSIZ)  
 C----------------------------------------------- 
 C------recompute modulus for law42,88,90
       MX = MAT(1)
@@ -129,7 +131,7 @@ C------recompute modulus for law42,88,90
       C1=PM(32,MX)
       E0=PM(20,MX)
       QH = GEO(13,PID(1))
-      IF (ISCTL>0 .AND. NU>0.48999) QH = ZEP05*QH
+      IF (ISCTL>0 .AND. NU>0.48999) QH = ZEP5*QH
       LAMGT(1:NEL)=CXX(1:NEL)*CXX(1:NEL)*RHO(1:NEL)
       F_ET(1:NEL)=ONE
       SELECT CASE (MTN)
@@ -141,32 +143,68 @@ C------recompute modulus for law42,88,90
           G0 = HALF*G0
           LAMG = C1+FOUR_OVER_3*G0
           F_ET(1:NEL)=MAX(ONE,LAMGT(1:NEL)/LAMG)
+          F_GT(1:NEL)=MAX(ONE,(LAMGT(1:NEL)-C1)/G0/FOUR_OVER_3)
         CASE (1)
           LAMG = C1+FOUR_OVER_3*G0
         CASE (62)
           G0 = HALF*G0
           LAMG = C1+FOUR_OVER_3*G0
-          DO I=1,NEL
-            F_ET(I)=MAX(ONE,LAMGT(I)/LAMG)
-            SFAC = MIN(TEN,F_ET(I))
-            IF (SFAC>TWO) SFAC=TEN
-            F_ET(I)=SFAC*F_ET(I)
-            STI(I)=SFAC*STI(I)
-          ENDDO
+          F_ET(1:NEL)=MAX(ONE,LAMGT(1:NEL)/LAMG)
         CASE (88)
           C1 = THIRD*E0/(1-TWO*NU)
           LAMG = C1+FOUR_OVER_3*G0
           F_ET(1:NEL)=MAX(ONE,LAMGT(1:NEL)/LAMG)
+        CASE (90)
+          IF (QH==ONE) QH = FOURTH
+          LAMG = C1+FOUR_OVER_3*G0
+          F_ET(1:NEL)=MAX(ONE,QH*LAMGT(1:NEL)/LAMG)
         CASE DEFAULT
-          IF (ISCTL>0) QH = FOURTH*QH ! 2.5 for default
+!          IF (ISCTL>0) QH = FOURTH*QH ! 2.5 for default
           LAMG = C1+FOUR_OVER_3*G0
           F_ET(1:NEL)=MAX(ONE,LAMGT(1:NEL)/LAMG)
-      END SELECT
-      IF (QH>ONE) STI(1:NEL) = QH*STI(1:NEL)
+        END SELECT
+!      IF (QH>ONE) STI(1:NEL) = QH*STI(1:NEL)
+      F_STI(1:NEL) = MAX(ONE,QH)
       SFAC = 0.038*QH*LAMG
+! special case for stiffing      
+      IF (MTN==62) THEN
+        DO I=1,NEL
+          SFAC1 = MIN(TEN,F_ET(I))
+          IF (SFAC1>TWO) SFAC1=TEN
+          F_ET(I)=SFAC1*F_ET(I)
+          F_STI(I)=SFAC1*F_STI(I)
+        ENDDO
+      ELSEIF (MTN==42.OR.MTN==69) THEN
+        DO I=1,NEL
+          IF (F_ET(I)>ONE) THEN
+            SFAC1 = MIN(FOUR,F_GT(I))
+            F_ET(I)=SFAC1*F_ET(I)
+            F_STI(I)=SFAC1*F_STI(I)
+          END IF 
+        ENDDO
+      END IF
+! law1,62 need high stiffness for distortion ctl (QH>1) but dt decreasing     
+! reset QH=1 and increasing stif only after some hourglass strain      
+      IF (MTN==1.OR.MTN==62) THEN
+          DO I=1,NEL
+              S_MAX=ZERO
+            DO J=1,4
+              S_MAX=MAX(S_MAX,ABS(FHOUR(I,1,J)),ABS(FHOUR(I,2,J)),ABS(FHOUR(I,3,J)))
+            END DO
+            FAC1 = SFAC*VOL(I)**TWO_THIRD
+            E_MAX=S_MAX/FAC1
+            SFAC1 = MIN(TEN,2500*E_MAX)
+            SFAC1 = MAX(ONE,SFAC1)
+            F_ET(I)=SFAC1*F_ET(I)
+            F_STI(I)=SFAC1*F_STI(I)
+          END DO
+      END IF
+!
+      IF (ISCTL==0) F_ET(1:NEL)=ONE
       DO I=1,NEL
-         CAQ(I)=SFAC*DT1*OFF(I)
-         FCL(I)=F_ET(I)*CAQ(I)*VOL(I)**THIRD
+          CAQ(I)=SFAC*DT1*OFF(I)
+          FCL(I)=F_ET(I)*CAQ(I)*VOL(I)**THIRD
+          STI(I)=F_STI(I)*STI(I)
       ENDDO
 !
        DO I=1,NEL
@@ -264,6 +302,9 @@ C
      &   HY1(I)*HGY1(I) + HY2(I)*HGY2(I) + 
      &   HY3(I)*HGY3(I) + HY4(I)*HGY4(I) ) 
       ENDDO   
+      DO I=1,NEL
+        FHOUR(I,1:3,1:4) = FHOUR(I,1:3,1:4)*OFF(I)
+      ENDDO
 C
       DO I=1,NEL
 C
@@ -374,9 +415,8 @@ C
             ENDIF
           ENDDO
         ENDIF
-#include "atomic.inc"
+!$OMP ATOMIC
           EHOUR = EHOUR + EHOURT
-#include "atomend.inc"
       ENDIF
 C
 #include "vectorize.inc"

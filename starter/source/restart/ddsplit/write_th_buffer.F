@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    write_th_buffer    ../starter/source/restart/ddsplit/write_th_buffer.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit            ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    w_th               ../starter/source/restart/ddsplit/w_th.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    write_th_buffer    ../starter/source/restart/ddsplit/write_th_buffer.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit            ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    w_th               ../starter/source/restart/ddsplit/w_th.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE WRITE_TH_BUFFER(TH       ,NODLOCAL ,CEL      ,P,
      2                           NTHGRP0  ,NTHGRP   ,NTHGRP01 ,NTHGRP1  , 
      3                           SCEL     ,NUMSPH   ,NUMNOD   ,NCLUSTER ,

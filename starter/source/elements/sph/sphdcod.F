@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    sphdcod                ../starter/source/elements/sph/sphdcod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sphdcod                ../starter/source/elements/sph/sphdcod.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SPHDCOD(NPC,ISPHIO,NOM_OPT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -56,11 +56,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, IS, J, I, K
+      INTEGER N, J
       INTEGER ID
       CHARACTER(LEN=NCHARTITLE)::TITR
 C=======================================================================
-C     (I) TRAITEMENT DES FCTS
+C     (I) PROCESSING OF FUNCTIONS
 C=======================================================================
 C     I.1 INLET/OUTLET CONDITIONS
 C=======================================================================
@@ -147,6 +147,5 @@ C              IERR=IERR+1
             ENDIF
       ENDDO
 C=======================================================================
- 900  CONTINUE
       RETURN
       END

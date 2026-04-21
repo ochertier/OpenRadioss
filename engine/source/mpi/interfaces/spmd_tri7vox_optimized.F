@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_tri7vox_optimized   ../engine/source/mpi/interfaces/spmd_tri7vox_optimized.F
-      !||--- called by ------------------------------------------------------
-      !||    i7main_tri               ../engine/source/interfaces/intsort/i7main_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../engine/source/output/message/message.F
-      !||    arret                    ../engine/source/system/arret.F
-      !||    spmd_iallgatherv         ../engine/source/mpi/generic/spmd_iallgatherv.F
-      !||    spmd_iallgatherv_int     ../engine/source/mpi/generic/spmd_iallgatherv_int.F
-      !||--- uses       -----------------------------------------------------
-      !||    comm_tri7vox_mod         ../engine/share/modules/comm_tri7vox_mod.F
-      !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||    tri7box                  ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_tri7vox_optimized   ../engine/source/mpi/interfaces/spmd_tri7vox_optimized.F
+!||--- called by ------------------------------------------------------
+!||    i7main_tri               ../engine/source/interfaces/intsort/i7main_tri.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../engine/source/output/message/message.F
+!||    arret                    ../engine/source/system/arret.F
+!||    spmd_iallgatherv         ../engine/source/mpi/generic/spmd_iallgatherv.F
+!||    spmd_iallgatherv_int     ../engine/source/mpi/generic/spmd_iallgatherv_int.F
+!||--- uses       -----------------------------------------------------
+!||    comm_tri7vox_mod         ../engine/share/modules/comm_tri7vox_mod.F
+!||    message_mod              ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod      ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box                  ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_TRI7VOX_OPTIMIZED(
      1   NSV     ,NSN      ,X      ,V     ,MS     ,
      2   BMINMAL ,WEIGHT   ,STIFN  ,NIN   ,ISENDTO,
@@ -53,6 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -85,12 +87,12 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,INFO,I,NOD, DT_CST, LOC_PROC,P,IDEB,
-     .        SIZ,J, L, BUFSIZ, LEN, NB, IERROR1, IAD,
-     .        STATUS(MPI_STATUS_SIZE),IERROR,REQ_SB(NSPMD),
-     .        REQ_RB(NSPMD),KK,NBIRECV,IRINDEXI(NSPMD),
+      INTEGER MSGTYP, I, NOD, LOC_PROC, P, IDEB, 
+     . J, L, LEN, NB,
+     . STATUS(MPI_STATUS_SIZE),IERROR,
+     . KK,NBIRECV,IRINDEXI(NSPMD),
      .        REQ_RD(NSPMD),REQ_SD(NSPMD),REQ_SD2(NSPMD),
-     .        REQ_RC(NSPMD),REQ_SC(NSPMD),
+     .
      .        INDEXI,ISINDEXI(NSPMD),INDEX(NUMNOD),NBOX(NSPMD),
      .        NBX,NBY,NBZ,IX,IY,IZ,
      .        MSGOFF, MSGOFF2, MSGOFF3, MSGOFF4, MSGOFF5,
@@ -109,7 +111,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(0:LRVOXEL,0:LRVOXEL) :: CRVOXEL_LOC
 
 
-      integer :: key,code
+ 
      
       DATA MSGOFF/6000/
       DATA MSGOFF2/6001/
@@ -124,7 +126,7 @@ C-----------------------------------------------
       TYPE(real_pointer), DIMENSION(NSPMD) :: RBUF
       TYPE(int_pointer) , DIMENSION(NSPMD) :: IBUF   
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGNSNFI  
-      my_real, DIMENSION(:,:), ALLOCATABLE :: XTMP
+ 
       INTEGER, DIMENSION(NSPMD) :: TAB_NB
 
 C-----------------------------------------------
@@ -132,8 +134,8 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
 C=======================================================================
-C     tag des boites contenant des facettes
-C     et creation des candidats
+C     tag of the boxes containing facets
+C     and creation of candidates
 C=======================================================================
       LOC_PROC = ISPMD + 1
 
@@ -141,7 +143,7 @@ C=======================================================================
       NBY = LRVOXEL
       NBZ = LRVOXEL
 C
-C Sauvegarde valeur ancienne des nsn frontieres
+C Old value backup of the NSN Frontieres
 C
       IF(INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.IFQ>0
      .   .OR.NUM_IMP>0.OR.ITIED/=0.OR.ITYP==23.OR.ITYP==24   
@@ -151,7 +153,7 @@ C
          END DO
       END IF
 C
-C   boite minmax pour le tri provenant de i7buce BMINMA
+C   minmax box for sorting coming from i7buce BMINMA
 C
       IF(IRCVFROM(NIN,LOC_PROC)==0.AND.
      .   ISENDTO(NIN,LOC_PROC)==0) RETURN
@@ -225,11 +227,11 @@ C
       ENDIF
 
 C
-C   envoi voxel + boite min/max
+C   Voxel shipment + min/max box
 C
 
 C
-C   envoi de XREM
+C   sending of XREM
 C
 C computation of real and integer sending buffers sizes
 c general case
@@ -311,10 +313,10 @@ C-----for   NBINFLG
 
         DO KK = 1, NBIRECV
            P=IRINDEXI(KK)
-C Traitement special sur d.d. ne consever que les noeuds internes
+C Special treatment on d.d. only keep internal nodes
           DO J = IAD_ELEM(1,P), IAD_ELEM(1,P+1)-1
             NOD = FR_ELEM(J)
-C weight < 0 temporairement pour ne conserver que les noeuds non frontiere
+C weight < 0 temporarily to keep only non-boundary nodes
             WEIGHT(NOD) = WEIGHT(NOD)*(-1)
           ENDDO
 C
@@ -371,7 +373,7 @@ C
 C
           DO J = IAD_ELEM(1,P), IAD_ELEM(1,P+1)-1
             NOD = FR_ELEM(J)
-C remise de weight > 0
+C resetting weight > 0
             WEIGHT(NOD) = WEIGHT(NOD)*(-1)
           ENDDO
 C old tag
@@ -603,7 +605,7 @@ c INT25
               DO J = 1, NB
                 I = INDEX(J)
                 NOD = NSV(I)
-C               IRTLM(3,NSN) en TYPE25 / IRTLM(3,-) inutile ici 
+C               IRTLM(3,NSN) in TYPE25 / IRTLM(3,-) useless here 
                 IBUF(P)%p(L2+ISHIFT)  =IRTLM(4*(I-1)+1)
                 IBUF(P)%p(L2+ISHIFT+1)=IRTLM(4*(I-1)+2)
 C
@@ -659,7 +661,7 @@ C reset old tag for next P
 C
       IF(ITYP==25) DEALLOCATE(ITAGNSNFI)
 C
-C   reception  des donnees XREM
+C   reception of XREM data
 C
       IF(IRCVFROM(NIN,LOC_PROC)/=0) THEN
         NSNR = 0

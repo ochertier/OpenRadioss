@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i8_nearest_seg   ../engine/source/interfaces/inter3d/i8_nearest_seg.F
-      !||--- called by ------------------------------------------------------
-      !||    i8msr3           ../engine/source/interfaces/inter3d/i8msr3.F
-      !||====================================================================
+!||====================================================================
+!||    i8_nearest_seg   ../engine/source/interfaces/inter3d/i8_nearest_seg.F
+!||--- called by ------------------------------------------------------
+!||    i8msr3           ../engine/source/interfaces/inter3d/i8msr3.F
+!||====================================================================
       SUBROUTINE I8_NEAREST_SEG(X, IS, M1, M2, M3, BMIN)
 C  
 C  COMPUTE BARYCENTRIC COORDINATES OF PROJECTION OF NODE IS ON TRIANGLE M1 M2 M3
@@ -74,8 +74,8 @@ C
       B1 =(WV(1)*N(1)+WV(2)*N(2)+WV(3)*N(3))*FAC
       B0 = ONE - B1 - B2
       BMIN=MIN(B0,B1,B2)    
-C BMIN > 0 Projection est a l'interieur du triangle
-C BMIN = 0 Projection est sur un cote du triangle
-C BMIN < 0 Projection est a l'exterieur du triangle
+C bmin > 0 projection is inside the triangle
+C bmin = 0 projection is on an edge of the triangle
+C bmin < 0 projection is outside the triangle
       RETURN
       END

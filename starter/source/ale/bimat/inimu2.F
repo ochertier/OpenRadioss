@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inimu2   ../starter/source/ale/bimat/inimu2.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur   ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    inimu2   ../starter/source/ale/bimat/inimu2.F
+!||--- called by ------------------------------------------------------
+!||    lectur   ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE INIMU2(PM,IX,F,DF)
 C
 C-----------------------------------------------
@@ -46,14 +46,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, MAT, LAW, M, J, N
-      my_real
-     .   ALPH
+      INTEGER :: I, MAT, LAW, M, J, N
+      my_real :: ALPH
 C-----------------------------------------------
 
       DO I=1,NUMELQ
         MAT=IABS(IX(1,I))
-        LAW=PM(19,MAT)
+        LAW=INT(PM(19,MAT))
         IF(LAW/=20)CYCLE !I
         DO M=1,NMULT
           ALPH=PM(30+M,MAT)

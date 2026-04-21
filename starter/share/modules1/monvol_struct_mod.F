@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,51 +20,49 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    monvol_struct_mod                ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    aleno                            ../starter/source/airbag/fvmbag1.F
-      !||    aletg                            ../starter/source/airbag/fvmbag1.F
-      !||    applysort2fvm                    ../starter/source/airbag/fvmesh0.F
-      !||    ddsplit                          ../starter/source/restart/ddsplit/ddsplit.F
-      !||    deallocate_igrsurf_split         ../starter/source/spmd/deallocate_igrsurf_split.F
-      !||    domdec2                          ../starter/source/spmd/domdec2.F
-      !||    dometis                          ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    fillcne                          ../starter/source/spmd/domdec2.F
-      !||    fvbag_vertex                     ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    fvbric1                          ../starter/source/airbag/fvbric1.F
-      !||    fvdim                            ../starter/source/airbag/fvmesh.F
-      !||    fvmesh0                          ../starter/source/airbag/fvmesh0.F
-      !||    fvnodi                           ../starter/source/airbag/fvmbag1.F
-      !||    fvtgi                            ../starter/source/airbag/fvmbag1.F
-      !||    hm_read_monvol_type1             ../starter/source/airbag/hm_read_monvol_type1.F
-      !||    hm_read_monvol_type10            ../starter/source/airbag/hm_read_monvol_type10.F
-      !||    hm_read_monvol_type11            ../starter/source/airbag/hm_read_monvol_type11.F
-      !||    hm_read_monvol_type2             ../starter/source/airbag/hm_read_monvol_type2.F
-      !||    hm_read_monvol_type3             ../starter/source/airbag/hm_read_monvol_type3.F
-      !||    hm_read_monvol_type4             ../starter/source/airbag/hm_read_monvol_type4.F
-      !||    hm_read_monvol_type5             ../starter/source/airbag/hm_read_monvol_type5.F
-      !||    hm_read_monvol_type6             ../starter/source/airbag/hm_read_monvol_type6.F
-      !||    hm_read_monvol_type7             ../starter/source/airbag/hm_read_monvol_type7.F
-      !||    hm_read_monvol_type8             ../starter/source/airbag/hm_read_monvol_type8.F
-      !||    hm_read_monvol_type9             ../starter/source/airbag/hm_read_monvol_type9.F
-      !||    hm_read_thgrou                   ../starter/source/output/th/hm_read_thgrou.F
-      !||    hm_thgrki_vent                   ../starter/source/output/th/hm_thgrki_vent.F
-      !||    hypermesh_tetra                  ../starter/stub/fvmbags_stub.F
-      !||    igrsurf_split                    ../starter/source/spmd/igrsurf_split.F
-      !||    init_monvol                      ../starter/source/airbag/init_monvol.F
-      !||    lectur                           ../starter/source/starter/lectur.F
-      !||    monvol_build_edges               ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_check_delete_duplicated   ../starter/source/airbag/monvol_check_delete_duplicated.F
-      !||    monvol_orient_surf               ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_reverse_normals           ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_triangulate_surface       ../starter/source/airbag/monvol_triangulate_surface.F
-      !||    read_monvol                      ../starter/source/airbag/read_monvol.F
-      !||    st_qaprint_driver                ../starter/source/output/qaprint/st_qaprint_driver.F
-      !||    st_qaprint_monvol                ../starter/source/output/qaprint/st_qaprint_monvol.F
-      !||    w_monvol                         ../starter/source/restart/ddsplit/w_monvol.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    monvol_struct_mod                ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    aleno                            ../starter/source/airbag/fvmbag1.F
+!||    applysort2fvm                    ../starter/source/airbag/fvmesh0.F
+!||    ddsplit                          ../starter/source/restart/ddsplit/ddsplit.F
+!||    deallocate_igrsurf_split         ../starter/source/spmd/deallocate_igrsurf_split.F
+!||    domdec2                          ../starter/source/spmd/domdec2.F
+!||    dometis                          ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    fillcne                          ../starter/source/spmd/domdec2.F
+!||    fvbag_vertex                     ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    fvbric1                          ../starter/source/airbag/fvbric1.F
+!||    fvdim                            ../starter/source/airbag/fvmesh.F
+!||    fvmesh0                          ../starter/source/airbag/fvmesh0.F
+!||    fvnodi                           ../starter/source/airbag/fvmbag1.F
+!||    hm_read_monvol_type1             ../starter/source/airbag/hm_read_monvol_type1.F
+!||    hm_read_monvol_type10            ../starter/source/airbag/hm_read_monvol_type10.F
+!||    hm_read_monvol_type11            ../starter/source/airbag/hm_read_monvol_type11.F
+!||    hm_read_monvol_type2             ../starter/source/airbag/hm_read_monvol_type2.F
+!||    hm_read_monvol_type3             ../starter/source/airbag/hm_read_monvol_type3.F
+!||    hm_read_monvol_type4             ../starter/source/airbag/hm_read_monvol_type4.F
+!||    hm_read_monvol_type5             ../starter/source/airbag/hm_read_monvol_type5.F
+!||    hm_read_monvol_type6             ../starter/source/airbag/hm_read_monvol_type6.F
+!||    hm_read_monvol_type7             ../starter/source/airbag/hm_read_monvol_type7.F
+!||    hm_read_monvol_type8             ../starter/source/airbag/hm_read_monvol_type8.F
+!||    hm_read_monvol_type9             ../starter/source/airbag/hm_read_monvol_type9.F
+!||    hm_read_thgrou                   ../starter/source/output/th/hm_read_thgrou.F
+!||    hm_thgrki_vent                   ../starter/source/output/th/hm_thgrki_vent.F
+!||    hypermesh_tetra                  ../starter/stub/fvmbags_stub.F
+!||    igrsurf_split                    ../starter/source/spmd/igrsurf_split.F
+!||    init_monvol                      ../starter/source/airbag/init_monvol.F
+!||    lectur                           ../starter/source/starter/lectur.F
+!||    monvol_build_edges               ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_check_delete_duplicated   ../starter/source/airbag/monvol_check_delete_duplicated.F
+!||    monvol_orient_surf               ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_reverse_normals           ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_triangulate_surface       ../starter/source/airbag/monvol_triangulate_surface.F
+!||    read_monvol                      ../starter/source/airbag/read_monvol.F
+!||    st_qaprint_driver                ../starter/source/output/qaprint/st_qaprint_driver.F
+!||    st_qaprint_monvol                ../starter/source/output/qaprint/st_qaprint_monvol.F
+!||    w_monvol                         ../starter/source/restart/ddsplit/w_monvol.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       MODULE MONVOL_STRUCT_MOD
 C-----------------------------------------------
 C   M o d u l e s
@@ -104,7 +102,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:, :), ALLOCATABLE :: IBAGJET
 !     Real info on injectors (NJET x NRBJET)
       my_real, DIMENSION(:, :), ALLOCATABLE :: RBAGJET
-!     Vent holes and porous surfaces
+!     Wind Holes and Porous Surfaces
       INTEGER :: NVENT, NPORSURF
 !     Integer data
       INTEGER, DIMENSION(:, :), ALLOCATABLE :: IBAGHOL
@@ -117,7 +115,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:, :), ALLOCATABLE :: ELEM
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGEL
       INTEGER, DIMENSION(:), ALLOCATABLE :: FVBAG_ELEMID
-!     Adress of element inside IXC and IXTG
+!     Address of element inside IXC and IXTG
       INTEGER, DIMENSION(:), ALLOCATABLE :: ELTG
 !     Store mat number of triagnel surface
       INTEGER, DIMENSION(:), ALLOCATABLE :: MATTG
@@ -147,7 +145,7 @@ C-----------------------------------------------
       LOGICAL :: EDGES_BUILT
       INTEGER :: NEDGE
       INTEGER, DIMENSION(:), ALLOCATABLE :: EDGE_NODE1, EDGE_NODE2, EDGE_ELEM, IAD_EDGE_ELEM
-!     Keep old adresses until full conversion is done
+!     Keep old addresses until full conversion is done
       INTEGER :: IADALE, IADALE2, IADALE3, IADALE4, IADALE5, IADALE6, IADALE7, IADALE8, IADALE9, 
      .     IADALE10, IADALE11, IADALE12, IADALE13, KRA5, KRA6, KR5
       LOGICAL :: OK_REORIENT
@@ -156,11 +154,11 @@ C-----------------------------------------------
       END TYPE MONVOL_STRUCT_
 
       CONTAINS
-      !||====================================================================
-      !||    copy_to_monvol   ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    copy_to_monvol   ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE COPY_TO_MONVOL(T_MONVOL, LICBAG, ICBAG, SMONVOL, MONVOL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -306,11 +304,11 @@ C-----------------------------------------------
       ENDDO
       END SUBROUTINE COPY_TO_MONVOL
 
-      !||====================================================================
-      !||    copy_to_volmon   ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    copy_to_volmon   ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE COPY_TO_VOLMON(T_MONVOL, LRCBAG, RCBAG, SVOLMON, VOLMON)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -331,9 +329,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     L o c a l   v a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: II, JJ, KK, I, ICOPY, N
+      INTEGER :: II, JJ, KK, I, ICOPY
       INTEGER :: NVENT, NJET
-      INTEGER :: SHIFT
 !     *****    !
 !     RVOLU    !
 !     *****    !
@@ -400,26 +397,26 @@ C-----------------------------------------------
       ENDDO
       END SUBROUTINE COPY_TO_VOLMON
 
-      !||====================================================================
-      !||    monvol_check_surfclose   ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_monvol_type1     ../starter/source/airbag/hm_read_monvol_type1.F
-      !||    hm_read_monvol_type10    ../starter/source/airbag/hm_read_monvol_type10.F
-      !||    hm_read_monvol_type11    ../starter/source/airbag/hm_read_monvol_type11.F
-      !||    hm_read_monvol_type2     ../starter/source/airbag/hm_read_monvol_type2.F
-      !||    hm_read_monvol_type3     ../starter/source/airbag/hm_read_monvol_type3.F
-      !||    hm_read_monvol_type4     ../starter/source/airbag/hm_read_monvol_type4.F
-      !||    hm_read_monvol_type5     ../starter/source/airbag/hm_read_monvol_type5.F
-      !||    hm_read_monvol_type6     ../starter/source/airbag/hm_read_monvol_type6.F
-      !||    hm_read_monvol_type7     ../starter/source/airbag/hm_read_monvol_type7.F
-      !||    hm_read_monvol_type8     ../starter/source/airbag/hm_read_monvol_type8.F
-      !||    hm_read_monvol_type9     ../starter/source/airbag/hm_read_monvol_type9.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    monvol_build_edges       ../starter/share/modules1/monvol_struct_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monvol_check_surfclose   ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_monvol_type1     ../starter/source/airbag/hm_read_monvol_type1.F
+!||    hm_read_monvol_type10    ../starter/source/airbag/hm_read_monvol_type10.F
+!||    hm_read_monvol_type11    ../starter/source/airbag/hm_read_monvol_type11.F
+!||    hm_read_monvol_type2     ../starter/source/airbag/hm_read_monvol_type2.F
+!||    hm_read_monvol_type3     ../starter/source/airbag/hm_read_monvol_type3.F
+!||    hm_read_monvol_type4     ../starter/source/airbag/hm_read_monvol_type4.F
+!||    hm_read_monvol_type5     ../starter/source/airbag/hm_read_monvol_type5.F
+!||    hm_read_monvol_type6     ../starter/source/airbag/hm_read_monvol_type6.F
+!||    hm_read_monvol_type7     ../starter/source/airbag/hm_read_monvol_type7.F
+!||    hm_read_monvol_type8     ../starter/source/airbag/hm_read_monvol_type8.F
+!||    hm_read_monvol_type9     ../starter/source/airbag/hm_read_monvol_type9.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    monvol_build_edges       ../starter/share/modules1/monvol_struct_mod.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MONVOL_CHECK_SURFCLOSE(T_MONVOLN, ITAB, SURF, X)
 C-----------------------------------------------
 C   M o d u l e s
@@ -454,14 +451,13 @@ C-----------------------------------------------
       INTEGER :: JJ, NEDGE, NELEM, IEDGE, NODE1, NODE2, INODE
       INTEGER :: NB_FREE_EDGE
       INTEGER(8) :: graph_ptr, tri_ptr, tri_ptr_global
-      INTEGER, DIMENSION(:), ALLOCATABLE :: FREE_EDGES_ID, FREE_EDGES, LOCAL_NODE_ID, 
-     .     GLOBAL_NODE_ID
-      INTEGER :: NB_CONNECTED_COMPS, TOTAL_SIZE, II, ITRI
+      INTEGER, DIMENSION(:), ALLOCATABLE :: FREE_EDGES_ID, FREE_EDGES, LOCAL_NODE_ID, GLOBAL_NODE_ID
+      INTEGER :: NB_CONNECTED_COMPS, TOTAL_SIZE, II
       INTEGER, DIMENSION(:), ALLOCATABLE :: PATHS, SIZES, CYCLES, SHIFT
-      INTEGER :: NPT, NTRI
+      INTEGER ::  NPT,NTRI
       my_real, DIMENSION(:), ALLOCATABLE :: NODE_COORD
       INTEGER, DIMENSION(:), ALLOCATABLE :: TRI_LIST
-      CHARACTER(LEN=1024) :: FILENAME
+      !CHARACTER(LEN=1024) :: FILENAME
 C-----------------------------------------------
 C     B e g i n n i n g   o f   s o u r c e
 C-----------------------------------------------
@@ -637,23 +633,23 @@ C-----------------------------------------------
      .     /5X, '  NUMBER OF REMAINING FREE EDGES: ',I10) 
       END SUBROUTINE MONVOL_CHECK_SURFCLOSE
 
-      !||====================================================================
-      !||    monvol_compute_volume   ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_monvol_type1    ../starter/source/airbag/hm_read_monvol_type1.F
-      !||    hm_read_monvol_type10   ../starter/source/airbag/hm_read_monvol_type10.F
-      !||    hm_read_monvol_type11   ../starter/source/airbag/hm_read_monvol_type11.F
-      !||    hm_read_monvol_type2    ../starter/source/airbag/hm_read_monvol_type2.F
-      !||    hm_read_monvol_type3    ../starter/source/airbag/hm_read_monvol_type3.F
-      !||    hm_read_monvol_type4    ../starter/source/airbag/hm_read_monvol_type4.F
-      !||    hm_read_monvol_type5    ../starter/source/airbag/hm_read_monvol_type5.F
-      !||    hm_read_monvol_type6    ../starter/source/airbag/hm_read_monvol_type6.F
-      !||    hm_read_monvol_type7    ../starter/source/airbag/hm_read_monvol_type7.F
-      !||    hm_read_monvol_type8    ../starter/source/airbag/hm_read_monvol_type8.F
-      !||    hm_read_monvol_type9    ../starter/source/airbag/hm_read_monvol_type9.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monvol_compute_volume   ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_monvol_type1    ../starter/source/airbag/hm_read_monvol_type1.F
+!||    hm_read_monvol_type10   ../starter/source/airbag/hm_read_monvol_type10.F
+!||    hm_read_monvol_type11   ../starter/source/airbag/hm_read_monvol_type11.F
+!||    hm_read_monvol_type2    ../starter/source/airbag/hm_read_monvol_type2.F
+!||    hm_read_monvol_type3    ../starter/source/airbag/hm_read_monvol_type3.F
+!||    hm_read_monvol_type4    ../starter/source/airbag/hm_read_monvol_type4.F
+!||    hm_read_monvol_type5    ../starter/source/airbag/hm_read_monvol_type5.F
+!||    hm_read_monvol_type6    ../starter/source/airbag/hm_read_monvol_type6.F
+!||    hm_read_monvol_type7    ../starter/source/airbag/hm_read_monvol_type7.F
+!||    hm_read_monvol_type8    ../starter/source/airbag/hm_read_monvol_type8.F
+!||    hm_read_monvol_type9    ../starter/source/airbag/hm_read_monvol_type9.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MONVOL_COMPUTE_VOLUME(T_MONVOLN, TITLE, IVOLU, SURF, 
      .     ITAB, NODE_COORD, PM, GEO, IXC, IXTG, 
      .     SA, ROT, VOL, VMIN, VEPS, SV)
@@ -663,6 +659,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : nchartitle
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -781,24 +778,25 @@ C-----------------------------------------------
       RETURN 
       END SUBROUTINE MONVOL_COMPUTE_VOLUME
       
-      !||====================================================================
-      !||    monvol_check_venthole_surf   ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_monvol_type11        ../starter/source/airbag/hm_read_monvol_type11.F
-      !||    hm_read_monvol_type4         ../starter/source/airbag/hm_read_monvol_type4.F
-      !||    hm_read_monvol_type5         ../starter/source/airbag/hm_read_monvol_type5.F
-      !||    hm_read_monvol_type6         ../starter/source/airbag/hm_read_monvol_type6.F
-      !||    hm_read_monvol_type7         ../starter/source/airbag/hm_read_monvol_type7.F
-      !||    hm_read_monvol_type8         ../starter/source/airbag/hm_read_monvol_type8.F
-      !||    hm_read_monvol_type9         ../starter/source/airbag/hm_read_monvol_type9.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                       ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                  ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monvol_check_venthole_surf   ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_monvol_type11        ../starter/source/airbag/hm_read_monvol_type11.F
+!||    hm_read_monvol_type4         ../starter/source/airbag/hm_read_monvol_type4.F
+!||    hm_read_monvol_type5         ../starter/source/airbag/hm_read_monvol_type5.F
+!||    hm_read_monvol_type6         ../starter/source/airbag/hm_read_monvol_type6.F
+!||    hm_read_monvol_type7         ../starter/source/airbag/hm_read_monvol_type7.F
+!||    hm_read_monvol_type8         ../starter/source/airbag/hm_read_monvol_type8.F
+!||    hm_read_monvol_type9         ../starter/source/airbag/hm_read_monvol_type9.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                       ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                  ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MONVOL_CHECK_VENTHOLE_SURF(IPRI, T_MONVOLN, IGRSURF, IHOL, SHOL, X, IXC, IXTG)
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
+      use element_mod , only : nixc,nixtg      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -863,7 +861,7 @@ C-----------------------------------------------
          SHOL = SHOL + DS
       ENDDO
 C------------------------------------------------
-C     Ajout condition Svent incluse dans Surf airbag
+C     Adding Svent Save Include in Surf Airbag
 C------------------------------------------------
       CHKSURF=0
       NN =IGRSURF(ISUR)%NSEG
@@ -874,7 +872,7 @@ C------------------------------------------------
          IF(ITY == 7) JI=JI+NUMELC
          NN1 =IGRSURF(EXT_SURFID)%NSEG
          FOUND = .FALSE.
-C     Test surface externe
+C     External surface test
          DO J1=1,NN1
             JI1 =IGRSURF(EXT_SURFID)%ELEM(J1)
             ITY1=IGRSURF(EXT_SURFID)%ELTYP(J1)
@@ -952,11 +950,11 @@ C
  1487 FORMAT(6X,'SH3N  ELEMENT ID=',I10,' OF ',A17,1X,I10,' DOES NOT BELONG TO THE AIRBAG SURFACE')     
       END SUBROUTINE MONVOL_CHECK_VENTHOLE_SURF
 
-      !||====================================================================
-      !||    monvol_allocate   ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur            ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    monvol_allocate   ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    lectur            ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE MONVOL_ALLOCATE(NVOLU, T_MONVOL, T_MONVOL_METADATA)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1035,11 +1033,11 @@ C-----------------------------------------------
          T_MONVOL(II)%OK_REORIENT = .TRUE.
       ENDDO
       END SUBROUTINE MONVOL_ALLOCATE
-      !||====================================================================
-      !||    monvol_deallocate   ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur              ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    monvol_deallocate   ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    lectur              ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE MONVOL_DEALLOCATE(NVOLU, T_MONVOL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1088,29 +1086,30 @@ C-----------------------------------------------
       ENDDO
       END SUBROUTINE MONVOL_DEALLOCATE
       END
-      !||====================================================================
-      !||    monvol_orient_surf      ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_monvol_type1    ../starter/source/airbag/hm_read_monvol_type1.F
-      !||    hm_read_monvol_type10   ../starter/source/airbag/hm_read_monvol_type10.F
-      !||    hm_read_monvol_type11   ../starter/source/airbag/hm_read_monvol_type11.F
-      !||    hm_read_monvol_type2    ../starter/source/airbag/hm_read_monvol_type2.F
-      !||    hm_read_monvol_type3    ../starter/source/airbag/hm_read_monvol_type3.F
-      !||    hm_read_monvol_type4    ../starter/source/airbag/hm_read_monvol_type4.F
-      !||    hm_read_monvol_type5    ../starter/source/airbag/hm_read_monvol_type5.F
-      !||    hm_read_monvol_type6    ../starter/source/airbag/hm_read_monvol_type6.F
-      !||    hm_read_monvol_type7    ../starter/source/airbag/hm_read_monvol_type7.F
-      !||    hm_read_monvol_type8    ../starter/source/airbag/hm_read_monvol_type8.F
-      !||    hm_read_monvol_type9    ../starter/source/airbag/hm_read_monvol_type9.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||    arret                   ../starter/source/system/arret.F
-      !||    monvol_build_edges      ../starter/share/modules1/monvol_struct_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||    monvol_struct_mod       ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monvol_orient_surf      ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_monvol_type1    ../starter/source/airbag/hm_read_monvol_type1.F
+!||    hm_read_monvol_type10   ../starter/source/airbag/hm_read_monvol_type10.F
+!||    hm_read_monvol_type11   ../starter/source/airbag/hm_read_monvol_type11.F
+!||    hm_read_monvol_type2    ../starter/source/airbag/hm_read_monvol_type2.F
+!||    hm_read_monvol_type3    ../starter/source/airbag/hm_read_monvol_type3.F
+!||    hm_read_monvol_type4    ../starter/source/airbag/hm_read_monvol_type4.F
+!||    hm_read_monvol_type5    ../starter/source/airbag/hm_read_monvol_type5.F
+!||    hm_read_monvol_type6    ../starter/source/airbag/hm_read_monvol_type6.F
+!||    hm_read_monvol_type7    ../starter/source/airbag/hm_read_monvol_type7.F
+!||    hm_read_monvol_type8    ../starter/source/airbag/hm_read_monvol_type8.F
+!||    hm_read_monvol_type9    ../starter/source/airbag/hm_read_monvol_type9.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||    arret                   ../starter/source/system/arret.F
+!||    monvol_build_edges      ../starter/share/modules1/monvol_struct_mod.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||    monvol_struct_mod       ../starter/share/modules1/monvol_struct_mod.F
+!||====================================================================
       SUBROUTINE MONVOL_ORIENT_SURF(T_MONVOLN, TITLE, IVOLU, ITAB, SURF, IXC, IXTG, X, ITYPE)
+      use element_mod , only : nixc,nixtg        
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -1188,7 +1187,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     L o c a l   v a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSEG,ISH34,JJ,II(4),IIK(4),KK, IELEM_ADJ,IDX,IDX_A,IDX_B,IFIRST,ILAST,IREAD,ICUR,IPAIR,INBLOCK,NPAIR,NB_ADJACENT,LL
+      INTEGER NSEG,ISH34,JJ,II(4),KK, IELEM_ADJ,IDX,IDX_A,IDX_B,IPAIR,NPAIR,LL
       INTEGER IDX1,IDX2
       INTEGER NEDG, SUM_ADJ
       !temporary memory
@@ -1199,15 +1198,12 @@ C-----------------------------------------------
       INTEGER(8) :: graph_ptr
       INTEGER :: IELEM,ICOMP, EDGES_A(5),EDGES_B(5), NB_REVERSED
       INTEGER :: NPT_A, NPT_B, IELEM1, IELEM2, ELTYP1, ELTYP2, NB_COMMON_NODE, 
-     .     NODELIST1(4), NODELIST2(4), ELEM1ID, ELEM2ID, ELEMTG, ELEMC, IELEMTG, IELEMC
+     .     NODELIST1(4), NODELIST2(4), ELEM1ID, ELEM2ID, ELEMTG, ELEMC, IELEMTG, IELEMC,SEG1ID,SEG2ID
       LOGICAL :: lFOUND, lFOUND_ADJ
-      INTEGER, POINTER, DIMENSION(:) :: ptrADJ
       INTEGER :: NB_DUPLICATED_ELTS
       INTEGER, DIMENSION(:), ALLOCATABLE :: DUPLICATED_ELTS
-      CHARACTER(LEN=1024) :: FILENAME, FILENAME1, FILENAME2
-      INTEGER(8) :: edge_ptr, duplicate_ptr
-      INTEGER, DIMENSION(3) :: FOUND_TABLE
-      INTEGER :: NOT_FOUND
+      CHARACTER(LEN=1024) :: FILENAME
+      INTEGER(8) :: duplicate_ptr
       LOGICAL debug_output
       INTEGER :: NTRI, NB_CON
       INTEGER, DIMENSION(:), ALLOCATABLE :: IAD_COMP_CONNEX
@@ -1652,26 +1648,26 @@ C      endif !(debug_output)
       ALLOCATE(DUPLICATED_ELTS(NB_DUPLICATED_ELTS * 2))
       CALL TAB1_GET(duplicate_ptr, DUPLICATED_ELTS)
       DO JJ = 1, NB_DUPLICATED_ELTS
-         ELEM1ID = SURF%ELEM(DUPLICATED_ELTS(2 * (JJ - 1) + 1))
-         ELEM2ID = SURF%ELEM(DUPLICATED_ELTS(2 * (JJ - 1) + 2))
-!     ELEM1D is already oriented, ELEM2ID has to be oriented reversely
+         SEG1ID = DUPLICATED_ELTS(2 * (JJ - 1) + 1)
+         SEG2ID = DUPLICATED_ELTS(2 * (JJ - 1) + 2)
+!     ELEM1D is already oriented, SEG2ID has to be oriented reversely
          ELTYP1 = SURF%ELTYP(DUPLICATED_ELTS(2 * (JJ - 1) + 1))
          ELTYP2 = SURF%ELTYP(DUPLICATED_ELTS(2 * (JJ - 1) + 2))
          IF (ELTYP1 == ELTYP2) THEN
-            II(1:4) = SURF%NODES(ELEM1ID, 1:4)
+            II(1:4) = SURF%NODES(SEG1ID, 1:4)
             IF (ELTYP1 == 7) THEN
 !     Triangles
-               SURF%NODES(ELEM2ID, 1:4) = (/ II(2), II(1), II(3), II(4) /)
+               SURF%NODES(SEG2ID, 1:4) = (/ II(2), II(1), II(3), II(4) /)
             ELSE
 !     Quads
-               SURF%NODES(ELEM2ID, 1:4) = (/ II(1), II(4), II(3), II(2) /)
+               SURF%NODES(SEG2ID, 1:4) = (/ II(1), II(4), II(3), II(2) /)
             ENDIF
          ELSE
 !     Target element is necessarily the triangle
-            II(1:4) = SURF%NODES(ELEM2ID,1:4)  
+            II(1:4) = SURF%NODES(SEG2ID,1:4)  
             EDGES_A(1:5) = (/ II(1:3), II(1), 0 /) 
             NPT_A = 3 
-            II(1:4) = SURF%NODES(ELEM1ID,1:4)  
+            II(1:4) = SURF%NODES(SEG1ID,1:4)  
             EDGES_B(1:5) = (/ II(1:4), II(1) /)
             NPT_B = 4   
             !--CHECK PATTERN (CURRENT vs ADJACENT)
@@ -1688,11 +1684,11 @@ C      endif !(debug_output)
                IF(lFOUND)EXIT
             ENDDO
             IF(lFOUND)THEN
-               II(1:4) = SURF%NODES(ELEM2ID, 1:4) 
+               II(1:4) = SURF%NODES(SEG2ID, 1:4) 
                IF(NPT_A == 4)THEN
-                  SURF%NODES(ELEM2ID,1:4)=(/ II(1), II(4), II(3), II(2) /)
+                  SURF%NODES(SEG2ID,1:4)=(/ II(1), II(4), II(3), II(2) /)
                ELSE
-                  SURF%NODES(ELEM2ID,1:4)=(/ II(2), II(1), II(3), II(4) /)
+                  SURF%NODES(SEG2ID,1:4)=(/ II(2), II(1), II(3), II(4) /)
                ENDIF
             ENDIF
          ENDIF
@@ -1765,24 +1761,24 @@ C      endif !(debug_output)
 
 
       END SUBROUTINE
-      !||====================================================================
-      !||    monvol_reverse_normals   ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_monvol_type1     ../starter/source/airbag/hm_read_monvol_type1.F
-      !||    hm_read_monvol_type10    ../starter/source/airbag/hm_read_monvol_type10.F
-      !||    hm_read_monvol_type11    ../starter/source/airbag/hm_read_monvol_type11.F
-      !||    hm_read_monvol_type2     ../starter/source/airbag/hm_read_monvol_type2.F
-      !||    hm_read_monvol_type3     ../starter/source/airbag/hm_read_monvol_type3.F
-      !||    hm_read_monvol_type4     ../starter/source/airbag/hm_read_monvol_type4.F
-      !||    hm_read_monvol_type5     ../starter/source/airbag/hm_read_monvol_type5.F
-      !||    hm_read_monvol_type6     ../starter/source/airbag/hm_read_monvol_type6.F
-      !||    hm_read_monvol_type7     ../starter/source/airbag/hm_read_monvol_type7.F
-      !||    hm_read_monvol_type8     ../starter/source/airbag/hm_read_monvol_type8.F
-      !||    hm_read_monvol_type9     ../starter/source/airbag/hm_read_monvol_type9.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monvol_reverse_normals   ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_monvol_type1     ../starter/source/airbag/hm_read_monvol_type1.F
+!||    hm_read_monvol_type10    ../starter/source/airbag/hm_read_monvol_type10.F
+!||    hm_read_monvol_type11    ../starter/source/airbag/hm_read_monvol_type11.F
+!||    hm_read_monvol_type2     ../starter/source/airbag/hm_read_monvol_type2.F
+!||    hm_read_monvol_type3     ../starter/source/airbag/hm_read_monvol_type3.F
+!||    hm_read_monvol_type4     ../starter/source/airbag/hm_read_monvol_type4.F
+!||    hm_read_monvol_type5     ../starter/source/airbag/hm_read_monvol_type5.F
+!||    hm_read_monvol_type6     ../starter/source/airbag/hm_read_monvol_type6.F
+!||    hm_read_monvol_type7     ../starter/source/airbag/hm_read_monvol_type7.F
+!||    hm_read_monvol_type8     ../starter/source/airbag/hm_read_monvol_type8.F
+!||    hm_read_monvol_type9     ../starter/source/airbag/hm_read_monvol_type9.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
+!||====================================================================
       SUBROUTINE MONVOL_REVERSE_NORMALS(T_MONVOLN, TITLE, IVOLU, ITAB, SURF, IXC, IXTG, VOL, X, ITYPE)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -1796,6 +1792,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
       USE MONVOL_STRUCT_MOD
+      use element_mod , only : nixc,nixtg      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1901,16 +1898,16 @@ C-----------------------------------------------
       END SUBROUTINE      
       
 
-      !||====================================================================
-      !||    monvol_build_edges       ../starter/share/modules1/monvol_struct_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol_check_surfclose   ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_orient_surf       ../starter/share/modules1/monvol_struct_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monvol_build_edges       ../starter/share/modules1/monvol_struct_mod.F
+!||--- called by ------------------------------------------------------
+!||    monvol_check_surfclose   ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_orient_surf       ../starter/share/modules1/monvol_struct_mod.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
+!||====================================================================
       SUBROUTINE MONVOL_BUILD_EDGES(T_MONVOLN, SURF)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -1943,7 +1940,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: EDGE_ARRAY_N1, EDGE_ARRAY_N2, EDGE_ARRAY_ELEM, 
      .     NB_CONNECT
       INTEGER(8) :: edge_ptr
-      INTEGER :: JJ, II(4), IDX, ELTYP, NEDG, KK
+      INTEGER :: JJ, II(4), IDX, ELTYP, NEDG
 C-----------------------------------------------
 C     S o u r c e   L i n e s
 C-----------------------------------------------

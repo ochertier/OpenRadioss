@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_preread_cload       ../starter/source/loads/general/cload/hm_preread_cload.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    ngr2usrn               ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_preread_cload       ../starter/source/loads/general/cload/hm_preread_cload.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    ngr2usrn               ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_PREREAD_CLOAD(NUMCLD ,IGRNOD ,IGRSURF,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -63,8 +63,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NLD,IGU,IGS,ISU,ISS,NN,ID,UID
-      INTEGER FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP
+      INTEGER I, IGU, IGS, NN, ID
       CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
@@ -96,7 +95,7 @@ C--------------------------------------------------
         CALL HM_GET_INTV  ('entityid',IGU,IS_AVAILABLE,LSUBMODEL)
 C--------------------------------------------------
         IGS = NGR2USRN(IGU,IGRNOD,NGRNOD,NN)
-C-----------Multidomaines -> on decompte les noeuds communs, on ne les compte qu'une foi---
+Cmultidomains -> shared nodes are counted only once
         IF (NSUBDOM>0) THEN
             IF (IDDOM>0) NN = NN-IGRNOD(IGS)%R2R_SHARE
             NNCL(I)=NN 

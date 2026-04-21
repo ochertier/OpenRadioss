@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_build_diag       ../engine/source/ams/sms_build_diag.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_build_mat_2      ../engine/source/ams/sms_build_mat_2.F
-      !||--- calls      -----------------------------------------------------
-      !||    foat_to_6_float      ../engine/source/system/parit.F
-      !||    my_barrier           ../engine/source/system/machine.F
-      !||    sms_rbe2_nodxi       ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe3_nodxi       ../engine/source/ams/sms_rbe3.F
-      !||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
-      !||    spmd_exch_nodnx      ../engine/source/mpi/ams/spmd_exch_nodnx.F
-      !||    spmd_exch_sms        ../engine/source/mpi/ams/spmd_exch_sms.F
-      !||    spmd_exch_sms6       ../engine/source/mpi/ams/spmd_exch_sms6.F
-      !||    spmd_frwall_nn       ../engine/source/mpi/kinematic_conditions/spmd_frwall_nn.F
-      !||    spmd_ibcast          ../engine/source/mpi/generic/spmd_ibcast.F
-      !||    spmd_mij_sms         ../engine/source/mpi/ams/spmd_sms.F
-      !||    spmd_sd_cj_2         ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_2.F
-      !||====================================================================
+!||====================================================================
+!||    sms_build_diag       ../engine/source/ams/sms_build_diag.F
+!||--- called by ------------------------------------------------------
+!||    sms_build_mat_2      ../engine/source/ams/sms_build_mat_2.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float      ../engine/source/system/parit.F
+!||    my_barrier           ../engine/source/system/machine.F
+!||    sms_rbe2_nodxi       ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe3_nodxi       ../engine/source/ams/sms_rbe3.F
+!||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
+!||    spmd_exch_nodnx      ../engine/source/mpi/ams/spmd_exch_nodnx.F
+!||    spmd_exch_sms        ../engine/source/mpi/ams/spmd_exch_sms.F
+!||    spmd_exch_sms6       ../engine/source/mpi/ams/spmd_exch_sms6.F
+!||    spmd_frwall_nn       ../engine/source/mpi/kinematic_conditions/spmd_frwall_nn.F
+!||    spmd_ibcast          ../engine/source/mpi/generic/spmd_ibcast.F
+!||    spmd_mij_sms         ../engine/source/mpi/ams/spmd_sms.F
+!||    spmd_sd_cj_2         ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_2.F
+!||--- uses       -----------------------------------------------------
+!||    my_alloc_mod         ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE SMS_BUILD_DIAG(
      1             ITASK    ,NODFT   ,NODLT  ,MS      ,NODII_SMS   ,
      2             JAD_SMS ,JDI_SMS  ,LT_SMS ,DIAG_SMS,INDX1_SMS   ,
@@ -52,6 +54,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      B             X       ,A        ,AR       ,IN          ,V     ,
      C             VR      ,TAGSLV_RBY_SMS,IRBE2,LRBE2      ,IRBE3 ,
      D             LRBE3   ,IAD_RBE3M,FR_RBE3M )
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -96,21 +102,22 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, KN, IKN, JJ, KK, II, IJ, N, M, IX, KMV
-      INTEGER NG, ITY, NEL, NFT, ISOLNOD,ILOC4(4)
-      INTEGER MSR, NSN, KI, KJ, KL, NSR, LOC_PROC, NN, MAIN
-      INTEGER K1, IC, ISMS,
-     .        NOD2ADD(NUMNOD), ICSIZE, IMOV, ITYP, ILAGM, ICOUNT,
+      INTEGER I, J, K, IJ, N, M, KMV
+      INTEGER ILOC4(4)
+      INTEGER NSN, LOC_PROC
+      INTEGER K1, IC, ISMS,ICSIZE, IMOV, ITYP, ILAGM, ICOUNT,
      .        N2, N3, N4, N5, N6, N7
-      INTEGER SIZE, LENR, IAD, L, LLT, KAD, JI, 
-     .        NODFT1_SMS, NODLT1_SMS, NODFT2_SMS, NODLT2_SMS,
-     .        KADI_SMS(NUMNOD), NADI_SMS(NUMNOD), NINDXT
-      my_real
-     .        MELE4, MELE12, XN, LTIJ, MSLV,
-     .        IXX, IYY, IZZ, XX, YY, ZZ, MAS,
-     .        VRX, VRY, VRZ, V1, V2, V3, GX, GY, GZ
+      INTEGER SIZE, LENR, 
+     .        NODFT1_SMS, NODLT1_SMS, NODFT2_SMS, NODLT2_SMS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NOD2ADD
+      INTEGER,DIMENSION(:),ALLOCATABLE :: KADI_SMS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NADI_SMS
       DATA ILOC4/2,4,6,8/
 C-----------------------------------------------
+      CALL MY_ALLOC(NOD2ADD,NUMNOD)
+      CALL MY_ALLOC(KADI_SMS,NUMNOD)
+      CALL MY_ALLOC(NADI_SMS,NUMNOD)
+
       NODII_SMS(NODFT:NODLT)=0
       DO N=NODFT,NODLT
         IF(JADI_SMS(N+1) > JADI_SMS(N))THEN
@@ -122,7 +129,7 @@ C
 C 
         CALL MY_BARRIER()
 C
-        IF(ITASK==0) THEN   ! comm sur 1er thread
+        IF(ITASK==0) THEN   ! comm on 1st thread
           DO K=1,FR_RMS(NSPMD+1)-1
             I=LIST_RMS(K)
             IF(I==0)CYCLE
@@ -418,7 +425,7 @@ C
       IF(IDTMINS/=0)THEN
         IF(IPARIT==0.OR.DEBUG(9)==0)THEN
           DO I=NODFT,NODLT
-C reset du passe
+C reset of the past
            DIAG_SMS(I)= ZERO
            DO IJ=JAD_SMS(I),JAD_SMS(I+1)-1
              DIAG_SMS(I)=DIAG_SMS(I)-LT_SMS(IJ)
@@ -426,7 +433,7 @@ C reset du passe
           END DO
         ELSE
           DO I=NODFT,NODLT
-C reset du passe
+C reset of the past
            DIAG_SMS(I)= ZERO
           END DO
 C
@@ -448,7 +455,7 @@ C
 C
 C      /DT/INTER/AMS
        DO I=NODFT,NODLT
-C reset du passe
+C reset of the past
         DIAG_SMS(I)= ZERO
        END DO
       END IF
@@ -471,7 +478,7 @@ C
 C 
           CALL MY_BARRIER()
 C
-          IF(ITASK==0) THEN   ! comm sur 1er thread
+          IF(ITASK==0) THEN   ! communication on the first thread
 
             LOC_PROC = ISPMD+1
             M = 1
@@ -503,7 +510,7 @@ C
 C
           CALL MY_BARRIER
 C
-          IF(ITASK==0) THEN   ! comm sur 1er thread
+          IF(ITASK==0) THEN   ! communication on the first thread
             SIZE = 1
             LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
 C
@@ -551,7 +558,7 @@ C
             MV(KMV)=MSKYI_SMS(K)
           END DO
 
-          IF(ITASK==0) THEN   ! comm sur 1er thread
+          IF(ITASK==0) THEN   ! communication on the first thread
             CALL SPMD_MIJ_SMS(
      1       ISKYI_SMS,FR_SMS,FR_RMS,LIST_RMS,MSKYI_SMS,
      2       MSKYI_FI_SMS)
@@ -599,7 +606,7 @@ C
 C 
           CALL MY_BARRIER()
 C 
-          IF(ITASK==0) THEN   ! comm sur 1er thread
+          IF(ITASK==0) THEN   ! communication on the first thread
             SIZE = 1
             LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
 C
@@ -654,7 +661,7 @@ C
             MV(KMV)=MSKYI_SMS(K)
           END DO
 
-          IF(ITASK==0) THEN   ! comm sur 1er thread
+          IF(ITASK==0) THEN   ! communication on the first thread
             CALL SPMD_MIJ_SMS(
      1       ISKYI_SMS,FR_SMS,FR_RMS,LIST_RMS,MSKYI_SMS,
      2       MSKYI_FI_SMS)
@@ -693,7 +700,7 @@ C
 C 
           CALL MY_BARRIER()
 C 
-          IF(ITASK==0) THEN   ! comm sur 1er thread
+          IF(ITASK==0) THEN   ! communication on the first thread
             SIZE = 1
             LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
 C
@@ -725,5 +732,9 @@ C
 C
       CALL MY_BARRIER
 C 
+      DEALLOCATE(NOD2ADD)
+      DEALLOCATE(KADI_SMS)
+      DEALLOCATE(NADI_SMS)
+
       RETURN
       END

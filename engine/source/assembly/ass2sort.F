@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ass2sort      ../engine/source/assembly/ass2sort.F
-      !||--- called by ------------------------------------------------------
-      !||    asspar2       ../engine/source/assembly/asspar2.F
-      !||    asspar4       ../engine/source/assembly/asspar4.F
-      !||    i17lll_ass    ../engine/source/interfaces/int17/i17for3.F
-      !||--- calls      -----------------------------------------------------
-      !||    stlsort       ../common_source/tools/sort/cppsort.cpp
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ass2sort      ../engine/source/assembly/ass2sort.F
+!||--- called by ------------------------------------------------------
+!||    asspar4       ../engine/source/assembly/asspar4.F
+!||    i17lll_ass    ../engine/source/interfaces/int17/i17for3.F
+!||--- calls      -----------------------------------------------------
+!||    stlsort       ../common_source/tools/sort/cppsort.cpp
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ASS2SORT(FSKYI,JJ1,JJ2,FSKYT,NFSK)
-C  FSKYI : IN/OUT : TABLEAU DE FORCES A TRIER EN ENTREE,
-C                   TABLEAU DE FORCES TRIE EN SORTIE
-C  JJ1   : IN     : INDICE DE DEBUT DANS FSKYI
-C  JJ2   : IN     : INDICE DE FIN DANS FSKYI
+C  FSKYI : IN/OUT : TABLEAU DE FORCES A TRIER EN INPUT,
+C                   TABLEAU DE FORCES TRIE EN OUTPUT
+C  JJ1   : IN     : START INDEX IN FSKYI
+C  JJ2   : IN     : END INDEX IN FSKYI
 C  FSKYT : IN/OUT : TABLEAU TEMPORAIRE
 C  NFSK : IN      : Dimension de FSKYI
 C-----------------------------------------------
@@ -61,7 +60,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K, L, ERROR, PERM(JJ2-JJ1+1)
+      INTEGER K, L
 C-----------------------------------------------   
       DO L = 1, NFSK
         DO K = JJ1, JJ2
@@ -76,20 +75,20 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    ass2sort_pxfem   ../engine/source/assembly/ass2sort.F
-      !||--- called by ------------------------------------------------------
-      !||    asspar4          ../engine/source/assembly/asspar4.F
-      !||--- calls      -----------------------------------------------------
-      !||    stlsort          ../common_source/tools/sort/cppsort.cpp
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ass2sort_pxfem   ../engine/source/assembly/ass2sort.F
+!||--- called by ------------------------------------------------------
+!||    asspar4          ../engine/source/assembly/asspar4.F
+!||--- calls      -----------------------------------------------------
+!||    stlsort          ../common_source/tools/sort/cppsort.cpp
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ASS2SORT_PXFEM(FSKYI,JJ1,JJ2,FSKYT,NFSK)
-C  FSKYI : IN/OUT : TABLEAU DE FORCES A TRIER EN ENTREE,
-C                   TABLEAU DE FORCES TRIE EN SORTIE
-C  JJ1   : IN     : INDICE DE DEBUT DANS FSKYI
-C  JJ2   : IN     : INDICE DE FIN DANS FSKYI
+C  FSKYI : IN/OUT : TABLEAU DE FORCES A TRIER EN INPUT,
+C                   TABLEAU DE FORCES TRIE EN OUTPUT
+C  JJ1   : IN     : START INDEX IN FSKYI
+C  JJ2   : IN     : END INDEX IN FSKYI
 C  FSKYT : IN/OUT : TABLEAU TEMPORAIRE
 C  NFSK : IN      : Dimension de FSKYI
 C-----------------------------------------------
@@ -115,7 +114,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K, L, ERROR, PERM(JJ2-JJ1+1),
+      INTEGER K, L,
      .  IDX1(JJ2-JJ1+1),IDX2(JJ2-JJ1+1),N1,N2,IPLY,
      .  IPLY1,KK
 C-----------------------------------------------   

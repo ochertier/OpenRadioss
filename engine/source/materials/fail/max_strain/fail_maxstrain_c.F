@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_maxstrain_c   ../engine/source/materials/fail/max_strain/fail_maxstrain_c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc             ../engine/source/materials/mat_share/mulawc.F90
-      !||    usermat_shell      ../engine/source/materials/mat_share/usermat_shell.F
-      !||====================================================================
+!||====================================================================
+!||    fail_maxstrain_c   ../engine/source/materials/fail/max_strain/fail_maxstrain_c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc             ../engine/source/materials/mat_share/mulawc.F90
+!||    usermat_shell      ../engine/source/materials/mat_share/usermat_shell.F
+!||====================================================================
       SUBROUTINE FAIL_MAXSTRAIN_C(
      1     NEL       ,NUPARAM   ,NUVAR     ,UPARAM    ,UVAR      , 
      2     TIME      ,NGL       ,IPG       ,ILAY      ,IPT       ,                          
@@ -68,7 +68,7 @@ C-----------------------------------------------
       my_real
      .   EPS1_MAX,EPS2_MAX,GAM12_MAX,TMAX,FCUT
       my_real
-     .   EXX(NEL),EYY(NEL),EXY(NEL),FINDEX,RFACTR,ASRATE
+     .   EXX(NEL),EYY(NEL),EXY(NEL),FINDEX,ASRATE
 C!----------------------------------------------
       !=======================================================================
       ! - INITIALISATION OF COMPUTATION ON TIME STEP

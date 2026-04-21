@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,27 +22,30 @@
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 !! \brief Register the python functions saved in the python structure into the python interpreter dictionary
-      !||====================================================================
-      !||    python_register_mod   ../engine/source/tools/curve/python_register.F90
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    python_register_mod   ../engine/source/tools/curve/python_register.F90
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||    resol_alloc_python    ../engine/source/engine/resol_alloc.F90
+!||====================================================================
       module python_register_mod
+        implicit none
       contains
-      !||====================================================================
-      !||    python_register                        ../engine/source/tools/curve/python_register.F90
-      !||--- called by ------------------------------------------------------
-      !||    resol                                  ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    element_user_id                        ../common_source/modules/element_user_id.F90
-      !||    python_element_init                    ../engine/source/mpi/python_spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    python_element_mod                     ../common_source/modules/python_element_mod.F90
-      !||    python_funct_mod                       ../common_source/modules/python_mod.F90
-      !||    python_spmd_mod                        ../engine/source/mpi/python_spmd_mod.F90
-      !||    user_id_mod                            ../common_source/modules/element_user_id.F90
-      !||====================================================================
-        subroutine python_register(py, itab, numnod,&
+!||====================================================================
+!||    python_register                        ../engine/source/tools/curve/python_register.F90
+!||--- called by ------------------------------------------------------
+!||    resol_alloc_python                     ../engine/source/engine/resol_alloc.F90
+!||--- calls      -----------------------------------------------------
+!||    element_user_id                        ../common_source/modules/element_user_id.F90
+!||    python_element_init                    ../engine/source/mpi/python_spmd_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    nodal_arrays_mod                       ../common_source/modules/nodal_arrays.F90
+!||    python_element_mod                     ../common_source/modules/python_element_mod.F90
+!||    python_funct_mod                       ../common_source/modules/python_mod.F90
+!||    python_spmd_mod                        ../engine/source/mpi/python_spmd_mod.F90
+!||    user_id_mod                            ../common_source/modules/element_user_id.F90
+!||====================================================================
+        subroutine python_register(py, nodes, numnod,&
         & ixs, nixs, numels, &
         & ixc, nixc, numelc, &
         & ixp, nixp, numelp, &
@@ -54,7 +57,8 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Module
 ! ----------------------------------------------------------------------------------------------------------------------
-          use iso_c_binding, only : c_char, c_null_char
+          use, intrinsic :: iso_c_binding, only : c_char, c_null_char
+          use nodal_arrays_mod
           use python_spmd_mod, only : python_element_init
           use python_element_mod, only : python_get_number_elemental_entities, python_get_elemental_entity
           use python_funct_mod, only : python_, max_code_length, max_line_length, NAME_LEN, python_create_node_mapping, &
@@ -69,7 +73,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           type(python_),intent(inout) :: py          !< the Fortran structure that holds the python function
           integer,      intent(in) :: numnod         !< the global number of nodes
-          integer,      intent(in) :: itab(numnod)   !< the global node ids
+          type(nodal_arrays_), intent(in) :: nodes   !< the nodal arrays
           integer, intent(in) :: nixs                !< number of integers in the solid data structure
           integer, intent(in) :: numels              !< number of solids
           integer, intent(in) :: ixs(nixs,numels)    !< solid data structure
@@ -110,8 +114,11 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           nelem = mvsiz * ngroup
           allocate(user_id(nelem))
+          user_id = -1
           allocate(local_id(nelem))
+          local_id = -1
           allocate(group_id(nelem))
+          group_id = -1
           allocate(character(kind=c_char, len=max_code_length) :: code)
 
           ierror = 0 ! if python error = 1 => python_initialize will do nothing, because python is not available
@@ -122,7 +129,7 @@
             ! stops the program if python_initialize failed and there are python functions
             write(6,*) "ERROR: python_register: python_initialize failed"
             !stop
-          endif
+          end if
           do n = 1, py%nb_functs
             do i = 1, py%functs(n)%len_code
               code(i:i) = py%functs(n)%code(i)
@@ -132,7 +139,7 @@
           end do
 
           ! creates a mapping between the global node ids and the local node ids
-          call python_create_node_mapping(itab, numnod)
+          call python_create_node_mapping(nodes%itab, numnod)
           call element_user_id(user_id, group_id, local_id, nelem, &
             ixs, nixs, numels, &
             ixc, nixc, numelc, &
@@ -163,16 +170,18 @@
             do j = 1, NAME_LEN
               py%elements%global%keyword(i)%h3d(j:j) = c_null_char
               py%elements%global%keyword(i)%name(j:j) = c_null_char
-            enddo
+            end do
             call python_get_elemental_entity(i,py%elements%global%keyword(i)%h3d,py%elements%global%user_ids(i)) !bind(c,name="cpp_python_get_elemental_entity")
-          enddo
+          end do
 
-          call python_element_init(py%elements, n, group_id, local_id, user_id)
-          if(py%nb_functs >0 )  call python_load_environment()
+          if(py%nb_functs >0 ) then
+            call python_element_init(py%elements, nelem, group_id, local_id, user_id)
+            call python_load_environment()
+          end if
           deallocate(code)
           deallocate(user_id)
           deallocate(local_id)
           deallocate(group_id)
-        end subroutine
+        end subroutine python_register
 
-      end module
+      end module python_register_mod

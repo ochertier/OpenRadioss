@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    gradient_limitation2             ../engine/source/ale/alemuscl/gradient_limitation2.F
-      !||--- called by ------------------------------------------------------
-      !||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
-      !||--- uses       -----------------------------------------------------
-      !||    alemuscl_mod                     ../common_source/modules/ale/alemuscl_mod.F
-      !||====================================================================
+!||====================================================================
+!||    gradient_limitation2             ../engine/source/ale/alemuscl/gradient_limitation2.F
+!||--- called by ------------------------------------------------------
+!||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
+!||--- uses       -----------------------------------------------------
+!||    alemuscl_mod                     ../common_source/modules/ale/alemuscl_mod.F
+!||    element_mod                      ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE GRADIENT_LIMITATION2(IXQ, X, TRIMAT)
 C-----------------------------------------------
 C  D e s c r i p t i o n   
@@ -38,6 +39,7 @@ C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE ALEMUSCL_MOD
+      use element_mod , only :nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,7 +70,7 @@ C-----------------------------------------------
       !!! and stability purposes
       DO I = LFT, LLT
          II = I + NFT
-         !!! Element centroid
+         !!!centroid element
          YK = ALEMUSCL_Buffer%ELCENTER(II,2) ; ZK = ALEMUSCL_Buffer%ELCENTER(II,3)
          reduc_factor = EP30
          NNUM = 0

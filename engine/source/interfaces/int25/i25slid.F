@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25prep_add    ../engine/source/interfaces/int25/i25slid.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_slid   ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box        ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25prep_add    ../engine/source/interfaces/int25/i25slid.F
+!||--- called by ------------------------------------------------------
+!||    i25main_slid   ../engine/source/interfaces/int25/i25main_slid.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box        ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25PREP_ADD(
      1                  NIN    ,NI25   ,NSN      ,NSNR   ,ITAB   ,
      2                  NADMSR ,ADMSR  ,IAD_FRNOR,FR_NOR ,NADD   ,
@@ -70,7 +70,7 @@ C
         END IF
       END DO
 C
-C      NADD(1:NADMSR+1), KADD <=> liste sky line des noeuds secnd concerns / tous les sommets frontires
+C      Nadd (1: Nadmsr+1), Kadd <=> Sky Line list of the send nodes concerns / All the Sommets Frontiers
 C------
 C
       DO N=1,NSN
@@ -139,13 +139,13 @@ C------
 C
       RETURN
       END
-      !||====================================================================
-      !||    i25prep_slid_1   ../engine/source/interfaces/int25/i25slid.F
-      !||--- called by ------------------------------------------------------
-      !||    i25comp_1        ../engine/source/interfaces/int25/i25comp_1.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25prep_slid_1   ../engine/source/interfaces/int25/i25slid.F
+!||--- called by ------------------------------------------------------
+!||    i25comp_1        ../engine/source/interfaces/int25/i25comp_1.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box          ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25PREP_SLID_1(
      1                  JLT    ,CAND_N ,CAND_E ,NIN    ,
      2                  NSN    ,NSNR   ,INACTI ,MSEGLO ,
@@ -190,7 +190,7 @@ C
 C
         IF(N <= NSN)THEN
 C
-C          pas de glisst !
+C          no sliding!
           IF(IRTLM(2,N) > 0) CYCLE
 C
           IF(IRECT(3,L)/=IRECT(4,L))THEN
@@ -200,7 +200,7 @@ C
             IT=-IRTLM(2,N)/5
             IF(FARM(IT,J)==2)THEN
 C
-C              quitte le contact
+C              leaves the contact
               DO JT=1,4
                 IF(FARM(JT,J)==2)THEN ! Hors cone vs normales cote no JT & (FAR/=0 .OR. BBB <= ZERO)
                   ITAG(ITRIA(1,JT))=1
@@ -249,14 +249,14 @@ C
 C
               IF( FARM(2,J) == 2 )THEN
 C
-C                leave side 23
+C                Leave Side 23
                 ISLIDE(2,N)=I2
                 ISLIDE(3,N)=I3
               END IF
 C
               IF( FARM(3,J) == 2 )THEN
 C
-C                leave side 31
+C                Leave Side 31
                 ISLIDE(3,N)=I3
                 ISLIDE(1,N)=I1
               END IF
@@ -292,7 +292,7 @@ C
 
             IF(FARM(IT,J)==2)THEN
 C
-C             leave contact 
+C             Leave Contact 
               DO JT=1,4
                 IF(FARM(JT,J)==2)THEN 
                   ITAG(ITRIA(1,JT))=1
@@ -333,21 +333,21 @@ C
 
               IF( FARM(1,J) == 2 )THEN
 C
-C                leave side 12
+C                Leave Side 12
                 ISLIDE_FI(NIN)%P(1,N)=I1
                 ISLIDE_FI(NIN)%P(2,N)=I2
               END IF
 C
               IF( FARM(2,J) == 2 )THEN
 C
-C                leave side 23
+C                Leave Side 23
                 ISLIDE_FI(NIN)%P(2,N)=I2
                 ISLIDE_FI(NIN)%P(3,N)=I3
               END IF
 C
               IF( FARM(3,J) == 2 )THEN
 C
-C                leave side 31
+C                Leave Side 31
                 ISLIDE_FI(NIN)%P(3,N)=I3
                 ISLIDE_FI(NIN)%P(1,N)=I1
               END IF
@@ -375,13 +375,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i25prep_slid_2   ../engine/source/interfaces/int25/i25slid.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_slid     ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25prep_slid_2   ../engine/source/interfaces/int25/i25slid.F
+!||--- called by ------------------------------------------------------
+!||    i25main_slid     ../engine/source/interfaces/int25/i25main_slid.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box          ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25PREP_SLID_2(
      1                  CAND_N ,CAND_E ,NIN    ,NI25   ,NSN    ,
      2                  NSNR   ,NRTM   ,SIZOPT ,K_STOK ,MSEGLO ,
@@ -613,13 +613,13 @@ C-----
 
       RETURN
       END
-      !||====================================================================
-      !||    i25keepf   ../engine/source/interfaces/int25/i25slid.F
-      !||--- called by ------------------------------------------------------
-      !||    i25mainf   ../engine/source/interfaces/int25/i25mainf.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25keepf   ../engine/source/interfaces/int25/i25slid.F
+!||--- called by ------------------------------------------------------
+!||    i25mainf   ../engine/source/interfaces/int25/i25mainf.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25KEEPF(
      1                  I_STOK ,INDEX  ,CAND_N ,CAND_E ,NIN    ,
      2                  NSN    ,NSNR   ,INACTI ,MSEGLO ,IRTLM  ,
@@ -651,7 +651,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, K, L, N, IKEEP
 C--------------------------------------------------------
-C      Ne garder que les couples candidats rellement impacts
+C      keep only candidate pairs that are actually impacted
 C--------------------------------------------------------
       DO I=1,I_STOK
         J=INDEX(I)
@@ -668,7 +668,7 @@ c     .                                mseglo(l),PENM(1,J)+PENM(2,J)+PENM(3,J)+P
 c              print *,'keepf natif',itab(nsv(n)),mseglo(l),PENM(1,J)+PENM(2,J)+PENM(3,J)+PENM(4,J)
             ELSE
 C
-C             attention si ici <=> pb parith/on
+C             here = pb parith/on
               print *,'i25keepf native - internal problem',itab(nsv(n)),irtlm(1,n),ispmd+1,time_s(1,n),
      .               PENM(1,J),PENM(2,J),PENM(3,J),PENM(4,J)
               IRTLM(1,N)=0
@@ -686,7 +686,7 @@ c     .                                mseglo(l),PENM(1,J)+PENM(2,J)+PENM(3,J)+P
               IKEEP=1
             ELSE
 C
-C             attention si ici <=> pb parith/on
+C             here <=> pb parith/on
               print *,'i25keepf remote - internal problem',itafi(nin)%p(n-nsn),irtlm_fi(nin)%p(1,n-nsn),
      .                             ispmd+1,time_sfi(nin)%p(2*(n-nsn-1)+1),
      .                PENM(1,J)+PENM(2,J)+PENM(3,J)+PENM(4,J)
@@ -704,14 +704,15 @@ C       switch to negative value if no more kept
 C----------------------------------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    i25prep_nindex   ../engine/source/interfaces/int25/i25slid.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_slid     ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25prep_nindex   ../engine/source/interfaces/int25/i25slid.F
+!||--- called by ------------------------------------------------------
+!||    i25main_slid     ../engine/source/interfaces/int25/i25main_slid.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod    ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod      ../engine/share/message_module/message_mod.F
+!||    tri7box          ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25PREP_NINDEX(
      1                  NIN    ,NI25   ,NSN    ,NSNR   ,
      3                  ITAB   ,NSV    ,IAD_FRNOR,FR_NOR ,NADD ,
@@ -767,7 +768,7 @@ C
             DO J=IAD_FRNOR(NI25,P),IAD_FRNOR(NI25,P+1)-1
               NOR       = FR_NOR(J)
 C
-C             NADD(1:NADMSR+1), KADD <=> liste sky line des noeuds secnd concerns / tous les sommets frontires
+C             Nadd (1: Nadmsr+1), Kadd <=> Sky Line list of the send nodes concerns / All the Sommets Frontiers
               DO N=NADD(NOR)+1, NADD(NOR+1)
                 I=KADD(N)
                 IF(TAGSLD(I) /= P)THEN
@@ -784,14 +785,15 @@ C     DEALLOCATE(TAGSLD)
 C------
       RETURN
       END
-      !||====================================================================
-      !||    i25prep_sizbufs   ../engine/source/interfaces/int25/i25slid.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_slid      ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||    tri7box           ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25prep_sizbufs   ../engine/source/interfaces/int25/i25slid.F
+!||--- called by ------------------------------------------------------
+!||    i25main_slid      ../engine/source/interfaces/int25/i25main_slid.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod       ../engine/share/message_module/message_mod.F
+!||    tri7box           ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25PREP_SIZBUFS(
      1                  NIN    ,NI25   ,NSN    ,NSNR   ,ITYP   ,
      2                  IFQ    ,INACTI ,IGAP   ,INTTH  ,ILEV   ,
@@ -908,7 +910,7 @@ C------
             DO J=IAD_FRNOR(NI25,P),IAD_FRNOR(NI25,P+1)-1
               NOR       = FR_NOR(J)
 C
-C             NADD(1:NADMSR+1), KADD <=> liste sky line des noeuds secnd concerns / tous les sommets frontires
+C             Nadd (1: Nadmsr+1), Kadd <=> Sky Line list of the send nodes concerns / All the Sommets Frontiers
               DO N=NADD(NOR)+1, NADD(NOR+1)
                 I=KADD(N)
                 IF(TAGSLD(I)==0)THEN
@@ -924,7 +926,7 @@ c                else
 c                  if(itafi(nin)%p(i-nsn)==31935)print *,'index rem',ispmd+1,p,iloc(i)
 c                end if
 C
-C               entree dans IAD_FRNOR(NI25,P:P+1)
+C               ENTER IN IAD_FRNOR (NI25, P: P+1)
                 FR_SLIDE(TAGSLD(I),ILOC(I))=J-IAD_FRNOR(NI25,P) + 1
               END DO
             END DO
@@ -936,14 +938,15 @@ C------
       RETURN
       END
 
-      !||====================================================================
-      !||    i25prep_send    ../engine/source/interfaces/int25/i25slid.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_slid    ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25prep_send    ../engine/source/interfaces/int25/i25slid.F
+!||--- called by ------------------------------------------------------
+!||    i25main_slid    ../engine/source/interfaces/int25/i25main_slid.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||    tri7box         ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25PREP_SEND(
      1                  NIN    ,NI25   ,NSN    ,NSNR   ,ITYP    ,
      2                  IFQ    ,INACTI ,IGAP   ,INTTH  ,ILEV    ,
@@ -1011,7 +1014,7 @@ C
 C
             NSEND = SIZBUFS(P)
 C
-C             Pointeurs sur la zone vs cette interface et ce processeur
+C             pointers to the zone vs this interface and this processor
             LR = 0
             LI = 0
 C
@@ -1030,7 +1033,7 @@ C
                 IBUF(P,NI25)%p(LI+1) = INTBUF_TAB%NSV_ON_PMAIN(I)
 c                 IF(MAIN_PROC(NOD) == LOC_PROC) THEN
 c                   IBUF(P,NI25)%p(LI+1) = -ITAB(NOD)
-c                   ! on peut metre ici directement le numero local
+c                   ! on peut metre ici directement le local number
 c                 ELSE
 c                   IBUF(P,NI25)%p(LI+1) = -ITAB(NOD)
 c                 ENDIF
@@ -1087,7 +1090,7 @@ C specific cases ../..
               ISHIFT = ISHIFT + 2
             ENDIF
 
-            IF(IGAP==1 .OR. IGAP==2)THEN
+            IF(IGAP==1 .OR. IGAP==2 .OR. IGAP==5)THEN
               LR = 0
               DO J=1,NSEND
                 I = INDEX(IDEB+J)
@@ -1319,7 +1322,7 @@ C
               ISHIFT = ISHIFT + 5
 
               IF (ILEV==2) THEN
-C             Voir avec
+C             see with
                 LI = 0
 C include      "vectorize.inc"
                 DO J = 1, NSEND

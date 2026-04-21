@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i14can         ../engine/source/interfaces/int14/i14can.F
-      !||--- called by ------------------------------------------------------
-      !||    i14cmp         ../engine/source/interfaces/int14/i14cmp.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i14can         ../engine/source/interfaces/int14/i14can.F
+!||--- called by ------------------------------------------------------
+!||    i14cmp         ../engine/source/interfaces/int14/i14cmp.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE I14CAN(NSI     ,KSI     ,X    ,
      2                  KSURF   ,IGRSURF ,BUFSF,
      3                  G       ,
@@ -57,14 +57,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ADRBUF, I, IN, IL
+      INTEGER ADRBUF, I, IN
       INTEGER DGR
       my_real
      .   XG, YG, ZG, A, B, C, ROT(9),
      .   AN, BN, CN, HN,
      .   TRMX, TRMY, TRMZ, TRMXN, TRMYN, TRMZN,
      .   XP, YP, ZP,
-     .   D, H, EG(6), EPG
+     .   D, H
 C-----------------------------------------------
       ADRBUF=IGRSURF(KSURF)%IAD_BUFR
 C
@@ -92,8 +92,8 @@ C-----------------------------------------------
        NSC=0
        NSP=0
 C-----------------------------------------------
-C      Calcul de EG (coefs de l'equation de l'ellipse
-C      dans rep. global centre en G).
+C      calculation of eg (coefficients of the ellipse equation)
+C      in rep.global center in G).
 C      Warning : Xloc = [ROT] Xglo
 C      EG(1)=ROT(1)*ROT(1)*A2+ROT(4)*ROT(4)*B2+ROT(7)*ROT(7)*C2
 C      EG(2)=ROT(1)*ROT(2)*A2+ROT(4)*ROT(5)*B2+ROT(7)*ROT(8)*C2
@@ -143,7 +143,7 @@ C---------------------------------
           ENDIF
         ELSE
 C---------------------------------
-C         tri exhaustif.
+C         exhaustive sorting.
           H =ONE+G*D
           HN=H**DGR
           IF (EW(IN) <= HN) THEN

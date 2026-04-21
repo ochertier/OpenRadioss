@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    find_newknot   ../starter/source/elements/ige3d/find_newknot.F
-      !||--- called by ------------------------------------------------------
-      !||    prerafig3d     ../starter/source/elements/ige3d/prerafig3d.F
-      !||====================================================================
+!||====================================================================
+!||    find_newknot   ../starter/source/elements/ige3d/find_newknot.F
+!||--- called by ------------------------------------------------------
+!||    prerafig3d     ../starter/source/elements/ige3d/prerafig3d.F
+!||====================================================================
       SUBROUTINE FIND_NEWKNOT(IEL,KXIG3D,KNOT,DIR,IAD_KNOT,
      .                        NKNOT1,NKNOT2,NKNOT3,IDCUT,NEWKNOT)
 C----------------------------------------------------------------------
-C   ROUTINE QUI RENVOIE EN FONCTION DU NUMERO DE LA COUPE D'ELEMENT
+C   routine that returns according to the element cut number
 C   A REALISER LE KNOT CORRESPONDANT A INSERER
 C----------------------------------------------------------------------
 C-----------------------------------------------
@@ -65,7 +65,7 @@ C     KXIG3D(13,*)  :   number of element's cuts needed in the Y direction
 C     KXIG3D(14,*)  :   number of element's cuts needed in the Z direction
 C=======================================================================                                         
 C----------------------------------------------------------------------
-C     INITIALISATION DES VARIABLES EN FONCTION DE LA DIRECTION DE COUPE
+C     initialization of variables according to the cutting direction
 C----------------------------------------------------------------------
 C
       IF(DIR==1) THEN
@@ -86,8 +86,8 @@ C
       ENDIF
 C
 C----------------------------------------------------------------------
-C  NE PERMET QUE LES COUPES PAR 2,4,8... (DES COUPES PAIRES), ET
-C  BORNE LE NOMBRE MAXIMAL DE COUPE PAR 8
+C  only allows cuts by 2, 4, 8... (even cuts), and
+C  limits the maximum number of cuts to 8
 C----------------------------------------------------------------------
 C
       SELECT CASE (IDCUT)
@@ -132,9 +132,9 @@ C
       END
 C
 C
-      !||====================================================================
-      !||    find_neighbourknot   ../starter/source/elements/ige3d/find_newknot.F
-      !||====================================================================
+!||====================================================================
+!||    find_neighbourknot   ../starter/source/elements/ige3d/find_newknot.F
+!||====================================================================
       SUBROUTINE FIND_NEIGHBOURKNOT(IDNEIGHBOUR,KXIG3D,TAB_OLDIDCUT,IDNBCUT,DIR,IDCUT_VOISIN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

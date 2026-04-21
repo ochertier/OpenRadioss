@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_cell_size_post_rcv   ../engine/source/mpi/interfaces/spmd_cell_size_post_rcv.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_cell_list_exchange   ../engine/source/mpi/interfaces/spmd_cell_list_exchange.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    inter_sorting_mod         ../engine/share/modules/inter_sorting_mod.F
-      !||    tri7box                   ../engine/share/modules/tri7box.F
-      !||====================================================================
-        SUBROUTINE SPMD_CELL_SIZE_POST_RCV(IRCVFROM,ISENDTO,NIN,SORT_COMM,ITIED)
+!||====================================================================
+!||    spmd_cell_size_post_rcv   ../engine/source/mpi/interfaces/spmd_cell_size_post_rcv.F
+!||--- called by ------------------------------------------------------
+!||    spmd_cell_list_exchange   ../engine/source/mpi/interfaces/spmd_cell_list_exchange.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    inter_sorting_mod         ../engine/share/modules/inter_sorting_mod.F
+!||    spmd_comm_world_mod       ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box                   ../engine/share/modules/tri7box.F
+!||====================================================================
+        SUBROUTINE SPMD_CELL_SIZE_POST_RCV(IRCVFROM,ISENDTO,NIN,SORT_COMM,ITIED,component)
 !$COMMENT
 !       SPMD_CELL_SIZE_POST_RCV description :
 !       prepare the reception of number of remote secondary nodes
@@ -44,6 +45,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -62,16 +64,17 @@ C-----------------------------------------------
         INTEGER, INTENT(in) :: ITIED
         INTEGER, DIMENSION(NINTER+1,NSPMD+1), INTENT(in) :: ISENDTO,IRCVFROM
         TYPE(sorting_comm_type), DIMENSION(NINTER), INTENT(inout) :: SORT_COMM   ! structure for interface sorting comm
+        type(component_), dimension(ninter), intent(inout) :: component
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
 #ifdef MPI        
-        INTEGER :: I,J,KK,IJK,KJI
+ 
         INTEGER :: P,P_LOC
-        INTEGER IERROR1,STATUS(MPI_STATUS_SIZE),IERROR
+        INTEGER IERROR
         INTEGER :: LOC_PROC
         INTEGER :: MSGOFF, MSGOFF2, MSGOFF3, MSGOFF4, MSGOFF5
-        INTEGER :: MSGTYP,INFO
+        INTEGER :: MSGTYP
         LOGICAL :: NEED_TO_RCV
 !   --------------------------------------------------------------------     
         DATA MSGOFF/6021/
@@ -93,11 +96,7 @@ C-----------------------------------------------
                 IF(ISENDTO(NIN,P)/=0) THEN  !   remote nsn>0
                     IF(LOC_PROC/=P) THEN
                         NEED_TO_RCV = .TRUE.
-                        IF(SORT_COMM(NIN)%PROC_NUMBER>NSPMD/2) THEN
-                            IF(.NOT.SORT_COMM(NIN)%KEEP_PROC(P_LOC)) THEN
-                                NEED_TO_RCV = .FALSE.
-                            ENDIF
-                        ENDIF
+                        if(.not.component(nin)%proc_comp(p)%need_comm_s) need_to_rcv = .false.
                         IF(ITIED/=0) NEED_TO_RCV = .TRUE.    ! itied option : force the exchange
                         IF(NEED_TO_RCV) THEN
                             MSGTYP = MSGOFF3 

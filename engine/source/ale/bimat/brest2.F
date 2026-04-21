@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    brest2             ../engine/source/ale/bimat/brest2.F
-      !||--- called by ------------------------------------------------------
-      !||    bforc2             ../engine/source/ale/bimat/bforc2.F
-      !||--- uses       -----------------------------------------------------
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||====================================================================
-      SUBROUTINE BREST2(ALPH,VOLT,PM,OFF,VOL0,SOFF,IC,VOLN,
+!||====================================================================
+!||    brest2             ../engine/source/ale/bimat/brest2.F
+!||--- called by ------------------------------------------------------
+!||    bforc2             ../engine/source/ale/bimat/bforc2.F
+!||--- uses       -----------------------------------------------------
+!||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||====================================================================
+      SUBROUTINE BREST2(VOLT,IC,VOLN,
      .     AIRE, AIRES, 
      .     D1, D2, D3, D4, D5, D6, 
      .     D1S, D2S, D3S, D4S, D5S, D6S,
-     .     VD2, DVOL,
      .     MAT,MAT_PARAM,NUMMAT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -53,13 +52,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real SOFF
       INTEGER IC(7,*), MAT(*)
-      my_real ALPH(*), VOLT(*), PM(NPROPM,*), OFF(*), VOL0(*),VOLN(MVSIZ),
+      my_real VOLT(*), VOLN(MVSIZ),
      .        AIRE(*), AIRES(*),
      .        D1(*), D2(*), D3(*), D4(*), D5(*), D6(*),
-     .        D1S(*), D2S(*), D3S(*), D4S(*), D5S(*), D6S(*),
-     .        VD2(*), DVOL(*)
+     .        D1S(*), D2S(*), D3S(*), D4S(*), D5S(*), D6S(*)
       INTEGEr,INTENT(IN) :: NUMMAT
       TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------

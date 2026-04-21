@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,17 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spmd_box_limit_reduction   ../engine/source/mpi/interfaces/spmd_box_limit_reduction.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_prepare_sort         ../engine/source/interfaces/generic/inter_prepare_sort.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_allreduce_db          ../engine/source/mpi/generic/spmd_allreduce_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_sorting_mod          ../engine/share/modules/inter_sorting_mod.F
-      !||    inter_struct_mod           ../engine/share/modules/inter_struct_mod.F
-      !||====================================================================
-        SUBROUTINE SPMD_BOX_LIMIT_REDUCTION(NB_INTER_SORTED)
+!||====================================================================
+!||    spmd_box_limit_reduction   ../engine/source/mpi/interfaces/spmd_box_limit_reduction.F
+!||--- called by ------------------------------------------------------
+!||    inter_init_component       ../engine/source/interfaces/generic/inter_init_component.F90
+!||    inter_prepare_sort         ../engine/source/interfaces/generic/inter_prepare_sort.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    inter_struct_mod           ../engine/share/modules/inter_struct_mod.F
+!||    spmd_mod                   ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
+        SUBROUTINE SPMD_BOX_LIMIT_REDUCTION(NB_INTER_SORTED,box_limit)
 !$COMMENT
 !       SPMD_GRID_LIMIT_REDUCTION description :
 !       compute the minimal & maximal positions      
@@ -43,7 +43,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
         USE INTER_STRUCT_MOD
-        USE INTER_SORTING_MOD
+        USE SPMD_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,15 +55,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(in) :: NB_INTER_SORTED        !   number of interfaces that need to be sorted
+        INTEGER, INTENT(in) :: NB_INTER_SORTED        !< number of interfaces that need to be sorted
+        my_real, dimension(6), intent(inout) :: box_limit !< upper & lower bound of the box
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER :: I
         REAL(kind=8), DIMENSION(6) :: BUFFER_S,BUFFER_R
 #ifdef MPI        
-        INTEGER :: ierror
-        INTEGER :: STATUS_(MPI_STATUS_SIZE)
         CHARACTER(len=4) :: MY_OPERATION
 C-----------------------------------------------
         !   ------------------  
@@ -76,7 +75,7 @@ C-----------------------------------------------
         MY_OPERATION(1:4) = ''
         MY_OPERATION(1:3) = "MAX"
         
-        CALL SPMD_ALLREDUCE_DB(BUFFER_S,BUFFER_R,6,MY_OPERATION)
+        CALL SPMD_ALLREDUCE(BUFFER_S,BUFFER_R,6,SPMD_MAX)
         !   ------------------
         IF(NB_INTER_SORTED>0) THEN
             DO I=1,3

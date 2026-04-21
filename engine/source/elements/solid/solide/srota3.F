@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,20 +21,20 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C ds008  18/2/00  +2
-      !||====================================================================
-      !||    srota3       ../engine/source/elements/solid/solide/srota3.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3duforc3   ../engine/source/elements/ige3d/ig3duforc3.F
-      !||    s10forc3     ../engine/source/elements/solid/solide10/s10forc3.F
-      !||    s16forc3     ../engine/source/elements/thickshell/solide16/s16forc3.F
-      !||    s20forc3     ../engine/source/elements/solid/solide20/s20forc3.F
-      !||    s4forc3      ../engine/source/elements/solid/solide4/s4forc3.F
-      !||    s8cforc3     ../engine/source/elements/thickshell/solide8c/s8cforc3.F
-      !||    s8eforc3     ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8zforc3     ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||    sforc3       ../engine/source/elements/solid/solide/sforc3.F
-      !||    spstres      ../engine/source/elements/sph/spstres.F
-      !||====================================================================
+!||====================================================================
+!||    srota3       ../engine/source/elements/solid/solide/srota3.F
+!||--- called by ------------------------------------------------------
+!||    ig3duforc3   ../engine/source/elements/ige3d/ig3duforc3.F
+!||    s10forc3     ../engine/source/elements/solid/solide10/s10forc3.F
+!||    s16forc3     ../engine/source/elements/thickshell/solide16/s16forc3.F
+!||    s20forc3     ../engine/source/elements/solid/solide20/s20forc3.F
+!||    s4forc3      ../engine/source/elements/solid/solide4/s4forc3.F
+!||    s8cforc3     ../engine/source/elements/thickshell/solide8c/s8cforc3.F
+!||    s8eforc3     ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8zforc3     ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||    sforc3       ../engine/source/elements/solid/solide/sforc3.F
+!||    spstres      ../engine/source/elements/sph/spstres.F
+!||====================================================================
       SUBROUTINE SROTA3(
      1   SIG,     S1,      S2,      S3,
      2   S4,      S5,      S6,      WXX,
@@ -63,7 +63,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
       my_real
      .   Q1, Q2, Q3
 C=======================================================================

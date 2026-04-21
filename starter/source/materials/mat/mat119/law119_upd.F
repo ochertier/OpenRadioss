@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    law119_upd             ../starter/source/materials/mat/mat119/law119_upd.F
-      !||--- called by ------------------------------------------------------
-      !||    updmat                 ../starter/source/materials/updmat.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    table_inters           ../starter/source/tools/curve/func_inters.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    law119_upd             ../starter/source/materials/mat/mat119/law119_upd.F
+!||--- called by ------------------------------------------------------
+!||    updmat                 ../starter/source/materials/updmat.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    table_inters           ../starter/source/tools/curve/func_inters.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE LAW119_UPD(NUPARAM ,NUMTABL ,ITABLE ,TABLE  ,TABLE_ID ,
      .                      UPARAM  ,PM      ,TITR   ,MAT_ID )          
 C-----------------------------------------------
@@ -61,8 +61,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,J,FUNC,FUND,NDIM,NPOINT
-      my_real :: E11,N12,N21,NU,C1,SSP,KMAX,KINI,DX,DY,SLOPE,RHO,
-     .           FSCALE1,FSCALE2,FSCALET,DET,A11,A12,A22,XINT,YINT
+      my_real :: N12,KMAX,KINI,DX,DY,SLOPE,
+     .           FSCALE1,FSCALE2,FSCALET,XINT,YINT
 c=======================================================================
       FUNC = ITABLE(1)
       FUND = ITABLE(2)

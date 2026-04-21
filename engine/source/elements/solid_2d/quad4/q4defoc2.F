@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    q4defoc2   ../engine/source/elements/solid_2d/quad4/q4defoc2.F
-      !||--- called by ------------------------------------------------------
-      !||    q4forc2    ../engine/source/elements/solid_2d/quad4/q4forc2.F
-      !||====================================================================
+!||====================================================================
+!||    q4defoc2   ../engine/source/elements/solid_2d/quad4/q4defoc2.F
+!||--- called by ------------------------------------------------------
+!||    q4forc2    ../engine/source/elements/solid_2d/quad4/q4forc2.F
+!||====================================================================
       SUBROUTINE Q4DEFOC2(
      1   VY1,     VY2,     VY3,     VY4,
      2   VZ1,     VZ2,     VZ3,     VZ4,
@@ -75,8 +75,7 @@ C-----------------------------------------------
       INTEGER I
       my_real
      .    VY13(MVSIZ),VY24(MVSIZ),VZ13(MVSIZ),VZ24(MVSIZ),
-     .    DYZ(MVSIZ),DZY(MVSIZ),DYY(MVSIZ),DZZ(MVSIZ),
-     .    VY,VZ
+     .    DYZ(MVSIZ),DZY(MVSIZ),DYY(MVSIZ),DZZ(MVSIZ)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------

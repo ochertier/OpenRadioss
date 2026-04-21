@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  |         INTTI12F                        /interf/intti12.F
-      !||====================================================================
-      !||    i12for3    ../engine/source/interfaces/interf/i12for3.F
-      !||--- called by ------------------------------------------------------
-      !||    intti12f   ../engine/source/interfaces/interf/intti12.F
-      !||====================================================================
+!||====================================================================
+!||    i12for3    ../engine/source/interfaces/interf/i12for3.F
+!||--- called by ------------------------------------------------------
+!||    intti12f   ../engine/source/interfaces/interf/intti12.F
+!||====================================================================
       SUBROUTINE I12FOR3(
      1  NSN  ,NMN  ,A      ,IRECT,CRST  ,
      2  MSR  ,NSV  ,IRTL   ,MS   ,WEIGHT,
@@ -54,7 +54,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NIR, I, J, I3, J3, I2, J2, I1, J1, II, L, JJ,JL
       my_real
-     .   H(4), XMSJ, SS, TT, XMSI, FXI, FYI, FZI,SP,SM,TP,TM,
+     .   H(4), SS, TT, XMSI, FXI, FYI, FZI,SP,SM,TP,TM,
      .   P(9),CST,SST,FXR, FYR, FZR
 C-----------------------------------------------
       NIR=2
@@ -70,7 +70,7 @@ C-----------------------------------------------
         ENDDO
       ENDIF
 
-       !Cel sauvegarde de la masse initiale
+       !cell saves the initial mass
         DO II=1,NMN
           J=MSR(II)
           MMASS(II)=MS(J)

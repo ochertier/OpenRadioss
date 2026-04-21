@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s16init3               ../starter/source/elements/thickshell/solide16/s16init3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    failini                ../starter/source/elements/solid/solide/failini.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    s16coor3               ../starter/source/elements/thickshell/solide16/s16coor3.F
-      !||    s16deri3               ../starter/source/elements/thickshell/solide16/s16deri3.F
-      !||    s16mass3               ../starter/source/elements/thickshell/solide16/s16mass3.F
-      !||    s16rst                 ../starter/source/elements/thickshell/solide16/s16deri3.F
-      !||    s20msi                 ../starter/source/elements/solid/solide20/s20mass3.F
-      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
-      !||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s16init3               ../starter/source/elements/thickshell/solide16/s16init3.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    failini                ../starter/source/elements/solid/solide/failini.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    s16coor3               ../starter/source/elements/thickshell/solide16/s16coor3.F
+!||    s16deri3               ../starter/source/elements/thickshell/solide16/s16deri3.F
+!||    s16mass3               ../starter/source/elements/thickshell/solide16/s16mass3.F
+!||    s16rst                 ../starter/source/elements/thickshell/solide16/s16deri3.F
+!||    s20msi                 ../starter/source/elements/solid/solide20/s20mass3.F
+!||    s20temp                ../starter/source/elements/solid/solide20/s20temp.F90
+!||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+!||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    s20temp_mod            ../starter/source/elements/solid/solide20/s20temp.F90
+!||====================================================================
       SUBROUTINE S16INIT3(
      1      ELBUF_STR ,MAS     ,IXS     ,PM      ,X        ,
      2      DETONATORS,GEO     ,VEUL    ,ALE_CONNECTIVITY ,IPARG    ,
@@ -64,6 +66,8 @@ C-----------------------------------------------
       USE MATPARAM_DEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       use glob_therm_mod
+      use s20temp_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -108,6 +112,7 @@ C-----------------------------------------------
       INTEGER NF1,IBID,I,IGTYP,IP,NF2,NPTR,NPTS,NPTT,NLAY,IL,IR,IS,IT,
      .        N, NUVAR,IINT, NCC,IDEF,JHBE,IPID1,L_PLA,L_SIGB
       INTEGER NC(MVSIZ,16),MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ),RBID(1)
+      INTEGER ,PARAMETER :: NPE=16
       CHARACTER(LEN=NCHARTITLE)::TITR1
       my_real
      .   BID, FV,WI,AA,BB
@@ -122,6 +127,7 @@ C-----------------------------------------------
      .  TX(MVSIZ),TY(MVSIZ),TZ(MVSIZ),UL(MVSIZ,16),
      .  NI(MVSIZ,16),DNIDR(MVSIZ,16),DNIDS(MVSIZ,16),DNIDT(MVSIZ,16),
      .  DTX(MVSIZ),STIN(MVSIZ,16), RHOCP(MVSIZ),TEMP0(MVSIZ), AIRE(MVSIZ)
+      my_real :: TEMPEL(NEL)
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
       TYPE(BUF_MAT_) ,POINTER :: MBUF
@@ -341,7 +347,7 @@ C
       ENDDO
 C
 C----------------------------------------
-C     INITIALISATION DE LA THERMIQUE 
+C     INITIALIZATION OF THERMAL CONDITIONS
 C----------------------------------------
       IF(JTHE /=0) CALL ATHERI(MAT,PM,GBUF%TEMP)
 C-----------------------------
@@ -388,6 +394,12 @@ c
      5      LBUF%VOL,DELTAX ,STIN   ,NI     ,VOLG   ,UL        ,LBUF%VOL0DP )
          ENDIF
 c
+         IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+           CALL S20TEMP(NEL,NUMNOD,MVSIZ,NPE, NC,NI(1,IP),TEMP,TEMPEL)
+         ELSE
+           TEMPEL(1:NEL) = TEMP0(1:NEL)
+         ENDIF             
+!
          CALL MATINI(PM       ,IXS    ,NIXS        ,X          ,
      .               GEO      ,ALE_CONNECTIVITY  ,DETONATORS  ,IPARG      ,
      .               SIGI     ,NEL    ,SKEW        ,IGEO(1,1)  ,
@@ -395,9 +407,9 @@ c
      .               MAT      ,IPM    ,NSIGS       ,NUMSOL     ,PTSOL    ,
      .               IP       ,NGL    ,NPF         ,TF         ,BUFMAT   ,
      .               GBUF     ,LBUF   ,MBUF        ,ELBUF_STR  ,ILOADP   ,
-     .               FACLOAD, DELTAX)
+     .               FACLOAD, DELTAX  ,TEMPEL      ,MAT_PARAM  )
 C----------------------------------------
-C     INITIALISATION DES MASSES
+C     INITIALIZATION OF MASSES
 C----------------------------------------
          CALL S20MSI(LBUF%RHO ,MASS     ,LBUF%VOL  ,DTELEM(NFT+1),STI    ,
      .               LBUF%OFF ,LBUF%SIG ,LBUF%EINT ,DTX          ,NEL    ,
@@ -471,8 +483,8 @@ C----------------------------------------
      .             SIGI,NSIGS,IXS,NIXS,PTSOL,
      .             RNOISE,PERTURB,MAT_PARAM)
 C------------------------------------------
-C     assemblage des Volumes nodaux et Modules nodaux
-C     (pour rigidites d'interface)
+C     assembly of Nodal Volumes and Nodal Modules
+C     (for interface rigidities)
 C------------------------------------------
       IF (I7STIFS /= 0) THEN
         NCC=16

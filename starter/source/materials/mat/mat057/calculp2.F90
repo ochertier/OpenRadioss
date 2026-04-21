@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,76 +20,80 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    calculp2_mod    ../starter/source/materials/mat/mat057/calculp2.F90
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat57   ../starter/source/materials/mat/mat057/hm_read_mat57.F90
-      !||    hm_read_mat78   ../starter/source/materials/mat/mat078/hm_read_mat78.F
-      !||====================================================================
-     module calculp2_mod
+!||====================================================================
+!||    calculp2_mod                         ../starter/source/materials/mat/mat057/calculp2.F90
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat57                        ../starter/source/materials/mat/mat057/hm_read_mat57.F90
+!||    hm_read_mat78                        ../starter/source/materials/mat/mat078/hm_read_mat78.F
+!||    hm_read_yield_criterion_barlat1989   ../starter/source/materials/mat/mat131/yield_criterion/hm_read_yield_criterion_barlat1989.F90
+!||    hm_read_yield_criterion_barlat2000   ../starter/source/materials/mat/mat131/yield_criterion/hm_read_yield_criterion_barlat2000.F90
+!||====================================================================
+      module calculp2_mod
+        implicit none
       contains
-      !||====================================================================
-      !||    calculp2        ../starter/source/materials/mat/mat057/calculp2.F90
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat57   ../starter/source/materials/mat/mat057/hm_read_mat57.F90
-      !||    hm_read_mat78   ../starter/source/materials/mat/mat078/hm_read_mat78.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
-      subroutine calculp2(a    ,c    ,h    ,p    ,m    ,r45  )  
-!-------------------------------------------------------------------------------
-!   M o d u l e s
-!-------------------------------------------------------------------------------   
-      use constant_mod                    
-!-------------------------------------------------------------------------------
-!   I m p l i c i t   T y p e s
-!-------------------------------------------------------------------------------
-      implicit none 
-#include  "my_real.inc"
-!-----------------------------------------------
-!   D u m m y   A r g u m e n t s
-!-----------------------------------------------
-      my_real, intent(in)    :: a   !< Barlat 89 a parameter
-      my_real, intent(in)    :: c   !< Barlat 89 c parameter
-      my_real, intent(in)    :: h   !< Barlat 89 h parameter
-      my_real, intent(in)    :: m   !< Barlat 89 m exponent
-      my_real, intent(in)    :: r45 !< Lankford coefficient in 45 deg. direction
-      my_real, intent(inout) :: p   !< Barlat 89 p parameter
-!-----------------------------------------------
-!   L o c a l   V a r i a b l e s
-!-----------------------------------------------
-      integer i
-      my_real gama,alpha,beta,f,df,c1,c2,c3,c4,c5,pp,m2,                       &
-        aba2,abb2,abg1,ca,cb,ca1,cb1
-      integer, parameter :: nmax = 10
-!--------------------------------------------------------------
-      m2 = m-two
-      c1 = two**m*c
-      c2 = fourth*(1-h)
-      c2 = c2*c2
-      c3 = fourth*(1+h)
-      c4 = half*(1+h)
-      pp = p
-      do i = 1,nmax
-       gama  = sqrt(c2 + fourth*pp*pp)
-       alpha = c3-gama
-       beta  = c3+gama
-       c5    = two*c2/gama
-       aba2  = abs(alpha)**m2
-       abb2  = abs(beta)**m2
-       ca    = aba2*(c4-c5)*(one+r45)
-       cb    = abb2*(c4+c5)*(one+r45)
-       ca1   = aba2*alpha
-       cb1   = abb2*beta
-       abg1  = c1*gama**(m-one)
-       f     = a*(alpha*(ca1-ca) + beta*(cb1-cb)) + gama*abg1
-       df    = a*((m-one)*(ca-cb)-(ca1-cb1)*(m+(one+r45)*c5/gama)) + m*abg1
-       df    = half*df*pp/gama
-       pp    = pp - f/df
-      enddo
-      p = pp
+!||====================================================================
+!||    calculp2                             ../starter/source/materials/mat/mat057/calculp2.F90
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat57                        ../starter/source/materials/mat/mat057/hm_read_mat57.F90
+!||    hm_read_mat78                        ../starter/source/materials/mat/mat078/hm_read_mat78.F
+!||    hm_read_yield_criterion_barlat1989   ../starter/source/materials/mat/mat131/yield_criterion/hm_read_yield_criterion_barlat1989.F90
+!||--- uses       -----------------------------------------------------
+!||====================================================================
+        subroutine calculp2(a    ,c    ,h    ,p    ,m    ,r45  )
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                        Modules
+! ----------------------------------------------------------------------------------------------------------------------
+          use constant_mod
+          use precision_mod, only: WP
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                 implicit none
+! ----------------------------------------------------------------------------------------------------------------------
+          implicit none
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   arguments
+! ----------------------------------------------------------------------------------------------------------------------
+          real(kind=WP), intent(in)    :: a   !< Barlat 89 a parameter
+          real(kind=WP), intent(in)    :: c   !< Barlat 89 c parameter
+          real(kind=WP), intent(in)    :: h   !< Barlat 89 h parameter
+          real(kind=WP), intent(in)    :: m   !< Barlat 89 m exponent
+          real(kind=WP), intent(in)    :: r45 !< Lankford coefficient in 45 deg. direction
+          real(kind=WP), intent(inout) :: p   !< Barlat 89 p parameter
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   local variables
+! ----------------------------------------------------------------------------------------------------------------------
+          integer :: i
+          real(kind=WP) :: gama,alpha,beta,f,df,c1,c2,c3,c4,c5,pp,m2,                       &
+            aba2,abb2,abg1,ca,cb,ca1,cb1
+          integer, parameter :: nmax = 10
+! ----------------------------------------------------------------------------------------------------------------------
+          m2 = m-two
+          c1 = two**m*c
+          c2 = fourth*(1-h)
+          c2 = c2*c2
+          c3 = fourth*(1+h)
+          c4 = half*(1+h)
+          pp = p
+          do i = 1,nmax
+            gama  = sqrt(c2 + fourth*pp*pp)
+            alpha = c3-gama
+            beta  = c3+gama
+            c5    = two*c2/gama
+            aba2  = abs(alpha)**m2
+            abb2  = abs(beta)**m2
+            ca    = aba2*(c4-c5)*(one+r45)
+            cb    = abb2*(c4+c5)*(one+r45)
+            ca1   = aba2*alpha
+            cb1   = abb2*beta
+            abg1  = c1*gama**(m-one)
+            f     = a*(alpha*(ca1-ca) + beta*(cb1-cb)) + gama*abg1
+            df    = a*((m-one)*(ca-cb)-(ca1-cb1)*(m+(one+r45)*c5/gama)) + m*abg1
+            df    = half*df*pp/gama
+            pp    = pp - f/df
+          end do
+          p = pp
 !
-      end subroutine calculp2
-     end module calculp2_mod
+        end subroutine calculp2
+      end module calculp2_mod
 
 
 

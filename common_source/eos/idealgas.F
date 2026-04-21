@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,134 +20,109 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    idealgas     ../common_source/eos/idealgas.F
-      !||--- called by ------------------------------------------------------
-      !||    eosmain      ../common_source/eos/eosmain.F
-      !||--- uses       -----------------------------------------------------
-      !||    output_mod   ../common_source/modules/output/output_mod.F90
-      !||====================================================================
-      SUBROUTINE IDEALGAS(IFLAG ,NEL  ,PM   ,OFF   ,EINT  ,MU   ,MU2 , 
-     2                     ESPE ,DVOL ,DF   ,VNEW  ,MAT   ,PSH  ,
-     3                     PNEW ,DPDM ,DPDE ,THETA ,ECOLD)
+!||====================================================================
+!||    idealgas_mod   ../common_source/eos/idealgas.F
+!||--- called by ------------------------------------------------------
+!||    eosmain        ../common_source/eos/eosmain.F
+!||    eosmain51      ../engine/source/materials/mat/mat051/eosmain51.F90
+!||====================================================================
+      MODULE IDEALGAS_MOD
+      IMPLICIT NONE
+      CONTAINS
+!||====================================================================
+!||    idealgas        ../common_source/eos/idealgas.F
+!||--- called by ------------------------------------------------------
+!||    eosmain         ../common_source/eos/eosmain.F
+!||    eosmain51       ../engine/source/materials/mat/mat051/eosmain51.F90
+!||--- uses       -----------------------------------------------------
+!||    constant_mod    ../common_source/modules/constant_mod.F
+!||    eos_param_mod   ../common_source/modules/mat_elem/eos_param_mod.F90
+!||====================================================================
+      SUBROUTINE IDEALGAS(
+     1                     IFLAG ,NEL  ,OFF  ,EINT  ,MU   ,
+     2                     ESPE ,DVOL ,DF   ,VNEW    ,PSH  ,
+     3                     PNEW ,DPDM ,DPDE ,EOS_STRUCT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE OUTPUT_MOD , ONLY : WFEXT
+        USE CONSTANT_MOD , ONLY : ZERO, EM15, HALF, ONE
+        USE EOS_PARAM_MOD , ONLY : EOS_PARAM_
+        USE EOS_PARAM_MOD , ONLY : EOS_PARAM_
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
 C This subroutine contains numerical solving
 C of IDEAL GAS EOS
+!----------------------------------------------------------------------------
+!! \details STAGGERED SCHEME IS EXECUTED IN TWO PASSES IN EOSMAIN : IFLG=0 THEN IFLG=1
+!! \details COLLOCATED SCHEME IS DOING A SINGLE PASS : IFLG=2
+!! \details
+!! \details  STAGGERED SCHEME
+!! \details     EOSMAIN / IFLG = 0 : DERIVATIVE CALCULATION FOR SOUND SPEED ESTIMATION c[n+1] REQUIRED FOR PSEUDO-VISCOSITY (DPDE:partial derivative, DPDM:total derivative)
+!! \details     MQVISCB            : PSEUDO-VISCOSITY Q[n+1]
+!! \details     MEINT              : INTERNAL ENERGY INTEGRATION FOR E[n+1] : FIRST PART USING P[n], Q[n], and Q[n+1] CONTRIBUTIONS
+!! \details     EOSMAIN / IFLG = 1 : UPDATE P[n+1], T[N+1]
+!! \details                          INTERNAL ENERGY INTEGRATION FOR E[n+1] : LAST PART USING P[n+1] CONTRIBUTION
+!! \details                            (second order integration dE = -P.dV where P = 0.5(P[n+1] + P[n]) )
+!! \details  COLLOCATED SCHEME
+!! \details     EOSMAIN / IFLG = 2 : SINGLE PASS FOR P[n+1] AND DERIVATIVES
+!----------------------------------------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-#include      "implicit_f.inc"
-#include      "comlock.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "scr06_c.inc"
+      IMPLICIT NONE
+#include    "my_real.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER MAT(NEL), IFLAG, NEL
-      my_real PM(NPROPM,NUMMAT), 
-     .     OFF(NEL)  ,EINT(NEL) ,MU(NEL)   , 
-     .     MU2(NEL)  ,ESPE(NEL) ,DVOL(NEL) ,DF(NEL)  , 
-     .     VNEW(NEL) ,PNEW(NEL) ,DPDM(NEL),
-     .     DPDE(NEL) ,THETA(NEL),ECOLD(NEL)
-      my_real, INTENT(INOUT) :: PSH(NEL)
+      INTEGER,INTENT(IN) ::  IFLAG, NEL
+      my_real,INTENT(INOUT) :: EINT(NEL), DPDM(NEL), DPDE(NEL), PNEW(NEL), PSH(NEL)
+      my_real,INTENT(IN) :: OFF(NEL),MU(NEL),ESPE(NEL),DVOL(NEL),DF(NEL),VNEW(NEL)
+      TYPE(EOS_PARAM_),INTENT(IN) :: EOS_STRUCT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, MX
-      my_real :: P0,GAMMA,T0,E0,SPH,AA, BB,WFEXTT, DVV, PP, Cv, RHO, RHO0
+      INTEGER I
+      my_real :: P0,GAMMA,T0,E0,BB,DVV,PP
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
+
+      GAMMA      = EOS_STRUCT%UPARAM(1)
+      P0         = EOS_STRUCT%UPARAM(2)
+      T0         = EOS_STRUCT%UPARAM(3)
+      E0         = EOS_STRUCT%E0
+      PSH(1:NEL) = EOS_STRUCT%PSH
+
       IF(IFLAG == 0) THEN
-         MX         = MAT(1)
-         E0         = PM(23,MX)         
-         GAMMA      = PM(32,MX)
-         P0         = PM(31,MX)
-         PSH(1:NEL) = PM(88,MX)
-         T0         = PM(35,MX)
-         SPH        = PM(69,MX)
          DO I=1,NEL
            PP      = (GAMMA-ONE)*(ONE+MU(I))*ESPE(I)
            DPDM(I) = (GAMMA-ONE)*(ESPE(I)+PP*DF(I))     !total derivative
-           DPDE(I) = (GAMMA-ONE)*(ONE+MU(I))             !partial derivative
-         ENDDO
-         DO I=1,NEL
-           ECOLD(I)=-THREE100*SPH
-           IF(MU(I)>ZERO) ECOLD(I)=ECOLD(I)*(ONE+(GAMMA-ONE)*MU(I)*(ONE-MU(I)))
+           DPDE(I) = (GAMMA-ONE)*(ONE+MU(I))            !partial derivative
+           PNEW(I) = (MAX(PP,ZERO)-PSH(I))*OFF(I)       ! P(mu[n+1],E[n])
          ENDDO
 C-----------------------------------------------
       ELSEIF(IFLAG == 1) THEN
-         WFEXTT     =ZERO
-         MX         = MAT(1)
-         E0         = PM(23,MX)
-         GAMMA      = PM(32,MX)
-         P0         = PM(31,MX)
-         PSH(1:NEL) = PM(88,MX)
-         T0         = PM(35,MX)
-         SPH        = PM(69,MX)
-         ! p1 = p(mu,E+dE) = (g-1)*(1+mu)*(E-dvv*(p0+p1))    where p1,p0 are total pressure (no pshift), dvv = DVOL/2/V0                                               
          DO I=1,NEL
            BB          = (GAMMA-ONE)*(ONE+MU(I))
+           DPDE(I)     = BB  !partial derivative
            DVV         = HALF*DVOL(I)*DF(I) / MAX(EM15,VNEW(I))
-           PNEW(I)     = BB*ESPE(I) / (ONE+BB*DVV)         
-           PNEW(I)     = MAX(PNEW(I),ZERO)*OFF(I)
-           EINT(I)     = EINT(I) - HALF*DVOL(I)*PNEW(I)
-           WFEXTT      = WFEXTT-DVOL(I)*PSH(I)
-           PNEW(I)     = PNEW(I)-PSH(I)
-         ENDDO       
-#include "atomic.inc"
-       WFEXT = WFEXT + WFEXTT
-#include "atomend.inc"
-         MX     = MAT(1)
-         RHO0   = PM(1 ,MX)
-         SPH    = PM(69,MX)
-         Cv     = PM(36,MX)
-         DO I=1,NEL
-           RHO      = RHO0*(ONE+MU(I))
-           IF(OFF(I)<1.) CYCLE
-           THETA(I) = EINT(I)/Cv/RHO/VNEW(I)
-           THETA(I) = MAX(ZERO,THETA(I))
+           PNEW(I)     = BB*ESPE(I) / (ONE+BB*DVV) ! P(mu[n+1],E[n+1])
+           PNEW(I)     = (MAX(PNEW(I),ZERO)-PSH(I))*OFF(I)
+           EINT(I)     = EINT(I) - HALF*DVOL(I)*(PNEW(I)+PSH(I))
          ENDDO
 C-----------------------------------------------
        ELSEIF (IFLAG == 2) THEN
-         MX = MAT(1)
-         E0 = PM(23,MX)
-         GAMMA = PM(32,MX)
-         P0 = PM(31,MX)
-         PSH(1:NEL) = PM(88,MX)
-         T0 = PM(35,MX)
-         SPH = PM(69,MX)
-         RHO0 = PM(1 ,MX)
-         Cv = PM(36,MX)
-         DO I=1, NEL
+          DO I=1, NEL
             IF (VNEW(I) > ZERO) THEN
-               PP      = (GAMMA-ONE)*(ONE+MU(I))*ESPE(I) - PSH(I)
-               DPDM(I) = (GAMMA-ONE)*(ESPE(I)+(PP+PSH(I))*DF(I)) !total derivative
-               DPDE(I) = (GAMMA-ONE)*(ONE+MU(I)) !partial derivative
-               PNEW(I) = PP
+              PP      = (GAMMA-ONE)*(ONE+MU(I))*ESPE(I) - PSH(I)
+              DPDM(I) = (GAMMA-ONE)*(ESPE(I)+(PP+PSH(I))*DF(I)) !total derivative
+              DPDE(I) = (GAMMA-ONE)*(ONE+MU(I)) !partial derivative
+              PNEW(I) = PP
             ENDIF
-         ENDDO
-         DO I=1,NEL
-           IF(VNEW(I) > ZERO) THEN
-             THETA(I) = ESPE(I)/RHO0/Cv !law151 only espe is defined
-             THETA(I) = MAX(ZERO,THETA(I))
-           ENDIF
-         ENDDO
-      ENDIF
+          ENDDO
+        ENDIF
 C-----------------------------------------------
-      RETURN
-      END
+        RETURN
+      END SUBROUTINE IDEALGAS
+      END MODULE IDEALGAS_MOD

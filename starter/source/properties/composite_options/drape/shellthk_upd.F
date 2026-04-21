@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    shellthk_upd   ../starter/source/properties/composite_options/drape/shellthk_upd.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod      ../starter/share/modules1/drape_mod.F
-      !||    stack_mod      ../starter/share/modules1/stack_mod.F
-      !||    submodel_mod   ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    shellthk_upd   ../starter/source/properties/composite_options/drape/shellthk_upd.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod      ../starter/share/modules1/drape_mod.F
+!||    stack_mod      ../starter/share/modules1/stack_mod.F
+!||    submodel_mod   ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE SHELLTHK_UPD( 
      .                     DRAPE    , STACK, THK ,IXC     ,IXTG ,
      .                     IGEO     ,IWORKSH     ,INDX)
@@ -38,6 +38,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE STACK_MOD
       USE DRAPE_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,8 +66,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: II,NPT,PID, IGTYP,IPOS,IPPID,IPMAT,IPANG, IPTHK,
-     .           IPPOS, NTHK,ISUBS,J,I3,I4,ISH3N,IE,NSLICE,K,IINT,IPID,IP
-      my_real :: THINNING, THKLY , POS, DT,TMIN,TMAX,THICKT,THICKC, THK_IT
+     .           IPPOS, NTHK,ISUBS,J,I3,ISH3N,IE,NSLICE,K,IINT,IPID,IP
+      my_real :: THINNING, THKLY ,TMIN,TMAX,THICKT,THICKC, THK_IT
       TYPE (DRAPE_PLY_),  POINTER   :: DRAPE_PLY
 C-----------------------------------------------
 C-----------------------------------------------
@@ -205,6 +206,7 @@ C  re-set the thickness of shell according to /DRAPE layer thinning
                     THICKC = THICKC + THKLY
                   ENDDO
                  ENDIF ! igtyp
+                DRAPE(IE)%THICK = THICKC
                ENDIF ! IE
                IF (THK(II) == ZERO) THK(II) = THICKC  
             ENDDO ! numelc
@@ -283,6 +285,7 @@ C
                     THICKC = THICKC + THKLY
                   ENDDO ! IGTYP
                 ENDIF 
+                DRAPE(IE)%THICK = THICKC
               ENDIF ! IE 
                  IF (THK(ISH3N) == ZERO) THK(ISH3N) = THICKC
             ENDDO ! numelc           

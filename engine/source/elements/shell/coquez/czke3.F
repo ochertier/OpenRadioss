@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,32 +20,33 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    czke3          ../engine/source/elements/shell/coquez/czke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
-      !||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_c4       ../engine/source/implicit/assem_c4.F
-      !||    c4eoff         ../engine/source/elements/shell/coque/c4eoff.F
-      !||    cmatc3         ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||    cmatch3        ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||    cmatip3        ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||    czbe3          ../engine/source/elements/shell/coquez/czbe3.F
-      !||    czber3         ../engine/source/elements/shell/coquez/czbe3.F
-      !||    czcoork3       ../engine/source/elements/shell/coquez/czcoork3.F
-      !||    czlkec3        ../engine/source/elements/shell/coquez/czlkec3.F
-      !||    czlkecg3       ../engine/source/elements/shell/coquez/czlkecg3.F
-      !||    czlkecr3       ../engine/source/elements/shell/coquez/czlkec3.F
-      !||    czlkect3       ../engine/source/elements/shell/coquez/czlkect3.F
-      !||    czlken3        ../engine/source/elements/shell/coquez/czlken3.F
-      !||    czlkenr3       ../engine/source/elements/shell/coquez/czlken3.F
-      !||    czsumg3        ../engine/source/elements/shell/coquez/czsumg3.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod      ../engine/share/modules/drape_mod.F
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    stack_mod      ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    czke3          ../engine/source/elements/shell/coquez/czke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
+!||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_c4       ../engine/source/implicit/assem_c4.F
+!||    c4eoff         ../engine/source/elements/shell/coque/c4eoff.F
+!||    cmatc3         ../engine/source/elements/shell/coqueba/cmatc3.F
+!||    cmatch3        ../engine/source/elements/shell/coqueba/cmatc3.F
+!||    cmatip3        ../engine/source/elements/shell/coqueba/cmatc3.F
+!||    czbe3          ../engine/source/elements/shell/coquez/czbe3.F
+!||    czber3         ../engine/source/elements/shell/coquez/czbe3.F
+!||    czcoork3       ../engine/source/elements/shell/coquez/czcoork3.F
+!||    czlkec3        ../engine/source/elements/shell/coquez/czlkec3.F
+!||    czlkecg3       ../engine/source/elements/shell/coquez/czlkecg3.F
+!||    czlkecr3       ../engine/source/elements/shell/coquez/czlkec3.F
+!||    czlkect3       ../engine/source/elements/shell/coquez/czlkect3.F
+!||    czlken3        ../engine/source/elements/shell/coquez/czlken3.F
+!||    czlkenr3       ../engine/source/elements/shell/coquez/czlken3.F
+!||    czsumg3        ../engine/source/elements/shell/coquez/czsumg3.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod      ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    stack_mod      ../engine/share/modules/stack_mod.F
+!||====================================================================
        SUBROUTINE CZKE3 (
      1            JFT    ,JLT    ,NFT    ,NPT    ,MTN    ,
      2            ITHK   ,NCYCLE ,ISTRAIN,IPLA   ,PM     ,
@@ -60,7 +61,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD      
       USE STACK_MOD
-      USE DRAPE_MOD      
+      USE DRAPE_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -87,7 +89,7 @@ C-----------------------------------------------
      .         ETAG(*),IDDL(*)  ,NDOF(*)  ,IADK(*) ,JDIK(*)
       INTEGER, DIMENSION(SEDRAPE) :: INDX_DRAPE
      
-C     REAL OU REAL*8
+C     real or real*8
       my_real
      .   PM(NPROPM,*),GEO(NPROPG,*),BUFMAT(*),X(3,*),THKE(*),
      .   OFF(MVSIZ),K_DIAG(*) ,K_LT(*)
@@ -131,7 +133,7 @@ C   L O C A L   V A R I A B L E S
 C--------------------------------
       INTEGER 
      .   I, J,J1,J2, NEL, NPLAT,IPLAT(MVSIZ), NLAY,L_DIRA,L_DIRB,
-     .   IREP,IBID,EP,IDRIL,IBID1
+     .   IREP,EP,IDRIL
       INTEGER  MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ),IORTH,IGTYP,IUN
       my_real 
      .  X13(MVSIZ),  X24(MVSIZ),  Y13(MVSIZ),  Y24(MVSIZ),
@@ -321,7 +323,7 @@ C--------------------------
      7              MF34,MF44,FM12,FM13,FM14,FM23,FM24,FM34, 
      8              IORTH,HMOR,HFOR,HMFOR)
 C--------------------------
-C     2. Cisaillement Transversale (const+hourglass): 
+C     2. Transversal shear (Const+Hourglass): 
 C--------------------------
        CALL CZLKECT3(JFT  ,JLT   ,VOL  ,HC   ,RX   ,
      4               RY   ,SX    ,SY   ,RX2  ,RY2  ,
@@ -417,11 +419,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    czfkeu3     ../engine/source/elements/shell/coquez/czke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    czfikijuj   ../engine/source/elements/shell/coquez/czke3.F
-      !||====================================================================
+!||====================================================================
+!||    czfkeu3     ../engine/source/elements/shell/coquez/czke3.F
+!||--- calls      -----------------------------------------------------
+!||    czfikijuj   ../engine/source/elements/shell/coquez/czke3.F
+!||====================================================================
        SUBROUTINE CZFKEU3 (
      1            JFT    ,JLT    ,   
      8            KE11   ,KE22   ,KE33   ,KE44   ,   
@@ -450,7 +452,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C   L O C A L   V A R I A B L E S
 C--------------------------------
       INTEGER 
-     .   I, J, M ,EP,ITRAN0,ITRAN1
+     .   I, J ,EP,ITRAN0,ITRAN1
       my_real    
      .   FJ(3),MJ(3),UJ(3),RJ(3)
 C
@@ -598,11 +600,11 @@ C
 C      
       RETURN
       END
-      !||====================================================================
-      !||    czfikijuj   ../engine/source/elements/shell/coquez/czke3.F
-      !||--- called by ------------------------------------------------------
-      !||    czfkeu3     ../engine/source/elements/shell/coquez/czke3.F
-      !||====================================================================
+!||====================================================================
+!||    czfikijuj   ../engine/source/elements/shell/coquez/czke3.F
+!||--- called by ------------------------------------------------------
+!||    czfkeu3     ../engine/source/elements/shell/coquez/czke3.F
+!||====================================================================
        SUBROUTINE CZFIKIJUJ (KEIJ   ,UJ     ,RJ     ,FI     ,MI     ,
      .                      ITRAN   )
 C-----------------------------------------------
@@ -621,7 +623,7 @@ C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
       INTEGER 
-     .   I, J, M  
+     .   I, J  
 C
         DO I=1,3
          FI(I)=ZERO

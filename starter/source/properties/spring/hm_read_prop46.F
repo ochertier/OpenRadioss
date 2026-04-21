@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop46           ../starter/source/properties/spring/hm_read_prop46.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    set_u_geo                ../starter/source/user_interface/uaccess.F
-      !||    set_u_pnu                ../starter/source/user_interface/uaccess.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop46           ../starter/source/properties/spring/hm_read_prop46.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    set_u_geo                ../starter/source/user_interface/uaccess.F
+!||    set_u_pnu                ../starter/source/user_interface/uaccess.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP46(IOUT,NUVAR ,PARGEO, UNITAB,IGTYP,
-     .                          ID,PROP_TAG,TITR,LSUBMODEL,IUNIT)
+     .                          ID,PROP_TAG,LSUBMODEL,IUNIT)
 C-----------------------------------------------
       USE UNITAB_MOD
       USE MESSAGE_MOD
@@ -140,7 +140,7 @@ C--------------------------------------------------
       CALL HM_GET_FLOATV('NFORCE',XLIM2,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('STIFF1',XK,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('DAMP1',DAMP,IS_AVAILABLE,LSUBMODEL,UNITAB)
-C-- Optional ligne
+C- Optional line
       CALL HM_GET_FLOATV('FScale11',SCALET,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('FScale22',SCALEX,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('FScale21',SCALEV,IS_AVAILABLE,LSUBMODEL,UNITAB)
@@ -215,8 +215,8 @@ C-----------------------------
       PROP_TAG(IGTYP)%G_MOM = 5
       PROP_TAG(IGTYP)%G_SKEW = 6
       PROP_TAG(IGTYP)%G_MASS = 1
-      PROP_TAG(IGTYP)%G_V_REPCVT  = 3 ! -- VITESSES REPERE CONVECTEE (V_REPCVT)
-      PROP_TAG(IGTYP)%G_VR_REPCVT = 3  ! -- VITESSES REPERE CONVECTEE (VR_REPCVT)
+      PROP_TAG(IGTYP)%G_V_REPCVT  = 3 ! -- VELOCITIES convected frameE (V_REPCVT)
+      PROP_TAG(IGTYP)%G_VR_REPCVT = 3  ! -- VELOCITIES convected frameE (VR_REPCVT)
       PROP_TAG(IGTYP)%G_NUVAR = NUVAR
 C
       RETURN

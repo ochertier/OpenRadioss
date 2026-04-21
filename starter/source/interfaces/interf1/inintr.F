@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inintr                 ../starter/source/interfaces/interf1/inintr.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    flush_remnode_array    ../starter/source/interfaces/inter3d1/flush_remnode_array.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    inint2                 ../starter/source/interfaces/inter2d1/inint2.F
-      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
-      !||    iwcontdd_new           ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    remn_i2_edgop          ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||    remn_i2op              ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||    remn_self24            ../starter/source/interfaces/inter3d1/remn_self24.F
-      !||    reset_gap              ../starter/source/interfaces/interf1/reset_gap.F
-      !||    ri2_int24p_ini         ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||    upgrade_remnode        ../starter/source/interfaces/interf1/upgrade_remnode.F
-      !||    upgrade_remnode_edg    ../starter/source/interfaces/interf1/upgrade_remnode.F
-      !||--- uses       -----------------------------------------------------
-      !||    front_mod              ../starter/share/modules1/front_mod.F
-      !||    intbufmod              ../starter/share/modules1/restart_mod.F
-      !||    intbufscratch_mod      ../starter/source/interfaces/interf1/intbufscratch_mod.F
-      !||    inter_cand_mod         ../starter/share/modules1/inter_cand_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inintr                       ../starter/source/interfaces/interf1/inintr.F
+!||--- called by ------------------------------------------------------
+!||    lectur                       ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    flush_remnode_array          ../starter/source/interfaces/inter3d1/flush_remnode_array.F
+!||    fretitl2                     ../starter/source/starter/freform.F
+!||    inint2                       ../starter/source/interfaces/inter2d1/inint2.F
+!||    inint3                       ../starter/source/interfaces/inter3d1/inint3.F
+!||    iwcontdd_new                 ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    remn_i2_edgop                ../starter/source/interfaces/inter3d1/i7remnode.F
+!||    remn_i2op                    ../starter/source/interfaces/inter3d1/i7remnode.F
+!||    remn_self24                  ../starter/source/interfaces/inter3d1/remn_self24.F
+!||    reset_gap                    ../starter/source/interfaces/interf1/reset_gap.F
+!||    ri2_int24p_ini               ../starter/source/interfaces/inter3d1/i7remnode.F
+!||    upgrade_remnode              ../starter/source/interfaces/interf1/upgrade_remnode.F
+!||    upgrade_remnode_edg          ../starter/source/interfaces/interf1/upgrade_remnode.F
+!||--- uses       -----------------------------------------------------
+!||    front_mod                    ../starter/share/modules1/front_mod.F
+!||    intbufmod                    ../starter/share/modules1/restart_mod.F
+!||    intbufscratch_mod            ../starter/source/interfaces/interf1/intbufscratch_mod.F
+!||    inter_cand_mod               ../starter/share/modules1/inter_cand_mod.F
+!||    message_mod                  ../starter/share/message_module/message_mod.F
+!||    stack_mod                    ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE ININTR(IPARI     ,INSCR     ,X                 ,V               ,IXS         ,IXQ   ,
      2                  IXC       ,PM        ,GEO               ,ITAB            ,MS          ,
      3                  MWA       ,RWA       ,IXTG              ,IKINE           ,IXT         ,
@@ -55,12 +56,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A                  KNOD2EL1D ,IXS10     ,INTER_CAND        ,FRIGAP          ,IXS16       ,
      B                  IXS20     ,IPM       ,NOM_OPT           ,IPARTS          ,SISKWN      ,
      C                  KXX       ,IXX       ,IGEO              ,INTERCEP        ,LELX        ,
-     D                  INTBUF_TAB,FILLSOL   ,PM_STACK          ,IWORKSH         ,NSNT        ,
+     D                  INTBUF_TAB,FILLSOL   ,stack             ,IWORKSH         ,NSNT        ,
      E                  NMNT      ,KXIG3D    ,IXIG3D            ,KNOD2ELQ        ,NOD2ELQ     ,
      F                  SEGQUADFR,TAGPRT_FRIC,INTBUF_FRIC_TAB   ,IPARTT          ,
      G                  IPARTP    ,IPARTX    ,IPARTR            ,NSN_MULTI_CONNEC,T2_NB_CONNEC,
      H                  SICODE    ,ICODE     ,ISKEW             ,MULTI_FVM       ,S_NOD2ELS   ,
-     I                  SITAB     ,SITABM1)
+     I                  SITAB     ,SITABM1   ,FLAG_ELEM_INTER25 ,LIST_NIN25      ,IRESP       ,
+     J                  NIXX      ,S_NOD2EL1D)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -77,6 +79,8 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE INTER_CAND_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE INT18_LAW151_NSV_SHIFT_MOD , ONLY : INT18_LAW151_NSV_SHIFT
+      use stack_mod , only : stack_ply       
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -87,7 +91,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr12_c.inc"
 #include      "scr15_c.inc"
 #include      "units_c.inc"
@@ -110,11 +113,14 @@ C-----------------------------------------------
      .   IWORKSH(*),NSNT, NMNT,KXIG3D(NIXIG3D,*),IXIG3D(*),
      .   KNOD2ELQ(*),NOD2ELQ(*),SEGQUADFR(2,*),TAGPRT_FRIC(*),IPARTT(*),
      .   IPARTP(*),IPARTX(*),IPARTR(*),NSN_MULTI_CONNEC,T2_NB_CONNEC(*),
-     .   ICODE(*), ISKEW(SISKWN)
+     .   ICODE(*), ISKEW(SISKWN),NIXX
       my_real X(3,*),V(3,*), PM(*), GEO(*), MS(*), RWA(6,*),
      .        THK(*),THK_PART(*),FRIGAP(NPARIR,NINTER),
-     .        LELX(*), FILLSOL(*),PM_STACK(*)
+     .        LELX(*), FILLSOL(*)
       INTEGER NOM_OPT(LNOPT1,*),KXX(*),IXX(*)
+      INTEGER, INTENT(IN) :: LIST_NIN25(NINTER)
+      INTEGER, INTENT(IN) :: FLAG_ELEM_INTER25(NINTER25,NUMELS)   
+      INTEGER , INTENT(IN) :: IRESP,S_NOD2EL1D
       TYPE(INTERSURFP) :: INTERCEP(3,NINTER)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(SCRATCH_STRUCT_) INSCR(*)
@@ -125,6 +131,7 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       TYPE(INTER_CAND_), INTENT(inout) :: INTER_CAND
+      type(stack_ply), intent(inout) :: stack !< stack data structure             
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -132,11 +139,11 @@ C-----------------------------------------------
       INTEGER N, JINSCR, NIN,IWRN, I
       INTEGER NTY, NSN2T, NMN2T,ID,
      .        NSNET  ,NMNET  ,MULTIMP, IREMNODE, NREMNODE,
-     .        NREMN(NINTER),NREMN_OLD(NINTER),IEDG,IEDGN,ST2_CONNEC,
-     .        REMNODE_SIZE,LEN_FILNAM,REMNODE_SIZE_EDG,IREMNODE_EDG
+     .        NREMN(NINTER),ST2_CONNEC,
+     .        REMNODE_SIZE,LEN_FILNAM,REMNODE_SIZE_EDG,IREMNODE_EDG,NIN25
       CHARACTER*(2148) FILNAM
       CHARACTER(LEN=NCHARTITLE) :: TITR
-      INTEGER, DIMENSION(:),ALLOCATABLE :: REMNODE,KREMNODE,T2_ADD_CONNEC,T2_CONNEC,IKINE1
+      INTEGER, DIMENSION(:),ALLOCATABLE :: T2_ADD_CONNEC,T2_CONNEC,IKINE1
       
       INTEGER :: NS
       INTEGER :: NSN,NMN
@@ -156,7 +163,7 @@ C-----------------------------------------------
       LOGICAL :: IS_INTER18_AND_LAW151
       INTEGER :: FLAG_OUTPUT !< flag for output
       LOGICAL :: FLAG_REMOVED_NODE !< flag to remove some S node from the list of candidates
-      INTEGER :: FLAGREMNODE,IJK
+      INTEGER :: IJK
       INTEGER :: KIND_INTERFACE
       INTEGER, DIMENSION(3) :: NEXT_INTER ! number of interface (3 different kinds of interface : type2,type24 and other)
       INTEGER, DIMENSION(3) :: ADDRESS_INTER ! address in the INTERFACE_INDEX array
@@ -178,7 +185,7 @@ C
         IKINE1(I) = 0
       ENDDO
 C-----------------------------------------------
-      IF(((IMACH == 3 .AND. IDDLEVEL == 0)) .AND. (DECTYP >= 3 .AND. DECTYP <= 6) .AND. N2D == 0)THEN
+      IF(((IDDLEVEL == 0)) .AND. (DECTYP >= 3 .AND. DECTYP <= 6) .AND. N2D == 0)THEN
         NSNT = 0
         NMNT = 0
         NSN2T = 0
@@ -235,7 +242,7 @@ C-----------------------------------------------
             INTERFACE_TYPE24(NEXT_INTER(3)) = N
             IF(NTY == 25) THEN
               ! special case : interface type 25 with edge to edge 
-              ! LEDGE array is initialized during the sorting (why? i don't know)
+              ! LEDGE array is initialized during the sorting                    
               ! i7remnode algo for interface type 25 with edge to edge must be done after the %LEDGE initialization
               IEDGE = IPARI(58,N)
               IF(IEDGE/=0) SKIP_TYPE25_EDGE_2_EDGE = 1
@@ -332,9 +339,12 @@ C---     Initial dimension of REMNODE arrays
             NIN=N
             ID=NOM_OPT(1,NIN)
             CALL FRETITL2(TITR,NOM_OPT(LNOPT1-LTITR+1,NIN),LTITR)
+            NIN25 = LIST_NIN25(NIN)
 
             IF(N2D == 0)THEN
-
+              IF( MULTI_FVM%IS_INT18_LAW151 ) THEN
+                CALL INT18_LAW151_NSV_SHIFT('+',0,1,MULTI_FVM,IPARI,INTBUF_TAB,npari,ninter,numnod,OPT_INT_ID=N)
+              ENDIF
               CALL ININT3(
      .               INSCR(N)%WA             , X                     , IXS                   , IXC            , PM               ,
      1               GEO                     , IPARI                 , NIN                   , ITAB           , MS               ,
@@ -349,13 +359,17 @@ C---     Initial dimension of REMNODE arrays
      A               I_MEM                   , RESORT                , INTER_CAND            , IXS16          , IXS20            ,
      B               ID                      , TITR                  , IREMNODE              , NREMNODE       , IPARTS           ,
      C               KXX                     , IXX                   , IGEO                  , INTERCEP       , LELX             ,
-     D               INTBUF_TAB              , FILLSOL               , PM_STACK              , IWORKSH        , KXIG3D           ,
+     D               INTBUF_TAB              , FILLSOL               , stack                 , IWORKSH        , KXIG3D           ,
      E               IXIG3D                  , TAGPRT_FRIC           , INTBUF_FRIC_TAB       , IPARTT         , IPARTP           ,
      F               IPARTX                  , IPARTR                , NSN_MULTI_CONNEC      , T2_ADD_CONNEC  , T2_NB_CONNEC     ,
      G               T2_CONNEC               , NOM_OPT               , ICODE                 , ISKEW          , IREMNODE_EDG     ,
      H               MULTI_FVM%S_APPEND_ARRAY, MULTI_FVM%X_APPEND    , MULTI_FVM%MASS_APPEND , N2D            , FLAG_REMOVED_NODE,
      I               NSPMD                   ,INTER_TYPE2_NUMBER     , ELEM_LINKED_TO_SEGMENT, INSCR(N)%SINSCR, SICODE           ,
-     J               SITAB )
+     J               SITAB                   ,NIN25                  , FLAG_ELEM_INTER25     , MULTI_FVM      , IRESP            ,
+     K               NIXX                    ,S_NOD2EL1D             , IINTTHICK             )
+              IF( MULTI_FVM%IS_INT18_LAW151 ) THEN
+                CALL INT18_LAW151_NSV_SHIFT('-',0,1,MULTI_FVM,IPARI,INTBUF_TAB,npari,ninter,numnod,OPT_INT_ID=N)
+              ENDIF
 
               IF (I_MEM /= 0) GOTO 200
             ELSE
@@ -424,7 +438,7 @@ C - with low stiffness
 C - included in the *main interface*
 C
 C *main interface* : interface that concern a lot of nodes with
-C significantly different velocities between secnd and main
+C significantly different velocities between second and main
       displacement_max = 0.0
       NS = 0
       MAIN_INTERFACE_SIZE = -1 
@@ -498,7 +512,7 @@ C
                IF(displacement > displacement_max / 10.0 .AND. NMN + NSN > MAIN_INTERFACE_SIZE) THEN
                  IF( NMN + NSN > NUMNOD / 100 ) THEN
                    ! main interface = interface that has the maximum displacement velocity
-                   ! between main and secnd, and that contains at least 1% of the nodes
+                   ! between main and second, and that contains at least 1% of the nodes
                    MAIN_INTERFACE_SIZE = NMN + NSN
                    ID_MAIN_INTERFACE = N
 C                  CONDITION(N) = .FALSE.
@@ -547,7 +561,7 @@ c         WRITE(,*) "main stiff=",main_stiff
               ! interface
                  min_stiff = MIN(min_stiff,avg_stiff(N)) 
                  IPARI(69,N) = 1
-C Appel   routine poids noeuds interfaces
+C Call routine for interface node weights
               ENDIF !CPT
             ENDIF ! CONDITION
           ENDDO ! NINTER

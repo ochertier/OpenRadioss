@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,52 +20,53 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    qforc2                 ../engine/source/elements/solid_2d/quad/qforc2.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain                ../engine/source/ale/alemain.F
-      !||    forint                 ../engine/source/elements/forint.F
-      !||--- calls      -----------------------------------------------------
-      !||    alero2                 ../engine/source/ale/ale2d/alero2.F
-      !||    amomt2                 ../engine/source/ale/ale2d/amomt2.F
-      !||    check_off_ale          ../engine/source/elements/solid/solide/check_off_ale.F
-      !||    ede112                 ../engine/source/ale/euler2d/ede112.F
-      !||    edefo2                 ../engine/source/ale/euler2d/edefo2.F
-      !||    emomt2                 ../engine/source/ale/euler2d/emomt2.F
-      !||    eulro2                 ../engine/source/ale/euler2d/eulro2.F
-      !||    mmain                  ../engine/source/materials/mat_share/mmain.F90
-      !||    qbilan                 ../engine/source/elements/solid_2d/quad/qbilan.F
-      !||    qcoor2                 ../engine/source/elements/solid_2d/quad/qcoor2.F
-      !||    qcumu2                 ../engine/source/elements/solid_2d/quad/qcumu2.F
-      !||    qcumu2p                ../engine/source/elements/solid_2d/quad/qcumu2p.F
-      !||    qdefo2                 ../engine/source/elements/solid_2d/quad/qdefo2.F
-      !||    qdlen2                 ../engine/source/elements/solid_2d/quad/qdlen2.F
-      !||    qfint2                 ../engine/source/elements/solid_2d/quad/qfint2.F
-      !||    qhvis2                 ../engine/source/elements/solid_2d/quad/qhvis2.F
-      !||    qlagr2                 ../engine/source/elements/solid_2d/quad/qlagr2.F
-      !||    qmass2                 ../engine/source/elements/solid_2d/quad/qmass2.F
-      !||    qmass2p                ../engine/source/elements/solid_2d/quad/qmass2p.F
-      !||    qmassreal2             ../engine/source/elements/solid_2d/quad/qmassreal2.F
-      !||    qmassreal2p            ../engine/source/elements/solid_2d/quad/qmassreal2p.F
-      !||    qrcoor2                ../engine/source/elements/solid_2d/quad/qrcoor2.F
-      !||    qrdefo2                ../engine/source/elements/solid_2d/quad/qrdefo2.F
-      !||    qrota2                 ../engine/source/elements/solid_2d/quad/qrota2.F
-      !||    qrrota2                ../engine/source/elements/solid_2d/quad/qrrota2.F
-      !||    qvolu2                 ../engine/source/elements/solid_2d/quad/qvolu2.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    dt_mod                 ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
-      !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    table_mod              ../engine/share/modules/table_mod.F
-      !||    timer_mod              ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE QFORC2(TIMERS, ELBUF_TAB  ,NG          ,
+!||====================================================================
+!||    qforc2                 ../engine/source/elements/solid_2d/quad/qforc2.F
+!||--- called by ------------------------------------------------------
+!||    alemain                ../engine/source/ale/alemain.F
+!||    forint                 ../engine/source/elements/forint.F
+!||--- calls      -----------------------------------------------------
+!||    alero2                 ../engine/source/ale/ale2d/alero2.F
+!||    amomt2                 ../engine/source/ale/ale2d/amomt2.F
+!||    check_off_ale          ../engine/source/elements/solid/solide/check_off_ale.F
+!||    ede112                 ../engine/source/ale/euler2d/ede112.F
+!||    edefo2                 ../engine/source/ale/euler2d/edefo2.F
+!||    emomt2                 ../engine/source/ale/euler2d/emomt2.F
+!||    eulro2                 ../engine/source/ale/euler2d/eulro2.F
+!||    mmain                  ../engine/source/materials/mat_share/mmain.F90
+!||    qbilan                 ../engine/source/elements/solid_2d/quad/qbilan.F
+!||    qcoor2                 ../engine/source/elements/solid_2d/quad/qcoor2.F
+!||    qcumu2                 ../engine/source/elements/solid_2d/quad/qcumu2.F
+!||    qcumu2p                ../engine/source/elements/solid_2d/quad/qcumu2p.F
+!||    qdefo2                 ../engine/source/elements/solid_2d/quad/qdefo2.F
+!||    qdlen2                 ../engine/source/elements/solid_2d/quad/qdlen2.F
+!||    qfint2                 ../engine/source/elements/solid_2d/quad/qfint2.F
+!||    qhvis2                 ../engine/source/elements/solid_2d/quad/qhvis2.F
+!||    qlagr2                 ../engine/source/elements/solid_2d/quad/qlagr2.F
+!||    qmass2                 ../engine/source/elements/solid_2d/quad/qmass2.F
+!||    qmass2p                ../engine/source/elements/solid_2d/quad/qmass2p.F
+!||    qmassreal2             ../engine/source/elements/solid_2d/quad/qmassreal2.F
+!||    qmassreal2p            ../engine/source/elements/solid_2d/quad/qmassreal2p.F
+!||    qrcoor2                ../engine/source/elements/solid_2d/quad/qrcoor2.F
+!||    qrdefo2                ../engine/source/elements/solid_2d/quad/qrdefo2.F
+!||    qrota2                 ../engine/source/elements/solid_2d/quad/qrota2.F
+!||    qrrota2                ../engine/source/elements/solid_2d/quad/qrrota2.F
+!||    qvolu2                 ../engine/source/elements/solid_2d/quad/qvolu2.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    ale_mod                ../common_source/modules/ale/ale_mod.F
+!||    dt_mod                 ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
+!||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    table_mod              ../engine/share/modules/table_mod.F
+!||    timer_mod              ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE QFORC2(TIMERS, OUTPUT, ELBUF_TAB  ,NG          ,
      1                  PM         ,GEO         ,IC          ,X        ,A           ,
      2                  V          ,MS          ,W           ,FLUX     ,FLU1        ,
      3                  VEUL       ,ALE_CONNECT ,IPARG       ,NLOC_DMG ,
@@ -79,7 +80,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D                  SVIS       ,NSVOIS      ,IRESP       ,TT       ,DT1         ,
      .                  IDEL7NOK   ,IDTMIN      ,MAXFUNC     ,
      .                  IMON_MAT   ,USERL_AVAIL ,impl_s   ,idyna       ,
-     .                  DT         ,GLOB_THERM,SENSORS)
+     .                  DT         ,GLOB_THERM,SENSORS,s_flux,s_qmv,nv46)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -90,10 +91,10 @@ c
 c TYPE NAME                FUNCTION
 c  I   PM ,GEO             Material and geometrical property data
 c  I   IC(7,NUM_QUAD)      connectivity and mid,pid integer data
-c  I   X(3,NUMNOD)         co-ordinate
+c  I   X(3,NUMNOD)         coordinate
 c  IO  A(3,NUMNOD)         nodal internal force
 c  I   V(3,NUMNOD)         nodal velocity
-c  IO  MS(NUMNOD)          nodal masse
+c  IO  MS(NUMNOD)          nodal mass
 c  I   EV()                internal element(material) data
 c  I   FLUX(4,NEL)         flux at each side used w/ ALE or EULER
 c  I   FLU1  ,VEUL  ,IELVS used w/ ALE or EULER
@@ -108,10 +109,10 @@ c  IO  STIFN(NUMNOD)       nodal stiffness to calcul nodal time step
 c  IO  EANI()              anim output vector
 c  I   IPARTQ()            quad element group data (output)
 c  I   NEL                 nb of quad element in this group
-c  I   IADQ() ,FSKY()      work arrays for special option of internal force assemlage
+c  I   IADQ() ,FSKY()      work arrays for special option of internal force assemblage
 c  IO  XPHI,FPHI,VPHI,MSPHI,PV ,
 c      X0PHI ,EVD : variables for sensibility(opt) no more used
-c  I   BUFVOIS()           work table for fluide w/ SPMD
+c  I   BUFVOIS()           work table for fluid w/ SPMD
 c  I   QMV(8,)             work table used w/ ALE or EULER
 c  I   GRESAV,GRTH,IGRTH   work table used for TH (time history) output
 c  I   TABLE               new alternative Radioss function(table) data
@@ -120,6 +121,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TIMER_MOD
+      USE OUTPUT_MOD, only : output_
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD
@@ -145,6 +147,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       my_real, INTENT(IN) :: DT1
       my_real, INTENT(IN) :: TT
       INTEGER,INTENT(IN) :: SNPC
@@ -159,14 +162,17 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
       INTEGER, INTENT(IN) :: IMON_MAT
+      integer, intent(in) :: s_flux !< first dimension of flux array
+      integer, intent(in) :: s_qmv !< first dimension of qmv array      
+      integer, intent(in) :: nv46 !< second dimension of flux array            
       INTEGER IC(*), IPARG(NPARG,NGROUP), NPF(*),IPARTQ(NUMELQ),
      .        IPM(*), GRTH(*),IGRTH(*),IGEO(*), IADQ(4,*), ITASK
       INTEGER, INTENT(IN) :: SZ_BUFVOIS
       INTEGER OFFSET,NEL,NG,NELTST,ITYPTST,IOUTPRT,H3D_STRAIN
       my_real DT2T
-      my_real PM(*), GEO(*), X(*), A(*), V(*), MS(*), W(*), FLUX(4,*),
+      my_real PM(*), GEO(*), X(*), A(*), V(*), MS(*), W(*), FLUX(s_flux,nv46),
      .        FLU1(*), VEUL(*), TF(*), BUFMAT(*), FSKY(*),
-     .        PARTSAV(*), STIFN(*),EANI(*), BUFVOIS(6,*),QMV(8,*),GRESAV(*),VOLN(MVSIZ),
+     .        PARTSAV(*), STIFN(*),EANI(*), BUFVOIS(6,*),QMV(s_qmv,2*nv46),GRESAV(*),VOLN(MVSIZ),
      .        MS_2D(*),FSKYM(*)
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
       TYPE(TTABLE) TABLE(*)
@@ -186,8 +192,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LCO, NF1, IFLAG,I,II,IPTR,IPTS,IPTT,ILAY,ISTRAIN
-      INTEGER IBIDON(1),IBID,N,SZ_IX,DUMMY_IPARG1(NPARG)
+      INTEGER LCO, NF1, IFLAG,I,IPTR,IPTS,IPTT,ILAY,ISTRAIN
+      INTEGER IBIDON(1),IBID,SZ_IX,DUMMY_IPARG1(NPARG)
 
       my_real RX(MVSIZ),RY(MVSIZ),RZ(MVSIZ),SX(MVSIZ),SY(MVSIZ),SZ(MVSIZ),TX(MVSIZ),TY(MVSIZ),TZ(MVSIZ)
 
@@ -209,7 +215,7 @@ C-----------------------------------------------
       my_real WYY(MVSIZ),WZZ(MVSIZ),VDX(MVSIZ)
 
       ! SPH case
-      my_real MUVOID(MVSIZ), STI(MVSIZ),BID(MVSIZ), MBID(MVSIZ),RSDA(1)
+      my_real MUVOID(MVSIZ), STI(MVSIZ),BID(MVSIZ), MBID(MVSIZ)
       ! void MMAIN
       my_real SIGY(MVSIZ),ET(MVSIZ),GAMA(MVSIZ,6),R3_FREE(MVSIZ),R4_FREE(MVSIZ)
       my_real  R11(MVSIZ),R12(MVSIZ),R13(MVSIZ),
@@ -362,12 +368,12 @@ C------------
      B   VOLN,    AIRE,    AIREM,   NC1,
      C   NC2,     NC3,     NC4,     NEL)
         CALL ALERO2(
-     1   GBUF%OFF,   GBUF%VOL,   GBUF%RHO,   FLUX(1,NF1),
+     1   GBUF%OFF,   GBUF%VOL,   GBUF%RHO,   FLUX,
      2   FLU1(NF1),  W,          VY1,        VY2,
      3   VY3,        VY4,        VZ1,        VZ2,
      4   VZ3,        VZ4,        VOLN,       DVOL,
      5   VD2,        NC1,        NC2,        NC3,
-     6   NC4,        NGL)
+     6   NC4,        NGL,s_flux,nv46,nft)
         CALL QROTA2(
      1   GBUF%SIG,S1,      S2,      S3,
      2   S4,      S5,      S6,      WYZ,
@@ -377,10 +383,9 @@ C-----------
 C      EULER
 C-----------
         IF (MTN == 11) CALL EDE112(
-     1   PM,         V,          VEUL,       X,
+     1   PM,         V,          X,
      2   IC,         ALE_CONNECT,WYZ,        DYZ,
-     3   DZY,        EYY,        EZZ,        ETT,
-     4   EYZ,        EYT,        EZT)
+     3   DZY,        EYY,        EZZ)
         CALL EDEFO2(
      1   GBUF%VOL,V,       VEUL,    Y1,
      2   Y2,      Y3,      Y4,      Z1,
@@ -393,9 +398,7 @@ C-----------
      9   VOLN,    AIRE,    DELTAX,  VDY,
      A   VDZ,     VD2,     NC1,     NC2,
      B   NC3,     NC4)
-        CALL EULRO2(
-     1   GBUF%VOL,   GBUF%RHO,   FLUX(1,NF1),FLU1(NF1),
-     2   VOLN,       DVOL,       NGL)
+        CALL EULRO2(GBUF%RHO,FLUX,FLU1(NF1),VOLN,DVOL,NGL,s_flux,nv46,nft)
         CALL QROTA2(
      1   GBUF%SIG,S1,      S2,      S3,
      2   S4,      S5,      S6,      WYZ,
@@ -411,7 +414,7 @@ c
       IPTS = 1
       IPTT = 1
 c
-      CALL MMAIN(TIMERS,
+      CALL MMAIN(TIMERS, OUTPUT,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -446,7 +449,7 @@ c
      .   numgeo,      numnod,      numels,            
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, impl_s,
-     .   idyna,       DT         , BID      )
+     .   idyna,       DT         , BID      ,SENSORS)
 C--------------------------
 C       SYNTHESIS PER MATERIAL (thermics)
 C--------------------------
@@ -467,7 +470,8 @@ c
      5   EHOU,       R22,        R23,        R32,
      6   R33,        GRESAV,     GRTH,       IGRTH,
      7   IBIDON(1),  GBUF%EINTTH,ITASK,      NEL,
-     8   JTUR,       JCVT,       IGRE,SENSORS)
+     8   JTUR,       JCVT,       IGRE,       SENSORS,
+     9   GBUF%G_WPLA,GBUF%WPLA)
         ENDIF
         RETURN
       ENDIF
@@ -560,15 +564,16 @@ c
      5   EHOU,       R22,        R23,        R32,
      6   R33,        GRESAV,     GRTH,       IGRTH,
      7   IBIDON(1),  GBUF%EINTTH,ITASK,      NEL,
-     8   JTUR,       JCVT,       IGRE,SENSORS)
+     8   JTUR,       JCVT,       IGRE,       SENSORS,
+     9   GBUF%G_WPLA,GBUF%WPLA)
       ENDIF
 C
 C------------------------
-C     FORCES DE TRANSPORT
+C     TRANSPORT FORCES
 C------------------------
-       IF(JALE>0.AND.MTN/=11)
-     .   CALL AMOMT2(
-     1   PM,      V,       W,       GBUF%RHO,
+       IF(JALE > 0 .AND. MTN /= 11)THEN
+         CALL AMOMT2(
+     1   PM,      W,       GBUF%RHO,
      2   Y1,      Y2,      Y3,      Y4,
      3   Z1,      Z2,      Z3,      Z4,
      4   T11,     T12,     T13,     T14,
@@ -579,9 +584,12 @@ C------------------------
      9   VZ4,     EYY,     EZZ,     DYZ,
      A   DZY,     NC1,     NC2,     NC3,
      B   NC4,     MAT,     GBUF%OFF,QMV,
-     C   BUFMAT,  DELTAX,  VIS, IPM)
-       IF(JEUL>0.)
-     .   CALL EMOMT2(
+     C   BUFMAT,  DELTAX,  VIS, IPM,
+     .   nft,s_qmv,nv46)
+       ENDIF
+
+       IF(JEUL > 0)THEN
+        CALL EMOMT2(
      1   PM,      GBUF%RHO,Y1,      Y2,
      2   Y3,      Y4,      Z1,      Z2,
      3   Z3,      Z4,      VY1,     VY2,
@@ -591,9 +599,10 @@ C------------------------
      7   T23,     T24,     PY1,     PY2,
      8   PZ1,     PZ2,     AIRE,    EYY,
      9   EZZ,     DYZ,     DZY,     VDY,
-     A   VDZ,     DELTAX,  VIS,     VD2,
-     B   NC1,     NC2,     NC3,     NC4,
-     C   MAT,     QMV,     BUFMAT,  IPM)
+     A   VDZ,     DELTAX,  VIS,
+     C   MAT,     QMV,     BUFMAT,  IPM,
+     .   nft,s_qmv,nv46)
+       ENDIF
 C--------------------
 C     FORCES INTERNES
 C--------------------

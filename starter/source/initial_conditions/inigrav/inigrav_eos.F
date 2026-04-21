@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inigrav_eos        ../starter/source/initial_conditions/inigrav/inigrav_eos.F
-      !||--- called by ------------------------------------------------------
-      !||    inigrav_load       ../starter/source/initial_conditions/inigrav/inigrav_load.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    inigrav_eos        ../starter/source/initial_conditions/inigrav/inigrav_eos.F
+!||--- called by ------------------------------------------------------
+!||    inigrav_load       ../starter/source/initial_conditions/inigrav/inigrav_load.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INIGRAV_EOS(NELG, NEL, NG, MATID, IPM, GRAV0, RHO0, DEPTH, PM, BUFMAT,
      .                       ELBUF_TAB,PSURF,LIST,PRES,IMAT,MLW,NPF,TF,NUMMAT,MAT_PARAM)
 C-----------------------------------------------
@@ -34,6 +34,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MATPARAM_DEF_MOD
+      USE EOSMAIN_MOD , ONLY : EOSMAIN
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,13 +61,13 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,K
-      INTEGER :: EOSTYPE, ITER, MAX_ITER, MAT(NEL), REMAINING_ELTS, NBMAT, NVAREOS
-      INTEGER :: IBID(NEL) !bfrac not used int his context
+      INTEGER :: EOSTYPE, ITER, MAX_ITER, MAT(NEL), REMAINING_ELTS, NBMAT, NVAREOS, NVARTMP_EOS
+      my_real :: BID(NEL) !bfrac not used int his context
       my_real :: TOL, INCR
       my_real :: FUNC(NEL), DFUNC(NEL), ERROR(NEL), RHOZERO(NEL), RHO(NEL), 
      .           MU(NEL), MU2(NEL), ESPE(NEL), DVOL(NEL), DF(NEL), VOL(NEL), PSH(NEL), 
      .           DPDRHO(NEL), DPDM(NEL), DPDE(NEL), THETA(NEL), ECOLD(NEL), P0(NEL), 
-     .           GRUN(NEL),PREF(NEL), OFF(NEL), EINT(NEL), SIG(NEL,6), POLD(NEL),RHO_OLD,V0(NEL)
+     .           GRUN(NEL),PREF(NEL), OFF(NEL), EINT(NEL), SIG(NEL,6),RHO_OLD,V0(NEL)
 
       LOGICAL :: CONT, CONVERGED(NEL)
       TYPE(G_BUFEL_), POINTER :: GBUF
@@ -84,12 +85,14 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
       GBUF => ELBUF_TAB(NG)%GBUF
       NULLIFY(LBUF)
       NULLIFY(EBUF)
-      NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS
       EBUF =>  ELBUF_TAB(NG)%BUFLY(1)%EOS(1, 1, 1)
+      NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS
+      NVARTMP_EOS = ELBUF_TAB(NG)%BUFLY(1)%NVARTMP_EOS
       IF(IMAT>0)THEN
         LBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1, 1, 1)
         EBUF =>  ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1, 1, 1)
         NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
+        NVARTMP_EOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVARTMP_EOS
       ENDIF
       
       EOSTYPE          = MAT_PARAM(MATID)%IEOS   
@@ -100,6 +103,8 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
       ERROR(1:NEL)     = EP30
       TOL              = EM4
       CONVERGED(1:NEL) =.FALSE.
+      DVOL(1:NEL)      = ZERO
+      THETA(1:NEL)     = ZERO
 
       !===================================================================!
       !                     BUFFER INITIALIZATION                         !
@@ -142,7 +147,6 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
       !===================================================================!
       !                     ITERATIONS                                    !
       !===================================================================! 
-      POLD(1:NEL)=PRES(1:NEL)   
       REMAINING_ELTS = NEL                      !Number of elements for which convergence is not achieved 
       DO WHILE(CONT .AND. ITER < MAX_ITER)   !Start nonlinear solver loop
          ITER = ITER + 1
@@ -151,13 +155,13 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
             DF(K) = RHOZERO(K) / RHO(K)
             EINT(K) = EINT(K) / DF(K) !with IFLAG==2 we need ESPE=Df*EINT
          ENDDO
-         CALL EOSMAIN(2     , NEL    , EOSTYPE  , PM     , OFF  , EINT, 
-     .                RHO   , RHOZERO, MU       , MU2    , ESPE , 
-     .                DVOL  , DF     , VOL      , MAT    , PSH  , 
-     .                PRES  , DPDM   , DPDE     , THETA  , ECOLD, 
-     .                BUFMAT, SIG    , MU       , MLW    , POLD ,
-     .                NPF   , TF     , EBUF%VAR , NVAREOS, MAT_PARAM(MATID),
-     .                IBID)
+         CALL EOSMAIN(2     , NEL        , EOSTYPE  , PM     , OFF  , EINT,
+     .                RHO   , RHOZERO    , MU       , MU2    , ESPE ,
+     .                DVOL  , DF         , VOL      , MAT    , PSH  ,
+     .                PRES  , DPDM       , DPDE     , THETA  , 
+     .                BUFMAT, SIG        , MU       , MLW    , 
+     .                NPF   , TF         , EBUF%VAR , NVAREOS, MAT_PARAM(MATID),
+     .                BID  , NVARTMP_EOS, EBUF%VARTMP)
           DO K=1,NEL
             EINT(K)=EINT(K)*DF(K) ! set back to Eint/V
           ENDDO

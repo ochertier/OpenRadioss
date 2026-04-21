@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cndt3pinch   ../engine/source/elements/shell/coqueba/cndt3pinch.F
-      !||--- called by ------------------------------------------------------
-      !||    cbaforc3     ../engine/source/elements/shell/coqueba/cbaforc3.F
-      !||====================================================================
+!||====================================================================
+!||    cndt3pinch   ../engine/source/elements/shell/coqueba/cndt3pinch.F
+!||--- called by ------------------------------------------------------
+!||    cbaforc3     ../engine/source/elements/shell/coqueba/cbaforc3.F
+!||====================================================================
       SUBROUTINE CNDT3PINCH(JFT   ,JLT     ,OFF  ,DT2T ,AMU  ,
      1                 NELTST,ITYPTST ,STI  ,STIR ,OFFG,
      2                 SSP   ,VISCMX  ,RHO  ,VOL0 ,THK0,THK02,
@@ -66,8 +66,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER INDXOF(MVSIZ),
-     .        I, J, II, NINDX,IDT,ITYEL
-      my_real DT(MVSIZ),FAC,MAS,DIVM,MMIN  ,IZ   
+     . I, J, NINDX,IDT,ITYEL
+      my_real DT(MVSIZ),FAC,DIVM,MMIN
 C=======================================================================
       DO I=JFT,JLT
         VISCMX(I) = MAX(VISCMX(I), AMU(I))
@@ -233,7 +233,7 @@ C
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
  1000 FORMAT(1X,'--MINIMUM TIME STEP ',I1,'N SHELL ELEMENT NUMBER ',I10)
  1200 FORMAT(1X,'--DELETE ',I1,'N SHELL ELEMENT NUMBER ',I10)
- 1300 FORMAT(1X,'--DELETE ',I1',N SHELL ELEMENT:',I10,' AT TIME:',G11.4)
+ 1300 FORMAT(1X,'--DELETE ',I1,'N SHELL ELEMENT:',I10,' AT TIME:',G11.4)
  1400 FORMAT(1X,'--CONSTANT TIME STEP ',I1,'N SHELL ELEMENT NUMBER',I10)
 C
       IF(NODADT/=0.OR.(IDTMINS==2.AND.JSMS/=0))RETURN

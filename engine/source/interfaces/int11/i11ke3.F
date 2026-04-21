@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11ke3          ../engine/source/interfaces/int11/i11ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_int_k       ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    ass_spmd11      ../engine/source/implicit/assem_int.F
-      !||    assem_int11     ../engine/source/implicit/assem_int.F
-      !||    i11cor3         ../engine/source/interfaces/int11/i11cor3.F
-      !||    i11dstk3        ../engine/source/interfaces/int11/i11dstk3.F
-      !||    i11keg3         ../engine/source/interfaces/int11/i11keg3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i11ke3          ../engine/source/interfaces/int11/i11ke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_int_k       ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    ass_spmd11      ../engine/source/implicit/assem_int.F
+!||    assem_int11     ../engine/source/implicit/assem_int.F
+!||    i11cor3         ../engine/source/interfaces/int11/i11cor3.F
+!||    i11dstk3        ../engine/source/interfaces/int11/i11dstk3.F
+!||    i11keg3         ../engine/source/interfaces/int11/i11keg3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I11KE3(
      1      A         ,V        ,MS        ,IPARI   ,INTBUF_TAB,
      2      X        ,NIN       ,NUM_IMP ,CAND_N    ,
@@ -56,7 +57,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "impl2_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -64,7 +64,7 @@ C-----------------------------------------------
       INTEGER NUM_IMP,CAND_N(*),CAND_E(*),NIN,IDDL(*),
      .        IADK(*) ,JDIK(*),LREM,ITAB(*)
 C     REAL
-      my_real DT2T,
+      my_real 
      .   X(*), A(3,*), V(3,*),MS(*),
      .   K_DIAG(*),K_LT(*),GAP_IMP
 
@@ -72,8 +72,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NOINT,I, I_STOK, NSEG,JLT , NFT, JLT_NEW, IGAP, 
-     .        I_STOK_LOC,DEBUT,IDESAC, IGSTI, IBID
+      INTEGER NOINT, I_STOK,JLT , NFT, IGAP, 
+     .        IDESAC, IGSTI, IBID
       INTEGER N1(MVSIZ), N2(MVSIZ), M1(MVSIZ), M2(MVSIZ)
 C     REAL
       my_real
@@ -115,7 +115,7 @@ C
       GAPMIN=INTBUF_TAB%VARIABLES(13)
       KMIN =INTBUF_TAB%VARIABLES(17)
       KMAX =INTBUF_TAB%VARIABLES(18)
-C------pour evider la desactivation des noeuds secnds------
+Cto avoid deactivation of secondary nodes
       GAP_IMP=MIN(GAP_IMP,ZEP9*GAPMIN)
       IDESAC = 0
 C
@@ -164,7 +164,7 @@ C
      A  K2J12        ,N1           ,N2       ,NIN     ,LREM         ,
      B  OFF          ,SK_INT       ,IDESAC   )
 C
-           IF (IMACH==3.AND.NSPMD>1) THEN
+           IF (NSPMD>1) THEN
             LREM = LREM + JLT
             CALL ASS_SPMD11(3      ,N1       ,N2        ,M1       ,         
      1         M2       ,JLT       ,IDDL     ,K_DIAG    ,K_LT     ,
@@ -184,15 +184,16 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i11forcf3       ../engine/source/interfaces/int11/i11ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    i7mainfr        ../engine/source/interfaces/int07/i7ke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11corp3        ../engine/source/interfaces/int11/i11corp3.F
-      !||    i11frf3         ../engine/source/interfaces/int11/i11keg3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i11forcf3       ../engine/source/interfaces/int11/i11ke3.F
+!||--- called by ------------------------------------------------------
+!||    i7mainfr        ../engine/source/interfaces/int07/i7ke3.F
+!||--- calls      -----------------------------------------------------
+!||    i11corp3        ../engine/source/interfaces/int11/i11corp3.F
+!||    i11frf3         ../engine/source/interfaces/int11/i11keg3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I11FORCF3(  A     ,V      ,MS   ,X       ,D       ,
      1                    IPARI   ,INTBUF_TAB,NIN     ,
      2                    NUM_IMP ,CAND_N ,CAND_E)
@@ -227,8 +228,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I_STOK, JLT_NEW, JLT , NFT, 
-     .        INACTI, NRTS,NTY,L
+      INTEGER  I_STOK, JLT_NEW, JLT , NFT, 
+     .         NRTS,NTY,L
       INTEGER N1(MVSIZ), N2(MVSIZ), M1(MVSIZ), M2(MVSIZ)
 C     REAL
       my_real
@@ -288,17 +289,18 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_i11mainf    ../engine/source/interfaces/int11/i11ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_tripi       ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11cdcor3       ../engine/source/interfaces/int11/i11cdcor3.F
-      !||    i11cor3         ../engine/source/interfaces/int11/i11cor3.F
-      !||    i11dstk3        ../engine/source/interfaces/int11/i11dstk3.F
-      !||    i11dstr3        ../engine/source/interfaces/int11/i11dstk3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    imp_i11mainf    ../engine/source/interfaces/int11/i11ke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_tripi       ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    i11cdcor3       ../engine/source/interfaces/int11/i11cdcor3.F
+!||    i11cor3         ../engine/source/interfaces/int11/i11cor3.F
+!||    i11dstk3        ../engine/source/interfaces/int11/i11dstk3.F
+!||    i11dstr3        ../engine/source/interfaces/int11/i11dstk3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE IMP_I11MAINF(
      1       IPARI  ,INTBUF_TAB,X         ,
      2       V      ,MS        ,NIN       ,LINDMAX  ,
@@ -335,8 +337,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NOINT,I, I_STOK, NSEG,JLT , NFT, JLT_NEW, IGAP, 
-     .        I_STOK_LOC,DEBUT,LREM,IDESAC,NB_LOC, IGSTI, IBID
+      INTEGER NOINT,I, I_STOK,JLT , NFT, JLT_NEW, IGAP, 
+     .        I_STOK_LOC,DEBUT,NB_LOC, IGSTI, IBID
       INTEGER N1(MVSIZ), N2(MVSIZ), M1(MVSIZ), M2(MVSIZ),
      .        CS_LOC(MVSIZ),CM_LOC(MVSIZ),INDEX2(LINDMAX)
 C     REAL
@@ -380,7 +382,7 @@ C
       KMAX =INTBUF_TAB%VARIABLES(18)
 C
         I_STOK = INTBUF_TAB%I_STOK(1)
-C decoupage statique
+C static decoupage
         NB_LOC = I_STOK / NTHREAD
         IF (JTASK==NTHREAD) THEN
           I_STOK_LOC = I_STOK-NB_LOC*(NTHREAD-1)
@@ -391,7 +393,7 @@ C decoupage statique
         I_STOK = 0
 C
         NUM_IMP = 0
-C recalcul du istok
+C recalculation of istok
         DO I = DEBUT+1, DEBUT+I_STOK_LOC
           IF(INTBUF_TAB%CAND_N(I)<0) THEN
             I_STOK = I_STOK + 1
@@ -403,7 +405,7 @@ C inbuf == cand_S
 C
         DO NFT = 0 , I_STOK - 1 , NVSIZ
           JLT = MIN( NVSIZ, I_STOK - NFT )
-C preparation candidats retenus
+C preparation CANDIDATES retenus
           CALL I11CDCOR3(
      1         JLT,INDEX2(NFT+1),INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,CM_LOC,
      2         CS_LOC)
@@ -447,17 +449,18 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i11fku3         ../engine/source/interfaces/int11/i11ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    int_fku3        ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11cor3         ../engine/source/interfaces/int11/i11cor3.F
-      !||    i11corkp3       ../engine/source/interfaces/int11/i11corp3.F
-      !||    i11dstk3        ../engine/source/interfaces/int11/i11dstk3.F
-      !||    i11kfor3        ../engine/source/interfaces/int11/i11keg3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i11fku3         ../engine/source/interfaces/int11/i11ke3.F
+!||--- called by ------------------------------------------------------
+!||    int_fku3        ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    i11cor3         ../engine/source/interfaces/int11/i11cor3.F
+!||    i11corkp3       ../engine/source/interfaces/int11/i11corp3.F
+!||    i11dstk3        ../engine/source/interfaces/int11/i11dstk3.F
+!||    i11kfor3        ../engine/source/interfaces/int11/i11keg3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I11FKU3(
      1      A         ,V         ,MS        ,D        ,
      2      IPARI     ,INTBUF_TAB,X        ,NIN     ,
@@ -486,15 +489,15 @@ C-----------------------------------------------
       INTEGER IPARI(*)
       INTEGER NUM_IMP,CAND_N(*),CAND_E(*),NIN,IUPD
 C     REAL
-      my_real DT2T,
+      my_real 
      .   X(*), A(3,*),V(3,*),D(3,*),MS(*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I_STOK, NSEG,JLT , NFT, JLT_NEW, IGAP, 
-     .        I_STOK_LOC,DEBUT,LREM,IDESAC, IGSTI, IBID
+      INTEGER  I_STOK,JLT , NFT, IGAP, 
+     .        IDESAC, IGSTI, IBID
       INTEGER N1(MVSIZ), N2(MVSIZ), M1(MVSIZ), M2(MVSIZ)
 C     REAL
       my_real

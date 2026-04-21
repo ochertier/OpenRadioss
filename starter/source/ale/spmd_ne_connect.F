@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c_spmd_ne_connect      ../starter/source/ale/spmd_ne_connect.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c_spmd_ne_connect      ../starter/source/ale/spmd_ne_connect.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE C_SPMD_NE_CONNECT(ALE_CONNECTIVITY, PROC    , CEP      , CEL     , 
      .                             NODGLOBAL       , NODLOCAL, 
      .                             NUMEL           , NUMNOD  , NUMEL_L  , NUMNOD_L, 
@@ -66,7 +66,7 @@ C-----------------------------------------------
       INTEGER :: INODE, IAD, IAD1, IAD2, NODE_ID, P, IELEM, IELEM_L, PROC2, II
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGELE
       INTEGER, DIMENSION(:, :), ALLOCATABLE :: TAGELE_L
-      INTEGER, DIMENSION(:), ALLOCATABLE :: LERCVOIS, LESDVOIS, NERCVOIS, NESDVOIS
+      INTEGER, DIMENSION(:), ALLOCATABLE ::   NERCVOIS, NESDVOIS
       INTEGER, DIMENSION(:), ALLOCATABLE :: PROC_LIST
       INTEGER :: ELEM1_L, ELEM2_L
       LOGICAL :: OK_RC
@@ -154,13 +154,13 @@ C-----------------------------------------------
       END SUBROUTINE C_SPMD_NE_CONNECT
 
 
-      !||====================================================================
-      !||    spmd_ne_connect        ../starter/source/ale/spmd_ne_connect.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_ne_connect        ../starter/source/ale/spmd_ne_connect.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SPMD_NE_CONNECT(ALE_CONNECTIVITY, PROC    , CEP      , CEL     , 
      .                           NODGLOBAL       , NODLOCAL, 
      .                           NUMEL           , NUMNOD  , NUMEL_L  , NUMNOD_L, 

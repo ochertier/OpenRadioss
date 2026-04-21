@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ebcs_extrapol   ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ebcs_extrap2    ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
-      !||--- uses       -----------------------------------------------------
-      !||    ebcs_mod        ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ebcs_extrapol   ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ebcs_extrap2    ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
+!||--- uses       -----------------------------------------------------
+!||    ebcs_mod        ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
       SUBROUTINE EBCS_EXTRAPOL(FV, NP, TF, EBCS_TAB)
       USE EBCS_MOD
 C-----------------------------------------------
@@ -110,11 +110,11 @@ C-----------------------------------------------
       RETURN
       END SUBROUTINE EBCS_EXTRAPOL
 
-      !||====================================================================
-      !||    ebcs_extrap2    ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
-      !||--- called by ------------------------------------------------------
-      !||    ebcs_extrapol   ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
-      !||====================================================================
+!||====================================================================
+!||    ebcs_extrap2    ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
+!||--- called by ------------------------------------------------------
+!||    ebcs_extrapol   ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
+!||====================================================================
       SUBROUTINE EBCS_EXTRAP2(TF,TT,NPOINT,F)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -124,20 +124,15 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPOINT
-C     REAL
-      my_real
-     .   TT, F
-C     REAL
-      my_real
-     .   TF(2,*)
+      my_real TT, F
+      my_real TF(2,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, M
-C     REAL
-      my_real
-     .   DT1, DT2, D1, D2, TG
 
+C-----------------------------------------------
+C   B o d y
+C-----------------------------------------------
       !!! If tt (=current time) is lower than tmin (=TF(1,1)) then take first value
       !!! If tt (=current time) is greater than tmax (=TF(1,NPOINT)= then take last value
 

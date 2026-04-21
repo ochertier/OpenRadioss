@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s6chour3   ../engine/source/elements/thickshell/solide6c/s6chourg3.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cforc3   ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s6chour3   ../engine/source/elements/thickshell/solide6c/s6chourg3.F
+!||--- called by ------------------------------------------------------
+!||    s6cforc3   ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||====================================================================
       SUBROUTINE S6CHOUR3(RHO,VOL,SSP,
      .   X1, X2, X3, X4, X5, X6, X7, X8,
      .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
@@ -66,7 +66,7 @@ C     REAL
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER :: I,J
+      INTEGER :: I
 C                                                                     12
       my_real
      .   DETT ,  
@@ -81,7 +81,7 @@ C                                                                     12
      .   X_17_46 , X_28_35 ,
      .   Y_17_46 , Y_28_35 ,
      .   Z_17_46 , Z_28_35 ,
-     .   HX,HY,HZ,H1X,H1Y,H1Z,H2X,H2Y,H2Z,H3Y,H3Z,H4X,H4Y,H4Z,
+     .   HX,HY,HZ,H1X,H1Y,H1Z,H2X,H2Y,H2Z,
      .   PX1(MVSIZ), PX2(MVSIZ), PX3(MVSIZ), PX4(MVSIZ),  
      .   PY1(MVSIZ), PY2(MVSIZ), PY3(MVSIZ), PY4(MVSIZ),  
      .   PZ1(MVSIZ), PZ2(MVSIZ), PZ3(MVSIZ), PZ4(MVSIZ),  

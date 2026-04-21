@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    precrklay       ../engine/source/elements/xfem/precrklay.F
-      !||--- called by ------------------------------------------------------
-      !||    cforc3          ../engine/source/elements/shell/coque/cforc3.F
-      !||    czforc3         ../engine/source/elements/shell/coquez/czforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    precrklay       ../engine/source/elements/xfem/precrklay.F
+!||--- called by ------------------------------------------------------
+!||    cforc3          ../engine/source/elements/shell/coque/cforc3.F
+!||    czforc3         ../engine/source/elements/shell/coquez/czforc3.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||====================================================================
       SUBROUTINE PRECRKLAY(JFT     ,JLT    ,NFT     ,NLAY   ,ELCRKINI,
      .                     IEL_CRK,INOD_CRK,NODENR  ,CRKEDGE,XEDGE4N )
 C-----------------------------------------------
@@ -61,9 +61,9 @@ c           tag uncut layer for advancing
             ICUT = 0
             DO K=1,4   ! edges
               IEDGE = XEDGE4N(K,ELCRK)    ! N  local de l'arrete (elem sys xfem)
-              ICUT  = CRKEDGE(ILAY)%ICUTEDGE(IEDGE)    ! flag arrete coupe/non
-              IF (ICUT == 1) THEN        ! tag elements avec un crack sur le bord
-                ELCRKINI(ILAY,I) = 2    ! avancement de fissure dans l'element possible
+              ICUT  = CRKEDGE(ILAY)%ICUTEDGE(IEDGE)    ! Flag stops cup/no
+              IF (ICUT == 1) THEN        ! tag elements with a crack on the edge
+                ELCRKINI(ILAY,I) = 2    ! crack propagation in the element possible
                 EXIT
               ENDIF
             ENDDO
@@ -73,13 +73,13 @@ c           tag uncut layer for advancing
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    precrklaytg     ../engine/source/elements/xfem/precrklay.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3         ../engine/source/elements/sh3n/coque3n/c3forc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    precrklaytg     ../engine/source/elements/xfem/precrklay.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3         ../engine/source/elements/sh3n/coque3n/c3forc3.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||====================================================================
       SUBROUTINE PRECRKLAYTG(JFT      ,JLT      ,NFT     ,NLAY    ,ELCRKINI,
      .                       IEL_CRKTG,INOD_CRK ,NODENR  ,CRKEDGE ,XEDGE3N )
 C-----------------------------------------------
@@ -130,15 +130,15 @@ c           tag uncut layer for advancing
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    crkoffc         ../engine/source/elements/xfem/precrklay.F
-      !||--- called by ------------------------------------------------------
-      !||    cforc3          ../engine/source/elements/shell/coque/cforc3.F
-      !||    czforc3         ../engine/source/elements/shell/coquez/czforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    crkoffc         ../engine/source/elements/xfem/precrklay.F
+!||--- called by ------------------------------------------------------
+!||    cforc3          ../engine/source/elements/shell/coque/cforc3.F
+!||    czforc3         ../engine/source/elements/shell/coquez/czforc3.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE CRKOFFC(ELBUF_STR,XFEM_STR  ,
      .                   JFT      ,JLT       ,NFT    ,IR      ,IS        ,
      .                   NXLAY    ,IEL_CRK   ,CRKEDGE,XEDGE4N )
@@ -170,13 +170,13 @@ C-----------------------------------------------
       INTEGER I,K,ILAY,ELCRK,IFAC,ILAYCRK,IEDGE,IXEL
       TYPE(G_BUFEL_) ,POINTER :: GBUF
 C-----------------------
-c     tag bord libre d'un element std efface dans une loi
-c     on delete les phantomes 
+c     tag free edge of a std element deleted in a law
+c     delete the phantoms
 C=======================================================================
       GBUF => ELBUF_STR%GBUF
 C---
       DO I=JFT,JLT
-        ELCRK = IEL_CRK(I+NFT)   ! N  element sys xfem
+        ELCRK = IEL_CRK(I+NFT)   ! DYE SYS XFEM
         IF (ELCRK == 0) CYCLE 
         IFAC = 0
         DO ILAY=1,NXLAY
@@ -189,7 +189,7 @@ C----
           DO ILAY=1,NXLAY
             DO K=1,4                                                      
               IEDGE = XEDGE4N(K,ELCRK)                                    
-              CRKEDGE(ILAY)%IBORDEDGE(IEDGE) = 2   ! devient bord libre  
+              CRKEDGE(ILAY)%IBORDEDGE(IEDGE) = 2   ! becomes free edge  
             ENDDO                                                         
 C---
             DO IXEL=1,NXEL                                              
@@ -206,14 +206,14 @@ C---
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    crkofftg        ../engine/source/elements/xfem/precrklay.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3         ../engine/source/elements/sh3n/coque3n/c3forc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    crkofftg        ../engine/source/elements/xfem/precrklay.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3         ../engine/source/elements/sh3n/coque3n/c3forc3.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE CRKOFFTG(ELBUF_STR,XFEM_STR  ,
      .                    JFT      ,JLT       ,NFT    ,IR      ,IS        ,
      .                    NXLAY    ,IEL_CRKTG ,CRKEDGE,XEDGE3N )
@@ -242,7 +242,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,ILAY,ELCRKTG,ELCRK,IFAC,ILAYCRK,IEDGE,IXEL
+      INTEGER I,K,ILAY,ELCRKTG,ELCRK,IFAC,ILAYCRK,IEDGE,IXEL
       TYPE(G_BUFEL_) ,POINTER :: GBUF
 C=======================================================================
       GBUF => ELBUF_STR%GBUF

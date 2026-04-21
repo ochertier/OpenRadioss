@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8e_sigp       ../engine/source/elements/solid/solide8e/s8e_sig.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3       ../engine/source/elements/solid/solide10/s10forc3.F
-      !||    s8eforc3       ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    s8esigp3i      ../engine/source/elements/solid/solide8e/s8esigp3i.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s8e_sigp       ../engine/source/elements/solid/solide8e/s8e_sig.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3       ../engine/source/elements/solid/solide10/s10forc3.F
+!||    s8eforc3       ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||--- calls      -----------------------------------------------------
+!||    s8esigp3i      ../engine/source/elements/solid/solide8e/s8esigp3i.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE S8E_SIGP(
      1   ELBUF_TAB,SIGP,NEL)
 C-----------------------------------------------
@@ -54,7 +54,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ILAY,IP,IR,IS,IT,NPTR,NPTS,NPTT,I,J
+      INTEGER ILAY,IP,IR,IS,IT,NPTR,NPTS,NPTT,I
       INTEGER EPSIP(NEL)
 c-----------------------------------------------------
       my_real 

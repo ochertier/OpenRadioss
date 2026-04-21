@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alloc_elbuf_imp   ../engine/source/elements/elbuf/alloc_elbuf_imp.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar              ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    alloc_elbuf_imp   ../engine/source/elements/elbuf/alloc_elbuf_imp.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE ALLOC_ELBUF_IMP(ELBUF_TAB,ELBUF_IMP,NGROUP,IPARG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -52,10 +50,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NG,ITY,ERR,BUFLEN,NEL,NPT,NPG,NLAY,NPTR,NPTS,NPTT,NUVAR,NVARTMP,
-     .   NFAIL,K,IL,IR,IS,IT,IGTYP,NPTTOT,I,NONL,INLOC,NVAR_EOS
+     .   NFAIL,K,IL,IR,IS,IT,IGTYP,NPTTOT,I,NONL,INLOC,NVAR_EOS,NVARTMP_EOS
       INTEGER ! global variables 
      .   G_GAMA,G_SIG,G_OFF,G_NOFF,G_EINT,G_EINS,G_TEMP,
-     .   G_RHO,G_PLA,G_VOL,G_EPSD,G_QVIS,G_DELTAX,G_TB,G_RK,G_RE,
+     .   G_RHO,G_PLA,G_VOL,G_EPSD,G_QVIS,G_DELTAX,G_TB,G_RK,G_RE,G_WPLA
      .   G_SMSTR,G_HOURG,G_BFRAC,G_THK,G_FOR,G_MOM,G_TAG22,G_STRA,G_SIGI,
      .   G_DMG,G_FORPG,G_MOMPG,G_STRPG,G_UELR,G_UELR1,G_EPSQ,G_IERR,
      .   G_DAMDL,G_FORTH,G_EINTTH,G_SEQ,
@@ -67,14 +65,15 @@ C-----------------------------------------------
      .   G_BPRELD,G_COR_NF,G_COR_FR,G_COR_XR,G_DEFINI,G_FORINI,
      .   G_FORPGPINCH,G_MOMPGPINCH,G_EPGPINCHXZ,G_EPGPINCHYZ,G_EPGPINCHZZ,
      .   G_SKEW_ID,G_MAXFRAC,G_MAXEPS,G_SLIPRING_ID,G_SLIPRING_STRAND,G_RETRACTOR_ID,
-     .   G_RINGSLIP,G_ADD_NODE,G_UPDATE,G_INTVAR,G_AMU,G_SLIPRING_FRAM_ID,G_FRAM_FACTOR
+     .   G_RINGSLIP,G_ADD_NODE,G_UPDATE,G_INTVAR,G_AMU,G_SLIPRING_FRAM_ID,G_FRAM_FACTOR,
+     .   G_YIELD_IN_COMP,G_XXOLD_IN_COMP
       INTEGER  ! layer variables
      .   LY_DMG,LY_GAMA,LY_DIRA,LY_DIRB,LY_CRKDIR,LY_PLAPT,LY_SIGPT,LY_HOURG,
      .   LY_UELR,LY_UELR1,LY_OFFPG,LY_OFF,LEN_PLAPT,LEN_SIGPT
       INTEGER  ! local variables
      .   L_OFF,L_EINT,L_EINS,L_RHO,L_DP_DRHO,L_VOL,L_PLA,L_TB,L_TEMP,
      .   L_RK,L_RE,L_VK,L_ROB,L_SIG,L_SIGV,L_SIGL,L_SIGA,L_SIGD,L_SIGB,
-     .   L_SIGC,L_SIGF,L_STRA,L_EPSA,L_EPSD,L_EPSQ,L_EPSF,L_CRAK,
+     .   L_SIGC,L_SIGF,L_STRA,L_EPSA,L_EPSD,L_EPSQ,L_EPSF,L_CRAK,L_WPLA,
      .   L_ANG,L_SF,L_QVIS,L_DELTAX,L_GAMA,
      .   L_DAM,L_DSUM,L_DGLO,L_EPE,L_EPC,L_XST,L_SSP,L_Z,L_FRAC,L_VISC,
      .   L_THK,L_FOR,L_MOM,L_SMSTR,L_BFRAC,L_DMG,L_FORTH,L_EINTTH,L_SEQ,
@@ -137,9 +136,9 @@ c
          ALLOCATE(ELBUF_IMP(NG)%BUFLY(IL)%PORO(NPTR,NPTS,NPTT),STAT=ERR)              
         ENDDO                                                           
 c-------------------------------------------------
-c       skip interlayer buffer for PLY_XFEM
+C       skip interlayer buffer for PLY_XFEM
 c-------------------------------------------------
-c       allocation & read of local buffer variables
+C       allocation & read of local buffer variables
 c-------------------------------------------------
         DO IL = 1, NLAY                                                            
          BUFLY => ELBUF_TAB(NG)%BUFLY(IL)                         
@@ -151,7 +150,9 @@ c
          BUFLY_IMP%IVISC     = BUFLY%IVISC    
          BUFLY_IMP%NFAIL     = BUFLY%NFAIL    
          BUFLY_IMP%NVAR_MAT  = BUFLY%NVAR_MAT    
+         BUFLY_IMP%NVAR_EOS  = BUFLY%NVAR_EOS         
          BUFLY_IMP%NVARTMP   = BUFLY%NVARTMP    
+         BUFLY_IMP%NVARTMP_EOS = BUFLY%NVARTMP_EOS         
          BUFLY_IMP%NVAR_VISC = BUFLY%NVAR_VISC    
          BUFLY_IMP%NVAR_LOC  = BUFLY%NVAR_LOC    
          BUFLY_IMP%NVAR_LAY  = BUFLY%NVAR_LAY   
@@ -216,6 +217,7 @@ c
          BUFLY_IMP%L_EPSQ    = BUFLY%L_EPSQ   
          BUFLY_IMP%L_EPSF    = BUFLY%L_EPSF   
          BUFLY_IMP%L_PLA     = BUFLY%L_PLA    
+         BUFLY_IMP%L_WPLA    = BUFLY%L_WPLA    
          BUFLY_IMP%L_TEMP    = BUFLY%L_TEMP        
          BUFLY_IMP%L_TB      = BUFLY%L_TB     
          BUFLY_IMP%L_RK      = BUFLY%L_RK     
@@ -285,7 +287,8 @@ c
             ALLOCATE(LBUF%EPSD  (NEL*BUFLY%L_EPSD)  ,STAT=ERR)                           
             ALLOCATE(LBUF%EPSQ  (NEL*BUFLY%L_EPSQ)  ,STAT=ERR)                           
             ALLOCATE(LBUF%EPSF  (NEL*BUFLY%L_EPSF)  ,STAT=ERR)                           
-            ALLOCATE(LBUF%PLA   (NEL*BUFLY%L_PLA)   ,STAT=ERR)                           
+            ALLOCATE(LBUF%PLA   (NEL*BUFLY%L_PLA)   ,STAT=ERR)      
+            ALLOCATE(LBUF%WPLA  (NEL*BUFLY%L_WPLA)  ,STAT=ERR)                                       
             ALLOCATE(LBUF%TEMP(NEL*BUFLY%L_TEMP), STAT=ERR)                              
             ALLOCATE(LBUF%TB(NEL*BUFLY%L_TB), STAT=ERR)                                  
             ALLOCATE(LBUF%RK(NEL*BUFLY%L_RK), STAT=ERR)                                  
@@ -332,7 +335,7 @@ c
           ENDDO                                                                     
          ENDDO                                                                      
         ENDDO       
-c        
+C        
 c-----    Material buffer - per integration point                                                                  
 c
         DO IL = 1, NLAY                                                     
@@ -355,7 +358,7 @@ c
           ENDDO                                                             
         ENDDO                                                               
 c-------------------------------
-c         failure model variables                            
+C         failure model variables                            
 c-------------------------------
         DO IL = 1, NLAY                                                      
           NFAIL = ELBUF_TAB(NG)% BUFLY(IL)%NFAIL                                   
@@ -400,7 +403,7 @@ c-------------------------------
           ENDDO                                                              
         ENDDO                                                                
 c-------------------------------
-c         Viscosity model variables                            
+C         Viscosity model variables                            
 c-------------------------------
         DO IL = 1, NLAY                                                    
           NUVAR = ELBUF_TAB(NG)% BUFLY(IL)%NVAR_VISC                                   
@@ -418,7 +421,7 @@ c-------------------------------
           ENDDO                                                           
         ENDDO     
 c-------------------------------
-c         Non-local regularization in the shell thickness                 
+C         Non-local regularization in the shell thickness                 
 c-------------------------------
         IF ((ITY==3).OR.(ITY==7)) THEN
           ! Number of integration points in the thickness
@@ -449,7 +452,7 @@ c-------------------------------
             ENDDO  
           ENDIF
 c-------------------------------
-c         Non-local regularization in the thickshell thickness                 
+C         Non-local regularization in the thickshell thickness                 
 c-------------------------------
         ELSEIF (ITY==1) THEN
           ! Number of integration points in the thickness
@@ -478,10 +481,11 @@ c-------------------------------
         ENDIF
         
 c-------------------------------
-c         EoS buffer
+C         EoS buffer
 c-------------------------------
       DO IL = 1, NLAY 
-        NVAR_EOS = ELBUF_TAB(NG)%BUFLY(IL)%NVAR_EOS                                                                                         
+        NVAR_EOS = ELBUF_TAB(NG)%BUFLY(IL)%NVAR_EOS 
+        NVARTMP_EOS = ELBUF_TAB(NG)%BUFLY(IL)%NVARTMP_EOS
         IF (IGTYP == 51 .OR. IGTYP == 52) THEN
           NPTT = ELBUF_TAB(NG)%BUFLY(IL)%NPTT
         ELSE
@@ -490,17 +494,18 @@ c-------------------------------
         DO IR = 1,NPTR                                                    
           DO IS = 1,NPTS                                                  
             DO IT = 1,NPTT                                                           
-              ALLOCATE( ELBUF_TAB(NG)%BUFLY(IL)%EOS(IR,IS,IT)%VAR(NEL*NVAR_EOS), STAT=ERR)                                                                                                                                      
+              ALLOCATE( ELBUF_TAB(NG)%BUFLY(IL)%EOS(IR,IS,IT)%VAR(NEL*NVAR_EOS), STAT=ERR)  
+              ALLOCATE( ELBUF_TAB(NG)%BUFLY(IL)%EOS(IR,IS,IT)%VARTMP(NEL*NVARTMP_EOS), STAT=ERR)                                                                                                                                                    
             ENDDO                                                             
           ENDDO                                                              
         ENDDO                                                             
-      ENDDO         
+      ENDDO       
 c-------------------------------------------------
-c       allocation of global buffer variables
+C       allocation of global buffer variables
 c-------------------------------------------------
         GBUF  => ELBUF_TAB(NG)%GBUF                                                  
         ELBUF_IMP(NG)%GBUF%NVAR_GLOB = GBUF%NVAR_GLOB
-c  
+C  
         ELBUF_IMP(NG)%GBUF%G_NOFF   = GBUF%G_NOFF     
         ELBUF_IMP(NG)%GBUF%G_IERR   = GBUF%G_IERR     
         ELBUF_IMP(NG)%GBUF%G_OFF    = GBUF%G_OFF      
@@ -517,6 +522,7 @@ c
         ELBUF_IMP(NG)%GBUF%G_EPSD   = GBUF%G_EPSD     
         ELBUF_IMP(NG)%GBUF%G_EPSQ   = GBUF%G_EPSQ
         ELBUF_IMP(NG)%GBUF%G_PLA    = GBUF%G_PLA      
+        ELBUF_IMP(NG)%GBUF%G_WPLA   = GBUF%G_WPLA             
         ELBUF_IMP(NG)%GBUF%G_TEMP   = GBUF%G_TEMP     
         ELBUF_IMP(NG)%GBUF%G_TB     = GBUF%G_TB       
         ELBUF_IMP(NG)%GBUF%G_RK     = GBUF%G_RK       
@@ -561,8 +567,10 @@ C
         ELBUF_IMP(NG)%GBUF%G_MAXEPS = GBUF%G_MAXEPS    
         ELBUF_IMP(NG)%GBUF%G_BETAORTh = GBUF%G_BETAORTh    
         ELBUF_IMP(NG)%GBUF%G_AMU    = GBUF%G_AMU
+        ELBUF_IMP(NG)%GBUF%G_FOR_G  = GBUF%G_FOR_G
+        ELBUF_IMP(NG)%GBUF%G_FORPG_G= GBUF%G_FORPG_G
 c---
-c 1-D elements (TRUSS, BEAM, SPRING, NSTRAND)
+C 1-D elements (TRUSS, BEAM, SPRING, NSTRAND)
 c---
         ELBUF_IMP(NG)%GBUF%G_AREA   = GBUF%G_AREA
         ELBUF_IMP(NG)%GBUF%G_SKEW   = GBUF%G_SKEW
@@ -598,8 +606,10 @@ c---
         ELBUF_IMP(NG)%GBUF%G_INIFRIC     = GBUF%G_INIFRIC
         ELBUF_IMP(NG)%GBUF%G_STRHG       = GBUF%G_STRHG
         ELBUF_IMP(NG)%GBUF%G_SKEW_ID   = GBUF%G_SKEW_ID
+        ELBUF_IMP(NG)%GBUF%G_YIELD_IN_COMP = GBUF%G_YIELD_IN_COMP
+        ELBUF_IMP(NG)%GBUF%G_XXOLD_IN_COMP = GBUF%G_XXOLD_IN_COMP
 c---
-c seatbelt elements
+C seatbelt elements
 c---
         ELBUF_IMP(NG)%GBUF%G_SLIPRING_ID = GBUF%G_SLIPRING_ID
         ELBUF_IMP(NG)%GBUF%G_SLIPRING_FRAM_ID = GBUF%G_SLIPRING_FRAM_ID
@@ -610,7 +620,7 @@ c---
         ELBUF_IMP(NG)%GBUF%G_UPDATE      = GBUF%G_UPDATE
         ELBUF_IMP(NG)%GBUF%G_FRAM_FACTOR = GBUF%G_FRAM_FACTOR
         ELBUF_IMP(NG)%GBUF%G_INTVAR      = GBUF%G_INTVAR
-c       
+C       
         ALLOCATE (ELBUF_IMP(NG)%GBUF%NOFF(NEL*GBUF%G_NOFF)       ,STAT=ERR)                         
         ALLOCATE (ELBUF_IMP(NG)%GBUF%IERR(NEL*GBUF%G_IERR)       ,STAT=ERR)                         
         ALLOCATE (ELBUF_IMP(NG)%GBUF%GAMA(NEL*GBUF%G_GAMA)       ,STAT=ERR)                  
@@ -635,6 +645,8 @@ c
         ALLOCATE (ELBUF_IMP(NG)%GBUF%MAXEPS(NEL*GBUF%G_MAXEPS)   ,STAT=ERR)      
         ALLOCATE (ELBUF_IMP(NG)%GBUF%BETAORTH(NEL*GBUF%G_BETAORTH) ,STAT=ERR)
         ALLOCATE (ELBUF_IMP(NG)%GBUF%AMU(NEL*GBUF%G_AMU)         ,STAT=ERR)                          
+        ALLOCATE (ELBUF_IMP(NG)%GBUF%FOR_G(NEL*GBUF%G_FOR_G)     ,STAT=ERR)  
+        ALLOCATE (ELBUF_IMP(NG)%GBUF%WPLA(NEL*GBUF%G_WPLA)       ,STAT=ERR)                                           
 c
         IF (NPTTOT /= 1) THEN
           ALLOCATE (ELBUF_IMP(NG)%GBUF%BFRAC(NEL*GBUF%G_BFRAC)   ,STAT=ERR)                  
@@ -647,7 +659,7 @@ c
           ALLOCATE (ELBUF_IMP(NG)%GBUF%VOL (NEL*GBUF%G_VOL)      ,STAT=ERR)                       
           ALLOCATE (ELBUF_IMP(NG)%GBUF%EPSD(NEL*GBUF%G_EPSD)     ,STAT=ERR)                       
           ALLOCATE (ELBUF_IMP(NG)%GBUF%EPSQ(NEL*GBUF%G_EPSQ)     ,STAT=ERR) 
-          ALLOCATE (ELBUF_IMP(NG)%GBUF%PLA (NEL*GBUF%G_PLA)      ,STAT=ERR)                       
+          ALLOCATE (ELBUF_IMP(NG)%GBUF%PLA (NEL*GBUF%G_PLA)      ,STAT=ERR)   
           ALLOCATE (ELBUF_IMP(NG)%GBUF%TEMP(NEL*GBUF%G_TEMP)     ,STAT=ERR)                       
           ALLOCATE (ELBUF_IMP(NG)%GBUF%TB(NEL*GBUF%G_TB)         ,STAT=ERR)                           
           ALLOCATE (ELBUF_IMP(NG)%GBUF%RK(NEL*GBUF%G_RK)         ,STAT=ERR)                           
@@ -675,11 +687,15 @@ C
 C                   
           ALLOCATE(ELBUF_IMP(NG)%GBUF%STRPG(NEL*GBUF%G_STRPG),STAT=ERR)                  
           ALLOCATE(ELBUF_IMP(NG)%GBUF%STRWPG(NEL*GBUF%G_STRWPG),STAT=ERR)                 
+          ALLOCATE(ELBUF_IMP(NG)%GBUF%FORPG_G(NEL*GBUF%G_FORPG_G),STAT=ERR)                           
         ENDIF
 C
 c---
-c 1-D elements (TRUSS, BEAM, SPRING, NSTRAND)
+C 1-D elements (TRUSS, BEAM, SPRING, NSTRAND)
 c---
+        IF(IGTYP == 3 .and. ITY == 5) THEN 
+          ALLOCATE (ELBUF_IMP(NG)%GBUF%DMGSCL(NEL*GBUF%G_DMGSCL)          ,STAT=ERR)
+        ENDIF
         ALLOCATE (ELBUF_IMP(NG)%GBUF%AREA(NEL*GBUF%G_AREA)              ,STAT=ERR)
         ALLOCATE (ELBUF_IMP(NG)%GBUF%SKEW(NEL*GBUF%G_SKEW)              ,STAT=ERR)
         ALLOCATE (ELBUF_IMP(NG)%GBUF%LENGTH(NEL*GBUF%G_LENGTH)          ,STAT=ERR)
@@ -713,9 +729,11 @@ c---
         ALLOCATE (ELBUF_IMP(NG)%GBUF%FORINI(NEL*GBUF%G_FORINI)          ,STAT=ERR)
         ALLOCATE (ELBUF_IMP(NG)%GBUF%INIFRIC(NEL*GBUF%G_INIFRIC)        ,STAT=ERR)
         ALLOCATE (ELBUF_IMP(NG)%GBUF%STRHG(NEL*GBUF%G_STRHG)            ,STAT=ERR)
-        ALLOCATE (ELBUF_IMP(NG)%GBUF%SKEW_ID(NEL*GBUF%G_SKEW_ID)      ,STAT=ERR)
+        ALLOCATE (ELBUF_IMP(NG)%GBUF%SKEW_ID(NEL*GBUF%G_SKEW_ID)        ,STAT=ERR)
+        ALLOCATE (ELBUF_IMP(NG)%GBUF%YIELD_IN_COMP(NEL*GBUF%G_YIELD_IN_COMP),STAT=ERR)
+        ALLOCATE (ELBUF_IMP(NG)%GBUF%XXOLD_IN_COMP(NEL*GBUF%G_XXOLD_IN_COMP),STAT=ERR)
 c---
-c seatbelt elements
+C seatbelt elements
 c---
         ALLOCATE (ELBUF_IMP(NG)%GBUF%SLIPRING_ID(NEL*GBUF%G_SLIPRING_ID))
         ALLOCATE (ELBUF_IMP(NG)%GBUF%SLIPRING_FRAM_ID(NEL*GBUF%G_SLIPRING_FRAM_ID))

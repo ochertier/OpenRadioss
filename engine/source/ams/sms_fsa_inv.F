@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_check        ../engine/source/ams/sms_fsa_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_pcg          ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    floatmin         ../common_source/tools/math/precision.c
-      !||    my_barrier       ../engine/source/system/machine.F
-      !||    sms_fsa_invh     ../engine/source/ams/sms_fsa_inv.F
-      !||    spmd_exchm_sms   ../engine/source/mpi/ams/spmd_sms.F
-      !||    spmd_glob_lmin   ../engine/source/mpi/ams/spmd_sms.F
-      !||    spmd_max_s       ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_nndft_sms   ../engine/source/mpi/ams/spmd_sms.F
-      !||    spmd_nnz_sms     ../engine/source/mpi/ams/spmd_sms.F
-      !||    startime         ../engine/source/system/timer_mod.F90
-      !||    stoptime         ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    ams_work_mod     ../engine/source/modules/ams_work_mod.F90
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||    my_alloc_mod     ../common_source/tools/memory/my_alloc.F90
-      !||    timer_mod        ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sms_check        ../engine/source/ams/sms_fsa_inv.F
+!||--- called by ------------------------------------------------------
+!||    sms_pcg          ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    floatmin         ../common_source/tools/math/precision.c
+!||    my_barrier       ../engine/source/system/machine.F
+!||    sms_fsa_invh     ../engine/source/ams/sms_fsa_inv.F
+!||    spmd_exchm_sms   ../engine/source/mpi/ams/spmd_sms.F
+!||    spmd_glob_lmin   ../engine/source/mpi/ams/spmd_sms.F
+!||    spmd_max_s       ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_nndft_sms   ../engine/source/mpi/ams/spmd_sms.F
+!||    spmd_nnz_sms     ../engine/source/mpi/ams/spmd_sms.F
+!||    startime         ../engine/source/system/timer_mod.F90
+!||    stoptime         ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    ams_work_mod     ../engine/source/modules/ams_work_mod.F90
+!||    message_mod      ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod     ../common_source/tools/memory/my_alloc.F90
+!||    timer_mod        ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE SMS_CHECK(TIMERS,NODFT ,NODLT ,IADK  ,JDIK  ,DIAG_K ,  
      2                     LT_K  ,IADI  , JDII ,LT_I  ,ITASK  ,
      3                     ITAB  ,IAD_ELEM,FR_ELEM,FR_SMS,FR_RMS,
@@ -84,7 +84,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ITAG(NUMNOD)   
 C
-      INTEGER I, J, K, L, NOD, IBID, IERR, IMIN,
+      INTEGER I, J, K, L, NOD, IMIN,
      .        NNZMFT, NNZMLT
       my_real
      .        LMIN
@@ -118,7 +118,7 @@ C
         CALL MY_ALLOC(AMS_WORK%CHECK%INVND,NUMNOD)
       ENDIF 
 C     ----- approx. (by each colonne of L_T) inverse ---------
-C     ----- utilise d'abord la place de [M] pour la matrice assemblee ---------
+C     ----- first uses the space of [M] for the assembled matrix ---------
       IF (NSPMD==1) THEN
         AMS_WORK%check%NNDFT0=0
         AMS_WORK%check%NNDFT1=NUMNOD
@@ -195,7 +195,7 @@ C M triee 1 ... NNDFT0 ... NNDFT1 ... NUMNOD
 C----------------------
       CALL MY_BARRIER
 C---------------------
-C M <- termes des processeurs voisins
+C M '<- Terms of neighboring processors
       IF (ITASK == 0 .AND. NSPMD > 1) THEN
         CALL SPMD_EXCHM_SMS(
      1           FR_SMS ,FR_RMS,LIST_SMS,LIST_RMS,IAD_ELEM,
@@ -325,20 +325,20 @@ C--------------------------------------------
       RETURN
       END
 C--------factorized sparse approximate inverse version hybrid------- 
-      !||====================================================================
-      !||    sms_fsa_invh    ../engine/source/ams/sms_fsa_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_check       ../engine/source/ams/sms_fsa_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||    get_subsp_sms   ../engine/source/ams/sms_fsa_inv.F
-      !||    imp_fsai        ../engine/source/implicit/imp_fsa_inv.F
-      !||    sms_pcg1        ../engine/source/ams/sms_fsa_inv.F
-      !||    sp_stat0        ../engine/source/implicit/imp_fsa_inv.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sms_fsa_invh    ../engine/source/ams/sms_fsa_inv.F
+!||--- called by ------------------------------------------------------
+!||    sms_check       ../engine/source/ams/sms_fsa_inv.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../engine/source/output/message/message.F
+!||    arret           ../engine/source/system/arret.F
+!||    get_subsp_sms   ../engine/source/ams/sms_fsa_inv.F
+!||    imp_fsai        ../engine/source/implicit/imp_fsa_inv.F
+!||    sms_pcg1        ../engine/source/ams/sms_fsa_inv.F
+!||    sp_stat0        ../engine/source/implicit/imp_fsa_inv.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SMS_FSA_INVH(NNZM   ,IADM  ,JDIM  , DIAG_M, LT_M, 
      1                  NNDFT0 ,NNDFT1,ITASK ,DIAG_INV)
 C-----------------------------------------------
@@ -366,7 +366,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C--- M->A^-1 LT_M  strictly lower in m.c.r.s. format
-      INTEGER I,J,K,M,N,NC,MAX_L,IERR,I_CHK,IER1,
+      INTEGER I,J,NC,MAX_L,IERR,IER1,
      .        JM(NUMNOD+1)
       INTEGER, DIMENSION(:),ALLOCATABLE :: IADA, JDIA
       my_real, 
@@ -383,7 +383,7 @@ C
          CALL ARRET(2)
        ENDIF 
 C
-C Boucle parallele dynamique SMP
+C SMP dynamic parallel loop
 C
 !$OMP DO SCHEDULE(DYNAMIC,1)
       DO I=NNDFT0+1,NUMNOD
@@ -413,7 +413,7 @@ C
      .                 MAX_L ,MJ    )
 C
         ENDIF 
-C------------filtrage----Diagonal est dans LT_M (last one)--
+C------------filtering----Diagonal is in LT_M (last one)--
         DIAG_INV(I)=MJ(NC)
        ENDDO
 
@@ -425,14 +425,14 @@ C
       RETURN
       END
 C----------version spmd---set submatrix A(N,N) Format m.c.c.s. for FSAI ----
-      !||====================================================================
-      !||    get_subsp_sms   ../engine/source/ams/sms_fsa_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_fsa_invh    ../engine/source/ams/sms_fsa_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    ind_lt2ln       ../engine/source/implicit/imp_fsa_inv.F
-      !||    intab0          ../engine/source/implicit/imp_fsa_inv.F
-      !||====================================================================
+!||====================================================================
+!||    get_subsp_sms   ../engine/source/ams/sms_fsa_inv.F
+!||--- called by ------------------------------------------------------
+!||    sms_fsa_invh    ../engine/source/ams/sms_fsa_inv.F
+!||--- calls      -----------------------------------------------------
+!||    ind_lt2ln       ../engine/source/implicit/imp_fsa_inv.F
+!||    intab0          ../engine/source/implicit/imp_fsa_inv.F
+!||====================================================================
       SUBROUTINE GET_SUBSP_SMS(IADM  ,JDIM  ,DIAG_M ,LT_M  ,NC    ,
      .                         IADA  ,JDIA  ,DIAG_A ,LT_A  ,JM    ,   
      .                         NNDFT0,NNDFT1 )
@@ -456,7 +456,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,JJ,NNZA,N,K0
+      INTEGER I,J,K,JJ,NNZA,N
 C--------------------------------------------
       NNZA=0
       IADA(1)=1
@@ -481,14 +481,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    sms_pcg1       ../engine/source/ams/sms_fsa_inv.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_fsa_invh   ../engine/source/ams/sms_fsa_inv.F
-      !||--- calls      -----------------------------------------------------
-      !||    mav_lt         ../engine/source/implicit/produt_v.F
-      !||    produt_v0      ../engine/source/implicit/produt_v.F
-      !||====================================================================
+!||====================================================================
+!||    sms_pcg1       ../engine/source/ams/sms_fsa_inv.F
+!||--- called by ------------------------------------------------------
+!||    sms_fsa_invh   ../engine/source/ams/sms_fsa_inv.F
+!||--- calls      -----------------------------------------------------
+!||    mav_lt         ../engine/source/implicit/produt_v.F
+!||    produt_v0      ../engine/source/implicit/produt_v.F
+!||====================================================================
       SUBROUTINE SMS_PCG1( 
      1                    NDDL  ,IADK  ,JDIK  ,DIAG_K ,LT_K  ,   
      2                    R     ,ISP   )
@@ -509,9 +509,9 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IT,IP,NLIM,ND,ISTOP,ISP,IBID
+      INTEGER I,IT,NLIM,ISTOP,ISP,IBID
       my_real
-     .   S , R2, R02, ALPHA, BETA, G0, G1, RR, TOLS, TOLN, TOLS2
+     .   S , R2, R02, ALPHA, BETA, G0, G1, TOLS, TOLN, TOLS2
       my_real
      .  X(NDDL) ,P(NDDL) ,Z(NDDL)  ,Y(NDDL),DIAG_M(NDDL) 
       my_real
@@ -553,7 +553,7 @@ C------X(I)=ZERO--------
       R2 =R02
       IF (R02==ZERO) GOTO 200
       TOLN=R02*TOLS2
-C-------pour etre coherent avec lanzos for linear
+C-------to be consistent with lanzos for linear
        IT=1
        DO I=1,NDDL
          X(I) = X(I) + ALPHA*P(I)
@@ -620,10 +620,5 @@ C--------X->R--------
         R(I) = X(I) 
        ENDDO 
 C--------------------------------------------
- 1002 FORMAT(3X,'TOTAL C.G. ITERATION=',I8,5X,
-     .          ' RELATIVE RESIDUAL NORM=',E11.4)
- 1003 FORMAT(5X,
-     . '---WARNING : THE ITERATION LIMIT NUMBER WAS REACHED',
-     . 1X,'IN FSAI')
        RETURN
       END

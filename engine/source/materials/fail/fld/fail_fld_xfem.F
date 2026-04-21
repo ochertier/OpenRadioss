@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_fld_xfem   ../engine/source/materials/fail/fld/fail_fld_xfem.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc          ../engine/source/materials/mat_share/mulawc.F90
-      !||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter          ../engine/source/tools/curve/finter.F
-      !||    finterfld       ../engine/source/materials/fail/fld/fail_fld_c.F
-      !||====================================================================
+!||====================================================================
+!||    fail_fld_xfem   ../engine/source/materials/fail/fld/fail_fld_xfem.F
+!||--- called by ------------------------------------------------------
+!||    mulawc          ../engine/source/materials/mat_share/mulawc.F90
+!||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
+!||--- calls      -----------------------------------------------------
+!||    finter          ../engine/source/tools/curve/finter.F
+!||    finterfld       ../engine/source/materials/fail/fld/fail_fld_c.F
+!||====================================================================
       SUBROUTINE FAIL_FLD_XFEM(
      1     NEL      ,NUPARAM  ,NUVAR    ,NFUNC    ,IFUNC    ,
      2     NPF      ,TF       ,TIME     ,UPARAM   ,
      3     NGL      ,IPT      ,NPTOT    ,SSP      ,TENS     ,
      4     SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      5     EPSXX    ,EPSYY    ,EPSXY    ,EPSYZ    ,EPSZX    ,  
-     6     UVAR     ,NOFF     ,OFF      ,
+     6     UVAR     ,NOFF     ,OFF      ,LF_DAMMX ,
      7     ELCRKINI ,IXFEM    ,IXEL     ,ILAY     ,IPTT     ,  
      8     OFFL     ,NPTT     ,NPTTF    ,DFMAX    ,TDEL     ,   
      9     DAM      ,FLD_IDX  ,NIPARAM  ,IPARAM   ,PLA      ,
@@ -83,10 +83,10 @@ C-----------------------------------------------
       INTEGER ELCRKINI(NXLAYMAX,NEL),NOFF(NEL),IFUNC(NFUNC),NGL(NEL),FLD_IDX(NEL)
       my_real 
      .   TIME,UPARAM(NUPARAM),SIGNXX(NEL),SIGNYY(NEL),
-     .   SIGNZZ(NEL),SIGNXY(NEL),SIGNYZ(NEL),SIGNZX(NEL),SSP(NEL),
+     .   SIGNXY(NEL),SIGNYZ(NEL),SIGNZX(NEL),SSP(NEL),
      .   EPSXX(NEL),EPSYY(NEL),EPSXY(NEL),EPSYZ(NEL),EPSZX(NEL),
-     .   TENS(NEL,5),DFMAX(NEL),TDEL(NEL),NPTTF(NEL),DAM(NEL)
-      INTEGER, INTENT(IN) :: NIPARAM
+     .   TENS(NEL,5),DFMAX(NEL,LF_DAMMX),TDEL(NEL),NPTTF(NEL),DAM(NEL)
+      INTEGER, INTENT(IN) :: NIPARAM, LF_DAMMX
       INTEGER, DIMENSION(NIPARAM), INTENT(IN) :: IPARAM
       my_real, DIMENSION(NEL), INTENT(IN) :: PLA,DEPSXX,DEPSYY,DEPSXY
       my_real, INTENT(IN) :: DT1
@@ -110,13 +110,13 @@ C        NPF,TF  : FUNCTION PARAMETER
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,J,K,L,IENG,IAD,NINDX,NINDXP,ISHELL,LAYXFEM,LENF
+      INTEGER I,II,J,IENG,IAD,NINDX,NINDXP,ISHELL,LAYXFEM,LENF
       INTEGER INDX(NEL),INDXP(NEL),RFLAG(NEL),RFLAGP(NEL)  
       my_real 
-     .   RANI,R1,R2,DADV,SIGMAX,S1,S2,SS,Q,DYDX,E12
+     .   RANI,R1,R2,DADV,S1,S2,SS,Q,DYDX,E12
       my_real, ALLOCATABLE, DIMENSION(:) :: XF  
       my_real 
-     .   TBA(NEL),TBK(NEL),SIGR(NEL),EMAJ(NEL),EMIN(NEL),
+     .   EMAJ(NEL),EMIN(NEL),
      .   EM(NEL),EM_DCRIT(NEL),EM_DADV(NEL),DEMAJ(NEL),DEMIN(NEL),
      .   BETA(NEL),ALPHA,FCUT
       CHARACTER (LEN=3) :: XCHAR
@@ -185,7 +185,10 @@ c
         DEMIN(I)  = ALPHA*DEMIN(I) + (ONE - ALPHA)*UVAR(I,3) 
         BETA(I)   = DEMIN(I)/SIGN(MAX(ABS(DEMAJ(I)),EM20),DEMAJ(I))
         UVAR(I,2) = DEMAJ(I)
-        UVAR(I,3) = DEMIN(I)        
+        UVAR(I,3) = DEMIN(I)
+        IF (IENG == 2) THEN
+          DFMAX(I,4) = BETA(I)
+        ENDIF 
       ENDDO
 c
       !=================================================================
@@ -201,25 +204,28 @@ c
         ENDDO
 c
         DO I = 1,NEL
-          EM(I)    = FINTERFLD(EMIN(I),LENF,XF)
-          DAM(I)   = EMAJ(I) / EM(I)
-          DFMAX(I) = MIN(ONE, DAM(I))
+          EM(I)  = FINTERFLD(EMIN(I),LENF,XF)
+          DAM(I) = EMAJ(I) / EM(I)
+          DFMAX(I,2) = DAM(I)
+          DFMAX(I,1) = MIN(ONE, DAM(I))
         ENDDO
       ! -> True strain input
       ELSE
         ! -> Classic formulation
         IF (IENG == 0) THEN 
           DO I = 1,NEL
-            EM(I)    = FINTER(IFUNC(1),EMIN(I),NPF,TF,DYDX)
-            DAM(I)   = EMAJ(I) / EM(I)
-            DFMAX(I) = MIN(ONE, DAM(I))
+            EM(I)  = FINTER(IFUNC(1),EMIN(I),NPF,TF,DYDX)
+            DAM(I) = EMAJ(I) / EM(I)
+            DFMAX(I,2) = DAM(I)
+            DFMAX(I,1) = MIN(ONE, DAM(I))
           ENDDO
         ! -> Non-linear path formulation
         ELSEIF (IENG == 2) THEN
           DO I = 1,NEL
-            EM(I)    = FINTER(IFUNC(1),EMIN(I),NPF,TF,DYDX)
-            DAM(I)   = MAX(PLA(I) / EM(I),DAM(I))
-            DFMAX(I) = MIN(ONE, DAM(I))
+            EM(I)  = FINTER(IFUNC(1),EMIN(I),NPF,TF,DYDX)
+            DAM(I) = MAX(PLA(I) / EM(I),DAM(I))
+            DFMAX(I,2) = DAM(I)
+            DFMAX(I,1) = MIN(ONE, DAM(I))
           ENDDO
         ENDIF
       ENDIF 
@@ -244,6 +250,7 @@ c
           ELSE
             FLD_IDX(I) = 2      ! zone 2  - high wrinkle tendency
           ENDIF
+          DFMAX(I,3) = FLD_IDX(I)
         ENDDO
       ELSE
         DO I = 1,NEL
@@ -260,6 +267,7 @@ c
           ELSE
             FLD_IDX(I) = MAX(2,FLD_IDX(I))      ! zone 2  - high wrinkle tendency
           ENDIF
+          DFMAX(I,3) = FLD_IDX(I)
         ENDDO
       ENDIF
 c--------------------------------------------------------------------
@@ -540,14 +548,6 @@ c-----------------
 c
       IF (IENG == 1) DEALLOCATE(XF)
 c-----------------------------------------------
- 2000 FORMAT(1X,'FOR SHELL ELEMENT (FLD)',I10,1X,'LAYER',I3,':',/
-     .       1X, 'STRESS TENSOR SET TO ZERO')
- 2100 FORMAT(1X,'FOR SHELL ELEMENT (FLD)',I10,1X,'LAYER',I3,':',/,
-     .       1X, 'STRESS TENSOR SET TO ZERO',1X,'AT TIME :',1PE20.13)
- 2400 FORMAT(1X,1PG20.13,' % OF THICKNESS OF SHELL BROKEN ')
- 2410 FORMAT(1X,1PG20.13,' % OF THICKNESS OF SHELL ',I10,' BROKEN ')
- 2500 FORMAT(1X,'  LOWER SKIN -> UPPER SKIN ')
- 2600 FORMAT(1X,'  UPPER SKIN -> LOWER SKIN ')
 c---  multilayer xfem
  3000 FORMAT(1X,'CRACK INITIALIZATION IN SHELL ELEMENT',I10,1X,'LAYER',I3)
  3100 FORMAT(1X,'CRACK INITIALIZATION IN SHELL ELEMENT',I10,1X,'LAYER',I3,/

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_grogronod           ../starter/source/groups/hm_grogronod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_grogronod           ../starter/source/groups/hm_grogronod.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_GROGRONOD(IGRNOD  ,ICOUNT  ,FLAG    ,ITER  ,ELKEY,   
      .                        LSUBMODEL)
 !---
-!   group des group des elements + parts
+! group of groups of elements + parts
 !---
 C-----------------------------------------------
 C   M o d u l e s
@@ -89,7 +89,7 @@ C=======================================================================
       IF (FLAG == 0) ICOUNT=0
       IGS =0
       CALL HM_OPTION_START('/GRNOD')
-C     boucle sur les groupes
+C     loop over the groups
       DO I=1,NGRNOD     
         CALL HM_OPTION_READ_KEY(LSUBMODEL,
      .                          OPTION_ID   = ID,
@@ -136,15 +136,14 @@ C                       reference a un groupe non initialise
                     NEL = 0
                     CYCLE
                   ELSE
-C                       reference a un groupe initialise
+C                       Reference has an initialized group
                     IF (NONTRI == 0) THEN
-C                         sorted group, tag les noeuds
+C                         sorted group, tag the nodes
                       DO L=1,IGRNOD(IGRS)%NENTITY
                         IF (JJ < 0) THEN
-C                             retire les noeuds du group si j10 < 0
+C                             remove nodes from the group if j10 < 0
                           BUFTMP(IGRNOD(IGRS)%ENTITY(L))=-1
                         ELSEIF (BUFTMP(IGRNOD(IGRS)%ENTITY(L)) == 0) THEN
-C                              ajoute les noeuds au group si j10 > 0 et noeud non rire
                           BUFTMP(IGRNOD(IGRS)%ENTITY(L))=1
                         ENDIF
                       ENDDO
@@ -190,13 +189,12 @@ c
                   CYCLE                                            
                 ELSE                                                 
                   IF (NONTRI == 0) THEN                                                       
-C                       tag les noeuds                                                            
+C                       tag the nodes
                     DO L=1,IGRNOD(IGRS)%NENTITY
                       IF (JJ < 0) THEN                                                    
-C                           retire les noeuds du group si j10 < 0                                 
+C                           remove nodes from the group if j10 < 0
                         BUFTMP(IGRNOD(IGRS)%ENTITY(L))=-1
                       ELSEIF (BUFTMP(IGRNOD(IGRS)%ENTITY(L)) == 0) THEN
-C                           ajoute les noeuds au group si j10 > 0 et noeud non retire            
                         BUFTMP(IGRNOD(IGRS)%ENTITY(L))=1
                       ENDIF                                                                   
                     ENDDO                                                                     

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_windshield_init      ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3                   ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cbainit3                  ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cinit3                    ../starter/source/elements/shell/coque/cinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    brokmann_crack_init       ../starter/source/materials/fail/windshield_alter/brokmann_crack_init.F90
-      !||    crack_depth_init          ../starter/source/materials/fail/windshield_alter/crack_depth_init.F90
-      !||    ngr2usrn                  ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    brokmann_crack_init_mod   ../starter/source/materials/fail/windshield_alter/brokmann_crack_init.F90
-      !||    crack_depth_init_mod      ../starter/source/materials/fail/windshield_alter/crack_depth_init.F90
-      !||====================================================================
+!||====================================================================
+!||    fail_windshield_init      ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
+!||--- called by ------------------------------------------------------
+!||    c3init3                   ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cbainit3                  ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cinit3                    ../starter/source/elements/shell/coque/cinit3.F
+!||--- calls      -----------------------------------------------------
+!||    brokmann_crack_init       ../starter/source/materials/fail/windshield_alter/brokmann_crack_init.F90
+!||    crack_depth_init          ../starter/source/materials/fail/windshield_alter/crack_depth_init.F90
+!||    ngr2usrn                  ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    brokmann_crack_init_mod   ../starter/source/materials/fail/windshield_alter/brokmann_crack_init.F90
+!||    crack_depth_init_mod      ../starter/source/materials/fail/windshield_alter/crack_depth_init.F90
+!||====================================================================
       SUBROUTINE FAIL_WINDSHIELD_INIT(ELBUF_STR,MAT_PARAM,FAIL_BROKMANN,
      .           NEL      ,NFT       ,ITY      ,IGRSH4N  ,IGRSH3N  ,
      .           ALDT     ,THK       ,NGL      )
@@ -70,7 +70,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
-      INTEGER I,II,KK,IEL,ID,IL,IR,IS,IT,NPTR,NPTS,NPTT,IFL,ITGLASS,ELNUM,
+      INTEGER I,II,KK,IEL,ID,IL,IR,IS,IT,NPTR,NPTS,NPTT,IFL,ITGLASS,
      .   IGR,IGRID,NUMEL,IMAT,IRUPT,NFAIL,NUPARAM,NUVAR,NINDX,IVAR,NUM
       INTEGER TAGSH(MAX(NUMELC,NUMELTG)),TAGEL(NEL),INDX(NEL)
       EXTERNAL  NGR2USRN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdkderic3   ../engine/source/elements/sh3n/coquedk/cdkderi3.F
-      !||--- called by ------------------------------------------------------
-      !||    cdkforc3    ../engine/source/elements/sh3n/coquedk/cdkforc3.F
-      !||====================================================================
+!||====================================================================
+!||    cdkderic3   ../engine/source/elements/sh3n/coquedk/cdkderi3.F
+!||--- called by ------------------------------------------------------
+!||    cdkforc3    ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+!||====================================================================
       SUBROUTINE CDKDERIC3(JFT ,JLT, X2,Y2,X3,Y3,AREA2,ALPE,ALDT,
      1                    PX2,PY2,PX3,PY3,PX,PY,PXY,PYY,VOL,VOLG,
      2                    NU,THK2)
@@ -48,13 +48,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
-C     REAL
-      my_real
-     .     AREAI(MVSIZ),
-     .     AL1, AL2, AL3, ALMAX,ALMIN,FAC
-      MY_REAL
-     .   X32(MVSIZ), Y32(MVSIZ),AL4, AL5, AL6      
+      INTEGER :: I
+      my_real :: AREAI(MVSIZ),AL1, AL2, AL3, ALMAX,ALMIN,FAC
+      MY_REAL :: X32(MVSIZ), Y32(MVSIZ),AL4, AL5, AL6
 C-----------------------------------------------
       DO I=JFT,JLT
        AREAI(I)=ONE/AREA2(I)
@@ -62,8 +58,6 @@ C-----------------------------------------------
        PY2(I)=-X3(I)*AREAI(I)
        PX3(I)=-Y2(I)*AREAI(I)
        PY3(I)=X2(I)*AREAI(I)
-C         PX1(I)=-PX3(I)-PX2(I)
-C         PY1(I)=-PY2(I)-PY3(I)
        X32(I) =X3(I)-X2(I)
        Y32(I) =Y3(I)-Y2(I)
       ENDDO
@@ -102,11 +96,11 @@ C---------------------------------------------------------
       RETURN
 C
       END
-      !||====================================================================
-      !||    cdkderi3   ../engine/source/elements/sh3n/coquedk/cdkderi3.F
-      !||--- called by ------------------------------------------------------
-      !||    cdkforc3   ../engine/source/elements/sh3n/coquedk/cdkforc3.F
-      !||====================================================================
+!||====================================================================
+!||    cdkderi3   ../engine/source/elements/sh3n/coquedk/cdkderi3.F
+!||--- called by ------------------------------------------------------
+!||    cdkforc3   ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+!||====================================================================
       SUBROUTINE CDKDERI3(JFT ,JLT,PX2,PY2,PX3,PY3,PX,PY,PXY,PYY,  
      1                    BZ1,BZ2,BZ3,BRX1,BRX2,BRX3,
      2                    BRY1,BRY2,BRY3,KSI,ETA)
@@ -131,10 +125,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
-      MY_REAL
-     .   XR1,XR2,XR3,YR1,YR2,YR3,XS1,XS2,XS3,YS1,YS2,YS3,
-     .   X2Y,Y2X,X6,Y6,XY6,RXY1(3),RXY2(3)
+      INTEGER I
+      MY_REAL :: XR1,XR2,XR3,YR1,YR2,YR3,XS1,XS2,XS3,YS1,YS2,YS3,X2Y,Y2X,X6,Y6,XY6,RXY1(3),RXY2(3)
 C-----------------------------------------------
       X2Y =ONE-TWO*KSI-ETA
       Y2X =ONE-TWO*ETA-KSI

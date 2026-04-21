@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_nodens_clause_mod   ../starter/source/model/sets/create_nodens_clause.F90
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                     ../starter/source/model/sets/hm_set.F
-      !||====================================================================
+!||====================================================================
+!||    create_nodens_clause_mod   ../starter/source/model/sets/create_nodens_clause.F90
+!||--- called by ------------------------------------------------------
+!||    hm_set                     ../starter/source/model/sets/hm_set.F
+!||====================================================================
       module create_nodens_clause_mod
+        implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
@@ -34,21 +35,21 @@
 !=======================================================================================================================
 !\brief This subroutine creates a clause from nodens
 !=======================================================================================================================
-      !||====================================================================
-      !||    create_nodens_clause        ../starter/source/model/sets/create_nodens_clause.F90
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                      ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                      ../starter/source/output/message/message.F
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
-      subroutine create_nodens_clause(clause ,itabm1 ,jclause ,is_available ,lsubmodel ,numnod)
+!||====================================================================
+!||    create_nodens_clause        ../starter/source/model/sets/create_nodens_clause.F90
+!||--- called by ------------------------------------------------------
+!||    hm_set                      ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                      ../starter/source/output/message/message.F
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
+        subroutine create_nodens_clause(clause ,itabm1 ,jclause ,is_available ,lsubmodel ,numnod)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -62,10 +63,6 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
-! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           integer,                                   intent(in) :: jclause                        !< parameter with HM_READER (current clause read)                      !< treat the NODENS Clause, read NODENS from HM_READER & fill clause
@@ -74,7 +71,7 @@
           integer,                                   intent(in)    :: itabm1(NUMNOD,2)               !< MAP Table UID -> LocalID
           type(SET_),                                intent(inout) :: clause                         !< (SET structure) Clause to be treated
           type(SUBMODEL_DATA),                       intent(in) :: lsubmodel(nsubmod)                !< SUBMODEL Structure
-          integer set_usrtos
+          integer :: set_usrtos
           external set_usrtos
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
@@ -89,7 +86,7 @@
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
 !
-          call hm_get_int_array_index('idsmax' ,ids_max ,jclause,is_available,lsubmodel)
+          call hm_get_int_array_index("idsmax" ,ids_max ,jclause,is_available,lsubmodel)
 
           allocate(nodens_read_tmp(ids_max))
           nodens_read_tmp(1:ids_max) = 0
@@ -100,28 +97,28 @@
 !         Read & convert Nodens
 !         ---------------------
           do i=1,ids_max
-            call hm_get_int_array_2indexes('ids',ids,jclause,i,is_available,lsubmodel)
+            call hm_get_int_array_2indexes("ids",ids,jclause,i,is_available,lsubmodel)
             nodsys = set_usrtos(ids,itabm1,numnod)
-            if(nodsys == 0)then      
+            if(nodsys == 0)then
 !             Nodens was not found. Issue a Warning & Skip.
-              call ancmsg(msgid=1902,anmode=aninfo,msgtype=msgwarning,i1= clause%set_id,i2=ids,c1=trim(clause%title),c2='NODENS')
+              call ancmsg(msgid=1902,anmode=aninfo,msgtype=msgwarning,i1= clause%set_id,i2=ids,c1=trim(clause%title),c2="NODENS")
             else
               nodsys = itabm1(nodsys,2)
               nindx = nindx+1    !   nb of CLAUSE nodens
               nodens_read_tmp(nindx) = nodsys
-            endif
-          enddo
+            end if
+          end do
 
           list_size = nindx
 
 !         Copy in final SET
 !         ------------------
-          clause%nb_nodens = list_size  
+          clause%nb_nodens = list_size
           allocate(clause%nodens(list_size))
 
           do i=1,list_size
             clause%nodens(i) = nodens_read_tmp(i)
-          enddo
+          end do
 !
           deallocate(nodens_read_tmp)
 ! ----------------------------------------------------------------------------------------------------------------------

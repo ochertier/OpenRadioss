@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multifluid_global_tdet   ../starter/source/multifluid/multifluid_global_tdet.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                   ../starter/source/elements/initia/initia.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    multifluid_global_tdet   ../starter/source/multifluid/multifluid_global_tdet.F
+!||--- called by ------------------------------------------------------
+!||    initia                   ../starter/source/elements/initia/initia.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MULTIFLUID_GLOBAL_TDET(IPARG,ELBUF_TAB,MULTI_FVM,IPM)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
-C CASE OF SUBMATERIAL BASED ON JWL MATERIAL LAW (HIGH EXPLISIVE WITH TIME CONTROL DETONATION)
+C CASE OF SUBMATERIAL BASED ON JWL MATERIAL LAW (HIGH EXPLOSIVE WITH TIME CONTROL DETONATION)
 C
 C This subroutine is computing detonation times in global buffer from detonation times of layers (submaterials
 C Global detonation time is relevant when there are several explosive submaterial laws.
@@ -49,10 +49,12 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE MESSAGE_MOD
       USE MULTI_FVM_MOD
+      USE CONSTANT_MOD , ONLY : ZERO, EP21
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-#include      "implicit_f.inc"
+          implicit none
+#include      "my_real.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -63,7 +65,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER,INTENT(IN)                 :: IPARG(NPARG,NGROUP),IPM(NPROPMI,NUMMAT)
+      INTEGER,INTENT(IN) :: IPARG(NPARG,NGROUP),IPM(NPROPMI,NUMMAT)
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP),INTENT(INOUT) :: ELBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM     
 C-----------------------------------------------
@@ -78,9 +80,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-     
       IF(MULTI_FVM%IS_USED)THEN
-
         DO NG=1,NGROUP    
               MTN     = IPARG(1,NG)
               NEL     = IPARG(2,NG)
@@ -100,10 +100,10 @@ C-----------------------------------------------
                     IS_JWL = .FALSE.
                     !Number of layers ( = number of material in law 151)
                     IF (NLAY > 1) THEN
-                       GBUF%TB(LFT:LLT) = -EP37
+                       GBUF%TB(LFT:LLT) = -EP21
                        DO ILAY = 1, NLAY
                           !SUBMATLAW = IPM(2, IPM(20 + ILAY, MTN))
-                          SUBMATLAW = ELBUF_TAB(NG)%BUFLY(ILAY)%ILAW  
+                          SUBMATLAW = ELBUF_TAB(NG)%BUFLY(ILAY)%ILAW
                           IF (SUBMATLAW == 5) THEN
                              LBUF => ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)
                              DO II = LFT, LLT
@@ -121,7 +121,7 @@ C-----------------------------------------------
                          ENDDO   
                        ELSE
                          DO II = LFT, LLT
-                           IF(GBUF%TB(II) == -EP37)THEN
+                           IF(GBUF%TB(II) <= -EP21)THEN
                              GBUF%TB(II) = ZERO
                            ENDIF
                          ENDDO                                        

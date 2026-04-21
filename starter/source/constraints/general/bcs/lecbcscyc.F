@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_preread_bcscyc      ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_preread_bcscyc      ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl                ../starter/source/starter/freform.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_PREREAD_BCSCYC(IGRNOD  ,NOM_OPT ,LSUBMODEL,NBCSCYNN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -125,16 +125,16 @@ c
 C
       RETURN
       END
-      !||====================================================================
-      !||    ini_bcscyc    ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur        ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||    inibcs_cy     ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ini_bcscyc    ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||--- called by ------------------------------------------------------
+!||    lectur        ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||    inibcs_cy     ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INI_BCSCYC(IBCSCYC,LBCSCYC,SKEW,X,ITAB,ICODE,IBFV,ITAGCYC)
 C-----------------------------------------------
 C   M o d u l e s
@@ -247,16 +247,16 @@ C------ok for NF1=0,NF2=0; NF1=NF2=ISK
 C
       RETURN
       END SUBROUTINE INI_BCSCYC
-      !||====================================================================
-      !||    inibcs_cy     ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||--- called by ------------------------------------------------------
-      !||    ini_bcscyc    ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||    car2cylin     ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inibcs_cy     ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||--- called by ------------------------------------------------------
+!||    ini_bcscyc    ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||    car2cylin     ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INIBCS_CY(NBCY_N,IXCYCL,ISK,SKEW,X  ,ITAB,ID)
 C-----------------------------------------------
 C   M o d u l e s
@@ -279,13 +279,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J ,N1(NBCY_N),N2(NBCY_N),INDEX(NBCY_N),NN(NBCY_N),IER1
+      INTEGER I, J ,N1(NBCY_N),N2(NBCY_N),INDEX(NBCY_N),IER1
 C
       my_real
      .     CY_X1(3,NBCY_N), CY_X2(3,NBCY_N),DIS1(NBCY_N),DIS2(NBCY_N),LMIN,
      .     CY_TMP(3,NBCY_N),RI,ZI,TOL,ERR_TH,ERMAX
 C========================================================================|
-C-----for each cut-section nodes, compute cylindrical co-ordinates and dis
+C-----for each cut-section nodes, compute cylindrical coordinates and dis
       DO I=1,NBCY_N
         N1(I) = IXCYCL(1,I)
         N2(I) = IXCYCL(2,I)
@@ -354,11 +354,11 @@ C------sorting by dis
 C
       RETURN
       END SUBROUTINE INIBCS_CY
-      !||====================================================================
-      !||    car2cylin   ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||--- called by ------------------------------------------------------
-      !||    inibcs_cy   ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||====================================================================
+!||====================================================================
+!||    car2cylin   ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||--- called by ------------------------------------------------------
+!||    inibcs_cy   ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||====================================================================
       SUBROUTINE CAR2CYLIN(NBCY_N,IX,X,CY_X,DIS,SKEW,XYZ0,TOL,IER)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -373,12 +373,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J 
-C
-      my_real
-     .     XX,YY,ZZ,XL,YL,ZL,R2,TH_MEAN,TH_MAX,ZL_MIN
+      INTEGER I
+      my_real XX,YY,ZZ,XL,YL,ZL,R2,TH_MEAN,TH_MAX,ZL_MIN
 C========================================================================|
-C----- compute cylindrical co-ordinates(r,cos(theta),z) and dis=r*r+z*z
+C----- compute cylindrical coordinates(r,cos(theta),z) and dis=r*r+z*z
       TH_MEAN =ZERO
       ZL_MIN = EP20
       DO I=1,NBCY_N
@@ -413,16 +411,16 @@ C--- numeric
 C
       RETURN
       END SUBROUTINE CAR2CYLIN
-      !||====================================================================
-      !||    int2cy_chk             ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    intab                  ../starter/source/interfaces/inter3d1/i24tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    int2cy_chk             ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||--- called by ------------------------------------------------------
+!||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    intab                  ../starter/source/interfaces/inter3d1/i24tools.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INT2CY_CHK(IPARI,INTBUF_TAB,ITAGCYC,ITAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -452,10 +450,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,N,NTY,NSN,NMN,ISL,NKIN,NOINT,IMODI,II,N1,N2,ND
-      INTEGER K,ILEV,NUVAR,IDEL7N,INTTH,IPR,IML,ICOM
-      CHARACTER(LEN=NCHARTITLE) :: TITR
-      LOGICAL IS1,IS2,ISD
+      INTEGER I,N,NTY,NSN,ISL,NOINT
+      INTEGER ILEV
 C=======================================================================
        DO N=1,NINTER
         NTY  = IPARI(7,N)

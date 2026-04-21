@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cnloc_mat104_ini   ../starter/source/materials/mat/mat104/cnloc_mat104_ini.F
-      !||--- called by ------------------------------------------------------
-      !||    cnloc_matini       ../starter/source/materials/mat_share/cnloc_matini.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    cnloc_mat104_ini   ../starter/source/materials/mat/mat104/cnloc_mat104_ini.F
+!||--- called by ------------------------------------------------------
+!||    cnloc_matini       ../starter/source/materials/mat_share/cnloc_matini.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE CNLOC_MAT104_INI(
      .          NEL      ,IPG      ,IPT      ,NUPARAM  ,NUVAR    ,UPARAM   ,
      .          UVAR     ,PLA      ,OFF      ,THKLY    ,OFFG     ,
@@ -60,7 +60,7 @@ c
       !=======================================================================
       !      Local Variables
       !=======================================================================
-      INTEGER I,K,II,IGURSON,ITER,NITER,NINDX,INDEX(NEL),NICE
+      INTEGER I, IGURSON, INDEX(NEL), NICE
 c
       my_real 
      .   CDR,KDR,HARD,YLD0,QVOCE,BVOCE,

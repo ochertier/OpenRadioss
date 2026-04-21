@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_inisph   ../engine/source/mpi/sph/spmd_sptool.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||    read_i_c      ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    sphbox        ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_inisph   ../engine/source/mpi/sph/spmd_sptool.F
+!||--- called by ------------------------------------------------------
+!||    rdresb        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||    read_i_c      ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||    sphbox        ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPMD_INISPH(IFLG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -47,7 +47,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "sphcom.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
@@ -62,7 +61,7 @@ C-----------------------------------------------
       IF(IFLG==1)THEN
        NSPHR = 0
        NSPHS = 0
-       IF(NUMSPHG>0.AND.IMACH==3.AND.NSPMD>1)THEN
+       IF(NUMSPHG>0.AND.NSPMD>1)THEN
         ALLOCATE(PSPHR(NSPMD),STAT=IERROR)
         ALLOCATE(PSPHS(NSPMD),STAT=IERROR1)
         IERROR = IERROR + IERROR1
@@ -102,7 +101,7 @@ C-----------------------------------------------
         END IF
        END IF
 C
-      ELSEIF(IFLG==2.AND.IMACH==3.AND.NSPMD>1)THEN
+      ELSEIF(IFLG==2.AND.NSPMD>1)THEN
         IF(NSPHR/=0)THEN
           ALLOCATE(XSPHR(SIZSPC,NSPHR),STAT=IERROR)
           ALLOCATE(WACOMPR(SIZSPW,NSPHR),STAT=IERROR1)
@@ -118,17 +117,17 @@ C
       RETURN
       END 
 C
-      !||====================================================================
-      !||    spmd_savesph   ../engine/source/mpi/sph/spmd_sptool.F
-      !||--- called by ------------------------------------------------------
-      !||    wrrestp        ../engine/source/output/restart/wrrestp.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_db       ../common_source/tools/input_output/write_db.F
-      !||    write_i_c      ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||====================================================================
-      SUBROUTINE SPMD_SAVESPH(IFLG)
+!||====================================================================
+!||    spmd_savesph   ../engine/source/mpi/sph/spmd_sptool.F
+!||--- called by ------------------------------------------------------
+!||    wrrestp        ../engine/source/output/restart/wrrestp.F
+!||--- calls      -----------------------------------------------------
+!||    write_db       ../common_source/tools/input_output/write_db.F
+!||    write_i_c      ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||====================================================================
+      SUBROUTINE SPMD_SAVESPH(IFLG,NUMSPHG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -141,16 +140,16 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IFLG
+      INTEGER, INTENT(IN) :: NUMSPHG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      IF(NUMSPH>0.AND.IMACH==3.AND.NSPMD>1)THEN
+      IF(NUMSPHG>0.AND.NSPMD>1)THEN
         IF(IFLG==1)THEN
           CALL WRITE_I_C(PSPHR,NSPMD)
           CALL WRITE_I_C(PSPHS,NSPMD)

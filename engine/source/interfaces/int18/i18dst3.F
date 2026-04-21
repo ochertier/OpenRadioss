@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,39 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i18dst3                ../engine/source/interfaces/int18/i18dst3.F
-      !||--- called by ------------------------------------------------------
-      !||    i18main_kine_i         ../engine/source/interfaces/int18/i18main_kine.F
-      !||    i7mainf                ../engine/source/interfaces/int07/i7mainf.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    tri7box                ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i18dst3_mod      ../engine/source/interfaces/int18/i18dst3.F
+!||--- called by ------------------------------------------------------
+!||    i18main_kine_i   ../engine/source/interfaces/int18/i18main_kine.F
+!||    i7mainf          ../engine/source/interfaces/int07/i7mainf.F
+!||====================================================================
+      MODULE I18DST3_MOD
+      CONTAINS
+!||====================================================================
+!||    i18dst3                ../engine/source/interfaces/int18/i18dst3.F
+!||--- called by ------------------------------------------------------
+!||    i18main_kine_i         ../engine/source/interfaces/int18/i18main_kine.F
+!||    i7mainf                ../engine/source/interfaces/int07/i7mainf.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    tri7box                ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I18DST3(
-     1                  JLT    ,CAND_N   , CAND_E ,CN_LOC ,CE_LOC        ,
-     2                  X1     ,X2       , X3     ,X4     ,Y1            ,
-     3                  Y2     ,Y3       , Y4     ,Z1     ,Z2            ,
-     4                  Z3     ,Z4       , XI     ,YI     ,ZI            ,
-     5                  NX1    ,NX2      , NX3    ,NX4    ,NY1           ,
-     6                  NY2    ,NY3      , NY4    ,NZ1    ,NZ2           ,
-     7                  NZ3    ,NZ4      , LB1    ,LB2    ,LB3           ,
-     8                  LB4    ,LC1      , LC2    ,LC3    ,LC4           ,
-     9                  P1     ,P2       , P3     ,P4     ,IX1           ,
-     A                  IX2    ,IX3      , IX4    ,NSVG   ,STIF          ,
-     B                  JLT_NEW,GAPV     , INACTI ,CAND_P ,ALE_NE_CONNECT,
-     C                  INDEX  ,VXI      , VYI    ,ITAB   ,XCELL         ,
-     D                  VZI    ,MSI      , KINI   ,SURF   ,IBAG          ,
-     E                  IGAP   ,MULTI_FVM,S_XCELL_REMOTE,XCELL_REMOTE)
+     1                  JLT     ,CAND_N    ,CAND_E         ,CN_LOC         ,CE_LOC        ,
+     2                  X1      ,X2        ,X3             ,X4             ,Y1            ,
+     3                  Y2      ,Y3        ,Y4             ,Z1             ,Z2            ,
+     4                  Z3      ,Z4        ,XI             ,YI             ,ZI            ,
+     5                  NX1     ,NX2       ,NX3            ,NX4            ,NY1           ,
+     6                  NY2     ,NY3       ,NY4            ,NZ1            ,NZ2           ,
+     7                  NZ3     ,NZ4       ,LB1            ,LB2            ,LB3           ,
+     8                  LB4     ,LC1       ,LC2            ,LC3            ,LC4           ,
+     9                  P1      ,P2        ,P3             ,P4             ,IX1           ,
+     A                  IX2     ,IX3       ,IX4            ,NSVG           ,STIF          ,
+     B                  JLT_NEW ,GAPV      ,CAND_P         ,ALE_NE_CONNECT ,
+     C                  INDEX   ,VXI       ,VYI            ,ITAB           ,XCELL         ,
+     D                  VZI     ,MSI       ,KINI           ,
+     E                  IGAP    ,MULTI_FVM ,S_XCELL_REMOTE ,XCELL_REMOTE)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -70,10 +78,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER JLT, JLT_NEW,INACTI, CAND_N(*),CN_LOC(MVSIZ),
-     .        CAND_E(*),CE_LOC(MVSIZ), NSVG(MVSIZ), KINI(*),ICURV
+      INTEGER JLT, JLT_NEW, CAND_N(*),CN_LOC(MVSIZ),
+     .        CAND_E(*),CE_LOC(MVSIZ), NSVG(MVSIZ), KINI(*)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
-     .        INDEX(MVSIZ),IBAG
+     .        INDEX(MVSIZ)
       INTEGER, INTENT(IN) :: ITAB(NUMNOD),IGAP
       INTEGER, INTENT(in) :: S_XCELL_REMOTE
       my_real
@@ -82,8 +90,8 @@ C-----------------------------------------------
      .     NZ1(MVSIZ), NZ2(MVSIZ), NZ3(MVSIZ), NZ4(MVSIZ),
      .     LB1(MVSIZ), LB2(MVSIZ), LB3(MVSIZ), LB4(MVSIZ),
      .     LC1(MVSIZ), LC2(MVSIZ), LC3(MVSIZ), LC4(MVSIZ),
-     .     KB1(MVSIZ), KB2(MVSIZ), KB3(MVSIZ), KB4(MVSIZ),
-     .     KC1(MVSIZ), KC2(MVSIZ), KC3(MVSIZ), KC4(MVSIZ),
+     .        
+     .        
      .     X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ),
      .     Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
      .     Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
@@ -91,14 +99,14 @@ C-----------------------------------------------
      .     P1(MVSIZ), P2(MVSIZ), P3(MVSIZ), P4(MVSIZ), 
      .     GAPV(MVSIZ), CAND_P(*),
      .     VXI(MVSIZ), VYI(MVSIZ), VZI(MVSIZ), MSI(MVSIZ),
-     .     SURF(3,*),XCELL(3,SXCELL)
+     .     XCELL(3,SXCELL)
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM      
       TYPE(t_connectivity), INTENT(IN) :: ALE_NE_CONNECT
       my_real, DIMENSION(S_XCELL_REMOTE), INTENT(in) :: XCELL_REMOTE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IG, J, IEL, IAD1, IAD2, ELEM_ID
+      INTEGER I, IEL, IAD1, IAD2, ELEM_ID
       my_real
      .     X0(MVSIZ), Y0(MVSIZ), Z0(MVSIZ),
      .     AL1(MVSIZ),  AL2(MVSIZ),  AL3(MVSIZ), AL4(MVSIZ),
@@ -113,13 +121,13 @@ C-----------------------------------------------
      .     HLB3(MVSIZ), HLC3(MVSIZ), HLB4(MVSIZ),HLC4(MVSIZ)
       my_real
      .     S2,D1,D2,D3,D4,DL,
-     .     X12,X23,X34,X41,XI0,SX1,SX2,SX3,SX4,SX0,
-     .     Y12,Y23,Y34,Y41,YI0,SY1,SY2,SY3,SY4,SY0,
-     .     Z12,Z23,Z34,Z41,ZI0,SZ1,SZ2,SZ3,SZ4,SZ0,
-     .     GAP2(MVSIZ), DS2,T1,T2,T3,
-     .     AL1NUM,AL2NUM,AL3NUM,AL4NUM,AL1DEN,AL2DEN,AL3DEN,AL4DEN,
-     .     X23D,Y23D,Z23D,X34D,Y34D,Z34D,X41D,Y41D,Z41D,
-     .     X12D,Y12D,Z12D,GAP2D,XI0D,YI0D,ZI0D,S2D, LA, HLA, AAA,
+     .     X12,X23,X34,X41,SX1,SX2,SX3,SX4,SX0,
+     .     Y12,Y23,Y34,Y41,SY1,SY2,SY3,SY4,SY0,
+     .     Z12,Z23,Z34,Z41,SZ1,SZ2,SZ3,SZ4,SZ0,
+     .     GAP2(MVSIZ),
+     .     
+     .     
+     .      LA, HLA, AAA,
      .     XI0V(MVSIZ),  YI0V(MVSIZ),  ZI0V(MVSIZ)
       my_real
      .     NNX1(MVSIZ), NNX2(MVSIZ), NNX3(MVSIZ), NNX4(MVSIZ),
@@ -308,16 +316,6 @@ C-----------------------------------------------
            GAP2(I)=GAPV(I)*GAPV(I)   
          ENDDO
        ENDIF             
-
-       IF (IBAG/=0) THEN
-#include "lockon.inc"
-        DO I=1,JLT
-          SURF(1,CAND_E(I))= NNX1(I) + NNX2(I) + NNX3(I) + NNX4(I)
-          SURF(2,CAND_E(I))= NNY1(I) + NNY2(I) + NNY3(I) + NNY4(I)
-          SURF(3,CAND_E(I))= NNZ1(I) + NNZ2(I) + NNZ3(I) + NNZ4(I)
-        ENDDO
-#include "lockoff.inc"
-       ENDIF
 
        DO I=1,JLT
         AAA    = ONE/MAX(EM30,X01(I)*X01(I)+Y01(I)*Y01(I)+Z01(I)*Z01(I))
@@ -522,5 +520,6 @@ C-----------------------------------------------
        ENDDO
 C---------------------
       RETURN
-      END
+      END SUBROUTINE I18DST3
 C===============================================================================
+      END MODULE I18DST3_MOD

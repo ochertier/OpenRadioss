@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2_imp1         ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_imp0         ../engine/source/interfaces/interf/i2_imp0.F
-      !||    i2_impi         ../engine/source/interfaces/interf/i2_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2updk0         ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updk1         ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_imp1         ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_imp0         ../engine/source/interfaces/interf/i2_imp0.F
+!||    i2_impi         ../engine/source/interfaces/interf/i2_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    i2updk0         ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updk1         ../engine/source/interfaces/interf/i2_imp1.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I2_IMP1(IPARI,INTBUF_TAB,ITAB  ,
      .                   NSC2 ,ISIJ2,NSS2,ISS2 ,
      .                   X    ,MS  ,IN   ,WEIGHT  ,
@@ -83,12 +84,7 @@ C
       J21=J12+2*NSN
       J22=J21+7*NSN
       JFI=J22+NMN
-C  version spmd avec plus d'un proc nsn = nsn_loc & nmn = nmn_loc
-c      IF (IMACH==3.AND.NSPMD>1) THEN
-c        NSN = IPARI(16)
-c        NMN = IPARI(18)
-c      ENDIF
-C
+C  SPMD version with more than one proc nsn = nsn_loc & nmn = nmn_loc
       IF(ILEV==1)THEN
         CALL I2UPDK1(NSN       ,NMN       ,INTBUF_TAB%IRECTM,
      1    INTBUF_TAB%DPARA,INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%IRTLM,
@@ -107,16 +103,17 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2_impm         ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_imp0         ../engine/source/interfaces/interf/i2_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_kij         ../engine/source/implicit/imp_glob_k.F
-      !||    i2updkm0        ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updkm1        ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_impm         ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_imp0         ../engine/source/interfaces/interf/i2_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    get_kij         ../engine/source/implicit/imp_glob_k.F
+!||    i2updkm0        ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updkm1        ../engine/source/interfaces/interf/i2_imp1.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I2_IMPM(IPARI,INTBUF_TAB,NMC2 ,IMIJ2,
      .                   X    ,MS  ,IN   ,WEIGHT  ,
      .                   NDOF ,NDDL,IDDL    ,IADK  ,JDIK ,
@@ -183,7 +180,7 @@ C-----------------------------------------------
        M11=M10+1
        M12=M11+NPARIR
        M21=M12+2*NSN1
-C------supposant ILEV est le meme pour NI,NJ---
+Cassuming ilev is the same for ni, nj
        ILEV  =IPARI(20,N1)
        IF (NDOF(NI)>0.AND.NDOF(NJ)>0) THEN
         CALL GET_KIJ(NI,NJ,IDDL,IADK,JDIK,LT_K,KDD,NDOF(NI),NDOF(NJ),IR)
@@ -203,23 +200,23 @@ C------supposant ILEV est le meme pour NI,NJ---
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2updk0      ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_imp1      ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_kii      ../engine/source/implicit/imp_glob_k.F
-      !||    get_kij      ../engine/source/implicit/imp_glob_k.F
-      !||    print_wkij   ../engine/source/implicit/imp_glob_k.F
-      !||    put_kii      ../engine/source/implicit/imp_glob_k.F
-      !||    put_kij      ../engine/source/implicit/imp_glob_k.F
-      !||    updkb_rb     ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||    updkb_rb1    ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||    updkb_rb2    ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||    updkdd       ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updkdd1      ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updkdd2      ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2updk0      ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_imp1      ../engine/source/interfaces/interf/i2_imp1.F
+!||--- calls      -----------------------------------------------------
+!||    get_kii      ../engine/source/implicit/imp_glob_k.F
+!||    get_kij      ../engine/source/implicit/imp_glob_k.F
+!||    print_wkij   ../engine/source/implicit/imp_glob_k.F
+!||    put_kii      ../engine/source/implicit/imp_glob_k.F
+!||    put_kij      ../engine/source/implicit/imp_glob_k.F
+!||    updkb_rb     ../engine/source/constraints/general/rbody/rby_imp0.F
+!||    updkb_rb1    ../engine/source/constraints/general/rbody/rby_imp0.F
+!||    updkb_rb2    ../engine/source/constraints/general/rbody/rby_imp0.F
+!||    updkdd       ../engine/source/interfaces/interf/i2_imp1.F
+!||    updkdd1      ../engine/source/interfaces/interf/i2_imp1.F
+!||    updkdd2      ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2UPDK0(NSN,NMN,IRECT,CRST,MSR ,
      1                   NSV,IRTL,MS    ,X  ,WEIGHT,
      2                   ITAB,NSC, ISI ,NS ,NODS,
@@ -251,10 +248,10 @@ C     REAL
      .   KII(6,6),BI(6),XS0(NSN),YS0(NSN),ZS0(NSN),
      .   XS,YS,ZS,XS1,YS1,ZS1,FACM,NUN
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
-C-------pour simplement etre coherent avec INTTI2, on ne distinque pas 3n,4n
-C-------on est oblige de distinque quand meme, sinon la matrice n'est plus positive
+C-------for simplement etre coherent with INTTI2, on ne distinque pas 3n,4n
+Cwe still have to distinguish, otherwise the matrix is no longer positive
 C      FACM = ONE / NIR
       NUN=-ONE 
       J1=0 
@@ -462,16 +459,16 @@ C--------update --
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2updkm0    ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_impm     ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- calls      -----------------------------------------------------
-      !||    put_kii     ../engine/source/implicit/imp_glob_k.F
-      !||    put_kij     ../engine/source/implicit/imp_glob_k.F
-      !||    updkb_rb2   ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||    updkdd1     ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2updkm0    ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_impm     ../engine/source/interfaces/interf/i2_imp1.F
+!||--- calls      -----------------------------------------------------
+!||    put_kii     ../engine/source/implicit/imp_glob_k.F
+!||    put_kij     ../engine/source/implicit/imp_glob_k.F
+!||    updkb_rb2   ../engine/source/constraints/general/rbody/rby_imp0.F
+!||    updkdd1     ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2UPDKM0(NS1,IRECT,CRST,NSV,IRTL,
      .                    NS2,IRECT1,CRST1,NSV1,IRTL1,
      .                    X  ,KDD   ,NDOF ,IDDL ,IADK    ,
@@ -605,21 +602,21 @@ C--------update --
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2updk1      ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_imp1      ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_kii      ../engine/source/implicit/imp_glob_k.F
-      !||    get_kij      ../engine/source/implicit/imp_glob_k.F
-      !||    i2matc       ../engine/source/interfaces/interf/i2_imp1.F
-      !||    print_wkij   ../engine/source/implicit/imp_glob_k.F
-      !||    put_kii      ../engine/source/implicit/imp_glob_k.F
-      !||    put_kij      ../engine/source/implicit/imp_glob_k.F
-      !||    updk1_ii     ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updk1_ij     ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updk1_jj     ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2updk1      ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_imp1      ../engine/source/interfaces/interf/i2_imp1.F
+!||--- calls      -----------------------------------------------------
+!||    get_kii      ../engine/source/implicit/imp_glob_k.F
+!||    get_kij      ../engine/source/implicit/imp_glob_k.F
+!||    i2matc       ../engine/source/interfaces/interf/i2_imp1.F
+!||    print_wkij   ../engine/source/implicit/imp_glob_k.F
+!||    put_kii      ../engine/source/implicit/imp_glob_k.F
+!||    put_kij      ../engine/source/implicit/imp_glob_k.F
+!||    updk1_ii     ../engine/source/interfaces/interf/i2_imp1.F
+!||    updk1_ij     ../engine/source/interfaces/interf/i2_imp1.F
+!||    updk1_jj     ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2UPDK1(NSN,NMN,IRECT,DPARA,MSR ,
      1                  NSV,IRTL,MS    ,X  ,WEIGHT,
      2                  ITAB,NSC, ISI ,NS ,NODS,
@@ -650,7 +647,7 @@ C     REAL
       my_real
      .   KDD(6,6),BD(6),KII(6,6),BI(6),XS,YS,ZS,XS1,YS1,ZS1
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
       CALL I2MATC(NSN,IRECT,DPARA,NSV,IRTL,X,NIR,RJ ,RJT  )
       J1=0 
@@ -722,7 +719,7 @@ C------- Update ---
         J1=J1+NS(II) 
        ENDIF 
       ENDDO
-C--------due au coupled block KIJ-attension ISI different que rigid body-
+C-------- Due to the coupled block kij-assumption is different that Rigid body-
       DO I=1,NSC
        II =ISI(1,I)
        JJ =ISI(2,I)
@@ -782,12 +779,12 @@ C
       RETURN
       END
 C-------------produit {K'}=[CDI]^t[K][CDI] B'=[CDI]^tB with [CDI]=-[RJT RJ]^t
-      !||====================================================================
-      !||    updk1_ii   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_frk1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updk1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    updk1_ii   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_frk1    ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updk1    ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE UPDK1_II(NDL,RJ,RJT,KDD,K,BD,B)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -852,11 +849,11 @@ C
       RETURN
       END
 C-------------produit {K'}=[CDI]^t[K][CDI] with [CDI]=-[RJT RJ]^t
-      !||====================================================================
-      !||    upfr1_ii   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_frup1   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    upfr1_ii   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_frup1   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE UPFR1_II(RJ,RJT,KII,K)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -900,13 +897,13 @@ C
       RETURN
       END
 C-------------produit {K'}=[CDI(I)]^t[KIJ][CDI(J)] with [CDI]=-[RJT RJ]^t
-      !||====================================================================
-      !||    updk1_ij   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_frk1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updk1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updkm1   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    updk1_ij   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_frk1    ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updk1    ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updkm1   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE UPDK1_IJ(NDI,NDJ,R1J,R1JT,R2J,R2JT,KDD,KII,ISYM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -994,12 +991,12 @@ C
       RETURN
       END
 C-------------produit {K'}=[K][CDI] [CDI]=-[RJT RJ]^t
-      !||====================================================================
-      !||    updk1_jj   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_frk1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updk1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    updk1_jj   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_frk1    ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updk1    ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE UPDK1_JJ(NDI,NDJ,RJ,RJT,KDD,KII)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1063,13 +1060,13 @@ C
       RETURN
       END
 C-------------produit {K'}=[CDI]^t[K][CDI]  with [CDI]=-H*[I]
-      !||====================================================================
-      !||    updkdd    ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_frk0   ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updk0   ../engine/source/interfaces/interf/i2_imp1.F
-      !||    rm_imp1   ../engine/source/model/remesh/rm_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updkdd    ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_frk0   ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updk0   ../engine/source/interfaces/interf/i2_imp1.F
+!||    rm_imp1   ../engine/source/model/remesh/rm_imp0.F
+!||====================================================================
       SUBROUTINE UPDKDD(NDL,KDD,KII,H2,ISYM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1109,14 +1106,14 @@ C
       RETURN
       END
 C-------------produit {K'}=[K][CDI]  with [CDI]=-H*[I]
-      !||====================================================================
-      !||    updkdd1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_frk0    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updk0    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updkm0   ../engine/source/interfaces/interf/i2_imp1.F
-      !||    rm_imp1    ../engine/source/model/remesh/rm_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    updkdd1    ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_frk0    ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updk0    ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updkm0   ../engine/source/interfaces/interf/i2_imp1.F
+!||    rm_imp1    ../engine/source/model/remesh/rm_imp0.F
+!||====================================================================
       SUBROUTINE UPDKDD1(NDI,NDJ,KDD,KII,H,ISYM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1157,11 +1154,11 @@ C
       RETURN
       END
 C-------------produit {K'}=[CDI]^t[KDD][CDJ]  with [CDI]=-HI*[KDD]
-      !||====================================================================
-      !||    updkdd2   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2updk0   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    updkdd2   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2updk0   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE UPDKDD2(NDL,KDD,KII,H1,H2)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1188,15 +1185,15 @@ C------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2matc     ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2recu1    ../engine/source/interfaces/interf/i2_imp2.F
-      !||    i2recu2    ../engine/source/interfaces/interf/i2_imp2.F
-      !||    i2updb1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updb12   ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updk1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2matc     ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2recu1    ../engine/source/interfaces/interf/i2_imp2.F
+!||    i2recu2    ../engine/source/interfaces/interf/i2_imp2.F
+!||    i2updb1    ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updb12   ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updk1    ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2MATC(NSN,IRECT,DPARA,NSV,IRTL,X ,
      1                  NIRI,RJ ,RJT  )
 C-----------------------------------------------
@@ -1222,7 +1219,7 @@ C     REAL
       my_real
      .   XS,YS,ZS
 C------------------------------------
-C     MATRICE DE JACOBIEN [C]
+C     jacobian matrix [c]
 C------------------------------------
       DO II=1,NSN
         I=NSV(II)
@@ -1242,7 +1239,7 @@ C------------------------------------
        ENDIF
        FACM = ONE / NIR
 C----------------------------------------------------
-C       VITESSE DE ROTATION MOYENNE DU SEGMENT MAIN
+C       average rotation velocity of the main segment
 C----------------------------------------------------
         X0=FACM*(XM(1)+XM(2)+XM(3)+XM(4))
         Y0=FACM*(YM(1)+YM(2)+YM(3)+YM(4))
@@ -1255,7 +1252,7 @@ C----------------------------------------------------
         XS=X(1,I)-X0
         YS=X(2,I)-Y0
         ZS=X(3,I)-Z0
-C--------cette partie est une double travail que INTTI1
+Cthis part is a double work as intti1
         XX=0 
         YY=0 
         ZZ=0 
@@ -1320,16 +1317,16 @@ C-------RJT=1/4[I]+(Rs)RJ---
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2updkm1   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_impm    ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2matcm    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    put_kii    ../engine/source/implicit/imp_glob_k.F
-      !||    put_kij    ../engine/source/implicit/imp_glob_k.F
-      !||    updk1_ij   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2updkm1   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_impm    ../engine/source/interfaces/interf/i2_imp1.F
+!||--- calls      -----------------------------------------------------
+!||    i2matcm    ../engine/source/interfaces/interf/i2_imp1.F
+!||    put_kii    ../engine/source/implicit/imp_glob_k.F
+!||    put_kij    ../engine/source/implicit/imp_glob_k.F
+!||    updk1_ij   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2UPDKM1(NS1,IRECT,DPARA,NSV,IRTL,
      .                    NS2,IRECT1,DPARA1,NSV1,IRTL1,
      .                    X  ,KDD   ,NDOF ,IDDL ,IADK    ,
@@ -1381,11 +1378,11 @@ C------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2matcm    ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2updkm1   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2matcm    ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2updkm1   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2MATCM(II,IRECT,DPARA,NSV,IRTL,X ,
      1                   NIRI,RJ ,RJT  )
 C-----------------------------------------------
@@ -1411,7 +1408,7 @@ C     REAL
       my_real
      .   XS,YS,ZS
 C------------------------------------
-C     MATRICE DE JACOBIEN [C]
+C     jacobian matrix [c]
 C------------------------------------
        I=NSV(II)
        L=IRTL(II)
@@ -1430,7 +1427,7 @@ C------------------------------------
        ENDIF
        FACM = ONE / NIR
 C----------------------------------------------------
-C       VITESSE DE ROTATION MOYENNE DU SEGMENT MAIN
+C       average rotation velocity of the main segment
 C----------------------------------------------------
         X0=FACM*(XM(1)+XM(2)+XM(3)+XM(4))
         Y0=FACM*(YM(1)+YM(2)+YM(3)+YM(4))
@@ -1443,7 +1440,7 @@ C----------------------------------------------------
         XS=X(1,I)-X0
         YS=X(2,I)-Y0
         ZS=X(3,I)-Z0
-C--------cette partie est une double travail que INTTI1
+Cthis part is a double work as intti1
         XX=0 
         YY=0 
         ZZ=0 
@@ -1500,12 +1497,12 @@ C-------RJT=1/4[I]+(Rs)RJ---
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2_frfm1   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
-      !||====================================================================
+!||====================================================================
+!||    i2_frfm1   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
+!||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
+!||====================================================================
       SUBROUTINE I2_FRFM1(X   ,IRECT,DPARA ,NSV ,IRTL ,
      1                    A   ,II   )
 C-----------------------------------------------
@@ -1581,7 +1578,7 @@ C
         FY0=FYS*FACM
         FZ0=FZS*FACM
 C------------------------------------------------------
-C     FORCES TRANSMISES AUX NOEUDS MAINS
+C     FORCES TRANSMISES AUX NODES MAINS
 C------------------------------------------------------
         DO JJ=1,NIR
          J=IRECT(JJ,L)
@@ -1592,12 +1589,12 @@ C------------------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2_frfm0   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
-      !||====================================================================
+!||====================================================================
+!||    i2_frfm0   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
+!||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
+!||====================================================================
       SUBROUTINE I2_FRFM0(X   ,IRECT,CRST  ,NSV  ,IRTL,
      1                    A   ,AR   ,II    ,NDOF )
 C-----------------------------------------------
@@ -1692,14 +1689,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2_frup0   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    diag_int   ../engine/source/mpi/implicit/imp_fri.F
-      !||    updk_mv    ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    updfr_rb   ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    i2_frup0   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    diag_int   ../engine/source/mpi/implicit/imp_fri.F
+!||    updk_mv    ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    updfr_rb   ../engine/source/constraints/general/rbody/rby_imp0.F
+!||====================================================================
       SUBROUTINE I2_FRUP0(X   ,IRECT,CRST  ,NSV  ,IRTL ,
      1                    II  ,NDOF ,KSS   ,K    )
 C-----------------------------------------------
@@ -1782,14 +1779,14 @@ C-------Update K(main node),B---
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2_frup1   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    diag_int   ../engine/source/mpi/implicit/imp_fri.F
-      !||    updk_mv    ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    upfr1_ii   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2_frup1   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    diag_int   ../engine/source/mpi/implicit/imp_fri.F
+!||    updk_mv    ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    upfr1_ii   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2_FRUP1(X   ,IRECT,DPARA ,NSV ,IRTL ,
      1                    II  ,KII  ,KJJ   )
 C-----------------------------------------------
@@ -1834,7 +1831,7 @@ C
        ENDIF
        FACM = ONE / NIR
 C----------------------------------------------------
-C       VITESSE DE ROTATION MOYENNE DU SEGMENT MAIN
+C       average rotation velocity of the main segment
 C----------------------------------------------------
         X0=FACM*(XM(1)+XM(2)+XM(3)+XM(4))
         Y0=FACM*(YM(1)+YM(2)+YM(3)+YM(4))
@@ -1886,18 +1883,19 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2_impr1        ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_dykv        ../engine/source/implicit/imp_dyna.F
-      !||    imp_dykv0       ../engine/source/implicit/imp_dyna.F
-      !||    upd_rhs         ../engine/source/implicit/upd_glob_k.F
-      !||    upd_rhs_fr      ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2updb0         ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updb1         ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_impr1        ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    imp_dykv        ../engine/source/implicit/imp_dyna.F
+!||    imp_dykv0       ../engine/source/implicit/imp_dyna.F
+!||    upd_rhs         ../engine/source/implicit/upd_glob_k.F
+!||    upd_rhs_fr      ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    i2updb0         ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updb1         ../engine/source/interfaces/interf/i2_imp1.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I2_IMPR1(IPARI,INTBUF_TAB,
      .                    X    ,NDOF ,IDDL    ,B     )
 C-----------------------------------------------
@@ -1959,13 +1957,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2updb0    ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_impr1   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- calls      -----------------------------------------------------
-      !||    updb_rb    ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    i2updb0    ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_impr1   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- calls      -----------------------------------------------------
+!||    updb_rb    ../engine/source/constraints/general/rbody/rby_imp0.F
+!||====================================================================
       SUBROUTINE I2UPDB0(NSN,IRECT,CRST,NSV,IRTL,
      1                   X  ,NDOF ,IDDL,B  )
 C-----------------------------------------------
@@ -1990,10 +1988,10 @@ C     REAL
      .   H(4),SS, TT, SP,SM,TP,TM,BD(6),
      .   BI(6),XS0,YS0,ZS0,XS,YS,ZS,NUN
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
-C-------pour simplement etre coherent avec INTTI2, on ne distinque pas 3n,4n
-C-------on est oblige de distinque quand meme, sinon la matrice n'est plus positive
+C------- To simply be coherent with inti2, we do not distinguish 3n, 4n
+Cwe still have to distinguish, otherwise the matrix is no longer positive
       NUN=-ONE 
       J1=0 
       DO II=1,NSN
@@ -2067,14 +2065,14 @@ CC-------Update B---
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2updb1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_impr1   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2matc     ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updb1_ii   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2updb1    ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_impr1   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- calls      -----------------------------------------------------
+!||    i2matc     ../engine/source/interfaces/interf/i2_imp1.F
+!||    updb1_ii   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2UPDB1(NSN,IRECT,DPARA,NSV,IRTL,
      1                   X ,NDOF ,IDDL ,B  )
 C-----------------------------------------------
@@ -2100,7 +2098,7 @@ C     REAL
       my_real
      .   BD(6),BI(6),XS,YS,ZS
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
       CALL I2MATC(NSN,IRECT,DPARA,NSV,IRTL,X,NIR,RJ ,RJT  )
       ND = 3
@@ -2131,12 +2129,12 @@ C
       RETURN
       END
 C-------------produit B'=[CDI]^tB with [CDI]=-[RJT RJ]^t
-      !||====================================================================
-      !||    updb1_ii   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2updb1    ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updb12   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    updb1_ii   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2updb1    ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updb12   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE UPDB1_II(NDL,RJ,RJT,BD,B)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2167,18 +2165,19 @@ C
 C
       RETURN
       END 
-      !||====================================================================
-      !||    i2_impr2        ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_dykv        ../engine/source/implicit/imp_dyna.F
-      !||    imp_dykv0       ../engine/source/implicit/imp_dyna.F
-      !||    upd_rhs         ../engine/source/implicit/upd_glob_k.F
-      !||    upd_rhs_fr      ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2updb02        ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2updb12        ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_impr2        ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    imp_dykv        ../engine/source/implicit/imp_dyna.F
+!||    imp_dykv0       ../engine/source/implicit/imp_dyna.F
+!||    upd_rhs         ../engine/source/implicit/upd_glob_k.F
+!||    upd_rhs_fr      ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    i2updb02        ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2updb12        ../engine/source/interfaces/interf/i2_imp1.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I2_IMPR2(IPARI,INTBUF_TAB,A    ,AR      ,
      .                    X    ,NDOF ,IDDL    ,B     )
 C-----------------------------------------------
@@ -2240,13 +2239,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2updb02   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_impr2   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- calls      -----------------------------------------------------
-      !||    updb_rb    ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    i2updb02   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_impr2   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- calls      -----------------------------------------------------
+!||    updb_rb    ../engine/source/constraints/general/rbody/rby_imp0.F
+!||====================================================================
       SUBROUTINE I2UPDB02(NSN,IRECT,CRST,NSV,IRTL,
      1                   X  ,NDOF ,IDDL,B   ,A   ,AR   )
 C-----------------------------------------------
@@ -2275,10 +2274,10 @@ C     REAL
      .   H(4),SS, TT, SP,SM,TP,TM,BD(6),
      .   BI(6),XS0,YS0,ZS0,XS,YS,ZS,NUN
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
-C-------pour simplement etre coherent avec INTTI2, on ne distinque pas 3n,4n
-C-------on est oblige de distinque quand meme, sinon la matrice n'est plus positive
+C------- To simply be coherent with inti2, we do not distinguish 3n, 4n
+Cwe still have to distinguish, otherwise the matrix is no longer positive
       NUN=-ONE 
       J1=0 
       IF (IRODDL/=0) THEN
@@ -2367,14 +2366,14 @@ CC-------Update B---
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2updb12   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_impr2   ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2matc     ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updb1_ii   ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2updb12   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    i2_impr2   ../engine/source/interfaces/interf/i2_imp1.F
+!||--- calls      -----------------------------------------------------
+!||    i2matc     ../engine/source/interfaces/interf/i2_imp1.F
+!||    updb1_ii   ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2UPDB12(NSN,IRECT,DPARA,NSV,IRTL,
      1                   X ,NDOF ,IDDL ,B   ,A    ,AR )
 C-----------------------------------------------
@@ -2404,7 +2403,7 @@ C     REAL
       my_real
      .   BD(6),BI(6),XS,YS,ZS
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
       CALL I2MATC(NSN,IRECT,DPARA,NSV,IRTL,X,NIR,RJ ,RJT  )
       IF (IRODDL/=0) THEN
@@ -2449,20 +2448,20 @@ C-------Update B---
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2_frk0      ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_kml      ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl      ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    print_wkij   ../engine/source/implicit/imp_glob_k.F
-      !||    put_kmii     ../engine/source/implicit/imp_glob_k.F
-      !||    put_kmij     ../engine/source/implicit/imp_glob_k.F
-      !||    updkb_rb     ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||    updkb_rb1    ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||    updkdd       ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updkdd1      ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2_frk0      ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    upd_kml      ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl      ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    print_wkij   ../engine/source/implicit/imp_glob_k.F
+!||    put_kmii     ../engine/source/implicit/imp_glob_k.F
+!||    put_kmij     ../engine/source/implicit/imp_glob_k.F
+!||    updkb_rb     ../engine/source/constraints/general/rbody/rby_imp0.F
+!||    updkb_rb1    ../engine/source/constraints/general/rbody/rby_imp0.F
+!||    updkdd       ../engine/source/interfaces/interf/i2_imp1.F
+!||    updkdd1      ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2_FRK0(IRECT,CRST  ,X    ,ITAB ,NSV  ,
      1                   IRTL ,IKC  ,NDOF  ,IDDL ,IDDLM,
      2                   IADK ,JDIK ,DIAG_K,LT_K ,B    ,
@@ -2493,7 +2492,7 @@ C     REAL
      .   H(4),H2(4), SS, TT, SP,SM,TP,TM,KDD(6,6),BD(6),
      .   KII(6,6),BI(6),XS0,YS0,ZS0,XS,YS,ZS,XS1,YS1,ZS1,NUN
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
       NUN=-ONE 
         I=NSV(II)
@@ -2609,19 +2608,19 @@ C------- Update ---
 C
       RETURN
       END
-      !||====================================================================
-      !||    i2_frk1      ../engine/source/interfaces/interf/i2_imp1.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_kml      ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl      ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    print_wkij   ../engine/source/implicit/imp_glob_k.F
-      !||    put_kmii     ../engine/source/implicit/imp_glob_k.F
-      !||    put_kmij     ../engine/source/implicit/imp_glob_k.F
-      !||    updk1_ii     ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updk1_ij     ../engine/source/interfaces/interf/i2_imp1.F
-      !||    updk1_jj     ../engine/source/interfaces/interf/i2_imp1.F
-      !||====================================================================
+!||====================================================================
+!||    i2_frk1      ../engine/source/interfaces/interf/i2_imp1.F
+!||--- called by ------------------------------------------------------
+!||    upd_kml      ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl      ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    print_wkij   ../engine/source/implicit/imp_glob_k.F
+!||    put_kmii     ../engine/source/implicit/imp_glob_k.F
+!||    put_kmij     ../engine/source/implicit/imp_glob_k.F
+!||    updk1_ii     ../engine/source/interfaces/interf/i2_imp1.F
+!||    updk1_ij     ../engine/source/interfaces/interf/i2_imp1.F
+!||    updk1_jj     ../engine/source/interfaces/interf/i2_imp1.F
+!||====================================================================
       SUBROUTINE I2_FRK1(IRECT,DPARA ,X    ,ITAB ,NSV  ,
      1                   IRTL ,IKC  ,NDOF  ,IDDL ,IDDLM,
      2                   IADK ,JDIK ,DIAG_K,LT_K ,B    ,
@@ -2655,7 +2654,7 @@ C     REAL
      .   KII(6,6),BI(6),X0,Y0,Z0,XS,YS,ZS,XS1,YS1,ZS1,NUN,
      .   RJ(3,3,4),RJT(3,3,4)
 C------------------------------------
-C     VITESSES DES NOEUDS SECONDS
+C     velocities of secondary nodes
 C------------------------------------
         I=NSV(II)
         L=IRTL(II)
@@ -2686,7 +2685,7 @@ C
         XS=X(1,I)-X0
         YS=X(2,I)-Y0
         ZS=X(3,I)-Z0
-C--------cette partie est une double travail que INTTI1
+Cthis part is a double work as intti1
         XX=0 
         YY=0 
         ZZ=0 

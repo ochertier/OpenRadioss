@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -76,9 +76,6 @@ C     IEXPM=0  dimension fixe
 
 C     ICRAY=0  non cray
 C     ICRAY=1  cray (hpalloc)
-      IMACH=3
-C     IMACH=0,1 ou 2  non spmd
-C     IMACH=3  seule reste spmd
       IRFORM=12
 C IRFORM= 5*irfe + irfl
 C irfl=0  lecture fichiers de restart binaire 32/64 bits

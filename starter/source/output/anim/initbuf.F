@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 CCgw|============================================================       
-      !||====================================================================
-      !||    initbuf    ../starter/source/output/anim/initbuf.F
-      !||--- called by ------------------------------------------------------
-      !||    dfuncs     ../starter/source/output/anim/dfuncs.F
-      !||    dmasanis   ../starter/source/output/anim/dmasanis.F
-      !||    tensors    ../starter/source/output/anim/tensors.F
-      !||====================================================================
+!||====================================================================
+!||    initbuf    ../starter/source/output/anim/initbuf.F
+!||--- called by ------------------------------------------------------
+!||    dfuncs     ../starter/source/output/anim/dfuncs.F
+!||    dmasanis   ../starter/source/output/anim/dmasanis.F
+!||    tensors    ../starter/source/output/anim/tensors.F
+!||====================================================================
       SUBROUTINE INITBUF (IPARG    ,NG      ,                           
      2   MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,                  
      3   NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,                  
@@ -64,7 +64,7 @@ C======================================================================
       ISMSTR  = IPARG(9,NG)                                             
       IF(ITY==1.OR.ITY==2)THEN                                      
         JEUL    = IPARG(11,NG)                                          
-      ELSE             ! attention dkt9_s3 utilise ce flag              
+      ELSE             ! Attention dkt9_s3 uses this flag              
         JEUL    = 0                                                     
       END IF                                                            
       JTUR    = IPARG(12,NG)                                            

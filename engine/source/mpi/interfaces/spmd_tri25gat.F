@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_tri25gat   ../engine/source/mpi/interfaces/spmd_tri25gat.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_tri     ../engine/source/interfaces/intsort/i25main_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod         ../engine/share/modules/h3d_mod.F
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_tri25gat   ../engine/source/mpi/interfaces/spmd_tri25gat.F
+!||--- called by ------------------------------------------------------
+!||    i25main_tri     ../engine/source/interfaces/intsort/i25main_tri.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../engine/source/output/message/message.F
+!||    arret           ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod         ../engine/share/modules/h3d_mod.F
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||    tri7box         ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_TRI25GAT(RESULT,NSN ,CAND_N ,I_STOK,NIN,
      2                        IGAP  ,NSNR,MULTIMP,ITY,INTTH ,
      3                        ILEV  ,NSNFIOLD,IPARI,NSNROLD ,
@@ -78,11 +78,11 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER OLDNSNR,NODFI,NNP,LSKYFI,
-     .        NOD, LOC_PROC, I, N, NN, P, IDEB, J, K, NI,
+     .         LOC_PROC, I, N, NN, P, IDEB, J, NI,
      .        IERROR1,IERROR2,IERROR3,IERROR4,IERROR5,IERROR6,IERROR7,
      .        IERROR8,IERROR9,IERROR0,IERROR11,IERROR12,
      .        IERROR13,IERROR14,IERROR15,IERROR16,IERROR17,IERROR18,IERROR19,IERROR20,
-     .        IERROR21,INDEX(NSNR),NN2,RSHIFT,ISHIFT, IOLDNSNFI, ND, JDEB, NSNR_OLD, Q,
+     .        IERROR21,INDEX(NSNR),NN2,RSHIFT,ISHIFT, IOLDNSNFI, JDEB, NSNR_OLD, Q,
      .        KK ,SIZREMNORFI, NE, KI, KM, LL
 
       INTEGER, DIMENSION(:), ALLOCATABLE :: IAUX, IFFI_ADH
@@ -106,10 +106,10 @@ C
 
       IF(RESULT==0) THEN
 C
-C Reperage des candidats
+C identification of candidates
 C
         DO NI = 1, NSNROLD
-C         STIFI a ete mis a jour dans SPMD_GET_STIF !
+C         STIFI has been updated in SPMD_Get_Stif!
 C         STIFI was not set at time=0 (not read from restart)
           IF((TT==ZERO.OR.STIFI(NIN)%P(NI)>ZERO).AND.IRTLM_FI(NIN)%P(4,NI)==LOC_PROC)THEN
             NODFI = NODFI + 1
@@ -131,7 +131,7 @@ C
           ENDIF
         ENDDO
 C
-C Allocation des tableaux de frontieres interfaces
+C allocation of interface boundary arrays
 C
         IERROR1 = 0
         IERROR2 = 0
@@ -387,7 +387,7 @@ c shift for integer variables (prepare for next setting)
             ENDIF
 
 c IGAP=1 or IGAP=2
-            IF(IGAP==1 .OR. IGAP==2)THEN
+            IF(IGAP==1 .OR. IGAP==2.OR. IGAP==5)THEN
 #include      "vectorize.inc"
               DO J = 1, NN
                 I = IAUX(J)

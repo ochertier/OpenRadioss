@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cm58in3   ../starter/source/materials/mat/mat058/cm58in3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3   ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cinit3    ../starter/source/elements/shell/coque/cinit3.F
-      !||    cmaini3   ../starter/source/elements/sh3n/coquedk/cmaini3.F
-      !||====================================================================
+!||====================================================================
+!||    cm58in3   ../starter/source/materials/mat/mat058/cm58in3.F
+!||--- called by ------------------------------------------------------
+!||    c3init3   ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cinit3    ../starter/source/elements/shell/coque/cinit3.F
+!||    cmaini3   ../starter/source/elements/sh3n/coquedk/cmaini3.F
+!||====================================================================
       SUBROUTINE CM58IN3(IREP  ,DIR1   ,DIR2  ,UPARAM    ,
      .                   UVAR  ,ALDT  ,NEL    ,NUVAR ,TAN_PHI  ,
      .                   X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
@@ -54,8 +54,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
       my_real
-     .   R,S,D1,D2,D11,D12,D21,D22,U1X,U1Y,U2X,U2Y,DET,W1X,W2X,W1Y,W2Y,
-     .   PHI,CSP,SNP,TANA,R1,R2,S1,S2,G0,AA,BB,SUMA,V1,V2,V3,WR,WS
+     .   
+     .   TANA,R1,R2,S1,S2,G0,AA,BB,SUMA,V1,V2,V3,WR,WS
       my_real , DIMENSION(NEL) :: E11,E12,E13,E21,E22,E23
 C======================================================================|
 C---  isoparametric (material) axes        

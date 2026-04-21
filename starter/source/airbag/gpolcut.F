@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    gpolcut   ../starter/source/airbag/gpolcut.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh1   ../starter/source/airbag/fvmesh.F
-      !||====================================================================
-      SUBROUTINE GPOLCUT(IPOLY , RPOLY  , IPOLY_OLD, RPOLY_OLD , INEDGE,
-     .                   RNEDGE, NBNEDGE, NX       , NY        , NZ    , 
-     .                   X0    , Y0     , Z0       , INS       , RNS   ,
-     .                   NN    , NHOL   , INZ      , IZ        , NNS3  ,
-     .                   NPOLY , NS     , IELNOD   , IELNOD_OLD)
+!||====================================================================
+!||    fvbag_gpolcut_mod   ../starter/source/airbag/gpolcut.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh1             ../starter/source/airbag/fvmesh.F
+!||====================================================================
+      MODULE FVBAG_GPOLCUT_MOD
+      CONTAINS
+!||====================================================================
+!||    fvbag_gpolcut   ../starter/source/airbag/gpolcut.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh1         ../starter/source/airbag/fvmesh.F
+!||====================================================================
+      SUBROUTINE FVBAG_GPOLCUT(IPOLY , RPOLY  , IPOLY_OLD, RPOLY_OLD , INEDGE,
+     .                         RNEDGE, NBNEDGE, NX       , NY        , NZ    ,
+     .                         X0    , Y0     , Z0       , INS       , RNS   ,
+     .                         NN    , NHOL   , INZ      , IZ        , NNS3  ,
+     .                         NPOLY , NS     , IELNOD   , IELNOD_OLD)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,7 +57,7 @@ C-----------------------------------------------
      .        TSEG(3,2*NN), NHOL_OLD, ICUT, J, JJ, NSEG_INI, NSEG1,
      .        REDIR(NN), N1, N2, ISTOP, NNP, ICLOSE, ISEG,
      .        POLY(2*NN,NN), IN, IN1, IN2, LENPOLY(NN), K, KK,
-     .        THOL(NHOL), JN, NHOLP, IADHOLP(NHOL), KN, I1, I2,
+     .        THOL(NHOL), JN, NHOLP, IADHOLP(NHOL), KN,
      .        ITAG2(2*NN), ITAGN(NN), ITAGS(NN), ISEG_OLD
       my_real
      .        X1, Y1, Z1, X2, Y2, Z2, ZL1, ZL2, ALPHA, NPX, NPY, NPZ,
@@ -61,7 +68,7 @@ C-----------------------------------------------
 C
       TOLE=EPSILON(ZERO)*0.5
 C
-C Liste des segments
+C List of segments
       IF (NHOL==0) THEN
          NN1=NN
       ELSE
@@ -83,7 +90,7 @@ C
          ITAGN(I)=0
          ITAGS(I)=0
       ENDDO
-C Segments du contour exterieur
+C Segments of the outer contour
       DO I=1,NN1
          II=I+1
          IF (I==NN1) II=1
@@ -177,7 +184,7 @@ C Segments du contour exterieur
          ENDIF
       ENDDO
       TSEG(3,NSEG)=1
-C Segments des trous
+C Segments of the holes
       NHOL_OLD=NHOL
       NHOL=0
       DO I=1,NHOL_OLD
@@ -282,7 +289,7 @@ C Segments des trous
          TSEG(3,NSEG)=NSEG_INI+1
 C
          IF (ICUT==0) THEN
-C Le trou n'est pas coupe
+C The hole is not cut
             NHOL=NHOL+1
             DO J=NSEG_INI+1,NSEG
                ITAG(J)=-NHOL
@@ -295,7 +302,7 @@ C
         RETURN
       ENDIF
       NSEG1=NSEG
-C Creation des nouvelles aretes dans le plan horizontal
+C Creation of new edges in the horizontal plane
       NPX=RPOLY_OLD(2)
       NPY=RPOLY_OLD(3)
       NPZ=RPOLY_OLD(4)
@@ -351,7 +358,7 @@ C
             II=0
          ENDIF
       ENDDO
-C Nouveaux polygones
+C New polygons
       ISTOP=0
       NPOLY=1
       NNP=0
@@ -411,7 +418,7 @@ C
          ENDDO
       ENDDO
       NPOLY=NPOLY-1
-C Attribution des trous
+C Attribution of holes
       DO I=1,NHOL
          J=1
          DO WHILE (ITAG(J)/=-I)
@@ -475,7 +482,7 @@ C
             IF (ABS(ALPHA)>=ONE) THOL(I)=J
          ENDDO
       ENDDO
-C Creation des tableaux de sortie
+C Creation of output tables
       DO I=1,NS
          RNS(2,I)=XNS(1,I)
          RNS(3,I)=XNS(2,I)
@@ -609,4 +616,5 @@ C
       ENDDO     
 C 
       RETURN
-      END
+      END SUBROUTINE FVBAG_GPOLCUT
+      END MODULE FVBAG_GPOLCUT_MOD

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25sto_e2s      ../starter/source/interfaces/inter3d1/i25sto_e2s.F
-      !||--- called by ------------------------------------------------------
-      !||    i25trivox_edg   ../starter/source/interfaces/inter3d1/i25trivox_edg.F
-      !||--- calls      -----------------------------------------------------
-      !||    i25pen3_e2s     ../starter/source/interfaces/inter3d1/i25pen3_e2s.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box         ../starter/share/modules1/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25sto_e2s      ../starter/source/interfaces/inter3d1/i25sto_e2s.F
+!||--- called by ------------------------------------------------------
+!||    i25trivox_edg   ../starter/source/interfaces/inter3d1/i25trivox_edg.F
+!||--- calls      -----------------------------------------------------
+!||    i25pen3_e2s     ../starter/source/interfaces/inter3d1/i25pen3_e2s.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box         ../starter/share/modules1/tri7box.F
+!||====================================================================
       SUBROUTINE I25STO_E2S(
      1      J_STOK,IRECT  ,X     ,II_STOK,INACTI,
      2      CAND_S,CAND_M ,MULNSN,NOINT  ,MARGE,
@@ -56,8 +56,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER I_MEM, IGAP0, NEDGE, NIN, ITAB(*), INACTI
-      INTEGER J_STOK,MULNSN,NOINT,IFORM,IGAP
+      INTEGER I_MEM, IGAP0, NEDGE, ITAB(*), INACTI
+      INTEGER J_STOK, MULNSN, NOINT, IGAP
       INTEGER IRECT(4,*),LEDGE(NLEDGE,*),ADMSR(4,*),CAND_S(*),CAND_M(*),II_STOK,
      .        CAND_A(*)
       INTEGER PROV_S(MVSIZ),PROV_M(MVSIZ)
@@ -69,8 +69,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K_STOK,I_STOK,IAD0,IAD,IADFIN,N,NE,EJ
-      INTEGER I_STOK_FIRST,NINDX,INDEX(MVSIZ) 
+      INTEGER I, J, K_STOK, I_STOK, N, NE
+      INTEGER INDEX(MVSIZ)
 C     REAL
       my_real
      .   PENE(MVSIZ)
@@ -81,7 +81,7 @@ C-----------------------------------------------
      .                  PENE    ,ADMSR  ,EDG_BISECTOR,VTX_BISECTOR ,ITAB,
      .                  DGAPLOAD)
 C-----------------------------------------------
-C SUPPRESSION DES ANCIENS CANDIDATS DEJA STOCKES (PENE INITIALE)
+C SUPPRESSION DES ANCIENS CANDIDATES DEJA STOCKES (PENE INITIALE)
 C-----------------------------------------------
       IF(INACTI==5)THEN
         DO I=1,J_STOK
@@ -89,7 +89,7 @@ C-----------------------------------------------
             N  = PROV_S(I)
             NE = PROV_M(I)
 C           IF(N>NEDGE) THEN
-C numerotation tris precedent pour les noeuds non locaux (SPMD)
+C numbering of previous sorts for non-local nodes (SPMD)
 C              N = OLDNUM(N-NEDGE)+NEDGE
 C              IF(N==NEDGE) N = NEDGE+NEDGEROLD+1
 C           END IF

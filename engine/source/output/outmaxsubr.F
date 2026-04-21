@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    gps_solid      ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax       ../engine/source/output/upd_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_exch_v    ../engine/source/mpi/generic/spmd_exch_v.F
-      !||    tensgps3       ../engine/source/output/anim/generate/tensor6.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    gps_solid      ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax       ../engine/source/output/upd_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_exch_v    ../engine/source/mpi/generic/spmd_exch_v.F
+!||    tensgps3       ../engine/source/output/anim/generate/tensor6.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE GPS_SOLID(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
      .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
      .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
@@ -38,7 +39,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD 
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixs,nixq,nixc,nixp,nixr,nixt,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,7 +78,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,LENR,NSIZ
+      INTEGER N, LENR, NSIZ
       my_real
      .  FAC
       my_real
@@ -114,17 +116,18 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    gpstra_solid         ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax             ../engine/source/output/upd_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_exch_n          ../engine/source/mpi/generic/spmd_exch_n.F
-      !||    spmd_exch_nodareai   ../engine/source/mpi/anim/spmd_exch_nodareai.F
-      !||    tensgpstrain         ../engine/source/output/anim/generate/tensgpstrain.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    gpstra_solid         ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax             ../engine/source/output/upd_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_exch_n          ../engine/source/mpi/generic/spmd_exch_n.F
+!||    spmd_exch_nodareai   ../engine/source/mpi/anim/spmd_exch_nodareai.F
+!||    tensgpstrain         ../engine/source/output/anim/generate/tensgpstrain.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod          ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE GPSTRA_SOLID(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
      .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
      .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
@@ -133,7 +136,8 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD 
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixs,nixq,nixc,nixp,nixr,nixt,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -171,7 +175,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,LENR
+      INTEGER N, LENR
       my_real
      .  FAC
       my_real
@@ -210,13 +214,13 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    sig2dpin2       ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    sig2d2pin       ../engine/source/output/outmaxsubr.F
-      !||    tm_sig_shell    ../engine/source/output/outmaxsubr.F
-      !||    tm_stra_shell   ../engine/source/output/outmaxsubr.F
-      !||====================================================================
+!||====================================================================
+!||    sig2dpin2       ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    sig2d2pin       ../engine/source/output/outmaxsubr.F
+!||    tm_sig_shell    ../engine/source/output/outmaxsubr.F
+!||    tm_stra_shell   ../engine/source/output/outmaxsubr.F
+!||====================================================================
       SUBROUTINE SIG2DPIN2(SIG,PIN,NEL)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -231,7 +235,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+      INTEGER I
       my_real
      .   S1,T1,DET,R
 C-----------------------------------------------
@@ -247,13 +251,13 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    sig3dpin2       ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    sig3d2pin       ../engine/source/output/outmaxsubr.F
-      !||    tm_sig_solid    ../engine/source/output/outmaxsubr.F
-      !||    tm_stra_solid   ../engine/source/output/outmaxsubr.F
-      !||====================================================================
+!||====================================================================
+!||    sig3dpin2       ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    sig3d2pin       ../engine/source/output/outmaxsubr.F
+!||    tm_sig_solid    ../engine/source/output/outmaxsubr.F
+!||    tm_stra_solid   ../engine/source/output/outmaxsubr.F
+!||====================================================================
       SUBROUTINE SIG3DPIN2(SIG,PIN,NEL)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -268,7 +272,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+      INTEGER I
       my_real
      .   S1,T1,T2,T3,S(6),P1,DETB,DETS,R,ALPHA
 C-----------------------------------------------
@@ -305,13 +309,13 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    sig3d2pin   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    ini_tmax    ../engine/source/output/ini_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    sig3dpin2   ../engine/source/output/outmaxsubr.F
-      !||====================================================================
+!||====================================================================
+!||    sig3d2pin   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    ini_tmax    ../engine/source/output/ini_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    sig3dpin2   ../engine/source/output/outmaxsubr.F
+!||====================================================================
       SUBROUTINE SIG3D2PIN(SIG1,SIG3,PIN,NEL)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -326,7 +330,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+ 
       my_real
      .   P2(NEL,2)
 C-----------------------------------------------
@@ -338,13 +342,13 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    sig2d2pin   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    ini_tmax    ../engine/source/output/ini_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    sig2dpin2   ../engine/source/output/outmaxsubr.F
-      !||====================================================================
+!||====================================================================
+!||    sig2d2pin   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    ini_tmax    ../engine/source/output/ini_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    sig2dpin2   ../engine/source/output/outmaxsubr.F
+!||====================================================================
       SUBROUTINE SIG2D2PIN(SIG1,SIG3,PIN,NEL)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -359,7 +363,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+ 
       my_real
      .   P2(NEL,2)
 C-----------------------------------------------
@@ -371,11 +375,11 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    ini_tmnorm2   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    ini_tmax      ../engine/source/output/ini_outmax.F
-      !||====================================================================
+!||====================================================================
+!||    ini_tmnorm2   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    ini_tmax      ../engine/source/output/ini_outmax.F
+!||====================================================================
       SUBROUTINE INI_TMNORM2(TM_D,TM_NORM2,NNOD)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -390,7 +394,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+      INTEGER I
       my_real
      .   S(3)
 C-----------------------------------------------
@@ -403,12 +407,12 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_vonm_solid   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    tm_seq_solid    ../engine/source/output/outmaxsubr.F
-      !||    upd_tmax        ../engine/source/output/upd_outmax.F
-      !||====================================================================
+!||====================================================================
+!||    tm_vonm_solid   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    tm_seq_solid    ../engine/source/output/outmaxsubr.F
+!||    upd_tmax        ../engine/source/output/upd_outmax.F
+!||====================================================================
       SUBROUTINE TM_VONM_SOLID(IVISC,SIG,VISC,VALUE,NEL)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -423,7 +427,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+      INTEGER I
       my_real
      .   S(6),S1,S2,S3,VONM,P,VONM2
 C-----------------------------------------------
@@ -444,15 +448,15 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_seq_solid    ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax        ../engine/source/output/upd_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    tm_vonm_solid   ../engine/source/output/outmaxsubr.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_seq_solid    ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax        ../engine/source/output/upd_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    tm_vonm_solid   ../engine/source/output/outmaxsubr.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_SEQ_SOLID(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,IVISC,VALUE,NEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -471,7 +475,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IL,IR,IS,IT
+      INTEGER I, IL, IR, IS, IT
       my_real
      .   S(6),S1,S2,S3,VONM
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
@@ -499,13 +503,13 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_dmg_solid   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax       ../engine/source/output/upd_outmax.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_dmg_solid   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax       ../engine/source/output/upd_outmax.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_DMG_SOLID(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,VALUE,NEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -524,8 +528,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IL,IR,IS,IT,NFAIL,IIR
-      TYPE(BUF_FAIL_) ,POINTER :: FBUF 
+      INTEGER I, IL, IR, IS, IT, NFAIL, IIR
+ 
       my_real,
      .  DIMENSION(:), POINTER  :: DFMAX
 C-----------------------------------------------
@@ -549,15 +553,15 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_sig_solid   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax       ../engine/source/output/upd_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    sig3dpin2      ../engine/source/output/outmaxsubr.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_sig_solid   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax       ../engine/source/output/upd_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    sig3dpin2      ../engine/source/output/outmaxsubr.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_SIG_SOLID(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,IVISC,
      .                        TEN1,TEN3,P2,NEL)
 C-----------------------------------------------
@@ -578,7 +582,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IL,IR,IS,IT,JJ(6)
+      INTEGER I, IL, IR, IS, IT, JJ(6)
       my_real
      .   S(NEL,6),S1,S2,S3,SP2(NEL,2)
       TYPE(L_BUFEL_)  ,POINTER :: LBUF  
@@ -619,15 +623,15 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_stra_solid   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax        ../engine/source/output/upd_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    sig3dpin2       ../engine/source/output/outmaxsubr.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_stra_solid   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax        ../engine/source/output/upd_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    sig3dpin2       ../engine/source/output/outmaxsubr.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_STRA_SOLID(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,
      .                         TEN1,TEN3,P2,NEL) 
 C-----------------------------------------------
@@ -648,7 +652,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IL,IR,IS,IT,JJ(6)
+      INTEGER I, IL, IR, IS, IT, JJ(6)
       my_real
      .   S(NEL,6),S1,S2,S3,SP2(NEL,2)
       TYPE(L_BUFEL_)  ,POINTER :: LBUF  
@@ -687,12 +691,12 @@ C !!!!! law 12,14
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_vonm_shell   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    tm_seq_shell    ../engine/source/output/outmaxsubr.F
-      !||    upd_tmax        ../engine/source/output/upd_outmax.F
-      !||====================================================================
+!||====================================================================
+!||    tm_vonm_shell   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    tm_seq_shell    ../engine/source/output/outmaxsubr.F
+!||    upd_tmax        ../engine/source/output/upd_outmax.F
+!||====================================================================
       SUBROUTINE TM_VONM_SHELL(FOR,VALUE,NEL)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -707,7 +711,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+      INTEGER I
       my_real
      .   S(3),S1,S2,S12,VONM2,VONM
 C-----------------------------------------------
@@ -724,15 +728,15 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_seq_shell    ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax        ../engine/source/output/upd_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    tm_vonm_shell   ../engine/source/output/outmaxsubr.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_seq_shell    ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax        ../engine/source/output/upd_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    tm_vonm_shell   ../engine/source/output/outmaxsubr.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_SEQ_SHELL(ELBUF_TAB,NLAY,NPTR,NPTS,VALUE,NEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -751,7 +755,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IL,IR,IS,IT
+      INTEGER I, IL, IR, IS, IT
       my_real
      .   S(3),S1,S2,S3,VONM
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -779,15 +783,15 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_sig_shell   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax       ../engine/source/output/upd_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    sig2dpin2      ../engine/source/output/outmaxsubr.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_sig_shell   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax       ../engine/source/output/upd_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    sig2dpin2      ../engine/source/output/outmaxsubr.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_SIG_SHELL(ELBUF_TAB,NLAY,NPTR,NPTS,TEN1,TEN3,P2,NEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -807,7 +811,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IL,IR,IS,IT,JJ(3)
+      INTEGER I, IL, IR, IS, IT, JJ(3)
       my_real
      .   S(NEL,3),S1,S2,S3,SP2(NEL,2)
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -845,15 +849,15 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_stra_shell   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax        ../engine/source/output/upd_outmax.F
-      !||--- calls      -----------------------------------------------------
-      !||    sig2dpin2       ../engine/source/output/outmaxsubr.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_stra_shell   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax        ../engine/source/output/upd_outmax.F
+!||--- calls      -----------------------------------------------------
+!||    sig2dpin2       ../engine/source/output/outmaxsubr.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_STRA_SHELL(ELBUF_TAB,NPTR,NPTS,TEN1,TEN3,P2,NEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -873,7 +877,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IL,IR,IS,IT,JJ(3),NPG,LENS,NG,PTS
+      INTEGER I, IR, IS, JJ(3), NPG, LENS, NG, PTS
       my_real
      .   S(NEL,3),S1,S2,S3,SP2(NEL,2)
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
@@ -926,13 +930,13 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_dmg_shells   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax        ../engine/source/output/upd_outmax.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_dmg_shells   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax        ../engine/source/output/upd_outmax.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_DMG_SHELLS(ELBUF_TAB,NLAY,NPTR,NPTS,VALUE,NEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -951,7 +955,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IL,IR,IS,IT,NFAIL,IIR
+      INTEGER I, IL, IR, IS, IT, NFAIL, IIR
       my_real, DIMENSION(:), POINTER  :: DFMAX
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
 C-----------------------------------------------
@@ -976,13 +980,13 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    tm_dmgl25_shell   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax          ../engine/source/output/upd_outmax.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tm_dmgl25_shell   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax          ../engine/source/output/upd_outmax.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE TM_DMGL25_SHELL(ELBUF_TAB,NLAY,NPTR,NPTS,IGTYP,
      .                           PM,MATLY,VALUE,NEL)
 C-----------------------------------------------
@@ -1085,11 +1089,11 @@ C
 C      
       RETURN
       END
-      !||====================================================================
-      !||    upd_tmnorm2   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax      ../engine/source/output/upd_outmax.F
-      !||====================================================================
+!||====================================================================
+!||    upd_tmnorm2   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax      ../engine/source/output/upd_outmax.F
+!||====================================================================
       SUBROUTINE UPD_TMNORM2(D,TM_D,TM_NORM2,NFT,NLT)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1109,7 +1113,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+      INTEGER I
       my_real
      .   S(3),NORM2
 C-----------------------------------------------
@@ -1126,11 +1130,11 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    upd_tmtens   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax     ../engine/source/output/upd_outmax.F
-      !||====================================================================
+!||====================================================================
+!||    upd_tmtens   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax     ../engine/source/output/upd_outmax.F
+!||====================================================================
       SUBROUTINE UPD_TMTENS(NSIG,PNSIG,TM_NSIG1,TM_NSIG3,TM_PNSIG,NFT,NLT,IGPSTAG)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1152,7 +1156,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+      INTEGER I
       my_real
      .   S(3),NORM2
 C-----------------------------------------------
@@ -1172,11 +1176,11 @@ C-----------------------------------------------
 C      
       RETURN
       END
-      !||====================================================================
-      !||    sig3dpin2h   ../engine/source/output/outmaxsubr.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_tmax     ../engine/source/output/upd_outmax.F
-      !||====================================================================
+!||====================================================================
+!||    sig3dpin2h   ../engine/source/output/outmaxsubr.F
+!||--- called by ------------------------------------------------------
+!||    upd_tmax     ../engine/source/output/upd_outmax.F
+!||====================================================================
       SUBROUTINE SIG3DPIN2H(SIG,PIN,NFT,NLT,IGPSTAG)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1196,7 +1200,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J
+      INTEGER I
       my_real
      .   S1,T1,T2,T3,S(6),P1,DETB,DETS,R,ALPHA
 C-----------------------------------------------
@@ -1208,7 +1212,9 @@ C-----------------------------------------------
         IF (S1 > EM10) THEN
           T1 = THIRD*(SIG(I,1)+SIG(I,2)+SIG(I,3))
           S(1:3) = SIG(I,1:3) - T1
-          S(4:6) = SIG(I,4:6) 
+          S(4) = SIG(I,4) 
+          S(5) = SIG(I,6) 
+          S(6) = SIG(I,5) 
           T2 = S(1)*S(1)+S(2)*S(2)+S(3)*S(3) + TWO*S1
           P1 = SQRT(T2/SIX)
           DETS = S(1)*(S(2)*S(3)-S(6)*S(6))-S(4)*(S(4)*S(3)-S(5)*S(6))

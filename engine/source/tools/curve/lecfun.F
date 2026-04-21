@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecfun        ../engine/source/tools/curve/lecfun.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur        ../engine/source/input/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    table_mod     ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecfun        ../engine/source/tools/curve/lecfun.F
+!||--- called by ------------------------------------------------------
+!||    lectur        ../engine/source/input/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||    table_mod     ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE LECFUN(NPC,PLD,NFCT,NPTST,TABLE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -121,7 +121,7 @@ C
         OK=0
         DO L=1,NFUNCT
 C
-C par construction TABLE(L) == Function no L
+C By Table Construction (L) == Function no L
          LL=TABLE(L)%NOTABLE
          IF(LL==LLNEW)THEN
           OK=1
@@ -166,7 +166,6 @@ C
 C
 2000  FORMAT(' NEW LOAD CURVES'  //
      .  '  NUMBER OF NEW LOAD CURVES. . . . . . =' ,I10 /)
-2100  FORMAT(' ** ERROR: LOAD CURVE NUMBER' )
 2200  FORMAT(///' LOAD FUNCTION NUMBER. . . . . =',I10/
      .          ' NUMBER OF TIME POINTS . . . . =',I8//
      .          ' TIME            VALUE          '   /)

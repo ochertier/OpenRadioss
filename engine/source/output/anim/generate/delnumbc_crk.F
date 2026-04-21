@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    delnumbc_crk      ../engine/source/output/anim/generate/delnumbc_crk.F
-      !||--- called by ------------------------------------------------------
-      !||    genani            ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_iget_partn   ../engine/source/mpi/anim/spmd_iget_partn.F
-      !||    spmd_max_xfe_i    ../engine/source/mpi/elements/spmd_xfem.F
-      !||    write_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod     ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    delnumbc_crk      ../engine/source/output/anim/generate/delnumbc_crk.F
+!||--- called by ------------------------------------------------------
+!||    genani            ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_iget_partn   ../engine/source/mpi/anim/spmd_iget_partn.F
+!||    spmd_max_xfe_i    ../engine/source/mpi/elements/spmd_xfem.F
+!||    write_i_c         ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod     ../engine/share/modules/crackxfem_mod.F
+!||====================================================================
       SUBROUTINE DELNUMBC_CRK(IPARG  ,IEL_CRK ,INUM    ,IDCMAX ,
      .                        EL2FA  ,IAD_CRKG,NBF_L   ,NBF    ,INDX_CRK )
 C-----------------------------------------------
@@ -54,9 +54,8 @@ C-----------------------------------------------
      .   INDX_CRK(*),INUM(*)
       INTEGER NBF_L,NBF
 C-----------------------------------------------
-      INTEGER I,N,II,IE,NG,ITY,NEL,NFT,IXFEM,IDCMAX,CRKS,RBUF,ELEM,ICRK,
+      INTEGER I, N, II, NG, ITY, NEL, NFT, IXFEM, IDCMAX, CRKS, RBUF, ELEM, ICRK, 
      .   NEL_CRK,NLEVXF
-      my_real OFF
 C=======================================================================
 c
       IF (NSPMD > 1) CALL SPMD_MAX_XFE_I(IDCMAX)
@@ -88,7 +87,7 @@ C-----------------------------------------------
                 ENDIF
               ENDDO
 C-----------------------------------------------
-C            COQUES 3 NOEUDS
+C            3-NODE SHELLS
 C-----------------------------------------------
             ELSEIF (ITY == 7) THEN
               DO I=1,NEL

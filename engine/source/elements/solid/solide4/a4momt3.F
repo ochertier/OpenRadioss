@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    a4momt3    ../engine/source/elements/solid/solide4/a4momt3.F
-      !||--- called by ------------------------------------------------------
-      !||    s4forc3    ../engine/source/elements/solid/solide4/s4forc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    a4momtn3   ../engine/source/elements/solid/solide4/a4momtn3.F
-      !||    upwind4    ../engine/source/elements/solid/solide4/upwind4.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod    ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    a4momt3    ../engine/source/elements/solid/solide4/a4momt3.F
+!||--- called by ------------------------------------------------------
+!||    s4forc3    ../engine/source/elements/solid/solide4/s4forc3.F
+!||--- calls      -----------------------------------------------------
+!||    a4momtn3   ../engine/source/elements/solid/solide4/a4momtn3.F
+!||    upwind4    ../engine/source/elements/solid/solide4/upwind4.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod    ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE A4MOMT3(
      1   PM,      RHO,     VOL,     X1,
      2   X2,      X3,      X4,      Y1,
@@ -104,13 +104,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real
-     .   V12(MVSIZ,3),V34(MVSIZ,3),V13(MVSIZ,3),V14(MVSIZ,3),
-     .   V24(MVSIZ,3),V23(MVSIZ,3),
      .   F1(MVSIZ),F2(MVSIZ),F3(MVSIZ),
      .   A1(MVSIZ),A2(MVSIZ),A3(MVSIZ),A4(MVSIZ),GAM(MVSIZ),
-     .   R(MVSIZ,3),S(MVSIZ,3),T(MVSIZ,3),FAC,
-     .   AJV(MVSIZ),AJ0(MVSIZ,3),AJ1(MVSIZ,3),AJ2(MVSIZ,3),AJ3(MVSIZ,3)
-      INTEGER I,J
+     .   R(MVSIZ,3),S(MVSIZ,3),T(MVSIZ,3),FAC
+      INTEGER I
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------
@@ -119,11 +116,11 @@ C-----------------------------------------------
 C   S o u r c e   C o d e
 C-----------------------------------------------      
       
-      ! CALCUL DE LA FORCE DE TRANSPORT AU CENTRE
+      ! calculation of transport force at the center
       ! STANDARD UPWIND UTILISANT LES DONNEES MATERIAUX
       IF(ALE%UPWIND%UPWM<2 .OR.MTN==11)THEN
         IF(MTN==11.AND.ALE%UPWIND%UPWM>1)THEN
-          ! VDX,VDY,VDZ EST CALCULE DANS M11VS3
+          ! vdx, vdy, vdz are calculated in m11vs3
           DO I=1,NEL
              R(I,1)=RX(I)
              R(I,2)=RY(I)
@@ -197,7 +194,7 @@ C-----------------------------------------------
 
       ELSE ! IF(ALE%UPWIND%UPWM<2 .OR.MTN==11)
 
-      ! SUPG OU TG
+      ! supg or tg
       ! TRANSPORTATION FORCE
       !  <PHI,UJ*DUI/DXJ> EVALUATED AT NODES 
 

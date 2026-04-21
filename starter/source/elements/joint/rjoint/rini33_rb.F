@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rini33_rb              ../starter/source/elements/joint/rjoint/rini33_rb.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    find_rby               ../starter/source/elements/joint/rjoint/rini33_rb.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    get_u_geo              ../starter/source/user_interface/uaccess.F
-      !||    get_u_skew             ../starter/source/user_interface/uaccess.F
-      !||    prod_atb               ../starter/source/elements/joint/rjoint/rini33.F
-      !||    reset_u_geo            ../starter/source/user_interface/uaccess.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rini33_rb              ../starter/source/elements/joint/rjoint/rini33_rb.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    find_rby               ../starter/source/elements/joint/rjoint/rini33_rb.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    get_u_geo              ../starter/source/user_interface/uaccess.F
+!||    get_u_skew             ../starter/source/user_interface/uaccess.F
+!||    prod_atb               ../starter/source/elements/joint/rjoint/rini33.F
+!||    reset_u_geo            ../starter/source/user_interface/uaccess.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE RINI33_RB(NEL,NUVAR,IPROP,IXR,NPBY,LPBY,RBY,STIFR,
      1                     UVAR,ITAB,IGEO,IXR_KJ,GMASS)
 C-----------------------------------------------
@@ -42,6 +42,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixr
 C-------------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -94,7 +95,7 @@ C
       IF (ISK2==0) NSK = 1
       ERR_FLG = 0
       IPID=IXR(1,1+NFT)       
-C------------------check sur les skews-----------------
+C------------------check on the skews-----------------
       DO I=1,NSK
         IDSK(I) = NINT(GET_U_GEO(1+I,IPROP))
         ISK = GET_U_SKEW(IDSK(I),NO(1),NO(2),NO(3),U)
@@ -141,7 +142,7 @@ C------------------check sur les skews-----------------
             IDSKRB(2) = IDSKRB(1)
       ENDIF
       
-C------------------Boucle sur les neuds-----------------
+C------------------Loop on the nodes-----------------
 
       IF(NRBODY==0) THEN
         CALL ANCMSG(MSGID=390,
@@ -205,7 +206,7 @@ C-->
 C
             ENDDO
 C
-C-->  Stockage d'une masse elementaire (masse hormonique) pour calcul d'energie specifique
+C-> Storage of a elementary mass (hormone mass) for special energy calculation
             GMASS(IEL) = (UVAR(34,IEL)*UVAR(35,IEL))/MAX(EM20,UVAR(34,IEL)+UVAR(35,IEL))
 C-->
             IF (IDRB(I)==0) THEN      
@@ -270,12 +271,12 @@ C-------------------------------------------------------
       RETURN
       END
 C
-      !||====================================================================
-      !||    find_rby    ../starter/source/elements/joint/rjoint/rini33_rb.F
-      !||--- called by ------------------------------------------------------
-      !||    rini33_rb   ../starter/source/elements/joint/rjoint/rini33_rb.F
-      !||    rini45_rb   ../starter/source/elements/joint/rjoint/rini45_rb.F
-      !||====================================================================
+!||====================================================================
+!||    find_rby    ../starter/source/elements/joint/rjoint/rini33_rb.F
+!||--- called by ------------------------------------------------------
+!||    rini33_rb   ../starter/source/elements/joint/rjoint/rini33_rb.F
+!||    rini45_rb   ../starter/source/elements/joint/rjoint/rini45_rb.F
+!||====================================================================
       INTEGER FUNCTION FIND_RBY(IDNOD,NPBY,LPBY)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

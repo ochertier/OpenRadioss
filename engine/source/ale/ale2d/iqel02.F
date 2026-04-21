@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    iqel02   ../engine/source/ale/ale2d/iqel02.F
-      !||--- called by ------------------------------------------------------
-      !||    intal2   ../engine/source/ale/inter/intal2.F
-      !||====================================================================
+!||====================================================================
+!||    iqel02   ../engine/source/ale/ale2d/iqel02.F
+!||--- called by ------------------------------------------------------
+!||    intal2   ../engine/source/ale/inter/intal2.F
+!||====================================================================
       SUBROUTINE IQEL02(X,IRECT,LMSR,MSR,NSV,ILOC,IRTL,
      +                  NSN,NSEG,CRST,NOR)
 C-----------------------------------------------

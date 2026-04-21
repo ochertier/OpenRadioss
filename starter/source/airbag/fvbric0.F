@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvbric0                ../starter/source/airbag/fvbric0.F
-      !||--- called by ------------------------------------------------------
-      !||    init_monvol            ../starter/source/airbag/init_monvol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    arret                  ../starter/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvbric0                ../starter/source/airbag/fvbric0.F
+!||--- called by ------------------------------------------------------
+!||    init_monvol            ../starter/source/airbag/init_monvol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FVBRIC0(IBUF   ,IXS    ,ITYP    ,NBRIC   ,
      .                   MONVID ,ILVOUT ,TITR    ,TAGNODBR,
      .                   TBRIC  ,TFAC   ,NB_NODE ,IGRBRIC,IBRIC,FVTYPE)
@@ -39,6 +39,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : nchartitle
+      use element_mod , only : nixs      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -63,9 +64,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: ADSKY, ADDCNEL, CNE
-      INTEGER I, J, NG, NNO, NFAC, NV, NG2, NNF, NNF2, NNOF, NNOF2, 
-     .        NC, NNO2, K, TNC(4), TNV(5,6), KK, L, NN1, K2, 
-     .        LL, NTYPE, NTYPE2, NODEID 
+      INTEGER I, J, NG, NNO, NG2, NNF, NNF2, NNOF, NNOF2,
+     .        NNO2, K, KK, K2,
+     .        NTYPE, NTYPE2, NODEID
       INTEGER, TARGET :: REDIRT(4), REDIRP(6), REDIRB(8), REDIRPY(5)
       INTEGER, DIMENSION(:), POINTER :: REDIR2, REDIR
 C
@@ -74,6 +75,8 @@ C
       INTEGER :: IAD, IAD1, IAD2, NNODEF(4), N1(8), N2(8), IP1(8), IP2(8), IS, NB_COMMON_NODE
       INTEGER, DIMENSION(:, :), POINTER :: FAC, FAC2
       INTEGER, DIMENSION(:), POINTER :: NOD, NOD2
+      integer, dimension(1,1), target :: nothing
+      
       DATA FAC4 /1,5,3,
      .           3,5,6,
      .           6,5,1,
@@ -104,6 +107,16 @@ C
       LOGICAL :: ERROR_RAISED, FACE_OK, FACE2_OK
 C     INITIALIZE ERROR FLAG
       ERROR_RAISED = .FALSE.
+      FACE_OK = .FALSE.
+      FACE2_OK = .FALSE.   
+      ng = 0
+C-----------------------------------------------
+      FAC2 => nothing 
+      FAC => nothing
+      NOD2 => nothing(:,1)
+      NOD => nothing(:,1)
+      REDIR => nothing(:,1)
+      REDIR2 => nothing(:,1)
 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C     TETRA indirection

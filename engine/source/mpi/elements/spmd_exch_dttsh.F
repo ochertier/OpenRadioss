@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_tag_tsh   ../engine/source/mpi/elements/spmd_exch_dttsh.F
-      !||--- called by ------------------------------------------------------
-      !||    tshcdcom_dim        ../engine/source/elements/thickshell/solidec/tshcdcom_dim.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_tag_tsh     ../engine/source/mpi/elements/spmd_exch_dttsh.F
+!||--- called by ------------------------------------------------------
+!||    tshcdcom_dim          ../engine/source/elements/thickshell/solidec/tshcdcom_dim.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_TAG_TSH(IAD_ELEM ,FR_ELEM ,ISEND,IRECV ,LEN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -36,6 +37,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -56,10 +58,10 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-       INTEGER LENCOM,MSGOFF ,MSGTYP
+       INTEGER MSGOFF ,MSGTYP
        INTEGER STATUS(MPI_STATUS_SIZE),REQ_R(NSPMD),REQ_S(NSPMD)
        INTEGER IERROR
-       INTEGER I,P,J,NOD,SIZ,L,IAD
+       INTEGER I,SIZ,L
 C-----------------------------------------------
        DATA MSGOFF/430/    
        
@@ -102,16 +104,17 @@ C
 #endif
        
        END SUBROUTINE SPMD_EXCH_TAG_TSH
-      !||====================================================================
-      !||    spmd_exch_vmax   ../engine/source/mpi/elements/spmd_exch_dttsh.F
-      !||--- called by ------------------------------------------------------
-      !||    resol            ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../engine/source/output/message/message.F
-      !||    arret            ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_vmax        ../engine/source/mpi/elements/spmd_exch_dttsh.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_VMAX(IAD_STSH ,FR_STSH ,IAD_RTSH ,FR_RTSH ,V_MAX )
 C-----------------------------------------------
 C   M o d u l e s
@@ -120,6 +123,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -151,7 +155,7 @@ C-----------------------------------------------
        
        LENCOM = IAD_STSH(NSPMD+1) - IAD_STSH(1) 
 
-C Allocation des Buffers           
+C Buffer allocation
        ALLOCATE(SEND_BUF(LENCOM),STAT=IERROR)
        IF(IERROR/=0) THEN
           CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
@@ -232,16 +236,17 @@ C ------------
 #endif
        
        END SUBROUTINE SPMD_EXCH_VMAX
-      !||====================================================================
-      !||    spmd_exch_fa   ../engine/source/mpi/elements/spmd_exch_dttsh.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_fa          ../engine/source/mpi/elements/spmd_exch_dttsh.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_FA(IAD_STSH ,FR_STSH ,IAD_RTSH ,FR_RTSH ,A  )
 C-----------------------------------------------
 C   M o d u l e s
@@ -250,6 +255,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -281,7 +287,7 @@ C-----------------------------------------------
        
        LENCOM = IAD_STSH(NSPMD+1) - IAD_STSH(1) 
 
-C Allocation des Buffers           
+C Buffer allocation
        ALLOCATE(SEND_BUF(3*LENCOM),STAT=IERROR)
        IF(IERROR/=0) THEN
           CALL ANCMSG(MSGID=20,ANMODE=ANINFO)

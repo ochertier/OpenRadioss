@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2025 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2026 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -78,7 +78,7 @@ void c_h3d_create_shells_(int *ITAB, int *NUMNOD, int *IXC, int *NIXC, int *NUME
         H3D_ID elem_id ;
         int i,j,cpt_elem,nbelemwrite;
 
-        char SH4NPOOL[] = "SH4N";
+        char SH4NPOOL[] = "SHELL";
         rc = Hyper3DAddString(h3d_file, SH4NPOOL, &sh4n_poolname_id);
         if( !rc ) throw rc;
 

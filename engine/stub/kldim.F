@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,9 +21,9 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #ifndef DNC
-      !||====================================================================
-      !||    kldim   ../engine/stub/kldim.F
-      !||====================================================================
+!||====================================================================
+!||    kldim   ../engine/stub/kldim.F
+!||====================================================================
       SUBROUTINE KLDIM(EIGIPM, EIGIBUF, NDOF  , LDIAG, LJDIK, 
      .                 LJDIK2, NDDL   , K_DIAG, K_LT , IADK , 
      .                 JDIK  , IKC    , NMS   , INLOC, IDDL )
@@ -144,7 +144,7 @@ C
             IF (IKC(II+J)>=1) ITAG(II+J)=-1
          ENDDO
       ENDDO
-C Elimination des ddls bloques dans la liste
+C Elimination of blocked DOFs in the list
       DO I=1,NDDL
          ITAG2(I)=ITAG(I)
          ITAG(I)=0

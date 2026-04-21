@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multifluid_init3t      ../starter/source/multifluid/multifluid_init3t.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    m5in3                  ../starter/source/initial_conditions/detonation/m5in3.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    s4coor3                ../starter/source/elements/solid/solide4/s4coor3.F
-      !||    s4deri3                ../starter/source/elements/solid/solide4/s4deri3.F
-      !||    s4mass3                ../starter/source/elements/solid/solide4/s4mass3.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    multifluid_init3t      ../starter/source/multifluid/multifluid_init3t.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    m5in3                  ../starter/source/initial_conditions/detonation/m5in3.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    s4coor3                ../starter/source/elements/solid/solide4/s4coor3.F
+!||    s4deri3                ../starter/source/elements/solid/solide4/s4deri3.F
+!||    s4mass3                ../starter/source/elements/solid/solide4/s4mass3.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MULTIFLUID_INIT3T(ELBUF_STR, 
      .     NEL, NSIGS, NSIGI, IXS, IGEO, IPM, IPARG, ALE_CONNECTIVITY, IPARTS, PTSOL, NPF, IPART, ILOADP,
      .     XREFS, GEO, PM, FACLOAD, TF, SKEW, SIGI, BUFMAT, X, 
@@ -50,6 +50,7 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE DEFAULTS_MOD
       USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -109,6 +110,7 @@ C-----------------------------------------------
      .     PY1(MVSIZ),PY2(MVSIZ),PY3(MVSIZ),PY4(MVSIZ),
      .     PZ1(MVSIZ),PZ2(MVSIZ),PZ3(MVSIZ),PZ4(MVSIZ),
      .     VOLU(MVSIZ), BID(MVSIZ), DUMMY, PRES,VFRAC
+      my_real :: TEMPEL(NEL)
       INTEGER :: II, IP, IBID, MATLAW,IMAS_DS
       DOUBLE PRECISION 
      .   VOLDP(MVSIZ)
@@ -137,6 +139,7 @@ C     Volume
      .     GBUF%DELTAX, VOLU, NGL, PID, MAT,
      .     PM ,VOLDP)
 
+      TEMPEL(:) = ZERO
       PM(104,IXS(1, 1 + NFT)) = ZERO  !global pressure
       
 C     Loop over the materials
@@ -161,7 +164,7 @@ C     Material initialization
      .        MAT, IPM, NSIGS, NUMSOL, PTSOL,
      .        IP, NGL,NPF, TF, BUFMAT,
      .        GBUF, LBUF, MBUF, ELBUF_STR, ILOADP,
-     .        FACLOAD, GBUF%DELTAX)
+     .        FACLOAD, GBUF%DELTAX,TEMPEL, MAT_PARAM )
      
          VFRAC = MAT_PARAM( IXS(1,1+NFT) )%MULTIMAT%VFRAC(ILAY)
          PRES  = PM(104, MAT_PARAM( IXS(1,1+NFT) )%MULTIMAT%MID(ILAY))
@@ -177,7 +180,7 @@ C     Material initialization
                ENDIF
                ERROR_THROWN = .TRUE.
             ENDIF
-            CALL M5IN3(PM, MAT, IPM(1, IXS(1,1+NFT)), DETONATORS, LBUF%TB, NGL, IPARG, X, IXS, NIXS)
+            CALL M5IN3(PM, MAT, IPM(1, IXS(1,1+NFT)), DETONATORS, LBUF%TB, IPARG, X, IXS, NIXS)
          ENDIF
       ENDDO
 

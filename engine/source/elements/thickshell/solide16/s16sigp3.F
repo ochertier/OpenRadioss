@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s16sigp3       ../engine/source/elements/thickshell/solide16/s16sigp3.F
-      !||--- called by ------------------------------------------------------
-      !||    s16forc3       ../engine/source/elements/thickshell/solide16/s16forc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    s8csigp3       ../engine/source/elements/thickshell/solide8c/s8csigp3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s16sigp3       ../engine/source/elements/thickshell/solide16/s16sigp3.F
+!||--- called by ------------------------------------------------------
+!||    s16forc3       ../engine/source/elements/thickshell/solide16/s16forc3.F
+!||--- calls      -----------------------------------------------------
+!||    s8csigp3       ../engine/source/elements/thickshell/solide8c/s8csigp3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE S16SIGP3(LFT,LLT,NEL,NPTR,NLAY,NPTT,ICP,MTN,
      .                    NPE,NIPMAX, PX, PY, PZ, VX, VY, VZ, 
      .                    W_GAUSS,DEFP,PM,MXT,SIG,DT1,
@@ -46,7 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER LFT,LLT, NPTR,NLAY,NPTT,ICR,ICS,ICT,ICP,NEL,
+      INTEGER LFT,LLT, NPTR,NLAY,NPTT,ICP,NEL,
      .        MTN,NPE,NIPMAX,MXT(*)
       my_real
      .  VX(MVSIZ,*),VY(MVSIZ,*),VZ(MVSIZ,*),

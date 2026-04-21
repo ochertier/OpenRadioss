@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat52              ../starter/source/materials/mat/mat052/hm_read_mat52.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword           ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat52              ../starter/source/materials/mat/mat052/hm_read_mat52.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword           ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT52(
      .           UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR    ,MFUNC    ,
      .           MAXFUNC  ,IFUNC    ,MTAG     ,PARMAT   ,UNITAB   ,
@@ -95,7 +95,7 @@ C-----------------------------------------------
      .      E, NU, YEILD, ET,CSD, VISP, Q1, Q2, Q3, SN, EPSN,
      .      F1,FN,FC, FF, FU,FI,G,C1,N,FAC_L,FAC_T,FAC_M,FAC_C,
      .      R,XFAC,YFAC,RHO0,RHOR,FCUT
-      INTEGER NRATE,J,I,NFUNC, IFLAG,IYIELDTAB,ITAB, ISRATE
+      INTEGER I, NFUNC, IFLAG, IYIELDTAB, ISRATE
 C=======================================================================
       IS_ENCRYPTED   = .FALSE.
       IS_AVAILABLE = .FALSE.
@@ -208,14 +208,31 @@ C
       PARMAT(4) = ISRATE
       PARMAT(5) = FCUT
       NUPARAM = 23 
-       NFUNC = 0
-       NUVAR = 6
+      NFUNC = 0
+      NUVAR = 2
 C     Formulation for solid elements time step computation.
       PARMAT(16) = 2
       PARMAT(17) = (ONE - TWO*NU)/(ONE + NU)
-      
+C      
       MTAG%G_PLA  = 1
       MTAG%L_PLA  = 1
+      MTAG%G_EPSD = 1
+      MTAG%L_EPSD = 1
+C
+      ! Tag for damage output
+      ! -> Number of output modes (stored in DMG(NEL,I), I>1)
+      MATPARAM%NMOD = 4
+      ! Total number of damage outputs
+      ! -> DMG(NEL,1) = Global damage output 
+      ! -> DMG(NEL,2:NMOD+1) = Damage modes output
+      MTAG%G_DMG = 1 + MATPARAM%NMOD
+      MTAG%L_DMG = 1 + MATPARAM%NMOD
+      ! -> Modes allocation and definition
+      ALLOCATE(MATPARAM%MODE(MATPARAM%NMOD))
+      MATPARAM%MODE(1) = "Void growth volume fraction fg"
+      MATPARAM%MODE(2) = "Nucleation volume fraction fn"
+      MATPARAM%MODE(3) = "Total void volume fraction ft"
+      MATPARAM%MODE(4) = "Effective void volume fraction f*"
 C 
       ! MATPARAM keywords
       CALL INIT_MAT_KEYWORD(MATPARAM,"HOOK")

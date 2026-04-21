@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,39 +20,41 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m12law             ../engine/source/materials/mat/mat012/m12law.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain              ../engine/source/materials/mat_share/mmain.F90
-      !||--- calls      -----------------------------------------------------
-      !||    eosmain            ../common_source/eos/eosmain.F
-      !||    m14ama             ../engine/source/materials/mat/mat014/m14ama.F
-      !||    m14ftg             ../engine/source/materials/mat/mat014/m14ftg.F
-      !||    m14gtf             ../engine/source/materials/mat/mat014/m14gtf.F
-      !||--- uses       -----------------------------------------------------
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    m12law             ../engine/source/materials/mat/mat012/m12law.F
+!||--- called by ------------------------------------------------------
+!||    mmain              ../engine/source/materials/mat_share/mmain.F90
+!||--- calls      -----------------------------------------------------
+!||    eosmain            ../common_source/eos/eosmain.F
+!||    m14ama             ../engine/source/materials/mat/mat014/m14ama.F
+!||    m14ftg             ../engine/source/materials/mat/mat014/m14ftg.F
+!||    m14gtf             ../engine/source/materials/mat/mat014/m14gtf.F
+!||--- uses       -----------------------------------------------------
+!||    eosmain_mod        ../common_source/eos/eosmain.F
+!||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||====================================================================
       SUBROUTINE M12LAW(
-     1   PM,        OFF,       SIG,       EINT,
-     2   PLA,       SIGF,      EPSF,      DAM,
-     3   EPE,       EPC,       A,         VOL,
-     4   RX,        RY,        RZ,        SX,
-     5   SY,        SZ,        MAT,       VNEW,
-     6   DVOL,      SSP,       D1,        D2,
-     7   D3,        D4,        D5,        D6,
-     8   SOLD1,     SOLD2,     SOLD3,     SOLD4,
-     9   SOLD5,     SOLD6,     SIGY,      DEFP,
-     A   NGL,       SEQ_OUTPUT,NEL,       EOSTYP,
-     B   RHO0,      AMU,       AMU2,      ESPE,
-     C   DF,        PSH,       PNEW,      DPDM,
-     D   DPDE,      RHO,       TEMP,      ECOLD,
-     E   BUFMAT,    NPC,       TF,        TSAIWU,
-     F   VAREOS,    NVAREOS,   JCVT,      JSPH,
-     G   MAT_PARAM)
+     1   PM,        OFF,        SIG,       EINT,
+     2   PLA,       SIGF,       EPSF,      DAM,
+     3   EPE,       EPC,        A,         VOL,
+     4   RX,        RY,         RZ,        SX,
+     5   SY,        SZ,         MAT,       VNEW,
+     6   DVOL,      SSP,        D1,        D2,
+     7   D3,        D4,         D5,        D6,
+     8   SOLD1,     SOLD2,      SOLD3,     SOLD4,
+     9   SOLD5,     SOLD6,      SIGY,      DEFP,
+     A   NGL,       SEQ_OUTPUT, NEL,       EOSTYP,
+     B   RHO0,      AMU,        AMU2,      ESPE,
+     C   DF,        PSH,        PNEW,      DPDM,
+     D   DPDE,      RHO,        TEMP,
+     E   BUFMAT,    NPC,        TF,        TSAIWU,
+     F   VAREOS,    NVAREOS,    JCVT,      JSPH,
+     G   MAT_PARAM, NVARTMP_EOS,VARTMP_EOS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
+      USE EOSMAIN_MOD , ONLY : EOSMAIN
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -92,24 +94,26 @@ C-----------------------------------------------
       my_real
      .   RHO0(NEL), AMU(NEL)  , AMU2(NEL), ESPE(NEL), DF(NEL) ,
      .   PSH(NEL) , PNEW(NEL) , DPDM(NEL), DPDE(NEL), RHO(NEL),
-     .   TEMP(NEL), ECOLD(NEL), BUFMAT(*),MUOLD(NEL)
+     .   TEMP(NEL), BUFMAT(*),MUOLD(NEL)
       INTEGER,INTENT(IN)::NPC(SNPC)
       my_real,INTENT(IN)::TF(STF)
+      INTEGER,INTENT(IN) :: NVARTMP_EOS
+      INTEGER,INTENT(INOUt) :: VARTMP_EOS(NEL,NVARTMP_EOS)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER KD1(MVSIZ), KD2(MVSIZ), KD3(MVSIZ), 
      .   KD4(MVSIZ),ICC(MVSIZ),
      .   I, IDAM, KDX, MX, NINDX, INDEX(MVSIZ), J, ICC_1
-      INTEGER IBID(1) !bfrac argument not used in this context
+      my_real BID(1) !bfrac argument not used in this context
       my_real
      .   AX(MVSIZ), AY(MVSIZ), AZ(MVSIZ), BX(MVSIZ), BY(MVSIZ), 
      .   BZ(MVSIZ), CX(MVSIZ), CY(MVSIZ),CZ(MVSIZ),
-     .   WVEC(MVSIZ),S1(MVSIZ), S2(MVSIZ), S3(MVSIZ),
+     .   WVEC(MVSIZ),
      .   T1(MVSIZ), T2(MVSIZ), T3(MVSIZ),T4(MVSIZ),T5(MVSIZ),T6(MVSIZ),
      .   E1(MVSIZ), E2(MVSIZ), E3(MVSIZ),E4(MVSIZ),E5(MVSIZ),E6(MVSIZ), 
-     .   HARD(MVSIZ), SIGMY(MVSIZ), ALPHA(MVSIZ), EFIB(MVSIZ),
-     .   EPSFT(MVSIZ), EPSFC(MVSIZ), SIGEQ(MVSIZ), P(MVSIZ),
+     .    SIGMY(MVSIZ), ALPHA(MVSIZ), EFIB(MVSIZ),
+     .   EPSFT(MVSIZ), EPSFC(MVSIZ),
      .   D11(MVSIZ), D12(MVSIZ), D13(MVSIZ), D22(MVSIZ),
      .   D23(MVSIZ), D33(MVSIZ), G12(MVSIZ), G23(MVSIZ), G31(MVSIZ),
      .   C11(MVSIZ), C22(MVSIZ), C33(MVSIZ), C12(MVSIZ), C23(MVSIZ),
@@ -364,22 +368,21 @@ C
           T2(I)=T2(I)+D12(I)*DEVE1(I)+D22(I)*DEVE2(I)+D23(I)*DEVE3(I)-POLD(I)
           T3(I)=T3(I)+D13(I)*DEVE1(I)+D23(I)*DEVE2(I)+D33(I)*DEVE3(I)-POLD(I)
         ENDDO
-C     
-        PNEW(:)        = ZERO
+C
         MUOLD(1:NEL)   =( RHO(1:NEL)/RHO0)-ONE
         SIG(1:NEL,1:6) = ZERO
         CALL EOSMAIN(0       ,NEL     ,EOSTYP ,PM    ,OFF  , ENER ,
      2               RHO     ,RHO0    ,AMU    ,AMU2  ,ESPE ,
      3               DVOL    ,DF      ,VNEW   ,MAT   ,PSH  ,
-     4               PNEW    ,DPDM    ,DPDE   ,TEMP  ,ECOLD,
-     5               BUFMAT  ,SIG     ,MUOLD  ,12    ,POLD,
-     6               NPC     ,TF      ,VAREOS ,NVAREOS, MAT_PARAM, IBID)
+     4               PNEW    ,DPDM    ,DPDE   ,TEMP  ,
+     5               BUFMAT  ,SIG     ,MUOLD  ,12    ,
+     6               NPC     ,TF      ,VAREOS ,NVAREOS, MAT_PARAM, BID, NVARTMP_EOS,VARTMP_EOS)
         CALL EOSMAIN(1       ,NEL     ,EOSTYP ,PM    ,OFF  , ENER ,
      2               RHO     ,RHO0    ,AMU    ,AMU2  ,ESPE ,
      3               DVOL    ,DF      ,VNEW   ,MAT   ,PSH  ,
-     4               PNEW    ,DPDM    ,DPDE   ,TEMP  ,ECOLD,
-     5               BUFMAT  ,SIG     ,MUOLD  ,12    ,POLD,
-     6               NPC     ,TF      ,VAREOS ,NVAREOS, MAT_PARAM, IBID)
+     4               PNEW    ,DPDM    ,DPDE   ,TEMP  ,
+     5               BUFMAT  ,SIG     ,MUOLD  ,12    ,
+     6               NPC     ,TF      ,VAREOS ,NVAREOS, MAT_PARAM, BID, NVARTMP_EOS,VARTMP_EOS)
         DO  I=1,NEL
           T1(I)=T1(I)-PNEW(I)
           T2(I)=T2(I)-PNEW(I)
@@ -554,8 +557,6 @@ C
         DP6(I)=TWO*F66(I)*SO6(I)
       ENDDO
 
- 3101 FORMAT(/' 205 WVEC SIGMY T1-T6 ',2E11.4/6E11.4)
- 3102 FORMAT(' F1 F2 F11 F22 F12 F23 F44 F55',3E11.4/5E11.4)
 C
       DO  I=1,NEL
          DS1(I)=T1(I)-SO1(I)
@@ -571,7 +572,6 @@ C
      .        +DP4(I)*DS4(I)+DP5(I)*DS5(I)+DP6(I)*DS6(I))*COEF(I)
       ENDDO
 C ***********      
- 3103 FORMAT(' 207 LAMDA DS1-DS6 ',E11.4/6E11.4)
 C
       DO  I=1,NEL
         CNN(I)=CN(I)-ONE
@@ -595,7 +595,6 @@ C
          ENDIF
       ENDDO
 c************
- 3104 FORMAT(' 208 LAMDA ',E11.4)
 C
       DO  I=1,NEL
          DP1(I)=LAMDA(I)*DP1(I)
@@ -605,7 +604,6 @@ C
          DP5(I)=LAMDA(I)*DP5(I)
          DP6(I)=LAMDA(I)*DP6(I)
       ENDDO
- 3105 FORMAT(' 209 PLA DP1-DP6',E11.4/6E11.4)
 C
       DO  I=1,NEL
         EPE(I,1)=EPE(I,1)-DP1(I)
@@ -677,6 +675,5 @@ C
       ENDDO 
 C------------------------------------------------------------------------
  1000 FORMAT(1X,'RUPTURE OF SOLID ELEMENT NUMBER ',I10)
- 6001 FORMAT(I6,' FAIL(14)   E(',I5,')   M(',A3,')   T(',6E10.3,')')
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spline_interpol_2d   ../starter/source/materials/tools/spline_interpol_2d.F
-      !||--- called by ------------------------------------------------------
-      !||    test_spline          ../starter/source/materials/tools/test_splines.F
-      !||====================================================================
+!||====================================================================
+!||    spline_interpol_2d   ../starter/source/materials/tools/spline_interpol_2d.F
+!||--- called by ------------------------------------------------------
+!||    test_spline          ../starter/source/materials/tools/test_splines.F
+!||====================================================================
       SUBROUTINE SPLINE_INTERPOL_2D(PTX, PTY ,KNOTS, T,  NX  ,NY  )
 C-----------------------------------------------
       ! FOR A GIVEN POSITION T in [0,1] which is position on [P1,P2], 
@@ -36,7 +36,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
-      ! INPUT  - PTS(0:3,:) are 4 control points
+      ! INPUT - PTS (0: 3, :) Are 4 Control points
       ! INPUT  - T is in [0,1]  : T=0 => VAL = P(2,:)
       ! OUTPUT - C is interpolated value.
       ! OUTPUT - C_D is 1st derivative

@@ -19,7 +19,12 @@ set ( cpprel  "-DCPP_rel=80" )
 # ---------------------
 
 #hm_reader
-set ( reader_lib "-L${source_directory}/../extlib/hm_reader/linux64/ -lhm_reader_linux64 ${source_directory}/../extlib/hm_reader/linux64/libapr-1.so.0 " )
+if ( USE_OPEN_READER STREQUAL 1 )
+       set ( reader_lib "-L${source_directory}/../exec -lopen_reader_linux64")
+else ()
+       set ( reader_lib "-L${source_directory}/../extlib/hm_reader/linux64/ -lhm_reader_linux64 -lapr-1 " )
+endif()
+
 
 #Lapack
 set (lapack_lib "${source_directory}/../extlib/lapack-3.10.0/lib_linux64_gf/liblapack.a ${source_directory}/../extlib/lapack-3.10.0/lib_linux64_gf/librefblas.a  ${source_directory}/../extlib/lapack-3.10.0/lib_linux64_gf/libtmglib.a")
@@ -30,6 +35,10 @@ set (metis_lib "${source_directory}/../extlib/metis/linux64/libmetis_linux64_gcc
 #ZLIB
 set (zlib_inc "-I${source_directory}/../extlib/zlib/linux64/include")
 set (zlib_lib "${source_directory}/../extlib/zlib/linux64/lib/libz.a")
+
+# MD5
+set (md5_inc "-I${source_directory}/../extlib/md5/include")
+set (md5_lib "-L${source_directory}/../extlib/md5/linux64/ -lmd5")
 
 #
 # compiler Flags
@@ -67,8 +76,18 @@ if ( CMAKE_C_COMPILER_VERSION VERSION_GREATER 10)
 set( portability "-fallow-argument-mismatch -fallow-invalid-boz -std=legacy")
 endif()
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
+                    OUTPUT_VARIABLE GCC_VERSION
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(GCC_VERSION MATCHES "^(11|15)\\.")
+        set(error_uninitialized " -Werror=maybe-uninitialized")
+    endif()
+endif()
+
+
 #set( strict "-Waliasing -Wunused-dummy-argument -Werror=unused-dummy-argument -Wdo-subscript -Warray-bounds -Wtabs -Werror=tabs -pedantic-errors -Wsurprising -Wuse-without-only -Werror=use-without-only ") 
-set( strict "-Werror=aliasing -Werror=unused-dummy-argument -Werror=do-subscript -Werror=array-bounds -Werror=surprising -Werror=tabs") 
+set( strict "-Werror=aliasing -Werror=unused-dummy-argument -Werror=do-subscript -Werror=array-bounds -Werror=surprising -Werror=tabs ${error_uninitialized} " ) 
 
 #no lto, OpenMP can be used
 set( OPENMP "-fopenmp" )
@@ -88,10 +107,26 @@ set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS "${FSANIT
 
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} -O0 -g ${OPENMP} " )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} -O0 -g ${OPENMP}  ${md5_inc} " )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc}  -O0 -g  ${OPENMP} -std=c++14  " )
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc}  -O0 -g  ${OPENMP}  ${md5_inc} -std=c++14  " )
+
+elseif ( debug STREQUAL "analysis" )
+
+# Fortran
+
+set( legacy_flags "  -fplugin=../../scripts/gcc_plugin/fortran_signatures.so  -Wall ${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} -DCPP_comp=f90 -DCOMP_GFORTRAN=1 -fdec-math -g -O0 -ffp-contract=off -frounding-math ${OPENMP} -fbacktrace -ffixed-line-length-none -Wdo-subscript ${ADF} ${portability}") 
+
+set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS " -fplugin=../../scripts/gcc_plugin/fortran_signatures.so  ${FSANITIZE} -Wall ${strict} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} -DCPP_comp=f90 -DCOMP_GFORTRAN=1 -fdec-math -g -O0 -ffp-contract=off -frounding-math ${OPENMP} -fbacktrace -ffixed-line-length-none ${ADF} " )
+
+
+# C source files
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} ${md5_inc} -O0 -g ${OPENMP} " )
+
+# CXX source files
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc}  ${md5_inc} -O0 -g  ${OPENMP} -std=c++14  " )
+
 
 elseif ( debug STREQUAL "asan" )
 
@@ -106,10 +141,10 @@ set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS "${FSANIT
 
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} -O0 -g ${OPENMP} ${zlib_inc}" )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} -O0 -g ${OPENMP} ${zlib_inc} ${md5_inc}" )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel}  -O0 -g  ${OPENMP} ${zlib_inc} -std=c++14 ")
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${precision_flag} -DMETIS5 ${cppmach} ${cpprel}  -O0 -g  ${OPENMP} ${zlib_inc}  ${md5_inc} -std=c++14 ")
 
 else ()
 
@@ -121,10 +156,10 @@ set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS " ${preci
 
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "-w ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} -O2 ${OPENMP} " )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "-w ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} ${md5_inc} -O2 ${OPENMP} " )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "-w ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} -O2 ${OPENMP} -std=c++14 " )
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "-w ${precision_flag} -DMETIS5 ${cppmach} ${cpprel} ${zlib_inc} ${md5_inc} -O2 ${OPENMP} -std=c++14 " )
 
 endif()
 
@@ -134,9 +169,9 @@ set (CMAKE_EXE_LINKER_FLAGS " -rdynamic -no-pie -O2 ${OPENMP} ${FSANITIZE}" )
 
 #Libraries
 if ( static_link STREQUAL "1" )
-set (LINK "dl ${flexpipe_lib} ${metis_lib} ${reader_lib}  ${lapack_lib} ${zlib_lib} -ldl -static-libgfortran -static-libstdc++ -static-libgcc -Wunused-function" )
+set (LINK "dl ${flexpipe_lib} ${metis_lib} ${reader_lib}  ${lapack_lib} ${zlib_lib} ${md5_lib} -ldl -static-libgfortran -static-libstdc++ -static-libgcc -Wunused-function" )
 else()
-set (LINK "dl ${flexpipe_lib} ${metis_lib} ${reader_lib}  ${lapack_lib} ${zlib_lib} -ldl -Wunused-function" )
+set (LINK "dl ${flexpipe_lib} ${metis_lib} ${reader_lib}  ${lapack_lib} ${zlib_lib} ${md5_lib} -ldl -Wunused-function" )
 endif()
 string(STRIP ${LINK} LINK)
 

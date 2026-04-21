@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    monv_prem       ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    dim_glob_k      ../engine/source/implicit/ind_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    dim_kinmv       ../engine/source/airbag/monv_imp0.F
-      !||    ini_kinmv       ../engine/source/airbag/monv_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_monv        ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monv_prem       ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    dim_glob_k      ../engine/source/implicit/ind_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    dim_kinmv       ../engine/source/airbag/monv_imp0.F
+!||    ini_kinmv       ../engine/source/airbag/monv_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    imp_monv        ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE MONV_PREM(
      1    NMONV     ,IMONV     ,MONVOL    ,IGRSURF   ,
      2    FR_MV     ,ITAG      ,NPBY      ,LPBY      ,NRBYAC    ,
@@ -52,7 +53,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "units_c.inc"
 #include      "impl1_c.inc"
@@ -71,9 +71,9 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, NTYP,NN,K1,IAD,IS,J,N,NOD,NUMN,ID,NMT,IROT,
+      INTEGER I, NTYP,NN,K1,IAD,IS,J,N,NOD,NUMN,NMT,IROT,
      .        IERR1,IERR2,IERR3,IERR4,IERR5,IERR6
-C-------IMONV(NMONV)--nb de noeuds dans chaque mv.----------------------
+C-------IMONV(NMONV)--number of nodes in each mv.----------------------
       NMONV = 0
       IF(NVOLU>0.AND.IMPMV>0) THEN
        DO N=1,NUMNOD
@@ -86,7 +86,7 @@ C-------IMONV(NMONV)--nb de noeuds dans chaque mv.----------------------
         NTYP=MONVOL(K1+1)
         IMONV(I)=0
         IF(NTYP==3) THEN
-         IF(IMACH==3.AND.FR_MV(ISPMD+1,I)==0) GO TO 100
+         IF(FR_MV(ISPMD+1,I)==0) GO TO 100
          IS   = MONVOL(K1+3)
          NN = IGRSURF(IS)%NSEG
          NUMN = NUMN_MV
@@ -105,7 +105,7 @@ C-------IMONV(NMONV)--nb de noeuds dans chaque mv.----------------------
          IMONV(I)=NUMN_MV - NUMN
          IF (IMONV(I)>0) NMONV = NMONV+1
         ELSEIF (NEIG==ZERO) THEN
-         IF(IMACH/=3.OR.ISPMD==0) THEN
+         IF(ISPMD==0) THEN
           WRITE(IOUT,1001)NTYP
           WRITE(ISTDO,1001)NTYP
          ENDIF
@@ -187,12 +187,13 @@ C
      .       '******  IT WILL BE IGNORED  *****')
       RETURN
       END
-      !||====================================================================
-      !||    dim_kinmv       ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_prem       ../engine/source/airbag/monv_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    dim_kinmv       ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_prem       ../engine/source/airbag/monv_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE DIM_KINMV(
      1    NPBY      ,LPBY      ,NRBYAC    ,IRBYAC    ,NINT2     ,
      2    IINT2     ,IPARI     ,INTBUF_TAB,INLOC     ,LNS       ,
@@ -225,8 +226,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER
-     .        I,J,K,N,L,NL,NJ,NI,J1,M,NSN,N1,N2,NK,ID,
-     .        JI,K10,K11,K12,K13,K14,KFI,NS
+     .        I,J,K,N,NI,M,NSN,ID,
+     .        JI,K10,K11,K12,K13,K14,KFI
 C----------------------------
       LNS2=0
       DO J=1,NINT2
@@ -293,12 +294,13 @@ C-----active rigid body main nodes------
 C----6---------------------------------------------------------------7---------8
       RETURN
       END
-      !||====================================================================
-      !||    ini_kinmv       ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_prem       ../engine/source/airbag/monv_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    ini_kinmv       ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_prem       ../engine/source/airbag/monv_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INI_KINMV(
      1    NPBY      ,LPBY      ,NRBYAC    ,IRBYAC    ,NINT2     ,
      2    IINT2     ,IPARI     ,INTBUF_TAB,INLOC     ,NRB_MV    ,
@@ -333,7 +335,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER
-     .        I,J,K,N,L,NL,NJ,NI,J1,M,NSN,N1,N2,NK,ID,
+     .        I,J,K,N,NI,M,NSN,ID,
      .        JI,K10,K11,K12,K13,K14,KFI,NI2,NRB,NR3,NR2
 c----------------------
       NI2=0
@@ -422,15 +424,15 @@ C-----active rigid body main nodes------
 C----6---------------------------------------------------------------7---------8
       RETURN
       END
-      !||====================================================================
-      !||    monv_fvl   ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_imp   ../engine/source/airbag/monv_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc   ../engine/share/modules/impbufdef_mod.F
-      !||    imp_monv   ../engine/share/modules/impbufdef_mod.F
-      !||    imp_rwl    ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monv_fvl   ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_imp   ../engine/source/airbag/monv_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc   ../engine/share/modules/impbufdef_mod.F
+!||    imp_monv   ../engine/share/modules/impbufdef_mod.F
+!||    imp_rwl    ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE MONV_FVL(IBFV      ,LJ      ,ISKEW   ,ICODT  )
 C-----------------------------------------------
 C   M o d u l e s
@@ -454,7 +456,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,L,IERR1,IERR2,IERR3,ITAG(NUMNOD)
+      INTEGER I,J,N,IERR1,IERR2,IERR3,ITAG(NUMNOD)
 C-----------------------------------------------
       DO N=1,NUMNOD
         ITAG(N) = 0
@@ -543,16 +545,17 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    monv_imp        ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv        ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    monv_fvl        ../engine/source/airbag/monv_imp0.F
-      !||    monv_m3         ../engine/source/airbag/monv_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monv_imp        ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv        ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    monv_fvl        ../engine/source/airbag/monv_imp0.F
+!||    monv_m3         ../engine/source/airbag/monv_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE MONV_IMP(MONVOL ,VOLMON  ,X      ,IGRSURF  ,
      1                    NMONV  ,IMONV   ,IPARI  ,INTBUF_TAB      ,
      2                    A_MV   ,AR_MV   ,NDOF   ,IDDL    ,IKC    ,
@@ -580,7 +583,6 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
 C-----------------------------------------------
        CALL MONV_FVL(IBFV      ,LJ    ,ISKEW   ,ICODT  )
        CALL MONV_M3(MONVOL ,VOLMON  ,X      ,IGRSURF  ,
@@ -591,19 +593,20 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    monv_m3         ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_imp        ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    id_mvini        ../engine/source/airbag/monv_imp0.F
-      !||    monv_kd         ../engine/source/airbag/monv_imp0.F
-      !||    updk_mv         ../engine/source/airbag/monv_imp0.F
-      !||    zeror           ../engine/source/system/zero.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_monv        ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monv_m3         ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_imp        ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    id_mvini        ../engine/source/airbag/monv_imp0.F
+!||    monv_kd         ../engine/source/airbag/monv_imp0.F
+!||    updk_mv         ../engine/source/airbag/monv_imp0.F
+!||    zeror           ../engine/source/system/zero.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    imp_monv        ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE MONV_M3(MONVOL ,VOLMON  ,X      ,IGRSURF  ,
      1                   NMONV  ,IMONV   ,IPARI  ,INTBUF_TAB,
      2                   A_MV   ,AR_MV   ,NDOF   ,IDDL    ,IKC    ,
@@ -641,7 +644,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IDDLM(NUMNOD),NKC,N,ND,ID,NKIN,IAD
+      INTEGER I,J,N,ND,ID,NKIN,IAD
       INTEGER M,NSN,JI,K10,K11,K12,K13,K14,L,NNOD,NJ,NL,NI
 C----------------
       CALL ID_MVINI(IPARI  ,INTBUF_TAB,NDOF   ,IDDL    ,IKC    ,
@@ -708,7 +711,7 @@ C------MSR(NMN)-----
          ELSE
           NNOD=4
          ENDIF
-C-------si noeud main est dependant aussi-----
+C------ SI Main node is also dependent -----
          DO M=1,NNOD
           NJ=INTBUF_TAB(N)%IRECTM(NL+M)
           DO J = 1, NDOF(NJ)
@@ -761,15 +764,16 @@ C--------RBE2----------
 C
       RETURN
       END
-      !||====================================================================
-      !||    id_mvini        ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_m3         ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    rbe3cl          ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_monv        ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    id_mvini        ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_m3         ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    rbe3cl          ../engine/source/constraints/general/rbe3/rbe3f.F
+!||--- uses       -----------------------------------------------------
+!||    imp_monv        ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE ID_MVINI(IPARI  ,INTBUF_TAB,NDOF   ,IDDL    ,IKC    ,
      1                    INLOC  ,X      ,SKEW   ,IRBE3   ,LRBE3  ,
      2                    FRBE3  ,IRBE2  ,LRBE2  )
@@ -802,7 +806,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IDDLM(NUMNOD),NKC,N,ND,ID,NND,IROT,NMT,IAD,IADS
+      INTEGER I,J,IDDLM(NUMNOD),NKC,N,ND,ID,IROT,NMT,IAD,IADS
       INTEGER M,NSN,JI,K10,K11,K12,K13,K14,L,NNOD,NJ,NL,NI
 C-----initialise iddl_mv-----------
       NKC = 0
@@ -869,7 +873,7 @@ C------MSR(NMN)-----
          ELSE
           NNOD=4
          ENDIF
-C-------si noeud main est dependant aussi-----
+C------ SI Main node is also dependent -----
          DO M=1,NNOD
           NJ=INTBUF_TAB(N)%IRECTM(NL+M)
           ND = 0
@@ -939,16 +943,16 @@ C---------RBE2------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    monv_kd        ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_m3        ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    monv_kedi      ../engine/source/airbag/monv_imp0.F
-      !||    monv_kedj      ../engine/source/airbag/monv_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monv_kd        ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_m3        ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    monv_kedi      ../engine/source/airbag/monv_imp0.F
+!||    monv_kedj      ../engine/source/airbag/monv_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE MONV_KD(MONVOL ,VOLMON  ,X      ,IGRSURF ,
      1                   NMONV  ,IMONV   ,K_DIAG ,NNMAX_MV)
 C-----------------------------------------------
@@ -976,14 +980,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, NTYP,NN,K1,IAD,IS,J,N,NMV,
-     .        N1,N2,N3,N4,KK1,J1,ID,ID1,M1,M2,M3,M4
+      INTEGER I, NN,K1,IS,J,NMV,
+     .        N1,N2,N3,N4,KK1,J1,M1,M2,M3,M4
       my_real
      .   VOL(NMONV),NOR(3,NNMAX_MV),DVD1(3),DVD2(3),GAMAV(NMONV)
       my_real
-     .   XX,YY,ZZ,X12,Y12,Z12,X13,Y13,Z13,X24,Y24,Z24,V,
+     .   XX,YY,ZZ,X13,Y13,Z13,X24,Y24,Z24,
      .   GAMAV2
-C-----IDDL(3,*) est apres upd_k-,si dependant-:comme interface remote---------
+C----- Idddl (3,*) is after UPD_K-, if depending-: as a remote interface --------------------
 C-----------reprend vol,gama------
       NMV = 0
       K1 = 1
@@ -1065,11 +1069,11 @@ C-----------K-elememtaire J1--Kij(i dans ele J;j dans ele J1 ---)
 C
       RETURN
       END
-      !||====================================================================
-      !||    monv_kedi   ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_kd     ../engine/source/airbag/monv_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    monv_kedi   ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_kd     ../engine/source/airbag/monv_imp0.F
+!||====================================================================
       SUBROUTINE MONV_KEDI(N1     ,N2      ,N3     ,N4     ,XX      ,
      1                     YY     ,ZZ      ,X13    ,Y13    ,Z13     ,
      2                     X24    ,Y24     ,Z24    ,N      ,VOL     ,
@@ -1084,12 +1088,12 @@ C-----------------------------------------------
       INTEGER N1,N2,N3,N4
 C     REAL
       my_real
-     .   XX,YY,ZZ,X12,Y12,Z12,X13,Y13,Z13,X24,Y24,Z24,VOL,
+     .   XX,YY,ZZ,X13,Y13,Z13,X24,Y24,Z24,VOL,
      .   DVD1(*),DVD2(*),N(3),GAMAV2,K_DIAG(3,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,NNOD,ND,ID
+      INTEGER I, J,NNOD,ND
       my_real
      .   DNDX1(3),DNDY1(3),DNDZ1(3),DNDX2(3),DNDY2(3),DNDZ2(3),
      .   KEV1(3),KEV2(3),KEVS(3),FAC,FACV(3)
@@ -1137,7 +1141,7 @@ C---------K11,K13=-K11-------------------
           KEV1(I) = FACV(I)*DVD1(I)
 C---------K12,K22-------------------
           KEV2(I) = FACV(I)*DVD2(I)
-C---------terme sup pour (xx,xj j=1,2)-------------------
+C---------- SUP term for (xx, xj j = 1,2) ------------------------------------------
           KEVS(I) = FACV(I)*N(I)
         ENDDO
 C---------KE11-------------------
@@ -1161,11 +1165,11 @@ C---------K44-------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    monv_kedj   ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_kd     ../engine/source/airbag/monv_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    monv_kedj   ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_kd     ../engine/source/airbag/monv_imp0.F
+!||====================================================================
       SUBROUTINE MONV_KEDJ(N1     ,N2      ,N3     ,N4     ,M1      ,
      1                     M2     ,M3      ,M4     ,N      ,NJ      ,
      2                     VOL    ,GAMAV2  ,DVD1   ,DVD2   ,K_DIAG  )
@@ -1185,7 +1189,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J,NNOD,NNOD1,ND,NM(4)
       my_real
-     .   KEV1(3),KEV2(3),KEVS(3),FAC,FACV(3)
+     .   KEV1(3),KEV2(3),KEVS(3),FACV(3)
 C---------DNDX:NX,x,NY,x,NZ,x,------------------------------------
       ND = 3
        NM(1) = M1
@@ -1234,25 +1238,26 @@ C---------KEIJ---J=N1,I=NM(j)----------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    updk_mv         ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    monv_m3         ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bcl_impkd       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fv_updkd        ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    fv_updkd2       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    i2_frup0        ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2_frup1        ../engine/source/interfaces/interf/i2_imp1.F
-      !||    l_dir           ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    prerbe2fr       ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    prerbe3fr       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe2_impkd      ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    rbe3_frupd      ../engine/source/constraints/general/rbe3/rbe3_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
-      !||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    updk_mv         ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    monv_m3         ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bcl_impkd       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fv_updkd        ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    fv_updkd2       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    i2_frup0        ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2_frup1        ../engine/source/interfaces/interf/i2_imp1.F
+!||    l_dir           ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    prerbe2fr       ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    prerbe3fr       ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe2_impkd      ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    rbe3_frupd      ../engine/source/constraints/general/rbe3/rbe3_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
+!||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE UPDK_MV(NDOF    ,IPARI  ,INTBUF_TAB,NI2_MV ,
      .                   II2_MV  ,NRB_MV ,IRB_MV  ,NFX_MV,IFX_MV ,
      .                   NBC_MV  ,IBC_MV ,NRW_MV  ,IRW_MV,IBFV   ,
@@ -1291,7 +1296,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ID,N,J,NDD,IS,NS,ILEV,J10,J11,J12,J21
+      INTEGER I,N,J,NS,ILEV,J10,J11,J12,J21
       INTEGER M,NSN,JI,L,NNOD,NJ,NL,NI,
      .        I1,J1,ISK,IFM,K1,K2,K3,ICT,NN,IROT,IAD,IADS,
      .        JT(3),JR(3),IR,IRAD,K,IC
@@ -1558,14 +1563,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    monv_diag       ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solvh1      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvih2     ../engine/source/implicit/lin_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_monv        ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    monv_diag       ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    lin_solvh1      ../engine/source/implicit/lin_solv.F
+!||    lin_solvih2     ../engine/source/implicit/lin_solv.F
+!||--- uses       -----------------------------------------------------
+!||    imp_monv        ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE MONV_DIAG(DIAG_K,NDOF,IPARI,INTBUF_TAB,IRBE3,LRBE3,
      .                     IRBE2  ,IFLAG )
 C-----------------------------------------------
@@ -1594,7 +1600,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NKC,N,ND,ID,IAD
+      INTEGER I,J,N,ID,IAD
       INTEGER M,NSN,JI,K10,K11,K12,K13,K14,L,NNOD,NJ,NL,NI
 C---------IFLAG=0: add; IFLAG=1:remove-------
       IF (IFLAG==0) THEN
@@ -1634,7 +1640,7 @@ C------MSR(NMN)-----
          ELSE
           NNOD=4
          ENDIF
-C-------si noeud main est dependant aussi-----
+C------ SI Main node is also dependent -----
          DO M=1,NNOD
           NJ=INTBUF_TAB(N)%IRECTM(NL+M)
           DO J = 1, NDOF(NJ)
@@ -1704,7 +1710,7 @@ C------MSR(NMN)-----
          ELSE
           NNOD=4
          ENDIF
-C-------si noeud main est dependant aussi-----
+C------ SI Main node is also dependent -----
          DO M=1,NNOD
           NJ=INTBUF_TAB(N)%IRECTM(NL+M)
           DO J = 1, NDOF(NJ)
@@ -1740,23 +1746,24 @@ C----------RBE2------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    mv_matv         ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    mav_lt2         ../engine/source/implicit/produt_v.F
-      !||    mav_lth         ../engine/source/implicit/produt_v.F
-      !||    mav_lth0        ../engine/source/implicit/produt_v.F
-      !||    mav_ltp         ../engine/source/implicit/produt_v.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp3_a2b        ../engine/source/airbag/monv_imp0.F
-      !||    imp3_u2x        ../engine/source/airbag/monv_imp0.F
-      !||    imp_pvga        ../engine/source/airbag/monv_imp0.F
-      !||    spmd_fr_poff    ../engine/source/mpi/kinematic_conditions/spmd_fr_poff.F
-      !||    zeror           ../engine/source/system/zero.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_monv        ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mv_matv         ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    mav_lt2         ../engine/source/implicit/produt_v.F
+!||    mav_lth         ../engine/source/implicit/produt_v.F
+!||    mav_lth0        ../engine/source/implicit/produt_v.F
+!||    mav_ltp         ../engine/source/implicit/produt_v.F
+!||--- calls      -----------------------------------------------------
+!||    imp3_a2b        ../engine/source/airbag/monv_imp0.F
+!||    imp3_u2x        ../engine/source/airbag/monv_imp0.F
+!||    imp_pvga        ../engine/source/airbag/monv_imp0.F
+!||    spmd_fr_poff    ../engine/source/mpi/kinematic_conditions/spmd_fr_poff.F
+!||    zeror           ../engine/source/system/zero.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    imp_monv        ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE MV_MATV(MONVOL ,VOLMON  ,X      ,IGRSURF,
      1                   FR_MV  ,NMONV  ,IMONV   ,U      ,F      ,
      2                   NDOF   ,IPARI  ,INTBUF_TAB,A      ,
@@ -1778,7 +1785,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1794,10 +1800,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,N,K,K1,KK1,N1,N2,N3,N4,ID,IAD,IS,NN,NTY
+      INTEGER I, J,K,K1,KK1,N1,N2,N3,N4,IS,NN,NTY
       my_real
      .   TEMP,VOL ,NOR(3,NNMAX_MV),
-     .   XX,YY,ZZ,X12,Y12,Z12,X13,Y13,Z13,X24,Y24,Z24,
+     .   XX,YY,ZZ,X13,Y13,Z13,X24,Y24,Z24,
      .   FNI(3),DPI,DPRES
 C----------------actualise X---------------------
       CALL IMP3_U2X(X     ,IPARI  ,INTBUF_TAB,NDOF  ,
@@ -1839,15 +1845,11 @@ C-----------calcul VOL,PRESS------
           NOR(3,J)=HALF*(X13*Y24-X24*Y13)
           VOL= VOL+THIRD*(NOR(1,J)*XX+NOR(2,J)*YY+NOR(3,J)*ZZ)
          ENDDO
-          IF(IMACH==3) THEN
-cow51g8+1
-           IF (NSPMD > 1) THEN
-            TEMP = VOL
-            CALL SPMD_FR_POFF(FR_MV(1,I),TEMP,1)
-            VOL = TEMP
-cow51g8+1
-           ENDIF
-          ENDIF
+         IF (NSPMD > 1) THEN
+          TEMP = VOL
+          CALL SPMD_FR_POFF(FR_MV(1,I),TEMP,1)
+          VOL = TEMP
+         ENDIF
          CALL IMP_PVGA(MONVOL(K1),VOLMON(KK1),VOL ,DPRES)
 C-----------noeud independant -> W------
         IF (DPRES/=ZERO) THEN
@@ -1896,28 +1898,29 @@ C-----------noeud independant -> W------
      .              ID_MVM4)
       RETURN
       END
-      !||====================================================================
-      !||    imp3_u2x        ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    int_matv        ../engine/source/implicit/imp_int_k.F
-      !||    int_matvp       ../engine/source/implicit/imp_int_k.F
-      !||    mv_matv         ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_upd2d        ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updd         ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impd        ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fv_impd         ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    i2_frrd0        ../engine/source/interfaces/interf/i2_imp2.F
-      !||    i2_frrd1        ../engine/source/interfaces/interf/i2_imp2.F
-      !||    l_dir           ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    prerbe2fr       ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    prerbe3fr       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe2_frd        ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    rbe3_frd        ../engine/source/constraints/general/rbe3/rbe3v.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
-      !||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp3_u2x        ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    int_matv        ../engine/source/implicit/imp_int_k.F
+!||    int_matvp       ../engine/source/implicit/imp_int_k.F
+!||    mv_matv         ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_upd2d        ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updd         ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impd        ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fv_impd         ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    i2_frrd0        ../engine/source/interfaces/interf/i2_imp2.F
+!||    i2_frrd1        ../engine/source/interfaces/interf/i2_imp2.F
+!||    l_dir           ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    prerbe2fr       ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    prerbe3fr       ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe2_frd        ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    rbe3_frd        ../engine/source/constraints/general/rbe3/rbe3v.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
+!||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE IMP3_U2X(X     ,IPARI  ,INTBUF_TAB,NDOF  ,
      .                   LX     ,A      ,AR     ,X_IMP ,NUMN  ,
      .                   INL    ,IDDL   ,NRB    ,IRB   ,IDDLM ,
@@ -1965,7 +1968,7 @@ C-----------------------------------------------
      .        NN,L,NNOD,NJ,ND,NL,ISK,IFM,LJFR(NFXVEL),IROT,IRAD,IC
       my_real
      .  XS,YS,ZS,EJ(3)
-C------utilise A,AR pour actualise U------
+C------ Use A, argues U -------
        DO I = 1, NUMN
         N = INL(I)
         DO J = 1, 3
@@ -2052,7 +2055,7 @@ C------Rigid bodies-------
           ENDIF
          ENDDO
        ENDDO
-C------esperons le hierachic est dans l'ordre
+C------hope the hierarchy is in order
        DO I=NRB,1,-1
         M=IRB(1,I)
          DO J = 1 , MIN(3,NDOF(M))
@@ -2160,7 +2163,7 @@ C------int2-------
          ELSE
           NNOD=4
          ENDIF
-C-------si noeud main est dependant aussi-----
+C------ SI Main node is also dependent -----
          DO M=1,NNOD
           NJ=INTBUF_TAB(N)%IRECTM(NL+M)
            DO J=1,NDOF(NJ)
@@ -2187,7 +2190,7 @@ C
          ELSE
           NNOD=4
          ENDIF
-C-------si noeud main est dependant aussi-----
+C------ SI Main node is also dependent -----
          DO M=1,NNOD
           NJ=INTBUF_TAB(N)%IRECTM(NL+M)
            DO J=1,NDOF(NJ)
@@ -2212,7 +2215,7 @@ C-------si noeud main est dependant aussi-----
         ENDIF
        ENDDO
 C
-C------Actuallise-X(*) dans X_IMP-----
+Cupdate-x(*) in x_imp
        DO I = 1, NUMN
         N = INL(I)
         DO J = 1, 3
@@ -2222,11 +2225,11 @@ C------Actuallise-X(*) dans X_IMP-----
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_pvga   ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    mv_matv    ../engine/source/airbag/monv_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    imp_pvga   ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    mv_matv    ../engine/source/airbag/monv_imp0.F
+!||====================================================================
       SUBROUTINE IMP_PVGA(IVOLU ,RVOLU   ,VOL     ,DPRES    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2246,7 +2249,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IDEF,IV
+      INTEGER IDEF
 C     REAL
       my_real
      .   VOL,VINC,GAMA,PRES,PMAX,VEPS,POLD,VOLD,PEXT,
@@ -2270,7 +2273,7 @@ C
       IF(IDEF==1)THEN
         PRES  = PEXT
       ELSE
-C       CALCUL DE L ENERGIE PUIS DE LA PRESSION
+C       calculation of energy and then pressure
         FAC  = HALF*(GAMA-ONE)*DV
         ENERGY= ((ONE-FAC/(VOLD-VINC))*ENERG_OLD-DEOUT*DT1 ) /
      .                             (ONE+FAC/(VOL-VINC))
@@ -2290,30 +2293,31 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    imp3_a2b        ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    int_matv        ../engine/source/implicit/imp_int_k.F
-      !||    int_matvp       ../engine/source/implicit/imp_int_k.F
-      !||    mv_matv         ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_fi           ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_fi2          ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updf         ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fv_updf         ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    i2_frfm0        ../engine/source/interfaces/interf/i2_imp1.F
-      !||    i2_frfm1        ../engine/source/interfaces/interf/i2_imp1.F
-      !||    kin_updf        ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    l_dir           ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    prerbe2fr       ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    prerbe3fr       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe2frf         ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    rbe3frf         ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rby_impf        ../engine/source/constraints/general/rbody/rby_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
-      !||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp3_a2b        ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    int_matv        ../engine/source/implicit/imp_int_k.F
+!||    int_matvp       ../engine/source/implicit/imp_int_k.F
+!||    mv_matv         ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_fi           ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_fi2          ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updf         ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fv_updf         ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    i2_frfm0        ../engine/source/interfaces/interf/i2_imp1.F
+!||    i2_frfm1        ../engine/source/interfaces/interf/i2_imp1.F
+!||    kin_updf        ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    l_dir           ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    prerbe2fr       ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    prerbe3fr       ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe2frf         ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    rbe3frf         ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rby_impf        ../engine/source/constraints/general/rbody/rby_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc        ../engine/share/modules/impbufdef_mod.F
+!||    imp_rwl         ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE IMP3_A2B(IPARI  ,INTBUF_TAB,NDOF  ,X_IMP  ,
      .                    A      ,AR     ,NUMN  ,INL   ,IDDL   ,
      .                    NRB    ,IRB    ,IDDLM ,NI2   ,II2    ,
@@ -2354,7 +2358,7 @@ C-----------------------------------------------
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,ID,ND,M,N,NS,NI,NSN,ILEV,JT(3),JR(3),
+      INTEGER I,J,ND,M,N,NS,NI,NSN,ILEV,JT(3),JR(3),
      .        JI,K10,K11,K12,K13,K14,J10,J11,J12,J21,
      .        L,NNOD,NJ,NL,IAD,IADS,IROT,ISK,IRAD,NN,IC
       my_real
@@ -2403,7 +2407,7 @@ C------IRTL(NSN)--main el number---
          ELSE
           NNOD=4
          ENDIF
-C-------si noeud main est dependant aussi-----
+C------ SI Main node is also dependent -----
          DO M=1,NNOD
            NJ=INTBUF_TAB(N)%IRECTM(NL+M)
            DO J=1,NDOF(NJ)
@@ -2535,13 +2539,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    recu_kdis   ../engine/source/airbag/monv_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv    ../engine/source/implicit/lin_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_monv    ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    recu_kdis   ../engine/source/airbag/monv_imp0.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv    ../engine/source/implicit/lin_solv.F
+!||--- uses       -----------------------------------------------------
+!||    imp_monv    ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE RECU_KDIS(NDOF   ,D     )
 C-----------------------------------------------
 C   M o d u l e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    imp_dt2   ../engine/source/implicit/imp_dt.F
-      !||--- called by ------------------------------------------------------
-      !||    resol     ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    imp_dt2   ../engine/source/implicit/imp_dt.F
+!||--- called by ------------------------------------------------------
+!||    resol     ../engine/source/engine/resol.F
+!||====================================================================
       SUBROUTINE IMP_DT2(DT_E)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -67,13 +67,13 @@ C         DT_MIN=MAX(DT_E,DT_MIN)
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_dtn    ../engine/source/implicit/imp_dt.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv   ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_dtf    ../engine/source/implicit/imp_dt.F
-      !||====================================================================
+!||====================================================================
+!||    imp_dtn    ../engine/source/implicit/imp_dt.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv   ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    imp_dtf    ../engine/source/implicit/imp_dt.F
+!||====================================================================
       SUBROUTINE IMP_DTN(IT,UL2,FAC,CUMUL_ALEN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -86,7 +86,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "impl1_c.inc"
 #include      "impl2_c.inc"
-#include      "scr05_c.inc" 
 #include      "task_c.inc" 
 #include      "com08_c.inc"
 C-----------------------------------------------
@@ -224,14 +223,14 @@ C------last step-------
         DLA_RIKS = FACT*DT2
        ENDIF
       ENDIF
-C----------reput old dt du to fix_p ------
+C--------- Old DT MADE OF TO FIX_P -------
       IFIX0 = IDTFIX
       IF (IFIX0>0) THEN
        IDTFIX = 0
       ELSE     
        CALL IMP_DTF(FAC)
       ENDIF
-      IF (IMACH/=3.OR.ISPMD==0) THEN
+      IF (ISPMD==0) THEN
       IF (NPRINT/=0) THEN
        WRITE(IOUT,*)
        IF(NPRINT<0)WRITE(ISTDO,*)
@@ -268,14 +267,13 @@ C---------------------------
  1003 FORMAT(5X,'--NEXT TIMESTEP IS DETERMINED BY INPUT FIX POINT--')
  1004 FORMAT(5X,'--RESET TIMESTEP DUE TO INPUT FIX POINT--')
  1005 FORMAT(5X,'--TIMESTEP IS ADJUSTED BY RIKS METHOD TO:',E11.4/)
- 1006 FORMAT(5X,'--TERMINAL LOADING TIME BY RIKS METHOD IS:',E11.4/)
       RETURN
       END
-      !||====================================================================
-      !||    imp_dtf   ../engine/source/implicit/imp_dt.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_dtn   ../engine/source/implicit/imp_dt.F
-      !||====================================================================
+!||====================================================================
+!||    imp_dtf   ../engine/source/implicit/imp_dt.F
+!||--- called by ------------------------------------------------------
+!||    imp_dtn   ../engine/source/implicit/imp_dt.F
+!||====================================================================
       SUBROUTINE IMP_DTF(FAC)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

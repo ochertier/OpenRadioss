@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    static         ../engine/source/general_controls/damping/static.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ngr2usr        ../engine/source/input/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    static         ../engine/source/general_controls/damping/static.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ngr2usr        ../engine/source/input/freform.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE STATIC(V,VR,A,AR,MS,IN,IGRNOD,WEIGHT_MD,WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -43,9 +43,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-!#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "scr11_c.inc"
 #include      "statr_c.inc"
 #include      "stati_c.inc"
@@ -115,8 +113,7 @@ C
        LAST = LAST+1
        ENCINT = ENCIN+ENROT
        IF(ENCINT<ENCINO)THEN
-        IF (IMACH/=3.OR.(IMACH==3.AND.ISPMD==0))
-     .   WFEXT = WFEXT - ENCINT
+        IF (ISPMD==0)WFEXT = WFEXT - ENCINT
         ENCINO=ZERO
         LAST=0
 C
@@ -172,16 +169,14 @@ C
        ENCGRPR = HALF*ENCGRPR
        ENCGRPN = ENCGRP * OMEGA2
        ENCGRPRN = ENCGRPR * OMEGA2
-       IF (IMACH/=3.OR.(IMACH==3.AND.ISPMD==0))
-     .  WFEXT = WFEXT + ENCGRPN - ENCGRP + ENCGRPRN - ENCGRPR
+       IF (ISPMD==0)WFEXT = WFEXT + ENCGRPN - ENCGRP + ENCGRPRN - ENCGRPR
 C
       ELSEIF(ISTAT2==1.AND.ISTATG/=0)THEN
 C
        LAST = LAST+1
        ENCINT = ENCIN+ENROT
        IF(ENCINT<ENCINO)THEN
-        IF (IMACH/=3.OR.(IMACH==3.AND.ISPMD==0))
-     .   WFEXT = WFEXT - ENCINT
+        IF (ISPMD==0)WFEXT = WFEXT - ENCINT
         ENCINO=ZERO
         LAST=0
 C
@@ -206,13 +201,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    e_period      ../engine/source/general_controls/damping/static.F
-      !||--- called by ------------------------------------------------------
-      !||    ener_w0       ../engine/source/general_controls/damping/static.F
-      !||--- calls      -----------------------------------------------------
-      !||    butterworth   ../engine/source/tools/univ/butterworth.F
-      !||====================================================================
+!||====================================================================
+!||    e_period      ../engine/source/general_controls/damping/static.F
+!||--- called by ------------------------------------------------------
+!||    ener_w0       ../engine/source/general_controls/damping/static.F
+!||--- calls      -----------------------------------------------------
+!||    butterworth   ../engine/source/tools/univ/butterworth.F
+!||====================================================================
       SUBROUTINE E_PERIOD(IPI,IPC,F_FIL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -234,7 +229,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J, I , IDF
+ 
 C     REAL
       my_real
      .   ENCINT, EINT,VV1,VV2,FV1,FV2,FV,FF
@@ -307,13 +302,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    ener_w0    ../engine/source/general_controls/damping/static.F
-      !||--- called by ------------------------------------------------------
-      !||    resol      ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    e_period   ../engine/source/general_controls/damping/static.F
-      !||====================================================================
+!||====================================================================
+!||    ener_w0    ../engine/source/general_controls/damping/static.F
+!||--- called by ------------------------------------------------------
+!||    resol      ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    e_period   ../engine/source/general_controls/damping/static.F
+!||====================================================================
       SUBROUTINE ENER_W0
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -337,13 +332,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J, I,FREQ,IDF,IPI,IPC,NC_ACT,IFIRST
+      INTEGER IDF, IPI, IPC, NC_ACT, IFIRST
       PARAMETER (NC_ACT = 200)
 C     REAL
       my_real
-     .   Q_ES,BETATE_N,FC,FI,BETATE_M
+     . BETATE_N,FC,FI,BETATE_M
       my_real
-     .   F_MAX,F_MIN,F_0,EI_TOL
+     . F_MAX,F_0,EI_TOL
 C     REAL
       CHARACTER*8 FILNAME
 C-----------------------------------------------

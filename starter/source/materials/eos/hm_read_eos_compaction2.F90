@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_eos_compaction2_mod   ../starter/source/materials/eos/hm_read_eos_compaction2.F90
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_eos                   ../starter/source/materials/eos/hm_read_eos.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_eos_compaction2_mod   ../starter/source/materials/eos/hm_read_eos_compaction2.F90
+!||--- called by ------------------------------------------------------
+!||    hm_read_eos                   ../starter/source/materials/eos/hm_read_eos.F
+!||====================================================================
       module hm_read_eos_compaction2_mod
       contains
 ! ======================================================================================================================
@@ -35,69 +35,75 @@
 !! \details  RHOR = PM(01)   -> provided by /MAT (can be erased by EOS if present : obsolete)
 !! \details  => MU0 = RHO/RHOR-1.
 !! \details  PM(31) = P(MU0,E0) -> will be used to initialize diagonal of stress tensor SIG(1:3,*)
-      !||====================================================================
-      !||    hm_read_eos_compaction2   ../starter/source/materials/eos/hm_read_eos_compaction2.F90
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_eos               ../starter/source/materials/eos/hm_read_eos.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                    ../starter/source/output/message/message.F
-      !||    finter                    ../starter/source/tools/curve/finter.F
-      !||    hm_get_floatv             ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv               ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted    ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod              ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod               ../starter/share/message_module/message_mod.F
-      !||    submodel_mod              ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_eos_compaction2   ../starter/source/materials/eos/hm_read_eos_compaction2.F90
+!||--- called by ------------------------------------------------------
+!||    hm_read_eos               ../starter/source/materials/eos/hm_read_eos.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                    ../starter/source/output/message/message.F
+!||    finter                    ../starter/source/tools/curve/finter.F
+!||    hm_get_floatv             ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim         ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv               ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted    ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod              ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod               ../starter/share/message_module/message_mod.F
+!||    submodel_mod              ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       subroutine hm_read_eos_compaction2(iout,pm,unitab,lsubmodel,imideos,eos_tag,ieos,npropm,maxeos,&
-                                          eos_param)
+                                          eos_struct, nfunc, npc, tf ,snpc ,npts , ale_rezon_param)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
-      use message_mod
-      use unitab_mod , only : unit_type_
-      use submodel_mod , only : nsubmod, submodel_data
-      use elbuftag_mod , only : eos_tag_
-      use constant_mod , only : zero, two_third, one, two, three, three100, ep20
-      use eos_param_mod , only : eos_param_
+          use message_mod
+          use unitab_mod , only : unit_type_
+          use submodel_mod , only : nsubmod, submodel_data
+          use elbuftag_mod , only : eos_tag_
+          use constant_mod , only : zero, em12, two_third, one, two, three, three100, ep20
+          use eos_param_mod , only : eos_param_
+          use precision_mod , only : WP
+          use ale_mod , only : ale_rezon_
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
       implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
       integer,intent(in) :: npropm, maxeos  !< array sizes
       type (unit_type_),intent(in) ::unitab !< data structure for units (/UNIT)
       integer, intent(in) :: iout !< file units
-      my_real, intent(inout) :: pm(npropm)  !< data structure for material laws
+      real(kind=WP), intent(inout) :: pm(npropm)  !< data structure for material laws
       type(submodel_data), dimension(nsubmod), intent(in) :: lsubmodel !< data structure for sumobeling method (//SUBMODEL)
       integer,intent(in) :: imideos
       type(eos_tag_),dimension(0:maxeos) ,intent(inout) :: eos_tag !< data structure for EoS
       integer,intent(in) :: ieos !< EoS (internal) identifier
-      type(eos_param_), intent(inout) :: eos_param !< eos data structure (specific parameters)
+      type(eos_param_), intent(inout) :: eos_struct !< eos data structure (specific parameters)
+      integer,intent(in) :: snpc, npts, nfunc
+      integer,intent(in) :: npc(snpc)
+      real(kind=WP),intent(in) :: tf(npts)
+      type(ale_rezon_), intent(inout) :: ale_rezon_param
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-      my_real  p0, e0, psh, rho0,rhoi,rhor
-      my_real  mu,mumin,mumax
-      my_real  mu0,ssp0, dpdmu
-      integer iform
-      logical :: is_encrypted, is_available, is_available_rho0
+          real(kind=WP)  :: p0, psh, rho0,rhoi,rhor
+          real(kind=WP)  :: mumin,mumax
+          real(kind=WP)  :: mu0,ssp0, dpdmu
+          integer :: iform
+          logical :: is_encrypted, is_available, is_available_rho0
 
-      integer :: P_FUNC_ID !< user function identifer
-      my_real :: Fscale, Xscale !< function scale factors
-      my_real :: bmin, bmax !< unload modulus
-      my_real :: dpdm0
+          integer :: P_FUNC_ID !< user function identifer
+          integer :: jfunc !< loop
+          real(kind=WP) :: Fscale, Xscale !< function scale factors
+          real(kind=WP) :: bmin, bmax !< unload modulus
+          real(kind=WP) :: tmp, dpdmu_mumax, dpdmu_mumin
+
+      real(kind=WP) :: fac_pres !< factor for unit translation
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   External
 ! ----------------------------------------------------------------------------------------------------------------------
-      my_real, external :: finter
+          real(kind=WP), external :: finter
 ! In order to get : y <- f(x)  and dydx <- f'(x) :
 ! Use :             y = FINTER(func_id,x,NPF,TF,dydx)
 !                       where - NPF,TF are constant arrays automatically built by Starter (/FUNCT data).
@@ -107,131 +113,173 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
-      is_encrypted = .false.
-      is_available = .false.
-      is_available_rho0 = .false.
-      iform=0
+          is_encrypted = .false.
+          is_available = .false.
+          is_available_rho0 = .false.
+          iform=0
+          p0=zero
 
-      eos_tag(ieos)%g_mu = 1
-      eos_tag(ieos)%l_mu = 1
-           
-      call hm_option_is_encrypted(is_encrypted)
+          eos_tag(ieos)%nvar = 1  !  --> elbuf%bufly%eos%nvar      (LAMBDA, C*C, Pnew, GAMMA, Pc, rho_bak)
+          !< ALE rezoning.
+          ! tell to rezoning how many user variables (uvar) must be rezoned.
+          ! Example :  nuvar = 5          ! material law has 5 user variables
+          !            %num_nuvar_mat = 2 ! uvar(I,1) and uvar(i,1) will be rezoned.
+          ale_rezon_param%num_nuvar_eos = 1
 
-      call hm_get_intv('P_FUNC', P_FUNC_ID, is_available,lsubmodel)
-      call hm_get_floatv('FSCALE_P', Fscale, is_available,lsubmodel,unitab)
-      call hm_get_floatv('XSCALE_P', Xscale, is_available,lsubmodel,unitab)
-      call hm_get_intv('IFORM', IFORM, is_available,lsubmodel)
+          call hm_option_is_encrypted(is_encrypted)
 
-      call hm_get_floatv('EOS_COM_Mue_min', mumin, is_available,lsubmodel,unitab)
-      call hm_get_floatv('EOS_COM_Mue_max', mumax, is_available,lsubmodel,unitab)
-      call hm_get_floatv('EOS_COM_BT', bmin, is_available,lsubmodel,unitab)
-      call hm_get_floatv('EOS_COM_B', bmax, is_available,lsubmodel,unitab)
+          call hm_get_intv('P_FUNC', P_FUNC_ID, is_available,lsubmodel)
+          call hm_get_floatv('FSCALE_P', Fscale, is_available,lsubmodel,unitab)
+          call hm_get_floatv('XSCALE_P', Xscale, is_available,lsubmodel,unitab)
+          call hm_get_intv('IFORM', IFORM, is_available,lsubmodel)
 
-      call hm_get_floatv('LAW5_PSH', psh, is_available,lsubmodel,unitab)
-      call hm_get_floatv('Refer_Rho', rho0, is_available_rho0,lsubmodel,unitab)
+          call hm_get_floatv('EOS_COM_Mue_min', mumin, is_available,lsubmodel,unitab)
+          call hm_get_floatv('EOS_COM_Mue_max', mumax, is_available,lsubmodel,unitab)
+          call hm_get_floatv('EOS_COM_BT', bmin, is_available,lsubmodel,unitab)
+          call hm_get_floatv('EOS_COM_B', bmax, is_available,lsubmodel,unitab)
 
-      rhor = pm(1)
-      rhoi = pm(89)
+          call hm_get_floatv('LAW5_PSH', psh, is_available,lsubmodel,unitab)
+          call hm_get_floatv('Refer_Rho', rho0, is_available_rho0,lsubmodel,unitab)
 
-      if(rho0 > zero) then
-        rhor = rho0
-        pm(1)= rho0
-      else
-        rho0=rhor
-      endif
+          !get dimension factor FSCALE_P for pressure (if any unit conversion to do)
+          call hm_get_floatv_dim('FSCALE_P', fac_pres, is_available, lsubmodel, unitab)
 
-      if(bmin <= zero)then
-         call ancmsg(MSGID=67,MSGTYPE=msgerror,ANMODE=aninfo,I1=imideos,C1='/EOS/COMPACTION2',C2='BMIN MUST BE POSITIVE')
-      endif
+          rhor = pm(1)
+          rhoi = pm(89)
 
-      if(bmax <= zero)then
-         call ancmsg(MSGID=67,MSGTYPE=msgerror,ANMODE=aninfo,I1=imideos,C1='/EOS/COMPACTION2',C2='BMAX MUST BE POSITIVE')
-      endif
+          if(rho0 > zero) then
+            rhor = rho0
+            pm(1)= rho0
+          else
+            rho0=rhor
+          endif
 
-      !iform=1 : constant unload modulus bunl (old Radioss revision)
-      !iform=2 : linear uload modulus from c1 to bunl (default)
-      if(iform /= 1 .and. iform /= 2)then
-        iform=2 !default
-      endif
+          if(bmin <= zero)then
+            call ancmsg(MSGID=67,MSGTYPE=msgerror,ANMODE=aninfo,I1=imideos,C1='/EOS/COMPACTION2',C2='BMIN MUST BE POSITIVE')
+          endif
 
-      if(mumax == zero) mumax=ep20
-      
-      mu = rho0/rhor-one
-      e0 = zero
-      if(pm(79)==zero)pm(79)=three100
-      pm(23) = e0
+          if(bmax <= zero)then
+            call ancmsg(MSGID=67,MSGTYPE=msgerror,ANMODE=aninfo,I1=imideos,C1='/EOS/COMPACTION2',C2='BMAX MUST BE POSITIVE')
+          endif
 
-      eos_param%nuparam = 7
-      eos_param%niparam = 1
-      eos_param%nuvar = 0
-      eos_param%nfunc = 1
-      eos_param%ntable = 0
-      call eos_param%construct() !allocations
+          !Default values
+          if(iform /= 1 .and. iform /= 2)then
+            !iform=1 : constant unload modulus bunl (old Radioss revision)
+            !iform=2 : linear uload modulus from c1 to bunl (default)
+            iform=2 !default
+          endif
 
-      !real parameters
-      eos_param%uparam(1) = bmin
-      eos_param%uparam(2) = bmax
-      eos_param%uparam(3) = mumin
-      eos_param%uparam(4) = mumax
-      eos_param%uparam(5) = Fscale
-      eos_param%uparam(6) = Xscale
-      eos_param%uparam(7) = psh
+          if(mumax == zero) mumax = ep20
+
+          if(Xscale == zero) Xscale = one
+
+      if(Fscale == zero) Fscale = one * fac_pres
+
+          if(pm(79)==zero)pm(79)=three100
 
       !integer parameters
-      eos_param%iparam(1) = iform
+      eos_struct%nuparam = 6
+      eos_struct%niparam = 1
+      eos_struct%nfunc = 1
+      eos_struct%ntable = 0
+      call eos_struct%construct() !allocations
+
+      !real parameters
+      eos_struct%uparam(1) = bmin
+      eos_struct%uparam(2) = bmax
+      eos_struct%uparam(3) = mumin
+      eos_struct%uparam(4) = mumax
+      eos_struct%uparam(5) = Fscale
+      eos_struct%uparam(6) = Xscale
+
+      eos_struct%psh = psh
+      eos_struct%e0 = zero
+
+      !integer parameters
+      eos_struct%iparam(1) = iform
 
       !functions
-      eos_param%func(1) = P_FUNC_ID ! user function id
+      eos_struct%func(1) = P_FUNC_ID ! user function id
 
-      !initial sound speed
-      if(rhoi == zero)then
-        mu0 = zero ! error 683 already displayed
-      else
-        if(rhor /= zero)then
-          mu0 = rhoi/rhor-one
-        else
-          mu0 = zero ! error 683 already displayed
-        endif
-      endif
+          !initial sound speed
+          if(rhoi == zero)then
+            mu0 = zero ! error 683 already displayed
+          else
+            if(rhor /= zero)then
+              mu0 = rhoi/rhor-one
+            else
+              mu0 = zero ! error 683 already displayed
+            endif
+          endif
 
-      !ssp0
-      ssp0 = zero
-      dpdmu=max(bmin,bmax)
-      if(rhor > zero) ssp0 = sqrt(dpdmu/rhor)
-      pm(27) = max(ssp0, pm(27))
-      pm(31) = p0-psh
-      pm(104)= p0-psh
+          !check unload modulus regarding C1
+          do jfunc=1,nfunc
+            if(npc(nfunc + jfunc + 1) == P_FUNC_ID) then
+              tmp = finter(jfunc ,-em12 ,npc,tf,dpdmu_mumin)
+              dpdmu_mumin = dpdmu_mumin * fac_pres
+              if(bmin < dpdmu_mumin)  then
+                call ancmsg(MSGID=67,MSGTYPE=msgerror,ANMODE=aninfo,I1=imideos, &
+                  C1='/EOS/COMPACTION2',C2='BMIN MUST BE GREATER THAN DERIVATIVE OF P(MU) AT 0.0')
+              end if
+              exit
+            end if
+          end do
 
-      write(iout,1000)
-      if(is_encrypted)then
-        WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
-      else
-        write(iout,1500) P_FUNC_ID, fscale, xscale, psh, bmin, bmax, mumin, mumax
-        if(is_available_rho0)write(iout,1503) pm(1)
-        if(iform==1)write(iout,1501)
-      endif
+          !check unload modulus regarding point of maximum compaction
+          if(mumax > zero .and. mumax < 1000.)then !possible overflow with unphysical value
+            do jfunc=1,nfunc
+              if(npc(nfunc + jfunc + 1) == P_FUNC_ID) then
+                tmp = finter(jfunc ,mumax,npc,tf,dpdmu_mumax)
+                dpdmu_mumax = dpdmu_mumax * fac_pres
+                if(bmax < dpdmu_mumax)  then
+                  call ancmsg(MSGID=67,MSGTYPE=msgerror,ANMODE=aninfo,I1=imideos, &
+                    C1='/EOS/COMPACTION2',C2='BMAX MUST BE GREATER THAN DERIVATIVE OF P(MU) AT MUMAX')
+                end if
+                exit
+              end if
+            end do
+          end if
 
-      return
+          !ssp0
+          ssp0 = zero
+          dpdmu=max(bmin,bmax)
+          if(rhor > zero) ssp0 = sqrt(dpdmu/rhor)
+          pm(27) = max(ssp0, pm(27))
+          pm(23) = zero ! e0
+          pm(31) = p0-psh
+          pm(32)= dpdmu !bulk modulus at mu=0
+          pm(104)= p0-psh
+
+          write(iout,1000)
+          if(is_encrypted)then
+            WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
+          else
+            write(iout,1500) P_FUNC_ID, fscale, xscale, psh, bmin, bmax, mumin, mumax
+            if(is_available_rho0)write(iout,1503) pm(1)
+            if(iform==1)write(iout,1501)
+          endif
+
+          return
 ! ----------------------------------------------------------------------------------------------------------------------
 
- 1000 FORMAT(&
-      5X,'  COMPACTION2 EOS    ',/,&
-      5X,'  ---------------    ',/)
- 1500 FORMAT(&
-      5X,'FUNCTION IDENTIFIER . . . . . . . . . . . .=',I10/,&
-      5X,'Y-SCALE FACTOR. . . . . . . . . . . . . . .=',1PG20.13/,&
-      5X,'X-SCALE FACTOR. . . . . . . . . . . . . . .=',1PG20.13/,&
-      5X,'PRESSURE SHIFT. . . . . . . . . . . . . . .=',1PG20.13/,&
-      5X,'BMIN : MINIMUM UNLOADING MODULUS  . . . . .=',1PG20.13/,&
-      5X,'BMAX : MAXIMUM UNLOADING MODULUS  . . . . .=',1PG20.13/,&
-      5X,'MU_MIN : ELASTIC LIMIT. . . . . . . . . . .=',1PG20.13/,&
-      5X,'MU_MAX : MAXIMUM COMPACTION . . . . . . . .=',1PG20.13)
- 1501 FORMAT(&
-      5X,'CONSTANT UNLOAD MODULUS'/)
- 1503 FORMAT(&
-      5X,'EOS REFERENCE DENSITY . . . . . . . . . .=',1PG20.13)
+1000      FORMAT(&
+            5X,'  COMPACTION2 EOS    ',/,&
+            5X,'  ---------------    ',/)
+1500      FORMAT(&
+            5X,'FUNCTION IDENTIFIER . . . . . . . . . . . .=',I10/,&
+            5X,'Y-SCALE FACTOR. . . . . . . . . . . . . . .=',1PG20.13/,&
+            5X,'X-SCALE FACTOR. . . . . . . . . . . . . . .=',1PG20.13/,&
+            5X,'PRESSURE SHIFT. . . . . . . . . . . . . . .=',1PG20.13/,&
+            5X,'BMIN : MINIMUM UNLOADING MODULUS  . . . . .=',1PG20.13/,&
+            5X,'BMAX : MAXIMUM UNLOADING MODULUS  . . . . .=',1PG20.13/,&
+            5X,'MU_MIN : ELASTIC LIMIT. . . . . . . . . . .=',1PG20.13/,&
+            5X,'MU_MAX : MAXIMUM COMPACTION . . . . . . . .=',1PG20.13)
+1501      FORMAT(&
+            5X,'CONSTANT UNLOAD MODULUS'/)
+1503      FORMAT(&
+            5X,'EOS REFERENCE DENSITY . . . . . . . . . .=',1PG20.13)
 
-      END SUBROUTINE HM_READ_EOS_COMPACTION2
+        END SUBROUTINE HM_READ_EOS_COMPACTION2
 ! ----------------------------------------------------------------------------------------------------------------------
-      
+
       END MODULE hm_read_eos_compaction2_mod

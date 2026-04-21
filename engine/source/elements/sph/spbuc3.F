@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mod_spbuc3   ../engine/source/elements/sph/spbuc3.F
-      !||--- called by ------------------------------------------------------
-      !||    spbuc3       ../engine/source/elements/sph/spbuc3.F
-      !||====================================================================
+!||====================================================================
+!||    mod_spbuc3   ../engine/source/elements/sph/spbuc3.F
+!||--- called by ------------------------------------------------------
+!||    spbuc3       ../engine/source/elements/sph/spbuc3.F
+!||====================================================================
       MODULE MOD_SPBUC3
       implicit none
       INTEGER*8, DIMENSION(:), ALLOCATABLE ::  IV
@@ -33,23 +33,23 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       INTEGER, DIMENSION(:,:), ALLOCATABLE ::  IXSPR
 
       END MODULE MOD_SPBUC3
-      !||====================================================================
-      !||    spbuc3           ../engine/source/elements/sph/spbuc3.F
-      !||--- called by ------------------------------------------------------
-      !||    sphtri           ../engine/source/elements/sph/sphtri.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../engine/source/output/message/message.F
-      !||    arret            ../engine/source/system/arret.F
-      !||    my_barrier       ../engine/source/system/machine.F
-      !||    myqsort          ../common_source/tools/sort/myqsort.F
-      !||    sptrivox         ../engine/source/elements/sph/sptrivox.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||    mod_spbuc3       ../engine/source/elements/sph/spbuc3.F
-      !||    sph_struct_mod   ../engine/share/modules/sph_struct_mod.F
-      !||    sphbox           ../engine/share/modules/sphbox.F
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spbuc3           ../engine/source/elements/sph/spbuc3.F
+!||--- called by ------------------------------------------------------
+!||    sphtri           ../engine/source/elements/sph/sphtri.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../engine/source/output/message/message.F
+!||    arret            ../engine/source/system/arret.F
+!||    my_barrier       ../engine/source/system/machine.F
+!||    myqsort          ../common_source/tools/sort/myqsort.F
+!||    sptrivox         ../engine/source/elements/sph/sptrivox.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../engine/share/message_module/message_mod.F
+!||    mod_spbuc3       ../engine/source/elements/sph/spbuc3.F
+!||    sph_struct_mod   ../engine/share/modules/sph_struct_mod.F
+!||    sphbox           ../engine/share/modules/sphbox.F
+!||    tri7box          ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPBUC3(X     ,KXSP   ,IXSP  ,NOD2SP,NSN   ,
      2                  SPBUF ,MA     ,JVOIS ,JSTOR ,JPERM ,
      3                  DVOIS ,IREDUCE,BMINMA,NSNR  ,NSP2SORTF,
@@ -86,13 +86,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER L, N0, N1, N2, N3, N4, I, J, NBMX, N11, N12, N14, N,
-     .  INOD,JNOD,NVOIS,NVOIS1,NVOIS2,K,M,NN,NS,MS,JK,IERROR,JTASK,
-     .  MY_ADRV,NVOISS
-C     REAL
-      my_real
-     .        MARGE, AAA, 
-     .        AAA2, XI,YI,ZI,XJ,YJ,ZJ, D2,D1X,D1Y,D1Z,DK
+      INTEGER :: I, N, INOD,JNOD,NVOIS,NVOIS1,NVOIS2,K,M,NN,NS,MS,JK,IERROR,JTASK,MY_ADRV,NVOISS
+      my_real :: MARGE, AAA, AAA2, XI,YI,ZI,XJ,YJ,ZJ, D2,D1X,D1Y,D1Z,DK
       INTEGER NBX,NBY,NBZ
       INTEGER (KIND=8) :: NBX8,NBY8,NBZ8,RES8,LVOXEL8
 C-----------------------------------------------
@@ -141,8 +136,8 @@ c!!!!      MARGE = TZINF-MAX(GAP,PMAX_GAP)  ! il s agit bien de la marge
         NBZ = MIN(100,MAX(NBZ8,1))
       ENDIF
 
-C     initialisation complete de VOXEL
-C (en // SMP il y a possibilite de redondance de traitement mais no pb)
+C     complete initialization of VOXEL
+C (in // SMP there is possibility of processing redundancy but no pb)
       DO I=INIVOXEL,(NBX+2)*(NBY+2)*(NBZ+2)
         VOXEL1(I)=0
       ENDDO
@@ -215,7 +210,7 @@ C-------
 
             END IF
           ELSE
-C on ne fait rien pour le remote
+C we do nothing for the remote
           ENDIF
         END DO
       END DO      
@@ -287,7 +282,7 @@ C-------
 
             END IF
           ELSE
-C on ne fait rien pour le remote
+C we do nothing for the remote
           ENDIF
         END DO
       END DO      
@@ -340,7 +335,7 @@ C-------
 
           AAA2 = AAA*AAA
 
-C a faire : symetrie parfaite <=> X(hmin)-X(hmax)
+C To do: Perfect symet <=> x (hmin) -x (hmax)
           D1X = XI - XJ
           D1Y = YI - YJ
           D1Z = ZI - ZJ
@@ -379,7 +374,7 @@ C a faire : symetrie parfaite <=> X(hmin)-X(hmax)
 
           AAA2 = AAA*AAA
 
-C a faire : symetrie parfaite <=> X(hmin)-X(hmax)
+C To do: Perfect symet <=> x (hmin) -x (hmax)
           D1X = XI - XJ
           D1Y = YI - YJ
           D1Z = ZI - ZJ
@@ -404,7 +399,7 @@ C a faire : symetrie parfaite <=> X(hmin)-X(hmax)
 
            DK=DVOIS(KVOISPH)
 C-----------------
-C Choix des cellules a conserver tq distance < DK pour eviter pb de parith/on
+C Choice of cells to keep such that distance < DK to avoid parallelization problems
            NVOIS=0
            DO K=1,KVOISPH
             IF(DVOIS(K)<DK)THEN

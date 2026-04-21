@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdkevec3          ../starter/source/elements/sh3n/coquedk/cdkevec3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3           ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    c3newve3          ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||    cdkepsini         ../starter/source/elements/sh3n/coquedk/cdkepsini.F
-      !||    cdkfint_reg_ini   ../starter/source/elements/sh3n/coquedk/cdkfint_reg_ini.F
-      !||    cdkinit3          ../starter/source/elements/sh3n/coquedk/cdkinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    clskew3           ../starter/source/elements/shell/coque/clskew.F
-      !||====================================================================
+!||====================================================================
+!||    cdkevec3          ../starter/source/elements/sh3n/coquedk/cdkevec3.F
+!||--- called by ------------------------------------------------------
+!||    c3init3           ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    c3newve3          ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||    cdkepsini         ../starter/source/elements/sh3n/coquedk/cdkepsini.F
+!||    cdkfint_reg_ini   ../starter/source/elements/sh3n/coquedk/cdkfint_reg_ini.F
+!||    cdkinit3          ../starter/source/elements/sh3n/coquedk/cdkinit3.F
+!||--- calls      -----------------------------------------------------
+!||    clskew3           ../starter/source/elements/shell/coque/clskew.F
+!||====================================================================
       SUBROUTINE CDKEVEC3(JFT ,JLT ,AREA,
      .                    X1  ,X2  ,X3  ,Y1  ,Y2  ,Y3  ,
      .                    Z1  ,Z2  ,Z3  ,E1X ,E2X ,E3X ,

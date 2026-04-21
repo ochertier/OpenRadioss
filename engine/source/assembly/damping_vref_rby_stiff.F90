@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    damping_vref_rby_stiff_mod   ../engine/source/assembly/damping_vref_rby_stiff.F90
-      !||--- called by ------------------------------------------------------
-      !||    rbyfor                       ../engine/source/constraints/general/rbody/rbyfor.F
-      !||====================================================================
+!||====================================================================
+!||    damping_vref_rby_stiff_mod   ../engine/source/assembly/damping_vref_rby_stiff.F90
+!||--- called by ------------------------------------------------------
+!||    rbyfor                       ../engine/source/constraints/general/rbody/rbyfor.F
+!||====================================================================
       module damping_vref_rby_stiff_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
@@ -35,27 +36,25 @@
 !!\brief This subroutine computes nodal stiffness on main nodes of RBODY for /DAMP/VREL
 !=======================================================================================================================
 !
-      !||====================================================================
-      !||    damping_vref_rby_stiff   ../engine/source/assembly/damping_vref_rby_stiff.F90
-      !||--- called by ------------------------------------------------------
-      !||    rbyfor                   ../engine/source/constraints/general/rbody/rbyfor.F
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod             ../common_source/modules/constant_mod.F
-      !||====================================================================
+!||====================================================================
+!||    damping_vref_rby_stiff   ../engine/source/assembly/damping_vref_rby_stiff.F90
+!||--- called by ------------------------------------------------------
+!||    rbyfor                   ../engine/source/constraints/general/rbody/rbyfor.F
+!||--- uses       -----------------------------------------------------
+!||    constant_mod             ../common_source/modules/constant_mod.F
+!||    precision_mod            ../common_source/modules/precision_mod.F90
+!||====================================================================
         subroutine damping_vref_rby_stiff(numnod,nnpby,nrbykin,nrbykin_l,npby,                       &
-          rby6_c,ms,in,stifn,stifr,size_rby6_c,irbkin_l)
+          rby6_c,ms,in,stifn,stifr,size_rby6_c,irbkin_l,nhi)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use constant_mod , only: one,two,em20
+          use precision_mod , only: WP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -66,16 +65,17 @@
           integer,                                   intent(in) :: npby(nnpby,nrbykin)         !< main structure for rigid bodies
           integer,                                   intent(in) :: size_rby6_c                 !< dimension of array rby6c
           integer,                                   intent(in) :: irbkin_l(nrbykin)           !< local global id of rigid_body
-          my_real,                                   intent(in) :: ms(numnod)                  !< nodal mass
-          my_real,                                   intent(in) :: in(numnod)                  !< nodal inertia
-          my_real,                                intent(inout) :: stifn(numnod)               !< nodal stiffness
-          my_real,                                intent(inout) :: stifr(numnod)               !< nodal rotational stiffness
+          integer,                                   intent(in) :: nhi                         !< hierarchy level of Rbody
+          real(kind=WP),                                   intent(in) :: ms(numnod)                  !< nodal mass
+          real(kind=WP),                                   intent(in) :: in(numnod)                  !< nodal inertia
+          real(kind=WP),                                intent(inout) :: stifn(numnod)               !< nodal stiffness
+          real(kind=WP),                                intent(inout) :: stifr(numnod)               !< nodal rotational stiffness
           double precision,                          intent(in) :: rby6_c(2,6,size_rby6_c)         !< working array for rigid body damping assembly
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
           integer :: nd,m,n
-          my_real :: c_tot,cr_tot,dd,fac
+          real(kind=WP) :: c_tot,cr_tot,dd,fac
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@
           do n=1,nrbykin_l
 
             nd = irbkin_l(n)
-            if(npby(7,nd)>0) THEN
+            if(npby(7,nd)>0.and.npby(20,nd)==nhi) THEN
 
               m = npby(1,nd)
 
@@ -98,9 +98,9 @@
               fac = sqrt(one + dd*dd) - dd
               stifr(m) = stifr(m) / fac**2
 !
-            endif
+            end if
 !
-          enddo
+          end do
 !
 ! ----------------------------------------------------------------------------------------------------------------------
         end subroutine damping_vref_rby_stiff

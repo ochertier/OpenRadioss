@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thrnur   ../engine/source/output/th/thrnur.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2    ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar     ../engine/source/input/nvar.F
-      !||====================================================================
+!||====================================================================
+!||    thrnur   ../engine/source/output/th/thrnur.F
+!||--- called by ------------------------------------------------------
+!||    hist2    ../engine/source/output/th/hist2.F
+!||====================================================================
       SUBROUTINE THRNUR(IAD,NN,IADV,NVAR,IPARG,
      .                 ITHBUF,BUFEL,    WA )
 C-----------------------------------------------
@@ -37,7 +35,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -51,31 +48,27 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER II, I, N, IH, NG, ITY, MTE, NB1, NB2, NB3,
-     .   NB4, NB5, NB6, NB10, NB11, NB12, NB13, K, M1, M2, M3, M4, M5,
-     .   M6, N1, N2, N3, N4, N5, NB7, NB8, M11, M10, NB9,IP,L,
-     .   NB2A, NB2B, NB4A, NB4B,  NB9A, NB9B, M8,NB14, NB15, NB16, NB17,
-     .   NB10A, NB10B, NB12A, NB12B, NB18,NB8A, NB8B, OFFSET1,OFFSET2,
+     .   NB4, NB5, NB6, K, M1, M2, M3,
+     .           IP,
+     .         
+     .         
      .   LWA,NEL,NFT
       my_real
      .   WWA(100),XFN
       II=0
       IH=IAD
-C   specifique spmd
-      IF (IMACH==3) THEN
-        LWA = NN*NVAR
-        DO I = 1, LWA
-          WA(I) = ZERO
-        ENDDO
+C   SPECIFIC SPMD
+      LWA = NN*NVAR
+      DO I = 1, LWA
+        WA(I) = ZERO
+      ENDDO
 C decalage IH
-        DO WHILE((ITHBUF(IH+NN)/=ISPMD).AND.
-     .           (IH<IAD+NN))
-          IH = IH + 1
-        ENDDO
-        IF (IH>=IAD+NN) RETURN 
-      ENDIF
+      DO WHILE((ITHBUF(IH+NN)/=ISPMD).AND.(IH<IAD+NN))
+        IH = IH + 1
+      ENDDO
+      IF (IH>=IAD+NN) RETURN 
 C
       DO NG=1,NGROUP
-C          IF(IMACH==3) IWA(NG) = II+1
         ITY=IPARG(5,NG)
         IF(ITY==50) THEN
           MTE=IPARG(1,NG)
@@ -95,16 +88,13 @@ C
 C
             IF (K==N)THEN
               IH=IH+1
-C   traitement specifique spmd
-              IF (IMACH==3) THEN
-C recherche du ii correct
-                II = ((IH-1) - IAD)*NVAR
-                DO WHILE((ITHBUF(IH+NN)/=ISPMD).AND.
-C    .                   (IH<=IAD+NN))
-     .                   (IH<IAD+NN))
-                  IH = IH + 1
-                ENDDO
-              ENDIF
+C   SPECT SPMD treatment
+
+C search for the correct ii
+              II = ((IH-1) - IAD)*NVAR
+              DO WHILE((ITHBUF(IH+NN)/=ISPMD).AND.(IH<IAD+NN))
+                IH = IH + 1
+              ENDDO
 C
               IF(IH>IAD+NN) RETURN
 C             IF (IP==ISPMD)THEN

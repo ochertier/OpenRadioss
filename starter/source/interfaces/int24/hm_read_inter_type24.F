@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_type24   ../starter/source/interfaces/int24/hm_read_inter_type24.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    definter               ../starter/source/interfaces/interf1/definter.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    inter_dcod_friction    ../starter/source/interfaces/reader/inter_dcod_friction.F
-      !||    inter_dcod_sensor      ../starter/source/interfaces/reader/inter_dcod_sensor.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_type24   ../starter/source/interfaces/int24/hm_read_inter_type24.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    definter               ../starter/source/interfaces/interf1/definter.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    inter_dcod_friction    ../starter/source/interfaces/reader/inter_dcod_friction.F
+!||    inter_dcod_sensor      ../starter/source/interfaces/reader/inter_dcod_sensor.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE24(
      1        IPARI      ,STFAC           ,FRIGAP     ,NOINT      ,NI         ,
      2        IGRNOD     ,IGRSURF         ,XFILTR     ,FRIC_P     ,DEF_INTER ,
@@ -96,22 +96,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,L,IBC1, IBC2, IBC3, IBUC, NOINT, NTYP, IBID,
+      INTEGER I,IBC1, IBC2, IBC3, IBUC, NOINT, NTYP,
      .    INACTI, IBC1M, IBC2M, IBC3M, IGSTI, IVIS2,IS1, IS2,
-     .    ILEV, IGAP,MULTIMP,HIERA,MFROT,IFQ,IBAG,MODFR,IERR1, 
-     .    IFLAGUNIT,ISYM,IEDGE,NOD1,IDUM,IGNORE,IDEL24,KK,II, 
+     .    ILEV, IGAP,MULTIMP,MFROT,IFQ,IBAG,MODFR, 
+     .    ISYM,IEDGE,NOD1,IDUM,IDEL24, 
      .    IGAP0,FLAGREMNOD,IDSENS,IDELKEEP,INTKG,IREM24I2,IPRINT,    
      .    INTFRIC,MULTIMPE,IASSIGN,ICURV,INTPLY,INTTH,NPREF,
      .    INTNITSCHE,IPEN0,NA1,NA2,IADM,NRADM,IFORM,IPSTIF
       my_real
      .    FRIC,GAP,STARTT,BUMULT,STOPT,C1,C2,C3,C4,C5,C6,ALPHA,
-     .    GAPSCALE,GAPMAX,STMIN,STMAX,STIFF,EDG_ANGL,
+     .    GAPSCALE,STMIN,STMAX,EDG_ANGL,
      .    PERCENT_SIZE,GAPMAX_S,GAPMAX_M,PENMAX,PENMIN,VISC,VISCF,
      .    ETEN_M,PADM,ANGLADM,RSTH,FHEAT,TINT,CADM,TPFIT,STFACM,
      .    DTSTIF
-      CHARACTER(LEN=40)::MESS
-      CHARACTER(LEN=NCHARTITLE)::MSGTITL
-      CHARACTER(LEN=NCHARKEY)::OPT,KEY,KEY1
+      CHARACTER(LEN=NCHARKEY)::KEY1
       CHARACTER(LEN=NCHARFIELD)::BCFLAG,BCFLAGM
 !
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
@@ -414,7 +412,7 @@ c          IEDGE=MIN(4,IEDGE)
 
 C--------change default EDG_ANGL=135         
         IF((IEDGE>=3).AND. EDG_ANGL==ZERO) 
-C     +            EDG_ANGL=NINTY+ONE
+C     +            EDG_ANGL=NINETY+ONE
      +            EDG_ANGL=HUNDRED+THIRTY+FIVE
         FRIGAP(26)  = COS((HUNDRED80-EDG_ANGL)*PI/HUNDRED80)
 
@@ -624,7 +622,7 @@ C------------remove BUMULT
         BUMULT=ZERO
         IF(BUMULT==ZERO) THEN
           BUMULT = BMUL0
-C bmult augmente pour les tres gros modeles et interface 7 ou 20
+C bmult increases for very large models and interface 7 or 20
 
             IF(NUMNOD > 2500000) THEN
               BUMULT = BMUL0*TWO
@@ -930,7 +928,6 @@ C--------------------------------------------------------------
       ENDIF
 C
 C--------------------------------------------------------------
- 1000 FORMAT(/1X,'  INTERFACE NUMBER :',I10,1X,A)
 C------------
       RETURN
  999  CALL FREERR(3)
@@ -967,11 +964,7 @@ C------------
  1524 FORMAT(/
      .    '    FRICTION MODEL 0 (Coulomb Law) :'/,
      .    '      FRICTION COEFFICIENT . . . . . . . . . ',1PG20.13/)
- 1525   FORMAT(//
-     .    '    FRICTION MODEL 0 (Coulomb Law) :'/,
-     .  '   Function for FRICTION COEFFICIENT wrt TEMPERATURE',I10/,
-     .      '    Abscissa scale factor on IFUNTCF. . . .  . ',1PG20.13/,
-     .      '    Ordinate scale factor on IFUNTCF .  . .  . ',1PG20.13/)
+
  1526 FORMAT(/
      .    '     EXPONENTIAL DECAY FRICTION LAW   '/
      .    '      MU = c1+(MUo-c1)*exp(-c2*v)'/
@@ -979,10 +972,7 @@ C------------
      .    '      DYNAMIC COEFFICIENT C1 . . . . . . . . . ',1PG20.13/,
      .    '      EXPONENTIAL DECAY COEFFICIENT C2 . . . . ',1PG20.13/)
 
- 1518 FORMAT( '    FRICTION FORMULATION: INCREMENTAL (STIFFNESS) ',
-     .             'FORMULATION')
- 1519 FORMAT( '    FRICTION FORMULATION: TOTAL (VISCOUS) ',
-     .             'FORMULATION')
+
  1520 FORMAT(
      .    '    FRICTION FILTERING FLAG. . . . . . . . . ',I10/,
      .    '    FILTERING FACTOR . . . . . . . . . . . . ',1PG20.13)

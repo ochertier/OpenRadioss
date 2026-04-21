@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    kinchk                 ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    kinchk                 ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE KINCHK(IKINE,RWL,ITAB,NPRW,LPRW,KINET,
      1                  NPBY, LPBY,IRBE2,LRBE2,IRBE3,LRBE3,
      2                  NOM_OPT,PTR_NOPT_RWALL,PTR_NOPT_RBE2,
@@ -70,7 +70,7 @@ C-----------------------------------------------
      .        IK(10), RBWARN, RB2WARN, KRB, NSLRB,
      .        MARQUEUR(8192),
      .        MARQUEURDOUBLE(13),J1,FLAG_IKCOND,MARQ2,MARQM2,
-     .        NS,NM,M,IAD,NUN,JJ,NIKRW
+     .        NS,NM,M,IAD,NUN,JJ,NIKRW,IPEN,NHIER
       INTEGER, DIMENSION(:), ALLOCATABLE :: NKINDOUBLE,NKIN,IKRW
       INTEGER ID
       CHARACTER(LEN=NCHARTITLE) :: TITR
@@ -79,7 +79,7 @@ C-----------------------------------------------------------------
       MARQ2  = 0
       MARQM2 = 0
 C=======================================================================
-C  CORRECTIONS AUTOMATIQUES INTERFACE 1,2,9 OU RBODY AVEC RWALL
+C  AUTOMATIC CORRECTIONS INTERFACE 1,2,9 OR RBODY WITH RWALL
 C=======================================================================
       K=0
       KK=0
@@ -90,6 +90,8 @@ C=======================================================================
         JWARN = 0
         NSL=NPRW(N)
         ITYP=NPRW(N+3*NRWALL)
+        IPEN=NPRW(N+8*NRWALL)
+        IF (IPEN>0) CYCLE 
         J=0
         DO L=1,NSL
           I=LPRW(K+L)
@@ -134,39 +136,62 @@ C=======================================================================
 C
 c      CALL ANCHECK(71)
 C----------------------------------------------------------
-C - no-autorised hierarchy :Check des noeuds mains des RBE3 sont SECONDARY de RBE2,or INT2
+C - unauthorized hierarchy: check that the main nodes of rbe3 are secondary to rbe2 or int2
 C----------------------------------------------------------
+! look at compatibility w/ BCS,RBODY and compute nrbe3_gp, ini penealty
       NUN=0
       DO I=1,NRBE3
         IAD = IRBE3(1,I)
+        IPEN= IRBE3(9,I)
+        IF (IPEN>0) CYCLE 
         NM = IRBE3(5,I)
         DO J =1,NM
         M = LRBE3(IAD+J)
         ID=NOM_OPT(1,PTR_NOPT_RBE3+I)
         CALL FRETITL2(TITR,
      .                NOM_OPT(LNOPT1-LTITR+1,PTR_NOPT_RBE3+I),LTITR)
-          IF (IKRBE2(IKINE(M))==1) THEN
-           CALL ANCMSG(MSGID=805,
+          IF (IKRBE2(IKINE(M))==1) THEN  
+            IF (IPEN<0) THEN  !error out
+              CALL ANCMSG(MSGID=805,
      .                 MSGTYPE=MSGERROR,
      .                 ANMODE=ANINFO_BLIND_1,
      .                 I1=ID,
      .                 C1=TITR,
      .                 I2=ITAB(M))
-           RETURN
+              RETURN
+            ELSE !switch to penalty
+              CALL ANCMSG(MSGID=3100,
+     .                 MSGTYPE=MSGWARNING,
+     .                 ANMODE=ANINFO_BLIND_1,
+     .                 I1=ID,
+     .                 C1=TITR,
+     .                 I2=ITAB(M))
+              IRBE3(9,I) = 1
+            END IF !(IPEN<0)
           ENDIF
           IF (ITF(IKINE(M))==1) THEN
-           CALL ANCMSG(MSGID=1035,
+            IF (IPEN<0) THEN  !error out
+              CALL ANCMSG(MSGID=1035,
      .                 MSGTYPE=MSGERROR,
      .                 ANMODE=ANINFO_BLIND_1,
      .                 I1=ID,
      .                 C1=TITR,
      .                 I2=ITAB(M))
-           RETURN
+              RETURN
+            ELSE !switch to penalty
+              CALL ANCMSG(MSGID=3096,
+     .                 MSGTYPE=MSGWARNING,
+     .                 ANMODE=ANINFO_BLIND_1,
+     .                 I1=ID,
+     .                 C1=TITR,
+     .                 I2=ITAB(M))
+              IRBE3(9,I) = 1
+            END IF !(IPEN<0)
           ENDIF
         ENDDO
       ENDDO
 C----------------------------------------------------------
-C - no-autorised hierarchy :Check des noeuds mains des RBE2 SECONDARY de INT2
+C - unauthorized hierarchy: check that the main nodes of rbe2 are secondary to int2
 C----------------------------------------------------------
       DO I=1,NRBE2
                M = IRBE2(3,I)
@@ -184,7 +209,7 @@ C----------------------------------------------------------
           ENDIF
       ENDDO
 C----------------------------------------------------------
-C - no-autorised hierarchy :Check des noeuds mains des RBODY sont SECONDARY de RBE2
+C - unauthorized hierarchy: check that the main nodes of rbody are secondary to rbe2
 C----------------------------------------------------------
       DO I=1,NRBODY
         M=NPBY(1,I)
@@ -204,25 +229,45 @@ C           NUN=NUN+1
          ENDIF
       ENDDO
 C----------------------------------------------------------
-C - no-autorised hierarchy :Check des noeuds mains des RBODY sont SECONDARY de RBE3
+C - unauthorized hierarchy: check that the main nodes of rbody are secondary to rbe3
 C----------------------------------------------------------
-      DO I=1,NRBODY
+      DO I=1,NRBODY          
         M=NPBY(1,I)
-         IF (IKRBE3(IKINE(M))==1) THEN
-           ID=NOM_OPT(1,I)
-           CALL FRETITL2(TITR,
-     .                   NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
-           CALL ANCMSG(MSGID=810,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO_BLIND_1,
-     .                 I1=ID,
-     .                 C1=TITR,
-     .                 I2=ITAB(M))
-           RETURN
-         ENDIF
+          IF (IKRBE3(IKINE(M))==1) THEN   ! add here the case of switching to penalty of RBE3
+            DO N=1,NRBE3
+              NSL= IRBE3(3,N)
+              IPEN= IRBE3(9,N)
+              IF (IPEN>0) CYCLE 
+              IF (NSL==M) THEN
+                IF (IPEN<0) THEN 
+                  ID=NOM_OPT(1,I)
+                  CALL FRETITL2(TITR,
+     .                          NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
+                  CALL ANCMSG(MSGID=810,
+     .                        MSGTYPE=MSGERROR,
+     .                        ANMODE=ANINFO_BLIND_1,
+     .                        I1=ID,
+     .                        C1=TITR,
+     .                        I2=ITAB(M))
+                  RETURN
+                ELSE ! switch to penalty of RBE3
+                  ID = IRBE3(2,N)
+                  CALL FRETITL2(TITR,
+     .                NOM_OPT(LNOPT1-LTITR+1,PTR_NOPT_RBE3+N),LTITR)
+                  CALL ANCMSG(MSGID=3104,
+     .                     MSGTYPE=MSGWARNING,
+     .                     ANMODE=ANINFO_BLIND_1,
+     .                     I1=ID,
+     .                     C1=TITR,
+     .                     I2=ITAB(M))
+                  IRBE3(9,N) = 1
+                END IF ! (IPEN<0) THEN 
+              END IF
+            END DO
+          END IF 
       ENDDO
 C----------------------------------------------------------
-C - Check des noeuds mains des RBE2 sont mains de RBODY
+C - Check that the main nodes of rbe2 are mains of rbody
 C----------------------------------------------------------
       DO I=1,NRBE2
                M = IRBE2(3,I)
@@ -242,8 +287,13 @@ C----------------------------------------------------------
          ENDDO
       ENDDO
 C----------------------------------------------------------
-C - Check des noeuds mains des Rbody SECONDARY d'autres Rbodies
+C - Check main nodes of Rbody SECONDARY to other Rbodies
 C----------------------------------------------------------
+      NHIER = 0
+      DO N=1,NRBYKIN
+        NHIER = MAX(NHIER,NPBY(20,N))
+      END DO
+      IF (NHIER==0) THEN
        KRB = 0
        DO N=1,NRBYKIN
          NSLRB = NPBY(2,N)
@@ -267,6 +317,7 @@ C----------------------------------------------------------
           ENDIF
         ENDDO
        ENDDO
+      END IF !(NHIER==0) THEN
 C----------------------------------------------------------
 C - Check incompatibility /BCS/CYCLIC
 C----------------------------------------------------------
@@ -306,7 +357,7 @@ C-------  RBE2
           ENDDO
         END IF 
 C-------  RBE3      
-        IF (IKRBE3(IKINE(I))/=0 ) THEN
+        IF (IKRBE3(IKINE(I))/=0 ) THEN ! will be looked after
           DO N=1,NRBE3
             NSL= IRBE3(3,N)
             ID = IRBE3(2,N)
@@ -323,6 +374,12 @@ C-------  RLINK
         END IF 
        ENDDO
       END IF !(NBCSCYC>0) THEN
+! remove ik of penalty RBE3
+      DO I=1,NRBE3
+        NSL= IRBE3(3,I)
+        IPEN = IRBE3(9,I)  
+        IF (IPEN>0) IKRBE3(IKINE(NSL)) = 0
+      END DO
 C=======================================================================
       IF(IPRI>=6)THEN
         WRITE(IOUT,*)' NODES WITH KINEMATIC CONDITIONS:'
@@ -342,18 +399,18 @@ C=======================================================================
       ENDIF
 C
 C---------------------------------------------------------------
-C LISTE CONDITIONS INCOMPATIBLES PAR TYPE
-C LISTE DES NOEUDS CONCERNES
+C LIST OF INCOMPATIBLE CONDITIONS BY TYPE
+C LIST OF AFFECTED NODES
 C
-C NKIN(I) >= 2     => POSSIBLE CONDITIONS INCOMPATIBLES SUR LE NOEUD I
-C FLAG_IKCOND = 1  => CONDITIONS INCOMPATIBLES DANS LE MODELE
-C MARQUEURDOUBLE(I) = 1 => CONDITIONS INCOMPATIBLES ENTRE CONDITIONS
-C                         DE MEME TYPE SUR LE NOEUD I
-C MARQUEUR(I) != 0 => CONDITIONS INCOMPATIBLES ENTRE CONDITIONS
-C                         DE TYPES DIFFERENTS SUR LE NOEUD I
-C MARQUEUR(I) = 2 => CAS RBODY + RWALL
-C MARQUEUR(I) =-2 => CAS INTERFACES TYPE 1,2,9  + RWALL
-C MARQUEUR(I) = 3 => CAS INTERFACES TYPE 1,2,9 + RBODY + RWALL
+C NKIN(I) >= 2     => POSSIBLE INCOMPATIBLE CONDITIONS ON NODE I
+C FLAG_IKCOND = 1  => INCOMPATIBLE CONDITIONS IN THE MODEL
+C MARQUEURDOUBLE(I) = 1 => INCOMPATIBLE CONDITIONS BETWEEN CONDITIONS
+C                         OF THE SAME TYPE ON NODE I
+C MARQUEUR(I) != 0 => INCOMPATIBLE CONDITIONS BETWEEN CONDITIONS
+C                         OF DIFFERENT TYPES ON NODE I
+C MARQUEUR(I) = 2 => CASE RBODY + RWALL
+C MARQUEUR(I) =-2 => CASE INTERFACES TYPE 1,2,9  + RWALL
+C MARQUEUR(I) = 3 => CASE INTERFACES TYPE 1,2,9 + RBODY + RWALL
 C---------------------------------------------------------------
       DO I=1,NUMNOD
         NKIN(I) = 0
@@ -894,7 +951,7 @@ c         WRITE(IOUT,FMT=FMW_10I)(IKRW(L),L=1,KWARN)
 c
       ENDIF
 C---------------------------------------------------------------
-C RESUME CONDITIONS INCOMPATIBLES PAR TYPE
+C SUMMARY OF INCOMPATIBLE CONDITIONS BY TYPE
 C---------------------------------------------------------------
       WRITE(IOUT,*)'SUMMARY OF POSSIBLE INCOMPATIBLE KINEMATIC CONDITION
      .S :'
@@ -1094,6 +1151,16 @@ C
           ENDDO
         ENDIF
       ENDDO
+!
+      NUN=0
+      DO I=1,NRBE3
+        IPEN = IRBE3(9,I)  ! add warning for added mass+pen
+        IF (IPEN>0) NUN = NUN + 1
+        IF (IPEN <0) IRBE3(9,I) =0
+      END DO
+      IF (NUN>0) THEN
+        WRITE(IOUT,'(/I8,X,A)')NUN,'OF RBE3 HAVE BEEN SWITCHED TO PENALTY METHOD'
+      ENDIF
 C---------------------------------------------------------------
       DO I=1,NUMNOD
 C reset flag impact / wall
@@ -1153,11 +1220,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    kinrem   ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur   ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    kinrem   ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    lectur   ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE KINREM(IKINE,IKINEW,RWL,ITAB,NPRW,LPRW,
      1                   NPBY, LPBY)
 C-----------------------------------------------
@@ -1182,12 +1249,12 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, K, L, N, KK, IKK, ITYP, NE, NSL
 C-----------------------------------------------------------------
-C  Recopie dans tableau de travail
+C  Copy to work table
       DO N=1,NUMNOD
         IKINEW(N)=IKINE(N)
       END DO
 C=======================================================================
-C  CORRECTIONS AUTOMATIQUES INTERFACE 1,2,9 OU RBODY AVEC RWALL
+C  AUTOMATIC CORRECTIONS INTERFACE 1,2,9 OR RBODY WITH RWALL
 C=======================================================================
       K=0
       KK=0
@@ -1223,15 +1290,15 @@ C=======================================================================
 C
       RETURN
       END
-      !||====================================================================
-      !||    inivchk     ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur      ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
-      !||    rbe3_impd   ../starter/source/constraints/general/kinchk.F
-      !||    rby_v0      ../starter/source/constraints/general/kinchk.F
-      !||====================================================================
+!||====================================================================
+!||    inivchk     ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    lectur      ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
+!||    rbe3_impd   ../starter/source/constraints/general/kinchk.F
+!||    rby_v0      ../starter/source/constraints/general/kinchk.F
+!||====================================================================
       SUBROUTINE INIVCHK(IKINE,RWL,ITAB,NPRW,LPRW,KINET,
      1                   NPBY, LPBY,IRBE2,LRBE2,IRBE3,LRBE3,
      2                   FRBE3,X   ,SKEW ,V   ,VR   )
@@ -1260,7 +1327,7 @@ C-----------------------------------------------
      .        IK(10), RBWARN, RB2WARN, KRB, NSLRB,ICDG,ISEN,M
 C-----------------------------------------------------------------
 C=======================================================================
-C  CORRECTIONS AUTOMATIQUES INITIAL VELOCITIES
+C  AUTOMATIC CORRECTIONS FOR INITIAL VELOCITIES
 C=======================================================================
 C should be done in hierarchy order: RBODY,RBE3,RBE2,int2...
 C-----------------------------------------------------------------
@@ -1300,11 +1367,11 @@ C-----------------------------------------------------------------
 
       RETURN
       END
-      !||====================================================================
-      !||    rby_v0    ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    inivchk   ../starter/source/constraints/general/kinchk.F
-      !||====================================================================
+!||====================================================================
+!||    rby_v0    ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    inivchk   ../starter/source/constraints/general/kinchk.F
+!||====================================================================
       SUBROUTINE RBY_V0(X  ,NOD  ,M   ,NSN  ,D     ,DR  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1340,14 +1407,14 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe3_impd   ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    inivchk     ../starter/source/constraints/general/kinchk.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe3     ../starter/source/constraints/general/kinchk.F
-      !||    rbe3cl      ../starter/source/constraints/general/kinchk.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3_impd   ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    inivchk     ../starter/source/constraints/general/kinchk.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe3     ../starter/source/constraints/general/kinchk.F
+!||    rbe3cl      ../starter/source/constraints/general/kinchk.F
+!||====================================================================
       SUBROUTINE RBE3_IMPD(IRBE3 ,LRBE3 ,X    ,D     ,DR    ,
      1                     FRBE3 ,SKEW  )
 C-----------------------------------------------
@@ -1432,11 +1499,11 @@ C
 C---
       RETURN
       END
-      !||====================================================================
-      !||    prerbe3     ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_impd   ../starter/source/constraints/general/kinchk.F
-      !||====================================================================
+!||====================================================================
+!||    prerbe3     ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_impd   ../starter/source/constraints/general/kinchk.F
+!||====================================================================
       SUBROUTINE PRERBE3(IRBE3 ,MAX_M , IROTG,JT  ,JR   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1517,17 +1584,17 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe3cl      ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe3_impd   ../starter/source/constraints/general/kinchk.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret       ../starter/source/system/arret.F
-      !||    invert      ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||    rbe3uf      ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||    rbe3um      ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||    zero1       ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||====================================================================
+!||====================================================================
+!||    rbe3cl      ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    rbe3_impd   ../starter/source/constraints/general/kinchk.F
+!||--- calls      -----------------------------------------------------
+!||    arret       ../starter/source/system/arret.F
+!||    invert      ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||    rbe3uf      ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||    rbe3um      ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||    zero1       ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||====================================================================
       SUBROUTINE RBE3CL(INRBE3  ,ILRBE3  ,NS     ,XYZ    ,FRBE3   ,
      .                  SKEW    ,NG      ,IROT   ,FDSTNB ,MDSTNB  )
 C-----------------------------------------------
@@ -1862,15 +1929,15 @@ C     DIAGNOSTIC INFORMATION
 C
       RETURN
       END
-      !||====================================================================
-      !||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    inivchk     ../starter/source/constraints/general/kinchk.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe2     ../starter/source/constraints/general/kinchk.F
-      !||    rbe2d0      ../starter/source/constraints/general/kinchk.F
-      !||    rbe2dl      ../starter/source/constraints/general/kinchk.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    inivchk     ../starter/source/constraints/general/kinchk.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe2     ../starter/source/constraints/general/kinchk.F
+!||    rbe2d0      ../starter/source/constraints/general/kinchk.F
+!||    rbe2dl      ../starter/source/constraints/general/kinchk.F
+!||====================================================================
       SUBROUTINE RBE2_IMPD(IRBE2 ,LRBE2 ,X    ,D     ,DR    ,SKEW )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1912,11 +1979,11 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    prerbe2     ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
-      !||====================================================================
+!||====================================================================
+!||    prerbe2     ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
+!||====================================================================
       SUBROUTINE PRERBE2(IRBE2 ,JT  ,JR   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1993,11 +2060,11 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe2d0      ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2d0      ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
+!||====================================================================
       SUBROUTINE RBE2D0(NSL   ,ISL   ,X     ,V     ,VR    ,
      1                  JT    ,JR    ,M     )
 C-----------------------------------------------
@@ -2050,11 +2117,11 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    rbe2dl      ../starter/source/constraints/general/kinchk.F
-      !||--- called by ------------------------------------------------------
-      !||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
-      !||====================================================================
+!||====================================================================
+!||    rbe2dl      ../starter/source/constraints/general/kinchk.F
+!||--- called by ------------------------------------------------------
+!||    rbe2_impd   ../starter/source/constraints/general/kinchk.F
+!||====================================================================
       SUBROUTINE RBE2DL(NSN   ,ISL   ,X     ,V     ,VR    ,
      1                  JT    ,JR    ,M     ,SKEW  )
 C-----------------------------------------------

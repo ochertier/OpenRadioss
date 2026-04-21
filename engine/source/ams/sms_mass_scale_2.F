@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,41 +21,44 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../engine/source/output/message/message.F
-      !||    arret              ../engine/source/system/arret.F
-      !||    my_barrier         ../engine/source/system/machine.F
-      !||    ngr2usr            ../engine/source/input/freform.F
-      !||    sms_admesh_0       ../engine/source/ams/sms_admesh.F
-      !||    sms_bcs            ../engine/source/ams/sms_bcs.F
-      !||    sms_bcscyc         ../engine/source/ams/sms_bcscyc.F
-      !||    sms_cjoint_0       ../engine/source/ams/sms_cjoint.F
-      !||    sms_cjoint_2       ../engine/source/ams/sms_cjoint.F
-      !||    sms_fixvel         ../engine/source/ams/sms_fixvel.F
-      !||    sms_gravit         ../engine/source/ams/sms_gravit.F
-      !||    sms_mav_lt         ../engine/source/ams/sms_pcg.F
-      !||    sms_pcg            ../engine/source/ams/sms_pcg.F
-      !||    sms_rbe3t1         ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe_cnds       ../engine/source/ams/sms_rbe2.F
-      !||    sms_thbcs          ../engine/source/ams/sms_thbcs.F
-      !||    spmd_exch_a_rb6    ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
-      !||    spmd_list_sms      ../engine/source/mpi/ams/spmd_sms.F
-      !||    spmd_mij_sms       ../engine/source/mpi/ams/spmd_sms.F
-      !||    startime           ../engine/source/system/timer_mod.F90
-      !||    stoptime           ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    ams_work_mod       ../engine/source/modules/ams_work_mod.F90
-      !||    groupdef_mod       ../common_source/modules/groupdef_mod.F
-      !||    intstamp_mod       ../engine/share/modules/intstamp_mod.F
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
-      !||    timer_mod          ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE SMS_MASS_SCALE_2(TIMERS,
+!||====================================================================
+!||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg             ../engine/source/output/message/message.F
+!||    arret              ../engine/source/system/arret.F
+!||    my_barrier         ../engine/source/system/machine.F
+!||    ngr2usr            ../engine/source/input/freform.F
+!||    sms_admesh_0       ../engine/source/ams/sms_admesh.F
+!||    sms_bcs            ../engine/source/ams/sms_bcs.F
+!||    sms_bcscyc         ../engine/source/ams/sms_bcscyc.F
+!||    sms_cjoint_0       ../engine/source/ams/sms_cjoint.F
+!||    sms_cjoint_2       ../engine/source/ams/sms_cjoint.F
+!||    sms_fixvel         ../engine/source/ams/sms_fixvel.F
+!||    sms_gravit         ../engine/source/ams/sms_gravit.F
+!||    sms_mav_lt         ../engine/source/ams/sms_pcg.F
+!||    sms_pcg            ../engine/source/ams/sms_pcg.F
+!||    sms_rbe3t1         ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe_cnds       ../engine/source/ams/sms_rbe2.F
+!||    sms_thbcs          ../engine/source/ams/sms_thbcs.F
+!||    spmd_exch_a_rb6    ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
+!||    spmd_list_sms      ../engine/source/mpi/ams/spmd_sms.F
+!||    spmd_mij_sms       ../engine/source/mpi/ams/spmd_sms.F
+!||    startime           ../engine/source/system/timer_mod.F90
+!||    stoptime           ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    ams_work_mod       ../engine/source/modules/ams_work_mod.F90
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod       ../common_source/modules/groupdef_mod.F
+!||    intstamp_mod       ../engine/share/modules/intstamp_mod.F
+!||    message_mod        ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||    timer_mod          ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE SMS_MASS_SCALE_2(TIMERS,PYTHON,
      1        ITASK    ,NODFT    ,NODLT    ,NODII_SMS ,INDX2_SMS ,
      2        NODXI_SMS,MS       ,MS0      ,A         ,ICODT     ,
      3        ICODR    ,ISKEW    ,SKEW     ,JAD_SMS   ,JDI_SMS   ,
@@ -92,6 +95,9 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SENSOR_MOD
       USE ams_work_mod
+      USE MY_ALLOC_MOD
+      use python_funct_mod, only : python_
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -119,6 +125,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      TYPE(python_), INTENT(INOUT) :: PYTHON
       INTEGER  ITASK, NODFT,NSENSOR,NODLT, NODII_SMS(*), INDX2_SMS(*),
      .         NODXI_SMS(*), ICODT(*), ICODR(*),
      .         ISKEW(*), JAD_SMS(*), JDI_SMS(*), INDX1_SMS(*),
@@ -189,11 +196,18 @@ C-----
       INTEGER, DIMENSION(:), ALLOCATABLE :: IMV
       my_real
      .       , DIMENSION(:), ALLOCATABLE :: MV
-      my_real,
-     .   DIMENSION(3,NUMNOD) :: MVSKW,VSKW,RSKW,DAMPSKW
+      my_real, DIMENSION(:,:), ALLOCATABLE :: MVSKW
+      my_real, DIMENSION(:,:), ALLOCATABLE :: VSKW
+      my_real, DIMENSION(:,:), ALLOCATABLE :: RSKW
+      my_real, DIMENSION(:,:), ALLOCATABLE :: DAMPSKW
       DOUBLE PRECISION
      .       , DIMENSION(:,:), ALLOCATABLE :: MV6
       EXTERNAL NGR2USR
+C-----------------------------------------------
+      CALL MY_ALLOC(MVSKW,3,NUMNOD)
+      CALL MY_ALLOC(VSKW,3,NUMNOD)
+      CALL MY_ALLOC(RSKW,3,NUMNOD)
+      CALL MY_ALLOC(DAMPSKW,3,NUMNOD)
 C-----------------------------------------------
       FREA(1:3,NODFT:NODLT)=ZERO
 C
@@ -232,7 +246,7 @@ C
 C
         CALL MY_BARRIER()
 C
-        IF(ITASK==0) THEN   ! comm sur 1er thread
+        IF(ITASK==0) THEN   ! communication on the first thread
           CALL SPMD_MIJ_SMS(
      1           ISKYI_SMS,FR_SMS,FR_RMS,LIST_RMS,MSKYI_SMS,
      2           MSKYI_FI_SMS)
@@ -242,7 +256,7 @@ C----
 C
       CALL SMS_GRAVIT(IGRV  ,AGRV   ,NPC   ,TF   ,A     ,
      2                V     ,X      ,SKEW  ,MS   ,SENSOR_TAB,
-     3                WEIGHT,LGRAV ,ITASK,TAGSLV_RBY_SMS,NSENSOR,WFEXT)
+     3                WEIGHT,LGRAV ,ITASK,TAGSLV_RBY_SMS,NSENSOR,WFEXT, python)
 C
       CALL MY_BARRIER
 C
@@ -303,7 +317,7 @@ C
 C
         CALL MY_BARRIER
 C
-C       Z_SMS utilise temporairement pour [M]V
+C       Z_SMS temporarily uses for [m] V
         CALL SMS_MAV_LT(TIMERS,
      1           NODFT   ,NODLT  ,NUMNOD ,JAD_SMS  ,JDI_SMS  ,
      2           ITASK   ,DIAG_SMS,LT_SMS,X_SMS ,Z_SMS ,
@@ -395,7 +409,7 @@ C-----------------------------------
           D_TSTOP  = DAMPR(18,ND)
           IF (TT>=D_TSTART .AND. TT<=D_TSTOP) THEN
             IF(ISK<=1)THEN
-C----- Damping sur dof rotation et seulement -----
+C----- Damping on rotation dof and only -----
              IF (DAMPR(19,ND)>0) CYCLE
              DAMPA = DAMPR(3,ND)
              DAMPB = DAMPR(4,ND)
@@ -653,7 +667,7 @@ C
 C
 C-----------------------------------
 C
-C     PREC_SMS utilise pour stocker la diagonale vraie (cf rbodies)
+C     PREC_SMS used to store the true diagonal (cf rbodies)
       PREC_SMS(NODFT:NODLT)=DIAG_SMS(NODFT:NODLT)
 C
       CALL MY_BARRIER()
@@ -787,7 +801,31 @@ C-----------------------------------
      Q            NODII_SMS,IBCSCYC ,LBCSCYC ,WFEXT,AMS_WORK )
 C
       CALL MY_BARRIER
-
+C
+c      DT15=HALF*DT1
+c      DT25=HALF*DT2
+c      TFEXTT=ERRTE_SMS
+c      ERRTET =ZERO
+c      DO N=NODFT1_SMS,NODLT1_SMS
+c        I = INDX1_SMS(N)
+c        VX = V(1,I)+DT05*A(1,I)
+c        VY = V(2,I)+DT05*A(2,I)
+c        VZ = V(3,I)+DT05*A(3,I)
+c        MVX = RES_SMS(1,I)
+c        MVY = RES_SMS(2,I)
+c        MVZ = RES_SMS(3,I)
+c        DW = (VX*MVX + VY*MVY + VZ*MVZ)*WEIGHT(I)
+c        TFEXTT =TFEXTT + DT15*DW
+c        ERRTET =ERRTET  + DT25*DW
+c      END DO
+c#include "lockon.inc"
+c      TFEXT=TFEXT+TFEXTT
+c      ERRTE_SMS=ERRTE_SMS+ERRTET
+c#include "lockoff.inc"
+c
+c      CALL MY_BARRIER
+c
+C
       IF(NJOINT > 0)THEN
         CALL SMS_CJOINT_2(A    ,AM    ,V ,VR,X    ,
      2                    LJOINT,MS,IN,IADCJ,FR_CJ,
@@ -810,6 +848,10 @@ C
       IF(IPARIT/=0)THEN
         DEALLOCATE(IMV, MV, MV6)
       END IF
+      DEALLOCATE(MVSKW)
+      DEALLOCATE(VSKW)
+      DEALLOCATE(RSKW)
+      DEALLOCATE(DAMPSKW)
 C
       RETURN
       END

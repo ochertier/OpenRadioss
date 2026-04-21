@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intal4          ../engine/source/ale/inter/intal4.F
-      !||--- called by ------------------------------------------------------
-      !||    intal3          ../engine/source/ale/inter/intal3.F
-      !||--- calls      -----------------------------------------------------
-      !||    iqela3          ../engine/source/ale/inter/iqela3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
-      SUBROUTINE INTAL4(IPARI,INTBUF_TAB         ,X         ,V         ,
-     1           A           ,VG      ,ICODE     ,IBCS      ,BCS       )
+!||====================================================================
+!||    intal4          ../engine/source/ale/inter/intal4.F
+!||--- called by ------------------------------------------------------
+!||    intal3          ../engine/source/ale/inter/intal3.F
+!||--- calls      -----------------------------------------------------
+!||    iqela3          ../engine/source/ale/inter/iqela3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
+      SUBROUTINE INTAL4(IPARI,INTBUF_TAB,V,VG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,8 +46,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real X(3,NUMNOD), V(3,NUMNOD), A(3,NUMNOD), VG(*), BCS(*)      
-      INTEGER IPARI(SIPARI), ICODE(*), IBCS(*)
+      my_real V(3,NUMNOD), VG(*)
+      INTEGER IPARI(SIPARI)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -57,10 +57,7 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       NSN=IPARI(5)
-      CALL IQELA3
-     1  (V               ,VG              ,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,INTBUF_TAB%NSV,
-     2   INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,ICODE            ,IBCS           ,BCS       ,
-     3   INTBUF_TAB%MSR, NSN)
-C
+      CALL IQELA3(V,VG,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,INTBUF_TAB%NSV,INTBUF_TAB%IRTLM,INTBUF_TAB%MSR,NSN)
+C-----------------------------------------------
       RETURN
       END

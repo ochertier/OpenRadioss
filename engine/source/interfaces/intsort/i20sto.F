@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i20sto     ../engine/source/interfaces/intsort/i20sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i20tri     ../engine/source/interfaces/intsort/i20tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    bitget     ../engine/source/interfaces/intsort/i20sto.F
-      !||    i20cor3t   ../engine/source/interfaces/int20/i20cor3t.F
-      !||    i7pen3     ../engine/source/interfaces/intsort/i7pen3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i20sto     ../engine/source/interfaces/intsort/i20sto.F
+!||--- called by ------------------------------------------------------
+!||    i20tri     ../engine/source/interfaces/intsort/i20tri.F
+!||--- calls      -----------------------------------------------------
+!||    bitget     ../engine/source/interfaces/intsort/i20sto.F
+!||    i20cor3t   ../engine/source/interfaces/int20/i20cor3t.F
+!||    i7pen3     ../engine/source/interfaces/intsort/i7pen3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I20STO(
      1      J_STOK,IRECT  ,XA    ,NSV   ,II_STOK,
      2      CAND_N,CAND_E ,MULNSN,NOINT ,MARGE  ,
@@ -94,7 +94,7 @@ C-----------------------------------------------
      .               YI    ,ZI    ,PENE  ,IX1    ,IX2  ,
      .               IX3   ,IX4   ,IGAP  ,GAP    ,GAPV )
 C-----------------------------------------------
-C SUPPRESSION DES CANDIDATS AUTOIMPACTES S1 OU S2
+C removal of self-ed candidates s1 or s2
 C-----------------------------------------------
        IF(ISYM==1)THEN
          DO I=1,J_STOK
@@ -116,7 +116,7 @@ C-----------------------------------------------
          ENDDO
        ENDIF
 C-----------------------------------------------
-C SUPPRESSION DES ANCIENS CANDIDATS DEJA STOCKES (PENE INITIALE)
+C SUPPRESSION DES ANCIENS CANDIDATES DEJA STOCKES (PENE INITIALE)
 C-----------------------------------------------
        IF(INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.IFQ>0)THEN
             DO I=1,J_STOK
@@ -124,7 +124,7 @@ C-----------------------------------------------
                 N  = PROV_N(I)
                 NE = PROV_E(I)+ESHIFT
                 IF(N>NSN) THEN
-C numerotation tris precedent pour les noeuds non locaux (SPMD)
+C previous sorting numbering for non-local nodes (spmd)
                  N = OLDNUM(N-NSN)+NSN
                   IF(N==NSN) N = NSN+NSNROLD+1
                 END IF
@@ -198,13 +198,13 @@ C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    i20sto_edge    ../engine/source/interfaces/intsort/i20sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i20tri_edge    ../engine/source/interfaces/intsort/i20tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i20pen3_edge   ../engine/source/interfaces/intsort/i20sto.F
-      !||====================================================================
+!||====================================================================
+!||    i20sto_edge    ../engine/source/interfaces/intsort/i20sto.F
+!||--- called by ------------------------------------------------------
+!||    i20tri_edge    ../engine/source/interfaces/intsort/i20tri.F
+!||--- calls      -----------------------------------------------------
+!||    i20pen3_edge   ../engine/source/interfaces/intsort/i20sto.F
+!||====================================================================
       SUBROUTINE I20STO_EDGE(
      1      J_STOK,IXLINS,IXLINM,XA    ,II_STOKE,
      2      CAND_S,CAND_M,NSN4  ,NOINT ,TZINF ,
@@ -241,11 +241,11 @@ C-----------------------------------------------
         CALL I20PEN3_EDGE(J_STOK ,PROV_S,PROV_M,TZINF ,XA    ,
      .               IXLINS,IXLINM,PENE  ,NLINSA ,NIN   )
 C-----------------------------------------------
-C il faut un lock sur toute la boucle (modification de chaine)
+C need a lock on the entire loop (chain modification)
 #include "lockon.inc"
         K_STOK = 0
 C-----------------------------------------------
-C elimination des couples deja trouves dans 1 boite precedente
+C elimination of pairs already found in 1 previous box
 C-----------------------------------------------
         I_STOK = II_STOKE
         IAD0 = 0
@@ -301,13 +301,13 @@ C
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    i20pen3_edge   ../engine/source/interfaces/intsort/i20sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i20sto_edge    ../engine/source/interfaces/intsort/i20sto.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box        ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i20pen3_edge   ../engine/source/interfaces/intsort/i20sto.F
+!||--- called by ------------------------------------------------------
+!||    i20sto_edge    ../engine/source/interfaces/intsort/i20sto.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box        ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I20PEN3_EDGE(JLT   ,CAND_N,CAND_E,GAP   ,XA    ,
      .                        IXLINS,IXLINM,PENE  ,NLINSA,NIN   )
 C-----------------------------------------------
@@ -325,7 +325,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -338,10 +337,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IG,N1,N2,M1,M2,NI,L
+      INTEGER I,N1,N2,M1,M2,NI,L
       my_real
      .     XS12,YS12,ZS12,XM12,YM12,ZM12,XXA,XXB,
-     .     XS2,XM2,XSM,XS2M2,YS2,YM2,YSM,YS2M2,ZS2,ZM2,ZSM,ZS2M2,
+     .     XS2,XM2,XSM,XS2M2,YS2M2,ZS2M2,
      .     XX,YY,ZZ,ALS,ALM,DET,
      .     GAP2, X11, X12, X13, X21, X22, X23,
      .     XMAX1,YMAX1,ZMAX1,XMAX2,YMAX2,ZMAX2,
@@ -376,74 +375,6 @@ C       B*(XM2*XS2 - XSM*XSM) = -XB*XS2+XA*XSM
 C       B = (XA*XSM-XB*XS2) / (XM2*XS2 - XSM*XSM)
 C       A = (XB*XSM-XA*XM2) / (XM2*XS2 - XSM*XSM)
 C--------------------------------------------------------
-      IF(IMACH /= 3)THEN
-        DO I=1,JLT
-          N1=IXLINS(1,CAND_N(I))
-          N2=IXLINS(2,CAND_N(I))
-          M1=IXLINM(1,CAND_E(I))
-          M2=IXLINM(2,CAND_E(I))
-
-c         calcul d'un minorant de la distance
-
-          XMAX1 = MAX(XA(1,N1),XA(1,N2))
-          YMAX1 = MAX(XA(2,N1),XA(2,N2))
-          ZMAX1 = MAX(XA(3,N1),XA(3,N2))
-          XMAX2 = MAX(XA(1,M1),XA(1,M2))
-          YMAX2 = MAX(XA(2,M1),XA(2,M2))
-          ZMAX2 = MAX(XA(3,M1),XA(3,M2))
-          XMIN1 = MIN(XA(1,N1),XA(1,N2))
-          YMIN1 = MIN(XA(2,N1),XA(2,N2))
-          ZMIN1 = MIN(XA(3,N1),XA(3,N2))
-          XMIN2 = MIN(XA(1,M1),XA(1,M2))
-          YMIN2 = MIN(XA(2,M1),XA(2,M2))
-          ZMIN2 = MIN(XA(3,M1),XA(3,M2))
-          DD = MAX(XMIN1-XMAX2,YMIN1-YMAX2,ZMIN1-ZMAX2,
-     .             XMIN2-XMAX1,YMIN2-YMAX1,ZMIN2-ZMAX1)
-          IF(DD > GAP)THEN
-            PENE(I) = ZERO
-            CYCLE
-          ENDIF
-
-c         calcul de la distance^2
-
-          XS12 = XA(1,N2)-XA(1,N1)
-          YS12 = XA(2,N2)-XA(2,N1)
-          ZS12 = XA(3,N2)-XA(3,N1)
-          XS2 = XS12*XS12 + YS12*YS12 + ZS12*ZS12
-          XM12 = XA(1,M2)-XA(1,M1)
-          YM12 = XA(2,M2)-XA(2,M1)
-          ZM12 = XA(3,M2)-XA(3,M1)
-          XM2 = XM12*XM12 + YM12*YM12 + ZM12*ZM12
-          XSM = - (XS12*XM12 + YS12*YM12 + ZS12*ZM12)
-          XS2M2 = XA(1,M2)-XA(1,N2)
-          YS2M2 = XA(2,M2)-XA(2,N2)
-          ZS2M2 = XA(3,M2)-XA(3,N2)
-          XXA =  XS12*XS2M2 + YS12*YS2M2 + ZS12*ZS2M2
-          XXB = -XM12*XS2M2 - YM12*YS2M2 - ZM12*ZS2M2 
-          DET = XM2*XS2 - XSM*XSM
-          DET = MAX(EM20,DET)
-
-          ALM = (XXA*XSM-XXB*XS2) / DET
-          XS2 = MAX(XS2,EM20)
-          XM2 = MAX(XM2,EM20)
-          ALM=MIN(ONE,MAX(ZERO,ALM))
-          ALS = -(XXA + ALM*XSM) / XS2
-          ALS=MIN(ONE,MAX(ZERO,ALS))
-          ALM = -(XXB + ALS*XSM) / XM2
-          ALM=MIN(ONE,MAX(ZERO,ALM))
-
-C         PENE = GAP^2 - DIST^2 UTILISE POUR TESTER SI NON NUL
-
-          XX =  ALS*XA(1,N1) + (ONE-ALS)*XA(1,N2)
-     .        - ALM*XA(1,M1) - (ONE-ALM)*XA(1,M2)
-          YY =  ALS*XA(2,N1) + (ONE-ALS)*XA(2,N2)
-     .        - ALM*XA(2,M1) - (ONE-ALM)*XA(2,M2)
-          ZZ =  ALS*XA(3,N1) + (ONE-ALS)*XA(3,N2)
-     .        - ALM*XA(3,M1) - (ONE-ALM)*XA(3,M2)
-          PENE(I) = GAP2 - XX*XX - YY*YY - ZZ*ZZ
-C
-        ENDDO
-      ELSE
 C
         DO I=1,JLT
           L = CAND_N(I)
@@ -468,7 +399,7 @@ C
           M1=IXLINM(1,CAND_E(I))
           M2=IXLINM(2,CAND_E(I))
 
-c         calcul d'un minorant de la distance
+c         calculation of a distance lower bound
 
           XMAX1 = MAX(X11,X21)
           YMAX1 = MAX(X12,X22)
@@ -489,7 +420,7 @@ c         calcul d'un minorant de la distance
             CYCLE
           ENDIF
 
-c         calcul de la distance^2
+c         calculation of distance^2
 
           XS12 = X21-X11
           YS12 = X22-X12
@@ -531,7 +462,7 @@ C
           ALM = MIN(ONE,ALM)
           ALM = MAX(ZERO,ALM)
 
-C  PENE = GAP^2 - DIST^2 UTILISE POUR TESTER SI NON NUL
+C  PENE = GAP^2 - DIST^2 USED TO TEST IF NON-NULL
 
           XX =  ALS*X11 + (ONE-ALS)*X21
      .        - ALM*XA(1,M1) - (ONE-ALM)*XA(1,M2)
@@ -542,29 +473,21 @@ C  PENE = GAP^2 - DIST^2 UTILISE POUR TESTER SI NON NUL
           PENE(I) = GAP2- XX*XX - YY*YY - ZZ*ZZ
 C
         END DO
-      END IF
 C
       RETURN
       END
 C===============================================================================
 
-      !||====================================================================
-      !||    bitget          ../engine/source/interfaces/intsort/i20sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i11for3         ../engine/source/interfaces/int11/i11for3.F
-      !||    i20dst3         ../engine/source/interfaces/int20/i20dst3.F
-      !||    i20sto          ../engine/source/interfaces/intsort/i20sto.F
-      !||    i24dst3e        ../engine/source/interfaces/int24/i24dst3e.F
-      !||    i24edgt         ../engine/source/interfaces/intsort/i24sto.F
-      !||    i24for3         ../engine/source/interfaces/int24/i24for3.F
-      !||    i24s1s2         ../engine/source/interfaces/intsort/i24sto.F
-      !||    i25for3         ../engine/source/interfaces/int25/i25for3.F
-      !||    i25for3_e2s     ../engine/source/interfaces/int25/i25for3_e2s.F
-      !||    i25for3e        ../engine/source/interfaces/int25/i25for3e.F
-      !||    i25s1s2         ../engine/source/interfaces/intsort/i25sto.F
-      !||    i25trivox_edg   ../engine/source/interfaces/intsort/i25trivox_edg.F
-      !||    i7for3          ../engine/source/interfaces/int07/i7for3.F
-      !||====================================================================
+!||====================================================================
+!||    bitget     ../engine/source/interfaces/intsort/i20sto.F
+!||--- called by ------------------------------------------------------
+!||    i20dst3    ../engine/source/interfaces/int20/i20dst3.F
+!||    i20sto     ../engine/source/interfaces/intsort/i20sto.F
+!||    i24dst3e   ../engine/source/interfaces/int24/i24dst3e.F
+!||    i24edgt    ../engine/source/interfaces/intsort/i24sto.F
+!||    i24for3    ../engine/source/interfaces/int24/i24for3.F
+!||    i24s1s2    ../engine/source/interfaces/intsort/i24sto.F
+!||====================================================================
       INTEGER FUNCTION BITGET(I,N)
       INTEGER I,N
       INTEGER S,I2P(0:12)! limite a 23 (cast reel pour spmd)

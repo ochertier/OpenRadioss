@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s6cbilan              ../engine/source/elements/thickshell/solide6c/s6cbilan.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cforc3              ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s6cbilan              ../engine/source/elements/thickshell/solide6c/s6cbilan.F
+!||--- called by ------------------------------------------------------
+!||    s6cforc3              ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||    s6zforc3              ../engine/source/elements/solid/solide6z/s6zforc3.F90
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE S6CBILAN(PARTSAV,EINT,RHO,RK,VOL,
      .   VXA, VYA, VZA, VA2, VNEW,IPARTS ,
      .   GRESAV,GRTH,IGRTH,OFF,IEXPAN,EINTTH,
      .   FILL, XX, YY, ZZ,
      .   XX2,YY2,ZZ2,XY,YZ,ZX,ITASK,IPARG,OFFG,
-     .   SENSORS)
+     .   SENSORS, NEL,G_WPLA, WPLA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -68,6 +69,8 @@ C     REAL
      .  IPARTS(*),GRTH(*),IGRTH(*),IPARG(*)
       my_real, INTENT(IN) :: OFFG(MVSIZ)
       type (sensors_),INTENT(INOUT) :: SENSORS
+      INTEGER, INTENT(IN) :: NEL,G_WPLA
+      my_real,DIMENSION(NEL*G_WPLA), INTENT(IN) :: WPLA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -83,7 +86,7 @@ C     REAL
      .   IXY(MVSIZ), IYZ(MVSIZ), IZX(MVSIZ),
      .   REI(MVSIZ), REK(MVSIZ), OFF_L(MVSIZ)
 C-----------------------------------------------
-      FLAG = IPARG(80) ! Flag pour sorties additionnelles
+      FLAG = IPARG(80) ! flag for additional outputs
 C-----------------------------------------------
 C     CALCUL BILAN SORTIES DEF 
 C-----------------------------------------------
@@ -111,6 +114,7 @@ C
         PARTSAV(4,M)=PARTSAV(4,M) + YM(I)
         PARTSAV(5,M)=PARTSAV(5,M) + ZM(I)
         IF (OFFG(I) >= ONE) PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I)
+        IF (G_WPLA > 0)  PARTSAV(29,M)=PARTSAV(29,M) + WPLA(I)
       END DO
 C
 C-----------------------------------------------
@@ -163,6 +167,7 @@ C
           PARTSAV(20,M)=PARTSAV(20,M) + IZX(I)
           PARTSAV(21,M)=PARTSAV(21,M) + REI(I)
           PARTSAV(22,M)=PARTSAV(22,M) + REK(I) 
+
 C         PARTSAV(8,M)=PARTSAV(8,M) + EHOU(I)
         END DO
       ENDIF

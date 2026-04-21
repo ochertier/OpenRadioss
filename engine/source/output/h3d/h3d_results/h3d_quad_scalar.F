@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_quad_scalar              ../engine/source/output/h3d/h3d_results/h3d_quad_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                       ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_quad_scalar_1            ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
-      !||    schlieren_buffer_gathering   ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_quad_scalar_1_mod        ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
-      !||    initbuf_mod                  ../engine/share/resol/initbuf.F
-      !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
-      !||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
-      !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
-      !||    stack_mod                    ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_quad_scalar              ../engine/source/output/h3d/h3d_results/h3d_quad_scalar.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                       ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_quad_scalar_1            ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
+!||    schlieren_buffer_gathering   ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
+!||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod                  ../common_source/modules/elements/element_mod.F90
+!||    h3d_quad_scalar_1_mod        ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
+!||    initbuf_mod                  ../engine/share/resol/initbuf.F
+!||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+!||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
+!||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
+!||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
+!||    stack_mod                    ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE H3D_QUAD_SCALAR(
      .                  ELBUF_TAB      ,QUAD_SCALAR,IPARG        ,
      .                  IXQ            ,PM          ,
@@ -64,6 +65,7 @@ C-----------------------------------------------
       USE h3d_quad_scalar_1_mod, ONLY: H3D_QUAD_SCALAR_1
       USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
       USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
+      use element_mod , only : nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -105,8 +107,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real
-     .   VALUE(MVSIZ)
       INTEGER NG,ILAY
       INTEGER 
      .        I,IUVAR

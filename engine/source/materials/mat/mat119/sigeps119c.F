@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps119c            ../engine/source/materials/mat/mat119/sigeps119c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc                ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    law119_membrane       ../engine/source/materials/mat/mat119/law119_membrane.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps119c            ../engine/source/materials/mat/mat119/sigeps119c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc                ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    law119_membrane       ../engine/source/materials/mat/mat119/law119_membrane.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE SIGEPS119C(
      .            NEL     ,IPT     ,NPT     ,NUPARAM ,NUVAR   ,
      .            NUMTABL ,ITABLE  ,TABLE   ,UVAR    ,UPARAM  ,
@@ -78,7 +78,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I
       my_real :: NU,G12,GS,GC,A1C,A2C,TCOAT,DEZZ
-      my_real ,DIMENSION(NEL) :: ET,THFAC
+      my_real ,DIMENSION(NEL) :: ET
 C=======================================================================
       NU      = UPARAM(5)
       G12     = UPARAM(6)

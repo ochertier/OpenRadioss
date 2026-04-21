@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ns_fvm_diffusion       ../engine/source/multifluid/ns_fvm_diffusion.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain                ../engine/source/ale/alemain.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_e1vois            ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    diffusion_mod          ../engine/share/modules/diffusion_mod.F
-      !||    ebcs_mod               ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ns_fvm_diffusion       ../engine/source/multifluid/ns_fvm_diffusion.F
+!||--- called by ------------------------------------------------------
+!||    alemain                ../engine/source/ale/alemain.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_e1vois            ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    diffusion_mod          ../engine/share/modules/diffusion_mod.F
+!||    ebcs_mod               ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||====================================================================
       subroutine ns_fvm_diffusion(ale_connect, multi_fvm, time_step, ebcs_tab, 
      .     diffusion, ipm, pm, iparg, elbuf_tab, nercvois, nesdvois, lercvois, lesdvois, 
      .     ixs, func_value)
@@ -41,6 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       USE DIFFUSION_MOD
       USE EBCS_MOD
       USE ELBUFDEF_MOD
+      use element_mod , only : nixs
 c-----------------------------------------------
 c   i m p l i c i t   t y p e s
 c-----------------------------------------------

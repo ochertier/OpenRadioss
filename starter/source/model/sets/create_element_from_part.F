@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_element_from_part   ../starter/source/model/sets/create_element_from_part.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                     ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    inverted_group_mod         ../starter/share/modules1/inverted_group_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_element_from_part   ../starter/source/model/sets/create_element_from_part.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                     ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    inverted_group_mod         ../starter/share/modules1/inverted_group_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CREATE_ELEMENT_FROM_PART(CLAUSE  ,INV_GROUP,NUMSPH)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -144,7 +144,7 @@ C=======================================================================
 !               QUAD
       IF (NUMELQ > 0) THEN
         SIZE = 0
-        DO ID=1,CLAUSE%NB_QUAD
+        DO ID=1,CLAUSE%NB_PART
           IP=CLAUSE%PART(ID)
           EL_FIRST = INV_GROUP%INDPARTQ(IP)
           EL_LAST  = INV_GROUP%INDPARTQ(IP+1)
@@ -154,7 +154,7 @@ C=======================================================================
         ALLOCATE( CLAUSE%QUAD(SIZE) )
 !
         IND = 0
-        DO ID=1,CLAUSE%NB_QUAD
+        DO ID=1,CLAUSE%NB_PART
           IP=CLAUSE%PART(ID)
           EL_FIRST = INV_GROUP%INDPARTQ(IP)
           EL_LAST  = INV_GROUP%INDPARTQ(IP+1)-1

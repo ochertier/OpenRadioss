@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,78 +20,87 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ebcs_mod                   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    alemain                    ../engine/source/ale/alemain.F
-      !||    c_iebcs                    ../starter/source/restart/ddsplit/c_iebcs.F
-      !||    ddsplit                    ../starter/source/restart/ddsplit/ddsplit.F
-      !||    domdec2                    ../starter/source/spmd/domdec2.F
-      !||    ebcclap                    ../engine/source/boundary_conditions/ebcs/ebcclap.F
-      !||    ebcs0                      ../engine/source/boundary_conditions/ebcs/ebcs0.F
-      !||    ebcs1                      ../engine/source/boundary_conditions/ebcs/ebcs1.F
-      !||    ebcs10                     ../engine/source/boundary_conditions/ebcs/ebcs10.F
-      !||    ebcs11                     ../engine/source/boundary_conditions/ebcs/ebcs11.F90
-      !||    ebcs4                      ../engine/source/boundary_conditions/ebcs/ebcs4.F
-      !||    ebcs5                      ../engine/source/boundary_conditions/ebcs/ebcs5.F
-      !||    ebcs6                      ../engine/source/boundary_conditions/ebcs/ebcs6.F
-      !||    ebcs7                      ../engine/source/boundary_conditions/ebcs/ebcs7.F
-      !||    ebcs_extrapol              ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
-      !||    ebcs_main                  ../engine/source/boundary_conditions/ebcs/ebcs_main.F
-      !||    ebcs_set_tcarp             ../starter/source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
-      !||    ebcvit4                    ../engine/source/boundary_conditions/ebcs/ebcvit4.F
-      !||    ebcvit5                    ../engine/source/boundary_conditions/ebcs/ebcvit5.F
-      !||    ebcvit7                    ../engine/source/boundary_conditions/ebcs/ebcvit7.F
-      !||    fillcne                    ../starter/source/spmd/domdec2.F
-      !||    hist2                      ../engine/source/output/th/hist2.F
-      !||    hm_read_ebcs_fluxout       ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_fluxout.F
-      !||    hm_read_ebcs_gradp0        ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_gradp0.F
-      !||    hm_read_ebcs_inip          ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_inip.F
-      !||    hm_read_ebcs_iniv          ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_iniv.F
-      !||    hm_read_ebcs_inlet         ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
-      !||    hm_read_ebcs_monvol        ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_monvol.F
-      !||    hm_read_ebcs_normv         ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_normv.F
-      !||    hm_read_ebcs_nrf           ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_nrf.F
-      !||    hm_read_ebcs_pres          ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_pres.F
-      !||    hm_read_ebcs_propergol     ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_propergol.F90
-      !||    hm_read_ebcs_valvin        ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_valvin.F
-      !||    hm_read_ebcs_valvout       ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_valvout.F
-      !||    hm_read_ebcs_vel           ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_vel.F
-      !||    iniebcs                    ../starter/source/boundary_conditions/ebcs/iniebcs.F
-      !||    iniebcs_nrf_tcar           ../starter/source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
-      !||    iniebcs_propergol          ../starter/source/boundary_conditions/ebcs/iniebcs_propergol.F90
-      !||    iniebcs_propergol_get_cv   ../starter/source/boundary_conditions/ebcs/iniebcs_propergol.F90
-      !||    iniebcsp0                  ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
-      !||    inigrav_load               ../starter/source/initial_conditions/inigrav/inigrav_load.F
-      !||    inigrav_part_list          ../starter/source/initial_conditions/inigrav/inigrav_part_list.F
-      !||    initia                     ../starter/source/elements/initia/initia.F
-      !||    lectur                     ../engine/source/input/lectur.F
-      !||    multi_ebcs                 ../engine/source/multifluid/multi_ebcs.F
-      !||    multi_nrf_ebcs             ../engine/source/multifluid/multi_nrf_ebcs.F
-      !||    multi_propergol_ebcs       ../engine/source/multifluid/multi_propergol_ebcs.F90
-      !||    multi_timeevolution        ../engine/source/multifluid/multi_timeevolution.F
-      !||    ns_fvm_diffusion           ../engine/source/multifluid/ns_fvm_diffusion.F
-      !||    radioss2                   ../engine/source/engine/radioss2.F
-      !||    rdresb                     ../engine/source/output/restart/rdresb.F
-      !||    read_ebcs                  ../starter/source/boundary_conditions/ebcs/read_ebcs.F
-      !||    resol                      ../engine/source/engine/resol.F
-      !||    resol_head                 ../engine/source/engine/resol_head.F
-      !||    sortie_main                ../engine/source/output/sortie_main.F
-      !||    split_ebcs                 ../starter/source/boundary_conditions/ebcs/split_ebcs.F
-      !||    spmd_init_ebcs             ../engine/source/mpi/fluid/spmd_cfd.F
-      !||    st_qaprint_driver          ../starter/source/output/qaprint/st_qaprint_driver.F
-      !||    st_qaprint_ebcs            ../starter/source/output/qaprint/st_qaprint_ebcs.F
-      !||    starter0                   ../starter/source/starter/starter0.F
-      !||    w_pon                      ../starter/source/restart/ddsplit/w_pon.F
-      !||    wrrestp                    ../engine/source/output/restart/wrrestp.F
-      !||--- uses       -----------------------------------------------------
-      !||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    names_and_titles_mod       ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ebcs_mod                          ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- called by ------------------------------------------------------
+!||    alemain                           ../engine/source/ale/alemain.F
+!||    c_iebcs                           ../starter/source/restart/ddsplit/c_iebcs.F
+!||    ddsplit                           ../starter/source/restart/ddsplit/ddsplit.F
+!||    domdec2                           ../starter/source/spmd/domdec2.F
+!||    ebcclap                           ../engine/source/boundary_conditions/ebcs/ebcclap.F
+!||    ebcs0_gradp0                      ../engine/source/boundary_conditions/ebcs/ebcs0_gradp0.F
+!||    ebcs10_nrf                        ../engine/source/boundary_conditions/ebcs/ebcs10_nrf.F
+!||    ebcs11_propellant                 ../engine/source/boundary_conditions/ebcs/ebcs11_propellant.F90
+!||    ebcs123_pres                      ../engine/source/boundary_conditions/ebcs/ebcs123_pres.F
+!||    ebcs12_cyclic                     ../engine/source/boundary_conditions/ebcs/ebcs12_cyclic.F90
+!||    ebcs4_vel                         ../engine/source/boundary_conditions/ebcs/ebcs4_vel.F
+!||    ebcs5_normv                       ../engine/source/boundary_conditions/ebcs/ebcs5_normv.F
+!||    ebcs6_inip                        ../engine/source/boundary_conditions/ebcs/ebcs6_inip.F
+!||    ebcs7_iniv                        ../engine/source/boundary_conditions/ebcs/ebcs7_iniv.F
+!||    ebcs8_inlet                       ../engine/source/boundary_conditions/ebcs/ebcs8_inlet.F90
+!||    ebcs_cyclic_surface_matching      ../starter/source/boundary_conditions/ebcs/ebcs_cyclic_surface_matching.F90
+!||    ebcs_cyclic_surface_matching_2d   ../starter/source/boundary_conditions/ebcs/ebcs_cyclic_surface_matching_2d.F90
+!||    ebcs_cyclic_surface_matching_3d   ../starter/source/boundary_conditions/ebcs/ebcs_cyclic_surface_matching_3d.F90
+!||    ebcs_extrapol                     ../engine/source/boundary_conditions/ebcs/ebcs_extrapol.F
+!||    ebcs_main                         ../engine/source/boundary_conditions/ebcs/ebcs_main.F
+!||    ebcs_set_tcarp                    ../starter/source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
+!||    ebcvit4                           ../engine/source/boundary_conditions/ebcs/ebcvit4.F
+!||    ebcvit5                           ../engine/source/boundary_conditions/ebcs/ebcvit5.F
+!||    ebcvit7                           ../engine/source/boundary_conditions/ebcs/ebcvit7.F
+!||    fillcne                           ../starter/source/spmd/domdec2.F
+!||    hist2                             ../engine/source/output/th/hist2.F
+!||    hm_read_ebcs_cyclic               ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_cyclic.F90
+!||    hm_read_ebcs_fluxout              ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_fluxout.F
+!||    hm_read_ebcs_gradp0               ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_gradp0.F
+!||    hm_read_ebcs_inip                 ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_inip.F
+!||    hm_read_ebcs_iniv                 ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_iniv.F
+!||    hm_read_ebcs_inlet                ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
+!||    hm_read_ebcs_monvol               ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_monvol.F
+!||    hm_read_ebcs_normv                ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_normv.F
+!||    hm_read_ebcs_nrf                  ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_nrf.F
+!||    hm_read_ebcs_pres                 ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_pres.F
+!||    hm_read_ebcs_propellant           ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_propellant.F90
+!||    hm_read_ebcs_valvin               ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_valvin.F
+!||    hm_read_ebcs_valvout              ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_valvout.F
+!||    hm_read_ebcs_vel                  ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_vel.F
+!||    iniebcs                           ../starter/source/boundary_conditions/ebcs/iniebcs.F
+!||    iniebcs_nrf_tcar                  ../starter/source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
+!||    iniebcs_propellant                ../starter/source/boundary_conditions/ebcs/iniebcs_propellant.F90
+!||    iniebcs_propellant_get_cp         ../starter/source/boundary_conditions/ebcs/iniebcs_propellant.F90
+!||    iniebcsp0                         ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
+!||    inigrav_load                      ../starter/source/initial_conditions/inigrav/inigrav_load.F
+!||    inigrav_part_list                 ../starter/source/initial_conditions/inigrav/inigrav_part_list.F
+!||    initia                            ../starter/source/elements/initia/initia.F
+!||    lectur                            ../engine/source/input/lectur.F
+!||    multi_ebcs                        ../engine/source/multifluid/multi_ebcs.F
+!||    multi_nrf_ebcs                    ../engine/source/multifluid/multi_nrf_ebcs.F
+!||    multi_timeevolution               ../engine/source/multifluid/multi_timeevolution.F
+!||    ns_fvm_diffusion                  ../engine/source/multifluid/ns_fvm_diffusion.F
+!||    radioss2                          ../engine/source/engine/radioss2.F
+!||    rdresb                            ../engine/source/output/restart/rdresb.F
+!||    read_ebcs                         ../starter/source/boundary_conditions/ebcs/read_ebcs.F
+!||    resol                             ../engine/source/engine/resol.F
+!||    resol_head                        ../engine/source/engine/resol_head.F
+!||    sortie_main                       ../engine/source/output/sortie_main.F
+!||    split_ebcs                        ../starter/source/boundary_conditions/ebcs/split_ebcs.F
+!||    spmd_init_ebcs                    ../engine/source/mpi/fluid/spmd_cfd.F
+!||    st_qaprint_driver                 ../starter/source/output/qaprint/st_qaprint_driver.F
+!||    st_qaprint_ebcs                   ../starter/source/output/qaprint/st_qaprint_ebcs.F
+!||    starter0                          ../starter/source/starter/starter0.F
+!||    w_pon                             ../starter/source/restart/ddsplit/w_pon.F
+!||    wrrestp                           ../engine/source/output/restart/wrrestp.F
+!||--- uses       -----------------------------------------------------
+!||    multi_fvm_mod                     ../common_source/modules/ale/multi_fvm_mod.F90
+!||    names_and_titles_mod              ../common_source/modules/names_and_titles_mod.F
+!||    precision_mod                     ../common_source/modules/precision_mod.F90
+!||====================================================================
       MODULE EBCS_MOD
         USE MULTI_FVM_MOD
         USE NAMES_AND_TITLES_MOD , only : nchartitle
-#include "my_real.inc"
+        USE PRECISION_MOD, ONLY : WP
+        implicit none
+
+        private :: WP
 
 
 !     -----------------
@@ -99,7 +108,7 @@
 !     -----------------
         type ebcs_parith_on
           integer, dimension(:,:), allocatable :: elem_adress
-        end type
+        end type ebcs_parith_on
         type(ebcs_parith_on), dimension(:), allocatable :: ebcs_parithon
 !     Generic ebcs type
 !     -----------------
@@ -107,10 +116,11 @@
 !     Generic ebcs type
 !     -----------------
         type, public :: t_ebcs
-          character(len=nchartitle) :: title =''              !<     user title
+          character(len=nchartitle) :: title =""              !<     user title
           integer :: type = -1
           integer :: ebcs_id = -1
           integer :: surf_id = -1
+          integer :: surf_id2 = -1
           integer :: nb_node = 0                              !<     number of nodes
           integer :: nb_elem = 0                              !<     number of elements
           integer, dimension(:), allocatable :: node_list     !<     node list
@@ -121,35 +131,44 @@
           integer, dimension(:), allocatable :: iseg          !<     iseg
           logical :: has_iface = .false.                      !<     Local id of the face of ielem
           integer, dimension(:), allocatable :: iface
+          integer, dimension(:), allocatable :: ng            !<     number of group for ielem
+          integer, dimension(:), allocatable :: iloc          !<     local number of ielem in this group
 
           logical :: debug_print = .false.                    !<     debug print
           logical :: is_multifluid = .false.
           logical :: has_ielem = .false.
           logical :: has_th = .false.
+          logical :: has_ng = .false.
+          logical :: has_iloc = .false.
 
 !     work tables
           logical :: has_la = .false.
-          my_real, dimension(:, :), allocatable :: la
+          real(kind=WP), dimension(:, :), allocatable :: la
           logical :: has_p0 = .false.
-          my_real, dimension(:), allocatable :: p0
+          real(kind=WP), dimension(:), allocatable :: p0
           logical :: has_dp0 = .false.
-          my_real, dimension(:), allocatable :: dp0
+          real(kind=WP), dimension(:), allocatable :: dp0
           logical :: has_ro0 = .false.
-          my_real, dimension(:), allocatable :: ro0
+          real(kind=WP), dimension(:), allocatable :: ro0
           logical :: has_en0 = .false.
-          my_real, dimension(:), allocatable :: en0
+          real(kind=WP), dimension(:), allocatable :: en0
           logical :: has_vold = .false.
-          my_real, dimension(:), allocatable :: vold
+          real(kind=WP), dimension(:), allocatable :: vold
           logical :: has_pold = .false.
-          my_real, dimension(:), allocatable :: pold
+          real(kind=WP), dimension(:), allocatable :: pold
           logical :: has_v0 = .false.
-          my_real, dimension(:, :), allocatable :: v0
+          real(kind=WP), dimension(:, :), allocatable :: v0
           logical :: has_reso = .false.
-          my_real, dimension(:, :), allocatable :: reso
+          real(kind=WP), dimension(:, :), allocatable :: reso
+          logical :: has_area = .false.
+          real(kind=WP), dimension(:), allocatable :: area
+          logical :: has_dvnf = .false.
+          real(kind=WP), dimension(:), allocatable :: dvnf  !normal grid velocity
 
         contains
 
           procedure, pass :: set_nodes_elems
+          procedure, pass :: set_nodes_elems_secondary_surface
           procedure, pass :: write_data, read_data
           procedure, pass :: write_common_data, read_common_data
           procedure, pass :: ebcs_destroy
@@ -159,7 +178,7 @@
 !     -------------------
         type, public, extends(t_ebcs) :: t_ebcs_pres
           integer :: ipres = 0, irho = 0, iener = 0, ivx = 0, ivy = 0, ivz = 0
-          my_real :: c = 0, pres = 0, rho = 0, lcar = 0, r1 = 0, r2 = 0,&
+          real(kind=WP) :: c = 0, pres = 0, rho = 0, lcar = 0, r1 = 0, r2 = 0,&
           &ener = 0, vx = 0, vy = 0, vz = 0
 
         contains
@@ -172,8 +191,8 @@
 !     ---------------------
         type, public, extends(t_ebcs) :: t_ebcs_valvin
           integer :: ipres = 0, irho = 0, iener = 0
-          my_real :: c = 0, ener = 0, rho = 0, pres = 0
-          my_real :: lcar = 0, r1 = 0, r2 = 0
+          real(kind=WP) :: c = 0, ener = 0, rho = 0, pres = 0
+          real(kind=WP) :: lcar = 0, r1 = 0, r2 = 0
 
         contains
 
@@ -185,8 +204,8 @@
 !     ----------------------
         type, public, extends(t_ebcs) :: t_ebcs_valvout
           integer :: ipres = 0, irho = 0, iener = 0
-          my_real :: c = 0, ener = 0, rho = 0, pres = 0
-          my_real :: lcar = 0, r1 = 0, r2 = 0
+          real(kind=WP) :: c = 0, ener = 0, rho = 0, pres = 0
+          real(kind=WP) :: lcar = 0, r1 = 0, r2 = 0
 
         contains
 
@@ -198,8 +217,8 @@
 !     ---------------------
         type, public, extends(t_ebcs) :: t_ebcs_gradp0
           integer :: ipres = 0, irho = 0, iener = 0
-          my_real :: c = 0, ener = 0, rho = 0, pres = 0
-          my_real :: lcar = 0, r1 = 0, r2 = 0
+          real(kind=WP) :: c = 0, ener = 0, rho = 0, pres = 0
+          real(kind=WP) :: lcar = 0, r1 = 0, r2 = 0
 
         contains
 
@@ -211,8 +230,8 @@
 !     ------------------
         type, public, extends(t_ebcs) :: t_ebcs_vel
           integer :: ivx = 0, ivy = 0, ivz = 0, irho = 0, iener = 0
-          my_real :: c = 0, ener = 0, rho = 0, vx = 0, vy = 0, vz = 0
-          my_real :: lcar = 0, r1 = 0, r2 = 0
+          real(kind=WP) :: c = 0, ener = 0, rho = 0, vx = 0, vy = 0, vz = 0
+          real(kind=WP) :: lcar = 0, r1 = 0, r2 = 0
 
         contains
 
@@ -224,8 +243,8 @@
 !     --------------------
         type, public, extends(t_ebcs) :: t_ebcs_normv
           integer :: ivimp = 0, irho = 0, iener = 0
-          my_real :: c = 0, ener = 0, rho = 0, vimp = 0
-          my_real :: lcar = 0, r1 = 0, r2 = 0
+          real(kind=WP) :: c = 0, ener = 0, rho = 0, vimp = 0
+          real(kind=WP) :: lcar = 0, r1 = 0, r2 = 0
 
         contains
 
@@ -236,7 +255,7 @@
 !     type = 6 /EBCS/INIP
 !     -------------------
         type, public, extends(t_ebcs) :: t_ebcs_inip
-          my_real :: rho = 0, c = 0, lcar = 0
+          real(kind=WP) :: rho = 0, c = 0, lcar = 0
 
         contains
 
@@ -247,7 +266,7 @@
 !     type = 7 /EBCS/INIV
 !     -------------------
         type, public, extends(t_ebcs) :: t_ebcs_iniv
-          my_real :: rho = 0, c = 0, lcar = 0
+          real(kind=WP) :: rho = 0, c = 0, lcar = 0
 
         contains
 
@@ -270,6 +289,7 @@
 !     --------------------
         type, public, extends(t_ebcs) :: t_ebcs_inlet
           type(fvm_inlet_data_struct) :: fvm_inlet_data
+          integer :: nbmat=1
 
         contains
 
@@ -292,8 +312,8 @@
 !     ----------------------
         type, public, extends(t_ebcs) :: t_ebcs_nrf
           integer :: nbmat=21
-          my_real :: tcar_p = 0., tcar_vf = 1E20
-          !my_real, dimension(:,:), allocatable :: phase_alpha
+          real(kind=WP) :: tcar_p = 0., tcar_vf = 1E20
+          !real(kind=WP), dimension(:,:), allocatable :: phase_alpha
           type(fvm_inlet_data_struct) :: fvm_inlet_data
 
         contains
@@ -302,18 +322,30 @@
           procedure, pass :: read_data => read_data_nrf
         end type t_ebcs_nrf
 
-!     type = 11 /EBCS/PROPERGOL
+!     type = 11 /EBCS/PROPELLANT
 !     ----------------------
-      type, public, extends(t_ebcs) :: t_ebcs_propergol
-      integer :: sensor_id=0, submat_id=1
-      my_real :: a = 0., n = 0., q = 0., rho0s=0.
-      integer :: ffunc_id=0, gfunc_id=0, hfunc_id=0
-      my_real :: fscaleX=1.0, fscaleY=1.0, gscaleX=1.0, gscaleY=0., hscaleX=1.0, hscaleY=1.0
-      type(fvm_inlet_data_struct) :: fvm_inlet_data
-      contains
-      procedure, pass :: write_data => write_data_propergol
-      procedure, pass :: read_data => read_data_propergol
-      end type t_ebcs_propergol
+        type, public, extends(t_ebcs) :: t_ebcs_propellant
+          integer :: sensor_id=0, submat_id=1, ienthalpy=1
+          real(kind=WP) :: a = 0., n = 0., q = 0., rho0s=0., gamma=1., T=300.
+          integer :: ffunc_id=0, gfunc_id=0, hfunc_id=0
+          real(kind=WP) :: fscaleX=1.0, fscaleY=1.0, gscaleX=1.0, gscaleY=0., hscaleX=1.0, hscaleY=1.0
+          type(fvm_inlet_data_struct) :: fvm_inlet_data
+        contains
+          procedure, pass :: write_data => write_data_propellant
+          procedure, pass :: read_data => read_data_propellant
+        end type t_ebcs_propellant
+
+!     type = 12 /EBCS/CYCLIC
+!     ----------------------
+        type, public, extends(t_ebcs) :: t_ebcs_cyclic
+          integer :: nbmat=21
+          integer :: node_id(6)=0 !Starter only. No need to transmit to Engine (used to build surface elems and nodes)
+
+        contains
+
+          procedure, pass :: write_data => write_data_cyclic
+          procedure, pass :: read_data => read_data_cyclic
+        end type t_ebcs_cyclic
 
 !     ----------------------
 !     Polymorphic variable (points to a specific ebcs type)
@@ -324,17 +356,17 @@
 
 !     Array of polymorphic variables, to handle every ebcs types (potentially different) in
 !     one same array of size nebcs
-   type, public :: t_ebcs_tab
-      integer :: nebcs
-      class(t_ebcs_poly), dimension(:), allocatable :: tab
-      integer, dimension(:), allocatable :: my_typ
-      logical, dimension(:), allocatable :: need_to_compute
-      logical :: is_created = .false.
-      integer :: nebcs_loc = 0, nebcs_fvm = 0, nebcs_parallel = 0, nebcs_propergol = 0
-   contains
-      procedure, pass :: create, destroy, write_type_data, create_from_types
-      procedure, nopass :: read_type_data
-   end type t_ebcs_tab
+        type, public :: t_ebcs_tab
+          integer :: nebcs
+          class(t_ebcs_poly), dimension(:), allocatable :: tab
+          integer, dimension(:), allocatable :: my_typ
+          logical, dimension(:), allocatable :: need_to_compute
+          logical :: is_created = .false.
+          integer :: nebcs_loc = 0, nebcs_fvm = 0, nebcs_parallel = 0, nebcs_propellant = 0
+        contains
+          procedure, pass :: create, destroy, write_type_data, create_from_types
+          procedure, nopass :: read_type_data
+        end type t_ebcs_tab
 
       contains
 
@@ -342,9 +374,9 @@
 !     ** Methods **     !
 !     =============     !
 
-      !||====================================================================
-      !||    ebcs_destroy   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ebcs_destroy   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
         subroutine ebcs_destroy(this)
           implicit none
           class(t_ebcs), intent(inout) :: this
@@ -364,6 +396,10 @@
           if(allocated(this%pold)) deallocate(this%pold)
           if(allocated(this%v0)) deallocate(this%v0)
           if(allocated(this%reso)) deallocate(this%reso)
+          if(allocated(this%area)) deallocate(this%area)
+          if(allocated(this%dvnf)) deallocate(this%dvnf)
+          if(allocated(this%ng)) deallocate(this%ng)
+          if(allocated(this%iloc)) deallocate(this%iloc)
         end subroutine ebcs_destroy
 
 !     ******************     !
@@ -372,9 +408,9 @@
 
 !     Allocation
 !     ----------
-      !||====================================================================
-      !||    create   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    create   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
         subroutine create(this, nebcs)
           implicit none
           class (t_ebcs_tab), intent(inout) :: this
@@ -384,14 +420,14 @@
             this%nebcs = nebcs
             allocate(this%tab(nebcs))
             this%is_created = .true.
-          endif
+          end if
         end subroutine create
 
 !     Creation from given type numbers
 !     --------------------------------
-      !||====================================================================
-      !||    create_from_types   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    create_from_types   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
         subroutine create_from_types(this, nebcs, type_tab)
           implicit none
           class (t_ebcs_tab), intent(inout) :: this
@@ -400,69 +436,69 @@
 
           integer :: ii, type
 
-          class (t_ebcs), pointer :: ebcs
-
-      if (nebcs > 0) then
-         allocate(this%tab(nebcs))
-         this%is_created = .true.
-         do ii = 1, nebcs
-            type = type_tab(ii)
-            select case (type)
-             case (1) ! /EBCS/PRES
-               allocate (t_ebcs_pres :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 1
-             case (2) ! /EBCS/VALVIN
-               allocate (t_ebcs_valvin :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 2
-             case (3) ! /EBCS/VALVOUT
-               allocate (t_ebcs_valvout :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 3
-             case (0) ! /EBCS/GRADP0
-               allocate (t_ebcs_gradp0 :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 0
-             case (4) ! /EBCS/VEL
-               allocate (t_ebcs_vel :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 4
-             case (5) ! /EBCS/NORMV
-               allocate (t_ebcs_normv :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 5
-             case (6) ! /EBCS/INIP
-               allocate (t_ebcs_inip :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 6
-             case (7) ! /ENCS/INIV
-               allocate (t_ebcs_iniv :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 7
-             case (100) ! /EBCS/MONVOL
-               allocate (t_ebcs_monvol :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 100
-             case (8) ! /EBCS/INLET
-               allocate (t_ebcs_inlet :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 8
-             case (9) ! /EBCS/FLUXOUT
-               allocate (t_ebcs_fluxout :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 9
-             case (10) ! /EBCS/NRF
-               allocate (t_ebcs_nrf :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 10
-             case (11) ! /EBCS/PROPERGOL
-               allocate (t_ebcs_propergol :: this%tab(ii)%poly)
-               this%tab(ii)%poly%type = 11
-             case default
-               print*, "EBCS type ", type, " unrecognized"
-            end select
-         enddo
-      endif
-   end subroutine create_from_types
+          if (nebcs > 0) then
+            allocate(this%tab(nebcs))
+            this%is_created = .true.
+            do ii = 1, nebcs
+              type = type_tab(ii)
+              select case (type)
+               case (1) ! /EBCS/PRES
+                allocate (t_ebcs_pres :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 1
+               case (2) ! /EBCS/VALVIN
+                allocate (t_ebcs_valvin :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 2
+               case (3) ! /EBCS/VALVOUT
+                allocate (t_ebcs_valvout :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 3
+               case (0) ! /EBCS/GRADP0
+                allocate (t_ebcs_gradp0 :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 0
+               case (4) ! /EBCS/VEL
+                allocate (t_ebcs_vel :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 4
+               case (5) ! /EBCS/NORMV
+                allocate (t_ebcs_normv :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 5
+               case (6) ! /EBCS/INIP
+                allocate (t_ebcs_inip :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 6
+               case (7) ! /ENCS/INIV
+                allocate (t_ebcs_iniv :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 7
+               case (100) ! /EBCS/MONVOL
+                allocate (t_ebcs_monvol :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 100
+               case (8) ! /EBCS/INLET
+                allocate (t_ebcs_inlet :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 8
+               case (9) ! /EBCS/FLUXOUT
+                allocate (t_ebcs_fluxout :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 9
+               case (10) ! /EBCS/NRF
+                allocate (t_ebcs_nrf :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 10
+               case (11) ! /EBCS/PROPELLANT
+                allocate (t_ebcs_propellant :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 11
+               case (12) ! /EBCS/CYCLIC
+                allocate (t_ebcs_cyclic :: this%tab(ii)%poly)
+                this%tab(ii)%poly%type = 12
+               case default
+                print*, "EBCS type ", type, " unrecognized"
+              end select
+            end do
+          end if
+        end subroutine create_from_types
 !     Deallocation
 !     ----------
-      !||====================================================================
-      !||    destroy   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    destroy   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
         subroutine destroy(this)
           implicit none
           class (t_ebcs_tab), intent(inout) :: this
 
-          integer :: ii
           if (allocated(this%tab)) then
 ! this is not useful and it causes a bug with Intel OneAPI 2023
 !        do ii = 1, this%nebcs
@@ -470,15 +506,15 @@
 !        enddo
 ! All allocatable subobjects are deallocated here:
             deallocate(this%tab)
-          endif
+          end if
         end subroutine destroy
 
 !     Read and write methods
 !     ----------------------
-      !||====================================================================
-      !||    write_type_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    write_type_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||====================================================================
         subroutine write_type_data(this, leni, lenr)
           implicit none
           class (t_ebcs_tab), intent(in) :: this
@@ -489,16 +525,16 @@
 
           do ii = 1, this%nebcs
             integer_data(ii) = this%tab(ii)%poly%type
-          enddo
+          end do
           call write_i_array_c(integer_data, this%nebcs)
           leni = leni + this%nebcs
           lenr = lenr + 0
         end subroutine write_type_data
 
-      !||====================================================================
-      !||    read_type_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    read_type_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||====================================================================
         subroutine read_type_data(nebcs, integer_data)
           implicit none
           integer, intent(in) :: nebcs
@@ -512,9 +548,9 @@
 
 !     Nodes and elements of the surface
 !     ---------------------------------
-      !||====================================================================
-      !||    set_nodes_elems   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    set_nodes_elems   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
         subroutine set_nodes_elems(this, nelem, numnod, surf_node)
           implicit none
 !     Dummy
@@ -530,19 +566,24 @@
           do ii = 1, nelem
             do jj = 1, 4
               tag_node(surf_node(ii, jj)) = 1
-            enddo
-          enddo
+            end do
+          end do
 !     keep track of nodes
           nnode = 0
           do ii = 1, numnod
             if (tag_node(ii) == 1) then
               nnode = nnode + 1
-            endif
-          enddo
+            end if
+          end do
 
           this%nb_node = nnode
           if(allocated(this%node_list)) deallocate(this%node_list)
-          allocate(this%node_list(nnode))
+          if(this%type ==12)then
+            ! BCS/CYCLIC has 2 surfaces
+            allocate(this%node_list(2*nnode))
+          else
+            allocate(this%node_list(nnode))
+          end if
 
           nnode = 0
           do ii = 1, numnod
@@ -550,28 +591,89 @@
               nnode = nnode + 1
               this%node_list(nnode) = ii
               tag_node(ii) = nnode
-            endif
-          enddo
+            end if
+          end do
 
 !     keep track of elems
           this%nb_elem = nelem
           if(allocated(this%elem_list)) deallocate(this%elem_list)
-          allocate(this%elem_list(4, nelem))
+          if(this%type ==12)then
+          ! BCS/CYCLIC has 2 surfaces
+            allocate(this%elem_list(4, 2*nelem))
+          else
+            allocate(this%elem_list(4, nelem))
+          end if
           do ii = 1, nelem
             do jj = 1, 4
               this%elem_list(jj, ii) = tag_node(surf_node(ii, jj))
-            enddo
-          enddo
+            end do
+          end do
 !     Allocate members
-          if(.not.allocated(this%ielem)) allocate(this%ielem(nelem))
+          if(this%type == 12 ) then
+            ! BCS/CYCLIC has 2 surfaces
+            if(.not.allocated(this%ielem)) allocate(this%ielem(2*nelem))
+            if(.not.allocated(this%itype)) allocate(this%itype(2*nelem))
+            if(.not.allocated(this%iseg)) allocate(this%iseg(2*nelem))
+          else
+            if(.not.allocated(this%ielem)) allocate(this%ielem(nelem))
+            if(.not.allocated(this%itype)) allocate(this%itype(nelem))
+            if(.not.allocated(this%iseg)) allocate(this%iseg(nelem))
+          end if
 
-          if(.not.allocated(this%itype)) allocate(this%itype(nelem))
-
-          if(.not.allocated(this%iseg)) allocate(this%iseg(nelem))
 
 !     memory deallocation
           deallocate(tag_node)
         end subroutine set_nodes_elems
+
+
+!||====================================================================
+!||    set_nodes_elems_secondary_surface   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
+       subroutine set_nodes_elems_secondary_surface(this, nelem, numnod, surf_node)
+          implicit none
+!     Dummy
+          class (t_ebcs), intent(inout) :: this
+          integer, intent(in) :: numnod, nelem
+          integer, dimension(nelem, 4), intent(in) :: surf_node
+!     Local
+          integer :: ii, jj, nnode
+          integer, dimension(:), allocatable :: tag_node
+!     tag surface nodes
+          allocate(tag_node(0:numnod))
+          tag_node(0:numnod) = 0
+          do ii = 1, nelem
+            do jj = 1, 4
+              tag_node(surf_node(ii, jj)) = 1
+            end do
+          end do
+!     keep track of nodes
+          nnode = 0
+          do ii = 1, numnod
+            if (tag_node(ii) == 1) then
+              nnode = nnode + 1
+            end if
+          end do
+          this%nb_node = nnode
+          nnode = 0
+          do ii = 1, numnod
+            if (tag_node(ii) == 1) then
+              nnode = nnode + 1
+              this%node_list(this%nb_node+nnode) = ii
+              tag_node(ii) = nnode
+            end if
+          end do
+!     keep track of elems
+          this%nb_elem = nelem
+          do ii = 1, nelem
+            do jj = 1, 4
+              this%elem_list(jj, nelem+ii) = tag_node(surf_node(ii, jj))
+            end do
+          end do
+!     memory deallocation
+          deallocate(tag_node)
+        end subroutine set_nodes_elems_secondary_surface
+
+
 
 !     ***********************     !
 !     read and write routines     !
@@ -579,9 +681,9 @@
 
 !     Abstract
 !     --------
-      !||====================================================================
-      !||    write_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    write_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
         subroutine write_data(this, leni, lenr)
           implicit none
           class (t_ebcs), intent(inout) :: this
@@ -589,34 +691,34 @@
           leni = leni + 0
           lenr = lenr + 0
           this%type=-1
-          print*,'Should not ebter in this code'
+          print*,"Should not ebter in this code"
         end subroutine write_data
 
-      !||====================================================================
-      !||    read_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    read_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
         subroutine read_data(this)
           implicit none
           class (t_ebcs), intent(inout) :: this
           this%type=-1
-          print*,'Should not ebter in this code'
+          print*,"Should not ebter in this code"
         end subroutine read_data
 
 !     Common write routine
 !     --------------------
 
-      !||====================================================================
-      !||    write_common_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db            ../common_source/tools/input_output/write_db.F
-      !||    write_i_c           ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    write_common_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db            ../common_source/tools/input_output/write_db.F
+!||    write_i_c           ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         subroutine write_common_data(this, leni, lenr)
           implicit none
           class (t_ebcs), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
-          integer, dimension(8) :: integer_data
+          integer, dimension(10) :: integer_data
           integer :: siz
           integer_data(1) = this%type
           integer_data(2) = this%ebcs_id
@@ -629,12 +731,16 @@
           if(this%has_ielem)integer_data(7) = 1
           integer_data(8) = 0
           if(this%has_th)integer_data(8) = 1
+          integer_data(9) = 0
+          if(this%has_ng)integer_data(9) = 1
+          integer_data(10) = 0
+          if(this%has_iloc)integer_data(10) = 1
           if (this%debug_print) print*, "integer_data ", integer_data
 
           lenr = lenr + 0
 
-          call write_i_array_c(integer_data, 8)
-          leni = leni + 8
+          call write_i_array_c(integer_data, 10)
+          leni = leni + 10
 
 !     write node list
           if (this%debug_print) print*, "node_list ", this%node_list
@@ -671,7 +777,7 @@
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write la
           if (this%has_la) then
@@ -683,31 +789,31 @@
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write p0
           if (this%has_p0) then
             call write_i_c(1, 1)
             leni = leni + 1
-            if (this%debug_print) print*, 'p0 = ', this%p0
+            if (this%debug_print) print*, "p0 = ", this%p0
             call write_db(this%p0, this%nb_node)
             leni = leni + this%nb_node
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write dp0
           if (this%has_dp0) then
             call write_i_c(1, 1)
             leni = leni + 1
-            if (this%debug_print) print*, 'dp0 = ', this%dp0
+            if (this%debug_print) print*, "dp0 = ", this%dp0
             call write_db(this%dp0, this%nb_elem)
             leni = leni + this%nb_node
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write ro0
           if (this%has_ro0) then
@@ -719,7 +825,7 @@
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write en0
           if (this%has_en0) then
@@ -731,7 +837,7 @@
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write pold
           if (this%has_pold) then
@@ -739,7 +845,7 @@
               siz=this%nb_elem
             else
               siz = this%nb_node
-            endif
+            end if
             call write_i_c(1, 1)
             leni = leni + 1
             if (this%debug_print) print*, "pold ", this%pold
@@ -748,7 +854,7 @@
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write +
           if (this%has_vold) then
@@ -756,7 +862,7 @@
               siz=this%nb_elem
             else
               siz = this%nb_node
-            endif
+            end if
             call write_i_c(1, 1)
             leni = leni + 1
             if (this%debug_print) print*, "vold ", this%vold
@@ -765,7 +871,7 @@
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write v0
           if (this%has_v0) then
@@ -777,7 +883,7 @@
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
 
 !     write reso
           if (this%has_reso) then
@@ -789,28 +895,51 @@
           else
             call write_i_c(0, 1)
             leni = leni + 1
-          endif
+          end if
+
+!     no need to write area, only has_area
+          if (this%has_area) then
+            call write_i_c(1, 1)
+            leni = leni + 1
+            if (this%debug_print) print*, "area ", "not in restart file"
+          else
+            call write_i_c(0, 1)
+            leni = leni + 1
+          end if
+
+!     no need to write dvnf, only has_dvnf
+          if (this%has_dvnf) then
+            call write_i_c(1, 1)
+            leni = leni + 1
+            if (this%debug_print) print*, "dvnf  ", "not in restart file"
+          else
+            call write_i_c(0, 1)
+            leni = leni + 1
+          end if
 
         end subroutine write_common_data
 
 !     Common read routine
 !     -------------------
 
-      !||====================================================================
-      !||    read_common_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array      ../common_source/tools/input_output/read_db.F
-      !||    read_i_c           ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    read_common_data   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array      ../common_source/tools/input_output/read_db.F
+!||    read_i_c           ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    constant_mod       ../common_source/modules/constant_mod.F
+!||====================================================================
         subroutine read_common_data(this)
+          use constant_mod , only : zero
           implicit none
           class (t_ebcs), intent(inout) :: this
 
-          integer, dimension(8) :: integer_data
+          integer, dimension(10) :: integer_data
           integer :: ihas_la, ihas_iface, ihas_p0, ihas_dp0, ihas_ro0, ihas_en0,&
-          &ihas_pold, ihas_vold, ihas_v0, ihas_reso,siz
+          &ihas_pold, ihas_vold, ihas_v0, ihas_reso,ihas_area,ihas_dvnf,siz
 
-          call read_i_array_c(integer_data, 8)
+          call read_i_array_c(integer_data, 10)
           this%type = integer_data(1)
           this%ebcs_id = integer_data(2)
           this%surf_id = integer_data(3)
@@ -822,7 +951,14 @@
           if(integer_data(7) == 1)this%has_ielem=.true.
           this%has_th=.false.
           if(integer_data(8) == 1)this%has_th=.true.
+          this%has_ng=.false.
+          if(integer_data(9) == 1)this%has_ng=.true.
+          if(this%has_ng)allocate(this%ng(this%nb_elem))
+          this%has_iloc=.false.
+          if(integer_data(10) == 1)this%has_iloc=.true.
+          if(this%has_iloc)allocate(this%iloc(this%nb_elem))
           if (this%debug_print) print*, "integer_data ", integer_data
+
 
 !     read node list
           allocate(this%node_list(this%nb_node))
@@ -858,7 +994,7 @@
             if (this%debug_print) print*, "iface ", this%iface
           else
             this%has_iface = .false.
-          endif
+          end if
 
 !     read la
           call read_i_c(ihas_la, 1)
@@ -869,7 +1005,7 @@
             if (this%debug_print) print*, "la ", this%la
           else
             this%has_la = .false.
-          endif
+          end if
 
 !     read p0
           call read_i_c(ihas_p0, 1)
@@ -877,10 +1013,10 @@
             this%has_p0 = .true.
             allocate(this%p0(this%nb_node))
             call read_db_array(this%p0, this%nb_node)
-            if (this%debug_print) print*, 'p0 = ', this%p0
+            if (this%debug_print) print*, "p0 = ", this%p0
           else
             this%has_p0 = .false.
-          endif
+          end if
 
 !     read dp0
           call read_i_c(ihas_dp0, 1)
@@ -888,10 +1024,10 @@
             this%has_dp0 = .true.
             allocate(this%dp0(this%nb_elem))
             call read_db_array(this%dp0, this%nb_elem)
-            if (this%debug_print) print*, 'dp0 = ', this%dp0
+            if (this%debug_print) print*, "dp0 = ", this%dp0
           else
             this%has_dp0 = .false.
-          endif
+          end if
 
 !     read ro0
           call read_i_c(ihas_ro0, 1)
@@ -902,7 +1038,7 @@
             if (this%debug_print) print*, "ro0 ", this%ro0
           else
             this%has_ro0 = .false.
-          endif
+          end if
 
 !     read en0
           call read_i_c(ihas_en0, 1)
@@ -913,7 +1049,7 @@
             if (this%debug_print) print*, "en0 ", this%en0
           else
             this%has_en0 = .false.
-          endif
+          end if
 
 !     read pold
           call read_i_c(ihas_pold, 1)
@@ -923,13 +1059,13 @@
               siz=this%nb_elem
             else
               siz = this%nb_node
-            endif
+            end if
             allocate(this%pold(siz))
             call read_db_array(this%pold, siz)
             if (this%debug_print) print*, "pold ", this%pold
           else
             this%has_pold = .false.
-          endif
+          end if
 
 !     read vold
           call read_i_c(ihas_vold, 1)
@@ -939,13 +1075,13 @@
               siz=this%nb_elem
             else
               siz = this%nb_node
-            endif
+            end if
             allocate(this%vold(siz))
             call read_db_array(this%vold, siz)
             if (this%debug_print) print*, "vold ", this%vold
           else
             this%has_vold = .false.
-          endif
+          end if
 
 !     read v0
           call read_i_c(ihas_v0, 1)
@@ -956,7 +1092,7 @@
             if (this%debug_print) print*, "v0 ", this%v0
           else
             this%has_v0 = .false.
-          endif
+          end if
 
 !     read reso
           call read_i_c(ihas_reso, 1)
@@ -967,23 +1103,47 @@
             if (this%debug_print) print*, "reso ", this%reso
           else
             this%has_reso = .false.
-          endif
+          end if
+
+!     no need to read area, only has_area
+          call read_i_c(ihas_area, 1)
+          if (ihas_area == 1) then
+            this%has_area = .true.
+            allocate(this%area(this%nb_elem))
+            this%area(1:this%nb_elem)= zero
+            if(this%debug_print) print *, "area ", "not in restart file"
+          else
+            this%has_area = .false.
+          end if
+
+!     no need to read dvnf, only has_dvnf
+          call read_i_c(ihas_dvnf, 1)
+          if (ihas_dvnf == 1) then
+            this%has_dvnf = .true.
+            allocate(this%dvnf(this%nb_elem))
+            this%dvnf(1:this%nb_elem)= zero
+            if(this%debug_print) print *, "dvnf  ", "not in restart file"
+          else
+            this%has_dvnf = .false.
+          end if
+
+
         end subroutine read_common_data
 
 !     /EBCS/PRES
 !     ----------
 
-      !||====================================================================
-      !||    write_data_pres   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db          ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_data_pres   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db          ../common_source/tools/input_output/write_db.F
+!||====================================================================
         subroutine write_data_pres(this, leni, lenr)
           implicit none
           class (t_ebcs_pres), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
           integer, dimension(6) :: integer_data
-          my_real, dimension(10) :: real_data
+          real(kind=WP), dimension(10) :: real_data
 
           integer_data(1) = this%ipres
           integer_data(2) = this%irho
@@ -1009,17 +1169,17 @@
           lenr = lenr + 10
         end subroutine write_data_pres
 
-      !||====================================================================
-      !||    read_data_pres   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array    ../common_source/tools/input_output/read_db.F
-      !||====================================================================
+!||====================================================================
+!||    read_data_pres   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array    ../common_source/tools/input_output/read_db.F
+!||====================================================================
         subroutine read_data_pres(this)
           implicit none
           class (t_ebcs_pres), intent(inout) :: this
 
           integer, dimension(6) :: integer_data
-          my_real, dimension(10) :: real_data
+          real(kind=WP), dimension(10) :: real_data
 
           call read_i_array_c(integer_data, 6)
           this%ipres =integer_data(1)
@@ -1045,18 +1205,18 @@
 !     /EBCS/VALVIN
 !     ----------
 
-      !||====================================================================
-      !||    write_data_valvin   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db            ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_data_valvin   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db            ../common_source/tools/input_output/write_db.F
+!||====================================================================
         subroutine write_data_valvin(this, leni, lenr)
           implicit none
           class (t_ebcs_valvin), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
           integer, dimension(3) :: integer_data
-          my_real, dimension(7) :: real_data
+          real(kind=WP), dimension(7) :: real_data
 
           integer_data(1) = this%ipres
           integer_data(2) = this%irho
@@ -1077,17 +1237,17 @@
           lenr = lenr + 7
         end subroutine write_data_valvin
 
-      !||====================================================================
-      !||    read_data_valvin   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array      ../common_source/tools/input_output/read_db.F
-      !||====================================================================
+!||====================================================================
+!||    read_data_valvin   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array      ../common_source/tools/input_output/read_db.F
+!||====================================================================
         subroutine read_data_valvin(this)
           implicit none
           class (t_ebcs_valvin), intent(inout) :: this
 
           integer, dimension(3) :: integer_data
-          my_real, dimension(7) :: real_data
+          real(kind=WP), dimension(7) :: real_data
 
           call read_i_array_c(integer_data, 3)
           this%ipres =integer_data(1)
@@ -1107,18 +1267,18 @@
 !     /EBCS/VALVOUT
 !     ----------
 
-      !||====================================================================
-      !||    write_data_valvout   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db             ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_data_valvout   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db             ../common_source/tools/input_output/write_db.F
+!||====================================================================
         subroutine write_data_valvout(this, leni, lenr)
           implicit none
           class (t_ebcs_valvout), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
           integer, dimension(3) :: integer_data
-          my_real, dimension(7) :: real_data
+          real(kind=WP), dimension(7) :: real_data
 
           integer_data(1) = this%ipres
           integer_data(2) = this%irho
@@ -1139,17 +1299,17 @@
           lenr = lenr + 7
         end subroutine write_data_valvout
 
-      !||====================================================================
-      !||    read_data_valvout   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array       ../common_source/tools/input_output/read_db.F
-      !||====================================================================
+!||====================================================================
+!||    read_data_valvout   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array       ../common_source/tools/input_output/read_db.F
+!||====================================================================
         subroutine read_data_valvout(this)
           implicit none
           class (t_ebcs_valvout), intent(inout) :: this
 
           integer, dimension(3) :: integer_data
-          my_real, dimension(7) :: real_data
+          real(kind=WP), dimension(7) :: real_data
 
           call read_i_array_c(integer_data, 3)
           this%ipres =integer_data(1)
@@ -1169,18 +1329,18 @@
 !     /EBCS/GRADP0
 !     ----------
 
-      !||====================================================================
-      !||    write_data_gradp0   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db            ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_data_gradp0   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db            ../common_source/tools/input_output/write_db.F
+!||====================================================================
         subroutine write_data_gradp0(this, leni, lenr)
           implicit none
           class (t_ebcs_gradp0), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
           integer, dimension(3) :: integer_data
-          my_real, dimension(7) :: real_data
+          real(kind=WP), dimension(7) :: real_data
 
           integer_data(1) = this%ipres
           integer_data(2) = this%irho
@@ -1201,17 +1361,17 @@
           lenr = lenr + 7
         end subroutine write_data_gradp0
 
-      !||====================================================================
-      !||    read_data_gradp0   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array      ../common_source/tools/input_output/read_db.F
-      !||====================================================================
+!||====================================================================
+!||    read_data_gradp0   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array      ../common_source/tools/input_output/read_db.F
+!||====================================================================
         subroutine read_data_gradp0(this)
           implicit none
           class (t_ebcs_gradp0), intent(inout) :: this
 
           integer, dimension(3) :: integer_data
-          my_real, dimension(7) :: real_data
+          real(kind=WP), dimension(7) :: real_data
 
           call read_i_array_c(integer_data, 3)
           this%ipres =integer_data(1)
@@ -1231,18 +1391,18 @@
 !     /EBCS/VEL
 !     ----------
 
-      !||====================================================================
-      !||    write_data_vel    ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db          ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_data_vel    ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db          ../common_source/tools/input_output/write_db.F
+!||====================================================================
         subroutine write_data_vel(this, leni, lenr)
           implicit none
           class (t_ebcs_vel), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
           integer, dimension(5) :: integer_data
-          my_real, dimension(9) :: real_data
+          real(kind=WP), dimension(9) :: real_data
 
           integer_data(1) = this%ivx
           integer_data(2) = this%ivy
@@ -1267,17 +1427,17 @@
           lenr = lenr + 9
         end subroutine write_data_vel
 
-      !||====================================================================
-      !||    read_data_vel    ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array    ../common_source/tools/input_output/read_db.F
-      !||====================================================================
+!||====================================================================
+!||    read_data_vel    ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array    ../common_source/tools/input_output/read_db.F
+!||====================================================================
         subroutine read_data_vel(this)
           implicit none
           class (t_ebcs_vel), intent(inout) :: this
 
           integer, dimension(5) :: integer_data
-          my_real, dimension(9) :: real_data
+          real(kind=WP), dimension(9) :: real_data
 
           call read_i_array_c(integer_data, 5)
           this%ivx = integer_data(1)
@@ -1301,18 +1461,18 @@
 !     /EBCS/NORMV
 !     ----------
 
-      !||====================================================================
-      !||    write_data_normv   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db           ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_data_normv   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db           ../common_source/tools/input_output/write_db.F
+!||====================================================================
         subroutine write_data_normv(this, leni, lenr)
           implicit none
           class (t_ebcs_normv), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
           integer, dimension(3) :: integer_data
-          my_real, dimension(7) :: real_data
+          real(kind=WP), dimension(7) :: real_data
 
           integer_data(1) = this%ivimp
           integer_data(2) = this%irho
@@ -1333,17 +1493,17 @@
           lenr = lenr + 7
         end subroutine write_data_normv
 
-      !||====================================================================
-      !||    read_data_normv   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array     ../common_source/tools/input_output/read_db.F
-      !||====================================================================
+!||====================================================================
+!||    read_data_normv   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array     ../common_source/tools/input_output/read_db.F
+!||====================================================================
         subroutine read_data_normv(this)
           implicit none
           class (t_ebcs_normv), intent(inout) :: this
 
           integer, dimension(3) :: integer_data
-          my_real, dimension(7) :: real_data
+          real(kind=WP), dimension(7) :: real_data
 
           call read_i_array_c(integer_data, 3)
           this%ivimp = integer_data(1)
@@ -1363,17 +1523,17 @@
 !     /EBCS/INIP
 !     ----------
 
-      !||====================================================================
-      !||    write_data_inip   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db          ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_data_inip   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db          ../common_source/tools/input_output/write_db.F
+!||====================================================================
         subroutine write_data_inip(this, leni, lenr)
           implicit none
           class (t_ebcs_inip), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
-          my_real, dimension(3) :: real_data
+          real(kind=WP), dimension(3) :: real_data
 
           real_data(1) = this%rho
           real_data(2) = this%c
@@ -1383,16 +1543,16 @@
           leni = leni + 0
         end subroutine write_data_inip
 
-      !||====================================================================
-      !||    read_data_inip   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array    ../common_source/tools/input_output/read_db.F
-      !||====================================================================
+!||====================================================================
+!||    read_data_inip   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array    ../common_source/tools/input_output/read_db.F
+!||====================================================================
         subroutine read_data_inip(this)
           implicit none
           class (t_ebcs_inip), intent(inout) :: this
 
-          my_real, dimension(3) :: real_data
+          real(kind=WP), dimension(3) :: real_data
 
           call read_db_array(real_data, 3)
           this%rho = real_data(1)
@@ -1403,17 +1563,17 @@
 !     /EBCS/INIV
 !     ----------
 
-      !||====================================================================
-      !||    write_data_iniv   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db          ../common_source/tools/input_output/write_db.F
-      !||====================================================================
+!||====================================================================
+!||    write_data_iniv   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db          ../common_source/tools/input_output/write_db.F
+!||====================================================================
         subroutine write_data_iniv(this, leni, lenr)
           implicit none
           class (t_ebcs_iniv), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
-          my_real, dimension(3) :: real_data
+          real(kind=WP), dimension(3) :: real_data
 
           real_data(1) = this%rho
           real_data(2) = this%c
@@ -1423,16 +1583,16 @@
           leni = leni + 0
         end subroutine write_data_iniv
 
-      !||====================================================================
-      !||    read_data_iniv   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array    ../common_source/tools/input_output/read_db.F
-      !||====================================================================
+!||====================================================================
+!||    read_data_iniv   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array    ../common_source/tools/input_output/read_db.F
+!||====================================================================
         subroutine read_data_iniv(this)
           implicit none
           class (t_ebcs_iniv), intent(inout) :: this
 
-          my_real, dimension(3) :: real_data
+          real(kind=WP), dimension(3) :: real_data
 
           call read_db_array(real_data, 3)
           this%rho = real_data(1)
@@ -1443,10 +1603,10 @@
 !     /EBCS/MONVOL
 !     ----------
 
-      !||====================================================================
-      !||    write_data_monvol   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    write_data_monvol   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||====================================================================
         subroutine write_data_monvol(this, leni, lenr)
           implicit none
           class (t_ebcs_monvol), intent(inout) :: this
@@ -1461,10 +1621,10 @@
           lenr = lenr + 0
         end subroutine write_data_monvol
 
-      !||====================================================================
-      !||    read_data_monvol   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    read_data_monvol   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||====================================================================
         subroutine read_data_monvol(this)
           implicit none
           class (t_ebcs_monvol), intent(inout) :: this
@@ -1479,16 +1639,19 @@
 !     /EBCS/INLET
 !     ----------
 
-      !||====================================================================
-      !||    write_data_inlet   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db_array     ../common_source/tools/input_output/write_db.F
-      !||    write_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    write_data_inlet   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db_array     ../common_source/tools/input_output/write_db.F
+!||    write_i_c          ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         subroutine write_data_inlet(this, leni, lenr)
           implicit none
           class (t_ebcs_inlet), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
+
+          call write_i_c(this%nbmat, 1)
+          leni = leni + 1
 
           call write_i_c(this%fvm_inlet_data%vector_velocity, 1)
           leni = leni + 1
@@ -1513,15 +1676,17 @@
           lenr = lenr + 21
         end subroutine write_data_inlet
 
-      !||====================================================================
-      !||    read_data_inlet   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array     ../common_source/tools/input_output/read_db.F
-      !||    read_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    read_data_inlet   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array     ../common_source/tools/input_output/read_db.F
+!||    read_i_c          ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         subroutine read_data_inlet(this)
           implicit none
           class (t_ebcs_inlet), intent(inout) :: this
+
+          call read_i_c(this%nbmat, 1)
 
           call read_i_c(this%fvm_inlet_data%vector_velocity, 1)
           call read_i_c(this%fvm_inlet_data%formulation, 1)
@@ -1539,12 +1704,12 @@
 !     /EBCS/FLUXOUT
 !     ----------
 
-      !||====================================================================
-      !||    write_data_fluxout   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db_array       ../common_source/tools/input_output/write_db.F
-      !||    write_i_c            ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    write_data_fluxout   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db_array       ../common_source/tools/input_output/write_db.F
+!||    write_i_c            ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         subroutine write_data_fluxout(this, leni, lenr)
           implicit none
           class (t_ebcs_fluxout), intent(inout) :: this
@@ -1573,12 +1738,12 @@
           lenr = lenr + 21
         end subroutine write_data_fluxout
 
-      !||====================================================================
-      !||    read_data_fluxout   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db_array       ../common_source/tools/input_output/read_db.F
-      !||    read_i_c            ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    read_data_fluxout   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db_array       ../common_source/tools/input_output/read_db.F
+!||    read_i_c            ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         subroutine read_data_fluxout(this)
           implicit none
           class (t_ebcs_fluxout), intent(inout) :: this
@@ -1600,38 +1765,38 @@
 !     /EBCS/NRF
 !     ----------
 
-      !||====================================================================
-      !||    write_data_nrf    ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db_array    ../common_source/tools/input_output/write_db.F
-      !||    write_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    write_data_nrf    ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db_array    ../common_source/tools/input_output/write_db.F
+!||    write_i_c         ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         subroutine write_data_nrf(this, leni, lenr)
           implicit none
           class (t_ebcs_nrf), intent(inout) :: this
           integer, intent(inout) :: leni, lenr
 
-          my_real, dimension(2) :: real_data
+          real(kind=WP), dimension(2) :: real_data
 
-      real_data(1) = this%tcar_p
-      real_data(2) = this%tcar_vf
-      call write_db_array(real_data, 2)
-      lenr = lenr + 2
-      !call write_db(this%phase_alpha, this%nbmat*this%nb_elem)
-      !lenr = lenr + this%nbmat*this%nb_elem
-      if(this%is_multifluid)then
-         call write_i_c(this%fvm_inlet_data%vector_velocity, 1)
-         leni = leni + 1
-         call write_i_c(this%fvm_inlet_data%formulation, 1)
-         leni = leni + 1
-         call write_i_array_c(this%fvm_inlet_data%func_vel, 3)
-         leni = leni + 3
-         call write_i_array_c(this%fvm_inlet_data%func_alpha, 21)
-         leni = leni + 21
-         call write_i_array_c(this%fvm_inlet_data%func_rho, 21)
-         leni = leni + 21
-         call write_i_array_c(this%fvm_inlet_data%func_pres, 21)
-         leni = leni + 21
+          real_data(1) = this%tcar_p
+          real_data(2) = this%tcar_vf
+          call write_db_array(real_data, 2)
+          lenr = lenr + 2
+          !call write_db(this%phase_alpha, this%nbmat*this%nb_elem)
+          !lenr = lenr + this%nbmat*this%nb_elem
+          if(this%is_multifluid)then
+            call write_i_c(this%fvm_inlet_data%vector_velocity, 1)
+            leni = leni + 1
+            call write_i_c(this%fvm_inlet_data%formulation, 1)
+            leni = leni + 1
+            call write_i_array_c(this%fvm_inlet_data%func_vel, 3)
+            leni = leni + 3
+            call write_i_array_c(this%fvm_inlet_data%func_alpha, 21)
+            leni = leni + 21
+            call write_i_array_c(this%fvm_inlet_data%func_rho, 21)
+            leni = leni + 21
+            call write_i_array_c(this%fvm_inlet_data%func_pres, 21)
+            leni = leni + 21
 
             call write_db_array(this%fvm_inlet_data%val_vel, 3)
             lenr = lenr + 3
@@ -1641,147 +1806,186 @@
             lenr = lenr + 21
             call write_db_array(this%fvm_inlet_data%val_pres, 21)
             lenr = lenr + 21
-          endif
+          end if
         end subroutine write_data_nrf
 
-      !||====================================================================
-      !||    read_data_nrf    ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db          ../common_source/tools/input_output/read_db.F
-      !||    read_db_array    ../common_source/tools/input_output/read_db.F
-      !||    read_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    read_data_nrf    ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db          ../common_source/tools/input_output/read_db.F
+!||    read_db_array    ../common_source/tools/input_output/read_db.F
+!||    read_i_c         ../common_source/tools/input_output/write_routines.c
+!||====================================================================
         subroutine read_data_nrf(this)
           implicit none
           class (t_ebcs_nrf), intent(inout) :: this
-          integer :: itmp
 
-      call read_db(this%tcar_p, 1)
-      call read_db(this%tcar_vf, 1)
-      !if(this%nbmat > 0)then
-      !  allocate(this%phase_alpha(this%nbmat,this%nb_elem))
-      !  call read_db(this%phase_alpha, this%nbmat*this%nb_elem)
-      !endif
-      if(this%is_multifluid)then
-         call read_i_c(this%fvm_inlet_data%vector_velocity, 1)
-         call read_i_c(this%fvm_inlet_data%formulation, 1)
-         call read_i_array_c(this%fvm_inlet_data%func_vel, 3)
-         call read_i_array_c(this%fvm_inlet_data%func_alpha, 21)
-         call read_i_array_c(this%fvm_inlet_data%func_rho, 21)
-         call read_i_array_c(this%fvm_inlet_data%func_pres, 21)
+          call read_db(this%tcar_p, 1)
+          call read_db(this%tcar_vf, 1)
+          !if(this%nbmat > 0)then
+          !  allocate(this%phase_alpha(this%nbmat,this%nb_elem))
+          !  call read_db(this%phase_alpha, this%nbmat*this%nb_elem)
+          !endif
+          if(this%is_multifluid)then
+            call read_i_c(this%fvm_inlet_data%vector_velocity, 1)
+            call read_i_c(this%fvm_inlet_data%formulation, 1)
+            call read_i_array_c(this%fvm_inlet_data%func_vel, 3)
+            call read_i_array_c(this%fvm_inlet_data%func_alpha, 21)
+            call read_i_array_c(this%fvm_inlet_data%func_rho, 21)
+            call read_i_array_c(this%fvm_inlet_data%func_pres, 21)
 
             call read_db_array(this%fvm_inlet_data%val_vel, 3)
             call read_db_array(this%fvm_inlet_data%val_alpha, 21)
             call read_db_array(this%fvm_inlet_data%val_rho, 21)
             call read_db_array(this%fvm_inlet_data%val_pres, 21)
-          endif
+          end if
         end subroutine read_data_nrf
 
-!     /EBCS/PROPERGOL
+!     /EBCS/PROPELLANT
 !     -------------
 
-      !||====================================================================
-      !||    write_data_propergol   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    write_db_array         ../common_source/tools/input_output/write_db.F
-      !||    write_i_c              ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
-      subroutine write_data_propergol(this, leni, lenr)
-      implicit none
-      class (t_ebcs_propergol), intent(inout) :: this
-      integer, intent(inout) :: leni, lenr
-      integer, dimension(5) :: integer_data
-      my_real, dimension(10) :: real_data
+!||====================================================================
+!||    write_data_propellant   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    write_db_array          ../common_source/tools/input_output/write_db.F
+!||    write_i_c               ../common_source/tools/input_output/write_routines.c
+!||====================================================================
+        subroutine write_data_propellant(this, leni, lenr)
+          implicit none
+          class (t_ebcs_propellant), intent(inout) :: this
+          integer, intent(inout) :: leni, lenr
+          integer, dimension(6) :: integer_data
+          real(kind=WP), dimension(12) :: real_data
 
-      integer_data(1) = this%sensor_id
-      integer_data(2) = this%ffunc_id
-      integer_data(3) = this%gfunc_id
-      integer_data(4) = this%hfunc_id
-      integer_data(5) = this%submat_id
+          integer_data(1) = this%sensor_id
+          integer_data(2) = this%ffunc_id
+          integer_data(3) = this%gfunc_id
+          integer_data(4) = this%hfunc_id
+          integer_data(5) = this%submat_id
+          integer_data(6) = this%ienthalpy
 
-      real_data(1)  = this%a
-      real_data(2)  = this%n
-      real_data(3)  = this%q
-      real_data(4)  = this%rho0s
-      real_data(5)  = this%fscaleX
-      real_data(6)  = this%fscaleY
-      real_data(7)  = this%gscaleX
-      real_data(8)  = this%gscaleY
-      real_data(9)  = this%hscaleX
-      real_data(10) = this%hscaleY
+          real_data(1)  = this%a
+          real_data(2)  = this%n
+          real_data(3)  = this%q
+          real_data(4)  = this%gamma
+          real_data(5)  = this%T
+          real_data(6)  = this%rho0s
+          real_data(7)  = this%fscaleX
+          real_data(8)  = this%fscaleY
+          real_data(9)  = this%gscaleX
+          real_data(10) = this%gscaleY
+          real_data(11) = this%hscaleX
+          real_data(12) = this%hscaleY
 
-      call write_i_array_c(integer_data, 5)
-      leni = leni + 5
+          call write_i_array_c(integer_data, 6)
+          leni = leni + 6
 
-      call write_db_array(real_data, 10)
-      lenr = lenr + 10
-      if(this%is_multifluid)then
-        call write_i_c(this%fvm_inlet_data%vector_velocity, 1)
-        leni = leni + 1
-        call write_i_c(this%fvm_inlet_data%formulation, 1)
-        leni = leni + 1
-        call write_i_array_c(this%fvm_inlet_data%func_vel, 3)
-        leni = leni + 3
-        call write_i_array_c(this%fvm_inlet_data%func_alpha, 21)
-        leni = leni + 21
-        call write_i_array_c(this%fvm_inlet_data%func_rho, 21)
-        leni = leni + 21
-        call write_i_array_c(this%fvm_inlet_data%func_pres, 21)
-        leni = leni + 21
+          call write_db_array(real_data, 12)
+          lenr = lenr + 12
+          if(this%is_multifluid)then
+            call write_i_c(this%fvm_inlet_data%vector_velocity, 1)
+            leni = leni + 1
+            call write_i_c(this%fvm_inlet_data%formulation, 1)
+            leni = leni + 1
+            call write_i_array_c(this%fvm_inlet_data%func_vel, 3)
+            leni = leni + 3
+            call write_i_array_c(this%fvm_inlet_data%func_alpha, 21)
+            leni = leni + 21
+            call write_i_array_c(this%fvm_inlet_data%func_rho, 21)
+            leni = leni + 21
+            call write_i_array_c(this%fvm_inlet_data%func_pres, 21)
+            leni = leni + 21
 
-        call write_db_array(this%fvm_inlet_data%val_vel, 3)
-        lenr = lenr + 3
-        call write_db_array(this%fvm_inlet_data%val_alpha, 21)
-        lenr = lenr + 21
-        call write_db_array(this%fvm_inlet_data%val_rho, 21)
-        lenr = lenr + 21
-        call write_db_array(this%fvm_inlet_data%val_pres, 21)
-        lenr = lenr + 21
-      endif
-      end subroutine write_data_propergol
+            call write_db_array(this%fvm_inlet_data%val_vel, 3)
+            lenr = lenr + 3
+            call write_db_array(this%fvm_inlet_data%val_alpha, 21)
+            lenr = lenr + 21
+            call write_db_array(this%fvm_inlet_data%val_rho, 21)
+            lenr = lenr + 21
+            call write_db_array(this%fvm_inlet_data%val_pres, 21)
+            lenr = lenr + 21
+          end if
+        end subroutine write_data_propellant
 
-      !||====================================================================
-      !||    read_data_propergol   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    read_db               ../common_source/tools/input_output/read_db.F
-      !||    read_db_array         ../common_source/tools/input_output/read_db.F
-      !||    read_i_c              ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
-      subroutine read_data_propergol(this)
-      implicit none
-      class (t_ebcs_propergol), intent(inout) :: this
+!||====================================================================
+!||    read_data_propellant   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_db                ../common_source/tools/input_output/read_db.F
+!||    read_db_array          ../common_source/tools/input_output/read_db.F
+!||    read_i_c               ../common_source/tools/input_output/write_routines.c
+!||====================================================================
+        subroutine read_data_propellant(this)
+          implicit none
+          class (t_ebcs_propellant), intent(inout) :: this
 
-      call read_i_c(this%sensor_id, 1)
-      call read_i_c(this%ffunc_id, 1)
-      call read_i_c(this%gfunc_id, 1)
-      call read_i_c(this%hfunc_id, 1)
-      call read_i_c(this%submat_id, 1)
+          call read_i_c(this%sensor_id, 1)
+          call read_i_c(this%ffunc_id, 1)
+          call read_i_c(this%gfunc_id, 1)
+          call read_i_c(this%hfunc_id, 1)
+          call read_i_c(this%submat_id, 1)
+          call read_i_c(this%ienthalpy, 1)
 
-      call read_db(this%a, 1)
-      call read_db(this%n, 1)
-      call read_db(this%q, 1)
-      call read_db(this%rho0s, 1)
-      call read_db(this%fscaleX, 1)
-      call read_db(this%fscaleY, 1)
-      call read_db(this%gscaleX, 1)
-      call read_db(this%gscaleY, 1)
-      call read_db(this%hscaleX, 1)
-      call read_db(this%hscaleY, 1)
+          call read_db(this%a, 1)
+          call read_db(this%n, 1)
+          call read_db(this%q, 1)
+          call read_db(this%gamma, 1)
+          call read_db(this%T, 1)
+          call read_db(this%rho0s, 1)
+          call read_db(this%fscaleX, 1)
+          call read_db(this%fscaleY, 1)
+          call read_db(this%gscaleX, 1)
+          call read_db(this%gscaleY, 1)
+          call read_db(this%hscaleX, 1)
+          call read_db(this%hscaleY, 1)
 
-      if(this%is_multifluid)then
-        call read_i_c(this%fvm_inlet_data%vector_velocity, 1)
-        call read_i_c(this%fvm_inlet_data%formulation, 1)
-        call read_i_array_c(this%fvm_inlet_data%func_vel, 3)
-        call read_i_array_c(this%fvm_inlet_data%func_alpha, 21)
-        call read_i_array_c(this%fvm_inlet_data%func_rho, 21)
-        call read_i_array_c(this%fvm_inlet_data%func_pres, 21)
+          if(this%is_multifluid)then
+            call read_i_c(this%fvm_inlet_data%vector_velocity, 1)
+            call read_i_c(this%fvm_inlet_data%formulation, 1)
+            call read_i_array_c(this%fvm_inlet_data%func_vel, 3)
+            call read_i_array_c(this%fvm_inlet_data%func_alpha, 21)
+            call read_i_array_c(this%fvm_inlet_data%func_rho, 21)
+            call read_i_array_c(this%fvm_inlet_data%func_pres, 21)
 
-        call read_db_array(this%fvm_inlet_data%val_vel, 3)
-        call read_db_array(this%fvm_inlet_data%val_alpha, 21)
-        call read_db_array(this%fvm_inlet_data%val_rho, 21)
-        call read_db_array(this%fvm_inlet_data%val_pres, 21)
-      endif
-      end subroutine read_data_propergol
+            call read_db_array(this%fvm_inlet_data%val_vel, 3)
+            call read_db_array(this%fvm_inlet_data%val_alpha, 21)
+            call read_db_array(this%fvm_inlet_data%val_rho, 21)
+            call read_db_array(this%fvm_inlet_data%val_pres, 21)
+          end if
+        end subroutine read_data_propellant
 
 
-end module ebcs_mod
+!     /EBCS/CYCLIC
+!     -------------
+
+!||====================================================================
+!||    write_data_cyclic   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||====================================================================
+        subroutine write_data_cyclic(this, leni, lenr)
+          implicit none
+          class (t_ebcs_cyclic), intent(inout) :: this
+          integer,intent(inout) :: leni, lenr
+          integer :: integer_data(1)
+          lenr = 0
+          leni = 0
+
+          integer_data(1) = this%surf_id2
+          call write_i_array_c(integer_data, 1)
+          leni = leni + 1
+
+        end subroutine write_data_cyclic
+
+!||====================================================================
+!||    read_data_cyclic   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    read_i_c           ../common_source/tools/input_output/write_routines.c
+!||====================================================================
+        subroutine read_data_cyclic(this)
+          implicit none
+          class (t_ebcs_cyclic), intent(inout) :: this
+          call read_i_c(this%surf_id2, 1)
+
+        end subroutine read_data_cyclic
+
+
+      end module ebcs_mod

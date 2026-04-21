@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_visc           ../starter/source/materials/visc/hm_read_visc.F
-      !||--- called by ------------------------------------------------------
-      !||    read_material_models   ../starter/source/materials/read_material_models.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_read_visc_lprony    ../starter/source/materials/visc/hm_read_visc_lprony.F
-      !||    hm_read_visc_prony     ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||    init_mat_keyword       ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_visc            ../starter/source/materials/visc/hm_read_visc.F
+!||--- called by ------------------------------------------------------
+!||    read_material_models    ../starter/source/materials/read_material_models.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||    hm_option_count         ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key      ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start         ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_read_visc_lprony     ../starter/source/materials/visc/hm_read_visc_lprony.F
+!||    hm_read_visc_plas       ../starter/source/materials/visc/hm_read_visc_plas.F90
+!||    hm_read_visc_prony      ../starter/source/materials/visc/hm_read_visc_prony.F
+!||    init_mat_keyword        ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod            ../starter/share/modules1/elbuftag_mod.F
+!||    hm_option_read_mod      ../starter/share/modules1/hm_option_read_mod.F
+!||    hm_read_visc_plas_mod   ../starter/source/materials/visc/hm_read_visc_plas.F90
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||    submodel_mod            ../starter/share/modules1/submodel_mod.F
+!||    table_mod               ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_VISC(MAT_PARAM   ,IPM        ,BUFMAT      ,
      .                        UNITAB      ,LSUBMODEL  ,TABLE       )
 C-----------------------------------------------
@@ -52,6 +54,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE TABLE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARKEY
+      USE HM_READ_VISC_PLAS_MOD
 C============================================================================
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -166,6 +169,11 @@ c           -----------------------------------
               CALL HM_READ_VISC_LPRONY(
      .             MAT_PARAM(IMAT)%VISC,IVISC ,MAT_ID   ,UNITAB  ,LSUBMODEL)
 c              
+            ELSE IF (KEY(1:6) == 'PLAS') THEN 
+c           -----------------------------------   
+              IVISC = 3
+              CALL HM_READ_VISC_PLAS(
+     .             MAT_PARAM(IMAT)%VISC,IVISC  ,IOUT, UNITAB  ,LSUBMODEL)
             END IF  ! visc model
 c-------------------------
             MAT_PARAM(IMAT)%IVISC = IVISC

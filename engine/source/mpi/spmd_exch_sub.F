@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_sub_boundaries   ../engine/source/mpi/spmd_exch_sub.F
-      !||--- called by ------------------------------------------------------
-      !||    resol_init            ../engine/source/engine/resol_init.F
-      !||--- uses       -----------------------------------------------------
-      !||    nlocal_reg_mod        ../common_source/modules/nlocal_reg_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sub_boundaries   ../engine/source/mpi/spmd_exch_sub.F
+!||--- called by ------------------------------------------------------
+!||    resol_init            ../engine/source/engine/resol_init.F
+!||--- uses       -----------------------------------------------------
+!||    nlocal_reg_mod        ../common_source/modules/nlocal_reg_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_SUB_BOUNDARIES(NLOC_DMG,IAD_ELEM,FR_ELEM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -35,6 +36,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -216,14 +218,15 @@ C     -----------------------------
       END
 
 
-      !||====================================================================
-      !||    spmd_exch_sub_poff   ../engine/source/mpi/spmd_exch_sub.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    nlocal_reg_mod       ../common_source/modules/nlocal_reg_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_sub_poff    ../engine/source/mpi/spmd_exch_sub.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    nlocal_reg_mod        ../common_source/modules/nlocal_reg_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_SUB_POFF(NLOC_DMG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -232,6 +235,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -251,19 +255,19 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I,J,K,L,M,ND
+      INTEGER I, J, K, L
       INTEGER NDDL,NSIZESUB,NN,NPOS,SIZEA
 
 C MPI  VARIABLES
 
-      INTEGER MSGTYP,NOD,LOC_PROC, SIZ,NB_NOD,NB,MAXLEV,VALUE
+      INTEGER MSGTYP, SIZ
 
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR
 
       INTEGER MSGOFF1
       INTEGER IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1)
-      INTEGER SEND_SIZ(NSPMD),RECV_SIZ(NSPMD)
-      INTEGER SIZ_SEND,SIZ_RECV
+ 
+ 
 
       INTEGER REQ_S(NSPMD)
       INTEGER REQ_R(NSPMD)
@@ -378,14 +382,15 @@ c-------------------------------------------------------------------
       END
 
 
-      !||====================================================================
-      !||    spmd_exch_sub_pon   ../engine/source/mpi/spmd_exch_sub.F
-      !||--- called by ------------------------------------------------------
-      !||    resol               ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    nlocal_reg_mod      ../common_source/modules/nlocal_reg_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_sub_pon     ../engine/source/mpi/spmd_exch_sub.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    nlocal_reg_mod        ../common_source/modules/nlocal_reg_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_SUB_PON(NLOC_DMG)
 !$COMMENT
 !       SPMD_EXCH_SUB_PON
@@ -404,6 +409,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -423,19 +429,19 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I,J,K,L,M,ND,IJK
+      INTEGER I, J, K, L, IJK
       INTEGER NDDL,NSIZESUB,NN,NPOS,SIZEA
 
 C MPI  VARIABLES
 
-      INTEGER MSGTYP,NOD,LOC_PROC, SIZ,NB_NOD,NB,MAXLEV,VALUE
+      INTEGER MSGTYP, SIZ
 
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR
 
       INTEGER MSGOFF1
       INTEGER IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1)
-      INTEGER SEND_SIZ(NSPMD),RECV_SIZ(NSPMD)
-      INTEGER SIZ_SEND,SIZ_RECV
+ 
+ 
 
       INTEGER :: SIZ_S,SIZ_R
       INTEGER REQ_S(NSPMD)

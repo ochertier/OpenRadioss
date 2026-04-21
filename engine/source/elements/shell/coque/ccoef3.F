@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ccoef3       ../engine/source/elements/shell/coque/ccoef3.F
-      !||--- called by ------------------------------------------------------
-      !||    cforc3       ../engine/source/elements/shell/coque/cforc3.F
-      !||    cforc3_crk   ../engine/source/elements/xfem/cforc3_crk.F
-      !||====================================================================
+!||====================================================================
+!||    ccoef3       ../engine/source/elements/shell/coque/ccoef3.F
+!||--- called by ------------------------------------------------------
+!||    cforc3       ../engine/source/elements/shell/coque/cforc3.F
+!||    cforc3_crk   ../engine/source/elements/xfem/cforc3_crk.F
+!||====================================================================
       SUBROUTINE CCOEF3(
      1            JFT     ,JLT     ,PM     ,MAT      ,GEO     ,
      2            PID     ,OFF     ,AREA   ,STI      ,STIR    ,
@@ -64,7 +64,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ISH,MX,IPID,J,IGTYP,IPGMAT,IGMAT
+      INTEGER I,ISH,MX,IPID,IGTYP,IPGMAT,IGMAT
 C     REAL
       my_real
      .   FAC1(MVSIZ),FSH, FAC1TMP,

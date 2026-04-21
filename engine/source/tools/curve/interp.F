@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    interp   ../engine/source/tools/curve/interp.F
-      !||--- called by ------------------------------------------------------
-      !||    laser2   ../engine/source/loads/laser/laser2.F
-      !||    laser3   ../engine/source/loads/laser/laser2.F
-      !||    m18law   ../engine/source/materials/mat/mat018/m18law.F
-      !||    m18th    ../engine/source/materials/mat/mat018/m18th.F
-      !||    repla3   ../engine/source/elements/spring/repla3.F
-      !||    rgwal1   ../engine/source/ale/grid/rgwal1.F
-      !||    timfun   ../engine/source/tools/curve/timfun.F
-      !||====================================================================
+!||====================================================================
+!||    interp   ../engine/source/tools/curve/interp.F
+!||--- called by ------------------------------------------------------
+!||    laser2   ../engine/source/loads/laser/laser2.F
+!||    laser3   ../engine/source/loads/laser/laser2.F
+!||    m18law   ../engine/source/materials/mat/mat018/m18law.F
+!||    m18th    ../engine/source/materials/mat/mat018/m18th.F
+!||    repla3   ../engine/source/elements/spring/repla3.F
+!||    rgwal1   ../engine/source/ale/grid/rgwal1.F
+!||    timfun   ../engine/source/tools/curve/timfun.F
+!||====================================================================
       SUBROUTINE INTERP(TF,TT,NPOINT,F,TG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -62,7 +62,7 @@ C-----------------------------------------------
       D2=TF(2,M)-TF(2,M-1)
       TG=ZERO
       IF(D1/=ZERO)TG=D2/D1
-      !TEST POUR PRECISION DU CALCUL
+      !test for calculation precision
       IF(DT1<=DT2)THEN
        F =TF(2,M-1)+DT1*TG
       ELSE

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ani_segquadfr1   ../starter/source/output/anim/ani_segquadfr.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    ani_segquadfr1   ../starter/source/output/anim/ani_segquadfr.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE ANI_SEGQUADFR1(IXQ ,SEGTAG ,KNOD2ELQ ,NOD2ELQ ,X ,NSEG)
+      use element_mod , only : nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,7 +49,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER JQ,JJ,K,NQQ,N1,N2,ISEG,KK,KQ,N,L1,L2,L, TRUEAXE, NQQ1,NQQ2
+      INTEGER JQ,K,N1,N2,KK,KQ,L1,L2,L, TRUEAXE, NQQ1,NQQ2
       INTEGER NODTAG(4),LINES(2,4),NQ(4)
       DATA LINES/1,2,
      .           2,3,
@@ -98,11 +100,11 @@ C
 C     
       RETURN
       END
-      !||====================================================================
-      !||    ani_segquadfr2   ../starter/source/output/anim/ani_segquadfr.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    ani_segquadfr2   ../starter/source/output/anim/ani_segquadfr.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE ANI_SEGQUADFR2(SEGTAG  ,SEGQUADFR )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -121,7 +123,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,JJ,LL
+      INTEGER N,JJ
 C     REAL
 C-----------------------------------------------
 C

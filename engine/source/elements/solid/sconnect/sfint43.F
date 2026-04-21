@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sfint43   ../engine/source/elements/solid/sconnect/sfint43.F
-      !||--- called by ------------------------------------------------------
-      !||    suser43   ../engine/source/elements/solid/sconnect/suser43.F
-      !||====================================================================
+!||====================================================================
+!||    sfint43   ../engine/source/elements/solid/sconnect/sfint43.F
+!||--- called by ------------------------------------------------------
+!||    suser43   ../engine/source/elements/solid/sconnect/suser43.F
+!||====================================================================
       SUBROUTINE SFINT43(IPG   ,NPG   ,NEL   ,HH    ,AREAPG,SOFT  ,
      .     FX1   ,FX2   ,FX3   ,FX4   ,FX5   ,FX6   ,FX7   ,FX8   ,
      .     FY1   ,FY2   ,FY3   ,FY4   ,FY5   ,FY6   ,FY7   ,FY8   ,
@@ -46,7 +46,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-      my_real FZZ,FYZ,FZX,RX,RY
+      my_real FZZ,FYZ,FZX
       my_real, DIMENSION(NEL) :: DFX1,DFX2,DFX3,DFX4,DFX5,DFX6,DFX7,DFX8,
      .                           DFY1,DFY2,DFY3,DFY4,DFY5,DFY6,DFY7,DFY8,
      .                           DFZ1,DFZ2,DFZ3,DFZ4,DFZ5,DFZ6,DFZ7,DFZ8 

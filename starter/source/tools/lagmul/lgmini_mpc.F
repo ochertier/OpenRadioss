@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lgmini_mpc             ../starter/source/tools/lagmul/lgmini_mpc.F
-      !||--- called by ------------------------------------------------------
-      !||    lagm_ini               ../starter/source/tools/lagmul/lagm_ini.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lgmini_mpc             ../starter/source/tools/lagmul/lgmini_mpc.F
+!||--- called by ------------------------------------------------------
+!||    lagm_ini               ../starter/source/tools/lagmul/lagm_ini.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LGMINI_MPC(IADLL  ,JLL    ,LLL    ,IBUFNC ,IBUFNN ,
      .                      IBUFDL ,IBUFSK ,NC, MASS, INER, ITAB   ,
      .                      NOM_OPT)
@@ -58,7 +58,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, IK, KF, NK, ISK, NN, NDL, NUMC
-      my_real COEF
       INTEGER ID
       CHARACTER(LEN=NCHARTITLE) :: TITR
 C======================================================================|

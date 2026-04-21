@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    prony_modelc   ../engine/source/materials/visc/prony_modelc.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc         ../engine/source/materials/mat_share/mulawc.F90
-      !||====================================================================
+!||====================================================================
+!||    prony_modelc   ../engine/source/materials/visc/prony_modelc.F
+!||--- called by ------------------------------------------------------
+!||    mulawc         ../engine/source/materials/mat_share/mulawc.F90
+!||====================================================================
       SUBROUTINE PRONY_MODELC(
      1     NEL  ,NUVAR  ,TIMESTEP,
      2     NPRONY   ,KV     ,GI , BETA     ,RHO0  ,
      3     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
      4     SIGVXX ,SIGVYY ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
-     5     SOUNDSP,UVAR    ,OFF )
+     5     SOUNDSP,UVAR    ,OFF    ,NVAR_DAMP)
 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -67,6 +67,7 @@ C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
       INTEGER NEL, NUVAR,NPRONY
+      INTEGER ,INTENT(IN) :: NVAR_DAMP
       my_real
      .   TIMESTEP,KV,GI(NPRONY),BETA(NPRONY),
      .   RHO0(NEL), EPSPXX(NEL),EPSPYY(NEL),
@@ -82,11 +83,11 @@ C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
       my_real
-     .    UVAR(NEL,NUVAR), OFF(NEL),THK(NEL)
+     .    UVAR(NEL,NUVAR), OFF(NEL)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,J
+      INTEGER :: I,J,II
       my_real :: G,DAV,EPXX,EPYY,EPZZ,P,
      .  AA(MVSIZ,NPRONY),BB(MVSIZ,NPRONY),H0(6),EPSPZZ(MVSIZ),
      .  H(6,NPRONY),S(6),A1(MVSIZ),A2(MVSIZ),FAC
@@ -104,6 +105,7 @@ C
           EPSPZZ(I) = ZERO
 C          
          DO J=1,NPRONY
+          II = (J-1)*(NUVAR-NVAR_DAMP)/NPRONY
           AA(I,J) =  EXP(-BETA(J)*TIMESTEP) 
           BB(I,J) =  TIMESTEP*GI(J)*EXP(-HALF*BETA(J)*TIMESTEP)
 C
@@ -124,15 +126,16 @@ C
        ENDDO
 C                
        DO I=1,NEL 
-C spherique part
+C SPHERIC PART
            DAV = THIRD*(EPSPXX(I) + EPSPYY(I) + EPSPZZ(I))
            P = -THREE*KV*DAV
-c deviatorique part           
+c Deviatori parties           
           EPXX = EPSPXX(I) - DAV
           EPYY = EPSPYY(I) - DAV
           EPZZ = EPSPZZ(I) - DAV          
 C  
           DO J= 1,NPRONY
+           II = (J-1)*(NUVAR-NVAR_DAMP)/NPRONY
 C         
            H0(1) = UVAR(I, (J - 1)*6 + 1)
            H0(2) = UVAR(I, (J - 1)*6 + 2)

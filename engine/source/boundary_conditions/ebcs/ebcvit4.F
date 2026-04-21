@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ebcvit4    ../engine/source/boundary_conditions/ebcs/ebcvit4.F
-      !||--- called by ------------------------------------------------------
-      !||    ebcclap    ../engine/source/boundary_conditions/ebcs/ebcclap.F
-      !||--- uses       -----------------------------------------------------
-      !||    ebcs_mod   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
-      SUBROUTINE EBCVIT4(V, A, LISTE, NOD, FV, RESO, LA, EBCS)
+!||====================================================================
+!||    ebcvit4    ../engine/source/boundary_conditions/ebcs/ebcvit4.F
+!||--- called by ------------------------------------------------------
+!||    ebcclap    ../engine/source/boundary_conditions/ebcs/ebcclap.F
+!||--- uses       -----------------------------------------------------
+!||    ebcs_mod   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
+      SUBROUTINE EBCVIT4(V, A, LISTE, NOD, FV, RESO, EBCS)
       USE EBCS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -41,16 +41,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LISTE(*),NOD
-      my_real
-     .       V(3,*),A(3,*),LA(3,NOD),RESO(3,NOD),FV(*)
+      my_real V(3,*),A(3,*),RESO(3,NOD),FV(*)
       TYPE(t_ebcs_vel), INTENT(IN) :: EBCS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,N,IVX,IVY,IVZ
-      my_real
-     .     C,LCAR,ALP,ALPDT,AX,AY,AZ,VIMP,VX,VY,VZ
-C
+      my_real C,LCAR,ALP,ALPDT,AX,AY,AZ,VX,VY,VZ
+
       IVX = EBCS%ivx
       IVY = EBCS%ivy
       IVZ = EBCS%ivz
@@ -92,7 +90,7 @@ c          write(6,*)'ebcvit5 N',N,' RESO',RESO(3,I),'A',A(3,N)
           AX=RESO(1,I)+ALPDT*(A(1,N)-RESO(1,I))
           AY=RESO(2,I)+ALPDT*(A(2,N)-RESO(2,I))
           AZ=RESO(3,I)+ALPDT*(A(3,N)-RESO(3,I))
-C memorisation de la reaction
+C saving of the reaction
           RESO(1,I)=AX
           RESO(2,I)=AY
           RESO(3,I)=AZ

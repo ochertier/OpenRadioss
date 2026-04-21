@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    smallg3    ../engine/source/elements/solid/solide/smallg3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8sforc3   ../engine/source/elements/solid/solide8s/s8sforc3.F
-      !||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||====================================================================
+!||====================================================================
+!||    smallg3    ../engine/source/elements/solid/solide/smallg3.F
+!||--- called by ------------------------------------------------------
+!||    s8eforc3   ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8sforc3   ../engine/source/elements/solid/solide8s/s8sforc3.F
+!||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||====================================================================
       SUBROUTINE SMALLG3(
      1   SAV,     OFFG,    WXX,     WYY,
      2   WZZ,     R11,     R12,     R13,
@@ -57,13 +57,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,j
+      INTEGER I
 C     REAL
       DOUBLE PRECISION
-     .   X , Y, Z   ,DV   ,WXXG,WYYG,WZZG
+     .   X , Y, Z      ,WXXG,WYYG,WZZG
 C-----------------------------------------------
 C-----------------------------
-C     ROTATION RBY DES COORDONNEES POUR SMALL STRAIN
+C     ROTATION RBY COORDINATES FOR SMALL STRAIN
 C-----------------------------
 C------------Wxx,y,z from local system to global 
       IF (JCVT > 0 ) THEN

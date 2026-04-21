@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    table_slope   ../starter/source/materials/tools/table_slope.F
-      !||--- called by ------------------------------------------------------
-      !||    law70_upd     ../starter/source/materials/mat/mat070/law70_upd.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    table_slope   ../starter/source/materials/tools/table_slope.F
+!||--- called by ------------------------------------------------------
+!||    law163_upd    ../starter/source/materials/mat/mat163/law163_upd.F90
+!||    law70_upd     ../starter/source/materials/mat/mat070/law70_upd.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE TABLE_SLOPE(TABLE,STIFFINI,STIFFMIN,STIFFMAX,XMAX)
 C-----------------------------------------------
 C   M o d u l e s
@@ -55,6 +56,7 @@ C=======================================================================
       STIFFMAX = ZERO
       STIFFMIN = EP20
       XMAX     = ZERO
+      Y1 = 0
       NDIM = TABLE%NDIM
       NPT  = SIZE(TABLE%X(1)%VALUES)
 c
@@ -87,13 +89,14 @@ c
       ELSE IF (NDIM == 2) THEN
         LEN2 = SIZE(TABLE%X(2)%VALUES)
         X1   = TABLE%X(1)%VALUES(1)
-        Y1   = TABLE%Y2D(1,1)
+        Y1 = TABLE%Y2D(1,1)
+        Y2 = 0
         DO I = 2,NPT
           X2 = TABLE%X(1)%VALUES(I)
           DX = X2 - X1
           DO J = 1,LEN2
             Y2 = TABLE%Y2D(I,J)
-            DY = Y2 - Y1          
+            DY = Y2 - Y1
             DYDX = DY/DX
             IF (DYDX > STIFFMAX) THEN
               STIFFMAX = DYDX
@@ -103,8 +106,8 @@ c
             IF (X1 == ZERO .or. X2 == ZERO) THEN
               STIFFINI = MAX(STIFFINI, DYDX)
             ENDIF
-            Y1 = Y2
-          ENDDO      
+          ENDDO
+          Y1 = Y2
           X1 = X2
         ENDDO
 c        

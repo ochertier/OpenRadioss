@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    write_thnms1_titles_mod   ../starter/source/output/th/write_thnms1_titles.F90
-      !||--- called by ------------------------------------------------------
-      !||    write_thnms1              ../starter/source/output/th/write_thnms1.F90
-      !||====================================================================
+!||====================================================================
+!||    write_thnms1_titles_mod   ../starter/source/output/th/write_thnms1_titles.F90
+!||--- called by ------------------------------------------------------
+!||    write_thnms1              ../starter/source/output/th/write_thnms1.F90
+!||====================================================================
       module write_thnms1_titles_mod
+        implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \write in th.nms1 name or var description
-      !||====================================================================
-      !||    write_thnms1_titles   ../starter/source/output/th/write_thnms1_titles.F90
-      !||--- called by ------------------------------------------------------
-      !||    write_thnms1          ../starter/source/output/th/write_thnms1.F90
-      !||====================================================================
+!||====================================================================
+!||    write_thnms1_titles   ../starter/source/output/th/write_thnms1_titles.F90
+!||--- called by ------------------------------------------------------
+!||    write_thnms1          ../starter/source/output/th/write_thnms1.F90
+!||====================================================================
         subroutine write_thnms1_titles(io,       nvar          ,var_title     ,var       ,init_id)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -44,10 +45,6 @@
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -68,13 +65,13 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nvar
             if(len_trim(var_title(i)) > 0 .and. len_trim(var_title(i)) < 100)then
-              write(io, '(2x,I10,X,a10,2x,a100)') init_id+i,var(i),var_title(i)
+              write(io, "(2x,I10,X,a10,2x,a100)") init_id+i,var(i),var_title(i)
             else if(len_trim(var(i)) > 0 .and. len_trim(var(i)) < 10)then
-              write(io, '(2x,I10,X,a10)') init_id+i,var(i)
+              write(io, "(2x,I10,X,a10)") init_id+i,var(i)
             else
-              write(io, '(2x,I10)') init_id+i
-            endif
-          enddo
+              write(io, "(2x,I10)") init_id+i
+            end if
+          end do
 ! ----------------------------------------------------------------------------------------------------------------------
         end subroutine write_thnms1_titles
       end module write_thnms1_titles_mod

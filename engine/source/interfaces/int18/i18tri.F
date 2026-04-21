@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i18tri      ../engine/source/interfaces/int18/i18tri.F
-      !||--- called by ------------------------------------------------------
-      !||    i7mainf     ../engine/source/interfaces/int07/i7mainf.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders   ../common_source/tools/sort/my_orders.c
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box     ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i18tri      ../engine/source/interfaces/int18/i18tri.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders   ../common_source/tools/sort/my_orders.c
+!||--- uses       -----------------------------------------------------
+!||    tri7box     ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I18TRI(INDEX,I_STOK,CAND_N,ITAB, NSN ,
      2                  NSV  ,NIN   )
-C Tri des candidats suivant le numero de noeud user
+C sorting candidates according to the user node number
 C=======================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -53,11 +51,11 @@ C-----------------------------------------------
      .         ITRI(I_STOK),INDTRI(2*I_STOK),WORK(70000)
 C-----------------------------------------------
       DO I = 1, I_STOK
-        NI = CAND_N(INDEX(I))                  ! l ordre des facette n importe plus a nouveau P/on
+        NI = CAND_N(INDEX(I))                  ! the face order any more again p/we
          IF(NI<=NSN) THEN
             ITRI(I) = ITAB(NSV(NI)) ! 1 seul critere : noeud (user)
         ELSE
-          ITRI(I) = ITAFI(NIN)%P(NI-NSN)       ! attention au noeud frontiere
+          ITRI(I) = ITAFI(NIN)%P(NI-NSN)       ! Watch out for the boundary node
         END IF
       END DO
 C

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbake3         ../engine/source/elements/shell/coqueba/cbake3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
-      !||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_c4       ../engine/source/implicit/assem_c4.F
-      !||    c4eoff         ../engine/source/elements/shell/coque/c4eoff.F
-      !||    cbabe3         ../engine/source/elements/shell/coqueba/cbabe3.F
-      !||    cbabec3        ../engine/source/elements/shell/coqueba/cbabe3.F
-      !||    cbaber3        ../engine/source/elements/shell/coqueba/cbabe3.F
-      !||    cbacoork       ../engine/source/elements/shell/coqueba/cbacoork.F
-      !||    cbaderirz      ../engine/source/elements/shell/coqueba/cbadef.F
-      !||    cbaini3        ../engine/source/elements/shell/coqueba/cbake3.F
-      !||    cbalke3        ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||    cbalkec3       ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||    cbalkerz       ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||    cbasumg3       ../engine/source/elements/shell/coqueba/cbasumg3.F
-      !||    cmatc3         ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||    cmatip3        ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod      ../engine/share/modules/drape_mod.F
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    stack_mod      ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cbake3         ../engine/source/elements/shell/coqueba/cbake3.F
+!||--- called by ------------------------------------------------------
+!||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
+!||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_c4       ../engine/source/implicit/assem_c4.F
+!||    c4eoff         ../engine/source/elements/shell/coque/c4eoff.F
+!||    cbabe3         ../engine/source/elements/shell/coqueba/cbabe3.F
+!||    cbabec3        ../engine/source/elements/shell/coqueba/cbabe3.F
+!||    cbaber3        ../engine/source/elements/shell/coqueba/cbabe3.F
+!||    cbacoork       ../engine/source/elements/shell/coqueba/cbacoork.F
+!||    cbaderirz      ../engine/source/elements/shell/coqueba/cbadef.F
+!||    cbaini3        ../engine/source/elements/shell/coqueba/cbake3.F
+!||    cbalke3        ../engine/source/elements/shell/coqueba/cbalke3.F
+!||    cbalkec3       ../engine/source/elements/shell/coqueba/cbalke3.F
+!||    cbalkerz       ../engine/source/elements/shell/coqueba/cbalke3.F
+!||    cbasumg3       ../engine/source/elements/shell/coqueba/cbasumg3.F
+!||    cmatc3         ../engine/source/elements/shell/coqueba/cmatc3.F
+!||    cmatip3        ../engine/source/elements/shell/coqueba/cmatc3.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod      ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    stack_mod      ../engine/share/modules/stack_mod.F
+!||====================================================================
        SUBROUTINE CBAKE3 (
      1            JFT    ,JLT    ,NFT    ,NPT    ,MTN    ,
      2            ITHK   ,NCYCLE ,
@@ -59,7 +60,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD   
       USE STACK_MOD
-      USE DRAPE_MOD         
+      USE DRAPE_MOD  
+      use element_mod , only : nixc       
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -83,7 +85,7 @@ C-----------------------------------------------
       INTEGER INDXOF(MVSIZ),ISUBSTACK,
      .         ETAG(*),IDDL(*)  ,NDOF(*)  ,IADK(*) ,JDIK(*)
       INTEGER, DIMENSION(SEDRAPE) :: INDX_DRAPE
-C     REAL OU REAL*8
+C     REAL OR REAL*8
       my_real
      .   PM(NPROPM,*),GEO(NPROPG,*),BUFMAT(*),   X(3,*),THKE(*)
       my_real    
@@ -99,11 +101,11 @@ C-----------------------------------------------
       INTEGER 
      .   NPLAT,NLAY,IPLAT(MVSIZ)
       INTEGER 
-     .   I, J,J1,J2, IR, IS, NEL,  IUN,  MX,L_DIRA ,L_DIRB ,
-     .   EP,NG,NPG,NNOD,IREP,PT1,PT2,PT3,LENF,LENM,NPTR,NPTS,
-     .   PT0,PTF,PTM,PTE,PTEP,PTS,PPTF,PPTM,PPTE,PPTEP,PPTS
+     .   I, J,J1,J2, IR, IS, NEL,  IUN,L_DIRA ,L_DIRB ,
+     .   NG,NPG,NNOD,IREP,LENF,LENM,NPTR,NPTS,
+     .   PTF,PTM
       INTEGER  MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ)
-      INTEGER  MPT,IORTH,IBID,IDRIL
+      INTEGER  MPT,IORTH,IDRIL
       PARAMETER (NPG = 4)
       PARAMETER (NNOD = 4)
       MY_REAL 
@@ -117,9 +119,9 @@ C-----------------------------------------------
      .      VASTN(MVSIZ,4*NNOD),AREA(MVSIZ),
      .      CDET(MVSIZ),THK2(MVSIZ)
       INTEGER 
-     .   NEL8,NEL5,NEL3,NPTM,IGTYP,PTMAT,NBM_S,NBDIR,NB16A
+     .   NEL8,NEL5,NEL3,NPTM,IGTYP
       MY_REAL 
-     .   SIGY(MVSIZ),VOL0(MVSIZ),THK0(MVSIZ),
+     .   VOL0(MVSIZ),THK0(MVSIZ),
      .   X13(MVSIZ) ,Y13(MVSIZ), X24(MVSIZ) ,HZ(MVSIZ),
      .   VOLG(MVSIZ),Y24(MVSIZ),HM(MVSIZ,4),HF(MVSIZ,4),HC(MVSIZ,2),
      .   HMOR(MVSIZ,2),HFOR(MVSIZ,2),HMFOR(MVSIZ,6),GS(MVSIZ)
@@ -216,7 +218,7 @@ C
         CALL CBABEC3(JFT ,JLT ,X13  ,X24  ,Y13  ,Y24 ,BM, NPLAT, IPLAT)
       END IF
 C-----------------------------------------------
-C     BOUCLE SUR POINTS D'INTEGRATION DE GAUSS
+C     LOOP OVER GAUSS INTEGRATION POINTS
 C-----------------------------------------------
       LENF = NEL*GBUF%G_FORPG/NPG
       LENM = NEL*GBUF%G_MOMPG/NPG
@@ -272,8 +274,8 @@ C----------------------------
           END IF
         ENDDO
        ENDDO
-C---------FIN DE BOUCLE DE 4 POINTS DE GAUSS------------
-C-------------membrane shear traitement--------------------
+C---------END OF LOOP OF 4 GAUSS POINTS------------
+C------------ Membrane shear treatment ---------------------------------------------------
         IF (IDRIL==0) THEN
          CALL CBALKEC3(JFT,JLT,VOLG  ,X13  ,X24  ,Y13  ,Y24, HM,
      1                    K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
@@ -303,11 +305,11 @@ C
 C
        RETURN
        END
-      !||====================================================================
-      !||    cbaini3   ../engine/source/elements/shell/coqueba/cbake3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbake3    ../engine/source/elements/shell/coqueba/cbake3.F
-      !||====================================================================
+!||====================================================================
+!||    cbaini3   ../engine/source/elements/shell/coqueba/cbake3.F
+!||--- called by ------------------------------------------------------
+!||    cbake3    ../engine/source/elements/shell/coqueba/cbake3.F
+!||====================================================================
         SUBROUTINE CBAINI3(JFT,JLT,VKSI,VETA,
      1                     K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
      2                     M11,M12,M13,M14,M22,M23,M24,M33,M34,M44,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecsubmod               ../starter/source/model/submodel/lecsubmod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                  ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||    euler_vrot              ../starter/source/model/submodel/euler_vrot.F
-      !||    hm_get_intv             ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count         ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key      ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start         ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    usrtos                  ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod      ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||    submodel_mod            ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
-      SUBROUTINE LECSUBMOD(ISUBMOD,X,UNITAB,ITABM1,RTRANS,ITAB,LSUBMODEL,IS_DYNA)
+!||====================================================================
+!||    lecsubmod                               ../starter/source/model/submodel/lecsubmod.F
+!||--- called by ------------------------------------------------------
+!||    lectur                                  ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                                  ../starter/source/output/message/message.F
+!||    euler_vrot                              ../starter/source/model/submodel/euler_vrot.F
+!||    hm_get_intv                             ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count                         ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key                      ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start                         ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    transform_translate_in_local_skew       ../starter/source/model/transformation/transform_translate_in_local_skew.F90
+!||    usrtos                                  ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod                      ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                             ../starter/share/message_module/message_mod.F
+!||    submodel_mod                            ../starter/share/modules1/submodel_mod.F
+!||    transform_translate_in_local_skew_mod   ../starter/source/model/transformation/transform_translate_in_local_skew.F90
+!||====================================================================
+      SUBROUTINE LECSUBMOD(ISUBMOD,X,UNITAB,ITABM1,RTRANS,
+     .                     ITAB,LSUBMODEL,IS_DYNA,ISKWN,LISKN,
+     .                     SKEW,LSKEW,SISKWN,SSKEW)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,6 +50,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE HM_OPTION_READ_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARKEY, NCHARFIELD
+      USE transform_translate_in_local_skew_mod, ONLY : transform_translate_in_local_skew
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -63,6 +68,9 @@ C-----------------------------------------------
      .   X(3,*),RTRANS(NTRANSF,*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       INTEGER  IS_DYNA
+      INTEGER, INTENT(IN) :: LISKN,LSKEW,SISKWN,SSKEW
+      INTEGER, INTENT(IN) :: ISKWN(LISKN,SISKWN/LISKN)
+      my_real, INTENT(IN) :: SKEW(LSKEW,SSKEW/LSKEW)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -70,8 +78,8 @@ C-----------------------------------------------
      .           ITRANSSUB,IDSUBOK(NSUBMOD),ISUBOK,IGU,I0,
      .           I1,N0,N1,IFLAGUNIT,IDNOD,NTAG,CTAG,INUM,SIDTRANS,
      .           IDSUB,ITY,K,
-     .           CUR_SUBMOD,SUB_LEVEL,NUMNUSR,NUMNUSR2
-      INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNODSUB ! NUMNOD
+     .           CUR_SUBMOD,SUB_LEVEL,NUMNUSR,NUMNUSR2,ISK,CNT
+      INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNODSUB,NODESSUB ! NUMNOD
       INTEGER :: WORK(70000)
       INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX,INDEX1,TAGNODSUB_TMP,IDNODSUB
       CHARACTER(LEN=NCHARKEY) ::  KEY
@@ -82,7 +90,7 @@ C-----------------------------------------------
      .        BID
       my_real
      .   TX,TY,TZ,ANGLE,FAC_L,X0(3),X1(3),ROT(9),S,XP,YP,ZP,
-     .   XCOLD(3), XCNEW(3)
+     .   XCOLD(3), XCNEW(3), SX, SY, SZ
       DATA MESS/'SUBMODEL DEFINITION                   '/
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
@@ -97,6 +105,9 @@ C=======================================================================
       UID = 0
       TAGNODSUB = 0
       NUMNUSR = 0
+
+      ALLOCATE(NODESSUB(NUMNOD))
+      NODESSUB = 0
 
       IF(IS_DYNA /= 0)THEN
         CALL CPP_NODES_COUNT(NUMNUSR,NUMNUSR2)
@@ -150,7 +161,7 @@ C--------------------------------------------------
         CALL CPP_NODE_SUB_TAG(TAGNODSUB)
       ENDIF
 C-------------------------------------
-C Recherche des ID doubles
+C Search for double IDs
 C-------------------------------------
 c      CALL UDOUBLE(ISUBMOD,LSUBMOD,NSUBMOD,MESS,0,BID)
 C-------------------------
@@ -231,13 +242,25 @@ C-------------------------
             TX=RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),15)
             TY=RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),16)
             TZ=RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),17)
+            ISK = int(RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),23))
+            !DO K=1,NUMNOD
+            !  IF(TAGNODSUB(K) == I) THEN
+            !      X(1,K)=X(1,K)+TX
+            !      X(2,K)=X(2,K)+TY
+            !      X(3,K)=X(3,K)+TZ
+            !  ENDIF
+            !ENDDO
+            CNT = 0
             DO K=1,NUMNOD
               IF(TAGNODSUB(K) == I) THEN
-                  X(1,K)=X(1,K)+TX
-                  X(2,K)=X(2,K)+TY
-                  X(3,K)=X(3,K)+TZ
+                CNT = CNT + 1
+                NODESSUB(CNT) = K
               ENDIF
             ENDDO
+            CALL transform_translate_in_local_skew(
+     .            NODESSUB     ,CNT        ,X   ,NUMNOD     , ISK  ,
+     .            TX           ,TY         ,TZ  ,SKEW       , LSKEW,
+     .            SSKEW        )
           ELSEIF(ITY == 2)THEN
             DO K=1,9
               ROT(K)=RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),K+2)
@@ -286,6 +309,45 @@ C-------------------------
                 X(3,K) = XCNEW(3) + ROT(3)*XP + ROT(6)*YP + ROT(9)*ZP      
               END IF                   
             ENDDO
+          ELSEIF(ITY == 5)THEN 
+            DO K=1,3
+              X0(K)=RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),K+11)
+            ENDDO
+            DO K=1,3
+              X1(K)=RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),K+14)
+            ENDDO
+            TX = X1(1) - X0(1)
+            TY = X1(2) - X0(2)
+            TZ = X1(3) - X0(3)
+            S = ONE/MAX(SQRT(TX*TX + TY*TY + TZ*TZ),EM20)
+            TX = TX*S
+            TY = TY*S
+            TZ = TZ*S
+            DO K=1,NUMNOD
+              IF(TAGNODSUB(K) == I) THEN
+                SX = X(1,K) - X0(1)
+                SY = X(2,K) - X0(2)
+                SZ = X(3,K) - X0(3)
+                S = SX*TX + SY*TY + SZ*TZ
+                X(1,K) = X(1,K) - TWO*TX*S
+                X(2,K) = X(2,K) - TWO*TY*S
+                X(3,K) = X(3,K) - TWO*TZ*S
+              ENDIF
+            ENDDO
+          ELSEIF(ITY == 6)THEN 
+            SX = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),20)
+            SY = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),21)
+            SZ = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),22)
+            DO K=1,3
+              X0(K)=RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(J),K+11)
+            ENDDO
+            DO K=1,NUMNOD
+              IF(TAGNODSUB(K) == I) THEN
+                X(1,K) = X0(1) + X(1,K) * SX
+                X(2,K) = X0(2) + X(2,K) * SY
+                X(3,K) = X0(3) + X(3,K) * SZ
+              ENDIF
+            ENDDO
           ENDIF
          ENDDO
         ENDIF
@@ -301,6 +363,7 @@ C-------------------------
         IF (ALLOCATED(IDNODSUB)) DEALLOCATE(IDNODSUB)
       ENDIF
       DEALLOCATE(TAGNODSUB)
+      IF(ALLOCATED(NODESSUB)) DEALLOCATE(NODESSUB)
 C-------------------------
 c MAKE TRANSFORMATION ON SUBMODEL NODES
 C-------------------------   

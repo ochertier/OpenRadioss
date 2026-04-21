@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps46   ../engine/source/materials/mat/mat046/sigeps46.F
-      !||--- called by ------------------------------------------------------
-      !||    m46law     ../engine/source/materials/mat/mat046/m46law.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod    ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps46   ../engine/source/materials/mat/mat046/sigeps46.F
+!||--- called by ------------------------------------------------------
+!||    m46law     ../engine/source/materials/mat/mat046/m46law.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod    ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE SIGEPS46 (
      1     NEL    ,NUPARAM,NUVAR   ,
      2     TIME   ,TIMESTEP,UPARAM  ,RHO0    ,RHO    ,
@@ -85,19 +85,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ISGS,IADBUF,K
+      INTEGER I,ISGS,IADBUF
       my_real 
      . VIS,C1,SMAG2,
      . DAV(MVSIZ),DXX(MVSIZ),DYY(MVSIZ),DZZ(MVSIZ),
      . DXY(MVSIZ),DYZ(MVSIZ),DZX(MVSIZ),SS(MVSIZ),
      . CA,VIS2(MVSIZ),VIS2N,VISCPRESSION,
-     . VIS1(MVSIZ),DELTA(MVSIZ),FAC,KAPA,E,C,VIS1O,VIS1N,Y2P,YPM
+     . VIS1(MVSIZ),DELTA(MVSIZ),FAC,KAPA,E,C,VIS1N,Y2P,YPM
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
 C CONSTANT
 C
-      YPM=ONZEP225
+      YPM=ELEVEN_P225
       KAPA=ZEP4187
       E=NINEP793
 C

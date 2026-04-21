@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,45 +20,45 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ufunc_dum   ../engine/source/user_interface/ufunc.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2    ../engine/source/engine/radioss2.F
-      !||====================================================================
+!||====================================================================
+!||    ufunc_dum   ../engine/source/user_interface/ufunc.F
+!||--- called by ------------------------------------------------------
+!||    radioss2    ../engine/source/engine/radioss2.F
+!||====================================================================
       SUBROUTINE UFUNC_DUM(IERR)
 C---------+---------+---+---+--------------------------------------------
 #include      "implicit_f.inc"
        INTEGER IERR
        IERR=0
       END
-      !||====================================================================
-      !||    get_u_func_n     ../engine/source/user_interface/ufunc.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_u_func_n     ../engine/source/user_interface/ufunc.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       INTEGER FUNCTION GET_U_FUNC_N(IFUNC)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-      INTEGER IFUNC,I,NPFI,NPFIP
+      INTEGER IFUNC,NPFI,NPFIP
       CALL GET_VAR_USER_I(5,IFUNC,NPFI)
       CALL GET_VAR_USER_I(5,IFUNC+1,NPFIP)
       GET_U_FUNC_N=(NPFIP-NPFI)/2
       RETURN
       END
-      !||====================================================================
-      !||    get_u_func_x        ../engine/source/user_interface/ufunc.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg              ../engine/source/output/message/message.F
-      !||    arret               ../engine/source/system/arret.F
-      !||    get_u_numfun        ../engine/source/user_interface/ufunc.F
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_func_x        ../engine/source/user_interface/ufunc.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg              ../engine/source/output/message/message.F
+!||    arret               ../engine/source/system/arret.F
+!||    get_u_numfun        ../engine/source/user_interface/ufunc.F
+!||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
+!||--- uses       -----------------------------------------------------
+!||    message_mod         ../engine/share/message_module/message_mod.F
+!||====================================================================
       my_real FUNCTION GET_U_FUNC_X(IFUNC,N)
 C-----------------------------------------------
 C   M o d u l e s
@@ -92,18 +92,18 @@ C-----------------------------------------------
       GET_U_FUNC_X=XX
       RETURN
       END
-      !||====================================================================
-      !||    get_u_func_y        ../engine/source/user_interface/ufunc.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg              ../engine/source/output/message/message.F
-      !||    arret               ../engine/source/system/arret.F
-      !||    get_u_numfun        ../engine/source/user_interface/ufunc.F
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_func_y        ../engine/source/user_interface/ufunc.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg              ../engine/source/output/message/message.F
+!||    arret               ../engine/source/system/arret.F
+!||    get_u_numfun        ../engine/source/user_interface/ufunc.F
+!||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
+!||--- uses       -----------------------------------------------------
+!||    message_mod         ../engine/share/message_module/message_mod.F
+!||====================================================================
       my_real FUNCTION GET_U_FUNC_Y(IFUNC,N)
 C-----------------------------------------------
 C   M o d u l e s
@@ -137,48 +137,48 @@ C-----------------------------------------------
       GET_U_FUNC_Y=YY
       RETURN
       END
-      !||====================================================================
-      !||    get_u_func          ../engine/source/user_interface/ufunc.F
-      !||--- called by ------------------------------------------------------
-      !||    airbagb             ../engine/source/airbag/airbag2.F
-      !||    airbagb1            ../engine/source/airbag/airbagb1.F
-      !||    damping51           ../engine/source/assembly/damping.F
-      !||    damping_vref_rby    ../engine/source/assembly/damping_vref_rby.F90
-      !||    fv_up_switch        ../engine/source/airbag/fv_up_switch.F
-      !||    fvbag1              ../engine/source/airbag/fvbag1.F
-      !||    fvvent0             ../engine/source/airbag/fvvent0.F
-      !||    material_flow       ../engine/source/tools/seatbelts/material_flow.F
-      !||    porfor4             ../engine/source/airbag/porfor4.F
-      !||    porform4            ../engine/source/airbag/porfor4.F
-      !||    ruser32             ../engine/source/elements/spring/ruser32.F
-      !||    ruser33             ../engine/source/elements/joint/ruser33.F
-      !||    ruser35             ../engine/source/elements/spring/ruser35.F
-      !||    ruser36             ../engine/source/elements/spring/ruser36.F
-      !||    ruser44             ../engine/source/elements/spring/ruser44.F
-      !||    ruser46             ../engine/source/elements/spring/ruser46.F
-      !||    stdpl               ../engine/source/elements/joint/ruser33.F
-      !||    volpvgb             ../engine/source/airbag/volpvg.F
-      !||    xddl33              ../engine/source/elements/joint/ruser33.F
-      !||    xddl33i             ../engine/source/elements/joint/ruser33.F
-      !||    xforc28             ../engine/source/elements/xelem/xforc28.F
-      !||    xforc29             ../engine/source/elements/xelem/xforc29.F
-      !||    xforc30             ../engine/source/elements/xelem/xforc30.F
-      !||    xforc31             ../engine/source/elements/xelem/xforc31.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_u_func                   ../engine/source/user_interface/ufunc.F
+!||--- called by ------------------------------------------------------
+!||    airbagb                      ../engine/source/airbag/airbag2.F
+!||    airbagb1                     ../engine/source/airbag/airbagb1.F
+!||    damping51                    ../engine/source/assembly/damping.F
+!||    damping_funct_ini            ../engine/source/assembly/damping_funct_ini.F90
+!||    damping_vref_compute_dampa   ../engine/source/assembly/damping_vref_compute_dampa.F90
+!||    damping_vref_rby             ../engine/source/assembly/damping_vref_rby.F90
+!||    fv_up_switch                 ../engine/source/airbag/fv_up_switch.F
+!||    fvbag1                       ../engine/source/airbag/fvbag1.F
+!||    fvvent0                      ../engine/source/airbag/fvvent0.F
+!||    material_flow                ../engine/source/tools/seatbelts/material_flow.F
+!||    porfor4                      ../engine/source/airbag/porfor4.F
+!||    porform4                     ../engine/source/airbag/porfor4.F
+!||    ruser32                      ../engine/source/elements/spring/ruser32.F
+!||    ruser33                      ../engine/source/elements/joint/ruser33.F
+!||    ruser35                      ../engine/source/elements/spring/ruser35.F
+!||    ruser36                      ../engine/source/elements/spring/ruser36.F
+!||    ruser44                      ../engine/source/elements/spring/ruser44.F
+!||    ruser46                      ../engine/source/elements/spring/ruser46.F
+!||    stdpl                        ../engine/source/elements/joint/ruser33.F
+!||    volpvgb                      ../engine/source/airbag/volpvg.F
+!||    xddl33                       ../engine/source/elements/joint/ruser33.F
+!||    xddl33i                      ../engine/source/elements/joint/ruser33.F
+!||    xforc28                      ../engine/source/elements/xelem/xforc28.F
+!||    xforc29                      ../engine/source/elements/xelem/xforc29.F
+!||    xforc30                      ../engine/source/elements/xelem/xforc30.F
+!||    xforc31                      ../engine/source/elements/xelem/xforc31.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_f               ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp            ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i               ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       my_real FUNCTION GET_U_FUNC(IFUNC,XX,DERI)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "scr05_c.inc"
-C
-      INTEGER IFUNC,I,NPFI,NPFIP,DEPLA
-      my_real 
-     .    ABC,DERI,XX,DX1,DX2,TFI,TFI1,TFI2,TFIP,VAL
+      INTEGER IFUNC,I,NPFI,NPFIP
+      my_real  DERI,XX,DX1,DX2,TFI,TFI1,TFI2,TFIP,VAL
 C-----------------------------------------------
         GET_U_FUNC = ZERO
         CALL GET_VAR_USER_I(5,IFUNC,NPFI)
@@ -217,15 +217,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_v_func           ../engine/source/user_interface/ufunc.F
-      !||--- called by ------------------------------------------------------
-      !||    ruser44              ../engine/source/elements/spring/ruser44.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_vfunc   ../engine/source/user_interface/eng_callback_c.c
-      !||    u_vinter2            ../engine/source/user_interface/eng_callback_c.c
-      !||    u_vinter2dp          ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_v_func           ../engine/source/user_interface/ufunc.F
+!||--- called by ------------------------------------------------------
+!||    ruser44              ../engine/source/elements/spring/ruser44.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_vfunc   ../engine/source/user_interface/eng_callback_c.c
+!||    u_vinter2            ../engine/source/user_interface/eng_callback_c.c
+!||    u_vinter2dp          ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       SUBROUTINE GET_V_FUNC(IFUNC,LLT,XX,DYDX,YY,JPOS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -237,10 +237,8 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "scr05_c.inc"
 C
-      INTEGER IFUNC(*),JPOS(*),I,LLT,JAD(MVSIZ),JLEN(MVSIZ)
-      INTEGER DEPLA
-      my_real
-     .    DYDX(*),XX(*),YY(*),VAR,TF
+      INTEGER IFUNC(*),JPOS(*),LLT,JAD(MVSIZ),JLEN(MVSIZ)
+      my_real DYDX(*),XX(*),YY(*)
 
       CALL GET_VAR_USER_VFUNC(5,LLT,IFUNC,JPOS,JAD,JLEN)
       IF (IRESP==1) THEN
@@ -251,14 +249,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_u_numfun     ../engine/source/user_interface/ufunc.F
-      !||--- called by ------------------------------------------------------
-      !||    get_u_func_x     ../engine/source/user_interface/ufunc.F
-      !||    get_u_func_y     ../engine/source/user_interface/ufunc.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_u_numfun     ../engine/source/user_interface/ufunc.F
+!||--- called by ------------------------------------------------------
+!||    get_u_func_x     ../engine/source/user_interface/ufunc.F
+!||    get_u_func_y     ../engine/source/user_interface/ufunc.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       INTEGER FUNCTION GET_U_NUMFUN(IDFUN)
 #include      "implicit_f.inc"
 #include      "com04_c.inc"
@@ -280,11 +278,11 @@ C---
 C---
       RETURN
       END
-      !||====================================================================
-      !||    get_u_fid        ../engine/source/user_interface/ufunc.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_u_fid        ../engine/source/user_interface/ufunc.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       INTEGER FUNCTION GET_U_FID(IFUN)
 #include      "implicit_f.inc"
 #include      "com04_c.inc"
@@ -299,13 +297,13 @@ C=======================================================================
 C---
       RETURN
       END
-      !||====================================================================
-      !||    get_u_func_inv      ../engine/source/user_interface/ufunc.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_u_func_inv      ../engine/source/user_interface/ufunc.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       my_real FUNCTION GET_U_FUNC_INV(IFUNC,YY)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -313,9 +311,8 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "scr05_c.inc"
 C
-      INTEGER IFUNC,I,NPFI,NPFIP,DEPLA
-      my_real 
-     .    ABC,YY,DERI,DY1,DY2,TFI,TFI1,TFI2,TFIP,VAL
+      INTEGER IFUNC,I,NPFI,NPFIP
+      my_real YY,DERI,DY1,DY2,TFI,TFI1,TFI2,TFIP,VAL
 C-----------------------------------------------
       GET_U_FUNC_INV = ZERO
       CALL GET_VAR_USER_I(5,IFUNC,NPFI)

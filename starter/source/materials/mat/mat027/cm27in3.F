@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cm27in3                ../starter/source/materials/mat/mat027/cm27in3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3                ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cinit3                 ../starter/source/elements/shell/coque/cinit3.F
-      !||    cmaini3                ../starter/source/elements/sh3n/coquedk/cmaini3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cm27in3                ../starter/source/materials/mat/mat027/cm27in3.F
+!||--- called by ------------------------------------------------------
+!||    c3init3                ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cinit3                 ../starter/source/elements/shell/coque/cinit3.F
+!||    cmaini3                ../starter/source/elements/sh3n/coquedk/cmaini3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CM27IN3(ELBUF_STR,
      .                   GEO ,IGEO,PM ,IPM ,IX ,NIX,
      .                   NLAY,IR  ,IS ,IMAT )
@@ -42,8 +42,8 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
-C INITIALISE LES DIRECTIONS DE FISSURES
-C INITIALISE LES EPAISSEURS ET LES MATERIAUX DES COUCHES
+C INITIALIZES THE CRACK DIRECTIONS
+C INITIALIZES THE THICKNESSES AND MATERIALS OF THE LAYERS
 C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -65,7 +65,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IPTHK,IPMAT,IPPOS,MID,MLN,IMID,IPID,PID
-      INTEGER I,N,I1,I2,I3,J,IGTYP,II,L_DMG,ILAYER,IT,NPTT
+      INTEGER I, N, I1, I2, I3, IGTYP, L_DMG, ILAYER, IT, NPTT
       my_real THKL,POS0,DP
       CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       my_real, DIMENSION(:), POINTER :: DIR_DMG

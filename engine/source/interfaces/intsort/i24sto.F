@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24sto      ../engine/source/interfaces/intsort/i24sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i24trivox   ../engine/source/interfaces/intsort/i24trivox.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24cor3t    ../engine/source/interfaces/intsort/i24cor3t.F
-      !||    i24edgt     ../engine/source/interfaces/intsort/i24sto.F
-      !||    i24pen3     ../engine/source/interfaces/intsort/i24pen3.F
-      !||    i24s1s2     ../engine/source/interfaces/intsort/i24sto.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box     ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24sto      ../engine/source/interfaces/intsort/i24sto.F
+!||--- called by ------------------------------------------------------
+!||    i24trivox   ../engine/source/interfaces/intsort/i24trivox.F
+!||--- calls      -----------------------------------------------------
+!||    i24cor3t    ../engine/source/interfaces/intsort/i24cor3t.F
+!||    i24edgt     ../engine/source/interfaces/intsort/i24sto.F
+!||    i24pen3     ../engine/source/interfaces/intsort/i24pen3.F
+!||    i24s1s2     ../engine/source/interfaces/intsort/i24sto.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box     ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24STO(
      1      J_STOK,IRECT  ,X     ,NSV   ,II_STOK,
      2      CAND_N,CAND_E ,MULNSN,NOINT ,MARGE  ,
@@ -101,14 +101,14 @@ C-----------------------------------------------
      .             MBINFLG,ISEADD ,ISEDGE ,PENE_E,IEDGE )
 
 C-----------------------------------------------
-C SUPPRESSION DES ANCIENS CANDIDATS DEJE STOCKES 
+C SUPPRESSION DES ANCIENS CANDIDATES DEJE STOCKES 
 C-----------------------------------------------
       DO I=1,J_STOK
        IF(PENE(I)/=ZERO)THEN
          N  = PROV_N(I)
          NE = PROV_E(I)+ESHIFT
          IF(N>NSN)THEN
-C numerotation tris precedent pour les noeuds non locaux (SPMD)
+C numbering of previous sorts for non-local nodes (spmd)
             N = OLDNUM(N-NSN)+NSN
             IF(N==NSN) N = NSN+NSNROLD+1
          END IF
@@ -188,15 +188,15 @@ C
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    i24s1s2   ../engine/source/interfaces/intsort/i24sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i24sto    ../engine/source/interfaces/intsort/i24sto.F
-      !||--- calls      -----------------------------------------------------
-      !||    bitget    ../engine/source/interfaces/intsort/i20sto.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box   ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24s1s2   ../engine/source/interfaces/intsort/i24sto.F
+!||--- called by ------------------------------------------------------
+!||    i24sto    ../engine/source/interfaces/intsort/i24sto.F
+!||--- calls      -----------------------------------------------------
+!||    bitget    ../engine/source/interfaces/intsort/i20sto.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box   ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24S1S2(LLT  ,NSN  ,ESHIFT,PROV_N,PROV_E,
      .                   NBINFLG,MBINFLG,PENE)
 C-----------------------------------------------
@@ -243,15 +243,15 @@ C=======================================================================
 C
       RETURN
       END
-      !||====================================================================
-      !||    i24edgt   ../engine/source/interfaces/intsort/i24sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i24sto    ../engine/source/interfaces/intsort/i24sto.F
-      !||--- calls      -----------------------------------------------------
-      !||    bitget    ../engine/source/interfaces/intsort/i20sto.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box   ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i24edgt   ../engine/source/interfaces/intsort/i24sto.F
+!||--- called by ------------------------------------------------------
+!||    i24sto    ../engine/source/interfaces/intsort/i24sto.F
+!||--- calls      -----------------------------------------------------
+!||    bitget    ../engine/source/interfaces/intsort/i20sto.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box   ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I24EDGT(LLT  ,NSN  ,ESHIFT,PROV_N,PROV_E,
      .                   MBINFLG,ISEADD ,ISEDGE ,PENE_E,IEDGE )
 C-----------------------------------------------
@@ -292,7 +292,7 @@ C=======================================================================
              IAD = ISEADD(N)
              NES = ISEDGE(IAD)
            ELSE
-c a faire !!!!!!!!!!!!!!!!!!!!!!!!!
+c a to perform !!!!!!!!!!!!!!!!!!!!!!!!!
              stop 987
            ENDIF
            IF(IME /= 1 .or. NES == 0) PENE_E(I)=ZERO

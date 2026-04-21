@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i20norms   ../engine/source/interfaces/int20/i20curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
-      !||====================================================================
+!||====================================================================
+!||    i20norms   ../engine/source/interfaces/int20/i20curv.F
+!||--- called by ------------------------------------------------------
+!||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
+!||====================================================================
       SUBROUTINE I20NORMS(NRTM,IRECT,NUMNOD,X,NOD_NORMAL,
      2                  NMN ,MSR  ,NLN,NLG,GAP_SH,
      3                  IAD_ELEM,FR_ELEM,NSV,NSN)
@@ -77,7 +77,7 @@ C-----------------------------------------------
       END IF
 
       DO I=1,NRTM
-c test pour ne prendre en compte que les solides 
+c test to consider only solids
         IF(GAP_SH(I)/=ZERO)THEN
           N1 = NLG(IRECT(1,I))
           N2 = NLG(IRECT(2,I))
@@ -161,12 +161,12 @@ c            AAA = ATAN2(SI,-CO)*TWO/PI/MAX(EM30,SI)
 
       RETURN
       END
-      !||====================================================================
-      !||    i20normsp        ../engine/source/interfaces/int20/i20curv.F
-      !||--- calls      -----------------------------------------------------
-      !||    myqsort          ../common_source/tools/sort/myqsort.F
-      !||    spmd_i7curvcom   ../engine/source/mpi/interfaces/spmd_i7curvcom.F
-      !||====================================================================
+!||====================================================================
+!||    i20normsp        ../engine/source/interfaces/int20/i20curv.F
+!||--- calls      -----------------------------------------------------
+!||    myqsort          ../common_source/tools/sort/myqsort.F
+!||    spmd_i7curvcom   ../engine/source/mpi/interfaces/spmd_i7curvcom.F
+!||====================================================================
       SUBROUTINE I20NORMSP(NRTM  ,IRECT   ,NUMNOD ,X    ,NOD_NORMAL,
      .                   NMN   ,MSR     ,LENT   ,MAXCC,ISDSIZ    ,
      .                   IRCSIZ,IAD_ELEM,FR_ELEM,ITAG ,NLN,NLG,
@@ -214,7 +214,7 @@ C-----------------------------------------------
         N2 = NLG(IRECT(2,I))
         N3 = NLG(IRECT(3,I))
         N4 = NLG(IRECT(4,I))
-c test pour ne prendre en compte que les solides 
+c test to consider only solids
         IF(GAP_SH(I)/=ZERO)THEN
 
 c          X13 = X(1,N3) - X(1,N1)
@@ -355,7 +355,7 @@ C
      .                      ISDSIZ,IRCSIZ,ITAG  ,LENR    ,LENS   )
       END IF
 C
-C     tri par packet des normales
+C     sorting by packet of normals
 C
       DO N1 = 1, NUMNOD
         N2 = ADSKYT(N1-1)
@@ -371,7 +371,7 @@ C
               NOD_NORMAL(J,N1) = NOD_NORMAL(J,N1) + FSKYT2(CC-N2+1)
             END DO
           END DO
-        ELSEIF(N4==1)THEN    ! cas 1 seule contribution => direct
+        ELSEIF(N4==1)THEN    ! Case 1 single contribution => direct
           NOD_NORMAL(1,N1) = FSKYT(1,N2)
           NOD_NORMAL(2,N1) = FSKYT(2,N2)
           NOD_NORMAL(3,N1) = FSKYT(3,N2)
@@ -379,11 +379,11 @@ C
       END DO
       RETURN
       END
-      !||====================================================================
-      !||    i20norm    ../engine/source/interfaces/int20/i20curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
-      !||====================================================================
+!||====================================================================
+!||    i20norm    ../engine/source/interfaces/int20/i20curv.F
+!||--- called by ------------------------------------------------------
+!||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
+!||====================================================================
       SUBROUTINE I20NORM(NRTM,IRECT,NUMNOD,X,NOD_NORMAL,
      .                  NMN ,MSR  ,NLN,NLG)
 C-----------------------------------------------
@@ -393,38 +393,27 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRTM,NUMNOD,IRECT(4,NRTM),NMN,MSR(*),NLN,NLG(NLN)
-C     REAL
       my_real
      .   X(3,NUMNOD), NOD_NORMAL(3,NUMNOD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J ,N1,N2,N3,N4
+      INTEGER I, N1, N2, N3, N4
       my_real
      .   SURFX,SURFY,SURFZ,X13,Y13,Z13,X24,Y24,Z24,AAA
 C-----------------------------------------------
 
-      IF(IMACH/=3)THEN
-        DO I=1,NMN
-          N1 = MSR(I)
-          IF(NLN/=0)N1 = NLG(N1)
-          NOD_NORMAL(1,N1) = ZERO
-          NOD_NORMAL(2,N1) = ZERO
-          NOD_NORMAL(3,N1) = ZERO
-        END DO
-      ELSE
-C optimisable en spmd si ajout flag pour routine de comm, spmd_exchange_n
-        DO N1=1,NUMNOD
-          NOD_NORMAL(1,N1) = ZERO
-          NOD_NORMAL(2,N1) = ZERO
-          NOD_NORMAL(3,N1) = ZERO
-        END DO
-      END IF
+
+C Optimizable in SPMD If Addition Flag for comm, SPMD_exchange_n
+      DO N1=1,NUMNOD
+        NOD_NORMAL(1,N1) = ZERO
+        NOD_NORMAL(2,N1) = ZERO
+        NOD_NORMAL(3,N1) = ZERO
+      END DO
 
       DO I=1,NRTM
         N1 = IRECT(1,I)
@@ -472,14 +461,14 @@ C optimisable en spmd si ajout flag pour routine de comm, spmd_exchange_n
       RETURN
       END
 C
-      !||====================================================================
-      !||    i20normp         ../engine/source/interfaces/int20/i20curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i20mainf         ../engine/source/interfaces/int20/i20mainf.F
-      !||--- calls      -----------------------------------------------------
-      !||    myqsort          ../common_source/tools/sort/myqsort.F
-      !||    spmd_i7curvcom   ../engine/source/mpi/interfaces/spmd_i7curvcom.F
-      !||====================================================================
+!||====================================================================
+!||    i20normp         ../engine/source/interfaces/int20/i20curv.F
+!||--- called by ------------------------------------------------------
+!||    i20mainf         ../engine/source/interfaces/int20/i20mainf.F
+!||--- calls      -----------------------------------------------------
+!||    myqsort          ../common_source/tools/sort/myqsort.F
+!||    spmd_i7curvcom   ../engine/source/mpi/interfaces/spmd_i7curvcom.F
+!||====================================================================
       SUBROUTINE I20NORMP(NRTM  ,IRECT   ,NUMNOD ,X    ,NOD_NORMAL,
      .                   NMN   ,MSR     ,LENT   ,MAXCC,ISDSIZ    ,
      .                   IRCSIZ,IAD_ELEM,FR_ELEM,ITAG ,NLN,NLG)
@@ -575,7 +564,7 @@ C
      .                      ISDSIZ,IRCSIZ,ITAG  ,LENR    ,LENS   )
       END IF
 C
-C     tri par packet des normales
+C     sorting by packet of normals
 C
       DO N1 = 1, NUMNOD
         N2 = ADSKYT(N1-1)
@@ -591,7 +580,7 @@ C
               NOD_NORMAL(J,N1) = NOD_NORMAL(J,N1) + FSKYT2(CC-N2+1)
             END DO
           END DO
-        ELSEIF(N4==1)THEN    ! cas 1 seule contribution => direct
+        ELSEIF(N4==1)THEN    ! Case 1 single contribution => direct
           NOD_NORMAL(1,N1) = FSKYT(1,N2)
           NOD_NORMAL(2,N1) = FSKYT(2,N2)
           NOD_NORMAL(3,N1) = FSKYT(3,N2)
@@ -601,11 +590,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    i20cmaj   ../engine/source/interfaces/int20/i20curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i20dst3   ../engine/source/interfaces/int20/i20dst3.F
-      !||====================================================================
+!||====================================================================
+!||    i20cmaj   ../engine/source/interfaces/int20/i20curv.F
+!||--- called by ------------------------------------------------------
+!||    i20dst3   ../engine/source/interfaces/int20/i20dst3.F
+!||====================================================================
       SUBROUTINE I20CMAJ(JLT    ,CMAJ   ,IRECT  ,NOD_NORMAL,CAND_E,
      2                  X1     ,X2     ,X3     ,X4        ,NLN    ,
      3                  Y1     ,Y2     ,Y3     ,Y4        ,NLG    ,
@@ -628,7 +617,7 @@ c          r = e
 c          tmaj = (e+1)t1' = (e-1)t'2
 c    => en 2D      t = t'max => Z = (Lmax/2)t'max
 c
-c       vecteurs:Z,L,N
+c       Vectors: Z, L, N
 c            Z^2 = (L/2.N)^2(L/2)^2 / (N^2(L/2)^2 - (L/2.N)^2)
 c            Z^2 = (L.N)^2 L^2 / 4(N^2 L^2 - (L.N)^2)
 c
@@ -770,11 +759,11 @@ c            Z^2 = (L.N)^2 L^2 / 4(N^2 L^2 - (L.N)^2)
 
       RETURN
       END
-      !||====================================================================
-      !||    i20normcnt   ../engine/source/interfaces/int20/i20curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i20mainf     ../engine/source/interfaces/int20/i20mainf.F
-      !||====================================================================
+!||====================================================================
+!||    i20normcnt   ../engine/source/interfaces/int20/i20curv.F
+!||--- called by ------------------------------------------------------
+!||    i20mainf     ../engine/source/interfaces/int20/i20mainf.F
+!||====================================================================
       SUBROUTINE I20NORMCNT(NRTM  ,IRECT ,NUMNOD,ITAG  ,LENT   ,
      2                      MAXCC ,NLN   ,NLG   )
 C-----------------------------------------------
@@ -790,8 +779,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J ,N1, N2, N3, N4, IERROR, IAD, SIZ, NB,
-     .        MSGTYP
+      INTEGER I, N1, N2, N3, N4
 C-----------------------------------------------
 C
       DO N1=1,NUMNOD

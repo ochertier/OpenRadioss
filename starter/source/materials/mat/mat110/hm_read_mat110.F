@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat110             ../starter/source/materials/mat/mat110/hm_read_mat110.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim          ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword           ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat110             ../starter/source/materials/mat/mat110/hm_read_mat110.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim          ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword           ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT110(
      .           UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR    ,NTABL    ,
      .           MTAG     ,PARMAT   ,UNITAB   ,PM       ,LSUBMODEL,
@@ -87,12 +87,12 @@ C     REAL
      .   ASRATE,KBOLTZ,XSCALE,YSCALE,FISOKIN,TINI,rhoBI_theta,B1,B2,MU,
      .   XSCALE_UNIT,YSCALE_UNIT
       my_real
-     .   F1,F2,DF1_DMU,DF2_DMU,D2F1_D2MU,D2F2_D2MU,EIG1,EIG2,
+     .   F1,F2,DF1_DMU,DF2_DMU,D2F1_D2MU,D2F2_D2MU,
      .   DPHI_DSIG1,DPHI_DSIG2,DMU_DSIG1,DMU_DSIG2,MINEIG,THET,DA_DCOS2(2),
      .   DB_DCOS2(2),DC_DCOS2(2),D2A_D2COS2(2),D2B_D2COS2(2),D2C_D2COS2(2),
-     .   DTHET_DCOS2,D2THET_D2THETCOS2,DF1_DCOS2,DF2_DCOS2,DPHI_DCOS2,
+     .   DF1_DCOS2,DF2_DCOS2,DPHI_DCOS2,
      .   D2F1_D2COS2,D2F2_D2COS2,D2F1_D2MUCOS2,D2F2_D2MUCOS2,MINEIGMU,
-     .   MINEIGTHET,NUMER,DNUMER_DMU,DNUMER_DCOS2,DENOM,DDENOM_DMU,DDENOM_DCOS2,
+     .   MINEIGTHET,DENOM,
      .   DMU_DCOS2,T(3,3),D(3,3),WEIGHT,DWEIGHT_DCOS2,D2WEIGHT_D2COS2,U,UPRIM,UPPRIM,
      .   DU_DMU,DUPRIM_DMU,V,VPRIM,VPPRIM,DV_DMU,DVPRIM_DMU,W0,fUN_AV,rLank_AV,
      .   fBI_MIN,fBI_MAX,fBI_TRANS,ADIRAC,FDIRAC,fPS_MIN,fPS_MAX,fPS_TRANS,

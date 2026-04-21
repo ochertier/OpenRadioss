@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_sahraei_s   ../engine/source/materials/fail/sahraei/fail_sahraei_s.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain            ../engine/source/materials/mat_share/mmain.F90
-      !||    mulaw            ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8           ../engine/source/materials/mat_share/mulaw8.F90
-      !||    usermat_solid    ../engine/source/materials/mat_share/usermat_solid.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter           ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    fail_sahraei_s   ../engine/source/materials/fail/sahraei/fail_sahraei_s.F
+!||--- called by ------------------------------------------------------
+!||    mmain            ../engine/source/materials/mat_share/mmain.F90
+!||    mulaw            ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8           ../engine/source/materials/mat_share/mulaw8.F90
+!||    usermat_solid    ../engine/source/materials/mat_share/usermat_solid.F
+!||--- calls      -----------------------------------------------------
+!||    finter           ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE FAIL_SAHRAEI_S(
      1     NEL   ,NFUNC ,IFUNC ,NPF   ,TF     ,
      2     TIME  ,NGL   ,UPARAM ,
@@ -75,7 +75,7 @@ C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
-      INTEGER NEL, NUPARAM,NUVAR
+      INTEGER NEL,NUVAR
       INTEGER NGL(NEL)
       INTEGER, INTENT(IN) :: NFUNC 
       INTEGER, DIMENSION(NFUNC), INTENT(IN) ::  IFUNC    
@@ -102,14 +102,14 @@ C        NPF,TF  : FUNCTION PARAMETER
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I,II,J,IFAIL,NINDX1,NINDX2,NUM,DEN,
+        INTEGER I,II,J,NINDX1,NINDX2,NUM,DEN,
      .          FAIL_ORT,ORDI,COMP_DIR,NINDXOFF,IDEL
         my_real
      .          VOL_STRAIN_LIMIT,MAX_COMP_STRAIN,RATIO_2,EL_REF,DAMAGE_SP(NEL)
         DOUBLE PRECISION          
      .          I1,I2,I3,E11,E22,E33,EXX,EYY,EZZ,EXY,EZX,EYZ,
      .          Q,R,R_INTER,PHI,RATIO(NEL),DAMAGE(NEL),E00,FAC,
-     .          VOL_STRAIN,NUMERATOR,DENOMINATOR,ORDINATE,
+     .          VOL_STRAIN,NUMERATOR,DENOMINATOR,
      .          LAMBDA,PLAMAX(NEL)
         INTEGER,DIMENSION(NEL) :: INDX1,INDX2,INDX3,INDXOFF
 C-----------------------------------------------
@@ -223,7 +223,7 @@ C
         I2 = EXX*EYY + EYY*EZZ + EZZ*EXX - EXY*EXY - EZX*EZX - EYZ*EYZ
         I3 = EXX*EYY*EZZ - EXX*EYZ*EYZ - EYY*EZX*EZX - EZZ*EXY*EXY + TWO*EXY*EZX*EYZ
         Q  = (THREE*I2 - I1*I1)/NINE
-        R  = (TWO*I1*I1*I1-NINE*I1*I2+TWENTY7*I3)/CINQUANTE4
+        R  = (TWO*I1*I1*I1-NINE*I1*I2+TWENTY7*I3)/FIFTY4
         R_INTER = MIN(R/SQRT(MAX(EM20,(-Q**3))),ONE)
         PHI     = ACOS(MAX(R_INTER,-ONE))
         ! Computation of principal strain

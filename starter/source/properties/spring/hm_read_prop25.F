@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop25           ../starter/source/properties/spring/hm_read_prop25.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop25           ../starter/source/properties/spring/hm_read_prop25.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP25(GEO, IGEO, UNITAB, ISKN,IGTYP, 
      .                          IG,PROP_TAG,IDTITL,LSUBMODEL,SUB_ID)
 C-----------------------------------------------
@@ -73,7 +73,7 @@ C-----------------------------------------------
      .         ISENS,IFL,IFAIL,ILENG,IFAIL2,K
 C     REAL
       my_real
-     .   A, B, D, E, F, XM, XIN, XK, XC, DN, DX, FWV,LSCALE, FSCALE,
+     .   A, B, D, E, F, XM, XIN, XK, XC, DN, DX, FWV,LSCALE,
      .   VT0, VR0, CC(6), CN(6), XA(6), XB(6),GF3,PUN,A_UNIT,D_UNIT,F_UNIT,
      .   E_UNIT,LSCALE_UNIT,GF3_UNIT,CRIT_SCALE(4),VR0_UNIT,VT0_UNIT
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
@@ -143,7 +143,7 @@ C----
      &    5X,'PROPERTY SET NUMBER . . . . . . . . . .=',I10/,
      &    5X,'CONFIDENTIAL DATA'//)
       ELSE
-        WRITE(IOUT,1801)IG,XM,XIN,ISKN(4,ISK),ISENS,IFL,ILENG
+        WRITE(IOUT,1801)IG,XM,XIN,ISKN(4,ISK),ABS(ISENS),IFL,ILENG
       ENDIF
 C
 !-------------------------------------------------------
@@ -314,7 +314,7 @@ C----
       ENDIF
 C
 !-----------------
-      ! Cisaillement
+      ! Shear
 !-----------------
 C--------------------------------------------------
 C EXTRACT DATAS (INTEGER VALUES)

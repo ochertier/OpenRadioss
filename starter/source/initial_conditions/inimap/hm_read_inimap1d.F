@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inimap1d           ../starter/source/initial_conditions/inimap/hm_read_inimap1d.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                     ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string              ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    lec_inimap1d_file          ../starter/source/initial_conditions/inimap/lec_inimap1d_file.F
-      !||    usr2sys                    ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
-      !||    inimap1d_mod               ../starter/share/modules1/inimap1d_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inimap1d           ../starter/source/initial_conditions/inimap/hm_read_inimap1d.F
+!||--- called by ------------------------------------------------------
+!||    lectur                     ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string              ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    lec_inimap1d_file          ../starter/source/initial_conditions/inimap/lec_inimap1d_file.F
+!||    usr2sys                    ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+!||    inimap1d_mod               ../starter/share/modules1/inimap1d_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INIMAP1D(INIMAP1D, NPC     ,ITABM1, X, IGRBRIC,
      .                        IGRQUAD , IGRSH3N, MULTI_FVM, UNITAB, LSUBMODEL)
 C-----------------------------------------------
@@ -89,10 +89,10 @@ C-----------------------------------------------
       CHARACTER MESS*40
       CHARACTER(LEN=NCHARLINE) :: KEY2
       CHARACTER(LEN=NCHARTITLE) :: TITR
-      INTEGER :: II, JJ, IFUNC1, IFUNC2, IFUNC3, IFUNC4, LNODID1, LNODID2, KK, ID, UID, J
+      INTEGER :: II, JJ, IFUNC1, IFUNC2, IFUNC3, LNODID1, LNODID2, KK, ID, UID, J
       DATA MESS/'INFILE'/
-      INTEGER :: GRBRICID_LOC, GRQUADID_LOC, GRSH3NID_LOC, IAD1, IAD2
-      my_real :: X0, Y0, Z0, X1, Y1, Z1, NORM, FAC1, FAC2, FAC_VEL, DUMMY
+      INTEGER :: GRBRICID_LOC, GRQUADID_LOC, GRSH3NID_LOC
+      my_real :: X0, Y0, Z0, X1, Y1, Z1, NORM, FAC1, FAC2, FAC_VEL
       INTEGER :: SIZE, LL
       LOGICAL :: FOUND
       CHARACTER(LEN=NCHARLINE) :: FILENAME

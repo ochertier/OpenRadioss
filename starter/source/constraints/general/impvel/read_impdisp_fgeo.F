@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_impdisp_fgeo          ../starter/source/constraints/general/impvel/read_impdisp_fgeo.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_impvel             ../starter/source/constraints/general/impvel/hm_read_impvel.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl                    ../starter/source/starter/freform.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim          ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    usr2sys                    ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_impdisp_fgeo          ../starter/source/constraints/general/impvel/read_impdisp_fgeo.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_impvel             ../starter/source/constraints/general/impvel/hm_read_impvel.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl                    ../starter/source/starter/freform.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim          ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    usr2sys                    ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE READ_IMPDISP_FGEO(
      .           NFGEO    ,INUM     ,IOPT     ,FBFVEL   ,IBFVEL   ,
      .           ITAB     ,ITABM1   ,IGRNOD   ,NOM_OPT  ,X0       ,
@@ -52,6 +52,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,10 +84,10 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,K,N,N1,N2,NUM0,IFGEO,JPART,NNOD,NOSKEW,NOFRAME,
      .   SENS_ID,PART_ID,OPTID,FUN_ID,IFRA_OUT,ILAGM,
-     .   FGEO,IDIS,ICOOR,DISTRIBUTION
+     .   FGEO,IDIS,ICOOR
       INTEGER ,DIMENSION(NUMNOD) :: NOD1
       my_real ,DIMENSION(NUMNOD) :: XF,YF,ZF
-      my_real :: TSTART,TSTOP,XSCALE,FSCAL_T,FSCAL_V,DIST,XI,YI,ZI,XRF,YRF,ZRF
+      my_real :: TSTART,TSTOP,XSCALE,FSCAL_T,DIST,XI,YI,ZI,XRF,YRF,ZRF
       CHARACTER(LEN=NCHARKEY)    :: KEY
       CHARACTER(LEN=NCHARTITLE)  :: TITR,MESS
       LOGICAL IS_AVAILABLE
@@ -178,7 +179,7 @@ c
             IBFVEL(3 ,INUM) = FUN_ID
             IBFVEL(4 ,INUM) = SENS_ID
             IBFVEL(5 ,INUM) = 0
-            IBFVEL(6 ,INUM) = 0  ! init dans lecrby (si vitesse de rotation sur main)
+            IBFVEL(6 ,INUM) = 0  ! initialization in lecrby (if rotation velocity on main)
             IBFVEL(7 ,INUM) = IDIS
             IBFVEL(8 ,INUM) = ILAGM
             IBFVEL(9 ,INUM) = NOFRAME

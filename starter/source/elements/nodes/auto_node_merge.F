@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    auto_node_merge   ../starter/source/elements/nodes/auto_node_merge.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_preread_node   ../starter/source/elements/reader/hm_preread_node.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    auto_node_merge   ../starter/source/elements/nodes/auto_node_merge.F
+!||--- called by ------------------------------------------------------
+!||    hm_preread_node   ../starter/source/elements/reader/hm_preread_node.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg            ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod       ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE AUTO_NODE_MERGE(IS_DYNA,NUMNUSR,NUMCNOD,NUMNOD,ITAB,X)
 C-----------------------------------------------
       USE MESSAGE_MOD
@@ -40,20 +40,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER,INTENT(IN)::IS_DYNA
+      INTEGER,INTENT(IN) :: IS_DYNA
       INTEGER,INTENT(IN) :: NUMNUSR, NUMCNOD
-      INTEGER,INTENT(OUT):: NUMNOD
+      INTEGER,INTENT(OUT) :: NUMNOD
       INTEGER,INTENT(IN),DIMENSION(NUMNUSR+NUMCNOD)    :: ITAB
-      my_real, INTENT(IN),DIMENSION(3,NUMNUSR) ::
-     .         X
+      my_real, INTENT(IN),DIMENSION(3,NUMNUSR) :: X
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IREF, J, STAT
+      INTEGER I, IREF, STAT
       INTEGER WORK(70000)
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITABM1, INDX
-      my_real
-     .  XODUSR, XMIN, YMIN, ZMIN, XMAX, YMAX, ZMAX, DX, DY, DZ, TOL
+      my_real :: XODUSR, XMIN, YMIN, ZMIN, XMAX, YMAX, ZMAX, DX, DY, DZ, TOL
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------

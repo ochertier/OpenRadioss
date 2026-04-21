@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdkfint3   ../engine/source/elements/sh3n/coquedk/cdkfint3.F
-      !||--- called by ------------------------------------------------------
-      !||    cdkforc3   ../engine/source/elements/sh3n/coquedk/cdkforc3.F
-      !||====================================================================
+!||====================================================================
+!||    cdkfint3   ../engine/source/elements/sh3n/coquedk/cdkfint3.F
+!||--- called by ------------------------------------------------------
+!||    cdkforc3   ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+!||====================================================================
           SUBROUTINE CDKFINT3(JFT,JLT,VOL,THK0,FOR,MOM,
      1                      PX2,PY2,PX3,PY3,
      2                      BZ1,BZ2,BZ3,
@@ -41,7 +41,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
-      INTEGER JFT,JLT,NG,NEL
+      INTEGER JFT,JLT,NEL
       MY_REAL 
      .   FOR(NEL,5),MOM(NEL,3), 
      .   PX2(*), PY2(*), PX3(*), PY3(*), 

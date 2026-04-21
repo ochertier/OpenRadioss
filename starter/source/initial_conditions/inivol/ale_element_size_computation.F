@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ale_element_size_computation   ../starter/source/initial_conditions/inivol/ale_element_size_computation.F
-      !||--- called by ------------------------------------------------------
-      !||    init_inivol                    ../starter/source/initial_conditions/inivol/init_inivol.F90
-      !||====================================================================
+!||====================================================================
+!||    ale_element_size_computation   ../starter/source/initial_conditions/inivol/ale_element_size_computation.F
+!||--- called by ------------------------------------------------------
+!||    init_inivol                    ../starter/source/initial_conditions/inivol/init_inivol.F90
+!||--- uses       -----------------------------------------------------
+!||====================================================================
         SUBROUTINE ALE_ELEMENT_SIZE_COMPUTATION(NPARG, NGROUP, NUMELS,NUMELTG,NUMELQ,NUMNOD,N2D,
      .                                          IPARG,IXS,IXQ,IXTG,
      .                                          ELEMENT_SIZE,MIN_MAX_POSITION,X,
@@ -41,6 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !               - compute the maximum element size 
 !               - compute the min/max node's positions & save the ALE node id
 !$ENDCOMMENT
+        use element_mod , only :nixs,nixq,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,9 +75,11 @@ C-----------------------------------------------
         INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_ARRAY
         my_real :: LOCAL_SIZE
         my_real, DIMENSION(3) :: MAX_NODE,MIN_NODE,DISTANCE
+        integer, target :: nothing(1,1) !< dummy for indirection
 C-----------------------------------------------
         ALLOCATE(TAG_ARRAY(NUMNOD))
         TAG_ARRAY(1:NUMNOD) = 0
+        IX => nothing
         ELEMENT_SIZE = -ONE
         MIN_MAX_POSITION(1:3) = EP30
         MIN_MAX_POSITION(4:6) = -EP30

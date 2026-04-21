@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r23law108          ../engine/source/elements/spring/r23law108.F
-      !||--- called by ------------------------------------------------------
-      !||    r23forc3           ../engine/source/elements/spring/r23forc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    r23bilan           ../engine/source/elements/spring/r23bilan.F
-      !||    r23coor3           ../engine/source/elements/spring/r23coor3.F
-      !||    r23l108def3        ../engine/source/elements/spring/r23l108def3.F
-      !||    r23sens3           ../engine/source/elements/spring/r23sens3.F
-      !||    r2cum3             ../engine/source/elements/spring/r2cum3.F
-      !||    r2cum3p            ../engine/source/elements/spring/r2cum3p.F
-      !||    r2len3             ../engine/source/elements/spring/r2len3.F
-      !||    r2tors             ../engine/source/elements/spring/r2tors.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||    python_funct_mod   ../common_source/modules/python_mod.F90
-      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
-      !||    table_mod          ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r23law108          ../engine/source/elements/spring/r23law108.F
+!||--- called by ------------------------------------------------------
+!||    r23forc3           ../engine/source/elements/spring/r23forc3.F
+!||--- calls      -----------------------------------------------------
+!||    r23bilan           ../engine/source/elements/spring/r23bilan.F
+!||    r23coor3           ../engine/source/elements/spring/r23coor3.F
+!||    r23l108def3        ../engine/source/elements/spring/r23l108def3.F
+!||    r23sens3           ../engine/source/elements/spring/r23sens3.F
+!||    r2cum3             ../engine/source/elements/spring/r2cum3.F
+!||    r2cum3p            ../engine/source/elements/spring/r2cum3p.F
+!||    r2len3             ../engine/source/elements/spring/r2len3.F
+!||    r2tors             ../engine/source/elements/spring/r2tors.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    h3d_mod            ../engine/share/modules/h3d_mod.F
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||    table_mod          ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE R23LAW108(PYTHON,
      1   ELBUF_STR, JFT,       JLT,       NEL,
      2   MTN,       IGEO,      GEO,       IPM,
@@ -66,6 +67,7 @@ C-----------------------------------------------
       USE H3D_MOD
       USE SENSOR_MOD
       USE python_funct_mod
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -113,32 +115,24 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NGL(MVSIZ),PID(MVSIZ),NC1(MVSIZ),NC2(MVSIZ),NC3(MVSIZ),
+      INTEGER NGL(MVSIZ), PID(MVSIZ), NC1(MVSIZ), NC2(MVSIZ), 
      .        MID(MVSIZ),IEQUIL(MVSIZ)
 C     REAL
       my_real 
-     .   STI(3,MVSIZ),STIR(3,MVSIZ),VISI(MVSIZ),VISIR(MVSIZ),
-     .   USTI(MVSIZ),USTIR(MVSIZ),DF(MVSIZ),AL(MVSIZ),UNUSED(MVSIZ),
-     .   UINER(MVSIZ),FR_W_E(MVSIZ),OFF(MVSIZ),BID
+     . STI(3,MVSIZ),STIR(3,MVSIZ),
+     . FR_W_E(MVSIZ),OFF(MVSIZ),BID
       my_real
-     .   EXX2(MVSIZ), EYX2(MVSIZ), EZX2(MVSIZ),
-     .   EXY2(MVSIZ), EYY2(MVSIZ), EZY2(MVSIZ),
-     .   EXZ2(MVSIZ), EYZ2(MVSIZ), EZZ2(MVSIZ),
-     .   AL2(MVSIZ),X1(MVSIZ),Y1(MVSIZ),Z1(MVSIZ),
-     .   X2(MVSIZ),Y2(MVSIZ),Z2(MVSIZ),X3(MVSIZ),Y3(MVSIZ),Z3(MVSIZ),
-     .   EX(MVSIZ),EY(MVSIZ),EZ(MVSIZ),
+     . X1(MVSIZ),Y1(MVSIZ),Z1(MVSIZ),
+     . X2(MVSIZ),Y2(MVSIZ),Z2(MVSIZ),
      .   EXX(MVSIZ),EYX(MVSIZ),EZX(MVSIZ),
      .   EXY(MVSIZ),EYY(MVSIZ),EZY(MVSIZ),
      .   EXZ(MVSIZ),EYZ(MVSIZ),EZZ(MVSIZ),
-     .   XCR(MVSIZ),XK(MVSIZ),XM(MVSIZ),XC(MVSIZ),RX1(MVSIZ),RX2(MVSIZ),
+     . XCR(MVSIZ),XM(MVSIZ),RX1(MVSIZ),RX2(MVSIZ),
      .   RY1(MVSIZ),RY2(MVSIZ),RZ1(MVSIZ),RZ2(MVSIZ),XIN(MVSIZ),
-     .   AK(MVSIZ),XKM(MVSIZ),XCM(MVSIZ),XKR(MVSIZ),
-     .   EX2(MVSIZ),EY2(MVSIZ),EZ2(MVSIZ),VX1(MVSIZ),VX2(MVSIZ),
-     .   VY1(MVSIZ),VY2(MVSIZ),VZ1(MVSIZ),VZ2(MVSIZ)
+     .   AK(MVSIZ),XKM(MVSIZ),XCM(MVSIZ),XKR(MVSIZ)
       INTEGER IGTYP,I,I0,NUVAR,IADBUF
       DOUBLE PRECISION
-     .   X1DP(3,MVSIZ),X2DP(3,MVSIZ),X3DP(3,MVSIZ),
-     .   ELX(3,MVSIZ),AL2DP(MVSIZ),ALDP(MVSIZ)
+     . X1DP(3,MVSIZ),X2DP(3,MVSIZ)
 C-----------------------------------------------
       TYPE(G_BUFEL_),POINTER :: GBUF
       INTEGER II(6)
@@ -196,37 +190,40 @@ C
         DO I=JFT,JLT
           MID(I)     = IXR(5,I)
           IADBUF = IPM(7,MID(I))
-          NUVAR = MAX(NUVAR, NINT(BUFMAT(IADBUF + 4))) 
+          NUVAR = MAX(NUVAR, NINT(BUFMAT(IADBUF + 4 -1))) 
         ENDDO
 !!    is like r2def3 (spring type08)    
         CALL R23L108DEF3(PYTHON,
-     1   IPM,                    IGEO,                   MID,                    PID,
-     2   BUFMAT,                 SKEW,                   GEO,                    GBUF%FOR(II(1)),
-     3   GBUF%FOR(II(2)),        GBUF%FOR(II(3)),        GBUF%EINT,              GBUF%TOTDEPL(II(1)),
-     4   GBUF%TOTDEPL(II(2)),    GBUF%TOTDEPL(II(3)),    NPF,                    TF,
-     5   OFF,                    GBUF%DEP_IN_TENS(II(1)),GBUF%DEP_IN_TENS(II(2)),GBUF%DEP_IN_TENS(II(3)),
-     6   GBUF%DEP_IN_COMP(II(1)),GBUF%DEP_IN_COMP(II(2)),GBUF%DEP_IN_COMP(II(3)),GBUF%FOREP(II(1)),
-     7   GBUF%FOREP(II(2)),      GBUF%FOREP(II(3)),      GBUF%LENGTH(II(1)),     GBUF%LENGTH(II(2)),
-     8   GBUF%LENGTH(II(3)),     GBUF%MOM(II(1)),        GBUF%MOM(II(2)),        GBUF%MOM(II(3)),
-     9   GBUF%TOTROT(II(1)),     GBUF%TOTROT(II(2)),     GBUF%TOTROT(II(3)),     GBUF%ROT_IN_TENS(II(1)),
-     A   GBUF%ROT_IN_TENS(II(2)),GBUF%ROT_IN_TENS(II(3)),GBUF%MOMEP(II(1)),      GBUF%MOMEP(II(2)),
-     B   GBUF%MOMEP(II(3)),      GBUF%ROT_IN_COMP(II(1)),GBUF%ROT_IN_COMP(II(2)),GBUF%ROT_IN_COMP(II(3)),
-     C   ANIM,                   GBUF%POSX,              GBUF%POSY,              GBUF%POSZ,
-     D   GBUF%POSXX,             GBUF%POSYY,             GBUF%POSZZ,             
-     E   V,                      GBUF%E6,                GBUF%RUPTCRIT,          NEL,
-     F   GBUF%LENGTH_ERR,        X1DP,                   X2DP,                   GBUF%YIELD(II(1)),
-     G   GBUF%YIELD(II(2)),      GBUF%YIELD(II(3)),      GBUF%YIELD(II(4)),      GBUF%YIELD(II(5)),
-     H   GBUF%YIELD(II(6)),      NGL,                    XKR,                    EXX,
-     I   EYX,                    EZX,                    EXY,                    EYY,
-     J   EZY,                    EXZ,                    EYZ,                    EZZ,
-     K   XCR,                    RX1,                    RY1,                    RZ1,
-     L   RX2,                    RY2,                    RZ2,                    XIN,
-     M   AK,                     XM,                     XKM,                    XCM,
-     N   NC1,                    NC2,                    NUVAR,                  GBUF%VAR,
-     O   GBUF%MASS,              GBUF%DEFINI(II(1)),     GBUF%DEFINI(II(2)),     GBUF%DEFINI(II(3)),
-     P   GBUF%DEFINI(II(4)),     GBUF%DEFINI(II(5)),     GBUF%DEFINI(II(6)),     IEQUIL,
-     Q   GBUF%SKEW_ID,           NFT,                    STF,                    SANIN,
-     R   IRESP,                  SNPC)
+     1   IPM,                      IGEO,                     MID,                      PID,
+     2   BUFMAT,                   SKEW,                     GEO,                      GBUF%FOR(II(1)),
+     3   GBUF%FOR(II(2)),          GBUF%FOR(II(3)),          GBUF%EINT,                GBUF%TOTDEPL(II(1)),
+     4   GBUF%TOTDEPL(II(2)),      GBUF%TOTDEPL(II(3)),      NPF,                      TF,
+     5   OFF,                      GBUF%DEP_IN_TENS(II(1)),  GBUF%DEP_IN_TENS(II(2)),  GBUF%DEP_IN_TENS(II(3)),
+     6   GBUF%DEP_IN_COMP(II(1)),  GBUF%DEP_IN_COMP(II(2)),  GBUF%DEP_IN_COMP(II(3)),  GBUF%FOREP(II(1)),
+     7   GBUF%FOREP(II(2)),        GBUF%FOREP(II(3)),        GBUF%LENGTH(II(1)),       GBUF%LENGTH(II(2)),
+     8   GBUF%LENGTH(II(3)),       GBUF%MOM(II(1)),          GBUF%MOM(II(2)),          GBUF%MOM(II(3)),
+     9   GBUF%TOTROT(II(1)),       GBUF%TOTROT(II(2)),       GBUF%TOTROT(II(3)),       GBUF%ROT_IN_TENS(II(1)),
+     A   GBUF%ROT_IN_TENS(II(2)),  GBUF%ROT_IN_TENS(II(3)),  GBUF%MOMEP(II(1)),        GBUF%MOMEP(II(2)),
+     B   GBUF%MOMEP(II(3)),        GBUF%ROT_IN_COMP(II(1)),  GBUF%ROT_IN_COMP(II(2)),  GBUF%ROT_IN_COMP(II(3)),
+     C   ANIM,                     GBUF%POSX,                GBUF%POSY,                GBUF%POSZ,
+     D   GBUF%POSXX,               GBUF%POSYY,               GBUF%POSZZ,             
+     E   V,                        GBUF%E6,                  GBUF%RUPTCRIT,            NEL,
+     F   GBUF%LENGTH_ERR,          X1DP,                     X2DP,                     GBUF%YIELD(II(1)),
+     G   GBUF%YIELD(II(2)),        GBUF%YIELD(II(3)),        GBUF%YIELD(II(4)),        GBUF%YIELD(II(5)),
+     H   GBUF%YIELD(II(6)),        NGL,                      XKR,                      EXX,
+     I   EYX,                      EZX,                      EXY,                      EYY,
+     J   EZY,                      EXZ,                      EYZ,                      EZZ,
+     K   XCR,                      RX1,                      RY1,                      RZ1,
+     L   RX2,                      RY2,                      RZ2,                      XIN,
+     M   AK,                       XM,                       XKM,                      XCM,
+     N   NC1,                      NC2,                      NUVAR,                    GBUF%VAR,
+     O   GBUF%MASS,                GBUF%DEFINI(II(1)),       GBUF%DEFINI(II(2)),       GBUF%DEFINI(II(3)),
+     P   GBUF%DEFINI(II(4)),       GBUF%DEFINI(II(5)),       GBUF%DEFINI(II(6)),       IEQUIL,
+     Q   GBUF%SKEW_ID,             NFT,                      STF,                      SANIN,
+     R   IRESP,                    SNPC,                     GBUF%G_YIELD_IN_COMP     ,GBUF%G_XXOLD_IN_COMP,
+     S   GBUF%YIELD_IN_COMP(II(1)),GBUF%YIELD_IN_COMP(II(2)),GBUF%YIELD_IN_COMP(II(3)),GBUF%YIELD_IN_COMP(II(4)),
+     T   GBUF%YIELD_IN_COMP(II(5)),GBUF%YIELD_IN_COMP(II(6)),GBUF%XXOLD_IN_COMP(II(1)),GBUF%XXOLD_IN_COMP(II(2)),
+     U   GBUF%XXOLD_IN_COMP(II(3)),GBUF%XXOLD_IN_COMP(II(4)),GBUF%XXOLD_IN_COMP(II(5)),GBUF%XXOLD_IN_COMP(II(6)))
 C
         DO I=JFT,JLT
           IF (GBUF%OFF(I) /= -TEN .AND. OFF(I) < ONE) GBUF%OFF(I) = OFF(I)
@@ -240,7 +237,7 @@ C
      5   XIN,      XM,       XKM,      XCM,
      6   XKR,      NC1,      NC2,      JSMS)
         CALL R23BILAN(
-     1   GBUF%EINT,PARTSAV,  IXR,      GEO,
+     1   GBUF%EINT,PARTSAV,  IXR,      GEO, 
      2   V,        IPARTR,   GBUF%MASS,GRESAV,
      3   GRTH,     IGRTH,    GBUF%OFF, NC1,
      4   NC2,      X,        VR,       NEL,

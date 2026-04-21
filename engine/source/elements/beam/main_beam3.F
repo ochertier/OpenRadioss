@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    main_beam3     ../engine/source/elements/beam/main_beam3.F
-      !||--- called by ------------------------------------------------------
-      !||    pforc3         ../engine/source/elements/beam/pforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    fail_beam3     ../engine/source/elements/beam/fail_beam3.F
-      !||    m1lawp         ../engine/source/materials/mat/mat001/m1lawp.F
-      !||    m2lawp         ../engine/source/materials/mat/mat002/m2lawp.F
-      !||    sigeps44p      ../engine/source/materials/mat/mat044/sigeps44p.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    mat_elem_mod   ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    main_beam3     ../engine/source/elements/beam/main_beam3.F
+!||--- called by ------------------------------------------------------
+!||    pforc3         ../engine/source/elements/beam/pforc3.F
+!||--- calls      -----------------------------------------------------
+!||    fail_beam3     ../engine/source/elements/beam/fail_beam3.F
+!||    m1lawp         ../engine/source/materials/mat/mat001/m1lawp.F
+!||    m2lawp         ../engine/source/materials/mat/mat002/m2lawp.F
+!||    sigeps44p      ../engine/source/materials/mat/mat044/sigeps44p.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    mat_elem_mod   ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||====================================================================
       SUBROUTINE MAIN_BEAM3(
      .       ELBUF_STR,NEL      ,ILAW     ,JTHE     ,IFAIL    ,
      .       IPM      ,PM       ,GEO      ,TEMPEL   ,OFF      ,
@@ -43,7 +43,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .       BUFMAT   ,NPROPG   ,NPROPMI  ,NPROPM   ,NUMMAT   ,
      .       NUMGEO   ,SBUFMAT  ,SNPC     ,STF      ,IOUT     ,
      .       ISTDO    ,NUVAR    ,UVAR     ,EPSD     ,IMAT     ,
-     .       FOR      ,MOM      ,EINT     ,ISMSTR   ,MAT_PARAM)
+     .       FOR      ,MOM      ,EINT     ,ISMSTR   ,MAT_PARAM,
+     .      NTABLE    ,TABLE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -73,6 +74,8 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN) :: ISTDO
       INTEGER ,INTENT(IN) :: NUVAR
       INTEGER ,INTENT(IN) :: ISMSTR
+      INTEGER ,INTENT(IN) :: NTABLE
+      TYPE(TTABLE), DIMENSION(NTABLE), INTENT(INOUT)    :: TABLE      ! TABLE DATA   
       INTEGER ,DIMENSION(SNPC) ,INTENT(IN) :: NPF
       INTEGER ,DIMENSION(NPROPMI,NUMMAT) ,INTENT(IN) :: IPM
       INTEGER ,DIMENSION(NEL) ,INTENT(IN) :: MAT
@@ -85,7 +88,7 @@ C-----------------------------------------------
       my_real ,INTENT(IN) :: TF(STF)
       my_real ,INTENT(IN) :: BUFMAT(SBUFMAT)
       my_real ,DIMENSION(NEL)  ,INTENT(IN)    :: AL
-      my_real ,DIMENSION(NEL)  ,INTENT(IN)    :: TEMPEL
+      my_real ,DIMENSION(NEL)  ,INTENT(INOUT) :: TEMPEL
       my_real ,DIMENSION(NEL)  ,INTENT(INOUT) :: EXX,EXY,EXZ
       my_real ,DIMENSION(NEL)  ,INTENT(INOUT) :: KXX,KYY,KZZ
       my_real ,DIMENSION(NEL)  ,INTENT(INOUT) :: OFF
@@ -102,7 +105,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,IPID,IPLA,ISRATE,NUPARAM,NFUNC,IADBUF,IFUNC(100)
       my_real :: AREA,IYY,IZZ,IXX,ASRATE,EPSDI,FACT
-      my_real ,DIMENSION(NEL) :: DPLA,SVM,PRESSURE,DEGMB,DEGFX,DEGSH
+      my_real ,DIMENSION(NEL) :: DPLA,SVM,PRESSURE,DEGMB,DEGFX,DEGSH,SIGY,
+     .   SVM0
 c=======================================================================
       IPID = PID(1)
 c-------------------
@@ -111,9 +115,16 @@ c-------------------
       ISRATE = IPM(3,IMAT)                      
       ASRATE = MIN(ONE, PM(9,IMAT)*DTIME)
 c
+      ! Geometric properties of the beam element
+      AREA = GEO(1 ,IPID)
+      IXX  = GEO(4 ,IPID)
+      IYY  = GEO(2 ,IPID)
+      IZZ  = GEO(18,IPID)
+c
       DO I = 1,NEL                                              
         EPSDI  = HALF*(EXX(I)**2) + (HALF*EXY(I))**2 + (HALF*EXZ(I))**2
         EPSDI  = AL(I)*SQRT(THREE*EPSDI)/THREE_HALF
+        SIGY(I) = 1.E30 
         IF (ISRATE > 0) THEN
           EPSD(I)= ASRATE*EPSDI + (ONE - ASRATE)*EPSD(I)
         ELSE       
@@ -137,22 +148,28 @@ c-------------------
         DEGFX(I) = MOM(I,1)*KXX(I)+MOM(I,2)*KYY(I)+MOM(I,3)*KZZ(I)
       ENDDO
 c
-      IPLA = ELBUF_STR%GBUF%G_PLA
-      ! Cumulated plastic strain increment
-      IF (IFAIL > 0 .and. IPLA > 0) THEN
-        DO I = 1,NEL
-          DPLA(I) = ELBUF_STR%GBUF%PLA(I)
-        ENDDO
-      ENDIF
       ! Compute undamaged forces and internal energy increment
       IF (ELBUF_STR%GBUF%G_DMGSCL > 0) THEN 
         DO I = 1,NEL
-          FOR(I,1) = FOR(I,1)/MAX(EM20,ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-          FOR(I,2) = FOR(I,2)/MAX(EM20,ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-          FOR(I,3) = FOR(I,3)/MAX(EM20,ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-          MOM(I,1) = MOM(I,1)/MAX(EM20,ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-          MOM(I,2) = MOM(I,2)/MAX(EM20,ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-          MOM(I,3) = MOM(I,3)/MAX(EM20,ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
+          FOR(I,1) = FOR(I,1)/MAX(EM20,ELBUF_STR%GBUF%DMGSCL(I))
+          FOR(I,2) = FOR(I,2)/MAX(EM20,ELBUF_STR%GBUF%DMGSCL(I))
+          FOR(I,3) = FOR(I,3)/MAX(EM20,ELBUF_STR%GBUF%DMGSCL(I))
+          MOM(I,1) = MOM(I,1)/MAX(EM20,ELBUF_STR%GBUF%DMGSCL(I))
+          MOM(I,2) = MOM(I,2)/MAX(EM20,ELBUF_STR%GBUF%DMGSCL(I))
+          MOM(I,3) = MOM(I,3)/MAX(EM20,ELBUF_STR%GBUF%DMGSCL(I))
+        ENDDO
+      ENDIF
+c
+      IPLA = ELBUF_STR%GBUF%G_PLA
+      ! Cumulated plastic strain increment
+      IF (IPLA > 0) THEN
+        DO I = 1,NEL
+          DPLA(I) = ELBUF_STR%GBUF%PLA(I)
+          SVM0(I) = FOR(I,1)*FOR(I,1) + THREE * AREA *
+     .             ( MOM(I,1)*MOM(I,1) / MAX(IXX,EM20)
+     .             + MOM(I,2)*MOM(I,2) / MAX(IYY,EM20)
+     .             + MOM(I,3)*MOM(I,3) / MAX(IZZ,EM20))
+          SVM0(I) = SQRT(SVM0(I)) / AREA
         ENDDO
       ENDIF
 c
@@ -170,13 +187,13 @@ c
      .         MAT    ,PID       )
 c
         CASE (2)  ! Johnson-Cook
-          CALL M2LAWP(
-     .         PM     ,FOR        ,MOM      ,EINT      ,GEO      ,        
-     .         OFF    ,ELBUF_STR%GBUF%PLA   ,EXX       ,EXY      ,EXZ      ,
-     .         KXX    ,KYY        ,KZZ      ,AL        ,F1       ,
-     .         F2     ,F3         ,M1       ,M2        ,M3       ,
-     .         NEL    ,MAT        ,PID      ,NGL       ,IPM      ,
-     .         NUMMAT ,NUVAR      ,UVAR     )
+          CALL M2LAWP (MAT_PARAM  ,
+     .         FOR    ,MOM      ,EINT      ,GEO      ,        
+     .         OFF    ,ELBUF_STR%GBUF%PLA  ,EXX      ,EXY      ,EXZ      ,
+     .         KXX    ,KYY      ,KZZ      ,AL        ,F1       ,
+     .         F2     ,F3       ,M1       ,M2        ,M3       ,
+     .         NEL    ,PID      ,NGL       ,
+     .         NUVAR  ,UVAR     ,SIGY     )
 c
         CASE (44)  ! Cowper-Symonds
           IADBUF  = IPM(7 ,IMAT)
@@ -191,23 +208,18 @@ c
      .         EXX      ,EXY      ,EXZ      ,KXX      ,KYY      ,KZZ     ,
      .         F1       ,F2       ,F3       ,M1       ,M2       ,M3      ,
      .         FOR      ,MOM      ,PM       ,NUVAR    ,UVAR     ,NFUNC   ,
-     .         IFUNC    ,TF       ,NPF      )
+     .         IFUNC    ,TF       ,NPF      ,SIGY )
 c
       END SELECT
 c
 c---------------------------
-c     failure models
+c     Plastic Work
 c---------------------------
-      IF (IFAIL > 0) THEN
-        IF (IPLA > 0) THEN
-          DO I = 1,NEL
-            DPLA(I) = ELBUF_STR%GBUF%PLA(I) - DPLA(I)
-          ENDDO
-        ENDIF
-        AREA = GEO(1 ,IPID)
-        IXX  = GEO(4 ,IPID)
-        IYY  = GEO(2 ,IPID)
-        IZZ  = GEO(18,IPID)
+      IF (IPLA > 0 .OR. IFAIL  > 0) THEN
+        DO I = 1,NEL
+          DPLA(I) = ELBUF_STR%GBUF%PLA(I) - DPLA(I)
+        ENDDO
+
         DO I = 1,NEL
           SVM(I) = F1(I)*F1(I) + THREE * AREA *
      .             ( M1(I)*M1(I) / MAX(IXX,EM20)
@@ -216,27 +228,40 @@ c---------------------------
           SVM(I) = SQRT(SVM(I)) / AREA
           PRESSURE(I) = THIRD * F1(I) / AREA
         ENDDO
+        
+        IF (IPLA > 0) THEN
+          DO I = 1,NEL
+            IF (ELBUF_STR%GBUF%G_WPLA > 0)   ELBUF_STR%GBUF%WPLA(I) = ELBUF_STR%GBUF%WPLA(I) + 
+     .             HALF*(SVM(I)+SVM0(I))*DPLA(I)*AREA*AL(I)
+          ENDDO
+        ENDIF 
+
+      ENDIF
 c
-        CALL FAIL_BEAM3(ELBUF_STR    ,MAT_PARAM%FAIL(1),NUMMAT  ,
-     .              NPROPM  ,SNPC    ,STF     ,
-     .              NEL     ,IMAT    ,JTHE    ,DPLA    ,
-     .              TEMPEL  ,NGL     ,PM      ,
-     .              OFF     ,EPSD    ,NPF     ,TF      ,
-     .              TIME    ,IOUT    ,ISTDO   ,
+c---------------------------
+c     failure models
+c---------------------------
+      IF (IFAIL > 0) THEN
+c
+        CALL FAIL_BEAM3(ELBUF_STR    ,MAT_PARAM,MAT_PARAM%FAIL(1),
+     .              SNPC    ,STF     ,NEL     ,JTHE    ,DPLA    ,
+     .              TEMPEL  ,NGL     ,OFF     ,EPSD    ,NPF     ,
+     .              TF      ,TIME    ,IOUT    ,ISTDO   ,
      .              SVM     ,PRESSURE,AREA    ,AL      ,
      .              F1      ,F2      ,F3      ,M1      ,M2      ,
      .              M3      ,ISMSTR  ,EXX     ,EXY     ,EXZ     ,
-     .              KXX     ,KYY     ,KZZ , DTIME    )
+     .              KXX     ,KYY     ,KZZ     ,DTIME  ,
+     .              NTABLE  ,TABLE   ,ELBUF_STR%GBUF%PLA , SIGY  )
 c
         ! Compute damaged forces
         IF (ELBUF_STR%GBUF%G_DMGSCL > 0) THEN 
           DO I = 1,NEL
-            F1(I) = F1(I)*(ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-            F2(I) = F2(I)*(ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-            F3(I) = F3(I)*(ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-            M1(I) = M1(I)*(ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-            M2(I) = M2(I)*(ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))
-            M3(I) = M3(I)*(ONE - ELBUF_STR%GBUF%FAIL(1)%DAMMX(I))        
+            F1(I) = F1(I)*ELBUF_STR%GBUF%DMGSCL(I)
+            F2(I) = F2(I)*ELBUF_STR%GBUF%DMGSCL(I)
+            F3(I) = F3(I)*ELBUF_STR%GBUF%DMGSCL(I)
+            M1(I) = M1(I)*ELBUF_STR%GBUF%DMGSCL(I)
+            M2(I) = M2(I)*ELBUF_STR%GBUF%DMGSCL(I)
+            M3(I) = M3(I)*ELBUF_STR%GBUF%DMGSCL(I)     
           ENDDO
         ENDIF
 c

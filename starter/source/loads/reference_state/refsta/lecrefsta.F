@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecrefsta        ../starter/source/loads/reference_state/refsta/lecrefsta.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../starter/source/output/message/message.F
-      !||    r2r_sys          ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    usr2sys          ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
-      !||    refsta_mod       ../starter/share/modules1/refsta_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecrefsta        ../starter/source/loads/reference_state/refsta/lecrefsta.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../starter/source/output/message/message.F
+!||    r2r_sys          ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    usr2sys          ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+!||    refsta_mod       ../starter/share/modules1/refsta_mod.F
+!||====================================================================
       SUBROUTINE LECREFSTA(ITABM1  ,UNITAB,IXC   ,IXTG  ,IXS   ,
      .                     XYZREF  ,XREFC ,XREFTG,XREFS ,TAGNOD,
      .                     IDDLEVEL,TAGREF )
@@ -44,6 +44,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE REFSTA_MOD , ONLY : RS0_FMT
       USE READER_OLD_MOD , ONLY : LINE
+      use element_mod , only : nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,8 +70,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I,J,IE,IN,ID,NN,IFLAGUNIT,NNOD
-      my_real XX,YY,ZZ,FAC_L
+      INTEGER  IE, IN, ID, NN, NNOD
+      my_real XX, YY, ZZ
       CHARACTER MESS*40
       DATA MESS/'REFSTA'/      
 C-----------------------------------------------
@@ -79,7 +80,7 @@ C-----------------------------------------------
       INTEGER USR2SYS,R2R_SYS
 C=======================================================================
 C--------------------------------------                              
-C  LECTURE DES NOEUDS ETAT DE REFERENCE
+C  READING OF REFERENCE STATE NODES
 C--------------------------------------
       IF(IDDLEVEL == 0) THEN
         WRITE(IOUT,1000)

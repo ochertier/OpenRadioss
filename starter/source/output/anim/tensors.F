@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tensors        ../starter/source/output/anim/tensors.F
-      !||--- called by ------------------------------------------------------
-      !||    genani1        ../starter/source/output/anim/genani1.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf        ../starter/source/output/anim/initbuf.F
-      !||    srota6         ../starter/source/output/anim/srota6.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    tensors        ../starter/source/output/anim/tensors.F
+!||--- called by ------------------------------------------------------
+!||    genani1        ../starter/source/output/anim/genani1.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf        ../starter/source/output/anim/initbuf.F
+!||    srota6         ../starter/source/output/anim/srota6.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TENSORS(ELBUF_TAB,IPARG   ,ITENS   ,IXS     ,PM      ,    
      2                   EL2FA   ,NBF     ,TENS    ,                      
      3                   X       ,IPART   ,IPARTSP ,ISPH3D  ,IPM     )                      
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixs    
 C-----------------------------------------------                        
 C   I m p l i c i t   T y p e s                                         
 C-----------------------------------------------                        
@@ -126,7 +127,7 @@ C             STRESS TENSOR IN GLOBAL SYSTEM
               DO I=LFT,LLT                                               
                 N = I + NFT                                              
                 IF(EL2FA(NN2+N)/=0)THEN                                
-C                 pour JHBE=14, valeurs moyennes est dans rep. corota.
+C                 For jhbe = 14, average values is in rep.Corota.
                   IF (KCVT==2.AND.JHBE/=14) THEN
                     GAMA(1)=GBUF%GAMA(JJ(1) + I)
                     GAMA(2)=GBUF%GAMA(JJ(2) + I)
@@ -142,7 +143,7 @@ C                 pour JHBE=14, valeurs moyennes est dans rep. corota.
                     GAMA(5)=ONE                                           
                     GAMA(6)=ZERO                                         
                   END IF                                                 
-                  CALL SROTA6(X,IXS(1,N),KCVT,EVAR(1,I),GAMA)                                    
+                  CALL SROTA6(X,IXS(1:NIXS,N),KCVT,EVAR(1:6,I),GAMA)                                    
                 ENDIF                                                    
               ENDDO                                                      
             ENDIF                                                       
@@ -381,7 +382,7 @@ C             DAMAGE IN GLOBAL SYSTEM
                     GAMA(5)=ONE                                           
                     GAMA(6)=ZERO                                         
                   END IF                                                 
-                  CALL SROTA6(X,IXS(1,N),KCVT,EVAR(1,I),GAMA)                                    
+                  CALL SROTA6(X,IXS(1:NIXS,N),KCVT,EVAR(1:6,I),GAMA)                                    
                 ENDIF                                                    
               ENDDO                                                      
             ENDIF                                                        

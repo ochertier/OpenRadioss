@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    szderi3     ../engine/source/elements/solid/solidez/szderi3.F
-      !||--- called by ------------------------------------------------------
-      !||    szforc3     ../engine/source/elements/solid/solidez/szforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    schkjabt3   ../engine/source/elements/solid/solide4/schkjabt3.F
-      !||====================================================================
+!||====================================================================
+!||    szderi3     ../engine/source/elements/solid/solidez/szderi3.F
+!||--- called by ------------------------------------------------------
+!||    szforc3     ../engine/source/elements/solid/solidez/szforc3.F
+!||--- calls      -----------------------------------------------------
+!||    schkjabt3   ../engine/source/elements/solid/solide4/schkjabt3.F
+!||====================================================================
       SUBROUTINE SZDERI3(
      1   OFF,     DET,     NGL,     ISMSTR,
      2   X1,      X2,      X3,      X4,
@@ -59,6 +59,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: JLAG
       INTEGER :: ISMSTR,NEL,NGL(*)
+C     ENSURE DOUBLE-PRECISION (64-BIT) FLOATING-POINT CALCULATIONS, EVEN WHEN COMPILING IN SINGLE-PRECISION MODE.
       DOUBLE PRECISION
      .   X1(*), X2(*), X3(*), X4(*), X5(*), X6(*), X7(*), X8(*),
      .   Y1(*), Y2(*), Y3(*), Y4(*), Y5(*), Y6(*), Y7(*), Y8(*),  
@@ -92,6 +93,8 @@ C
      .   Y_17_46 , Y_28_35 ,
      .   Z_17_46 , Z_28_35 ,
      .   HX,HY,HZ
+
+C     ENSURE DOUBLE-PRECISION (64-BIT) FLOATING-POINT CALCULATIONS, EVEN WHEN COMPILING IN SINGLE-PRECISION MODE.
       DOUBLE PRECISION
      .   X17 , X28 , X35 , X46,
      .   Y17 , Y28 , Y35 , Y46,
@@ -316,13 +319,13 @@ C -1 1 -1 1 1 -1 1 -1
       RETURN
 C
       END SUBROUTINE SZDERI3
-      !||====================================================================
-      !||    szderit3   ../engine/source/elements/solid/solidez/szderi3.F
-      !||--- called by ------------------------------------------------------
-      !||    szforc3    ../engine/source/elements/solid/solidez/szforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    schkjab3   ../engine/source/elements/solid/solide/schkjab3.F
-      !||====================================================================
+!||====================================================================
+!||    szderit3   ../engine/source/elements/solid/solidez/szderi3.F
+!||--- called by ------------------------------------------------------
+!||    szforc3    ../engine/source/elements/solid/solidez/szforc3.F
+!||--- calls      -----------------------------------------------------
+!||    schkjab3   ../engine/source/elements/solid/solide/schkjab3.F
+!||====================================================================
       SUBROUTINE SZDERIT3(
      1   OFF,     DET,     NGL,     NEL,
      2   X1,      X2,      X3,      X4,
@@ -516,11 +519,11 @@ C -1 1 -1 1 1 -1 1 -1
       RETURN
 C
       END SUBROUTINE SZDERIT3
-      !||====================================================================
-      !||    szderito3   ../engine/source/elements/solid/solidez/szderi3.F
-      !||--- called by ------------------------------------------------------
-      !||    szforc3     ../engine/source/elements/solid/solidez/szforc3.F
-      !||====================================================================
+!||====================================================================
+!||    szderito3   ../engine/source/elements/solid/solidez/szderi3.F
+!||--- called by ------------------------------------------------------
+!||    szforc3     ../engine/source/elements/solid/solidez/szforc3.F
+!||====================================================================
       SUBROUTINE SZDERITO3(
      1   OFF,     DET,     PX1,     PX2,
      2   PX3,     PX4,     PY1,     PY2,

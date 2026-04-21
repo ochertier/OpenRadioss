@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ini_eos_vars           ../starter/source/elements/elbuf_init/ini_eos_vars.F
-      !||--- called by ------------------------------------------------------
-      !||    read_material_models   ../starter/source/materials/read_material_models.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ini_eos_vars           ../starter/source/elements/elbuf_init/ini_eos_vars.F
+!||--- called by ------------------------------------------------------
+!||    read_material_models   ../starter/source/materials/read_material_models.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
+!||====================================================================
       SUBROUTINE INI_EOS_VARS(EOS_TAG)
 C-----------------------------------------------
 C     M o d u l e s
@@ -43,7 +43,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER                 :: ILAW,IEOS
+      INTEGER                 :: IEOS
       TYPE(EOS_TAG_), POINTER :: ETAG
 C=======================================================================
 C     Set default variables used in all equation of state (eos)
@@ -52,17 +52,18 @@ C=======================================================================
       DO IEOS = 0,MAXEOS
         ETAG => EOS_TAG(IEOS)
 
-        ETAG%G_MU     = 0
-        ETAG%G_TB     = 0
-        ETAG%G_ABURN  = 0
-        ETAG%G_BFRAC  = 0
+        ETAG%G_MU    = 0
+        ETAG%G_TB    = 0
+        ETAG%G_ABURN = 0
+        ETAG%G_BFRAC = 0
 
-        ETAG%L_MU     = 0
-        ETAG%L_TB     = 0
-        ETAG%L_ABURN  = 0
-        ETAG%L_BFRAC  = 0
+        ETAG%L_MU    = 0
+        ETAG%L_TB    = 0
+        ETAG%L_ABURN = 0
+        ETAG%L_BFRAC = 0
         
-        ETAG%NVAR     = 0
+        ETAG%NVAR    = 0
+        ETAG%NVARTMP = 0
       ENDDO
 
 C-----------------------------------------------

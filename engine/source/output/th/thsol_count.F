@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thsol_count   ../engine/source/output/th/thsol_count.F
-      !||--- called by ------------------------------------------------------
-      !||    init_th       ../engine/source/output/th/init_th.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar          ../engine/source/input/nvar.F
-      !||====================================================================
+!||====================================================================
+!||    thsol_count   ../engine/source/output/th/thsol_count.F
+!||--- called by ------------------------------------------------------
+!||    init_th       ../engine/source/output/th/init_th.F
+!||====================================================================
       SUBROUTINE THSOL_COUNT(NTHGRP2 , ITHGRP , WA_SIZE, INDEX_WA_SOL,
      .                 IPARG   ,ITHBUF  ,SITHBUF)
 C-----------------------------------------------
@@ -41,7 +39,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -56,11 +53,11 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL :: BOOL
-      INTEGER II,I,J,JJ,K,L,N, IH, NG, MTE,LWA,NEL,
-     .   NUVAR, IP,IPT,ISOLNOD,ITENS,IPWWA,ISPAU,IUWWA,
-     .   IT,IR,IS,J1,J2,J3,NPTG,NPTR,NPTT,NPTS,NLAY,NFAIL,NVARF,
-     .   NC1,NC2,NC3,NC4,NC5,NC6,NC7,NC8,KHBE,KCVT,NUVARTH,
-     .   CPT,PID,ISVIS,TSHELL,TSH_ORT,ICSIG,IVISC,NPTL,IL,KK(6)
+      INTEGER II,I,J,K,N, IH, NG, MTE,NEL,
+     .    IP,
+     .   
+     .   
+     .   ISVIS,IVISC(6)
       INTEGER :: J_FIRST,NITER,IADB,NN,IADV,NVAR,ITYP,IJK
       INTEGER, DIMENSION(NTHGRP2) :: INDEX_SOL
 
@@ -103,12 +100,10 @@ c
 
                                     IF (K == N)THEN
                                         IH=IH+1
-                                        IF (IMACH == 3) THEN
-                                            II = ((IH-1) - IADB)*NVAR
-                                            DO WHILE((ITHBUF(IH+NN) /= ISPMD).AND.(IH < IADB+NN))
-                                                IH = IH + 1
-                                            ENDDO
-                                        ENDIF
+                                        II = ((IH-1) - IADB)*NVAR
+                                        DO WHILE((ITHBUF(IH+NN) /= ISPMD).AND.(IH < IADB+NN))
+                                            IH = IH + 1
+                                        ENDDO
                                         IF (IH > IADB+NN) GOTO 666
                                         WA_SIZE = WA_SIZE + NVAR + 1
                                     ENDIF   ! element = ITHBUF()

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,226 +20,233 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ddsplit                  ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    c_bufel                  ../starter/source/restart/ddsplit/c_bufel.F
-      !||    c_cluster                ../starter/source/restart/ddsplit/w_cluster.F
-      !||    c_crkadd                 ../starter/source/restart/ddsplit/c_crkadd.F
-      !||    c_crkedge                ../starter/source/restart/ddsplit/c_crkedge.F
-      !||    c_crkxfem                ../starter/source/restart/ddsplit/c_crkxfem.F
-      !||    c_dampvrel               ../starter/source/restart/ddsplit/c_dampvrel.F
-      !||    c_drape                  ../starter/source/restart/ddsplit/c_drape.F
-      !||    c_eig                    ../starter/source/restart/ddsplit/c_eig.F
-      !||    c_elig3d                 ../starter/source/restart/ddsplit/c_elig3d.F
-      !||    c_elmx                   ../starter/source/restart/ddsplit/c_elmx.F
-      !||    c_eltloc                 ../starter/source/restart/ddsplit/c_eltloc.F
-      !||    c_fasolfr                ../starter/source/restart/ddsplit/c_idglob.F
-      !||    c_front                  ../starter/source/restart/ddsplit/c_front.F
-      !||    c_fvbag                  ../starter/source/airbag/c_fvbag.F
-      !||    c_fxbody1                ../starter/source/restart/ddsplit/c_fxbody.F
-      !||    c_fxbody2                ../starter/source/restart/ddsplit/c_fxbody.F
-      !||    c_fxbody3                ../starter/source/restart/ddsplit/c_fxbody.F
-      !||    c_fxbody4                ../starter/source/restart/ddsplit/c_fxbody.F
-      !||    c_group_str              ../starter/source/restart/ddsplit/c_group_str.F
-      !||    c_ibcl                   ../starter/source/restart/ddsplit/c_ibcl.F
-      !||    c_ibcscyc                ../starter/source/restart/ddsplit/c_ibcscyc.F
-      !||    c_ibft                   ../starter/source/restart/ddsplit/c_ibft.F
-      !||    c_ibfv                   ../starter/source/restart/ddsplit/c_ibfv.F
-      !||    c_ibmpc                  ../starter/source/restart/ddsplit/c_ibmpc.F
-      !||    c_ibvel                  ../starter/source/restart/ddsplit/c_ibvel.F
-      !||    c_icfield                ../starter/source/restart/ddsplit/c_icfield.F
-      !||    c_icnds10                ../starter/source/restart/ddsplit/c_icnds10.F
-      !||    c_iconv                  ../starter/source/restart/ddsplit/c_iconv.F
-      !||    c_idglob                 ../starter/source/restart/ddsplit/c_idglob.F
-      !||    c_iebcs                  ../starter/source/restart/ddsplit/c_iebcs.F
-      !||    c_igrav                  ../starter/source/restart/ddsplit/c_igrav.F
-      !||    c_iloadp                 ../starter/source/restart/ddsplit/c_iloadp.F
-      !||    c_inivell                ../starter/source/restart/ddsplit/c_inivell.F90
-      !||    c_iradia                 ../starter/source/restart/ddsplit/c_iradia.F
-      !||    c_irbe2                  ../starter/source/restart/ddsplit/c_irbe2.F
-      !||    c_irbe3                  ../starter/source/restart/ddsplit/c_irbe3.F
-      !||    c_islin_str              ../starter/source/restart/ddsplit/c_islin_str.F
-      !||    c_isph                   ../starter/source/restart/ddsplit/c_isph.F
-      !||    c_isurf_str              ../starter/source/restart/ddsplit/c_isurf_str.F
-      !||    c_ithflux                ../starter/source/restart/ddsplit/c_ithflux.F
-      !||    c_ixfloc                 ../starter/source/restart/ddsplit/c_ixfloc.F
-      !||    c_joint_sms              ../starter/source/constraints/general/cyl_joint/write_count_joint_sms.F
-      !||    c_lag                    ../starter/source/restart/ddsplit/c_lag.F
-      !||    c_llink                  ../starter/source/restart/ddsplit/c_llink.F
-      !||    c_mad                    ../starter/source/restart/ddsplit/c_mad.F
-      !||    c_multi_vel              ../starter/source/restart/ddsplit/c_multi_vel.F
-      !||    c_ncrkxfem               ../starter/source/restart/ddsplit/c_ncrkxfem.F
-      !||    c_ngroup                 ../starter/source/restart/ddsplit/c_ngroup.F
-      !||    c_nloads                 ../starter/source/restart/ddsplit/c_nloads.F
-      !||    c_pon                    ../starter/source/restart/ddsplit/c_pon.F
-      !||    c_poro                   ../starter/source/restart/ddsplit/c_poro.F
-      !||    c_pxfem                  ../starter/source/restart/ddsplit/c_pxfem.F
-      !||    c_rbyk                   ../starter/source/restart/ddsplit/c_rbyk.F
-      !||    c_rbymk                  ../starter/source/restart/ddsplit/c_rbymk.F
-      !||    c_rwall                  ../starter/source/restart/ddsplit/c_rwall.F
-      !||    c_seatbelts              ../starter/source/restart/ddsplit/c_seatbelts.F
-      !||    c_sectio                 ../starter/source/restart/ddsplit/c_sectio.F
-      !||    c_segquadfr              ../starter/source/restart/ddsplit/c_segquadfr.F
-      !||    c_spmd_ne_connect        ../starter/source/ale/spmd_ne_connect.F
-      !||    c_vois                   ../starter/source/restart/ddsplit/c_vois.F
-      !||    eigwrestp                ../starter/source/restart/ddsplit/wrrest.F
-      !||    elapstime_omp            ../starter/source/system/timer.F
-      !||    f_nodloc2                ../starter/source/restart/ddsplit/f_nodloc2.F
-      !||    fvwrestp                 ../starter/source/restart/ddsplit/fvwrestp.F
-      !||    fxbwrestp                ../starter/source/restart/ddsplit/wrrest.F
-      !||    iface                    ../starter/source/ale/ale3d/iface.F
-      !||    iface2                   ../starter/source/ale/ale3d/iface.F
-      !||    intbuf_ini_starter       ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
-      !||    intstamp_wresti          ../starter/share/modules1/intstamp_mod.F
-      !||    intstamp_wrestr          ../starter/share/modules1/intstamp_mod.F
-      !||    ipari_l_ini              ../starter/source/restart/ddsplit/ipari_l_ini.F
-      !||    m_flow                   ../starter/source/restart/ddsplit/m_flow.F
-      !||    nfwrestp                 ../starter/source/restart/ddsplit/wrrest.F
-      !||    setlenwa                 ../starter/source/restart/ddsplit/setlenwa.F
-      !||    split_ebcs               ../starter/source/boundary_conditions/ebcs/split_ebcs.F
-      !||    split_interfaces         ../starter/source/restart/ddsplit/split_interfaces.F
-      !||    split_skew               ../starter/source/restart/ddsplit/split_skew.F
-      !||    spmd_ne_connect          ../starter/source/ale/spmd_ne_connect.F
-      !||    spmd_userwi_rest         ../starter/source/user_interface/user_windows_tools.F
-      !||    startime                 ../starter/source/system/timer.F
-      !||    stoptime                 ../starter/source/system/timer.F
-      !||    table_wresti             ../starter/source/tools/curve/table_tools.F
-      !||    table_wrestr             ../starter/source/tools/curve/table_tools.F
-      !||    w_alelag                 ../starter/source/restart/ddsplit/w_alelag.F
-      !||    w_anim_crk               ../starter/source/restart/ddsplit/w_anim_crk.F
-      !||    w_anim_ply               ../starter/source/restart/ddsplit/w_anim_ply.F
-      !||    w_avuply                 ../starter/source/restart/ddsplit/w_avuply.F
-      !||    w_bcs_proc               ../starter/source/restart/ddsplit/w_bcs_proc.F90
-      !||    w_bid                    ../starter/source/restart/ddsplit/w_bid.F
-      !||    w_bufbric_22             ../starter/source/interfaces/inter3d1/w_bufbric_22.F
-      !||    w_bufel                  ../starter/source/restart/ddsplit/w_bufel.F
-      !||    w_cluster                ../starter/source/restart/ddsplit/w_cluster.F
-      !||    w_crkxfem                ../starter/source/restart/ddsplit/w_crkxfem.F
-      !||    w_dampvrel               ../starter/source/restart/ddsplit/w_dampvrel.F
-      !||    w_disp0_vel0_cload       ../starter/source/restart/ddsplit/w_disp0_vel0_cload.F
-      !||    w_drape                  ../starter/source/restart/ddsplit/w_drape.F
-      !||    w_elbuf_str              ../starter/source/restart/ddsplit/w_elbuf_str.F
-      !||    w_elig3d                 ../starter/source/restart/ddsplit/w_elig3d.F
-      !||    w_elmx                   ../starter/source/restart/ddsplit/w_elmx.F
-      !||    w_fac                    ../starter/source/restart/ddsplit/w_fac.F
-      !||    w_failwave               ../starter/source/restart/ddsplit/w_failwave.F
-      !||    w_fasolfr                ../starter/source/restart/ddsplit/w_fasolfr.F
-      !||    w_fbft                   ../starter/source/restart/ddsplit/w_fbft.F
-      !||    w_fconv                  ../starter/source/restart/ddsplit/w_fconv.F
-      !||    w_fi                     ../starter/source/restart/ddsplit/w_fi.F
-      !||    w_fixvel                 ../starter/source/restart/ddsplit/w_fixvel.F
-      !||    w_fradia                 ../starter/source/restart/ddsplit/w_fradia.F
-      !||    w_frbe3                  ../starter/source/restart/ddsplit/w_frbe3.F
-      !||    w_front                  ../starter/source/restart/ddsplit/w_front.F
-      !||    w_fsph                   ../starter/source/restart/ddsplit/w_fsph.F
-      !||    w_fthflux                ../starter/source/restart/ddsplit/w_fthflux.F
-      !||    w_geo                    ../starter/source/restart/ddsplit/w_geo.F
-      !||    w_gjoint                 ../starter/source/restart/ddsplit/w_gjoint.F
-      !||    w_group_str              ../starter/source/restart/ddsplit/w_group_str.F
-      !||    w_ibcl                   ../starter/source/restart/ddsplit/w_ibcl.F
-      !||    w_ibcscyc                ../starter/source/restart/ddsplit/w_ibcscyc.F
-      !||    w_ibft                   ../starter/source/restart/ddsplit/w_ibft.F
-      !||    w_ibfv                   ../starter/source/restart/ddsplit/w_ibfv.F
-      !||    w_ibmpc                  ../starter/source/restart/ddsplit/w_ibmpc.F
-      !||    w_ibvel                  ../starter/source/restart/ddsplit/w_ibvel.F
-      !||    w_icfield                ../starter/source/restart/ddsplit/w_icfield.F
-      !||    w_icnds10                ../starter/source/restart/ddsplit/w_icnds10.F
-      !||    w_iconv                  ../starter/source/restart/ddsplit/w_iconv.F
-      !||    w_ieloc                  ../starter/source/restart/ddsplit/w_ieloc.F
-      !||    w_igrav                  ../starter/source/restart/ddsplit/w_igrav.F
-      !||    w_iloadp                 ../starter/source/restart/ddsplit/w_iloadp.F
-      !||    w_ing2loc                ../starter/source/restart/ddsplit/w_ing2loc.F
-      !||    w_inivel_str             ../starter/source/restart/ddsplit/w_inivel_str.F90
-      !||    w_inloc                  ../starter/source/restart/ddsplit/w_inloc.F
-      !||    w_iparg                  ../starter/source/restart/ddsplit/w_iparg.F
-      !||    w_iradia                 ../starter/source/restart/ddsplit/w_iradia.F
-      !||    w_irbe2                  ../starter/source/restart/ddsplit/w_irbe2.F
-      !||    w_irbe3                  ../starter/source/restart/ddsplit/w_irbe3.F
-      !||    w_irivet                 ../starter/source/restart/ddsplit/w_irivet.F
-      !||    w_iskewsp                ../starter/source/restart/ddsplit/w_iskewsp.F
-      !||    w_iskn                   ../starter/source/restart/ddsplit/w_iskn.F
-      !||    w_islin_str              ../starter/source/restart/ddsplit/w_islin_str.F
-      !||    w_isph                   ../starter/source/restart/ddsplit/w_isph.F
-      !||    w_isurf_str              ../starter/source/restart/ddsplit/w_isurf_str.F
-      !||    w_itabm1                 ../starter/source/restart/ddsplit/w_itabm1.F
-      !||    w_ithflux                ../starter/source/restart/ddsplit/w_ithflux.F
-      !||    w_ixaloc                 ../starter/source/restart/ddsplit/w_ixaloc.F
-      !||    w_ixbloc                 ../starter/source/restart/ddsplit/w_ixbloc.F
-      !||    w_ixloc                  ../starter/source/restart/ddsplit/w_ixloc.F
-      !||    w_joint_sms              ../starter/source/constraints/general/cyl_joint/write_count_joint_sms.F
-      !||    w_knotloc                ../starter/source/restart/ddsplit/w_knotloc.F
-      !||    w_lacc                   ../starter/source/restart/ddsplit/w_lacc.F
-      !||    w_las                    ../starter/source/restart/ddsplit/w_las.F
-      !||    w_lgau                   ../starter/source/restart/ddsplit/w_lgau.F
-      !||    w_llink                  ../starter/source/restart/ddsplit/w_llink.F
-      !||    w_mad                    ../starter/source/restart/ddsplit/w_mad.F
-      !||    w_main_proc_weight       ../starter/source/restart/ddsplit/w_master_proc_weight.F
-      !||    w_monvol                 ../starter/source/restart/ddsplit/w_monvol.F
-      !||    w_outmaxn                ../starter/source/restart/ddsplit/w_outmaxn.F
-      !||    w_ply_info               ../starter/source/restart/ddsplit/w_ply_info.F
-      !||    w_pon                    ../starter/source/restart/ddsplit/w_pon.F
-      !||    w_poro                   ../starter/source/restart/ddsplit/w_poro.F
-      !||    w_pxfem                  ../starter/source/restart/ddsplit/w_pxfem.F
-      !||    w_r3nloc                 ../starter/source/restart/ddsplit/w_r3nloc.F
-      !||    w_rbyk                   ../starter/source/restart/ddsplit/w_rbyk.F
-      !||    w_rbymk                  ../starter/source/restart/ddsplit/w_rbymk.F
-      !||    w_reloc                  ../starter/source/restart/ddsplit/w_reloc.F
-      !||    w_reloc2                 ../starter/source/restart/ddsplit/w_reloc2.F
-      !||    w_rfilloc                ../starter/source/restart/ddsplit/w_rfilloc.F
-      !||    w_rnloc                  ../starter/source/restart/ddsplit/w_rnloc.F
-      !||    w_rnnloc                 ../starter/source/restart/ddsplit/w_rnnloc.F
-      !||    w_rsph                   ../starter/source/restart/ddsplit/w_rsph.F
-      !||    w_rwall                  ../starter/source/restart/ddsplit/w_rwall.F
-      !||    w_rwar                   ../starter/source/restart/ddsplit/w_rwar.F
-      !||    w_seatbelts              ../starter/source/restart/ddsplit/w_seatbelts.F
-      !||    w_secbuf                 ../starter/source/restart/ddsplit/w_secbuf.F
-      !||    w_sectio                 ../starter/source/restart/ddsplit/w_sectio.F
-      !||    w_segquadfr              ../starter/source/restart/ddsplit/w_segquadfr.F
-      !||    w_skwsph                 ../starter/source/restart/ddsplit/w_skwsph.F
-      !||    w_skwsub                 ../starter/source/restart/ddsplit/w_skwsub.F
-      !||    w_stack                  ../starter/source/restart/ddsplit/w_stack.F
-      !||    w_subset_str             ../starter/source/restart/ddsplit/w_subset_str.F
-      !||    w_tabmat_prop            ../starter/source/restart/ddsplit/w_tabmat_prop.F
-      !||    w_th_surf_loadp          ../starter/source/restart/ddsplit/w_th_surf_loadp.F
-      !||    w_th_surf_pload          ../starter/source/restart/ddsplit/w_th_surf_pload.F
-      !||    wrcomip                  ../starter/source/restart/ddsplit/wrcommp.F
-      !||    wrcomr                   ../starter/source/restart/ddsplit/wrcomm.F
-      !||    write_elgroup_param      ../starter/source/restart/ddsplit/write_elgroup_param.F
-      !||    write_joint              ../starter/source/constraints/general/cyl_joint/write_joint.F
-      !||    write_matparam           ../starter/source/materials/mat/write_matparam.F
-      !||    write_nloc_struct        ../starter/source/restart/ddsplit/write_nloc_struct.F
-      !||    write_pcyl               ../starter/source/loads/general/load_pcyl/write_pcyl.F
-      !||    write_sensors            ../starter/source/tools/sensor/write_sensors.F
-      !||    write_th_buffer          ../starter/source/restart/ddsplit/write_th_buffer.F
-      !||    wrweight_rm              ../starter/source/restart/ddsplit/wrweight_rm.F
-      !||--- uses       -----------------------------------------------------
-      !||    c_inivell_mod            ../starter/source/restart/ddsplit/c_inivell.F90
-      !||    cluster_mod              ../starter/share/modules1/cluster_mod.F
-      !||    constraint_mod           ../starter/source/modules/constaint_mod.F90
-      !||    drape_mod                ../starter/share/modules1/drape_mod.F
-      !||    dsgraph_mod              ../starter/share/modules1/dsgraph_mod.F
-      !||    front_mod                ../starter/share/modules1/front_mod.F
-      !||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
-      !||    intstamp_mod             ../starter/share/modules1/intstamp_mod.F
-      !||    joint_mod                ../starter/share/modules1/joint_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    mid_pid_mod              ../starter/share/modules1/mid_pid_mod.F
-      !||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
-      !||    split_cfd_mod            ../starter/share/modules1/split_cfd_mod.F
-      !||    stack_mod                ../starter/share/modules1/stack_mod.F
-      !||    stack_var_mod            ../starter/share/modules1/stack_var_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||    table_mod                ../starter/share/modules1/table_mod.F
-      !||    w_inivel_str_mod         ../starter/source/restart/ddsplit/w_inivel_str.F90
-      !||====================================================================
+!||====================================================================
+!||    ddsplit                          ../starter/source/restart/ddsplit/ddsplit.F
+!||--- called by ------------------------------------------------------
+!||    lectur                           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    c_bufel                          ../starter/source/restart/ddsplit/c_bufel.F
+!||    c_cluster                        ../starter/source/restart/ddsplit/w_cluster.F
+!||    c_crkadd                         ../starter/source/restart/ddsplit/c_crkadd.F
+!||    c_crkedge                        ../starter/source/restart/ddsplit/c_crkedge.F
+!||    c_crkxfem                        ../starter/source/restart/ddsplit/c_crkxfem.F
+!||    c_dampvrel                       ../starter/source/restart/ddsplit/c_dampvrel.F
+!||    c_drape                          ../starter/source/restart/ddsplit/c_drape.F
+!||    c_eig                            ../starter/source/restart/ddsplit/c_eig.F
+!||    c_elig3d                         ../starter/source/restart/ddsplit/c_elig3d.F
+!||    c_elmx                           ../starter/source/restart/ddsplit/c_elmx.F
+!||    c_eltloc                         ../starter/source/restart/ddsplit/c_eltloc.F
+!||    c_fasolfr                        ../starter/source/restart/ddsplit/c_idglob.F
+!||    c_front                          ../starter/source/restart/ddsplit/c_front.F
+!||    c_fvbag                          ../starter/source/airbag/c_fvbag.F
+!||    c_fxbody1                        ../starter/source/restart/ddsplit/c_fxbody.F
+!||    c_fxbody2                        ../starter/source/restart/ddsplit/c_fxbody.F
+!||    c_fxbody3                        ../starter/source/restart/ddsplit/c_fxbody.F
+!||    c_fxbody4                        ../starter/source/restart/ddsplit/c_fxbody.F
+!||    c_group_str                      ../starter/source/restart/ddsplit/c_group_str.F
+!||    c_ibcl                           ../starter/source/restart/ddsplit/c_ibcl.F
+!||    c_ibcscyc                        ../starter/source/restart/ddsplit/c_ibcscyc.F
+!||    c_ibft                           ../starter/source/restart/ddsplit/c_ibft.F
+!||    c_ibfv                           ../starter/source/restart/ddsplit/c_ibfv.F
+!||    c_ibmpc                          ../starter/source/restart/ddsplit/c_ibmpc.F
+!||    c_ibvel                          ../starter/source/restart/ddsplit/c_ibvel.F
+!||    c_icfield                        ../starter/source/restart/ddsplit/c_icfield.F
+!||    c_icnds10                        ../starter/source/restart/ddsplit/c_icnds10.F
+!||    c_iconv                          ../starter/source/restart/ddsplit/c_iconv.F
+!||    c_idglob                         ../starter/source/restart/ddsplit/c_idglob.F
+!||    c_iebcs                          ../starter/source/restart/ddsplit/c_iebcs.F
+!||    c_igrav                          ../starter/source/restart/ddsplit/c_igrav.F
+!||    c_iloadp                         ../starter/source/restart/ddsplit/c_iloadp.F
+!||    c_inivell                        ../starter/source/restart/ddsplit/c_inivell.F90
+!||    c_iradia                         ../starter/source/restart/ddsplit/c_iradia.F
+!||    c_irbe2                          ../starter/source/restart/ddsplit/c_irbe2.F
+!||    c_irbe3                          ../starter/source/restart/ddsplit/c_irbe3.F
+!||    c_islin_str                      ../starter/source/restart/ddsplit/c_islin_str.F
+!||    c_isph                           ../starter/source/restart/ddsplit/c_isph.F
+!||    c_isurf_str                      ../starter/source/restart/ddsplit/c_isurf_str.F
+!||    c_ithflux                        ../starter/source/restart/ddsplit/c_ithflux.F
+!||    c_ixfloc                         ../starter/source/restart/ddsplit/c_ixfloc.F
+!||    c_joint_sms                      ../starter/source/constraints/general/cyl_joint/write_count_joint_sms.F
+!||    c_lag                            ../starter/source/restart/ddsplit/c_lag.F
+!||    c_llink                          ../starter/source/restart/ddsplit/c_llink.F
+!||    c_mad                            ../starter/source/restart/ddsplit/c_mad.F
+!||    c_multi_vel                      ../starter/source/restart/ddsplit/c_multi_vel.F
+!||    c_ncrkxfem                       ../starter/source/restart/ddsplit/c_ncrkxfem.F
+!||    c_ngroup                         ../starter/source/restart/ddsplit/c_ngroup.F
+!||    c_nloads                         ../starter/source/restart/ddsplit/c_nloads.F
+!||    c_pon                            ../starter/source/restart/ddsplit/c_pon.F
+!||    c_poro                           ../starter/source/restart/ddsplit/c_poro.F
+!||    c_pxfem                          ../starter/source/restart/ddsplit/c_pxfem.F
+!||    c_rbyk                           ../starter/source/restart/ddsplit/c_rbyk.F
+!||    c_rbymk                          ../starter/source/restart/ddsplit/c_rbymk.F
+!||    c_rwall                          ../starter/source/restart/ddsplit/c_rwall.F
+!||    c_seatbelts                      ../starter/source/restart/ddsplit/c_seatbelts.F
+!||    c_sectio                         ../starter/source/restart/ddsplit/c_sectio.F
+!||    c_segquadfr                      ../starter/source/restart/ddsplit/c_segquadfr.F
+!||    c_sfem_exclude                   ../starter/source/restart/ddsplit/split_sfem_exclude.F90
+!||    c_spmd_ne_connect                ../starter/source/ale/spmd_ne_connect.F
+!||    c_vois                           ../starter/source/restart/ddsplit/c_vois.F
+!||    checksum_write_starter_restart   ../starter/source/output/checksum/checksum_option.F90
+!||    eigwrestp                        ../starter/source/restart/ddsplit/wrrest.F
+!||    elapstime_omp                    ../starter/source/system/timer.F
+!||    f_nodloc2                        ../starter/source/restart/ddsplit/f_nodloc2.F
+!||    fvwrestp                         ../starter/source/restart/ddsplit/fvwrestp.F
+!||    fxbwrestp                        ../starter/source/restart/ddsplit/wrrest.F
+!||    iface                            ../starter/source/ale/ale3d/iface.F
+!||    iface2                           ../starter/source/ale/ale3d/iface.F
+!||    intbuf_ini_starter               ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
+!||    intstamp_wresti                  ../starter/share/modules1/intstamp_mod.F
+!||    intstamp_wrestr                  ../starter/share/modules1/intstamp_mod.F
+!||    ipari_l_ini                      ../starter/source/restart/ddsplit/ipari_l_ini.F
+!||    m_flow                           ../starter/source/restart/ddsplit/m_flow.F
+!||    nfwrestp                         ../starter/source/restart/ddsplit/wrrest.F
+!||    setlenwa                         ../starter/source/restart/ddsplit/setlenwa.F
+!||    split_ebcs                       ../starter/source/boundary_conditions/ebcs/split_ebcs.F
+!||    split_interfaces                 ../starter/source/restart/ddsplit/split_interfaces.F
+!||    split_skew                       ../starter/source/restart/ddsplit/split_skew.F
+!||    spmd_ne_connect                  ../starter/source/ale/spmd_ne_connect.F
+!||    spmd_userwi_rest                 ../starter/source/user_interface/user_windows_tools.F
+!||    startime                         ../starter/source/system/timer.F
+!||    stoptime                         ../starter/source/system/timer.F
+!||    table_wresti                     ../starter/source/tools/curve/table_tools.F
+!||    table_wrestr                     ../starter/source/tools/curve/table_tools.F
+!||    w_alelag                         ../starter/source/restart/ddsplit/w_alelag.F
+!||    w_anim_crk                       ../starter/source/restart/ddsplit/w_anim_crk.F
+!||    w_anim_ply                       ../starter/source/restart/ddsplit/w_anim_ply.F
+!||    w_avuply                         ../starter/source/restart/ddsplit/w_avuply.F
+!||    w_bcs_proc                       ../starter/source/restart/ddsplit/w_bcs_proc.F90
+!||    w_bid                            ../starter/source/restart/ddsplit/w_bid.F
+!||    w_bufbric_22                     ../starter/source/interfaces/inter3d1/w_bufbric_22.F
+!||    w_bufel                          ../starter/source/restart/ddsplit/w_bufel.F
+!||    w_cluster                        ../starter/source/restart/ddsplit/w_cluster.F
+!||    w_crkxfem                        ../starter/source/restart/ddsplit/w_crkxfem.F
+!||    w_dampvrel                       ../starter/source/restart/ddsplit/w_dampvrel.F
+!||    w_disp0_vel0_cload               ../starter/source/restart/ddsplit/w_disp0_vel0_cload.F
+!||    w_drape                          ../starter/source/restart/ddsplit/w_drape.F
+!||    w_elbuf_str                      ../starter/source/restart/ddsplit/w_elbuf_str.F
+!||    w_elig3d                         ../starter/source/restart/ddsplit/w_elig3d.F
+!||    w_elmx                           ../starter/source/restart/ddsplit/w_elmx.F
+!||    w_fac                            ../starter/source/restart/ddsplit/w_fac.F
+!||    w_failwave                       ../starter/source/restart/ddsplit/w_failwave.F
+!||    w_fasolfr                        ../starter/source/restart/ddsplit/w_fasolfr.F
+!||    w_fbft                           ../starter/source/restart/ddsplit/w_fbft.F
+!||    w_fconv                          ../starter/source/restart/ddsplit/w_fconv.F
+!||    w_fi                             ../starter/source/restart/ddsplit/w_fi.F
+!||    w_fixvel                         ../starter/source/restart/ddsplit/w_fixvel.F
+!||    w_fradia                         ../starter/source/restart/ddsplit/w_fradia.F
+!||    w_frbe3                          ../starter/source/restart/ddsplit/w_frbe3.F
+!||    w_front                          ../starter/source/restart/ddsplit/w_front.F
+!||    w_fsph                           ../starter/source/restart/ddsplit/w_fsph.F
+!||    w_fthflux                        ../starter/source/restart/ddsplit/w_fthflux.F
+!||    w_geo                            ../starter/source/restart/ddsplit/w_geo.F
+!||    w_gjoint                         ../starter/source/restart/ddsplit/w_gjoint.F
+!||    w_group_str                      ../starter/source/restart/ddsplit/w_group_str.F
+!||    w_ibcl                           ../starter/source/restart/ddsplit/w_ibcl.F
+!||    w_ibcscyc                        ../starter/source/restart/ddsplit/w_ibcscyc.F
+!||    w_ibft                           ../starter/source/restart/ddsplit/w_ibft.F
+!||    w_ibfv                           ../starter/source/restart/ddsplit/w_ibfv.F
+!||    w_ibmpc                          ../starter/source/restart/ddsplit/w_ibmpc.F
+!||    w_ibvel                          ../starter/source/restart/ddsplit/w_ibvel.F
+!||    w_icfield                        ../starter/source/restart/ddsplit/w_icfield.F
+!||    w_icnds10                        ../starter/source/restart/ddsplit/w_icnds10.F
+!||    w_iconv                          ../starter/source/restart/ddsplit/w_iconv.F
+!||    w_ieloc                          ../starter/source/restart/ddsplit/w_ieloc.F
+!||    w_igrav                          ../starter/source/restart/ddsplit/w_igrav.F
+!||    w_iloadp                         ../starter/source/restart/ddsplit/w_iloadp.F
+!||    w_ing2loc                        ../starter/source/restart/ddsplit/w_ing2loc.F
+!||    w_inivel_str                     ../starter/source/restart/ddsplit/w_inivel_str.F90
+!||    w_inloc                          ../starter/source/restart/ddsplit/w_inloc.F
+!||    w_iparg                          ../starter/source/restart/ddsplit/w_iparg.F
+!||    w_iradia                         ../starter/source/restart/ddsplit/w_iradia.F
+!||    w_irbe2                          ../starter/source/restart/ddsplit/w_irbe2.F
+!||    w_irbe3                          ../starter/source/restart/ddsplit/w_irbe3.F
+!||    w_irivet                         ../starter/source/restart/ddsplit/w_irivet.F
+!||    w_iskewsp                        ../starter/source/restart/ddsplit/w_iskewsp.F
+!||    w_iskn                           ../starter/source/restart/ddsplit/w_iskn.F
+!||    w_islin_str                      ../starter/source/restart/ddsplit/w_islin_str.F
+!||    w_isph                           ../starter/source/restart/ddsplit/w_isph.F
+!||    w_isurf_str                      ../starter/source/restart/ddsplit/w_isurf_str.F
+!||    w_itabm1                         ../starter/source/restart/ddsplit/w_itabm1.F
+!||    w_ithflux                        ../starter/source/restart/ddsplit/w_ithflux.F
+!||    w_ixaloc                         ../starter/source/restart/ddsplit/w_ixaloc.F
+!||    w_ixbloc                         ../starter/source/restart/ddsplit/w_ixbloc.F
+!||    w_ixloc                          ../starter/source/restart/ddsplit/w_ixloc.F
+!||    w_joint_sms                      ../starter/source/constraints/general/cyl_joint/write_count_joint_sms.F
+!||    w_knotloc                        ../starter/source/restart/ddsplit/w_knotloc.F
+!||    w_lacc                           ../starter/source/restart/ddsplit/w_lacc.F
+!||    w_las                            ../starter/source/restart/ddsplit/w_las.F
+!||    w_lgau                           ../starter/source/restart/ddsplit/w_lgau.F
+!||    w_llink                          ../starter/source/restart/ddsplit/w_llink.F
+!||    w_mad                            ../starter/source/restart/ddsplit/w_mad.F
+!||    w_main_proc_weight               ../starter/source/restart/ddsplit/w_master_proc_weight.F
+!||    w_monvol                         ../starter/source/restart/ddsplit/w_monvol.F
+!||    w_outmaxn                        ../starter/source/restart/ddsplit/w_outmaxn.F
+!||    w_ply_info                       ../starter/source/restart/ddsplit/w_ply_info.F
+!||    w_pon                            ../starter/source/restart/ddsplit/w_pon.F
+!||    w_poro                           ../starter/source/restart/ddsplit/w_poro.F
+!||    w_pxfem                          ../starter/source/restart/ddsplit/w_pxfem.F
+!||    w_r3nloc                         ../starter/source/restart/ddsplit/w_r3nloc.F
+!||    w_rbyk                           ../starter/source/restart/ddsplit/w_rbyk.F
+!||    w_rbymk                          ../starter/source/restart/ddsplit/w_rbymk.F
+!||    w_reloc                          ../starter/source/restart/ddsplit/w_reloc.F
+!||    w_reloc2                         ../starter/source/restart/ddsplit/w_reloc2.F
+!||    w_rfilloc                        ../starter/source/restart/ddsplit/w_rfilloc.F
+!||    w_rnloc                          ../starter/source/restart/ddsplit/w_rnloc.F
+!||    w_rnnloc                         ../starter/source/restart/ddsplit/w_rnnloc.F
+!||    w_rsph                           ../starter/source/restart/ddsplit/w_rsph.F
+!||    w_rwall                          ../starter/source/restart/ddsplit/w_rwall.F
+!||    w_rwar                           ../starter/source/restart/ddsplit/w_rwar.F
+!||    w_seatbelts                      ../starter/source/restart/ddsplit/w_seatbelts.F
+!||    w_secbuf                         ../starter/source/restart/ddsplit/w_secbuf.F
+!||    w_sectio                         ../starter/source/restart/ddsplit/w_sectio.F
+!||    w_segquadfr                      ../starter/source/restart/ddsplit/w_segquadfr.F
+!||    w_sfem_exclude                   ../starter/source/restart/ddsplit/split_sfem_exclude.F90
+!||    w_skwsph                         ../starter/source/restart/ddsplit/w_skwsph.F
+!||    w_skwsub                         ../starter/source/restart/ddsplit/w_skwsub.F
+!||    w_stack                          ../starter/source/restart/ddsplit/w_stack.F
+!||    w_subset_str                     ../starter/source/restart/ddsplit/w_subset_str.F
+!||    w_tabmat_prop                    ../starter/source/restart/ddsplit/w_tabmat_prop.F
+!||    w_th_surf_loadp                  ../starter/source/restart/ddsplit/w_th_surf_loadp.F
+!||    w_th_surf_pload                  ../starter/source/restart/ddsplit/w_th_surf_pload.F
+!||    wrcomip                          ../starter/source/restart/ddsplit/wrcommp.F
+!||    wrcomr                           ../starter/source/restart/ddsplit/wrcomm.F
+!||    write_elgroup_param              ../starter/source/restart/ddsplit/write_elgroup_param.F
+!||    write_joint                      ../starter/source/constraints/general/cyl_joint/write_joint.F
+!||    write_matparam                   ../starter/source/materials/mat/write_matparam.F
+!||    write_nloc_struct                ../starter/source/restart/ddsplit/write_nloc_struct.F
+!||    write_pcyl                       ../starter/source/loads/general/load_pcyl/write_pcyl.F
+!||    write_sensors                    ../starter/source/tools/sensor/write_sensors.F
+!||    write_th_buffer                  ../starter/source/restart/ddsplit/write_th_buffer.F
+!||    wrweight_rm                      ../starter/source/restart/ddsplit/wrweight_rm.F
+!||--- uses       -----------------------------------------------------
+!||    c_inivell_mod                    ../starter/source/restart/ddsplit/c_inivell.F90
+!||    checksum_starter_option_mod      ../starter/source/output/checksum/checksum_option.F90
+!||    cluster_mod                      ../starter/share/modules1/cluster_mod.F
+!||    constraint_mod                   ../starter/source/modules/constaint_mod.F90
+!||    detonators_mod                   ../starter/share/modules1/detonators_mod.F
+!||    drape_mod                        ../starter/share/modules1/drape_mod.F
+!||    dsgraph_mod                      ../starter/share/modules1/dsgraph_mod.F
+!||    front_mod                        ../starter/share/modules1/front_mod.F
+!||    fvbag_mod                        ../starter/share/modules1/fvbag_mod.F
+!||    intstamp_mod                     ../starter/share/modules1/intstamp_mod.F
+!||    joint_mod                        ../starter/share/modules1/joint_mod.F
+!||    message_mod                      ../starter/share/message_module/message_mod.F
+!||    mid_pid_mod                      ../starter/share/modules1/mid_pid_mod.F
+!||    monvol_struct_mod                ../starter/share/modules1/monvol_struct_mod.F
+!||    split_cfd_mod                    ../starter/share/modules1/split_cfd_mod.F
+!||    split_sfem_exclude_mod           ../starter/source/restart/ddsplit/split_sfem_exclude.F90
+!||    stack_mod                        ../starter/share/modules1/stack_mod.F
+!||    stack_var_mod                    ../starter/share/modules1/stack_var_mod.F
+!||    submodel_mod                     ../starter/share/modules1/submodel_mod.F
+!||    table_mod                        ../starter/share/modules1/table_mod.F
+!||    w_bcs_proc_mod                   ../starter/source/restart/ddsplit/w_bcs_proc.F90
+!||    w_inivel_str_mod                 ../starter/source/restart/ddsplit/w_inivel_str.F90
+!||====================================================================
       SUBROUTINE DDSPLIT(
-     1   P            ,CEP          ,CEL           ,IGEO          ,MAT_ELEM    ,
+     1   P            ,CEP          ,CEL            ,IGEO         ,MAT_ELEM    ,
      2   IPM          ,ICODE        ,ISKEW          ,ISKN         ,INSEL       ,
      3   IBCSLAG      ,IPART        ,IPARTS         ,IPARTQ       ,IPARTC      ,
-     4   IPARTT       ,IPARTP       ,IPARTR         ,IPARTTG     ,
+     4   IPARTT       ,IPARTP       ,IPARTR         ,IPARTTG      ,DETONATORS  ,
      5   IPARTX       ,NPC          ,IXTG           ,GROUP_PARAM_TAB,
      6   IXTG6        ,IXS          ,IXS10          ,IXS20        ,IXS16       ,
      7   IXQ          ,IXC          ,IXT            ,IXP          ,IXR         ,
@@ -249,7 +256,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      B   LAS          ,LACCELM      ,NNLINK         ,LLLINK       ,
      C   IPARG        ,IGRAV        ,LGRAV          ,IBVEL        ,LBVEL       ,
      D   IACTIV       ,FACTIV       ,KINET          ,IPARI        ,NPRW        ,
-     E   LPRW         ,IEXMAD       ,NPBY        ,
+     E   LPRW         ,IEXMAD       ,NPBY           ,
      F   LPBY         ,IXRI         ,NSTRF          ,LJOINT       ,PORNOD      ,
      G   MONVOL       ,ICONTACT     ,LAGBUF         ,
      H   FR_IAD       ,X            ,D              ,V            ,VR          ,
@@ -329,7 +336,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D   KLOADPINTER  , LOADPINTER ,DGAPLOADINT     ,S_LOADPINTER, LEN_CEP ,DYNAIN_DATA,
      E   DRAPEG       ,USER_WINDOWS,OUTPUT          ,INTERFACES  ,NUMBER_LOAD_CYL,
      F   LOADS_PER_PROC, PYTHON    ,DPL0CLD         ,VEL0CLD     ,NAMES_AND_TITLES,
-     G   BCS_PER_PROC,constraint_struct,glob_therm  ,PBLAST)
+     G   BCS_PER_PROC,constraint_struct,glob_therm  ,PBLAST      ,RWSTIF_PEN,SLN_PEN,
+     H   IN_SFEM     , NE_SFEM )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -386,6 +394,12 @@ C-----------------------------------------------
       use glob_therm_mod
       use write_ale_grid_mod, only : write_ale_grid
       use PBLAST_MOD
+      USE DETONATORS_MOD , ONLY : DETONATORS_STRUCT_
+      use checksum_starter_option_mod, only : checksum_write_starter_restart
+      use w_bcs_proc_mod , only : w_bcs_proc
+      use element_mod , only : nixs,nixq,nixc,nixp,nixt,nixr,nixtg
+      use split_sfem_exclude_mod
+
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -432,7 +446,8 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB
       INTEGER, INTENT(IN) :: LEN_CEP !< size of CEP
-      INTEGER, DIMENSION(SCEL), INTENT(IN) :: CEL !< connectivity global element id --> local element 
+      INTEGER, DIMENSION(SCEL), INTENT(IN) :: CEL !< connectivity global element id --> local element
+      TYPE(DETONATORS_STRUCT_),INTENT(IN) :: DETONATORS !< detonators data structure
       INTEGER P,
      .        LIBAGALE, LENTHG, LENLAS, NPTS,LEN,
      .        LBUFMAT, LBUFGEO, LBUFSF, LENXLAS, LNOM_OPT,
@@ -565,15 +580,16 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSLIN)   :: IGRSLIN
       TYPE (PINCH) :: PINCH_DATA
 
+      INTEGER,INTENT(IN) :: SLN_PEN
+      my_real, DIMENSION(SLN_PEN), INTENT(IN   )  :: RWSTIF_PEN
       LOGICAL, INTENT(IN) :: FLAG_24_25
       INTEGER, INTENT(IN) :: NUMNOD_L
       INTEGER, INTENT(INOUT) :: NINDX_NM,NINDX_SCRT
       INTEGER, DIMENSION(*), INTENT(INOUT) :: INDX_NM,INDX_SCRT
       INTEGER, DIMENSION(*) :: TAG_NM,TAG_SCRATCH
-!       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
-!       INDX_XXX : size = NUMNOD
-!                 index of non-zero TAG_XXX value
-!                 used for optimize the initialization
+      INTEGER,INTENT(IN) :: NE_SFEM
+      INTEGER, DIMENSION(NE_SFEM), INTENT(IN   )  :: IN_SFEM
+!-----------------------------------------------
 !                 of TAG_XXX array (XXX = NM or SCRT for SCRATCH)
 !                 allocated array in lectur and threadprivate array
 !       NINDX_XXX : number of non-zero TAG_XXX value
@@ -623,7 +639,7 @@ C-----------------------------------------------
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
 !       INDX_xxx : integer ; dimension=NUMELxxx ; index for the surface
 !                  of the remote connected element
-!       FACE_ELM_xxx : integer ; dimension=(6/4/3*NUMELxxx,2) ; surface
+!       Face_elm_xxx: Integer;Dimension = (6/4/3*NUMELXXX, 2);surface
 !                  of the remote connected element
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
         TYPE(t_ebcs_tab), INTENT(INOUT) :: EBCS_TAB
@@ -668,7 +684,7 @@ C-----------------------------------------------
      .        EIGIPM_L(NEIPM,NEIG), LEIBUF_L, EIGIBUF_L(LEIBUF),
      .        IFLOW_L(LIFLOW), DD_LAGF(3,NSPMD+1),MY_ILEN,MY_RLEN,
      .        SKIPPON_L,LLRBE3_L,NSKYRBE3_L,
-     .        NRBE3_L,NBDDRBE3M,NSLARBM_L,NSKYRBMK,
+     .        NRBE3_L,NBDDRBE3M,NSLARBM_L,NSKYRBMK,NRBE3PEN_L,
      .        NRBYMKIN_L ,NBDDNRBYM,NSKTRBMK_L,NRBYMK_L,
      .        NSKYRBMK_L, LAG_SEC,
      .        NRBE2_L,LLRBE2_L,NBDDRBE2,NUMELCPXFE_L,NUMNODPXFE_L,
@@ -686,9 +702,9 @@ C-----------------------------------------------
      .        LENIGRBRIC_L,LENIGRQUAD_L,LENIGRSH4N_L,
      .        LENIGRTRUS_L,LENIGRBEAM_L,LENIGRSPRI_L,
      .        LENIGRSH3N_L,LENISURF_L,LENISLIN_L,NBCSCYC_L,LLBCSCYC_L,NS_DIFF,
-     .        N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,N_ANCHOR_REMOTE_SEND_L,
+     .        N_SLIPRING_L,N_RETRACTOR_L,N_GUIDED_CABLE_L,N_ANCHOR_REMOTE_L,N_ANCHOR_REMOTE_SEND_L,
      .        N_SEATBELT_L,N_SEATBELT_2D_L,NUMSH4N_L,NUMSH3N_L,NCLOAD_L,NPLOAD_L,
-     .        NDAMP_VREL_L,IDAMP_VREL_L(NDAMP),NINIVELT_L
+     .        NDAMP_VREL_L,IDAMP_VREL_L(NDAMP),NINIVELT_L,LRW_PEN_L,NRW_PEN_L
       INTEGER LWAMP_L  !< Size of Working area in Engine. Need for SPH
       INTEGER LWANMP_L !< Size of Working area in Engine. Need for SPH
       INTEGER NCONV_L,NFXTEMP_L,NRADIA_L,NFXFLUX_L
@@ -740,7 +756,7 @@ c SPH inlet spmd structure
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=4096) :: TMP_NAME
 C-----------------------------------------------
-C structure de fichier v44 a modifier
+C file structure v44 to modify
 C-----------------------------------------------
       INTEGER LHEADER,LVARINT,LVARREA,LMXVINT,LMXVREA,LEN_G,LEN_M,
      .        LEN_S,LEN_ADM,LEN_IG,LEN_PM
@@ -784,7 +800,7 @@ C-----------------------------------------------
       INTEGER (KIND=8) :: FILE_SIZE
       real(kind=8) :: SECS
 C
-      INTEGER NPINCH_L
+      INTEGER NPINCH_L,NE_SFEM_L
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       INTEGER, DIMENSION(:), ALLOCATABLE :: ELEMID_L
       INTEGER, DIMENSION(:), ALLOCATABLE :: NE_LERCVOIS  !(NE_NERVOIS)
@@ -795,6 +811,7 @@ C
       TYPE(t_ebcs_tab) :: EBCS_TAB_LOC,EBCS_TAB_LOC_2
       TYPE(t_connectivity_ext1) :: ee_connect_l
       LOGICAL :: IS_EBCS_PARALLEL
+      INTEGER :: ISHADOW !< shadowing option for detonators (Eikonal equation solver)
 C-----------------------------------------------
       TYPE(SEATBELT_REMOTE_NODES_STRUCT) ANCHOR_REMOTE_L,ANCHOR_REMOTE_SEND_L
 C-----------------------------------------------
@@ -838,14 +855,14 @@ C--------------------------------------------
       ISP0 = 0
       IF(P==1) ISP0 = 1
 C--------------------------------------------
-C Init Frontiere LAG MULT
+C Init boundary Lag Mult
 C--------------------------------------------
       DO PROC = 1, NSPMD+1
        DD_LAGF(1,PROC) = 0
        DD_LAGF(2,PROC) = 0
       END DO
 C--------------------------------------------
-C Tableaux numeration nodale
+C Node numbering tables
 C--------------------------------------------
       IF(NUMNOD_L>0) ALLOCATE(NODGLOB(NUMNOD_L))
       CALL F_NODLOC2(NUMNOD,P  ,NODGLOB,NODLOCAL,IGEO ,
@@ -905,7 +922,7 @@ C--------------------------------------------
         CALL C_CLUSTER(CLUSTERS,P-1,CEP,NCLUSTER_L,NUMLOCCLUSTER)
       ENDIF
 C--------------------------------------------
-C count neighbo elements CFD/ALE
+C count neighbor elements CFD/ALE
 C--------------------------------------------
       NSVOIS   = 0
       NQVOIS   = 0
@@ -921,7 +938,9 @@ C--------------------------------------------
       NESVOIS  = 0
       NE_NERVOIS  = 0
       NE_NESVOIS  = 0
-      IF (IALE + IEULER + GLOB_THERM%ITHERM + IALELAG > 0) THEN
+      ISHADOW = 0
+      IF(DETONATORS%IS_SHADOWING_REQUIRED) ISHADOW = 1
+      IF (IALE + IEULER + GLOB_THERM%ITHERM + IALELAG + ISHADOW > 0) THEN
         NUMEL = MAX(NUMELS,NUMELQ)
         NUMEL_L = MAX(NUMELS_L,NUMELQ_L)
         IF (MULTI_FVM%IS_USED .AND. N2D /= 0) THEN
@@ -933,9 +952,7 @@ C--------------------------------------------
      3              P-1     ,IXS    ,IXQ     ,IXTG,
      4              NERVOIS ,NESVOIS,NODLOCAL,NUMNOD_L,NUMEL_L,
      5              CEL, MULTI_FVM,ALE_ELM,SIZE_ALE_ELM)
-      ENDIF
-
-!     Node element connectivity
+!       Node element connectivity
         IF(ALE_CONNECTIVITY%has_ne_connect)THEN
           CALL C_SPMD_NE_CONNECT(ALE_CONNECTIVITY, P - 1, CEP, CEL,
      .                           NODGLOB, NODLOCAL,
@@ -943,7 +960,8 @@ C--------------------------------------------
      .                           NUMELS_L, NUMELQ_L, NUMELTG_L,
      .                           NE_NERVOIS, NE_NESVOIS,
      .                           NE_NSVOIS, NE_NQVOIS, NE_NTGVOIS)
-        ENDIF
+        ENDIF   
+      ENDIF
 C
 C--------------------------------------
 C     count ebcs (multifluid)
@@ -1015,7 +1033,7 @@ C        ALLOCATE
          IPT = 1
         ! --------------------
         ! loop over the ebcs, 3 cases :
-        ! (1) multifluid ebcs : parallel 
+        ! (1) multifluid ebcs : parallel
         ! (2) non-reflecting ebcs (/EBCS/NRF) : parallel
         ! (3) other ebcs  : sequential --> all the elements/nodes of the ebcs are on main processor
         ! for cases (1) & (2) : need to convert global id into local processor id
@@ -1049,11 +1067,11 @@ C        ALLOCATE
                   IPT = IPT + 1
                ENDDO
             ! ------------
-            ! parallel ebcs : /NRF /PROPERGOL
+            ! parallel ebcs : /NRF /PROPELLANT
             ELSEIF(IS_EBCS_PARALLEL)THEN
                NEBCS_PARALLEL = NEBCS_PARALLEL + 1
                ALLOCATE(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly, source = EBCS_TAB%tab(II)%poly)
-               IF(EBCS_TAB%tab(II)%poly%has_ielem) THEN     
+               IF(EBCS_TAB%tab(II)%poly%has_ielem) THEN
                     EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%nb_elem = IEBCS_NELEM_L(II)
                     IF (ALLOCATED(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%iface)) THEN
                        DEALLOCATE(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%iface)
@@ -1112,7 +1130,7 @@ C--------------------------------------
          ENDIF
       ENDIF
 C--------------------------------------
-c count buffer subset, groups, surfaces, lines
+c Count Buffer Subset, Groups, Surfaces, Lines
 C--------------------------------------
       LENIGRNOD_L = 0
       LENIGRBRIC_L = 0
@@ -1163,18 +1181,19 @@ c      stop CPU timer for IPARI_L_INI
       ENDIF
 
 C--------------------------------------------
-C count nodes RW
+C Count Nodes RW
 C--------------------------------------------
       NSLAW_L  = 0
       NESLAW_L = 0
       LWSAV_L  = 0
       NSKYRW_L = 0
+      LRW_PEN_L= 0
       IF(NRWALL > 0)
      1  CALL C_RWALL(NPRW    ,LPRW   ,RWL     ,
      2               CEP    ,P-1     ,NSLAW_L ,NESLAW_L,
-     3               LWSAV_L,NSKYRW_L)
+     3               LWSAV_L,NSKYRW_L,LRW_PEN_L,NRW_PEN_L)
 C--------------------------------------------
-C count Stockage Madymo
+C count Madymo storage
 C--------------------------------------------
       NMADSH4_L = 0
       NMADSH3_L = 0
@@ -1186,7 +1205,7 @@ C--------------------------------------------
      +  CALL C_MAD(IEXMAD,NMADSH4_L,NMADSH3_L,NMADSOL_L,NMADNOD_L,
      +             MADCL_NMADNOD_L,CEP      ,P-1      )
 C--------------------------------------------
-C count Nodes RBY
+C Count nodes rby
 C--------------------------------------------
       NSLARB_L = 0
       NSKYRBK_L = 0
@@ -1210,7 +1229,7 @@ C--------------------------------------------
      +  CALL C_SECTIO(NSTRF    ,CEP    ,P-1,NSTRF_L,
      +                LSECBUF_L,NNODT_L,NNODL_L)
 C--------------------------------------------
-C count Joints Cylindriques : already done
+C Count cylindrical joints: Already Done
 C--------------------------------------------
       LJOINT_L = 0
       IF(JOINT_SMS) THEN
@@ -1224,7 +1243,7 @@ C--------------------------------------------
         CALL C_PORO(PORNOD,P-1,NUMPOR_L,GEO)
       ENDIF
 C--------------------------------------------
-C count Buffer Element
+C Buffer element
 C--------------------------------------------
       CALL C_BUFEL(IPARG,P-1,LBUFEL_L)
 C--------------------------------------------
@@ -1238,7 +1257,7 @@ C--------------------------------------------
         INTBAG_L = INTBAG
       ENDIF
 C--------------------------------------
-C counts  Elem multi-brins
+C counts  Multi-wire element
 C--------------------------------------
       ISUMNX_L = 0
       IF (NUMELX_L>0)
@@ -1318,9 +1337,10 @@ C--------------------------------------
       LLRBE3_L=0
       NBDDRBE3M = 0
       NSKYRBE3_L = 0
+      NRBE3PEN_L=0
       IF (NRBE3>0)
      .   CALL C_IRBE3(IRBE3,LRBE3,NSKYRBE3_L,P-1,
-     .                NRBE3_L,LLRBE3_L ,NBDDRBE3M)
+     .                NRBE3_L,LLRBE3_L ,NBDDRBE3M,NRBE3PEN_L)
 C--------------------------------------
 C counts MPC
 C--------------------------------------
@@ -1331,7 +1351,7 @@ C--------------------------------------
         CALL C_IBMPC(IBMPC,IBMPC(INUM),IBMPC(IDDL),IBMPC(ISKW),DD_LAGF)
       END IF
 C--------------------------------------
-C counts nb of local elts 
+C counts nb of local elts
 C--------------------------------------
       NUMEL_L = NUMELS_L + NUMELQ_L + NUMELC_L + NUMELT_L + NUMELP_L
      +        + NUMELR_L + NUMELTG_L+ NUMELX_L + NUMSPH_L
@@ -1383,7 +1403,7 @@ C--------------------------------------------
 C counts and split FLEXIBLE BODY
 C--------------------------------------------
       IF (NFXBODY>0) THEN
-C Split arrays 
+C Split arrays
          CALL C_FXBODY1(
      .     FXBIPM,    FXBNOD,   NODLOCAL, IPARG,    FXBELM,
      .     LENNOD_L,  LENMOD_L, LENELM_L, LENSIG_L, P-1,
@@ -1441,14 +1461,16 @@ C--------------------------------------------
       N_SEATBELT_2D_L = 0
       N_SLIPRING_L = 0
       N_RETRACTOR_L = 0
+      N_GUIDED_CABLE_L = 0
       N_ANCHOR_REMOTE_L = 0
       N_ANCHOR_REMOTE_SEND_L = 0
       OFF = NUMELS + NUMELQ + NUMELC + NUMELT + NUMELP
 C
-      IF (NSLIPRING + NRETRACTOR > 0) THEN
+      IF (NSLIPRING + NRETRACTOR + NGUIDED_CABLE> 0) THEN
         CALL C_SEATBELTS(N_SLIPRING_L,N_RETRACTOR_L,P,NODLOCAL,ELBUF_TAB,
      .                   IPARG,N_ANCHOR_REMOTE_L,N_ANCHOR_REMOTE_SEND_L,ANCHOR_REMOTE_L,ANCHOR_REMOTE_SEND_L,
-     .                   N_SEATBELT_L,N_SEATBELT_2D_L,CEP,OFF)
+     .                   N_SEATBELT_L,N_SEATBELT_2D_L,CEP,OFF,
+     .                   N_GUIDED_CABLE_L)
       ENDIF
 C--------------------------------------------
       IF (NFLOW>0) CALL M_FLOW(IFLOW, IFLOW_L, NODLOCAL, P, MEMFLOW)
@@ -1477,7 +1499,7 @@ C--------------------------------------------
          ENDIF
       ENDIF
 C--------------------------------------------
-C count external solids faces 
+C count external solids faces
 C--------------------------------------------
       NFASOLFR_L= 0
       IF(NFASOLFR/=0 .AND. NUMELS_L/=0)THEN
@@ -1491,19 +1513,19 @@ C--------------------------------------------
         CALL C_SEGQUADFR(SEGQUADFR, CEP, P-1, CEL, NSEGQUADFR_L)
       ENDIF
 C--------------------------------------
-C counts flux convec
+C Convec flow courses
 C--------------------------------------
       NCONV_L = 0
       IF (GLOB_THERM%NUMCONV > 0)
      .    CALL C_ICONV(IBCV,CEP,P-1,NCONV_L,GLOB_THERM%NUMCONV,GLOB_THERM%NICONV)
 C--------------------------------------
-C counts radiative fluxes              
+C counts radiative fluxes
 C--------------------------------------
       NRADIA_L = 0
       IF (GLOB_THERM%NUMRADIA > 0) CALL C_IRADIA(IBCR,CEP,P-1,NRADIA_L,
      .           GLOB_THERM%NUMRADIA,GLOB_THERM%NUMCONV,GLOB_THERM%NIRADIA)
 C--------------------------------------
-C counts imposed fluxes 
+C counts imposed fluxes
 C--------------------------------------
       NFXFLUX_L = 0
       IF (GLOB_THERM%NFXFLUX > 0) CALL C_ITHFLUX(IBFFLUX,CEP,P-1,NFXFLUX_L,
@@ -1515,13 +1537,13 @@ C--------------------------------------
       IF (GLOB_THERM%NFXTEMP > 0)
      .  CALL C_IBFT(IBFT,GLOB_THERM%NFXTEMP,NFXTEMP_L,P-1,DD_LAGF,GLOB_THERM%NIFT)
 C--------------------------------------
-C count Lagrange multiplier
+C Count Lagrange Multiply
 C--------------------------------------
       LAG_SEC=0
       IF(LAG_NCF+LAG_NCL > 0)
      .  CALL C_LAG(IPARI,NPRW,LAG_SEC)
 C--------------------------------------------
-C count Elements PLY X-FEM type SHEL 4-N
+C Count Ply X-FEM Type SHEL 4-N
 C--------------------------------------------
        NUMELCPXFE_L = 0
        NUMNODPXFE_L = 0
@@ -1614,7 +1636,7 @@ C
      1      LENWA_L ,NTHWA    ,NAIRWA    ,NUMELS_L ,NUMELQ_L,
      2      NUMELC_L,NUMELTG_L,NUMELT_L  ,NUMELP_L ,NUMELR_L,
      3      NUMNOD_L,NMNT     ,L_MUL_LAG1,L_MUL_LAG,MAXNX   ,
-     4      LWASPH_L,NUMSPH_L  ,LWASPIO, NRCVVOIS, 
+     4      LWASPH_L,NUMSPH_L  ,LWASPIO, NRCVVOIS,NGROUP_L,
      5      LWAMP_L, LWANMP_L,GLOB_THERM%ITHERM )
 C--------------------------------------
 C counts LLCFIELD
@@ -1628,7 +1650,7 @@ C--------------------------------------
         NISKY0_L=NISKY0_L+4*LLLOADP_L
       ENDIF
 C--------------------------------------
-C     counts ELEMENTS ISO GEOMETRIQUES
+C     counts ISO GEOMETRIC ELEMENTS
 C--------------------------------------
       ISUMNIG3D_L = 0
       IF (NUMELIG3D>0)
@@ -1659,14 +1681,14 @@ C--------------------------------------------
             CALL C_DRAPE(DRAPEG%INDX,CEP(MIN(OFF+1,LEN_CEP)),P-1,
      .                  NUMELC,NUMSH4N_L)
          ENDIF
-         
+
          OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR
-         
+
          IF(NUMELTG_DRAPE > 0) THEN
             CALL C_DRAPE(DRAPEG%INDX(NUMELC+1),CEP(MIN(OFF+1,LEN_CEP)),P-1,
      .                    NUMELTG,NUMSH3N_L)
          ENDIF
-       ENDIF      
+       ENDIF
 C--------------------------------------
 C counts CLOAD
 C--------------------------------------
@@ -1684,19 +1706,25 @@ C counts INIVEL
 C--------------------------------------
        NINIVELT_L = 0
       IF (LOADS%NINIVELT>0) THEN
-        CALL C_INIVELL(                                              
-     .                 NGRNOD,  NGRBRIC,    NGRQUAD,       NGRSH3N,           
-     .                 IGRNOD,  IGRBRIC,    IGRQUAD,       IGRSH3N,           
-     .                   P-1 ,      CEP,       SCEP,      NODLOCAL,           
+        CALL C_INIVELL(
+     .                 NGRNOD,  NGRBRIC,    NGRQUAD,       NGRSH3N,
+     .                 IGRNOD,  IGRBRIC,    IGRQUAD,       IGRSH3N,
+     .                   P-1 ,      CEP,       SCEP,      NODLOCAL,
      .                 NUMNOD,LOADS%NINIVELT,LOADS%INIVELT,NINIVELT_L)
       ENDIF
 C--------------------------------------
 C counts /DAMP/VREL
-C--------------------------------------    
-      NDAMP_VREL_L = 0 
-      IDAMP_VREL_L(1:NDAMP) = 0 
+C--------------------------------------
+      NDAMP_VREL_L = 0
+      IDAMP_VREL_L(1:NDAMP) = 0
       IF (NDAMP > 0) CALL C_DAMPVREL(DAMPR,IGRNOD,P,IDAMP_VREL_L,NDAMP_VREL_L,
      .                               NGRNOD,NDAMP,NRDAMP)
+C--------------------------------------
+C counts sfem_exclude
+C--------------------------------------
+      NE_SFEM_L = 0
+      IF (NE_SFEM > 0) 
+     .     CALL C_SFEM_EXCLUDE(NUMNOD,NODLOCAL,NE_SFEM,IN_SFEM,NE_SFEM_L)
 C--------------------------------------------
 C Open Restart FILE
 C--------------------------------------------
@@ -1708,7 +1736,7 @@ C--------------------------------------------
       FILNAM = ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_'//PROCNAM//'.rst'
       TMP_NAME = OUTFILE_NAME(1:OUTFILE_NAME_LEN)//FILNAM(1:LEN_TRIM(FILNAM))
       LEN_TMP_NAME = OUTFILE_NAME_LEN+ROOTLEN+14
-C fichier de restart au format binaire ieee 64 bits
+C Restart file in binary format ieee 64 bits
       DO I=1,LEN_TMP_NAME
           IFILNAM(I)=ICHAR(TMP_NAME(I:I))
       ENDDO
@@ -1726,11 +1754,11 @@ C fichier de restart au format binaire ieee 64 bits
       CALL WRITE_C_C(IFILNAM2,ROOTLEN+14)
       LEN_IA = LEN_IA + ROOTLEN+14
 C--------------------------------------------
-C  Skippon_l for obsolide "modif" option.
+C  Skippon_l for obsolete "modif" option.
       SKIPPON_L = NUMNOD_L+1 + LCNE_L + LCNI2_L +
      .  8*NUMELS_L + 6*NUMELS10_L + 8*NUMELS16_L + 12*NUMELS20_L +
      .  4*NUMELQ_L + 4*NUMELC_L   + 2*NUMELT_L + 2*NUMELP_L +
-     .  3*NUMELR_L + 3*NUMELTG_L  + 3*NUMELTG6_L + 
+     .  3*NUMELR_L + 3*NUMELTG_L  + 3*NUMELTG6_L +
      .  4*NNMV_L   + 4*NCONLD_L  + 4*NCONV_L  + NSKYRW_L + NSKYRBK_L +
      .  NISKYI2_L +
      .  NNMV_L     + NNMVC_L      + NSKYLL_L + NSKYRBM_L + NSKYI18_L +
@@ -1741,7 +1769,7 @@ C  Skippon_l for obsolide "modif" option.
        ENDIF
 
 C--------------------------------------------
-C     SPMD: variables preparation 
+C     SPMD: variables preparation
 C--------------------------------------------
 
       CALL WRCOMIP(
@@ -1786,8 +1814,9 @@ C--------------------------------------------
      4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L,DYNAIN_DATA,
      5   NUMSH4N_L,NUMSH3N_L,INTERFACES%PARAMETERS,SENSORS,LOADS_PER_PROC%NLOAD_CYL,
      6   NCLOAD_L,NPLOAD_L,NDAMP_VREL_L, UNITAB,
-     7   LWAMP_L,LWANMP_L,NINIVELT_L,GLOB_THERM,PBLAST)
-     
+     7   LWAMP_L,LWANMP_L,NINIVELT_L,GLOB_THERM,PBLAST,NE_SFEM_L,
+     8   NGUIDED_CABLE,N_GUIDED_CABLE_L)
+
 
       CALL WRCOMR(LMXVREA,LVARREA,TABVREA,MSNDP(P),P,INTERFACES%PARAMETERS,
      .            UNITAB ,GLOB_THERM, OUTPUT)
@@ -1852,6 +1881,7 @@ C--------------------------------------
 #ifdef DNC
       CALL WRDUM_INFO()
 #endif
+      CALL checksum_write_starter_restart(OUTPUT)
 C     NODGLOB Deplacee
 C--------------------------------------
       CALL WRITE_I_C(NODGLOB,NUMNOD_L)
@@ -1859,7 +1889,7 @@ C--------------------------------------
       CALL W_MAIN_PROC_WEIGHT(NODGLOB,NUMNOD_L,NSPMD,P)
       LEN_IA = LEN_IA + 2*NUMNOD_L
 C--------------------------------------
-C     Integers 
+C     Integers
 C--------------------------------------
       LEN_G = NPROPGI*NUMGEO
       LEN_M = NPROPMI*NUMMAT
@@ -1924,7 +1954,9 @@ C--------------------------------------------
 C--------------------------------------------
 C boundary Elts CFD/ALE
 C--------------------------------------------
-      IF (IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0) THEN
+      ISHADOW = 0
+      IF(DETONATORS%IS_SHADOWING_REQUIRED) ISHADOW = 1
+      IF (IALE+IEULER+GLOB_THERM%ITHERM+IALELAG +ISHADOW > 0) THEN
         IF(NUMELS_L+NUMELQ_L+NUMELTG_L>0) THEN
           ALLOCATE(IDGLOB_L(NUMELS_L + NSVOIS + NUMELQ_L + NQVOIS + NUMELTG_L + NTGVOIS))
           ALLOCATE(UIDGLOB_L(NUMELS_L + NSVOIS + NUMELQ_L + NQVOIS + NUMELTG_L + NTGVOIS))
@@ -1948,7 +1980,8 @@ C--------------------------------------------
         CALL C_IXFLOC(NUMEL,IXSF,IXQF,IXTGF,NSVOIS,
      +                NQVOIS,NTGVOIS,P-1,IPARG,CEP,CEL,
      +                ALE_CONNECTIVITY,ee_connect_l,IXS,IXQ,IXTG,NODLOCAL,NUMELS_L,NUMELQ_L,NUMELTG_L,MULTI_FVM,
-     +                ID_GLOBAL_VOIS,INDX_S,INDX_Q,INDX_TG,FACE_ELM_S,FACE_ELM_Q,FACE_ELM_TG,FACE_VOIS)
+     +                ID_GLOBAL_VOIS,INDX_S,INDX_Q,INDX_TG,FACE_ELM_S,FACE_ELM_Q,FACE_ELM_TG,FACE_VOIS,
+     +                DETONATORS%IS_SHADOWING_REQUIRED)
 
         CALL WRITE_I_C(IXTGF, NIXTG * NTGVOIS)
         LEN_IA = LEN_IA + NIXTG * NTGVOIS
@@ -1973,14 +2006,14 @@ C--------------------------------------------
       CALL W_IXLOC(IXS,NIXS,8,CEP(MIN(OFF+1,LEN_CEP)),P-1,
      +             NUMELS,NUMELS_L,NODLOCAL,LEN_IA)
 C
-      IF (IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0) THEN
+      IF (IALE+IEULER+GLOB_THERM%ITHERM+IALELAG+ISHADOW > 0) THEN
          CALL WRITE_I_C(IXSF,NIXS*NSVOIS)
          LEN_IA = LEN_IA + NIXS*NSVOIS
          IF(NSVOIS>0)
      +        DEALLOCATE(IXSF)
       ENDIF
 C--------------------------------------------
-C Solids                                
+C Solids
 C--------------------------------------------
       OFF = OFF+NUMELS8
       CALL W_IXALOC(IXS10,6,CEP(MIN(OFF+1,LEN_CEP)),P-1,
@@ -2030,7 +2063,7 @@ C--------------------------------------
         CALL W_GJOINT(GJBUFI,NGJOINT,LKJNI,NODLOCAL,LEN_IA)
       END IF
 C--------------------------------------
-C NALE et voisin ALE
+C NALE and ALE neighbor
 C--------------------------------------
       IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0) THEN
         IF(IALE+IEULER+IALELAG/=0)
@@ -2125,7 +2158,7 @@ C--------------------------------------
 
       CALL W_ISLIN_STR(IGRSLIN ,LEN_IA , P-1, NODLOCAL)
 C--------------------------------------
-C Elem multi-brins
+C Multi-wire element
 C--------------------------------------
       IF (NUMELX>0)
      .  CALL W_ELMX(KXX,NUMELX_L,ISUMNX_L,IXX,CEP,
@@ -2155,7 +2188,7 @@ C--------------------------------------------
          CALL WRITE_I_C(KLOADPINTER, NINTER+1)
          LEN_IA = LEN_IA + NINTER + 1
          CALL WRITE_I_C(LOADPINTER,S_LOADPINTER )
-         LEN_IA = LEN_IA + S_LOADPINTER 
+         LEN_IA = LEN_IA + S_LOADPINTER
       ENDIF
 C--------------------------------------
 C IBFV
@@ -2174,10 +2207,10 @@ C--------------------------------------
       NEBCS_FVM = 0
       CALL WRITE_I_C(NEBCS, 1) ! total number of /EBCS
       CALL WRITE_I_C(EBCS_TAB_LOC%nebcs_fvm, 1) ! multifluid ebcs number
-      CALL WRITE_I_C(NEBCS_PARALLEL, 1)  ! /NRF or /PROPERGOL ebcs number
+      CALL WRITE_I_C(NEBCS_PARALLEL, 1)  ! /NRF or /PROPELLANT ebcs number
       CALL WRITE_I_C(OTHER_NEBCS, 1) ! other ebcs
       ! ---------------
-      ! common data 
+      ! common data
       IF (NEBCS > 0)THEN
          CALL EBCS_TAB%write_type_data(LEN_IA, LEN_AM)
       ENDIF
@@ -2337,6 +2370,11 @@ C--------------------------------------------
      .                 LEN_IA  )
       ENDIF
 C--------------------------------------
+C sfem_exclude
+C--------------------------------------
+      IF (NE_SFEM > 0) 
+     .   CALL W_SFEM_EXCLUDE(NUMNOD,NODLOCAL,NE_SFEM,IN_SFEM,NE_SFEM_L,LEN_IA)
+C--------------------------------------
 C INTBUF_TAB
 C--------------------------------------
       IF(NINTER>0) THEN
@@ -2368,7 +2406,7 @@ c       stop CPU timer for INTBUF_INI
         CALL STOPTIME(6,1)
 
         IF (I22LEN_L>0)THEN
-          !init tableau de 0
+          !initialize table to 0
           CALL W_BUFBRIC_22()
         ENDIF
 
@@ -2390,12 +2428,12 @@ c       stop CPU timer for SPLIT_INTERFACES
       ENDIF
 
 C--------------------------------------
-C RW et RW ALE
+C RW and RW ALE
 C--------------------------------------
       IF(NRWALL > 0)
      +  CALL W_RWALL(NPRW    ,LPRW    ,RWL   ,
      +               CEP     ,CEL     ,NODLOCAL,P-1   ,
-     +               NSLAW_L,NESLAW_L,NUMNOD_L,LEN_IA)
+     +               NSLAW_L,NESLAW_L ,NUMNOD_L,LEN_IA)
 C--------------------------------------------
 C Madymo
 C--------------------------------------------
@@ -2442,7 +2480,7 @@ C--------------------------------------------
 C Airbags
 C--------------------------------------------
       IF(NVOLU>0)THEN
-C        LENVOLU = NIMV*NVOLU+LICBAG+LIBAGJET+LIBAGHOL+LIBAGALE
+C        Lenvolu = NIMV*NVOLU+LICBAG+LIBAGJET+LIBAGHOL+LIBAGALE
         CALL W_MONVOL(MONVOL,LENVOLU,NODLOCAL,LEN_IA,MONVOL_L,ITAB,T_MONVOL,P)
       ENDIF
 C--------------------------------------------
@@ -2453,7 +2491,7 @@ C--------------------------------------------
         LEN_IA = LEN_IA + LAG_NHF+3*LAG_NCF+2
       END IF
 C--------------------------------------
-C     ECRITURE ICNDS10 Itet=2 of S10
+C     WRITE ICNDS10 Itet=2 of S10
 C--------------------------------------
       IF (NS10E_L > 0) THEN
         IF(NBDDCNDM > 0) THEN
@@ -2490,7 +2528,7 @@ C--------------------------------------------
        ENDIF
 
 C--------------------------------------
-C Frontieres SPMD
+C SPMD boundarys
 C--------------------------------------
       NUMEL = MAX(NUMELS,NUMELQ)
       NUMEL_L2 = MAX(NUMELS_L,NUMELQ_L)
@@ -2612,7 +2650,7 @@ c       stop CPU timer for W_FI
          CALL W_FSPH()
       ENDIF
 C--------------------------------------
-C structure int21 (partie entiere)
+C structure int21 (integer part)
 C--------------------------------------
       IF(NINTSTAMP /= 0)THEN
         CALL INTSTAMP_WRESTI(INTSTAMP, LINTSTAMP, NODLOCAL)
@@ -2625,7 +2663,7 @@ C--------------------------------------
           CALL INTFRIC_WRESTI(INTBUF_FRIC_TAB,NINTERFRIC)
        ENDIF
 C--------------------------------------
-C structure tables (partie entiere)
+C Table structure (Integer Part)
 C--------------------------------------
       IF(NTABLE /= 0)THEN
         CALL TABLE_WRESTI(TABLE, LTABLE)
@@ -2711,13 +2749,13 @@ C--------------------------------------------
 
 C--------------------------------------------
       CALL W_R3NLOC(X,NODGLOB,NUMNOD_L,LEN_AM)
-      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0)
+      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG+ISHADOW > 0)
      .  CALL W_BID(3*NRCVVOIS,LEN_AM)
       CALL W_R3NLOC(D,NODGLOB,NUMNOD_L,LEN_AM)
-      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0)
+      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG+ISHADOW > 0)
      .  CALL W_BID(3*NRCVVOIS,LEN_AM)
       CALL W_R3NLOC(V,NODGLOB,NUMNOD_L,LEN_AM)
-      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0)
+      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG+ISHADOW > 0)
      .  CALL W_BID(3*NRCVVOIS,LEN_AM)
       IF(IRODDL>0) THEN
         CALL W_R3NLOC(VR,NODGLOB,NUMNOD_L,LEN_AM)
@@ -2737,14 +2775,16 @@ C--------------------------------------------
       IF (NDAMP>0) THEN
         CALL WRITE_DB(DAMPR,NRDAMP*NDAMP)
         LEN_AM = LEN_AM + NRDAMP*NDAMP
-        IF(IRODDL>0)THEN
-          CALL W_RNNLOC(DAMP,NODGLOB,NUMNOD_L,6,LEN_AM)
-        ELSE
-          CALL W_R3NLOC(DAMP,NODGLOB,NUMNOD_L,LEN_AM)
-        ENDIF
+        IF (SDAMP > 0) THEN
+          IF(IRODDL>0)THEN
+            CALL W_RNNLOC(DAMP,NODGLOB,NUMNOD_L,6,LEN_AM)
+          ELSE
+            CALL W_R3NLOC(DAMP,NODGLOB,NUMNOD_L,LEN_AM)
+          ENDIF
+        ENDIF  
       ENDIF
 C--------------------------------------------
-C Mass et Inertia
+C Mass and Inertia
 C--------------------------------------------
       CALL W_RNLOC(MS,NODGLOB,NUMNOD_L,LEN_AM)
 
@@ -2781,7 +2821,7 @@ C--------------------------------------
       CALL WRITE_ELGROUP_PARAM(GROUP_PARAM_TAB,IPARG,P-1,NGROUP_L,LEN)
       LEN_AM = LEN_AM + LEN
 C--------------------------------------------
-C Skew et Frames
+C Skew and Frames
 C--------------------------------------------
       CALL WRITE_DB(SKEW,LSKEW*(NUMSKW+1))
       LEN_AM = LEN_AM + LSKEW*(NUMSKW+1)
@@ -2834,7 +2874,7 @@ C In BUFGEO is a double precision Buffer, even in Single Precision
       LEN_AM = LEN_AM + LBUFGEO
       CALL WRITE_DB(BUFSF ,LBUFSF )
       LEN_AM = LEN_AM + LBUFSF
-C LAG options
+C Lag Options
       IF(NUMMPC>0.AND.P==1)THEN
         CALL WRITE_DB(BRMPC,LMPC)
         LEN_AM = LEN_AM + LMPC
@@ -2900,13 +2940,13 @@ C
         CALL W_R3NLOC(ASAV,NODGLOB,NUMNOD_L,LEN_AM)
       ENDIF
 C--------------------------------------
-C SPH Cells partie reelle
+C SPH Cells real part
 C--------------------------------------
       IF (NUMSPH>0)THEN
         CALL W_RSPH(SPBUF ,NUMSPH_L,CEPSP,P-1,VSPHIO,LEN_AM, SSPHVELN_L  )
       ENDIF
 C--------------------------------------
-C Masses nodales fluides
+C Nodal fluid masses
 C--------------------------------------
       IF(IALE == 1 .OR. IEULER == 1 .OR. IALELAG == 1) THEN
         CALL W_RNLOC(MSNF,NODGLOB,NUMNOD_L,LEN_AM)
@@ -2924,8 +2964,8 @@ C--------------------------------------------
 C--------------------------------------------
 C FSAV
 C--------------------------------------------
-      CALL WRITE_DB(FSAV,NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+NFXBODY+NINTSUB))
-      LEN_AM = LEN_AM + NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+ NFXBODY+NINTSUB)
+      CALL WRITE_DB(FSAV,NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+NFXBODY+NINTSUB+NGUIDED_CABLE))
+      LEN_AM = LEN_AM + NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+ NFXBODY+NINTSUB+NGUIDED_CABLE)
 C--------------------------------------------
 C TIMER MAT/PROP and WEIGHT
 C--------------------------------------------
@@ -2986,7 +3026,7 @@ C RBE3
 C--------------------------------------------
       IF(NRBE3>0)
      .  CALL W_FRBE3(IRBE3   ,LRBE3  ,P-1    ,LLRBE3_L,
-     .               FRBE3   ,FRBE3(3*SLRBE3+1),LEN_AM  )
+     .               FRBE3   ,FRBE3(3*SLRBE3+1),LEN_AM,NRBE3PEN_L )
 C--------------------------------------
 C NACTIV
 C--------------------------------------
@@ -3038,7 +3078,7 @@ c------------------
         ENDDO
       ENDIF
 C--------------------------------------------
-C Element Clusters
+C clusters
 C--------------------------------------------
       IF (NCLUSTER > 0) CALL W_CLUSTER(CLUSTERS,
      .                                 IPARG,NODLOCAL,
@@ -3046,10 +3086,11 @@ C--------------------------------------------
      .                                 NUMLOCGROUP,
      .                                 LEN_IA,LEN_AM)
 C--------------------------------------------
-C RWALL et RWALL ALE
+C RWALL and RWALL ALE
 C--------------------------------------------
       CALL W_RWAR(NPRW,LPRW ,RWL, RWSAV,
-     +            LWSAV_L,CEP,P-1,LEN_AM)
+     +            LWSAV_L,LRW_PEN_L,NRW_PEN_L,
+     +            RWSTIF_PEN,SLN_PEN,CEP,P-1,LEN_AM)
 C--------------------------------------------
 C RBY
 C--------------------------------------------
@@ -3276,7 +3317,7 @@ C-----------------------------------------------
 C--------------------------------------------
 C SEATBELTS - SLIPRING / RETRACTOR
 C--------------------------------------------
-      IF (NSLIPRING + NRETRACTOR > 0) THEN
+      IF (NSLIPRING + NRETRACTOR + NGUIDED_CABLE> 0) THEN
         CALL W_SEATBELTS(LEN_IA,LEN_AM,P,NODLOCAL,N_ANCHOR_REMOTE_L,
      .       N_ANCHOR_REMOTE_SEND_L,ANCHOR_REMOTE_L,ANCHOR_REMOTE_SEND_L)
       ENDIF
@@ -3313,7 +3354,7 @@ C ALEBAG
 C-----------------------------------------------
       CALL FVWRESTP(P)
 C-----------------------------------------------
-C thermique des coques + solides
+C thermal of shells + solids
 C-----------------------------------------------
         IF(GLOB_THERM%ITHERM_FE > 0  ) THEN
           CALL W_RNLOC(MCP,NODGLOB,NUMNOD_L,LEN_AM)
@@ -3512,7 +3553,7 @@ C  for foam+air
           CALL W_ALELAG(DFLOW,VFLOW,WFLOW,NODGLOB,NUMNOD_L,LEN_AM)
        ENDIF
 C--------------------------------------------
-C TH Groupes
+C Th groups
 C--------------------------------------------
        IF(LENTHGR > 0) THEN
          CALL WRITE_DB(RTHBUF,LENTHGR)
@@ -3532,7 +3573,7 @@ C WIGE (ISO-GEOM ELEMENTS)
 C--------------------------------------------
        IF(NUMELIG3D > 0) CALL W_RNLOC(WIGE,NODGLOB,NUMNOD,LEN_AM)
 C--------------------------------------------
-C STACK proprerties
+C STACK properties
 C--------------------------------------------
        IF(IPART_STACK > 0 .OR. IPART_PCOMPP > 0 ) THEN
           LEN_IG  = (4*NPT_STACK + 2)*NS_STACK
@@ -3619,18 +3660,18 @@ C 10: NUMELTG_L
 C 11: NUMELX_L
 C 12: NBDDPROC :  nb of boundary proc 
 C 13: NBDDBOUN :  nb of boundary node 
-C 14: NBDDNOD :   size of comm:nb de nodes
-C 15: NBDDNRB :   size of comm: nb de nodes main de rby
+C 14: NBDDNOD :   size of comm:nb of nodes
+C 15: NBDDNRB :   size of comm: nb of nodes main of rby
 C 16: NRBYKIN_L : number of local rigid body main
 C 17: NUMSPH_L : number of particles SPH (local) 
 C 18: MEMI : size memory local int MA
 C 19: MEMR : size memory local float AM
-C 20: NSNT_L : number of nodes secnds (interface de contact 7,10,11)
-C 21: NMNT_L : number of nodes main (interface de contact 7,10,11)
-C 22: NSNT2_L : number of nodes secnds (interface type2)
+C 20: NSNT_L : number of nodes seconds (contact interface 7,10,11)
+C 21: NMNT_L : number of nodes main (contact interface 7,10,11)
+C 22: NSNT2_L : number of nodes seconds (interface type2)
 C 23: NMNT2_L : number of nodes main (interface type2)
 C 24: RESTSIZE : restart size in KB
-C 24: NSLARB_L : number of nodes secnd rigid body
+C 24: NSLARB_L : number of nodes second rigid body
       DDSTAT(1) = NUMNOD_L
       DDSTAT(2) = NUMEL_L
       DDSTAT(3) = NUMELS_L
@@ -3706,4 +3747,4 @@ C
 
 
       RETURN
-      END
+      END SUBROUTINE DDSPLIT

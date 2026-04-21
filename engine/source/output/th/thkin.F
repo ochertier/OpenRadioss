@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thkin    ../engine/source/output/th/thkin.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2    ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtdes   ../engine/source/output/th/wrtdes.F
-      !||====================================================================
+!||====================================================================
+!||    thkin    ../engine/source/output/th/thkin.F
+!||--- called by ------------------------------------------------------
+!||    hist2    ../engine/source/output/th/hist2.F
+!||--- calls      -----------------------------------------------------
+!||    wrtdes   ../engine/source/output/th/wrtdes.F
+!||====================================================================
       SUBROUTINE THKIN(J1,J2,ITHBUF,L1,L2,WA,FSAV,IFORM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -37,18 +37,16 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
       INTEGER ITHBUF(*),IFORM
       INTEGER J1,J2,L1,L2,K
-      my_real
-     .        WA(*),FSAV(NTHVKI,*)
+      my_real :: WA(*),FSAV(NTHVKI,*)
 C
       INTEGER I,J,L,II
 C
 C Gathering already done , only p0 writes 
 
-      IF (IMACH/=3.OR.ISPMD==0) THEN
+      IF (ISPMD==0) THEN
         II = 0
         DO J=J1,J2
               I=ITHBUF(J)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sort_mid_pid   ../engine/source/system/sort_mid_pid.F
-      !||--- called by ------------------------------------------------------
-      !||    grpsplit       ../engine/source/engine/resol_init.F
-      !||--- uses       -----------------------------------------------------
-      !||    mid_pid_mod    ../engine/share/modules/mid_pid_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sort_mid_pid   ../engine/source/system/sort_mid_pid.F
+!||--- called by ------------------------------------------------------
+!||    grpsplit       ../engine/source/engine/resol_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    mid_pid_mod    ../engine/share/modules/mid_pid_mod.F
+!||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
        SUBROUTINE SORT_MID_PID(N_SHELL,IGROUC_SHELL,
      1                         POIN_GROUP_MID_SHELL,POIN_GROUP_PID_SHELL,
      2                         MID_SHELL,TAB_LOC,TAB_SHELL_LOC,TAB_MAT)
 
         USE MID_PID_MOD
+        USE MY_ALLOC_MOD
 
 !      ----------------------------------------------
 !      Sort Shell groups :
@@ -77,20 +80,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-       INTEGER ::I,J,II,JJ,K,INDI,NBR_MID_PID_GRP
-       INTEGER :: NG,NGG,NGG_LOC,ITY
+       INTEGER ::I,J,II,JJ,NBR_MID_PID_GRP
+       INTEGER :: NG,NGG,NGG_LOC
        INTEGER :: MARQUEUR,MARQUEUR_2,MARQUEUR_3,COMPTEUR_MAT_PROP_SHELL,COMPTEUR
        INTEGER :: FIRST,LAST,SHIFT,GR_ID,GR_ID2
-       INTEGER :: NBR_MID,NFT
        INTEGER :: MID,MAX_MID
        INTEGER :: PID,MAX_PID,PID_1,PID_2
        INTEGER, DIMENSION(:), ALLOCATABLE :: PID_INDEX,INDEX
-       INTEGER, DIMENSION(N_SHELL) :: POIN_MID_SHELL
+       INTEGER, DIMENSION(:), ALLOCATABLE :: POIN_MID_SHELL
        my_real POIDS_J,POIDS_J1
-       TYPE(MID_PID_TYPE),DIMENSION(NUMMAT) :: MID_PID_SHELL
+       TYPE(MID_PID_TYPE),DIMENSION(:),ALLOCATABLE :: MID_PID_SHELL
 C-----------------------------------------------
-
-       ALLOCATE( PID_INDEX(NUMMAT) )
+       ALLOCATE(MID_PID_SHELL(NUMMAT))
+       ALLOCATE(PID_INDEX(NUMMAT) )
+       CALL MY_ALLOC(POIN_MID_SHELL,N_SHELL)
        PID_INDEX(1:NUMMAT) = 0
 
        COMPTEUR = 0
@@ -240,6 +243,7 @@ C-----------------------------------------------
          DEALLOCATE( MID_PID_SHELL(MID)%PID1D )      
        ENDDO
 
-
+       DEALLOCATE(MID_PID_SHELL)
+       DEALLOCATE(POIN_MID_SHELL)
        RETURN
        END SUBROUTINE SORT_MID_PID

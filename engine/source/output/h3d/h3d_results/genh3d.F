@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,155 +20,162 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    genh3d                               ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- called by ------------------------------------------------------
-      !||    sortie_main                          ../engine/source/output/sortie_main.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                               ../engine/source/output/message/message.F
-      !||    arret                                ../engine/source/system/arret.F
-      !||    c_h3d_create_beams                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_beams.cpp
-      !||    c_h3d_create_components              ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_components.cpp
-      !||    c_h3d_create_displacement_datatype   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_displacement_datatype.cpp
-      !||    c_h3d_create_nodes                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_nodes.cpp
-      !||    c_h3d_create_quads                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_quads.cpp
-      !||    c_h3d_create_rbe2                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_rbe2.cpp
-      !||    c_h3d_create_rbe3                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_rbe3.cpp
-      !||    c_h3d_create_rbodies                 ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_rbodies.cpp
-      !||    c_h3d_create_results_end             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_results_end.cpp
-      !||    c_h3d_create_rwalls                  ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_rwalls.cpp
-      !||    c_h3d_create_sh3ns                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_sh3ns.cpp
-      !||    c_h3d_create_shells                  ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_shells.cpp
-      !||    c_h3d_create_skins                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_skins.cpp
-      !||    c_h3d_create_solid8n                 ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_solid8n.cpp
-      !||    c_h3d_create_sph                     ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_sph.cpp
-      !||    c_h3d_create_springs                 ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_springs.cpp
-      !||    c_h3d_create_truss                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_truss.cpp
-      !||    c_h3d_eroded_oned                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_oned.cpp
-      !||    c_h3d_eroded_quad                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_quad.cpp
-      !||    c_h3d_eroded_shell                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_shell.cpp
-      !||    c_h3d_eroded_skin                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_skin.cpp
-      !||    c_h3d_eroded_solid                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_solid.cpp
-      !||    c_h3d_eroded_sph                     ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_sph.cpp
-      !||    c_h3d_open_file                      ../engine/source/output/h3d/h3d_build_cpp/c_h3d_open_file.cpp
-      !||    c_h3d_reopen_file                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_open_file.cpp
-      !||    c_h3d_update_nodal_fvmbag_scalar     ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_nodal_fvmbag_scalar.cpp
-      !||    c_h3d_update_nodal_scalar            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_nodal_scalar.cpp
-      !||    c_h3d_update_nodal_tensor            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_nodal_tensor.cpp
-      !||    c_h3d_update_nodal_vector            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_nodal_vector.cpp
-      !||    c_h3d_update_oned_scalar             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_oned_scalar.cpp
-      !||    c_h3d_update_oned_tensor             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_oned_tensor.cpp
-      !||    c_h3d_update_oned_torsor             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_oned_torsor.cpp
-      !||    c_h3d_update_oned_vector             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_oned_vector.cpp
-      !||    c_h3d_update_quad_scalar             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_quad_scalar.cpp
-      !||    c_h3d_update_quad_tensor             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_quad_tensor.cpp
-      !||    c_h3d_update_quad_vector             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_quad_vector.cpp
-      !||    c_h3d_update_shell_scalar            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_shell_scalar.cpp
-      !||    c_h3d_update_shell_tensor            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_shell_tensor.cpp
-      !||    c_h3d_update_shell_vector            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_shell_vector.cpp
-      !||    c_h3d_update_skin_scalar             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_skin_scalar.cpp
-      !||    c_h3d_update_skin_tensor             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_skin_tensor.cpp
-      !||    c_h3d_update_skin_vector             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_skin_vector.cpp
-      !||    c_h3d_update_solid_scalar            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_solid_scalar.cpp
-      !||    c_h3d_update_solid_tensor            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_solid_tensor.cpp
-      !||    c_h3d_update_solid_vector            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_solid_vector.cpp
-      !||    c_h3d_update_sph_scalar              ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_sph_scalar.cpp
-      !||    c_h3d_update_sph_tensor              ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_sph_tensor.cpp
-      !||    drbe2cnt                             ../engine/source/output/anim/generate/drbe2cnt.F
-      !||    drbe3cnt                             ../engine/source/output/anim/generate/drbe3cnt.F
-      !||    drbycnt                              ../engine/source/output/anim/generate/drbycnt.F
-      !||    fretitl                              ../engine/source/input/freform.F
-      !||    get_nodal_ipart                      ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||    h3d_constit                          ../engine/source/output/h3d/h3d_build_fortran/h3d_constit.F
-      !||    h3d_create_datatype                  ../engine/source/output/h3d/h3d_build_fortran/h3d_create_datatype.F
-      !||    h3d_create_fvmbag_centroids          ../engine/source/output/h3d/h3d_build_fortran/h3d_create_fvmbag_centroids.F
-      !||    h3d_create_rbe2_impi                 ../engine/source/output/h3d/h3d_build_fortran/h3d_create_rbe2_impi.F
-      !||    h3d_create_rbe3_impi                 ../engine/source/output/h3d/h3d_build_fortran/h3d_create_rbe3_impi.F
-      !||    h3d_create_rbodies_impi              ../engine/source/output/h3d/h3d_build_fortran/h3d_create_rbodies_impi.F
-      !||    h3d_dxyz_rwall                       ../engine/source/output/h3d/h3d_build_fortran/h3d_dxyz_rwall.F
-      !||    h3d_dxyz_rwall_update                ../engine/source/output/h3d/h3d_build_fortran/h3d_dxyz_rwall_update.F
-      !||    h3d_nodal_scalar                     ../engine/source/output/h3d/h3d_results/h3d_nodal_scalar.F
-      !||    h3d_nodal_tensor                     ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
-      !||    h3d_nodal_vector                     ../engine/source/output/h3d/h3d_results/h3d_nodal_vector.F
-      !||    h3d_oned_off                         ../engine/source/output/h3d/spmd/spmd_h3d_oned_off.F
-      !||    h3d_oned_scalar                      ../engine/source/output/h3d/h3d_results/h3d_oned_scalar.F90
-      !||    h3d_oned_tensor                      ../engine/source/output/h3d/h3d_results/h3d_oned_tensor.F
-      !||    h3d_oned_torsor                      ../engine/source/output/h3d/h3d_results/h3d_oned_torsor.F
-      !||    h3d_oned_vector                      ../engine/source/output/h3d/h3d_results/h3d_oned_vector.F
-      !||    h3d_quad_off                         ../engine/source/output/h3d/spmd/spmd_h3d_quad_off.F
-      !||    h3d_quad_scalar                      ../engine/source/output/h3d/h3d_results/h3d_quad_scalar.F
-      !||    h3d_quad_tensor                      ../engine/source/output/h3d/h3d_results/h3d_quad_tensor.F
-      !||    h3d_quad_vector                      ../engine/source/output/h3d/h3d_results/h3d_quad_vector.F
-      !||    h3d_shell_off                        ../engine/source/output/h3d/spmd/spmd_h3d_shell_off.F
-      !||    h3d_shell_scalar                     ../engine/source/output/h3d/h3d_results/h3d_shell_scalar.F
-      !||    h3d_shell_tensor                     ../engine/source/output/h3d/h3d_results/h3d_shell_tensor.F
-      !||    h3d_shell_vector                     ../engine/source/output/h3d/h3d_results/h3d_shell_vector.F
-      !||    h3d_skin_ixskin                      ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||    h3d_skin_off                         ../engine/source/output/h3d/h3d_results/h3d_skin_off.F
-      !||    h3d_skin_pre_map                     ../engine/source/output/h3d/h3d_results/h3d_skin_pre_map.F
-      !||    h3d_skin_scalar                      ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||    h3d_skin_tensor                      ../engine/source/output/h3d/h3d_results/h3d_skin_tensor.F
-      !||    h3d_skin_vector                      ../engine/source/output/h3d/h3d_results/h3d_skin_vector.F
-      !||    h3d_solid_off                        ../engine/source/output/h3d/spmd/spmd_h3d_solid_off.F
-      !||    h3d_solid_scalar                     ../engine/source/output/h3d/h3d_results/h3d_solid_scalar.F
-      !||    h3d_solid_tensor                     ../engine/source/output/h3d/h3d_results/h3d_solid_tensor.F
-      !||    h3d_solid_vector                     ../engine/source/output/h3d/h3d_results/h3d_solid_vector.F
-      !||    h3d_sph_off                          ../engine/source/output/h3d/spmd/spmd_h3d_sph_off.F
-      !||    h3d_sph_scalar                       ../engine/source/output/h3d/h3d_results/h3d_sph_scalar.F
-      !||    h3d_sph_tensor                       ../engine/source/output/h3d/h3d_results/h3d_sph_tensor.F
-      !||    h3d_update_fvmbag_centroids          ../engine/source/output/h3d/h3d_build_fortran/h3d_update_fvmbag_centroids.F
-      !||    h3dlib_load                          ../engine/source/output/h3d/h3d_build_cpp/h3d_dl.c
-      !||    scanor                               ../engine/source/output/anim/generate/scanor.F
-      !||    spmd_h3d_gather_i                    ../engine/source/output/h3d/spmd/spmd_h3d_gather_i.F
-      !||    spmd_h3d_gather_i_node               ../engine/source/output/h3d/spmd/spmd_h3d_gather_i_node.F
-      !||    spmd_h3d_gather_i_node_part          ../engine/source/output/h3d/spmd/spmd_h3d_gather_i_node_part.F
-      !||    spmd_h3d_gather_r                    ../engine/source/output/h3d/spmd/spmd_h3d_gather_r.F
-      !||    spmd_h3d_gather_r_nodal_value        ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_nodal_value.F
-      !||    spmd_h3d_gather_r_node               ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_node.F
-      !||    spmd_h3d_gather_t_node               ../engine/source/output/h3d/spmd/spmd_h3d_gather_t_node.F
-      !||    spmd_h3d_max_r_nodal_value           ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_nodal_value.F
-      !||    spmd_h3d_max_r_nodal_value_21        ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_nodal_value.F
-      !||    spmd_h3d_sum_r_nodal                 ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_node.F
-      !||    spmd_h3d_sum_r_nodal_21              ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_node.F
-      !||    spmd_h3d_sum_r_nodal_value           ../engine/source/output/h3d/spmd/spmd_h3d_sum_r_nodal_value.F
-      !||    spmd_outpitab                        ../engine/source/mpi/interfaces/spmd_outp.F
-      !||    startime                             ../engine/source/system/timer_mod.F90
-      !||    stoptime                             ../engine/source/system/timer_mod.F90
-      !||    sysfus2                              ../engine/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod                 ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    aleanim_mod                          ../engine/share/modules/aleanim_mod.F
-      !||    cluster_mod                          ../engine/share/modules/cluster_mod.F
-      !||    crackxfem_mod                        ../engine/share/modules/crackxfem_mod.F
-      !||    drape_mod                            ../engine/share/modules/drape_mod.F
-      !||    elbufdef_mod                         ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    fvbag_mod                            ../engine/share/modules/fvbag_mod.F
-      !||    glob_therm_mod                       ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    groupdef_mod                         ../common_source/modules/groupdef_mod.F
-      !||    h3d_inc_mod                          ../engine/share/modules/h3d_inc_mod.F
-      !||    h3d_mod                              ../engine/share/modules/h3d_mod.F
-      !||    h3d_oned_scalar_mod                  ../engine/source/output/h3d/h3d_results/h3d_oned_scalar.F90
-      !||    inoutfile_mod                        ../common_source/modules/inoutfile_mod.F
-      !||    matparam_def_mod                     ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    message_mod                          ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod                        ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    my_alloc_mod                         ../common_source/tools/memory/my_alloc.F90
-      !||    names_and_titles_mod                 ../common_source/modules/names_and_titles_mod.F
-      !||    outmax_mod                           ../common_source/modules/outmax_mod.F
-      !||    outputs_mod                          ../common_source/modules/outputs_mod.F
-      !||    plyxfem_mod                          ../engine/share/modules/plyxfem_mod.F
-      !||    sensor_mod                           ../common_source/modules/sensor_mod.F90
-      !||    stack_mod                            ../engine/share/modules/stack_mod.F
-      !||    table_mod                            ../engine/share/modules/table_mod.F
-      !||    timer_mod                            ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE GENH3D(TIMERS,X        ,D        ,V           ,A           ,BUFEL    ,
+!||====================================================================
+!||    genh3d                               ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- called by ------------------------------------------------------
+!||    sortie_main                          ../engine/source/output/sortie_main.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                               ../engine/source/output/message/message.F
+!||    arret                                ../engine/source/system/arret.F
+!||    c_h3d_create_beams                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_beams.cpp
+!||    c_h3d_create_components              ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_components.cpp
+!||    c_h3d_create_displacement_datatype   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_displacement_datatype.cpp
+!||    c_h3d_create_nodes                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_nodes.cpp
+!||    c_h3d_create_quads                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_quads.cpp
+!||    c_h3d_create_rbe2                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_rbe2.cpp
+!||    c_h3d_create_rbe3                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_rbe3.cpp
+!||    c_h3d_create_rbodies                 ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_rbodies.cpp
+!||    c_h3d_create_results_end             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_results_end.cpp
+!||    c_h3d_create_rwalls                  ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_rwalls.cpp
+!||    c_h3d_create_sh3ns                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_sh3ns.cpp
+!||    c_h3d_create_shells                  ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_shells.cpp
+!||    c_h3d_create_skins                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_skins.cpp
+!||    c_h3d_create_solid8n                 ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_solid8n.cpp
+!||    c_h3d_create_sph                     ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_sph.cpp
+!||    c_h3d_create_springs                 ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_springs.cpp
+!||    c_h3d_create_truss                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_truss.cpp
+!||    c_h3d_eroded_oned                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_oned.cpp
+!||    c_h3d_eroded_quad                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_quad.cpp
+!||    c_h3d_eroded_shell                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_shell.cpp
+!||    c_h3d_eroded_skin                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_skin.cpp
+!||    c_h3d_eroded_solid                   ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_solid.cpp
+!||    c_h3d_eroded_sph                     ../engine/source/output/h3d/h3d_build_cpp/c_h3d_eroded_sph.cpp
+!||    c_h3d_open_file                      ../engine/source/output/h3d/h3d_build_cpp/c_h3d_open_file.cpp
+!||    c_h3d_reopen_file                    ../engine/source/output/h3d/h3d_build_cpp/c_h3d_open_file.cpp
+!||    c_h3d_update_nodal_fvmbag_scalar     ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_nodal_fvmbag_scalar.cpp
+!||    c_h3d_update_nodal_scalar            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_nodal_scalar.cpp
+!||    c_h3d_update_nodal_tensor            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_nodal_tensor.cpp
+!||    c_h3d_update_nodal_vector            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_nodal_vector.cpp
+!||    c_h3d_update_oned_scalar             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_oned_scalar.cpp
+!||    c_h3d_update_oned_tensor             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_oned_tensor.cpp
+!||    c_h3d_update_oned_torsor             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_oned_torsor.cpp
+!||    c_h3d_update_oned_vector             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_oned_vector.cpp
+!||    c_h3d_update_quad_scalar             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_quad_scalar.cpp
+!||    c_h3d_update_quad_tensor             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_quad_tensor.cpp
+!||    c_h3d_update_quad_vector             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_quad_vector.cpp
+!||    c_h3d_update_shell_scalar            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_shell_scalar.cpp
+!||    c_h3d_update_shell_tensor            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_shell_tensor.cpp
+!||    c_h3d_update_shell_vector            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_shell_vector.cpp
+!||    c_h3d_update_skin_scalar             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_skin_scalar.cpp
+!||    c_h3d_update_skin_tensor             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_skin_tensor.cpp
+!||    c_h3d_update_skin_vector             ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_skin_vector.cpp
+!||    c_h3d_update_solid_scalar            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_solid_scalar.cpp
+!||    c_h3d_update_solid_tensor            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_solid_tensor.cpp
+!||    c_h3d_update_solid_vector            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_solid_vector.cpp
+!||    c_h3d_update_sph_scalar              ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_sph_scalar.cpp
+!||    c_h3d_update_sph_tensor              ../engine/source/output/h3d/h3d_build_cpp/c_h3d_update_sph_tensor.cpp
+!||    drbe2cnt                             ../engine/source/output/anim/generate/drbe2cnt.F
+!||    drbe3cnt                             ../engine/source/output/anim/generate/drbe3cnt.F
+!||    drbycnt                              ../engine/source/output/anim/generate/drbycnt.F
+!||    fretitl                              ../engine/source/input/freform.F
+!||    get_nodal_ipart                      ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||    h3d_constit                          ../engine/source/output/h3d/h3d_build_fortran/h3d_constit.F
+!||    h3d_create_datatype                  ../engine/source/output/h3d/h3d_build_fortran/h3d_create_datatype.F
+!||    h3d_create_fvmbag_centroids          ../engine/source/output/h3d/h3d_build_fortran/h3d_create_fvmbag_centroids.F
+!||    h3d_create_rbe2_impi                 ../engine/source/output/h3d/h3d_build_fortran/h3d_create_rbe2_impi.F
+!||    h3d_create_rbe3_impi                 ../engine/source/output/h3d/h3d_build_fortran/h3d_create_rbe3_impi.F
+!||    h3d_create_rbodies_impi              ../engine/source/output/h3d/h3d_build_fortran/h3d_create_rbodies_impi.F
+!||    h3d_dxyz_rwall                       ../engine/source/output/h3d/h3d_build_fortran/h3d_dxyz_rwall.F
+!||    h3d_dxyz_rwall_update                ../engine/source/output/h3d/h3d_build_fortran/h3d_dxyz_rwall_update.F
+!||    h3d_gather_id_val                    ../engine/source/output/h3d/spmd/h3d_gather_id_val.F90
+!||    h3d_nodal_scalar                     ../engine/source/output/h3d/h3d_results/h3d_nodal_scalar.F
+!||    h3d_nodal_tensor                     ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
+!||    h3d_nodal_vector                     ../engine/source/output/h3d/h3d_results/h3d_nodal_vector.F
+!||    h3d_oned_off                         ../engine/source/output/h3d/spmd/spmd_h3d_oned_off.F
+!||    h3d_oned_scalar                      ../engine/source/output/h3d/h3d_results/h3d_oned_scalar.F90
+!||    h3d_oned_tensor                      ../engine/source/output/h3d/h3d_results/h3d_oned_tensor.F
+!||    h3d_oned_torsor                      ../engine/source/output/h3d/h3d_results/h3d_oned_torsor.F
+!||    h3d_oned_vector                      ../engine/source/output/h3d/h3d_results/h3d_oned_vector.F
+!||    h3d_quad_off                         ../engine/source/output/h3d/spmd/spmd_h3d_quad_off.F
+!||    h3d_quad_scalar                      ../engine/source/output/h3d/h3d_results/h3d_quad_scalar.F
+!||    h3d_quad_tensor                      ../engine/source/output/h3d/h3d_results/h3d_quad_tensor.F
+!||    h3d_quad_vector                      ../engine/source/output/h3d/h3d_results/h3d_quad_vector.F
+!||    h3d_shell_off                        ../engine/source/output/h3d/spmd/spmd_h3d_shell_off.F
+!||    h3d_shell_scalar                     ../engine/source/output/h3d/h3d_results/h3d_shell_scalar.F
+!||    h3d_shell_tensor                     ../engine/source/output/h3d/h3d_results/h3d_shell_tensor.F
+!||    h3d_shell_vector                     ../engine/source/output/h3d/h3d_results/h3d_shell_vector.F
+!||    h3d_skin_ixskin                      ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||    h3d_skin_off                         ../engine/source/output/h3d/h3d_results/h3d_skin_off.F
+!||    h3d_skin_pre_map                     ../engine/source/output/h3d/h3d_results/h3d_skin_pre_map.F
+!||    h3d_skin_scalar                      ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||    h3d_skin_tensor                      ../engine/source/output/h3d/h3d_results/h3d_skin_tensor.F
+!||    h3d_skin_vector                      ../engine/source/output/h3d/h3d_results/h3d_skin_vector.F
+!||    h3d_solid_off                        ../engine/source/output/h3d/spmd/spmd_h3d_solid_off.F
+!||    h3d_solid_scalar                     ../engine/source/output/h3d/h3d_results/h3d_solid_scalar.F
+!||    h3d_solid_tensor                     ../engine/source/output/h3d/h3d_results/h3d_solid_tensor.F
+!||    h3d_solid_vector                     ../engine/source/output/h3d/h3d_results/h3d_solid_vector.F
+!||    h3d_sph_off                          ../engine/source/output/h3d/spmd/spmd_h3d_sph_off.F
+!||    h3d_sph_scalar                       ../engine/source/output/h3d/h3d_results/h3d_sph_scalar.F
+!||    h3d_sph_tensor                       ../engine/source/output/h3d/h3d_results/h3d_sph_tensor.F
+!||    h3d_update_fvmbag_centroids          ../engine/source/output/h3d/h3d_build_fortran/h3d_update_fvmbag_centroids.F
+!||    h3dlib_load                          ../engine/source/output/h3d/h3d_build_cpp/h3d_dl.c
+!||    scanor                               ../engine/source/output/anim/generate/scanor.F
+!||    spmd_gather_int                      ../engine/source/mpi/generic/spmd_gather_int.F
+!||    spmd_h3d_gather_i                    ../engine/source/output/h3d/spmd/spmd_h3d_gather_i.F
+!||    spmd_h3d_gather_i_node               ../engine/source/output/h3d/spmd/spmd_h3d_gather_i_node.F
+!||    spmd_h3d_gather_i_node_part          ../engine/source/output/h3d/spmd/spmd_h3d_gather_i_node_part.F
+!||    spmd_h3d_gather_r                    ../engine/source/output/h3d/spmd/spmd_h3d_gather_r.F
+!||    spmd_h3d_gather_r_nodal_value        ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_nodal_value.F
+!||    spmd_h3d_gather_r_node               ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_node.F
+!||    spmd_h3d_gather_t_node               ../engine/source/output/h3d/spmd/spmd_h3d_gather_t_node.F
+!||    spmd_h3d_max_r_nodal_value           ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_nodal_value.F
+!||    spmd_h3d_max_r_nodal_value_21        ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_nodal_value.F
+!||    spmd_h3d_sum_r_nodal                 ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_node.F
+!||    spmd_h3d_sum_r_nodal_21              ../engine/source/output/h3d/spmd/spmd_h3d_gather_r_node.F
+!||    spmd_h3d_sum_r_nodal_value           ../engine/source/output/h3d/spmd/spmd_h3d_sum_r_nodal_value.F
+!||    spmd_outpitab                        ../engine/source/mpi/interfaces/spmd_outp.F
+!||    startime                             ../engine/source/system/timer_mod.F90
+!||    stoptime                             ../engine/source/system/timer_mod.F90
+!||    sysfus2                              ../engine/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod                 ../common_source/modules/ale/ale_connectivity_mod.F
+!||    aleanim_mod                          ../common_source/modules/aleanim_mod.F
+!||    cluster_mod                          ../engine/share/modules/cluster_mod.F
+!||    crackxfem_mod                        ../engine/share/modules/crackxfem_mod.F
+!||    drape_mod                            ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod                         ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod                          ../common_source/modules/elements/element_mod.F90
+!||    fvbag_mod                            ../engine/share/modules/fvbag_mod.F
+!||    glob_therm_mod                       ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    groupdef_mod                         ../common_source/modules/groupdef_mod.F
+!||    h3d_gather_id_val_mod                ../engine/source/output/h3d/spmd/h3d_gather_id_val.F90
+!||    h3d_inc_mod                          ../engine/share/modules/h3d_inc_mod.F
+!||    h3d_mod                              ../engine/share/modules/h3d_mod.F
+!||    h3d_oned_scalar_mod                  ../engine/source/output/h3d/h3d_results/h3d_oned_scalar.F90
+!||    inoutfile_mod                        ../common_source/modules/inoutfile_mod.F
+!||    loads_mod                            ../common_source/modules/loads/loads_mod.F90
+!||    matparam_def_mod                     ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    message_mod                          ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod                        ../common_source/modules/ale/multi_fvm_mod.F90
+!||    my_alloc_mod                         ../common_source/tools/memory/my_alloc.F90
+!||    names_and_titles_mod                 ../common_source/modules/names_and_titles_mod.F
+!||    outmax_mod                           ../common_source/modules/outmax_mod.F
+!||    output_mod                           ../common_source/modules/output/output_mod.F90
+!||    pblast_mod                           ../common_source/modules/loads/pblast_mod.F90
+!||    plyxfem_mod                          ../engine/share/modules/plyxfem_mod.F
+!||    sensor_mod                           ../common_source/modules/sensor_mod.F90
+!||    spmd_mod                             ../engine/source/mpi/spmd_mod.F90
+!||    stack_mod                            ../engine/share/modules/stack_mod.F
+!||    table_mod                            ../engine/share/modules/table_mod.F
+!||    timer_mod                            ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE GENH3D(OUTPUT, TIMERS,X        ,D        ,V           ,A           ,BUFEL    ,
      2                  IXS      ,IXQ      ,IXC         ,IXT         ,IXP      ,
      3                  IXR      ,IXTG     ,SWAFT       ,SMAS        ,SXNORM   ,
      4                  SIAD     ,IPARG    ,PM          ,GEO         ,MS       ,
      5                  SINVERT  ,CONT     ,SMATER      ,ICUT        ,SKEW     ,
      6                  XCUT     ,FINT     ,ITAB        ,SEL2FA      ,FEXT     ,
-     7                  FOPT     ,ANIN     ,LPBY        ,NPBY        ,NSTRF    ,
+     7                  FOPT     ,LPBY        ,NPBY        ,NSTRF    ,
      8                  RWBUF    ,NPRW     ,TANI        ,ELBUF_TAB   ,MAT_PARAM,
      A                  DD_IAD   ,WEIGHT   ,EANI        ,IPART       ,CLUSTER  ,
      B                  IPARTS   ,IPARTQ   ,IPARTC      ,IPARTT      ,IPARTP   ,
@@ -217,7 +224,7 @@ C-----------------------------------------------
         USE CLUSTER_MOD
         USE STACK_MOD
         USE H3D_MOD
-        USE ALEANIM_MOD  !, ONLY : FANI_CELL
+        USE ALEANIM_MOD
         USE MULTI_FVM_MOD
         USE GROUPDEF_MOD
         USE INOUTFILE_MOD
@@ -225,7 +232,7 @@ C-----------------------------------------------
         USE SENSOR_MOD
         USE OUTMAX_MOD
         USE H3D_INC_MOD
-        USE OUTPUTS_MOD
+        USE OUTPUT_MOD
         USE TABLE_MOD
         USE LOADS_MOD
         USE MATPARAM_DEF_MOD
@@ -233,7 +240,10 @@ C-----------------------------------------------
         USE OUTMAX_MOD
         USE DRAPE_MOD
         use glob_therm_mod
-        USE PBLAST_MOD
+        USE PBLAST_MOD 
+        USE h3d_gather_id_val_mod
+        USE SPMD_MOD
+        use element_mod , only : nixs,nixq,nixc,nixt,nixr,nixp,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -270,14 +280,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT ! Output structure
         TYPE(TIMER_), INTENT(INOUT) :: TIMERS ! Timers for /MON
         INTEGER SWAFT,SMAS,SXNORM,SIAD,SINVERT,SMATER,SEL2FA,SWA4,
      .          SIADG,NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),
      .          LESDVOIS(*),SPH2SOL(*),SH4TREE(*),SH3TREE(*),TAG_SKINS6(*)
         INTEGER
-     .    SUIX, SXUSR ,SFACPTX,SIXEDGE,SIXFACET,SIXSOLID,SNUMX1,
+     .    SUIX, SXUSR ,SIXEDGE,SIXFACET,SIXSOLID,SNUMX1,
      .    SNUMX2,SNUMX3,SOFFX1,SOFFX2,SOFFX3,SMASS1,SMASS2,
-     .    SMASS3,SFUNC1,SFUNC2,SFUNC3,SFIN,SNFACPTX,NPF(*)
+     .    SMASS3,SFUNC1,SFUNC2,SFUNC3,SNFACPTX,NPF(*)
 
         INTEGER  IGEO(NPROPGI,NUMGEO),IPM(NPROPMI,NUMMAT),INDX_CRK(*),
      .    LRBE2(*),LRBE3(*),FR_RBE2(3,*),FR_RBE3M(3,*),
@@ -287,7 +298,7 @@ C-----------------------------------------------
      .     X(3*NUMNOD), D(3*NUMNOD), V(3*NUMNOD), A(3,NUMNOD), BUFEL(*),
      .     PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO),CONT(*),
      .     XCUT(*) , FINT(3,NUMNOD),MS(NUMNOD),RWBUF(NRWLP,*),SKEW(LSKEW,*),
-     .     RBY(NRBY,*),FEXT(3,NUMNOD) ,FOPT(6,*),ANIN(*),TANI(6,*),EANI(*),
+     .     RBY(NRBY,*),FEXT(3,NUMNOD) ,FOPT(6,*),TANI(6,*),EANI(*),
      .     TORS(15,*),BUFSF(*), RDATA(*),
      .     BUFMAT(*),BUFGEO(*),
      .     SPBUF(*), VR(3*NUMNOD),VOLMON(SVOLMON), RFLOW(*), FNCONT(3,*), FTCONT(3,*),
@@ -310,12 +321,9 @@ C-----------------------------------------------
      .          NODGLOB(*),IAD_ELEM(2,*),FR_ELEM(*),FR_WALL(*), IFLOW(*),
      .          IPARI(NPARI,*),IRBE2(NRBE2L,*),IRBE3(NRBE3L,*),
      .          WEIGHT_MD(*),NODGLOBXFE(*),IPARTIG3D(*)
-        INTEGER CTEXT(111), IB
-        INTEGER DD_IAD(NSPMD+1,*),
-     .          NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,
-     .          N1,N2,N3
+        INTEGER DD_IAD(NSPMD+1,*)
         INTEGER FR_SEC(NSPMD+1,*),FR_RBY2(3,*),IAD_RBY2(4,*),
-     .          NERBT(NRBODY),LOC_PROC,PROC,NERBE2T(NRBE2G),
+     .          NERBE2T(NRBE2G),
      .          NERBE3T(NRBE3G),IAD_RBE2(4,*),NV46,KXIG3D(*),
      .          IXIG3D(*),SIG3DSOLID,MDS_MATID(*)
         INTEGER LLOADP(SLLOADP)
@@ -339,8 +347,8 @@ C-----------------------------------------------
         TYPE (TTABLE),DIMENSION(NTABLE)  ,INTENT(IN) :: TABLE
         TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
         my_real , INTENT(IN) :: AR(SAR)
-        my_real , INTENT(IN) :: CSEFRIC(NINEFRIC,S_EFRICINT) ,CSEFRICG(S_EFRIC),
-     .                          CSEFRIC_STAMP(NINEFRIC_STAMP,S_EFRICINTG) ,CSEFRICG_STAMP(S_EFRICG)
+        my_real , INTENT(IN) :: CSEFRIC(OUTPUT%DATA%NINEFRIC,OUTPUT%DATA%S_EFRICINT) ,CSEFRICG(OUTPUT%DATA%S_EFRIC),
+     .  CSEFRIC_STAMP(OUTPUT%DATA%NINEFRIC_STAMP,OUTPUT%DATA%S_EFRICINTG) ,CSEFRICG_STAMP(OUTPUT%DATA%S_EFRICG)
         my_real ,DIMENSION(3,NUMNOD), INTENT(IN) :: X_C
         TYPE (DRAPE_) , INTENT(IN)  :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
         TYPE (DRAPEG_), INTENT(IN)  :: DRAPEG
@@ -350,40 +358,19 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         my_real, DIMENSION(:), ALLOCATABLE :: WAFT  , MAS   
-        INTEGER IAD(SIAD),INVERT(SINVERT),EL2FA(SEL2FA),
-     .          IADG(NSPMD,SIADG),
-     .          FIRST_NODE_IG3D
-
-        my_real ,DIMENSION (:), ALLOCATABLE :: CBUF
-        INTEGER ,DIMENSION (:), ALLOCATABLE :: ICBUF
-        SAVE CBUF,ICBUF
-
-        CHARACTER*80 STR, MES*30, TITL*100, H3DTITLE
+        INTEGER IAD(SIAD),INVERT(SINVERT),EL2FA(SEL2FA),IADG(NSPMD,SIADG)
+        CHARACTER*80 H3DTITLE
         CHARACTER(LEN=NCHARLINE100):: KEYWORD
         CHARACTER CH_H3D*4,FILNAM*100
-        INTEGER I, NBF, NBPART, MAGIC, J, IFUNC, FILEN, NSENSOR,
-     .          NELCUT,
-     .          N,K,
-     .          NERBY,ISK(6),
-     .          LAYER,IPT,GAUSS,ID_PLY,IUVAR,
-     .          ALL_SUB_CHILDS,IDMDS,IMDSVAR,ID
-        INTEGER II,II_L,INC,P,NSLARB_L,NDMA2,NUMELS_T,NSKEWA,NB1D,
-     .          M1,M2,M3,M,M01,NBONED_T, NBF_L, LEN, NUMELT_T,
-     .          NUMELR_T, NUMELP_T
-        INTEGER NERBE2,NERBE3
-        INTEGER I161,I16A,I16B,I16C,I16D,I16E,I16F,I16G,I16H,I16I,I16J,
-     .          I16K,I16L,I16M,I16N
+        INTEGER I, NBF, NBPART, J, IFUNC, FILEN, NSENSOR,NELCUT,K,NERBY,LAYER,IPT,GAUSS,ID_PLY,IUVAR
+        INTEGER II,INC,NDMA2, NBF_L
+        INTEGER NERBE2,NERBE3,ALL_SUB_CHILDS,IDMDS,IMDSVAR
+        INTEGER I161,I16A,I16B,I16C,I16D,I16E,I16F,I16G,I16H,I16I,I16J,I16K,I16L,I16M,I16N
         INTEGER NNN
         INTEGER ISPH3D
         INTEGER SBUFSPM,SBUFRECVM,SBUFSPO,SPORBY,N_OUTP_DATA,LEN_H3DTITLE,N_H3D_PART_LIST
-        my_real
-     .     CDG(3),XMIN,YMIN,ZMIN,XMAX,YMAX,ZMAX, SCALE,
-     .     RVAL
-        INTEGER 
-     .          JJ, 
-     .          NBPART2D, ISUBG,IR,IS,IT,INTER_INPUT,INTERSKID,
-     .          NI, ITYSKID, INTERFRIC
-
+        my_real CDG(3),XMIN,YMIN,ZMIN,XMAX,YMAX,ZMAX, SCALE
+        INTEGER IR,IS,IT,INTER_INPUT,INTERSKID,NI,ITYSKID,INTERFRIC
         INTEGER, DIMENSION(:), ALLOCATABLE :: SHELL_ID,SHELL_ID_P,
      .                                        SHELL_ITY,SHELL_ITY_P,ONED_ID,ONED_ID_P,
      .                                        ONED_ITY,ONED_ITY_P,SOLID_ID,SOLID_ID_P,
@@ -398,8 +385,8 @@ C-----------------------------------------------
      .                                        ISOLNOD,ISOLNOD_P
         INTEGER, DIMENSION(:), ALLOCATABLE :: IS_WRITEN_NODE_FVM,NODE_ID_FVM
         INTEGER  INFO1,INFO2,IS_CORNER_DATA, COMPID_RBODIES, COMPID_RBE2S, COMPID_RBE3S, MAX_PART_ID
-        INTEGER  ERROR_LOAD,NUMNOD_H3DPART,WORK(70000)
-c a mettre en allocatable
+        INTEGER  ERROR_LOAD,NUMNOD_H3DPART
+c to be made allocatable
         INTEGER, DIMENSION(:,:), ALLOCATABLE ::
      .           IXC_P,
      .           IXC_TMP,
@@ -442,23 +429,22 @@ c a mettre en allocatable
      .           IMAPSKP
         my_real, DIMENSION(:), ALLOCATABLE :: X_P,D_P
         INTEGER, DIMENSION(:), ALLOCATABLE :: ITAB_P
-
-        INTEGER :: IAD_H3DPART,IAD_P,NUMNODG0,IP0 ,NIXSKIN
-        INTEGER :: NUMELC_P(NSPMD),NUMNOD_P(NSPMD)
-
-
-
-C
+        INTEGER :: NUMNODG0,IP0 ,NIXSKIN
+        INTEGER :: NUMNOD_P(NSPMD)
         INTEGER MAX_NOD_ID,MAX_NCORN
-        my_real
-     .         , DIMENSION(:), ALLOCATABLE :: NODAL_SCALAR,NODAL_SCALAR_P,
+        REAL(KIND=4), DIMENSION(:), ALLOCATABLE :: SHELL_STACK
+        REAL(KIND=4), DIMENSION(:), ALLOCATABLE :: SHELL_STACK_P
+        INTEGER,DIMENSION(NSPMD) ::  GATHER_SIZE
+        INTEGER,DIMENSION(NSPMD) ::  TMP_OFFSETS
+        INTEGER,DIMENSION(NSPMD+1) ::  SH_TRIA_SPMD_OFFSETS
+        my_real, DIMENSION(:), ALLOCATABLE :: NODAL_SCALAR,NODAL_SCALAR_P,
      .                                        NODAL_VECTOR,NODAL_VECTOR_P,
      .                                        NODAL_TENSOR,NODAL_TENSOR_P,
      .                                        ONED_SCALAR,ONED_SCALAR_P,
      .                                        ONED_VECTOR,ONED_VECTOR_P,
      .                                        ONED_TENSOR,ONED_TENSOR_P,
      .                                        ONED_TORSOR,ONED_TORSOR_P,
-     .                                        SHELL_SCALAR,SHELL_SCALAR_P,
+     .                                        SHELL_SCALAR_P,SHELL_SCALAR,
      .                                        SHELL_VECTOR,SHELL_VECTOR_P,
      .                                        SHELL_TENSOR,SHELL_TENSOR_P,
      .                                        SOLID_SCALAR,SOLID_SCALAR_P,
@@ -476,29 +462,23 @@ C
      .                                        NODAL_VECTOR_FVM
         INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNOD,TAGNOD_P,
      .                                        ITAB_P_PART,ITABM1_P
-        my_real
-     .     XWL(NRWALL) ,YWL(NRWALL) , ZWL(NRWALL), V1(NRWALL), V2(NRWALL), V3(NRWALL),
-     .     VV1(NRWALL), VV2(NRWALL), VV3(NRWALL), XL(NRWALL), XN(NRWALL), YN(NRWALL),
-     .     ZN(NRWALL)
-
+        my_real XWL(NRWALL) ,YWL(NRWALL) , ZWL(NRWALL), V1(NRWALL), V2(NRWALL), V3(NRWALL),
+     .          VV1(NRWALL), VV2(NRWALL), VV3(NRWALL), XL(NRWALL), XN(NRWALL), YN(NRWALL),
+     .          ZN(NRWALL)
         LOGICAL IS_FILE_EXISTS
-!
         INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_CHILD,SUB_IAD,SUB_TITLE
         INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_NCHILD
         INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_LEVEL
         INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_ID
         INTEGER (KIND=8) :: H3DTOTALSIZE8
-
-        INTEGER :: LEN_TMP_NAME,LEN_RADVERS,OBJECT_ID, NPOLH, NPOLHG, NPOLH_ANIM, NPOLH_ANIM_G, NPOLH_P(0:NSPMD-1)
+        INTEGER :: LEN_TMP_NAME,LEN_RADVERS,OBJECT_ID, NPOLH, NPOLHG, NPOLH_ANIM, NPOLH_ANIM_G, 
+     *             FVM_GLOBALS(3)
         INTEGER :: AIRBAGS_TOTAL_FVM_IN_H3D_G
         CHARACTER(len=2148) :: TMP_NAME
         CHARACTER RADVERS*68
-
         TYPE(FVBAG_DATA), DIMENSION(:), ALLOCATABLE :: FVDATA_P
-        my_real, DIMENSION(:), ALLOCATABLE :: FVDATA_1D_ARRAY,FVDATA_1D_ARRAY_P
-        my_real TMP
+        my_real, DIMENSION(:), ALLOCATABLE :: FVDATA_1D_ARRAY
         INTEGER ITMP,MODE
-
         TYPE USER_NOD_ID_
           !VIRTUAL NODES MANAGEMENT
           !some option are writing virtual entities in H3D files. it requires to generate nodes which must have identifiers.
@@ -521,9 +501,13 @@ C
 
         TYPE(USER_NOD_ID_) :: USER_NOD_ID
         INTEGER SZ_ANIN
+        INTEGER :: MAX_SHELL_STACKSIZE          ! Maximum number of shell scalar to write
+        INTEGER :: SHELL_STACKSIZE              ! Number of shell scalar to write
+        INTEGER :: SHELL_STACKSIZE_P0           ! total shell scalar to write after gather
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
+        MAX_SHELL_STACKSIZE = NUMELC + NUMELTG
         CALL STARTIME(TIMERS,MACRO_TIMER_GENH3D)
 
         USER_NOD_ID%INPUT_MAX=0
@@ -873,6 +857,7 @@ c
           ENDIF
 C
           ALLOCATE(ITAB_P_PART(NUMNOD_H3DPART))
+          ITAB_P_PART(1:NUMNOD_H3DPART) = 0!Initialization needed, otherwise it may be used uninitialized in sysfus2 call
           ALLOCATE(ITABM1_P(2*NUMNODG))
 C
           IF(NSPMD > 1) THEN
@@ -939,57 +924,42 @@ c
 
         IF(NSPMD > 1)THEN
           IF(NFVBAG >0 )THEN
-            ALLOCATE (FVDATA_P(NFVBAG))
+
+            if (ispmd == 0)ALLOCATE (FVDATA_P(NFVBAG))
             AIRBAGS_TOTAL_FVM_IN_H3D_G = 0
             DO J=1,NFVBAG
-              !get %NPOLH form ISPMD=1 ; currently FVMBAG are stored on ISPMD=1. To be changed later
-              NPOLH = 0; IF(ISPMD == FVSPMD(J)%PMAIN-1)NPOLH = FVDATA(J)%NPOLH
-              NPOLH_P(:) = 0
-              CALL SPMD_H3D_GATHER_I(NPOLH, 1,NPOLH_P, NSPMD)
-              NPOLHG = NPOLH_P(FVSPMD(J)%PMAIN-1) ! index 1 because NPOLH is on ISPMD == FVSPMD(J)%PMAIN-1 ; otherwise sum of NPOLH_P
 
-              !get %NPOLH_ANIM form (FVSPMD(J)%PMAIN-1)=1 ; currently FVMBAG are stored on ISPMD=1. To be changed later
-              NPOLH_ANIM = 0; IF(ISPMD == FVSPMD(J)%PMAIN-1)NPOLH_ANIM = FVDATA(J)%NPOLH_ANIM
-              NPOLH_P(:) = 0
-              CALL SPMD_H3D_GATHER_I(NPOLH_ANIM, 1,NPOLH_P, NSPMD)
-              NPOLH_ANIM_G = NPOLH_P(FVSPMD(J)%PMAIN-1) ! index 1 because NPOLH is on (FVSPMD(J)%PMAIN-1) == 1 ; otherwise sum of NPOLH_P
+              ! get NPOLHG,NPOLH_ANIM_G, AIRBAGS_TOTAL_FVM_IN_H3D
+              if ( (FVSPMD(J)%PMAIN-1 == 0) .and. (ispmd == 0)) then ! no communication Internal mesh is already on Domain 0
 
-              !get AIRBAGS_TOTAL_FVM_IN_H3D
-              NPOLH_P(:) = 0
-              CALL SPMD_H3D_GATHER_I(AIRBAGS_TOTAL_FVM_IN_H3D, 1,NPOLH_P, NSPMD)
-              IF(ISPMD == 0)THEN
-                DO JJ=1,NSPMD
-                  AIRBAGS_TOTAL_FVM_IN_H3D_G = AIRBAGS_TOTAL_FVM_IN_H3D_G + NPOLH_P(JJ-1)   !sum NPOLH_ANIM
-                ENDDO
-              ENDIF
+                 NPOLHG                     = FVDATA(J)%NPOLH
+                 NPOLH_ANIM_G               = FVDATA(J)%NPOLH_ANIM
+                 AIRBAGS_TOTAL_FVM_IN_H3D_G = AIRBAGS_TOTAL_FVM_IN_H3D
 
-              !FVDATA data structure in a 1D array
-              NPOLH = MAX(1, NPOLH)
-              ALLOCATE(FVDATA_1D_ARRAY(12*NPOLH))
+              else
+                 if (FVSPMD(J)%PMAIN-1 == ispmd)then ! the airbag is on another domain the ispmd=0
 
-              IF(NPOLH > 0)THEN
-                FVDATA_1D_ARRAY(00*NPOLH+1:01*NPOLH) = FVDATA(J)%CENTROID_POLH(1,1:NPOLH)
-                FVDATA_1D_ARRAY(01*NPOLH+1:02*NPOLH) = FVDATA(J)%CENTROID_POLH(2,1:NPOLH)
-                FVDATA_1D_ARRAY(02*NPOLH+1:03*NPOLH) = FVDATA(J)%CENTROID_POLH(3,1:NPOLH)
-                FVDATA_1D_ARRAY(03*NPOLH+1:04*NPOLH) = FVDATA(J)%QPOLH(1,1:NPOLH)
-                FVDATA_1D_ARRAY(04*NPOLH+1:05*NPOLH) = FVDATA(J)%QPOLH(2,1:NPOLH)
-                FVDATA_1D_ARRAY(05*NPOLH+1:06*NPOLH) = FVDATA(J)%QPOLH(3,1:NPOLH)
-                FVDATA_1D_ARRAY(06*NPOLH+1:07*NPOLH) = FVDATA(J)%PPOLH(1:NPOLH)
-                FVDATA_1D_ARRAY(07*NPOLH+1:08*NPOLH) = FVDATA(J)%SSPPOLH(1:NPOLH)
-                FVDATA_1D_ARRAY(08*NPOLH+1:09*NPOLH) = FVDATA(J)%DTPOLH(1:NPOLH)
-                FVDATA_1D_ARRAY(09*NPOLH+1:10*NPOLH) = FVDATA(J)%MPOLH(1:NPOLH)
-                FVDATA_1D_ARRAY(10*NPOLH+1:11*NPOLH) = FVDATA(J)%RPOLH(1:NPOLH)
-                FVDATA_1D_ARRAY(11*NPOLH+1:12*NPOLH) = FVDATA(J)%TPOLH(1:NPOLH)
-              ENDIF
+                   FVM_GLOBALS(1) = FVDATA(J)%NPOLH
+                   FVM_GLOBALS(2) = FVDATA(J)%NPOLH_ANIM
+                   FVM_GLOBALS(3) = AIRBAGS_TOTAL_FVM_IN_H3D
 
-              ! spmd gathering of 1d array
-              NPOLHG = MAX(NPOLHG,1)
-              ALLOCATE(FVDATA_1D_ARRAY_P(12*NPOLHG))
-              FVDATA_1D_ARRAY_P(:) = 0
-              CALL SPMD_H3D_GATHER_R(FVDATA_1D_ARRAY, 12*NPOLH,FVDATA_1D_ARRAY_P, 12*NPOLHG)
+                   call spmd_send(FVM_GLOBALS,3,IT_SPMD(1),25001)
+                 endif
+ 
+                 if (ispmd == 0)then
+                    call spmd_recv(FVM_GLOBALS,3,IT_SPMD(FVSPMD(J)%PMAIN),25001)
+                    NPOLHG                     = FVM_GLOBALS(1)
+                    NPOLH_ANIM_G               = FVM_GLOBALS(2)
+                    AIRBAGS_TOTAL_FVM_IN_H3D_G = FVM_GLOBALS(3)
+                 else
+                    NPOLHG = 0
+                    NPOLH_ANIM_G = 0
+                    AIRBAGS_TOTAL_FVM_IN_H3D_G = 0
+                 endif
+              endif
 
-              ! on relevant domain (ispmd==0) retrieve FVBAG data structure from 1d array
-              IF(ISPMD==0)THEN
+              ! Allocate FVDATA_P
+              if (ispmd == 0)then
                 ALLOCATE (FVDATA_P(J)%CENTROID_POLH(3,NPOLHG))
                 ALLOCATE (FVDATA_P(J)%QPOLH(3,NPOLHG))
                 ALLOCATE (FVDATA_P(J)%PPOLH(NPOLHG))
@@ -1000,25 +970,62 @@ c
                 ALLOCATE (FVDATA_P(J)%TPOLH(NPOLHG))
                 FVDATA_P(J)%NPOLH = NPOLHG
                 FVDATA_P(J)%NPOLH_ANIM = NPOLH_ANIM_G
-                IF(NPOLHG > 0)THEN
-                  FVDATA_P(J)%CENTROID_POLH(1,1:NPOLHG) = FVDATA_1D_ARRAY_P(00*NPOLHG+1:01*NPOLHG)
-                  FVDATA_P(J)%CENTROID_POLH(2,1:NPOLHG) = FVDATA_1D_ARRAY_P(01*NPOLHG+1:02*NPOLHG)
-                  FVDATA_P(J)%CENTROID_POLH(3,1:NPOLHG) = FVDATA_1D_ARRAY_P(02*NPOLHG+1:03*NPOLHG)
-                  FVDATA_P(J)%QPOLH(1,1:NPOLHG)         = FVDATA_1D_ARRAY_P(03*NPOLHG+1:04*NPOLHG)
-                  FVDATA_P(J)%QPOLH(2,1:NPOLHG)         = FVDATA_1D_ARRAY_P(04*NPOLHG+1:05*NPOLHG)
-                  FVDATA_P(J)%QPOLH(3,1:NPOLHG)         = FVDATA_1D_ARRAY_P(05*NPOLHG+1:06*NPOLHG)
-                  FVDATA_P(J)%PPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY_P(06*NPOLHG+1:07*NPOLHG)
-                  FVDATA_P(J)%SSPPOLH(1:NPOLHG)         = FVDATA_1D_ARRAY_P(07*NPOLHG+1:08*NPOLHG)
-                  FVDATA_P(J)%DTPOLH(1:NPOLHG)          = FVDATA_1D_ARRAY_P(08*NPOLHG+1:09*NPOLHG)
-                  FVDATA_P(J)%MPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY_P(09*NPOLHG+1:10*NPOLHG)
-                  FVDATA_P(J)%RPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY_P(10*NPOLHG+1:11*NPOLHG)
-                  FVDATA_P(J)%TPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY_P(11*NPOLHG+1:12*NPOLHG)
-                ENDIF
-                USER_NOD_ID%FVMBAG_LEN = USER_NOD_ID%FVMBAG_LEN + NPOLHG
-              ENDIF
+              endif
 
-              DEALLOCATE(FVDATA_1D_ARRAY)
-              DEALLOCATE(FVDATA_1D_ARRAY_P)
+              if ( (FVSPMD(J)%PMAIN-1 == 0) .and. (ispmd == 0)) then ! no communication Internal mesh is already on Domain 0 just copy
+                 ! NPOLH = NPOLH_G
+                 FVDATA_P(J)%CENTROID_POLH(1,1:NPOLHG) = FVDATA(J)%CENTROID_POLH(1,1:NPOLHG)
+                 FVDATA_P(J)%CENTROID_POLH(2,1:NPOLHG) = FVDATA(J)%CENTROID_POLH(2,1:NPOLHG)
+                 FVDATA_P(J)%CENTROID_POLH(3,1:NPOLHG) = FVDATA(J)%CENTROID_POLH(3,1:NPOLHG)
+                 FVDATA_P(J)%QPOLH(1,1:NPOLHG)         = FVDATA(J)%QPOLH(1,1:NPOLHG)
+                 FVDATA_P(J)%QPOLH(2,1:NPOLHG)         = FVDATA(J)%QPOLH(2,1:NPOLHG)
+                 FVDATA_P(J)%QPOLH(3,1:NPOLHG)         = FVDATA(J)%QPOLH(3,1:NPOLHG)
+                 FVDATA_P(J)%PPOLH(1:NPOLHG)           = FVDATA(J)%PPOLH(1:NPOLHG)
+                 FVDATA_P(J)%SSPPOLH(1:NPOLHG)         = FVDATA(J)%SSPPOLH(1:NPOLHG)
+                 FVDATA_P(J)%DTPOLH(1:NPOLHG)          = FVDATA(J)%DTPOLH(1:NPOLHG)
+                 FVDATA_P(J)%MPOLH(1:NPOLHG)           = FVDATA(J)%MPOLH(1:NPOLHG)
+                 FVDATA_P(J)%RPOLH(1:NPOLHG)           = FVDATA(J)%RPOLH(1:NPOLHG)
+                 FVDATA_P(J)%TPOLH(1:NPOLHG)           = FVDATA(J)%TPOLH(1:NPOLHG)
+              else
+                 if (ispmd == FVSPMD(J)%PMAIN-1)then     ! Nothing to do for the others
+                    ALLOCATE(FVDATA_1D_ARRAY(12*NPOLHG))
+                    FVDATA_1D_ARRAY(00*NPOLHG+1:01*NPOLHG) = FVDATA(J)%CENTROID_POLH(1,1:NPOLHG)
+                    FVDATA_1D_ARRAY(01*NPOLHG+1:02*NPOLHG) = FVDATA(J)%CENTROID_POLH(2,1:NPOLHG)
+                    FVDATA_1D_ARRAY(02*NPOLHG+1:03*NPOLHG) = FVDATA(J)%CENTROID_POLH(3,1:NPOLHG)
+                    FVDATA_1D_ARRAY(03*NPOLHG+1:04*NPOLHG) = FVDATA(J)%QPOLH(1,1:NPOLHG)
+                    FVDATA_1D_ARRAY(04*NPOLHG+1:05*NPOLHG) = FVDATA(J)%QPOLH(2,1:NPOLHG)
+                    FVDATA_1D_ARRAY(05*NPOLHG+1:06*NPOLHG) = FVDATA(J)%QPOLH(3,1:NPOLHG)
+                    FVDATA_1D_ARRAY(06*NPOLHG+1:07*NPOLHG) = FVDATA(J)%PPOLH(1:NPOLHG)
+                    FVDATA_1D_ARRAY(07*NPOLHG+1:08*NPOLHG) = FVDATA(J)%SSPPOLH(1:NPOLHG)
+                    FVDATA_1D_ARRAY(08*NPOLHG+1:09*NPOLHG) = FVDATA(J)%DTPOLH(1:NPOLHG)
+                    FVDATA_1D_ARRAY(09*NPOLHG+1:10*NPOLHG) = FVDATA(J)%MPOLH(1:NPOLHG)
+                    FVDATA_1D_ARRAY(10*NPOLHG+1:11*NPOLHG) = FVDATA(J)%RPOLH(1:NPOLHG)
+                    FVDATA_1D_ARRAY(11*NPOLHG+1:12*NPOLHG) = FVDATA(J)%TPOLH(1:NPOLHG)
+
+                    call spmd_send(FVDATA_1D_ARRAY,12*NPOLHG,IT_SPMD(1),25000)
+                    DEALLOCATE(FVDATA_1D_ARRAY)
+                 endif
+
+                 if (ispmd == 0)then
+                    ALLOCATE(FVDATA_1D_ARRAY(12*NPOLHG))
+                    call spmd_recv(FVDATA_1D_ARRAY,12*NPOLHG,IT_SPMD(FVSPMD(J)%PMAIN),25000)
+
+                    FVDATA_P(J)%CENTROID_POLH(1,1:NPOLHG) = FVDATA_1D_ARRAY(00*NPOLHG+1:01*NPOLHG)
+                    FVDATA_P(J)%CENTROID_POLH(2,1:NPOLHG) = FVDATA_1D_ARRAY(01*NPOLHG+1:02*NPOLHG)
+                    FVDATA_P(J)%CENTROID_POLH(3,1:NPOLHG) = FVDATA_1D_ARRAY(02*NPOLHG+1:03*NPOLHG)
+                    FVDATA_P(J)%QPOLH(1,1:NPOLHG)         = FVDATA_1D_ARRAY(03*NPOLHG+1:04*NPOLHG)
+                    FVDATA_P(J)%QPOLH(2,1:NPOLHG)         = FVDATA_1D_ARRAY(04*NPOLHG+1:05*NPOLHG)
+                    FVDATA_P(J)%QPOLH(3,1:NPOLHG)         = FVDATA_1D_ARRAY(05*NPOLHG+1:06*NPOLHG)
+                    FVDATA_P(J)%PPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY(06*NPOLHG+1:07*NPOLHG)
+                    FVDATA_P(J)%SSPPOLH(1:NPOLHG)         = FVDATA_1D_ARRAY(07*NPOLHG+1:08*NPOLHG)
+                    FVDATA_P(J)%DTPOLH(1:NPOLHG)          = FVDATA_1D_ARRAY(08*NPOLHG+1:09*NPOLHG)
+                    FVDATA_P(J)%MPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY(09*NPOLHG+1:10*NPOLHG)
+                    FVDATA_P(J)%RPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY(10*NPOLHG+1:11*NPOLHG)
+                    FVDATA_P(J)%TPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY(11*NPOLHG+1:12*NPOLHG)
+                    USER_NOD_ID%FVMBAG_LEN = USER_NOD_ID%FVMBAG_LEN + NPOLHG
+                    DEALLOCATE(FVDATA_1D_ARRAY)
+                 endif
+              endif
 
             ENDDO
           ENDIF!NFVBAG > 0
@@ -1100,7 +1107,10 @@ c
             ENDDO
           ENDIF
 c
-          IF(NSPMD > 1) THEN
+          IF(NSPMD > 1) THEN 
+            if (ispmd == 0)then
+                IPARTSP_P(1:NUMSPHG)=0
+            endif
             CALL STARTIME(TIMERS,MACRO_TIMER_SPMDH3D)
             CALL SPMD_H3D_GATHER_I(IPARTSP,NUMSPH,IPARTSP_P,NUMSPHG)
             CALL STOPTIME(TIMERS,MACRO_TIMER_SPMDH3D)
@@ -1810,6 +1820,8 @@ c
 c
 c
         ALLOCATE(SHELL_SCALAR(NUMELC+NUMELTG))
+        ALLOCATE(SHELL_STACK(MAX_SHELL_STACKSIZE))
+        ALLOCATE(SHELL_STACK_P(NUMELCG+NUMELTGG))        
         ALLOCATE(SHELL_VECTOR(3*(NUMELC+NUMELTG)))
         ALLOCATE(SHELL_TENSOR(3*(NUMELC+NUMELTG)))
         ALLOCATE(SHELL_ID(NUMELC+NUMELTG))
@@ -1957,6 +1969,17 @@ c
           CALL SPMD_H3D_GATHER_I(SHELL_ID,NUMELC+NUMELTG,SHELL_ID_P,NUMELCG+NUMELTGG)
           CALL SPMD_H3D_GATHER_I(SHELL_ITY,NUMELC+NUMELTG,SHELL_ITY_P,NUMELCG+NUMELTGG)
           CALL SPMD_H3D_GATHER_R(SHELL_SCALAR,NUMELC+NUMELTG,SHELL_SCALAR_P,NUMELCG+NUMELTGG)
+
+          ! Gather number of Shell & Triangle elements per processor
+          ! Permits to compute an Offset for H3D Scalar values
+          CALL SPMD_GATHER_INT(NUMELC+NUMELTG,TMP_OFFSETS,IT_SPMD(1),1,NSPMD)
+          IF (ISPMD == 0) THEN
+             SH_TRIA_SPMD_OFFSETS(1) = 0
+             DO I=2,NSPMD+1
+                SH_TRIA_SPMD_OFFSETS(I) = SH_TRIA_SPMD_OFFSETS(I-1) + TMP_OFFSETS(I-1)
+             ENDDO
+          ENDIF
+          ! --------------------------------------------------------------------------
           CALL STOPTIME(TIMERS,MACRO_TIMER_SPMDH3D)
         ELSE
           SHELL_ID_P(1:NUMELC+NUMELTG) =  SHELL_ID(1:NUMELC+NUMELTG)
@@ -2093,6 +2116,14 @@ C  UPDATE RESULTS VALUES
 C-----------------------------------------------
 c
         DO I = 1,H3D_DATA%N_OUTP_H3D
+c
+          IS_WRITEN_NODE(1:NUMNOD) = 0
+          IS_WRITEN_SOLID(1:NUMELS) = 0
+          IS_WRITEN_SHELL(1:NUMELC+NUMELTG) = 0
+          IS_WRITEN_ONED(1:NUMELR+NUMELP+NUMELT) = 0
+          IS_WRITEN_QUAD(1:NUMELQ) = 0
+          IS_WRITEN_SPH(1:NUMSPH) = 0
+          IS_WRITEN_SKIN(1:NUMSKIN) = 0
 c-----
 c nodal scalar
 c-----
@@ -2129,9 +2160,9 @@ c          IF(ISPMD == 0) print *,'nodal scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INFO
 
 c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT_LIST(I)%PART(1:NPART)
 
-          CALL H3D_NODAL_SCALAR(
+          CALL H3D_NODAL_SCALAR(OUTPUT,
      .      ELBUF_TAB         ,NODAL_SCALAR  ,IFUNC          ,IPARG                        ,GEO                       ,
-     .      MAS               ,PM            ,ANIN           ,ITAB                         ,NODE_ID                   ,
+     .      MAS               ,PM            ,ITAB                         ,NODE_ID                   ,
      .      INFO1             ,INFO2         ,IS_WRITEN_NODE ,H3D_DATA%OUTPUT_LIST(I)%PART ,IPARTC                    ,
      .      IPARTTG           ,IXC           ,IXTG           ,TEMP                         ,IFLOW                     ,
      .      RFLOW             ,IXS           ,IXQ            ,NV46                         ,MONVOL                    ,
@@ -2143,7 +2174,7 @@ c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
      .      IXP               ,IXT           ,N_H3D_PART_LIST,INTERFRIC                    ,CSEFRIC                   ,
      .      CSEFRICG          ,CSEFRIC_STAMP ,CSEFRICG_STAMP ,NODAL_SCALAR_FVM             ,AIRBAGS_TOTAL_FVM_IN_H3D_G,
      .      IS_WRITEN_NODE_FVM,ISPMD         ,FVDATA_P       ,USER_NOD_ID%FVMBAG_SHIFT     ,MULTI_FVM ,
-     .      GLOB_THERM%ITHERM_FE)
+     .      GLOB_THERM%ITHERM_FE, NFVBAG)
 
 c
             IF (NSPMD > 1 ) THEN
@@ -2161,11 +2192,11 @@ c
               ELSEIF(KEYWORD == 'CSE_FRIC'.AND.INTERFRIC > 0)THEN
                 CALL SPMD_OUTPITAB(NODE_ID,WEIGHT,NODGLOB,NODE_ID_P)
                 CALL SPMD_OUTPITAB(IS_WRITEN_NODE,WEIGHT,NODGLOB,IS_WRITEN_NODE_P)
-                IF(INTERFRIC <= NINEFRIC ) THEN
+                IF(INTERFRIC <= OUTPUT%DATA%NINEFRIC ) THEN
                   CALL SPMD_H3D_SUM_R_NODAL_VALUE(NODGLOB,NODAL_SCALAR,NUMNOD,NODAL_SCALAR_P,NUMNODG)
                 ELSE
                   IF(ISPMD == 0) THEN
-                    NODAL_SCALAR_P(1:NUMNODG) =CSEFRIC_STAMP(INTERFRIC-NINEFRIC,1:NUMNODG)
+                    NODAL_SCALAR_P(1:NUMNODG) =CSEFRIC_STAMP(INTERFRIC-OUTPUT%DATA%NINEFRIC,1:NUMNODG)
                   ENDIF
                 ENDIF
               ELSEIF((KEYWORD == 'CSE_FRIC'.AND.INTERFRIC == 0).OR.KEYWORD == 'CSE_FRICG')THEN
@@ -2231,7 +2262,7 @@ c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
 
             CALL H3D_NODAL_VECTOR(
      .                     ELBUF_TAB         ,NODAL_VECTOR             , IFUNC         ,IPARG  ,GEO             ,
-     .                     MAS               ,PM                       , ANIN          ,ITAB   ,NODE_ID         ,
+     .                     MAS               ,PM                       , ITAB   ,NODE_ID         ,
      .                     INFO1             ,INFO2                    , IS_WRITEN_NODE,H3D_DATA%OUTPUT_LIST(I)%PART,
      .                     IPARTC          ,
      .                     IPARTTG           ,IXC                      , IXTG          ,TEMP   ,IFLOW           ,
@@ -2344,7 +2375,7 @@ c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
 
             CALL H3D_NODAL_TENSOR(
      .                       ELBUF_TAB, NODAL_TENSOR ,IFUNC      ,IPARG,GEO ,MAS       ,PM         ,
-     .                        ANIN , ITAB, NODE_ID   ,INFO1        ,INFO2      ,
+     .                        ITAB, NODE_ID   ,INFO1        ,INFO2      ,
      .                       IS_WRITEN_NODE,H3D_DATA%OUTPUT_LIST(I)%PART ,IPARTC,IPARTTG,
      .                    IXC, IXTG,TEMP,IFLOW,RFLOW,IXS,IXQ,NV46,MONVOL   ,VOLMON, DIAG_SMS,MS,
      .                     PDAMA2,X, STIFR, STIFN, A, D, V, CONT, FCONTG, FINT, FEXT,KEYWORD,
@@ -2391,7 +2422,7 @@ c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
 
             SZ_ANIN = SANIN - NDMA2
             CALL H3D_ONED_SCALAR(ELBUF_TAB      ,IPARG    ,GEO  , IXT,
-     .                           IXP            ,IXR      ,PM   , ANIN(NDMA2+1),
+     .                           IXP            ,IXR      ,PM   , OUTPUT%DATA%SCAL_SPRING,
      .                           ONED_SCALAR    ,ONED_ID  ,ONED_ITY,
      .                           IS_WRITEN_ONED ,IPARTT ,IPARTP,IPARTR,H3D_DATA%OUTPUT_LIST(I)%PART,
      .                           KEYWORD, X , D   ,IPT, 
@@ -2439,7 +2470,7 @@ c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
 
             CALL H3D_ONED_VECTOR(ELBUF_TAB   ,IFUNC  ,IPARG    ,GEO  ,
      .                  IXT          ,IXP    ,IXR    ,PM   ,
-     .                  ANIN(NDMA2+1),ONED_VECTOR,
+     .                  OUTPUT%DATA%SCAL_SPRING,ONED_VECTOR,
      .                  ONED_ID      ,ONED_ITY,INFO1 ,INFO2    , IS_WRITEN_ONED  ,
      .                  IPARTT ,IPARTP,IPARTR,H3D_DATA%OUTPUT_LIST(I)%PART,
      .                  KEYWORD      , X     , D     ,TORS   )
@@ -2484,7 +2515,7 @@ c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
 
             CALL H3D_ONED_TENSOR(ELBUF_TAB   ,IFUNC  ,IPARG    ,GEO  ,
      .                  IXT          ,IXP    ,IXR    ,PM   ,
-     .                  ANIN(NDMA2+1),ONED_TENSOR,
+     .                  OUTPUT%DATA%SCAL_SPRING,ONED_TENSOR,
      .                  ONED_ID      ,ONED_ITY,INFO1 ,INFO2    , IS_WRITEN_ONED  ,
      .                  IPARTT ,IPARTP,IPARTR,H3D_DATA%OUTPUT_LIST(I)%PART,
      .                  KEYWORD      , X     , D     ,IPT)
@@ -2575,9 +2606,10 @@ c         IF(ISPMD == 0)  print *,'shell scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INFO
 
 c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT_LIST(I)%PART(1:NPART)
 
+            SHELL_STACKSIZE = 0
             CALL H3D_SHELL_SCALAR(
-     .                       ELBUF_TAB ,SHELL_SCALAR ,IPARG        ,GEO        ,
-     .                       IXC       ,IXTG          ,PM           ,BUFMAT     ,
+     .                       ELBUF_TAB ,SHELL_STACK ,IPARG        ,GEO        ,
+     .                       IXC       ,IXTG          ,PM         ,BUFMAT     ,
      .                       EANI,
      .                       IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                       X         ,V             ,W            ,ALE_CONNECT,
@@ -2586,26 +2618,42 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
      .                       IS_WRITEN_SHELL,IPARTC ,IPARTTG     ,LAYER        ,IPT        ,
      .                       ID_PLY     ,IUVAR ,H3D_DATA%OUTPUT_LIST(I)%PART,KEYWORD,GLOB_THERM%ITHERM,
      .                       D          ,MULTI_FVM ,IDMDS        ,IMDSVAR      ,MDS_MATID  ,
-     .                       OBJECT_ID  ,MODE      ,MAT_PARAM    )
+     .                       OBJECT_ID  ,MODE      ,MAT_PARAM    ,H3D_DATA%LIGHT,MAX_SHELL_STACKSIZE,
+     .                       SHELL_STACKSIZE)
 
 c
+           
+            if (ispmd==0) then
+                IS_WRITEN_SHELL_P(1:SHELL_STACKSIZE) =  IS_WRITEN_SHELL(1:SHELL_STACKSIZE)
+                SHELL_STACK_P(1:SHELL_STACKSIZE) =  SHELL_STACK(1:SHELL_STACKSIZE)
+                SHELL_STACKSIZE_P0 = SHELL_STACKSIZE
+            else
+                SHELL_STACKSIZE_P0 = 1
+            endif
             IF (NSPMD > 1 ) THEN
-              CALL STARTIME(TIMERS,MACRO_TIMER_SPMDH3D)
-              CALL SPMD_H3D_GATHER_I(IS_WRITEN_SHELL,NUMELC+NUMELTG,IS_WRITEN_SHELL_P,NUMELCG+NUMELTGG)
-              CALL SPMD_H3D_GATHER_R(SHELL_SCALAR,NUMELC+NUMELTG,SHELL_SCALAR_P,NUMELCG+NUMELTGG)
-              CALL STOPTIME(TIMERS,MACRO_TIMER_SPMDH3D)
-            ELSE
-              IS_WRITEN_SHELL_P(1:NUMELC+NUMELTG) =  IS_WRITEN_SHELL(1:NUMELC+NUMELTG)
-              SHELL_SCALAR_P(1:NUMELC+NUMELTG) =  SHELL_SCALAR(1:NUMELC+NUMELTG)
+               CALL STARTIME(TIMERS,MACRO_TIMER_SPMDH3D)
+
+               ! First Gather the size of the shell+triangle stack
+               CALL SPMD_GATHER_INT(SHELL_STACKSIZE,GATHER_SIZE,IT_SPMD(1),1,NSPMD)
+
+               ! Then gather the shell+triangle stack to P0 & apply elemen offset
+               ! to fit with P0 order
+               CALL H3D_GATHER_ID_VAL(IS_WRITEN_SHELL,SHELL_STACK,SHELL_STACKSIZE,
+     *           IS_WRITEN_SHELL_P,SHELL_STACK_P,NUMELCG+NUMELTGG,
+     *           SHELL_STACKSIZE_P0,GATHER_SIZE,SH_TRIA_SPMD_OFFSETS,NSPMD,ISPMD,IT_SPMD)      
+
+               CALL STOPTIME(TIMERS,MACRO_TIMER_SPMDH3D)
             ENDIF
 c
             IF(ISPMD == 0) THEN
+
               CALL STARTIME(TIMERS,MACRO_TIMER_LIBH3D)
               CALL C_H3D_UPDATE_SHELL_SCALAR(TT,H3D_DATA%IH3D,ITAB,NUMNOD,IXC_P,
      .                             NIXC,NUMELCG,IPARTC,IXTG,NIXTG,
-     .                             NUMELTGG,IPARTTG,SHELL_SCALAR_P,SHELL_ID_P,
+     .                             NUMELTGG,IPARTTG,SHELL_STACK_P,SHELL_ID_P,
      .                             N_OUTP_DATA,SHELL_ITY_P,NUMELS,
-     .                             NUMELQ,NUMELT,NUMELP,NUMELR,IS_WRITEN_SHELL_P)
+     .                             NUMELQ,NUMELT,NUMELP,NUMELR,IS_WRITEN_SHELL_P,
+     .                             SHELL_STACKSIZE_P0)
               CALL STOPTIME(TIMERS,MACRO_TIMER_LIBH3D)
 
             ENDIF
@@ -2633,7 +2681,7 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
      .                       ELBUF_TAB ,SHELL_VECTOR ,IFUNC      ,IPARG,GEO    ,
      .                       IXQ       ,IXC       ,IXTG          ,PM       ,
      .                       EL2FA     ,NBF       ,IAD          ,
-     .                       NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
+     .                       NBF_L     ,EANI      ,OUTPUT%DATA%SCAL_SPRING ,NBPART       ,IADG       ,
      .                       IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                       INVERT    ,X         ,V             ,W            ,
      .                       NV46      ,NERCVOIS  ,NESDVOIS      ,LERCVOIS     ,LESDVOIS   ,
@@ -2750,7 +2798,7 @@ c          IF(ISPMD == 0)  print *,'solid scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INF
      .                      NERCVOIS,NESDVOIS, LERCVOIS,LESDVOIS,
      .                      SOLID_ID  ,SOLID_ITY     ,IPARTS       ,LAYER      ,
      .                      IR        ,IS        ,IT            ,IUVAR        ,H3D_DATA%OUTPUT_LIST(I)%PART,
-     .                      IS_WRITEN_SOLID,INFO1,KEYWORD       ,GLOB_THERM%ITHERM,FANI_CELL    ,
+     .                      IS_WRITEN_SOLID,INFO1,KEYWORD       ,GLOB_THERM%ITHERM,OUTPUT%DATA%FANI_CELL    ,
      .                      MULTI_FVM, IDMDS         ,IMDSVAR      ,
      .                      OBJECT_ID ,MAT_PARAM ,MODE          )
 c
@@ -2795,13 +2843,13 @@ c          IF(ISPMD == 0)  print *,'solid scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INF
      .                      ELBUF_TAB ,SOLID_VECTOR ,IFUNC      ,IPARG,GEO    ,
      .                      IXQ       ,IXS       ,IXTG          ,PM           ,
      .                      EL2FA     ,NBF       ,IAD          ,
-     .                      NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
+     .                      NBF_L     ,EANI      ,OUTPUT%DATA%SCAL_SPRING ,NBPART       ,IADG       ,
      .                      IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                      INVERT    ,X         ,V             ,W            ,
      .                      NV46      ,NERCVOIS  ,NESDVOIS      ,LERCVOIS     ,LESDVOIS   ,
      .                      STACK     ,SOLID_ID  ,SOLID_ITY     ,IPARTS       ,LAYER      ,
      .                      IR        ,IS        ,IT            ,IUVAR        ,H3D_DATA%OUTPUT_LIST(I)%PART,
-     .                      IS_WRITEN_SOLID,INFO1,KEYWORD       ,FANI_CELL    ,
+     .                      IS_WRITEN_SOLID,INFO1,KEYWORD       ,OUTPUT%DATA%FANI_CELL    ,
      .                      H3D_DATA, MULTI_FVM)
 c
             IF (NSPMD > 1 ) THEN
@@ -3029,7 +3077,7 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
      .                       ELBUF_TAB ,QUAD_VECTOR ,IFUNC      ,IPARG,GEO    ,
      .                       IXQ       ,IXC       ,IXTG          ,PM       ,
      .                       EL2FA     ,NBF       ,IAD          ,
-     .                       NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
+     .                       NBF_L     ,EANI      ,OUTPUT%DATA%SCAL_SPRING ,NBPART       ,IADG       ,
      .                       IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                       INVERT    ,X         ,V             ,W            ,
      .                       NV46      ,NERCVOIS  ,NESDVOIS      ,LERCVOIS     ,LESDVOIS   ,
@@ -3253,19 +3301,21 @@ c-----
         IF(ALLOCATED(NODE_ID_FVM))DEALLOCATE(NODE_ID_FVM)
         IF(ALLOCATED(IS_WRITEN_NODE_FVM))DEALLOCATE(IS_WRITEN_NODE_FVM)
 
-        ! FVDATA_P deallocate
-        IF(ALLOCATED(FVDATA_P))THEN
-          DO J=1,NFVBAG
-            IF(ASSOCIATED(FVDATA_P(J)%CENTROID_POLH))DEALLOCATE (FVDATA_P(J)%CENTROID_POLH)
-            IF(ASSOCIATED(FVDATA_P(J)%PPOLH))DEALLOCATE (FVDATA_P(J)%PPOLH)
-            IF(ASSOCIATED(FVDATA_P(J)%SSPPOLH))DEALLOCATE (FVDATA_P(J)%SSPPOLH)
-            IF(ASSOCIATED(FVDATA_P(J)%DTPOLH))DEALLOCATE (FVDATA_P(J)%DTPOLH)
-            IF(ASSOCIATED(FVDATA_P(J)%QPOLH))DEALLOCATE (FVDATA_P(J)%QPOLH)
-            IF(ASSOCIATED(FVDATA_P(J)%MPOLH))DEALLOCATE (FVDATA_P(J)%MPOLH)
-            IF(ASSOCIATED(FVDATA_P(J)%RPOLH))DEALLOCATE (FVDATA_P(J)%RPOLH)
-            IF(ASSOCIATED(FVDATA_P(J)%TPOLH))DEALLOCATE (FVDATA_P(J)%TPOLH)
-          ENDDO
-          DEALLOCATE(FVDATA_P)
+        if (ispmd ==0)then
+          ! FVDATA_P deallocate
+          IF(ALLOCATED(FVDATA_P))THEN
+            DO J=1,NFVBAG
+              IF(ASSOCIATED(FVDATA_P(J)%CENTROID_POLH))DEALLOCATE (FVDATA_P(J)%CENTROID_POLH)
+              IF(ASSOCIATED(FVDATA_P(J)%PPOLH))DEALLOCATE (FVDATA_P(J)%PPOLH)
+              IF(ASSOCIATED(FVDATA_P(J)%SSPPOLH))DEALLOCATE (FVDATA_P(J)%SSPPOLH)
+              IF(ASSOCIATED(FVDATA_P(J)%DTPOLH))DEALLOCATE (FVDATA_P(J)%DTPOLH)
+              IF(ASSOCIATED(FVDATA_P(J)%QPOLH))DEALLOCATE (FVDATA_P(J)%QPOLH)
+              IF(ASSOCIATED(FVDATA_P(J)%MPOLH))DEALLOCATE (FVDATA_P(J)%MPOLH)
+              IF(ASSOCIATED(FVDATA_P(J)%RPOLH))DEALLOCATE (FVDATA_P(J)%RPOLH)
+              IF(ASSOCIATED(FVDATA_P(J)%TPOLH))DEALLOCATE (FVDATA_P(J)%TPOLH)
+            ENDDO
+            DEALLOCATE(FVDATA_P)
+          ENDIF
         ENDIF
 
         DEALLOCATE(NODAL_SCALAR)

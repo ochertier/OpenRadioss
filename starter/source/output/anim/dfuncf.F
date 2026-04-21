@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dfuncf         ../starter/source/output/anim/dfuncf.F
-      !||--- called by ------------------------------------------------------
-      !||    genani1        ../starter/source/output/anim/genani1.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    dfuncf         ../starter/source/output/anim/dfuncf.F
+!||--- called by ------------------------------------------------------
+!||    genani1        ../starter/source/output/anim/genani1.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE DFUNCF(ELBUF_TAB,FUNC  ,IFUNC ,IPARG  ,GEO   ,                  
      .                  IXT      ,IXP   ,IXR   ,MASS   ,PM    ,                  
      .                  EL2FA    ,NBF   ,IADP  ,NBPART ,XFUNC1)
@@ -34,6 +34,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixt,nixp,nixr
 C-----------------------------------------------                        
 C   I m p l i c i t   T y p e s                                         
 C-----------------------------------------------                        
@@ -77,7 +78,7 @@ C     REAL
 C
       TYPE(G_BUFEL_)  ,POINTER :: GBUF
 C-----------------------------------------------
-C La routine ne fonctionne que pour les IFUNC 3,7,14-19 (stress)        
+C La routine ne fonctionne que pour les IFUNC 3,7,14-19 (stress)
 C-----------------------------------------------                        
 C                                                                       
       NN1 = 1                                                           
@@ -251,7 +252,7 @@ C
           ENDIF
         ENDIF ! IF (ITY)
 C-----------------------------------------------                        
-C       FIN DE BOUCLE SUR LES OFFSET                                    
+C       END OF LOOP ON OFFSETS
 C-----------------------------------------------                        
        ENDDO ! DO OFFSET = 0,NEL-1,NVSIZ
       ENDDO !       DO NG=1,NGROUP

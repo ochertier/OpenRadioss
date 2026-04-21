@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
-      !||====================================================================
-      !||    sensor_contact   ../engine/source/tools/sensor/sensor_contact.F
-      !||--- called by ------------------------------------------------------
-      !||    sensor_base      ../engine/source/tools/sensor/sensor_base.F
-      !||--- calls      -----------------------------------------------------
-      !||    butterworth      ../engine/source/tools/univ/butterworth.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sensor_contact   ../engine/source/tools/sensor/sensor_contact.F
+!||--- called by ------------------------------------------------------
+!||    sensor_base      ../engine/source/tools/sensor/sensor_base.F
+!||--- calls      -----------------------------------------------------
+!||    butterworth      ../engine/source/tools/univ/butterworth.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SENSOR_CONTACT(SENSOR ,
      .           IPARI    ,DIMFB   ,STABS   ,TABS   ,FBSAV6)
 C-----------------------------------------------
@@ -61,8 +61,7 @@ C Local Variables
 C----------------------------------------------------------
       INTEGER :: INT_ID,INTSUB,ID_INTER,IDIR,ICRIT,ISECT,IFLAG
       my_real :: FMIN,FMAX,FF,FV,FV1,FV2,VV1,VV2,FREQ,
-     .           TMIN,TDELAY,TCRIT,TSTART,TSTOPS,INFINITY
-      PARAMETER (INFINITY = 1.0E20)
+     .           TMIN,TDELAY,TCRIT,TSTART,TSTOPS
 C=======================================================================
       TMIN   = SENSOR%TMIN
       TDELAY = SENSOR%TDELAY

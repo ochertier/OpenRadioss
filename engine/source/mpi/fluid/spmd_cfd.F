@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,19 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #include "macro.inc"
-      !||====================================================================
-      !||    spmd_xvois     ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain        ../engine/source/ale/alemain.F
-      !||    alethe         ../engine/source/ale/alethe.F
-      !||    alew1          ../engine/source/ale/grid/alew1.F
-      !||    alew5          ../engine/source/ale/grid/alew5.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_xvois     ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alemain        ../engine/source/ale/alemain.F
+!||    alethe         ../engine/source/ale/alethe.F
+!||    alew1          ../engine/source/ale/grid/alew1.F
+!||    alew5          ../engine/source/ale/grid/alew5.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany   ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_XVOIS(
      1    X     ,NBRCVOIS,NBSDVOIS,LNRCVOIS,LNSDVOIS,
      2    LENCOM)
@@ -42,10 +42,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#include "spmd.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -130,16 +126,16 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_wvois     ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alew           ../engine/source/ale/grid/alew.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_wvois     ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alew           ../engine/source/ale/grid/alew.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany   ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_WVOIS(X       ,D       ,W ,NBRCVOIS,NBSDVOIS,
      .                      LNRCVOIS,LNSDVOIS,LENCOM)
       USE SPMD_MOD
@@ -247,18 +243,18 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    spmd_evois     ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    aeturb         ../engine/source/ale/turbulence/aeturb.F
-      !||    akturb         ../engine/source/ale/turbulence/akturb.F
-      !||    atherm         ../engine/source/ale/atherm.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_evois     ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    aeturb         ../engine/source/ale/turbulence/aeturb.F
+!||    akturb         ../engine/source/ale/turbulence/akturb.F
+!||    atherm         ../engine/source/ale/atherm.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany   ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_EVOIS(
      1     T       ,VAL2  ,NERCVOIS,NESDVOIS,LERCVOIS,
      2     LESDVOIS,LENCOM)
@@ -353,26 +349,22 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_e1vois                      ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    aconve                           ../engine/source/ale/aconve.F
-      !||    afluxt                           ../engine/source/ale/ale51/afluxt.F
-      !||    agauge                           ../engine/source/ale/agauge.F
-      !||    ale51_gradient_reconstruction    ../engine/source/ale/alemuscl/ale51_gradient_reconstruction.F
-      !||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
-      !||    alew6                            ../engine/source/ale/grid/alew6.F
-      !||    arezon                           ../engine/source/ale/arezon.F
-      !||    multi_timeevolution              ../engine/source/multifluid/multi_timeevolution.F
-      !||    ns_fvm_diffusion                 ../engine/source/multifluid/ns_fvm_diffusion.F
-      !||    prelecflow                       ../engine/source/elements/solid/solide/prelecflow.F
-      !||    schlieren_buffer_gathering       ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait                        ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany                     ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod                         ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_e1vois                      ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    agauge                           ../engine/source/ale/agauge.F
+!||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
+!||    alew6                            ../engine/source/ale/grid/alew6.F
+!||    multi_timeevolution              ../engine/source/multifluid/multi_timeevolution.F
+!||    ns_fvm_diffusion                 ../engine/source/multifluid/ns_fvm_diffusion.F
+!||    prelecflow                       ../engine/source/elements/solid/solide/prelecflow.F
+!||    schlieren_buffer_gathering       ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait                        ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany                     ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod                         ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_E1VOIS(
      1                        PHI     ,NERCVOIS,NESDVOIS,LERCVOIS,
      2                        LESDVOIS,LENCOM  )
@@ -462,16 +454,14 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_e6vois    ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    afluxt         ../engine/source/ale/ale51/afluxt.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_e6vois    ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany   ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_E6VOIS(
      1                       PHI     ,NERCVOIS,NESDVOIS,LERCVOIS,
      2                       LESDVOIS,LENCOM  )
@@ -574,16 +564,14 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    spmd_e4vois    ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    afluxt         ../engine/source/ale/ale51/afluxt.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_e4vois    ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany   ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_E4VOIS(
      1                       PHI     ,NERCVOIS,NESDVOIS,LERCVOIS,
      2                       LESDVOIS,LENCOM  )
@@ -681,18 +669,18 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_envois           ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain               ../engine/source/ale/alemain.F
-      !||    alew6                 ../engine/source/ale/grid/alew6.F
-      !||    multi_timeevolution   ../engine/source/multifluid/multi_timeevolution.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait             ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany          ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_envois           ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alemain               ../engine/source/ale/alemain.F
+!||    alew6                 ../engine/source/ale/grid/alew6.F
+!||    multi_timeevolution   ../engine/source/multifluid/multi_timeevolution.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait             ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany          ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_ENVOIS(DIM,
      1                       PHI     ,NERCVOIS,NESDVOIS,LERCVOIS,
      2                       LESDVOIS,LENCOM  )
@@ -787,16 +775,16 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_i8vois    ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    afluxt         ../engine/source/ale/ale51/afluxt.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_i8vois     ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    init_ale_spmd   ../engine/source/ale/init_ale_spmd.F90
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait       ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany    ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_I8VOIS(
      1                       PHI   ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,
      2                       LENCOM)
@@ -907,16 +895,16 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    spmd_i4vois    ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    afluxt         ../engine/source/ale/ale51/afluxt.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_i4vois     ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    init_ale_spmd   ../engine/source/ale/init_ale_spmd.F90
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait       ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany    ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_I4VOIS(
      1                       PHI   ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,
      2                       LENCOM)
@@ -1017,17 +1005,18 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_l11vois   ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain        ../engine/source/ale/alemain.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_l11vois   ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alemain        ../engine/source/ale/alemain.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait      ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany   ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_L11VOIS(
      1                        LBVOIS  ,IPARG   ,ELBUF_TAB,PM      ,IXS,
      2                        IXQ     ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,
@@ -1037,6 +1026,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE SPMD_MOD
+      use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1200,16 +1190,16 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_exalew   ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alew2         ../engine/source/ale/grid/alew2.F
-      !||    alew4         ../engine/source/ale/grid/alew4.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait     ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod      ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_exalew   ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alew2         ../engine/source/ale/grid/alew2.F
+!||    alew4         ../engine/source/ale/grid/alew4.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait     ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod      ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_EXALEW(WA,WB,IAD_ELEM,FR_ELEM,NALE,SIZE,LENR)
         USE SPMD_MOD
 C-----------------------------------------------
@@ -1329,17 +1319,17 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_exalew_pon   ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alew2             ../engine/source/ale/grid/alew2.F
-      !||    alew4             ../engine/source/ale/grid/alew4.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait         ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany      ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod          ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_exalew_pon   ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alew2             ../engine/source/ale/grid/alew2.F
+!||    alew4             ../engine/source/ale/grid/alew4.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait         ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany      ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod          ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_EXALEW_PON(
      1   FSKY  ,FSKYV ,IAD_ELEM,FR_ELEM,NALE,
      2   ADDCNE,PROCNE,FR_NBCC ,SIZE   ,LENR,
@@ -1410,17 +1400,6 @@ C
           NOD = FR_ELEM(J)
           IF(IABS(NALE(NOD)) == 1) THEN
             IF(IVECTOR == 1) THEN
-              DO CC = ADDCNE(NOD),ADDCNE(NOD+1)-1
-                IF(PROCNE(CC) == LOC_PROC) THEN
-                  SBUF(L)   = FSKYV(CC,1)
-                  SBUF(L+1) = FSKYV(CC,2)
-                  SBUF(L+2) = FSKYV(CC,3)
-                  SBUF(L+3) = FSKYV(CC,4)
-                  SBUF(L+4) = FSKYV(CC,5)
-                  SBUF(L+5) = FSKYV(CC,6)
-                  L = L + SIZE
-                ENDIF
-              ENDDO
             ELSE
               DO CC = ADDCNE(NOD),ADDCNE(NOD+1)-1
                 IF(PROCNE(CC) == LOC_PROC) THEN
@@ -1460,17 +1439,6 @@ C
           NOD = FR_ELEM(J)
           IF(IABS(NALE(NOD)) == 1) THEN
             IF(IVECTOR == 1) THEN
-              DO CC = ADDCNE(NOD), ADDCNE(NOD+1)-1
-                IF(PROCNE(CC) == I) THEN
-                  FSKYV(CC,1) = RBUF(L)
-                  FSKYV(CC,2) = RBUF(L+1)
-                  FSKYV(CC,3) = RBUF(L+2)
-                  FSKYV(CC,4) = RBUF(L+3)
-                  FSKYV(CC,5) = RBUF(L+4)
-                  FSKYV(CC,6) = RBUF(L+5)
-                  L = L + SIZE
-                ENDIF
-              ENDDO
             ELSE
               DO CC = ADDCNE(NOD), ADDCNE(NOD+1)-1
                 IF(PROCNE(CC) == I) THEN
@@ -1502,14 +1470,14 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_glob_dmin9   ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    wrrestp           ../engine/source/output/restart/wrrestp.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod          ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_glob_dmin9   ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    wrrestp           ../engine/source/output/restart/wrrestp.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod          ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_GLOB_DMIN9(V,LEN)
         USE SPMD_MOD
 C-----------------------------------------------
@@ -1557,16 +1525,16 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_extag   ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    rgwat2       ../engine/source/interfaces/int09/rgwat2.F
-      !||    rgwat3       ../engine/source/interfaces/int09/rgwat3.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait    ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    spmd_mod     ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_extag   ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    rgwat2       ../engine/source/interfaces/int09/rgwat2.F
+!||    rgwat3       ../engine/source/interfaces/int09/rgwat3.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait    ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    spmd_mod     ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_EXTAG(NTAG,IAD_ELEM,FR_ELEM,LENR)
         USE SPMD_MOD
 C-----------------------------------------------
@@ -1675,17 +1643,17 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_segcom    ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain        ../engine/source/ale/alemain.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod        ../common_source/modules/ale/ale_mod.F
-      !||    segvar_mod     ../engine/share/modules/segvar_mod.F
-      !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_segcom    ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alemain        ../engine/source/ale/alemain.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_waitany   ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    ale_mod        ../common_source/modules/ale/ale_mod.F
+!||    segvar_mod     ../engine/share/modules/segvar_mod.F
+!||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_SEGCOM(SEGVAR,NPSEGCOM,LSEGCOM,SIZE,FLAG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1909,16 +1877,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_init_ebcs   ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain          ../engine/source/ale/alemain.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_ibcast      ../engine/source/mpi/generic/spmd_ibcast.F
-      !||--- uses       -----------------------------------------------------
-      !||    ebcs_mod         ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_init_ebcs   ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alemain          ../engine/source/ale/alemain.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_ibcast      ../engine/source/mpi/generic/spmd_ibcast.F
+!||--- uses       -----------------------------------------------------
+!||    ebcs_mod         ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_INIT_EBCS(V,ISIZXV,IAD_ELEM,FR_ELEM,EBCS_TAB)
       USE EBCS_MOD
       USE SPMD_MOD
@@ -2022,18 +1990,19 @@ C
       RETURN
       END
       
-      !||====================================================================
-      !||    spmd_l51vois         ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain              ../engine/source/ale/alemain.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_wait            ../engine/source/mpi/spmd_mod.F90
-      !||    spmd_waitany         ../engine/source/mpi/spmd_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
-      !||    spmd_mod             ../engine/source/mpi/spmd_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    spmd_l51vois         ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- called by ------------------------------------------------------
+!||    alemain              ../engine/source/ale/alemain.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_wait            ../engine/source/mpi/spmd_wait.F90
+!||    spmd_waitany         ../engine/source/mpi/spmd_wait.F90
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod          ../common_source/modules/elements/element_mod.F90
+!||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
+!||    spmd_mod             ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_L51VOIS(
      1     LBVOIS  ,IPARG    ,ELBUF_TAB ,PM       ,IXS     ,
      2     IXQ     ,NERCVOIS ,NESDVOIS  ,LERCVOIS ,LESDVOIS,
@@ -2044,6 +2013,7 @@ C-----------------------------------------------
       USE SPMD_MOD
       USE ELBUFDEF_MOD
       USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS, M51_IFLG6_SIZE
+      use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2089,7 +2059,7 @@ C-----------------------------------------------
       TYPE(BUF_MAT_)  ,POINTER :: MBUF               
 C-----------------------------------------------
 
-      ! X on remote nodes
+      ! X We Remote Nodes
       LOC_PROC             = ISPMD+1
       IDEB                 = 0
       IDEB2                = 0

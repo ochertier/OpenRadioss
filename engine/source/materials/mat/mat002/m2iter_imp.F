@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m2iter_imp   ../engine/source/materials/mat/mat002/m2iter_imp.F
-      !||--- called by ------------------------------------------------------
-      !||    m2law        ../engine/source/materials/mat/mat002/m2law.F
-      !||====================================================================
+!||====================================================================
+!||    m2iter_imp   ../engine/source/materials/mat/mat002/m2iter_imp.F
+!||--- called by ------------------------------------------------------
+!||    m2law        ../engine/source/materials/mat/mat002/m2law.F
+!||====================================================================
       SUBROUTINE M2ITER_IMP(
      1   SIG,     EPXE,    AJ2,     G,
      2   CA,      CB,      CN,      EPD,
@@ -152,7 +152,7 @@ C
 CCC       IF(I==1)WRITE(*,*)'D_LAMBDA =',XSI
 C
 C     .. ENFORCING SOME CUT-OFFS, LEFT UNCHANGED
-C  ----!!!cette partie devrait etre   interieure de boucle ---  tester
+C  ----!!!this part should be inside the loop --- test
        AK(I)=AK(I)*EPD(I)
        IF(SIGMX(I)<AK(I))THEN
         AK(I)=SIGMX(I)

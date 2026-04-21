@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_thvarc              ../starter/source/output/th/hm_read_thvarc.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_thgrki         ../starter/source/output/th/hm_read_thgrki.F
-      !||    hm_read_thgrki_rbody   ../starter/source/output/th/hm_read_thgrki_rbody.F
-      !||    hm_read_thgrne         ../starter/source/output/th/hm_read_thgrne.F
-      !||    hm_read_thgrns         ../starter/source/output/th/hm_read_thgrns.F
-      !||    hm_read_thgrpa         ../starter/source/output/th/hm_read_thgrpa.F
-      !||    hm_read_thgrpa_sub     ../starter/source/output/th/hm_read_thgrpa.F
-      !||    hm_read_thgrsens       ../starter/source/output/th/hm_read_thgrsens.F
-      !||    hm_read_thgrsurf       ../starter/source/output/th/hm_read_thgrsurf.F
-      !||    hm_thgrki_vent         ../starter/source/output/th/hm_thgrki_vent.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string_index    ../starter/source/devtools/hm_reader/hm_get_string_index.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_thvarc              ../starter/source/output/th/hm_read_thvarc.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_thgrki         ../starter/source/output/th/hm_read_thgrki.F
+!||    hm_read_thgrki_rbody   ../starter/source/output/th/hm_read_thgrki_rbody.F
+!||    hm_read_thgrne         ../starter/source/output/th/hm_read_thgrne.F
+!||    hm_read_thgrns         ../starter/source/output/th/hm_read_thgrns.F
+!||    hm_read_thgrpa         ../starter/source/output/th/hm_read_thgrpa.F
+!||    hm_read_thgrpa_sub     ../starter/source/output/th/hm_read_thgrpa.F
+!||    hm_read_thgrsens       ../starter/source/output/th/hm_read_thgrsens.F
+!||    hm_read_thgrsurf       ../starter/source/output/th/hm_read_thgrsurf.F
+!||    hm_thgrki_vent         ../starter/source/output/th/hm_thgrki_vent.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string_index    ../starter/source/devtools/hm_reader/hm_get_string_index.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||    th_mod                 ../starter/share/modules1/th_mod.F90
+!||====================================================================
       INTEGER FUNCTION HM_THVARC(VARE,NV,IVAR,VARG,NVG,IVARG,NV0,ID,TITR,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -49,6 +50,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE TH_MOD , ONLY : TH_HAS_NODA_PEXT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,7 +71,7 @@ C-----------------------------------------------
       LOGICAL IS_AVAILABLE
       INTEGER,DIMENSION(:),ALLOCATABLE :: TAG
       CHARACTER VAR*10
-      INTEGER JREC,NVAR,TRU,N,L,M,I,J,K,OK
+      INTEGER NVAR, I, J, K, OK
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -116,10 +118,13 @@ c
 c                                                     
           IF(OK==0)THEN                                       
             DO I=1,NV                                                             
-              IF(VAR == VARE(I))THEN                                          
+              IF(VAR == VARE(I))THEN
+                IF(VAR(1:4) == 'PEXT ')THEN
+                  TH_HAS_NODA_PEXT = 1
+                ENDIF
                 TAG(I)=1                             
                 OK=1                                 
-C---------Multidomaines : pour les subsets, on stocke des infos en plus dans le th pour merge---------                      
+C-------- Multidomatic: for subsets, we store more info in the th for merge -----------------------
                     IF ((NSUBDOM>0).AND.(SUB_FLAG==1002)) THEN                                        
                     IF (I>=9) THEN                                                                     
                       TAG(3) = 1                                                                         

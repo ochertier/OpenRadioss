@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_i18_force_poff   ../engine/source/interfaces/int18/multi_i18_force_poff.F
-      !||--- called by ------------------------------------------------------
-      !||    i18for3                ../engine/source/interfaces/int18/i18for3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    tri7box                ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    multi_i18_force_poff   ../engine/source/interfaces/int18/multi_i18_force_poff.F
+!||--- called by ------------------------------------------------------
+!||    i18for3                ../engine/source/interfaces/int18/i18for3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    tri7box                ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE MULTI_I18_FORCE_POFF(DT, JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
      .     NSVG  ,H1   ,H2   ,H3   ,H4     ,STIF ,
      .     FX1   ,FY1  ,FZ1  ,FX2  ,FY2    ,FZ2  ,
@@ -53,7 +54,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE TRI7BOX
-      USE ELBUFDEF_MOD       
+      USE ELBUFDEF_MOD   
+      use element_mod , only : nixs    
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,7 +74,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
-      INTEGER JLT, NIN,INTTH,JTASK,IGROUPS(NUMELS),IPARG(NPARG,*),
+      INTEGER JLT, NIN, JTASK, IGROUPS(NUMELS), IPARG(NPARG, *), 
      .        IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),IX4(MVSIZ),NSVG(MVSIZ),IXS(NIXS,*)
       my_real, DIMENSION(2*MVSIZ), INTENT(in) :: MSI
       my_real
@@ -89,7 +91,6 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J1, IG, ISHIFT, NODFI, NG, ILOC, NEL, NFT
       INTEGER :: SHIFT_FORCE_INT
-      my_real MASS
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------

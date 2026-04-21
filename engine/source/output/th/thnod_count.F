@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thnod_count   ../engine/source/output/th/thnod_count.F
-      !||--- called by ------------------------------------------------------
-      !||    init_th       ../engine/source/output/th/init_th.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar          ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod   ../engine/share/modules/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    thnod_count   ../engine/source/output/th/thnod_count.F
+!||--- called by ------------------------------------------------------
+!||    init_th       ../engine/source/output/th/init_th.F
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod   ../engine/share/modules/plyxfem_mod.F
+!||====================================================================
       SUBROUTINE THNOD_COUNT(ITHGRP, NTHGRP2, WA_SIZE, INDEX_WA_NOD, ITHBUF, WEIGHT,SITHBUF)
 C-----------------------------------------------
 C   M o d u l e s
@@ -58,18 +56,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL :: BOOL,CONDITION
-      INTEGER :: N, I, J, ISK, II, L, K, IUN, IFRA, N1,IPLY,IDIR
-      INTEGER :: NN,IAD,IADV,NVAR,ITYP,NITER,J_FIRST
+      INTEGER :: N, I, J, ISK, II, IUN
+      INTEGER :: NN, IAD, IADV, NVAR, ITYP, J_FIRST
       INTEGER, DIMENSION(NTHGRP2) :: INDEX_NOD
-
-      my_real
-     .   XL(3),DL(3),VL(3),AL(3),VRL(3),ARL(3),OD(3),VO(3),AO(3),
-     .   VRG(3),ARG(3)
       DATA IUN/1/
 C-------------------------
 C     NODES
-C          DEPLACEMENT, VITESSE, ACCELERATION,
-C          VITESSE ANGULAIRE, ACCELERATION ANGULAIRE,
+C          DEPLACEMENT, VELOCITY, ACCELERATION,
+C          VELOCITY ANGULAIRE, ACCELERATION ANGULAIRE,
 C          & POSITION
 C-------------------------
         WA_SIZE = 0

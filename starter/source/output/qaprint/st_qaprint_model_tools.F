@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    st_qaprint_model_tools   ../starter/source/output/qaprint/st_qaprint_model_tools.F
-      !||--- called by ------------------------------------------------------
-      !||    st_qaprint_driver        ../starter/source/output/qaprint/st_qaprint_driver.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl2                 ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    func2d_mod               ../starter/share/modules1/func2d_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||    table_mod                ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    st_qaprint_model_tools   ../starter/source/output/qaprint/st_qaprint_model_tools.F
+!||--- called by ------------------------------------------------------
+!||    st_qaprint_driver        ../starter/source/output/qaprint/st_qaprint_driver.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl2                 ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    func2d_mod               ../starter/share/modules1/func2d_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||    table_mod                ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE ST_QAPRINT_MODEL_TOOLS(NOM_OPT   ,INOM_OPT  ,
      .           IBOX      ,IPMAS     ,NOM_SECT ,NSTRF ,SECBUF    ,
      .           SKEW      ,ISKWN     ,XFRAME   ,NPC   ,PLD       ,
@@ -133,7 +133,7 @@ C-----------------------------------------------
       CHARACTER(LEN=nchartitle)  :: TITR, TEMP_STRING
       DOUBLE PRECISION TEMP_DOUBLE
       INTEGER :: TEMP_INTEGER
-      INTEGER :: ISECT, K0, K1, K2, K3, K4, K5, K6, K7, K8, K9, K10, KR0
+      INTEGER :: ISECT, K0, K1, K2, K3, K4, K5, K6, K7, K8, K9, KR0
       INTEGER :: NNOD,NSEGS,NSEGQ,NSEGC,NSEGT,NSEGP,NSEGR,NSEGTG,NBINTER,
      .           ISEN,INTVAL
       INTEGER :: WORK(70000),INDEX(2*(NUMFRAM+1)),IFRAME,ITR1(NUMFRAM+1)
@@ -261,14 +261,14 @@ C-----------------------------------------------
 C     SECTIONS : /SECT, /SECT/CIRCLE, /SECT/PARAL
 C-----------------------------------------------
       IF ( MYQAKEY('SECTIONS') ) THEN
-        DO I=1,30                                                                          
+        DO I=1,MIN(30,SNSTRF)                                                                         
           IF(NSTRF(I) /= 0)THEN                                               
             WRITE(VARNAME,'(A,I0)') 'SECTIONS__NSTRF_',I                                 
             TEMP_INTEGER = NSTRF(I)                                 
             CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INTEGER,0.0_8)                  
           END IF                                                                           
         END DO                                                                             
-        DO I=1,10                                                                         
+        DO I=1,MIN(10,SSECBUF)                                                             
           IF(SECBUF(I) /= 0)THEN                                               
             WRITE(VARNAME,'(A,I0)') 'SECTIONS__SECBUF_',I                                 
             TEMP_DOUBLE = SECBUF(I)                                  
@@ -311,14 +311,14 @@ C-----------------------------------------------
           K7=K6+2*NSEGT
           K8=K7+2*NSEGP
           K9=K8+2*NSEGR          
-          DO I=K0,NSTRF(K0+24)-1
+          DO I=K0,MIN(NSTRF(K0+24)-1,SNSTRF)
             IF(NSTRF(I) /= 0)THEN
               WRITE(VARNAME,'(A,I0,A,I0)') 'SECTIONS__',OPT_ID,"_NSTRF_",I
               TEMP_INTEGER = NSTRF(I)
               CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INTEGER,0.0_8)
             END IF
           END DO              
-          DO I=KR0,NSTRF(K0+25)
+          DO I=KR0,MIN(SSECBUF,NSTRF(K0+25))
             IF(SECBUF(I) /= 0)THEN
           WRITE(VARNAME,'(A,I0,A,I0)') 'SECTIONS__',OPT_ID,"_SECBUF_",I
               TEMP_DOUBLE = SECBUF(I)

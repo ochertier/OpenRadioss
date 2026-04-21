@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop04           ../starter/source/properties/spring/hm_read_prop04.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    fretitl2                 ../starter/source/starter/freform.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop04           ../starter/source/properties/spring/hm_read_prop04.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    fretitl2                 ../starter/source/starter/freform.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP04(GEO   , IGEO    ,UNITAB   ,IG    ,IGTYP,
-     .                          IDTITL, PROP_TAG,LSUBMODEL,IUNIT)
+     .                          PROP_TAG,LSUBMODEL)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -61,7 +61,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER  IGEO(NPROPGI),IGTYP,IUNIT
+      INTEGER  IGEO(NPROPGI),IGTYP
 C     REAL
       my_real
      .   GEO(NPROPG)
@@ -71,13 +71,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
        INTEGER J, IFUNC, IFUNC2, IFUNC3, IECROU, IFV, IG,ISENS,
-     .         IFL, ILENG, IFORM
+     .         IFL, ILENG
 C     REAL
       my_real
-     .   A0, A, B, D, E, F, XM, XIN, XK, XC, DN, DX, PUN, 
+     .   A, B, D, E, F, DN, DX, PUN, 
      .   LSCALE,GF3,A_UNIT,B_UNIT,D_UNIT,E_UNIT,F_UNIT,LSCALE_UNIT,GF3_UNIT
-      CHARACTER(LEN=NCHARTITLE) :: TITR      
-      CHARACTER(LEN=NCHARTITLE)::IDTITL
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
@@ -286,7 +285,7 @@ C
       PROP_TAG(IGTYP)%G_TOTDEPL = 1  ! DX - total deformation (translation)
       PROP_TAG(IGTYP)%G_FOREP = 1    !  FORCE - (ELASTO PLASTIQUE (ISOTROPE))
       PROP_TAG(IGTYP)%G_DEP_IN_TENS = 1  ! DPX  (DPY,DPZ) - max displacement in tension
-      PROP_TAG(IGTYP)%G_DEP_IN_COMP = 1  ! DPX2 (DPY2,DPZ2) - max displacement in compression
+      PROP_TAG(IGTYP)%G_DEP_IN_COMP = 1  ! DPX2 (DPY2, DPZ2) - Max Displacement in Compression
       PROP_TAG(IGTYP)%G_POSX = 5
       PROP_TAG(IGTYP)%G_YIELD = 1
       PROP_TAG(IGTYP)%G_LENGTH_ERR = 1

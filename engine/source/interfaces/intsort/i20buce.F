@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i20buce       ../engine/source/interfaces/intsort/i20buce.F
-      !||--- called by ------------------------------------------------------
-      !||    i20main_tri   ../engine/source/interfaces/intsort/i20main_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    i20tri        ../engine/source/interfaces/intsort/i20tri.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i20buce       ../engine/source/interfaces/intsort/i20buce.F
+!||--- called by ------------------------------------------------------
+!||    i20main_tri   ../engine/source/interfaces/intsort/i20main_tri.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||    i20tri        ../engine/source/interfaces/intsort/i20tri.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
        SUBROUTINE I20BUCE(
      1   XA       ,IRECT   ,NSV     ,INACTI  ,CAND_P  ,
      2   NMN     ,NRTM    ,NSN     ,CAND_E  ,CAND_N ,
@@ -58,11 +58,10 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "warn_c.inc"
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NMN, NRTM, NSN, NOINT,IDT,INACTI,IFQ, NIN, NSNR, NSNROLD
+      INTEGER NMN, NRTM, NSN, NOINT, INACTI, IFQ, NIN, NSNR, NSNROLD
       INTEGER IRECT(4,*),NSV(*),MWAG(*), RENUM(*),NUM_IMP,NLN,ISYM
       INTEGER CAND_E(*),CAND_N(*),IFPEN(*),NLG(*)
       INTEGER NCONTACT,ESHIFT,ILD,NB_N_B, IGAP, NCONT,
@@ -84,25 +83,24 @@ C-----------------------------------------------
       INTEGER I_ADD_MAX
       PARAMETER (I_ADD_MAX = 1001)
 C
-      INTEGER I, J,  I_ADD, IP0, IP1, MAXSIZ,
-     .        ADD(2,I_ADD_MAX), LOC_PROC, N, ISZNSNR,
-     .        NSNFIOLD(NSPMD)
+      INTEGER I_ADD, IP0, IP1, MAXSIZ, 
+     . ADD(2,I_ADD_MAX), ISZNSNR
 C     REAL
       my_real
      .        XYZM(6,I_ADD_MAX-1), MARGE
       my_real
-     .        XXX,YYY,ZZZ,CURV_MAX(NRTM)
+     . CURV_MAX(NRTM)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
-C-----2- TRI PAR BOITES DES ELEMENTS ET DES NOEUDS
+C-----2- sorting of elements and nodes by boxes
 C
 C-----------------------------------------------
-C SI ON A PAS ASSEZ DE MEMOIRE POUR LES PILES ON RECOMMENCE LE TRI
-C EN INCREMENTANT LE NB_N_B (NOMBRE DE NOEUDS PAR BOITE FINIE)
+C if there is not enough memory for the stacks, the sorting is restarted
+C by increasing nb_n_b (number of nodes per finished box)
 C     POINTEUR  NOM                 TAILLE
-C     P0........                    NSN + 3 [+ NSNROLD dans le cas SPMD]
+C     p0........                    nsn + 3 [+ nsnrold in the case of spmd]
 C     P1........Elt Bas Pile        NRTM
 C     P2........Elt PILE            2*NRTM
 C     P21.......BPN                 NSN
@@ -114,7 +112,7 @@ C
       IP1 = IP0 + NSN + NSNROLD + 3
 
 C
-C-----INITIALISATION DES ADRESSES ET X,Y,Z
+C-----initialization of addresses and x, y, z
 C
 C     ADDE     ADDN     X      Y      Z
 C     1        1        XMIN   YMIN   ZMIN
@@ -134,19 +132,17 @@ C
       I_MEM = 0
 C
 
-      IF(IMACH==3.AND.
-     +  (INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.IFQ>0
-     +        .OR.NUM_IMP>0))THEN
+      IF((INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.IFQ>0 .OR.NUM_IMP>0))THEN
         ISZNSNR = NSNR
       ELSE
         ISZNSNR = 0
       END IF
 C
-C-----DEBUT DE LA PHASE DE TRI 
+C-----start of the sorting phase
 C
 C       SEPARER B ET N EN TWO
 C
-      MARGE = TZINF-GAP  ! il s agit bien de la marge
+      MARGE = TZINF-GAP  ! it is indeed the margin
       CALL I20TRI(
      1   ADD     ,NSN     ,RENUM    ,NSNR     ,ISZNSNR ,
      2   IRECT   ,XA      ,STF      ,STFA     ,XYZM    ,
@@ -160,7 +156,7 @@ C
      8   INTHEAT, IDT_THERM, NODADT_THERM) 
 C
 C     I_MEM = 1 ==> PAS ASSEZ DE MEMOIRE PILE
-C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATS
+C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATES
 C     I_MEM = 3 ==> TROP NIVEAUX PILE
       IF (I_MEM == 2) RETURN
       IF(I_MEM==1)THEN
@@ -183,7 +179,7 @@ C     I_MEM = 3 ==> TROP NIVEAUX PILE
 #include "lockoff.inc"
         ENDIF
         TZINF = THREE_OVER_4*TZINF
-C ne pas dimunuer la taille des boite
+C do not decrease the size of the boxes
 C        MINBOX= THREE_OVER_4*MINBOX
 C        MAXBOX= THREE_OVER_4*MAXBOX
         IF( TZINF<=GAP ) THEN
@@ -205,17 +201,17 @@ C        MAXBOX= THREE_OVER_4*MAXBOX
 C
       RETURN
       END
-      !||====================================================================
-      !||    i20buc_edge   ../engine/source/interfaces/intsort/i20buce.F
-      !||--- called by ------------------------------------------------------
-      !||    i20main_tri   ../engine/source/interfaces/intsort/i20main_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    i20tri_edge   ../engine/source/interfaces/intsort/i20tri.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i20buc_edge   ../engine/source/interfaces/intsort/i20buce.F
+!||--- called by ------------------------------------------------------
+!||    i20main_tri   ../engine/source/interfaces/intsort/i20main_tri.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||    i20tri_edge   ../engine/source/interfaces/intsort/i20tri.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
        SUBROUTINE I20BUC_EDGE(
      1   XA      ,IXLINS  ,IXLINM   ,NLG     ,
      2   NLINSA  ,NMNE     ,NLINMA  ,CAND_M  ,CAND_S  ,
@@ -242,7 +238,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NMNE, NLINMA, NSNE, NOINT,IDT,NLINSA,NIN, NLINSR, INACTI,
+      INTEGER NMNE, NLINMA, NOINT, NLINSA, NIN, NLINSR, 
      .        IGAP,IAUTO
       INTEGER IXLINS(2,*),IXLINM(2,*),ADDCM(*),CHAINE(2,*)
       INTEGER CAND_M(*),CAND_S(*),NLG(*)
@@ -260,8 +256,8 @@ C-----------------------------------------------
       INTEGER I_ADD_MAX
       PARAMETER (I_ADD_MAX = 1001)
 C
-      INTEGER I, J, N1, N2, I_ADD, MAXSIZ,
-     .        ADD(2,I_ADD_MAX), N
+      INTEGER I, I_ADD, MAXSIZ, 
+     . ADD(2,I_ADD_MAX)
 C     REAL
       my_real
      .        XYZM(6,I_ADD_MAX-1)
@@ -270,11 +266,11 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C=======================================================================
 C
-C-----2- TRI PAR BOITES 
+C-----2- sorting by boxes
 C
 C-----------------------------------------------
-C SI ON A PAS ASSEZ DE MEMOIRE POUR LES PILES ON RECOMMENCE LE TRI
-C EN INCREMENTANT LE NB_N_B (NOMBRE DE NOEUDS PAR BOITE FINIE)
+C if there is not enough memory for the stacks, the sorting is restarted
+C by increasing nb_n_b (number of nodes per finished box)
 C
 C     POINTEUR  NOM                 TAILLE
 C     P1........Elt Bas Pile        NLINM
@@ -283,7 +279,7 @@ C     P21.......Elt Bas Pile        NLINS
 C     P22.......Elt PILE            3*NLINS
       MAXSIZ = 3*(MAX(NLINMA,NLINSA+NLINSR)+100)
 
-C-----INITIALISATION DES ADRESSES ET X,Y,Z
+C-----initialization of addresses and x, y, z
 C
 C     ADDE     ADDN     X      Y      Z
 C     1        1        XMIN   YMIN   ZMIN
@@ -307,7 +303,7 @@ C
       ENDDO
 C
 C
-C-----DEBUT DE LA PHASE DE TRI 
+C-----start of the sorting phase
 C 
 C       SEPARER B ET N EN TWO
       CALL I20TRI_EDGE(
@@ -320,7 +316,7 @@ C       SEPARER B ET N EN TWO
      7   STIFS   ,STIFM   ,IAUTO    ,NIN      ) 
 C
 C     I_MEM = 1 ==> PAS ASSEZ DE MEMOIRE PILE
-C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATS
+C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATES
 C     I_MEM = 3 ==> TROP NIVEAUX PILE 
       IF (I_MEM == 1 .OR. I_MEM==2)RETURN
       IF(I_MEM==1)THEN
@@ -344,7 +340,7 @@ C     I_MEM = 3 ==> TROP NIVEAUX PILE
         ENDIF
 
         TZINF = THREE_OVER_4*TZINF
-C ne pas dimunuer la taille des boite
+C do not decrease the size of the boxes
 C        MINBOX= THREE_OVER_4*MINBOX
 C        MAXBOX= THREE_OVER_4*MAXBOX
         IF( TZINF<=GAP ) THEN

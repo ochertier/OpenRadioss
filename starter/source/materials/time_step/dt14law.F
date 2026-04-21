@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dt14law   ../starter/source/materials/time_step/dt14law.F
-      !||--- called by ------------------------------------------------------
-      !||    dtmain    ../starter/source/materials/time_step/dtmain.F
-      !||--- calls      -----------------------------------------------------
-      !||    dtel      ../starter/source/materials/time_step/dtel.F
-      !||    dtsph     ../starter/source/materials/time_step/dtsph.F
-      !||====================================================================
+!||====================================================================
+!||    dt14law   ../starter/source/materials/time_step/dt14law.F
+!||--- called by ------------------------------------------------------
+!||    dtmain    ../starter/source/materials/time_step/dtmain.F
+!||--- calls      -----------------------------------------------------
+!||    dtel      ../starter/source/materials/time_step/dtel.F
+!||    dtsph     ../starter/source/materials/time_step/dtsph.F
+!||====================================================================
       SUBROUTINE DT14LAW (PM,GEO,PID,MAT, DELTAX, AIRE, VOL, DTX)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -56,16 +56,16 @@ C     REAL
       my_real
      .   SSP(MVSIZ), RHO0(MVSIZ), VIS(MVSIZ)    
 C---------------------------------
-C     RECUPERATION DE LA VITESSE DU SON
+C     RECOVERY OF SOUND VELOCITY
 C=======================================================================
       DO I=LFT,LLT
       MX      =MAT(I)
-      SSP(I)  =PM(49,MX)
+      SSP(I)  =PM(49,MX) ! more precise estimator is to call EOSMAIN to compute BULK and SHEAR modulus updated for each element
       RHO0(I) =PM( 1,MX)
       VIS(I)  =ZERO 
       END DO
 C------------------------------
-C     CALCUL DU DT ELEM
+C     CALCULATION OF DT ELEM
 C------------------------------
       IF(JSPH==0)THEN
          CALL DTEL(SSP,PM,GEO,PID,MAT, RHO0, VIS, DELTAX, AIRE, VOL, DTX)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dxwalc      ../starter/source/output/anim/dxwalc.F
-      !||--- called by ------------------------------------------------------
-      !||    dxyzsect    ../starter/source/output/anim/dxyzsect.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    dxwalc      ../starter/source/output/anim/dxwalc.F
+!||--- called by ------------------------------------------------------
+!||    dxyzsect    ../starter/source/output/anim/dxyzsect.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE DXWALC(X ,RWL ,MSR ,
      3            XMIN ,YMIN ,ZMIN  ,XMAX ,YMAX  ,
      4            ZMAX)
@@ -46,7 +46,7 @@ C-----------------------------------------------
       INTEGER I
 C     REAL
       my_real
-     .   XWL, YWL, ZWL,XN,YN,ZN,D,DX,DY,DZ,XL, R, V1, V2, V3, VV1,
+     .   XWL, YWL, ZWL,XN,YN,ZN,DX,DY,DZ,XL, R, V1, V2, V3, VV1,
      .   VV2, VV3, VV, X0, Y0, Z0, ALPHA, S, C
       REAL R4
 C-----------------------------------------------

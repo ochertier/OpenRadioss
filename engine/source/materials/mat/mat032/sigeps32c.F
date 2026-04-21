@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps32c   ../engine/source/materials/mat/mat032/sigeps32c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    m32elas     ../engine/source/materials/mat/mat032/m32elas.F
-      !||    m32plas     ../engine/source/materials/mat/mat032/m32plas.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps32c   ../engine/source/materials/mat/mat032/sigeps32c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    m32elas     ../engine/source/materials/mat/mat032/m32elas.F
+!||    m32plas     ../engine/source/materials/mat/mat032/m32plas.F
+!||====================================================================
       SUBROUTINE SIGEPS32C(
      1                     JFT    ,JLT    ,PM     ,THK    ,OFF    ,
      2                     DIR    ,IPT    ,IMAT   ,NEL    ,DT1C   ,
@@ -69,10 +69,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
+      INTEGER I
       my_real
      .   NU,EZZ(MVSIZ),YOUNG,NORMXX,NORMYY,
-     .   A01,A02,A03,YLD,YMAX,CM,CE,CN,CA,
+     .   A01,A02,A03,YMAX,CM,CE,CN,CA,
      .   D11,D22,D12,SXX,SYY,SXY,P,Q,S11,S22,
      .   S12,A,B,C,SEQ,DSEQ_DA,DSEQ_DB,DSEQ_DC,
      .   DA_DS11,DA_DS22,DA_DS12,DB_DS11,DB_DS22,

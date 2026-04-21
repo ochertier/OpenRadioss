@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps65c   ../engine/source/materials/mat/mat065/sigeps65c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    eqsolv_2    ../engine/source/materials/mat/mat065/sigeps65c.F
-      !||    finter      ../engine/source/tools/curve/finter.F
-      !||    interstar   ../engine/source/materials/mat/mat065/sigeps65c.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps65c   ../engine/source/materials/mat/mat065/sigeps65c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    eqsolv_2    ../engine/source/materials/mat/mat065/sigeps65c.F
+!||    finter      ../engine/source/tools/curve/finter.F
+!||    interstar   ../engine/source/materials/mat/mat065/sigeps65c.F
+!||====================================================================
       SUBROUTINE SIGEPS65C(
      1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC  ,
-     2     NPF    ,NPT0    ,IPT     ,IFLAG   ,
+     2     NPF    ,NPT0   ,IPT     ,IFLAG   ,
      2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0   ,
-     3     AREA   ,EINT   ,THKLY   ,
+     3     AREA   ,EINT   ,THKLY   ,ISRATE  ,ASRATE ,
      4     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
      5     DEPSXX ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
      6     EPSXX  ,EPSYY  ,EPSXY   ,EPSYZ   ,EPSZX  ,
@@ -42,7 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9     SIGVXX ,SIGVYY ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
      A     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
      B     OFF    ,NGL    ,IPM     ,MAT     ,ETSE   ,
-     C     GS     ,YLD    ,EPSP    ,ISRATE  ,DPLA_I )
+     C     GS     ,YLD    ,EPSP    ,DPLA_I )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -103,8 +103,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL, NUPARAM, NUVAR, NPT0, IPT,IFLAG(*),
-     .   NGL(NEL),MAT(NEL),ISRATE,IPM(NPROPMI,*)
+      INTEGER NEL, NUPARAM, NUVAR, NPT0, IPT,ISRATE,
+     .   IFLAG(*),NGL(NEL),MAT(NEL),IPM(NPROPMI,*)
+      my_real ,INTENT(IN) :: ASRATE
+      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: EPSP    !< local strain rate used in equations
       my_real TIME,TIMESTEP,UPARAM(*),
      .   AREA(NEL),RHO0(NEL),EINT(NEL,2),
      .   THKLY(NEL),PLA(NEL),
@@ -116,7 +118,7 @@ C-----------------------------------------------
      .   EPSXY(NEL) ,EPSYZ(NEL) ,EPSZX(NEL) ,
      .   SIGOXX(NEL),SIGOYY(NEL),
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
-     .   GS(*)       ,EPSP(NEL)
+     .   GS(*)       
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -150,14 +152,14 @@ C-----------------------------------------------
       INTEGER I,I1,I2,J,J1,J2,K,K1,N0,N1,N2,N3,IADBUF,NFUNC,FUNC,FUND,
      .   NP1,NP2,NRATE
       INTEGER JJ(NEL),IFUNC(NEL,100),
-     .   IPOS(NEL),IAD(NEL),ILEN(NEL),     
+     .        
      .   IPOSC1(NEL),IADC1(NEL),ILENC1(NEL),     
      .   IPOSC2(NEL),IADC2(NEL),ILENC2(NEL),
      .   IPOSD1(NEL),IADD1(NEL),ILEND1(NEL),     
      .   IPOSD2(NEL),IADD2(NEL),ILEND2(NEL)
       my_real
-     .   R,DEZZ,DPLA,A11,A22,RATE1,RATE2,SIGY1,SIGY2,DYDX,DTDS,ALPHA,
-     .   S1,S2,SX,T1,T2,TY,X1,X2,Y1,Y2,A,B,C,EPSEFF,SFC,SFD
+     .   DEZZ,A11,A22,RATE1,RATE2,SIGY1,SIGY2,DYDX,DTDS,ALPHA,
+     .   S1,S2,SX,T1,T2,TY,X1,X2,Y1,Y2,A,B,C,SFC,SFD,EPSPL
       my_real 
      .   E(NEL),A1(NEL),A2(NEL),G(NEL),G3(NEL),HC(NEL),HD(NEL),
      .   NU(NEL),NNU1(NEL),NU3(NEL),EPSMAX(NEL),FAC(NEL),DEPLZZ(NEL),
@@ -166,10 +168,10 @@ C-----------------------------------------------
      .   DYDXD1(NEL),DYDXD2(NEL),YD1(NEL),YD2(NEL),
      .   DEPSE(NEL),EPSE(NEL),DEPSS(NEL),EPSS(NEL),
      .   DSIGXX(NEL),DSIGYY(NEL),DSIGXY(NEL),
-     .   CRIT(NEL),SIGFD(NEL),SIGFC(NEL),DSIGV(NEL),
+     .   CRIT(NEL),SIGFD(NEL),SIGFC(NEL),
      .   SDS(NEL),DSIG2(NEL),SV2(NEL),DSVM(NEL),
      .   EPSC1(NEL),EPSC2(NEL),EPSD1(NEL),EPSD2(NEL),
-     .   DYDXC(NEL),YC(NEL),YFAC1(NEL),YFAC2(NEL)
+     .   YFAC1(NEL),YFAC2(NEL)
 C======================================================================|
 c      NUVAR = 5 + NRATE*4
 c      UVAR(I,1) = epsilon star*
@@ -261,13 +263,12 @@ c---
        ENDDO
       ENDIF                  
 C-------------------
-C     STRAIN RATE - NON FILTERED
+C     STRAIN RATE
 C-------------------
       DO I=1,NEL
-        IF (ISRATE == 0)
-     .  EPSP(I) = HALF*(ABS(EPSPXX(I)+EPSPYY(I))
-     .          + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
-     .          + EPSPXY(I)*EPSPXY(I) ) )
+        EPSPL = HALF*(ABS(EPSPXX(I)+EPSPYY(I))
+     .        + SQRT((EPSPXX(I)-EPSPYY(I))**2 + EPSPXY(I)**2))
+        EPSP(I) = ASRATE*EPSPL + (ONE-ASRATE)*EPSP(I)
       ENDDO                                                           
 C-------------------
 C        STRAIN 
@@ -521,19 +522,19 @@ c
         UVAR(I,5) = EPSP(I)
         IF (PLA(I) > EPSMAX(I) .and. OFF(I) == ONE) OFF(I)=FOUR_OVER_5         
 c        EPSEFF=sqrt((EPSXX(I)*EPSXX(I)+EPSYY(I) *EPSYY(I)+EPSXY(I)
-c     .        *EPSXY(I))/(un+deux*NU(I)*NU(I)))         
+c     .*Epsxy (i))/(one+two*naked (i)*naked (i)))         
 C
       ENDDO                                                            
 C------------------------------------------
       RETURN
       END SUBROUTINE SIGEPS65C
 
-      !||====================================================================
-      !||    eqsolv_2    ../engine/source/materials/mat/mat065/sigeps65c.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps65    ../engine/source/materials/mat/mat065/sigeps65.F
-      !||    sigeps65c   ../engine/source/materials/mat/mat065/sigeps65c.F
-      !||====================================================================
+!||====================================================================
+!||    eqsolv_2    ../engine/source/materials/mat/mat065/sigeps65c.F
+!||--- called by ------------------------------------------------------
+!||    sigeps65    ../engine/source/materials/mat/mat065/sigeps65.F
+!||    sigeps65c   ../engine/source/materials/mat/mat065/sigeps65c.F
+!||====================================================================
       SUBROUTINE EQSOLV_2(A,B,C,X1,X2)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -543,7 +544,7 @@ C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
       my_real 
-     .   A,B,C,X
+     .   A,B,C
 C-----------------------------------------------
 c   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -567,12 +568,12 @@ c-----------
       RETURN
       END SUBROUTINE EQSOLV_2
       
-      !||====================================================================
-      !||    interstar   ../engine/source/materials/mat/mat065/sigeps65c.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps65    ../engine/source/materials/mat/mat065/sigeps65.F
-      !||    sigeps65c   ../engine/source/materials/mat/mat065/sigeps65c.F
-      !||====================================================================
+!||====================================================================
+!||    interstar   ../engine/source/materials/mat/mat065/sigeps65c.F
+!||--- called by ------------------------------------------------------
+!||    sigeps65    ../engine/source/materials/mat/mat065/sigeps65.F
+!||    sigeps65c   ../engine/source/materials/mat/mat065/sigeps65c.F
+!||====================================================================
       SUBROUTINE INTERSTAR(TF    ,IAD   ,IPOS  ,ILEN  ,NEL   ,
      .                     X     ,EPSS_i,DYDX  ,E     ,Y  ,YFAC   )
 C-----------------------------------------------

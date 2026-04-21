@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,33 +20,40 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_monvol_type7           ../starter/source/airbag/hm_read_monvol_type7.F
-      !||--- called by ------------------------------------------------------
-      !||    read_monvol                    ../starter/source/airbag/read_monvol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                         ../starter/source/output/message/message.F
-      !||    freerr                         ../starter/source/starter/freform.F
-      !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
-      !||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string_index            ../starter/source/devtools/hm_reader/hm_get_string_index.F
-      !||    monvol_check_surfclose         ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_check_venthole_surf     ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_compute_volume          ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_orient_surf             ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_reverse_normals         ../starter/share/modules1/monvol_struct_mod.F
-      !||    usr2sys                        ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                    ../starter/share/message_module/message_mod.F
-      !||    monvol_struct_mod              ../starter/share/modules1/monvol_struct_mod.F
-      !||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_monvol_type7_mod   ../starter/source/airbag/hm_read_monvol_type7.F
+!||--- called by ------------------------------------------------------
+!||    read_monvol                ../starter/source/airbag/read_monvol.F
+!||====================================================================
+      MODULE HM_READ_MONVOL_TYPE7_MOD
+      CONTAINS
+!||====================================================================
+!||    hm_read_monvol_type7           ../starter/source/airbag/hm_read_monvol_type7.F
+!||--- called by ------------------------------------------------------
+!||    read_monvol                    ../starter/source/airbag/read_monvol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                         ../starter/source/output/message/message.F
+!||    freerr                         ../starter/source/starter/freform.F
+!||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
+!||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string_index            ../starter/source/devtools/hm_reader/hm_get_string_index.F
+!||    monvol_check_surfclose         ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_check_venthole_surf     ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_compute_volume          ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_orient_surf             ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_reverse_normals         ../starter/share/modules1/monvol_struct_mod.F
+!||    usr2sys                        ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                    ../starter/share/message_module/message_mod.F
+!||    monvol_struct_mod              ../starter/share/modules1/monvol_struct_mod.F
+!||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MONVOL_TYPE7(T_MONVOLN, IPM, IGEO, ITABM1, 
-     .     SENSORS, NPT, PLD,
+     .     SENSORS,
      .     UNITAB, LUID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG,
      .     LSUBMODEL)
 C-----------------------------------------------
@@ -58,6 +65,7 @@ C-----------------------------------------------
       USE MONVOL_STRUCT_MOD
       USE SUBMODEL_MOD
       USE SENSOR_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -77,9 +85,9 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(UNIT_TYPE_), INTENT(IN) :: UNITAB
-      INTEGER, INTENT(IN) :: LUID, IPM(NPROPMI, *), IGEO(NPROPGI, *), ITABM1(*), NPT(*)
+      INTEGER, INTENT(IN) :: LUID, IPM(NPROPMI, *), IGEO(NPROPGI, *), ITABM1(*)
       INTEGER, INTENT(IN) :: NPC(*), ITAB(*), IXC(NIXC, *), IXTG(NIXTG, *)
-      my_real, INTENT(IN) :: X(3, *), GEO(NPROPG, *), PM(NPROPM, *), PLD(2, *)
+      my_real, INTENT(IN) :: X(3, *), GEO(NPROPG, *), PM(NPROPM, *)
       TYPE (SURF_), INTENT(INOUT), DIMENSION(NSURF) :: IGRSURF
       TYPE(MONVOL_STRUCT_), INTENT(INOUT) :: T_MONVOLN
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
@@ -96,22 +104,20 @@ C-----------------------------------------------
       INTEGER :: MID_INI, IEQUI, ITTF, MID_INISYS
       my_real :: HCONV, PEXT, TI, PINI
       my_real :: MWI, CPAI, CPBI, CPCI, CPDI, CPEI, CPFI, R_IGC1, CPI, RMWI, CVI, GAMAI
-      INTEGER :: NJET, NINJ
-      INTEGER, DIMENSION(:), ALLOCATABLE :: I_INJ, ISENS, IJET, NJ1, NJ2, NJ3, 
-     .     IPT, IPA, IPZ, I_INJSYS
+      INTEGER :: NJET
+      INTEGER, DIMENSION(:), ALLOCATABLE :: I_INJ, ISENS, IJET, NJ1, NJ2, NJ3, IPT, IPA, IPZ, I_INJSYS
       my_real, DIMENSION(:), ALLOCATABLE :: FPT, FPA, FPZ
       INTEGER :: NVENTHOLES, NPORSURF, NVENT
       CHARACTER(LEN = 40) :: MESS
       CHARACTER(LEN = 20) :: VENTTITLE
       INTEGER :: TITREVENT(20)
-      INTEGER, DIMENSION(:), ALLOCATABLE :: IPVENT, IFVENT, IDTPDEF, IPORT, IPORP, IPORA, 
-     .     IPORT1, IPORP1, IPORA1, IVDP, IBLOCKAGE
-      my_real, DIMENSION(:), ALLOCATABLE :: AVENT, BVENT, TVENT, TSTOPE, DPDEF, DTPDEF,
-     .     FPORT, FPORP, FPORA, FPORT1, FPORP1, FPORA1, FVDP, CLEAK
+      INTEGER, DIMENSION(:), ALLOCATABLE :: IPVENT, IFVENT, IDTPDEF, IPORT, IPORP, IPORA
+      INTEGER, DIMENSION(:), ALLOCATABLE :: IPORT1, IPORP1, IPORA1, IVDP, IBLOCKAGE
+      my_real, DIMENSION(:), ALLOCATABLE :: AVENT, BVENT, TVENT, TSTOPE, DPDEF, DTPDEF
+      my_real, DIMENSION(:), ALLOCATABLE :: FPORT, FPORP, FPORA, FPORT1, FPORP1, FPORA1, FVDP, CLEAK
       my_real :: TTFIRE
       CHARACTER(LEN = nchartitle) :: TITR1
-      my_real :: MI, RHOI, TI2, ESPECI, CPA, CPB, CPC, CPD, CPE, CPF, MW_TMP, RMWG, 
-     .     CPG, CVG, GAMA, SHOL
+      my_real :: MI, RHOI, TI2, ESPECI, CPA, CPB, CPC, CPD, CPE, CPF, MW_TMP, RMWG, CPG, CVG, GAMA, SHOL
       LOGICAL :: IS_AVAILABLE
 C-----------------------------------------------
 C     E x t e r n a l   F u n c t i o n s
@@ -122,6 +128,7 @@ C-----------------------------------------------
 C     B e g i n n i n g   o f   s o u r c e
 C-----------------------------------------------
       MESS = 'MONITORED VOLUME DEFINITION             '
+      RMWI = 0
 C     =======
 C     Reading
 C     =======
@@ -184,7 +191,6 @@ C     =======
          ALLOCATE(T_MONVOLN%RBAGHOL(NRBHOL, NVENT))
          T_MONVOLN%RBAGHOL(1:NRBHOL, 1:NVENT) = ZERO
       ENDIF
-      IF (NVENT > 0) THEN
          ALLOCATE(IPVENT(NVENT), IFVENT(NVENT), AVENT(NVENT), BVENT(NVENT))
          ALLOCATE(TVENT(NVENT), TSTOPE(NVENT), DPDEF(NVENT), DTPDEF(NVENT),
      .        IDTPDEF(NVENT))
@@ -194,7 +200,6 @@ C     =======
      .        FPORP1(NVENT), FPORA1(NVENT))
          ALLOCATE(IBLOCKAGE(NVENT), CLEAK(NVENT))
          ALLOCATE(IVDP(NVENT), FVDP(NVENT))
-      ENDIF
       IF (NVENTHOLES > 0) THEN
          DO II = 1, NVENTHOLES
             VENTTITLE = ''
@@ -1184,3 +1189,4 @@ C-----------------------------------------------
      .     /15X,'LEAKAGE AREA TIME FUNCTION. . . . . . .=',I10,
      .     /15X,'        SCALE FACTOR. . . . . . . . . .=',1PG20.13)
       END SUBROUTINE HM_READ_MONVOL_TYPE7
+      END MODULE HM_READ_MONVOL_TYPE7_MOD

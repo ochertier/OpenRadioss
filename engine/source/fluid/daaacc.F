@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    daaacc        ../engine/source/fluid/daaacc.F
-      !||--- called by ------------------------------------------------------
-      !||    flow1         ../engine/source/fluid/flow1.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_fl_sum   ../engine/source/mpi/generic/spmd_fl_sum.F
-      !||====================================================================
+!||====================================================================
+!||    daaacc        ../engine/source/fluid/daaacc.F
+!||--- called by ------------------------------------------------------
+!||    flow1         ../engine/source/fluid/flow1.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_fl_sum   ../engine/source/mpi/generic/spmd_fl_sum.F
+!||====================================================================
       SUBROUTINE DAAACC(NDIM, NNO, NEL, IFLOW, IBUF, ELEM, IBUFL, CNP, A, NORMAL, ACCF)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -51,7 +51,7 @@ C-----------------------------------------------
       my_real, ALLOCATABLE :: SBUF(:), RBUF(:)
 C
       JFORM = IFLOW(4)
-C Accelerations locales SPMD
+C Local SPMD accelerations
       IF (NSPMD == 1) THEN
          DO I=1,NNO
             II=IBUF(I)

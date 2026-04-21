@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_solid_tensor       ../engine/source/output/h3d/h3d_results/h3d_solid_tensor.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                 ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_solid_tensor_1     ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    schlieren_mod          ../engine/share/modules/schlieren_mod.F
-      !||    stack_mod              ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_solid_tensor       ../engine/source/output/h3d/h3d_results/h3d_solid_tensor.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                 ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_solid_tensor_1     ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod            ../engine/share/resol/initbuf.F
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||    schlieren_mod          ../engine/share/modules/schlieren_mod.F
+!||    stack_mod              ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE H3D_SOLID_TENSOR(
      .                  ELBUF_TAB,SOLID_TENSOR, IPARG   ,ITENS   ,IXS     ,PM       ,
      2                   EL2FA    ,NBF     ,TENS    ,EPSDOT  ,
@@ -49,6 +50,7 @@ C-----------------------------------------------
       USE SCHLIEREN_MOD 
       USE STACK_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

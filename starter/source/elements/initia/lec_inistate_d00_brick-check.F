@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lec_inistate_d00_brick_check   ../starter/source/elements/initia/lec_inistate_d00_brick-check.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inistate_d00           ../starter/source/elements/initia/hm_read_inistate_d00.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                         ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lec_inistate_d00_brick_check   ../starter/source/elements/initia/lec_inistate_d00_brick-check.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inistate_d00           ../starter/source/elements/initia/hm_read_inistate_d00.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                         ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LEC_INISTATE_D00_BRICK_CHECK (
      1                  IXS            ,IGEO          ,ITRIS         ,ISOLNODD00    ,IE            ,
      2                  NPT            ,NLAY          ,ISOLNOD       ,JJHBE         ,IGTYP         ,
@@ -38,6 +38,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
       USE MESSAGE_MOD      
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -77,7 +78,7 @@ C
       IF (ISOLNOD==16.OR.ISOLNOD==20) JJHBED00=16
       IF ((ISOLNOD==4.OR.ISOLNOD==10).AND.JJHBE /= 1) JJHBE = 1
       IF (JJHBE == 0) JJHBE = 1
-      IF (JJHBED00 == 1 .AND. IINT == 3) JJHBED00 = 5
+      IF (JJHBED00 == 1 .AND. IINT == 3 .AND. ISOLNOD==8) JJHBED00 = 5
 
       IF ((JJHBED00 /=JJHBE) .AND.((JJHBED00 /= 2).AND.
      .         (JJHBE /= 0)) .AND. ISOLNOD /= 4)  THEN

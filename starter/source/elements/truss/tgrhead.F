@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tgrhead        ../starter/source/elements/truss/tgrhead.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    tgrhead        ../starter/source/elements/truss/tgrhead.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TGRHEAD(
      1       IXT ,   PM  , GEO  ,   INUM    ,  ISEL,
      2       ITR1,   EADD, INDEX,   ITRI    ,      
@@ -41,7 +41,7 @@ C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
 C     IXT(5,NUMELT)     TABLEAU CONECS+MID+PID+NOS TRUSSES         E
-C     GEO(NPROPG,NUMGEO)TABLEAU DES CARACS DES PID                 E
+C     geo(npropg,numgeo) array of pid characteristics
 C     INUM(6,NUMELT)    TABLEAU DE TRAVAIL                         E/S
 C     ISEL(NSELT)       TABLEAU DESPOUTRES CHOISIS POUR TH         E/S
 C     ITR1(NSELT)       TABLEAU DE TRAVAIL                         E/S
@@ -61,7 +61,6 @@ C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "sms_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
@@ -71,23 +70,20 @@ C-----------------------------------------------
      .        ND, CEP(*), XEP(*),
      .        ITRUOFF(*), TAGPRT_SMS(*)
       INTEGER ,INTENT(INOUT), DIMENSION(NUMELT) ::ITAGPRLD_TRUSS
-C     REAL OU REAL*8
-      my_real
-     .    PM(NPROPM,*), GEO(NPROPG,*)
+      my_real :: PM(NPROPM,*), GEO(NPROPG,*)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRTRUS)  :: IGRTRUSS
       TYPE (SURF_)   , DIMENSION(NSURF)    :: IGRSURF
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER 
-     .        I,J,K,L,NG, ISSN, NN,N,MLN,MID,PID ,NGROU,
-     .        II,JJ,II2,JJ2,II3,JJ3,II4,JJ4,II5,JJ5,
-     .        MSKMLN,MSKISN,MSKPID, MSKMID, MODE,
-     .        WORK(70000),IPRLD
+      INTEGER :: I,J,K, ISSN, NN,MLN,MID,PID 
+      INTEGER :: II,JJ,II2,JJ2,II3,JJ3,II4,JJ4,II5,JJ5
+      INTEGER :: MSKMLN,MSKISN,MSKPID, MSKMID, MODE
+      INTEGER :: WORK(70000),IPRLD
       EXTERNAL MY_SHIFTL,MY_SHIFTR,MY_AND
       INTEGER MY_SHIFTL,MY_SHIFTR,MY_AND
-C
+
       DATA MSKMLN /O'07770000000'/
       DATA MSKISN /O'00000000700'/
       DATA MSKMID /O'07777777777'/
@@ -95,7 +91,7 @@ C
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
  
 C----------------------------------------------------------
-C   TRI GLOBAL SUR TOUS LES CRITERES POUR TOUS LES ELEMENTS
+C   global sort on all criteria for all elements
 C----------------------------------------------------------
 C
       DO I=1,NUMELT
@@ -110,11 +106,9 @@ C
         INUM(7,I)=IXT(5,I)
       ENDDO
 
-      IF (IMACH==3) THEN
-        DO I=1,NUMELT
-          XEP(I)=CEP(I)
-        ENDDO
-      ENDIF
+      DO I=1,NUMELT
+        XEP(I)=CEP(I)
+      ENDDO
 C
 C
       DO I = 1, NUMELT
@@ -165,22 +159,20 @@ C
         ENDDO
       ENDDO
 
-      IF (IMACH==3) THEN
-        DO I=1,NUMELT
-          CEP(I)=XEP(INDEX(I))
-        ENDDO
-      ENDIF
+      DO I=1,NUMELT
+        CEP(I)=XEP(INDEX(I))
+      ENDDO
 C
-C INVERSION DE INDEX (DANS ITR1)
+C inversion of index (in itr1)
 C
       DO I=1,NUMELT
         ITR1(INDEX(I))=I
       ENDDO
 C
-C RENUMEROTATION POUR TH
+C renumbering for th
 C
 C
-C RENUMEROTATION POUR SURFACES
+C renumbering for surfaces
 C
       DO I=1,NSURF
         NN=IGRSURF(I)%NSEG
@@ -190,7 +182,7 @@ C
         ENDDO
       ENDDO
 C
-C RENUMEROTATION POUR GROUPES DE TRUSSES
+C renumbering for truss groups
 C
       DO I=1,NGRTRUS
         NN=IGRTRUSS(I)%NENTITY
@@ -205,7 +197,7 @@ C REORDERING FOR ITAGPRLD_TRUSS
       ENDDO
 C
 C--------------------------------------------------------------
-C         DETERMINATION DES SUPER_GROUPES
+C         determination of super groups
 C--------------------------------------------------------------
       ND=1
       DO I=2,NUMELT

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmdset               ../starter/source/constraints/general/rbody/spmdset.F
-      !||--- called by ------------------------------------------------------
-      !||    damping_rby_spmdset   ../starter/source/general_controls/damping/damping_rby_spmdset.F90
-      !||    hm_read_rbody         ../starter/source/constraints/general/rbody/hm_read_rbody.F
-      !||    trirbmerge            ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus            ../starter/source/spmd/node/frontplus.F
-      !||    nlocal                ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    spmdset               ../starter/source/constraints/general/rbody/spmdset.F
+!||--- called by ------------------------------------------------------
+!||    damping_rby_spmdset   ../starter/source/general_controls/damping/damping_rby_spmdset.F90
+!||    hm_read_rbody         ../starter/source/constraints/general/rbody/hm_read_rbody.F
+!||    trirbmerge            ../starter/source/constraints/general/merge/hm_read_merge.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus            ../starter/source/spmd/node/frontplus.F
+!||    nlocal                ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE SPMDSET(N,NPBY,NNPBY,LPBY,NSL,K)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -73,7 +73,7 @@ C rigid body // noeud main sur les procs ayant au moins 1 secnd
           CALL IFRONTPLUS(NPBY(1,N),P)
         ENDIF
       ENDDO
-C rigid body // les secnds nodes ne sont pas connectes, on affecte arbitrairement le main sur le proc0
+C Rigid body // the secondary nodes are not connected, arbitrarily assigning the main node to proc0
       IF (S_FMAIN==0) CALL IFRONTPLUS(NPBY(1,N),1)
       IF(NPBY(8,N)/=0)THEN
         CALL IFRONTPLUS(NPBY(1,N),1)

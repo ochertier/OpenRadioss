@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C power   delamination model ------
-      !||====================================================================
-      !||    delm02law        ../engine/source/properties/composite_options/stack/delm02law.F
-      !||--- called by ------------------------------------------------------
-      !||    delamination     ../engine/source/properties/composite_options/stack/delamination.F
-      !||--- uses       -----------------------------------------------------
-      !||    fail_param_mod   ../common_source/modules/mat_elem/fail_param_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    delm02law        ../engine/source/properties/composite_options/stack/delm02law.F
+!||--- called by ------------------------------------------------------
+!||    delamination     ../engine/source/properties/composite_options/stack/delamination.F
+!||--- uses       -----------------------------------------------------
+!||    fail_param_mod   ../common_source/modules/mat_elem/fail_param_mod.F90
+!||====================================================================
       SUBROUTINE DELM02LAW(FAIL    ,
      1     NEL    ,NUVAR  ,TIME   ,TIMESTEP ,
      2     NGL    ,IPLY    ,
@@ -89,7 +89,7 @@ C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
-      INTEGER NEL, NUPARAM, NUVAR,NGL(*),
+      INTEGER NEL, NUVAR,NGL(*),
      .        IPLY
       my_real 
      .   TIME,TIMESTEP(*),SIGNZZ(*),
@@ -103,7 +103,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
-     .        I,J,IDEL,IDEL_L,IFLAG(MVSIZ),INDX(MVSIZ),NINDX,
+     .        I,J,INDX(MVSIZ),NINDX,
      .        NINDEX,INDEX(MVSIZ),JST(MVSIZ),IR,JJ
       my_real 
      .   GIC(MVSIZ),GIIC(MVSIZ),K(MVSIZ),ETA(MVSIZ),
@@ -165,7 +165,7 @@ cc
              DELTAF = GIC(I) + (GIIC(I) - GIC(I))*CC2
              DELTAF= TWO*DELTAF/MAX(K(I)*DELTA0, EM20)
 C
-C   compute lambda en fonction de DAm
+C   compute lambda depending on damage
 c             
               LAM = DELTA0*DELTAF
               LAM  = LAM/(DELTAF - DAM*(DELTAF - DELTA0) )

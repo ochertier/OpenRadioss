@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat36                  ../starter/source/materials/mat/mat036/hm_read_mat36.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat                    ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                         ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
-      !||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted         ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword               ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod                   ../starter/share/modules1/elbuftag_mod.F
-      !||    hm_option_read_mod             ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                    ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat36                  ../starter/source/materials/mat/mat036/hm_read_mat36.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat                    ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                         ../starter/source/output/message/message.F
+!||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
+!||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted         ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword               ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod                   ../starter/share/modules1/elbuftag_mod.F
+!||    hm_option_read_mod             ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                    ../starter/share/message_module/message_mod.F
+!||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT36(UPARAM   ,MAXUPARAM,NUPARAM   ,NUVAR    ,NVARTMP  ,
      .                         IFUNC    ,MAXFUNC  ,MFUNC     ,PARMAT   ,UNITAB   ,
      .                         ID       ,MTAG     ,TITR      ,LSUBMODEL,PM       ,
@@ -102,13 +102,14 @@ C-----------------------------------------------
      .           NBLINE,NBREAD,IFAIL,OPTE,ILAW,NFUNC
       my_real :: RHO0, RHOR,E,NU,G,C1,SOUNDSP, EPSMAX,EPSR1,EPSR2,EPSF,FISOKIN,FCUT,
      .           PSCAL_UNIT,PSCALE,EINF,CE ,
-     .           YFAC(MAXFUNC),RATE(MAXFUNC),STRAINRATE_UNIT(MAXFUNC),YFAC_UNIT(MAXFUNC)
+     .           YFAC(MAXFUNC),RATE(MAX(1,MAXFUNC)),STRAINRATE_UNIT(MAXFUNC),YFAC_UNIT(MAXFUNC)
       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
+      RATE(1) = ZERO
 C--------------------------------------------------
 C EXTRACT DATA (IS OPTION CRYPTED)
 C--------------------------------------------------
@@ -145,7 +146,7 @@ C-----------------------------------------------
       ENDIF
 c
       IF(NRATE > 100)THEN
-        CALL ANCMSG(MSGID=215, MSGTYPE=MSGERROR, ANMODE=ANINFO,I1=36,I2=ID,C1=TITR)
+        CALL ANCMSG(MSGID=3127, MSGTYPE=MSGERROR, ANMODE=ANINFO,I1=36,I2=ID,C1=TITR)
       ELSEIF (NRATE <= 0) THEN
         CALL ANCMSG(MSGID=740, MSGTYPE=MSGERROR, ANMODE=ANINFO,I1=ID,C1=TITR)
       ENDIF

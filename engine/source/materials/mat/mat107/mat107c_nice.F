@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mat107c_nice          ../engine/source/materials/mat/mat107/mat107c_nice.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps107c            ../engine/source/materials/mat/mat107/sigeps107c.F
-      !||--- calls      -----------------------------------------------------
-      !||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mat107c_nice          ../engine/source/materials/mat/mat107/mat107c_nice.F
+!||--- called by ------------------------------------------------------
+!||    sigeps107c            ../engine/source/materials/mat/mat107/sigeps107c.F
+!||--- calls      -----------------------------------------------------
+!||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE MAT107C_NICE(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
      2     UPARAM  ,UVAR    ,JTHE    ,OFF     ,RHO     ,
@@ -82,10 +82,10 @@ c
       !=======================================================================
       !      Local Variables
       !=======================================================================
-      INTEGER I,K,II,NINDX,INDEX(NEL),ITAB,ISMOOTH,IPOS(NEL,2)
+      INTEGER I,II,NINDX,INDEX(NEL),ITAB,ISMOOTH,IPOS(NEL,2)
 c
       my_real 
-     .   YOUNG1,YOUNG2,NU12,NU21,G12,A11,A12,A21,A22,C1,
+     .   YOUNG1,YOUNG2,NU12,NU21,G12,A11,A12,A21,A22,
      .   XI1,XI2,K1,K2,K3,K4,K5,K6,G1C,D1,D2,SIGY1,
      .   CINI1,S1,SIGY2,CINI2,S2,SIGY1C,CINI1C,S1C,
      .   SIGY2C,CINI2C,S2C,SIGYT,CINIT,ST,G23,G31
@@ -103,7 +103,7 @@ c
 c
       my_real, DIMENSION(NEL) ::
      .   ALPHA1,ALPHA2,ALPHA3,ALPHA4,ALPHA5,R1,R2,R1C,R2C,RT,
-     .   DSIGXX,DSIGYY,DSIGXY,DSIGYZ,DSIGZX,HARDP,PHI,PHI0,ETA1,ETA2,
+     .   DSIGXX,DSIGYY,DSIGXY,HARDP,PHI,PHI0,ETA1,ETA2,
      .   DR1_DP,DR2_DP,DR1C_DP,DR2C_DP,DRT_DP,HARDR,DPLA2,DPLA3,DPLA4,
      .   DPLA5,DPLA6
 c      

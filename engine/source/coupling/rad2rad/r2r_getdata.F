@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r2r_getdata        ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_displ_c        ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    get_displ_spmd     ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||    get_force_c        ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    get_force_nl_c     ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    get_force_spmd     ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||    spmd_exch_r2r_2    ../engine/source/mpi/r2r/spmd_r2r.F
-      !||    spmd_exch_r2r_nl   ../engine/source/mpi/r2r/spmd_exch_r2r_nl.F
-      !||    spmd_exch_work     ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod       ../common_source/modules/groupdef_mod.F
-      !||    nlocal_reg_mod     ../common_source/modules/nlocal_reg_mod.F
-      !||    rad2r_mod          ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_getdata        ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    get_displ_c        ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    get_displ_spmd     ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||    get_force_c        ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    get_force_nl_c     ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    get_force_spmd     ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||    spmd_exch_r2r_2    ../engine/source/mpi/r2r/spmd_r2r.F
+!||    spmd_exch_r2r_nl   ../engine/source/mpi/r2r/spmd_exch_r2r_nl.F
+!||    spmd_exch_work     ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod       ../common_source/modules/groupdef_mod.F
+!||    nlocal_reg_mod     ../common_source/modules/nlocal_reg_mod.F
+!||    rad2r_mod          ../engine/share/modules/rad2r.F
+!||====================================================================
       SUBROUTINE R2R_GETDATA(
      .               IEXLNK  ,IGRNOD  ,X       ,V       ,
      .               VR      ,A       ,AR      ,MS      ,IN      ,
@@ -63,7 +63,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "scr05_c.inc"
-!#include      "scr11_c.inc"
 #include      "task_c.inc"
 #include      "rad2r_c.inc"
 C-----------------------------------------------------------------
@@ -83,9 +82,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I, IEX, IDP, IDG, NNG, NB,NGLOB,LENR,SIZE,BID
-        INTEGER NBD,NL_FLAG,SBUF_SIZE,RBUF_SIZE,PSP
-        my_real WF, WM, WF2, WM2, WFB, WMB, WF2B, WM2B,ANN,VNN,ARN,VRN
+        INTEGER IEX, IDP, IDG, NNG, NB, NGLOB, LENR, SIZE
+        INTEGER NBD, NL_FLAG, SBUF_SIZE, RBUF_SIZE
+        my_real WF, WM, WF2, WM2, WFB, WMB, WF2B, WM2B
         INTEGER, DIMENSION(:), POINTER :: GRNOD
         my_real, POINTER, DIMENSION(:) :: MSNL,FNL
 C=======================================================================
@@ -191,7 +190,7 @@ C
         END IF
 
 C----- Count the work of external process forces
-        IF(IMACH/=3.OR.ISPMD==0) THEN
+        IF(ISPMD==0) THEN
           WFEXT_MD = WFEXT_MD + R2RFX1 + (WF + WM) * DT1
           R2RFX1 = WF  + WM
           R2RFX2 = WF2 + WM2
@@ -201,15 +200,15 @@ C-----------------------------------------------------------------
         RETURN
       END SUBROUTINE R2R_GETDATA
 C
-      !||====================================================================
-      !||    get_force_spmd     ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_getdata        ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_force_spmd_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    spmd_r2r_rset3     ../engine/source/mpi/r2r/spmd_r2r.F
-      !||    spmd_r2r_rset3b    ../engine/source/mpi/r2r/spmd_r2r.F
-      !||====================================================================
+!||====================================================================
+!||    get_force_spmd     ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- called by ------------------------------------------------------
+!||    r2r_getdata        ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- calls      -----------------------------------------------------
+!||    get_force_spmd_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    spmd_r2r_rset3     ../engine/source/mpi/r2r/spmd_r2r.F
+!||    spmd_r2r_rset3b    ../engine/source/mpi/r2r/spmd_r2r.F
+!||====================================================================
       SUBROUTINE GET_FORCE_SPMD(
      1   IDP    ,NNG     ,GRNOD  ,WF    ,WM    ,
      2   WF2    ,WM2     ,V      ,VR    ,A     ,
@@ -236,14 +235,11 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER LRBUF,i
+        INTEGER LRBUF
         my_real
      .          BUFR1(3,NGLOB),BUFR2(3,NGLOB),
      .          BUFR3(3,NGLOB),BUFR4(3,NGLOB),WTMP(4)
-        INTEGER POP0,POP1,RATE
-        my_real
-     .     POP2,POP3,SECS
-C
+ 
 C******************************************************************************C
 
         IF(ISPMD==0) THEN
@@ -281,14 +277,14 @@ C-----------------------------------------------------------------
         RETURN
       END SUBROUTINE GET_FORCE_SPMD
 C
-      !||====================================================================
-      !||    get_displ_spmd     ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_getdata        ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_displ_spmd_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    spmd_r2r_rset3     ../engine/source/mpi/r2r/spmd_r2r.F
-      !||====================================================================
+!||====================================================================
+!||    get_displ_spmd     ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- called by ------------------------------------------------------
+!||    r2r_getdata        ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- calls      -----------------------------------------------------
+!||    get_displ_spmd_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    spmd_r2r_rset3     ../engine/source/mpi/r2r/spmd_r2r.F
+!||====================================================================
       SUBROUTINE GET_DISPL_SPMD(
      1   IDP  ,NNG   ,GRNOD ,X      ,DD_R2R ,
      4   NGLOB,WEIGHT,IAD_ELEM,FR_ELEM,IEX        )
@@ -327,16 +323,16 @@ C-----------------------------------------------------------------
         RETURN
       END SUBROUTINE GET_DISPL_SPMD
 C
-      !||====================================================================
-      !||    r2r_sendkine       ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    send_mass_kine_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod       ../common_source/modules/groupdef_mod.F
-      !||    rad2r_mod          ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_sendkine       ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    send_mass_kine_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod       ../common_source/modules/groupdef_mod.F
+!||    rad2r_mod          ../engine/share/modules/rad2r.F
+!||====================================================================
       SUBROUTINE R2R_SENDKINE(
      .               IEXLNK  ,IGRNOD ,MS      ,IN)
 C-----------------------------------------------
@@ -364,7 +360,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I, IEX, IDP, IDG, NNG, OFF
+        INTEGER IEX, IDP, IDG, NNG, OFF
 C
         INTEGER, DIMENSION(:), POINTER :: GRNOD
 C=======================================================================

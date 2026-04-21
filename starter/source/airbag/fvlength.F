@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvlength   ../starter/source/airbag/fvlength.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh0    ../starter/source/airbag/fvmesh0.F
-      !||--- calls      -----------------------------------------------------
-      !||    fvnormal   ../starter/source/airbag/fvmbag1.F
-      !||====================================================================
-      SUBROUTINE FVLENGTH(IFV  ,NNS    ,NNTR   ,NPOLH,
-     1                  IBUF   ,IBUFA  ,ELEMA  ,TAGELA ,
-     2                  X      ,IVOLU  ,RVOLU  ,
-     3                  IFVNOD ,RFVNOD ,IFVTRI , 
-     4                  IFVPOLY,IFVTADR,IFVPOLH, 
-     5                  IFVPADR,IBPOLH ,DLH    )
+!||====================================================================
+!||    fvlength_mod   ../starter/source/airbag/fvlength.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh0        ../starter/source/airbag/fvmesh0.F
+!||====================================================================
+      MODULE FVLENGTH_MOD
+      CONTAINS
+!||====================================================================
+!||    fvlength   ../starter/source/airbag/fvlength.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh0    ../starter/source/airbag/fvmesh0.F
+!||--- calls      -----------------------------------------------------
+!||    fvnormal   ../starter/source/airbag/fvmbag1.F
+!||====================================================================
+      SUBROUTINE FVLENGTH(NNS   ,NNTR   ,NPOLH,
+     1                   IBUF   ,IBUFA  ,ELEMA  ,TAGELA ,
+     2                   X      ,IVOLU  ,
+     3                   IFVNOD ,RFVNOD ,IFVTRI ,
+     4                   IFVPOLY,IFVTADR,IFVPOLH,
+     5                   IFVPADR,IBPOLH ,DLH    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -44,12 +51,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IFV, NNS, NNTR, NPOLH
+      INTEGER NNS, NNTR, NPOLH
       INTEGER IBUF(*),   IBUFA(*),  ELEMA(3,*), TAGELA(*), 
      .        IVOLU(*),  IBPOLH(*), IFVNOD(3,*),IFVTRI(6,*),
      .        IFVPOLY(*),IFVTADR(*),IFVPOLH(*), IFVPADR(*)
-      my_real
-     .        X(3,*), RVOLU(*), RFVNOD(2,*), DLH 
+      my_real X(3,*), RFVNOD(2,*), DLH
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -67,8 +73,34 @@ C-----------------------------------------------
      .        X12, Y12, Z12, X23, Y23, Z23, X31, Y31, Z31, 
      .        L12, L23, L31, DL0, DL1, DL2, DLL, DLBR1, DLBR2, DLBR3
 C---------------------------------------------------
-C Noeuds des volumes finis
+C Nodes of the finite volumes
 C---------------------------------------------------
+      X12 = ZERO
+      Y12 = ZERO
+      Z12 = ZERO
+      X23 = ZERO
+      Y23 = ZERO
+      Z23 = ZERO
+      X31 = ZERO
+      Y31 = ZERO
+      Z31 = ZERO
+      DL0 = DLH
+      DL1 = EP30
+      DL2 = EP30
+      DLBR1 = EP30
+      DLBR2 = EP30
+      DLBR3 = EP30
+      X1 = ZERO
+      Y1 = ZERO
+      Z1 = ZERO
+      X2 = ZERO
+      Y2 = ZERO
+      Z2 = ZERO
+      X3 = ZERO
+      Y3 = ZERO
+      Z3 = ZERO
+
+
       DO I=1,NNS
          IF (IFVNOD(1,I)==1) THEN
             IEL=IFVNOD(2,I)
@@ -129,7 +161,7 @@ C
          ENDIF
       ENDDO
 C----------------------------
-C Normale, aire des triangles
+C Normal, area of the triangles
 C----------------------------
       DO I=1,NNTR
          N1=IFVTRI(1,I)
@@ -149,7 +181,7 @@ C----------------------------
          ENDIF
       ENDDO
 C------------------------------------------
-C Volume des polyhedres et longueur minimum
+C Volume of the polyhedra and minimum length
 C------------------------------------------
       DL0=DLH
       DL1=EP30
@@ -161,11 +193,11 @@ C------------------------------------------
       DO I=1,NPOLH
          PVOLU(I)=ZERO
          AREAPOLYMAX=ZERO
-C Boucle sur les polygones du polyhedre
+C Loop over the polygons of the polyhedra
          DO J=IFVPADR(I),IFVPADR(I+1)-1
             JJ=IFVPOLH(J)
             AREAPOLY=ZERO
-C Boucle sur les triangles du polygone
+C Loop over the triangles of the polygon
             DO K=IFVTADR(JJ), IFVTADR(JJ+1)-1
                KK=IFVPOLY(K)
                AREA=PAREA(KK)
@@ -286,4 +318,5 @@ C
      .    /5X,'    MINIMUM LENGTH BASED ON VOLUME/AREA. . .=',1PG20.13,' (FINITE VOLUME ID ',I10,')',' (BRICK ID ',I10,')',/)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2----+----3--
       RETURN
-      END
+      END SUBROUTINE FVLENGTH
+      END MODULE FVLENGTH_MOD

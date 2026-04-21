@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    nrf51ini               ../starter/source/materials/mat/mat051/nrf51ini.F
-      !||--- called by ------------------------------------------------------
-      !||    m51init                ../starter/source/materials/mat/mat051/m51init.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    nrf51ini               ../starter/source/materials/mat/mat051/nrf51ini.F
+!||--- called by ------------------------------------------------------
+!||    m51init                ../starter/source/materials/mat/mat051/m51init.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE NRF51INI(IPM             ,     PM,      X, NIX,     IX,
      .                    ALE_CONNECTIVITY, BUFMAT, UPARAM, RHO0,
      .                    UVAR            , NUVAR , NEL   , RHO , NUMEL
@@ -79,8 +79,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IVMAT,IMAT, IID, MLN, J, J2, IADBUF,
-     .        IFLGv, IE, IEV, NUPARAM,MUID,K,IFORM,IAD1,LGTH
+      INTEGER I, IVMAT,IMAT,IID,MLN,J,J2,IADBUF,IFLGv,IE,IEV,NUPARAM,K,IFORM,IAD1,LGTH
       my_real
      .   C01,C02,C03,C04,         C01v,C02v,C03v,C04v,
      .   C11,C12,C13,C14,         C11v,C12v,C13v,C14v,
@@ -170,7 +169,7 @@ C=======================================================================
           UVAR(I,4)            =  P0_NRF  ! default initialization for corner elems
           IAD1 = ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
           LGTH = ALE_CONNECTIVITY%ee_connect%iad_connect(IE+1) - IAD1
-          IVMAT = ZERO
+          IVMAT = 0
           DO J=1,LGTH
             IEV = ALE_CONNECTIVITY%ee_connect%connected(IAD1 + J - 1)
             IF(IEV == 0)CYCLE
@@ -477,8 +476,9 @@ C=======================================================================
             IMAT   = IX(1,I)
             MLN    = IPM(2,IMAT)
             IADBUF = IPM(7,IMAT)
+            NUPARAM = IPM(9,IMAT)
             IF(MLN/=51)CYCLE
-            UPRM => BUFMAT(IADBUF:IADBUF+275)
+            UPRM => BUFMAT(IADBUF:IADBUF+NUPARAM-1)
             TMP  = UPRM(31)
             IFORM = NINT(TMP)
             IF(IFORM>1)CYCLE
@@ -517,7 +517,7 @@ C=======================================================================
        ! Tcp : characteric time      !
        !-----------------------------!       
        M51_TCP_REF    = M51_LC0MAX/TWO/M51_SSP0MAX/LOG(TWO)
-       !Si Tcp=0 alors calcul automatique
+       !If TCP = 0 then automatic calculation
        IF(UPARAM(70)==ZERO)THEN
          UPARAM(70) = M51_TCP_REF
          lSET = 1

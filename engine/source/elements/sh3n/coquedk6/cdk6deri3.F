@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdk6deri3   ../engine/source/elements/sh3n/coquedk6/cdk6deri3.F
-      !||--- called by ------------------------------------------------------
-      !||    cdk6forc3   ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
-      !||====================================================================
+!||====================================================================
+!||    cdk6deri3   ../engine/source/elements/sh3n/coquedk6/cdk6deri3.F
+!||--- called by ------------------------------------------------------
+!||    cdk6forc3   ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
+!||====================================================================
       SUBROUTINE CDK6DERI3(JFT,JLT,X2,Y2,X3,Y3,AREA2,ALPE,ALDT,NU,THK2,
      1                    PX2,PY2,PX3,PY3,X4,Y4,Z4,X5,Y5,Z5,X6,Y6,Z6,
      2                    N4X,N4Y,N4Z,N5X,N5Y,N5Z,N6X,N6Y,N6Z,
@@ -51,12 +51,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,EP
+      INTEGER I,EP
       my_real
      .     AREAI(MVSIZ),
      .     AL1(MVSIZ), AL2(MVSIZ), AL3(MVSIZ), ALMAX, ALMIN
       MY_REAL
-     .   X32(MVSIZ), Y32(MVSIZ),AL4, AL5, AL6,AH(MVSIZ),
+     .   X32(MVSIZ), Y32(MVSIZ),AH(MVSIZ),
      .   H1(MVSIZ),H2(MVSIZ),H3(MVSIZ),H4(MVSIZ),H5(MVSIZ),H6(MVSIZ),
      .   C1(MVSIZ),C2(MVSIZ),C3(MVSIZ),S1(MVSIZ),S2(MVSIZ),S3(MVSIZ),
      .   H14(MVSIZ),H24(MVSIZ),H25(MVSIZ),H35(MVSIZ),H4D,H5D,H6D,
@@ -66,7 +66,7 @@ C-----------------------------------------------
      .   BETA36(MVSIZ),BETA16(MVSIZ),AL61,AL63,X61,Y61
       MY_REAL
      .   C11(MVSIZ,3,3), C21(MVSIZ,3,3),C22(MVSIZ,3),B11,B12,B13,
-     .   B21,B22,B23,B31,B32,B33,B1,B2,B3,H15,H26,H34,FAC
+     .   B21,B22,B23,B31,B32,B33,H15,H26,H34,FAC
 c     .   EM20,ONE,HALF,TWO,EP20,ZEP6
 c      DATA  EM20/1.E-20/,ONE/1.0/,HALF/0.5/,TWO/2.0/,EP20/1.E+20/,
 c     .      ZEP6/0.6/

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_matparam          ../engine/source/output/restart/read_matparam.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb                 ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_c_c               ../common_source/tools/input_output/write_routtines.c
-      !||    read_db                ../common_source/tools/input_output/read_db.F
-      !||    read_eosparam          ../engine/source/output/restart/read_eosparam.F90
-      !||    read_failparam         ../engine/source/output/restart/read_failparam.F
-      !||    read_i_c               ../common_source/tools/input_output/write_routtines.c
-      !||    read_mat_table         ../engine/source/materials/tools/read_mat_table.F
-      !||    read_thermparam        ../engine/source/output/restart/read_thermparam.F90
-      !||    read_viscparam         ../engine/source/output/restart/read_viscparam.F
-      !||--- uses       -----------------------------------------------------
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    read_eosparam_mod      ../engine/source/output/restart/read_eosparam.F90
-      !||    read_therpmaram_mod    ../engine/source/output/restart/read_thermparam.F90
-      !||====================================================================
+!||====================================================================
+!||    read_matparam                 ../engine/source/output/restart/read_matparam.F
+!||--- called by ------------------------------------------------------
+!||    rdresb                        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_ale_rezoning_param       ../engine/source/output/restart/read_ale_rezoning_param.F90
+!||    read_c_c                      ../common_source/tools/input_output/write_routines.c
+!||    read_db                       ../common_source/tools/input_output/read_db.F
+!||    read_eosparam                 ../engine/source/output/restart/read_eosparam.F90
+!||    read_failparam                ../engine/source/output/restart/read_failparam.F
+!||    read_i_c                      ../common_source/tools/input_output/write_routines.c
+!||    read_mat_table                ../engine/source/materials/tools/read_mat_table.F
+!||    read_thermparam               ../engine/source/output/restart/read_thermparam.F90
+!||    read_viscparam                ../engine/source/output/restart/read_viscparam.F
+!||--- uses       -----------------------------------------------------
+!||    mat_elem_mod                  ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    message_mod                   ../engine/share/message_module/message_mod.F
+!||    names_and_titles_mod          ../common_source/modules/names_and_titles_mod.F
+!||    read_ale_rezoning_param_mod   ../engine/source/output/restart/read_ale_rezoning_param.F90
+!||    read_eosparam_mod             ../engine/source/output/restart/read_eosparam.F90
+!||    read_therpmaram_mod           ../engine/source/output/restart/read_thermparam.F90
+!||====================================================================
       SUBROUTINE READ_MATPARAM(MAT_ELEM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -49,6 +51,7 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD
       USE read_eosparam_mod
       use read_therpmaram_mod
+      use read_ale_rezoning_param_mod , only : read_ale_rezoning_param
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,21 +59,25 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
+      TYPE (MAT_ELEM_) ,INTENT(INOUT), TARGET :: MAT_ELEM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,IMAT,NUMMAT,NUMTABL,NUPARAM,NIPARAM,NFAIL,ITHERM
+      INTEGER :: I,IMAT,NUMMAT,NUMTABL,NUPARAM,NIPARAM,NFAIL
       INTEGER :: IAD,NFIX,NFIXR,LEN,LENR,NMOD,MOD
       INTEGER ,DIMENSION(NCHARTITLE) :: NAME
       INTEGER ,DIMENSION(:) ,ALLOCATABLE :: IBUF
-      INTEGER :: NBSUBMAT, ISUB
+      INTEGER :: NBSUBMAT
       my_real ,DIMENSION(:) ,ALLOCATABLE :: RBUF
+      INTEGER :: OLDFORMAT,ISUB
 c=======================================================================
 c     read MATPARAM data
       NFIX   = 24
       NUMMAT = MAT_ELEM%NUMMAT
       ALLOCATE(MAT_ELEM%MAT_PARAM(NUMMAT))
+      DO IMAT=1,NUMMAT
+        CALL MAT_ELEM%MAT_PARAM(IMAT)%ZEROING
+      ENDDO
 
       LEN = NFIX*NUMMAT
       ALLOCATE (IBUF(LEN) )
@@ -170,10 +177,7 @@ c
 c     read thermal parameters
 c
       DO IMAT = 1,NUMMAT
-        ITHERM = MAT_ELEM%MAT_PARAM(IMAT)%ITHERM
-        IF (ITHERM > 0) THEN
-          CALL READ_THERMPARAM(MAT_ELEM%MAT_PARAM(IMAT)%THERM)
-        END IF
+        CALL READ_THERMPARAM(MAT_ELEM%MAT_PARAM(IMAT)%THERM)
       END DO      
 c      
 c     read parameters of failure models per material
@@ -204,29 +208,66 @@ c
         ENDIF
       ENDDO
 
+      ! read eos model parameters
+      DO IMAT = 1,NUMMAT
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%CV=ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%CP=ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%PSH=ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%E0=ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%P0=ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%PMIN=ZERO
+        IF (MAT_ELEM%MAT_PARAM(IMAT)%IEOS > 0) THEN
+          CALL READ_EOSPARAM(MAT_ELEM%MAT_PARAM(IMAT)%EOS)
+        END IF
+      END DO
+
       ! Read multimaterial buffer
       ALLOCATE (IBUF(21) ) !< mex is 21 submaterials
       ALLOCATE (RBUF(21) )
       DO IMAT = 1,NUMMAT
-        CALL READ_I_C(IBUF, 1)
+        CALL READ_I_C(IBUF, 2)
         NBSUBMAT = IBUF(1)
+        OLDFORMAT = IBUF(2)
         MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%NB = NBSUBMAT
+        MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%old_data_format = OLDFORMAT
         IF(NBSUBMAT > 0)THEN
           CALL READ_I_C(IBUF, NBSUBMAT)
           CALL READ_DB(RBUF, NBSUBMAT)
           MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%mid = IBUF(1:NBSUBMAT)
           MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%vfrac = RBUF(1:NBSUBMAT)
+           ALLOCATE (MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%pEOS(NBSUBMAT))
+           IF(OLDFORMAT == 1)THEN
+             !embedded EOS parameters
+             ALLOCATE (MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%EOS(NBSUBMAT))
+             DO I = 1,NBSUBMAT
+               CALL READ_EOSPARAM(MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%EOS(I))
+               MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%pEOS(I)%EOS => MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%EOS(I)
+             END DO
+           ELSE
+             ! pointers to user /EOS
+             DO I=1,NBSUBMAT
+               ISUB = MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%mid(I)
+               IF(ISUB>0)THEN
+                 MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%pEOS(I)%EOS => MAT_ELEM%MAT_PARAM(ISUB)%EOS
+               ELSE
+                 NULLIFY(MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%pEOS(I)%EOS)
+               ENDIF
+             ENDDO
+          ENDIF
         ENDIF
       ENDDO
       DEALLOCATE(IBUF)
       DEALLOCATE(RBUF)
 
-      ! read eos model parameters
+
+
+      !ASSOCIATE MULTIMAT_EOS
+
+      
+      ! read ALE rezoning parameters
       DO IMAT = 1,NUMMAT
-        IF (MAT_ELEM%MAT_PARAM(IMAT)%IEOS > 0) THEN
-          CALL READ_EOSPARAM(MAT_ELEM%MAT_PARAM(IMAT)%EOS)
-        END IF
-      END DO
+        CALL READ_ALE_REZONING_PARAM(MAT_ELEM%MAT_PARAM(IMAT)%REZON)
+      END DO       
 
 c-----------
       RETURN

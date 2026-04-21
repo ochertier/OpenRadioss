@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    constraint_mod   ../starter/source/modules/constaint_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit          ../starter/source/restart/ddsplit/ddsplit.F
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||    split_rwall      ../starter/source/constraints/general/rwall/split_rwall.F90
-      !||    w_front          ../starter/source/restart/ddsplit/w_front.F
-      !||====================================================================
+!||====================================================================
+!||    constraint_mod   ../starter/source/modules/constaint_mod.F90
+!||--- called by ------------------------------------------------------
+!||    ddsplit          ../starter/source/restart/ddsplit/ddsplit.F
+!||    lectur           ../starter/source/starter/lectur.F
+!||    split_rwall      ../starter/source/constraints/general/rwall/split_rwall.F90
+!||    w_front          ../starter/source/restart/ddsplit/w_front.F
+!||====================================================================
       module constraint_mod
 !=======================================================================================================================
-!!\brief 
+!!\brief
 !=======================================================================================================================
+        implicit none
 
         ! --------------------------------
-        ! Structure for domdec 
+        ! Structure for domdec
         type spmd_
           integer ::  pmain !< main processor of the current rwall/rbody/rbe3/...
           integer ::  s_node_number !< number of S nodes
@@ -67,9 +68,9 @@
         ! --------------------------------
 
         type constraint_
-          type(rwall_) ::  rwall    !< 
-          type(rbody_) ::  rbody    !< 
-          type(rbe3_) ::  rbe3    !<        
+          type(rwall_) ::  rwall    !<
+          type(rbody_) ::  rbody    !<
+          type(rbe3_) ::  rbe3    !<
         end type constraint_
 
 
@@ -79,11 +80,11 @@
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \brief Allocation of constraint_struct
-      !||====================================================================
-      !||    alloc_constraint_struct   ../starter/source/modules/constaint_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                    ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    alloc_constraint_struct   ../starter/source/modules/constaint_mod.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                    ../starter/source/starter/lectur.F
+!||====================================================================
         subroutine alloc_constraint_struct(nrwall,nspmd,constraint_struct)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -93,10 +94,6 @@
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -121,7 +118,7 @@
           do n=1,nrwall
             allocate( constraint_struct%rwall%spmd(n)%m_proc_list(nspmd) )
             constraint_struct%rwall%spmd(n)%m_proc_list(1:nspmd) = 0
-          enddo
+          end do
           ! ------------
 
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -132,11 +129,11 @@
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \brief Deallocation of constraint_struct
-      !||====================================================================
-      !||    dealloc_constraint_struct   ../starter/source/modules/constaint_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                      ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    dealloc_constraint_struct   ../starter/source/modules/constaint_mod.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                      ../starter/source/starter/lectur.F
+!||====================================================================
         subroutine dealloc_constraint_struct(nrwall,constraint_struct)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -146,10 +143,6 @@
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -168,7 +161,7 @@
           ! ------------
           do n=1,nrwall
             deallocate( constraint_struct%rwall%spmd(n)%m_proc_list )
-          enddo
+          end do
           ! ------------
           deallocate( constraint_struct%rwall%spmd )
 

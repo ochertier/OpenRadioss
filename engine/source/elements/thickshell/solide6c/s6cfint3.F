@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s6cfint3   ../engine/source/elements/thickshell/solide6c/s6cfint3.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cforc3   ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s6cfint3   ../engine/source/elements/thickshell/solide6c/s6cfint3.F
+!||--- called by ------------------------------------------------------
+!||    s6cforc3   ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||====================================================================
       SUBROUTINE S6CFINT3(
      1   SIG,     PX1,     PX2,     PX3,
      2   PX4,     PY1,     PY2,     PY3,
@@ -46,7 +46,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      I   QM,      EPLASM,  ZI,      WI,
      J   VOLG,    OFF,     NU,      VOL0,
      K   VOL0G,   G_PLA,   G_EPSD,  NEL,
-     L   SVIS)
+     L   SVIS,    G_WPLA,  L_WPLA,  G_WPLA_FLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -80,15 +80,18 @@ C     REAL
      .   SIGM(NEL,6),EINTM(*),RHOM(*),QM(*),EPSD(*),EPSDM(*),
      .   ZI,WI,VOLG(*),OFF(*),NU(*),VOL0(*),VOL0G(*)
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
+      INTEGER, INTENT(IN) :: G_WPLA_FLAG
+      my_real,DIMENSION(NEL*G_WPLA_FLAG), INTENT(INOUT) :: G_WPLA
+      my_real,DIMENSION(NEL*G_WPLA_FLAG), INTENT(IN) :: L_WPLA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
 C     REAL
       my_real
      .   S1(MVSIZ), S2(MVSIZ), S3(MVSIZ),
      .   S4(MVSIZ), S5(MVSIZ), S6(MVSIZ),
-     .   RX1(MVSIZ), RY1(MVSIZ), SX1(MVSIZ), SY1(MVSIZ),
+     .      
      .   FINT,FINTX,FINTY,FINTZ,FAC(MVSIZ),FXC,FYC,FINSX,FINSY
       my_real 
      .  NU1,FINSZ
@@ -102,7 +105,7 @@ C=======================================================================
        S6(I)=(SIG(I,6)+SVIS(I,6))*VOL(I)
       ENDDO
 C                                                                     12
-C  -------constant part---------
+C  ------ Constant part ---------
        DO I=1,NEL
         FINT=S1(I)*PX1(I)+S4(I)*PY1(I)
         FXC = JI33(I)*S6(I)
@@ -145,7 +148,7 @@ C
         F33(I)=F33(I)-FINT+FINTZ
         F36(I)=F36(I)-FINT-FINTZ
        ENDDO
-C   --- non constante part------------
+C   --- not constant part ------------
 C                                                                     12
       DO I=1,NEL
        S1(I) = ZI*S1(I)
@@ -217,7 +220,7 @@ C
         F36(I)=F36(I)-FINT-FINTZ
        ENDDO
 C----------------------------------------------    /
-C   - post-traitement-valeur moyenne au sens a'=(_/  a dv ) /v
+C   -Average post-processing in the sense A '= (_ / a dv) / V
       DO I=1,NEL
          FAC(I) = OFF(I)*VOL(I)/VOLG(I)
          SIGM(I,1) = SIGM(I,1) + FAC(I) * SIG(I,1)
@@ -228,6 +231,7 @@ C   - post-traitement-valeur moyenne au sens a'=(_/  a dv ) /v
          SIGM(I,6) = SIGM(I,6) + FAC(I) * SIG(I,6)
          RHOM(I)   = RHOM(I)   + FAC(I) * RHO(I)
          EINTM(I)  = EINTM(I)  + EINT(I)*VOL0(I)/VOL0G(I)
+         IF (G_WPLA_FLAG > 0) G_WPLA(I) = G_WPLA(I) + L_WPLA(I)
          QM(I)     = QM(I)     + FAC(I) * Q(I)
       ENDDO
       IF (G_PLA > 0) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    wciusc2                ../engine/source/input/wciusc2.F
-      !||--- called by ------------------------------------------------------
-      !||    frebcs                 ../engine/source/input/frebcs.F
-      !||    read10                 ../engine/source/input/read10.F
-      !||    read10p                ../engine/source/input/read10p.F
-      !||    read5p                 ../engine/source/input/read5p.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../engine/source/output/message/message.F
-      !||    arret                  ../engine/source/system/arret.F
-      !||    nvar                   ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    wciusc2                ../engine/source/input/wciusc2.F
+!||--- called by ------------------------------------------------------
+!||    frebcs                 ../engine/source/input/frebcs.F
+!||    read10                 ../engine/source/input/read10.F
+!||    read10p                ../engine/source/input/read10p.F
+!||    read5p                 ../engine/source/input/read5p.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../engine/source/output/message/message.F
+!||    arret                  ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE WCIUSC2(IREC,NBC,N,KEY0)
 C-----------------------------------------------
 C   M o d u l e s

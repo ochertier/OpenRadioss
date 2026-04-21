@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ig3donederiv      ../starter/source/elements/ige3d/ig3donederiv.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3dinit3         ../starter/source/elements/ige3d/ig3dinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../starter/source/output/message/message.F
-      !||    dersonebasisfun   ../starter/source/elements/ige3d/dersonebasisfun.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ig3donederiv      ../starter/source/elements/ige3d/ig3donederiv.F
+!||--- called by ------------------------------------------------------
+!||    ig3dinit3         ../starter/source/elements/ige3d/ig3dinit3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg            ../starter/source/output/message/message.F
+!||    dersonebasisfun   ../starter/source/elements/ige3d/dersonebasisfun.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod       ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE IG3DONEDERIV(
      1 ITEL  ,N     ,XXI   ,YYI   ,
      2 ZZI   ,WWI   ,IDX   ,IDY   ,
@@ -102,7 +102,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NUMLOC, I, J, K, NA, NB, NC
+      INTEGER NUMLOC, I, NA, NB, NC
       my_real
      .  DRDXI(NCTRL,3),SUMTOT, DETDXDXI, FN(NCTRL), 
      .  DNDXI(NCTRL), FM(NCTRL), DMDXI(NCTRL), FL(NCTRL),
@@ -234,7 +234,7 @@ C COMPUTE DERIVATES OF BASIS FUNCTIONS WITH RESPECT TO PHYSICAL COORDINATES
         ENDDO
       ENDDO
 
-C DETERMINANT DE LA MATRICE AJMAT (QUI REGROUPE DONC LES TWO JACOBIENS)
+C determinant of the ajmat matrix (which therefore groups the two jacobians)
 
       DETJAC=(AJMAT(1,1)*AJMAT(2,2)*AJMAT(3,3))
      .      +(AJMAT(1,2)*AJMAT(2,3)*AJMAT(3,1))

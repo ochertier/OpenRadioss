@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25cor3_1   ../engine/source/interfaces/int25/i25cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i25comp_1   ../engine/source/interfaces/int25/i25comp_1.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box     ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25cor3_1   ../engine/source/interfaces/int25/i25cor3.F
+!||--- called by ------------------------------------------------------
+!||    i25comp_1   ../engine/source/interfaces/int25/i25comp_1.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box     ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25COR3_1(
      1               JLT     ,X      ,IRECT  ,NSV  ,CAND_E ,
      2               CAND_N  ,IRTLM  ,STF    ,STFN ,STIF   ,
@@ -73,7 +73,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J , L, NN, IG, JFT, IX,  NI, I1, I2, I3, I4
+      INTEGER I ,J , L, NN, IG, IX,  NI
       my_real
      .        XN
 C-----------------------------------------------
@@ -224,13 +224,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i25cor3_21   ../engine/source/interfaces/int25/i25cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i25comp_2    ../engine/source/interfaces/int25/i25comp_2.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25cor3_21   ../engine/source/interfaces/int25/i25cor3.F
+!||--- called by ------------------------------------------------------
+!||    i25comp_2    ../engine/source/interfaces/int25/i25comp_2.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25COR3_21(
      1               JLT     ,X      ,IRECT ,NSV   ,CAND_E    ,
      2               CAND_N  ,STF    ,STFN  ,STIF  ,IGAP      ,
@@ -275,7 +275,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J , K, L, NN, IG, JFT, IX,  NI, I1, I2, I3, I4, NOR, II(4)
+      INTEGER I ,J , K, L, NN, IG, IX,  NI, NOR, II(4)
       my_real
      .        XN
 C-----------------------------------------------
@@ -446,13 +446,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i25cor3_22   ../engine/source/interfaces/int25/i25cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i25comp_2    ../engine/source/interfaces/int25/i25comp_2.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25cor3_22   ../engine/source/interfaces/int25/i25cor3.F
+!||--- called by ------------------------------------------------------
+!||    i25comp_2    ../engine/source/interfaces/int25/i25comp_2.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25COR3_22(
      1               JLT     ,X      ,IRECT ,NSV   ,CAND_E      ,
      2               CAND_N  ,STF    ,STFN ,STIF   ,IGAP        ,
@@ -511,7 +511,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J , K, L, NN, IG, JFT, IX,  NI, I1, I2, I3, I4, NOR, II(4), ISH
+      INTEGER I ,J , L, NN, IG, IX,  NI, ISH
       my_real
      .        XN
 C-----------------------------------------------
@@ -757,14 +757,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i25cor3_3        ../engine/source/interfaces/int25/i25cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i25mainf         ../engine/source/interfaces/int25/i25mainf.F
-      !||--- uses       -----------------------------------------------------
-      !||    parameters_mod   ../common_source/modules/interfaces/parameters_mod.F
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25cor3_3        ../engine/source/interfaces/int25/i25cor3.F
+!||--- called by ------------------------------------------------------
+!||    i25mainf         ../engine/source/interfaces/int25/i25mainf.F
+!||--- uses       -----------------------------------------------------
+!||    parameters_mod   ../common_source/modules/interfaces/parameters_mod.F
+!||    tri7box          ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25COR3_3(
      1               JLT     ,X       ,IRECT  ,NSV   ,CAND_E      ,
      2               CAND_N  ,STF     ,STFN   ,STIF   ,NOD_NORMAL ,
@@ -851,7 +851,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J , L, NN, IG, JFT, IX,  NI, I1, I2, I3, I4, IT
+      INTEGER I ,J , L, NN, IG, IX,  NI, IT
       my_real
      .        XN,DTS,STIF_MSDT(MVSIZ)
 C-----------------------------------------------
@@ -861,7 +861,7 @@ C-----------------------------------------------
            IF(NI<=NSN)THEN
              IG = NSV(NI)
              NSVG(I) = IG
-C---------------voir quand KINET(IG) est utilise  
+C-------------- see when Kinet (IG) is used  
              KINI(I) = KINET(IG)
              XI(I) = X(1,IG)
              YI(I) = X(2,IG)
@@ -1130,7 +1130,7 @@ C----------
         LC(I)  =LCM(IT,INDEX(I))
       ENDDO
 
-C----Friction model : secnd part IDs---------
+C----Friction model : second part IDs---------
       IF(INTFRIC > 0) THEN
          DO I=1,JLT
            NI = CAND_N(I)

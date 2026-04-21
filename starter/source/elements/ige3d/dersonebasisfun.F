@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dersonebasisfun   ../starter/source/elements/ige3d/dersonebasisfun.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3donederiv      ../starter/source/elements/ige3d/ig3donederiv.F
-      !||====================================================================
+!||====================================================================
+!||    dersonebasisfun   ../starter/source/elements/ige3d/dersonebasisfun.F
+!||--- called by ------------------------------------------------------
+!||    ig3donederiv      ../starter/source/elements/ige3d/ig3donederiv.F
+!||====================================================================
       SUBROUTINE DERSONEBASISFUN(IDXI, PXI, XI, KXI, DERS1, DERS2)
 C--------------------------------------------------------------------------------------------------------
 C
@@ -58,15 +58,11 @@ C-------------------------------------------------------------------------------
 C--------------------------------------------------------------------------------------------------------
 C Local variables 
 C--------------------------------------------------------------------------------------------------------
-      INTEGER J, JJ, K, L, NDERS
-      my_real 
-     .  SAVED, TEMP, ALEFT, RIGHT
-      my_real, 
-     .  DIMENSION(2) :: DERS, A
-      my_real, 
-     .  DIMENSION(PXI+1,PXI+1) :: ANDU
-      my_real, 
-     .  DIMENSION(PXI+1) :: ND
+      INTEGER J, JJ, K, NDERS
+      my_real SAVED, TEMP, ALEFT, RIGHT
+      my_real, DIMENSION(2) :: DERS
+      my_real, DIMENSION(PXI+1,PXI+1) :: ANDU
+      my_real, DIMENSION(PXI+1) :: ND
 
       NDERS=1
       ANDU(:,:)=ZERO
@@ -101,7 +97,7 @@ C-------------------------------------------------------------------------------
       
       DERS(1) = ANDU(1,PXI+1) 
 
-CCC ERREUR A PARTIR DE LA
+Cerror from here
 
       DO K=1,NDERS
         DO J=1,K+1

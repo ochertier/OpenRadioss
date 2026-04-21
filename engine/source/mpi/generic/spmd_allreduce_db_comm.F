@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,10 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_allreduce_db_comm   ../engine/source/mpi/generic/spmd_allreduce_db_comm.F
-      !||--- called by ------------------------------------------------------
-      !||    telesc                   ../engine/source/constraints/general/cyl_joint/telesc.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_allreduce_db_comm   ../engine/source/mpi/generic/spmd_allreduce_db_comm.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
         SUBROUTINE SPMD_ALLREDUCE_DB_COMM(VALUE,RES,MY_SIZE,MY_OPERATION,MY_COMM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -38,10 +36,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        CHARACTER(len=*), INTENT(in) :: MY_OPERATION
-        INTEGER, INTENT(in) :: MY_SIZE,MY_COMM
-        REAL(kind=8), DIMENSION(MY_SIZE), INTENT(in) :: VALUE
-        REAL(kind=8), DIMENSION(MY_SIZE), INTENT(out) :: RES
+        CHARACTER(len=*), INTENT(inout) :: MY_OPERATION
+        INTEGER, INTENT(inout) :: MY_SIZE,MY_COMM
+        REAL(kind=8), DIMENSION(MY_SIZE), INTENT(inout) :: VALUE
+        REAL(kind=8), DIMENSION(MY_SIZE), INTENT(inout) :: RES
 
 #ifdef MPI
 C-----------------------------------------------

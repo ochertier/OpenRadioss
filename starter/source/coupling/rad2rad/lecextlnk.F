@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecextlnk                ../starter/source/coupling/rad2rad/lecextlnk.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    grfind                   ../starter/source/starter/freform.F
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                  ../starter/share/modules1/r2r_mod.F
-      !||    reader_old_mod           ../starter/share/modules1/reader_old_mod.F90
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecextlnk                ../starter/source/coupling/rad2rad/lecextlnk.F
+!||--- called by ------------------------------------------------------
+!||    lectur                   ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    r2r_mod                  ../starter/share/modules1/r2r_mod.F
+!||    reader_old_mod           ../starter/share/modules1/reader_old_mod.F90
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE LECEXTLNK(IEXTER,IPART,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -70,19 +69,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER N, NUSER, IGR, IGRS, STAT,I,COMPT,SET
+        INTEGER NUSER, IGR, STAT,I,COMPT,SET
         CHARACTER MESS*40
         CHARACTER(LEN=NCHARKEY)::KEY
         CHARACTER(LEN=NCHARTITLE)::TITR
         INTEGER J,ADD,K
-        INTEGER FLAG_OK,NUM_LINK,FOUND,NEL,ID,NELN
+        INTEGER FLAG_OK,FOUND,NEL,ID,NELN
         INTEGER, DIMENSION(:), ALLOCATABLE :: ID_SUB_TEMP
         LOGICAL IS_AVAILABLE
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-        INTEGER GRFIND
-C
         DATA MESS/' ** ERROR EXTERNAL COUPLING DEFINITION '/
         WRITE(IOUT,1000)
         IF (NR2RLNK>0) WRITE(IOUT,1200)
@@ -91,14 +85,14 @@ C      IEXTER(1,M) ............... Id of GRNOD of the Link
 C      IEXTER(2,M) ............... Link ser Id
 C      IEXTER(3,M) ............... Id of 1st domain
 C      IEXTER(4,M) ............... Id of 2nd domain
-C      IEXTER(5,M) ............... Type du Link (4 ou 5)
-C        -> pour fulldomain IEXTER(4,M) = 0
-C        -> pour link classique IEXTER(4,M) = IEXTER(4,M) = -1
+C      IEXTER(5,M) ............... Type of the Link (4 or 5)
+C        -> For fulldomain iEnder (4, m) = 0
+C        -> for classic link iSSER (4, m) = ISUR (4, m) = -1
 C
 C
 C      ISUBDOM(1,N) .............. Id of subdomain
 C      ISUBDOM(2,N) .............. Nb of parts of the subdomain
-C      ISUBDOM(3,N) .............. Adress of the parts of the subdomain in ISUBDOM_PART
+C      ISUBDOM(3,N) .............. Address of the parts of the subdomain in ISUBDOM_PART
 C      ISUBDOM(4,N) .............. Id of principal link of subdomain
 C      ISUBDOM(5,N) .............. Nb of nodes of subdomain
 C      ISUBDOM(6,N) .............. Nb of elements of subdomain

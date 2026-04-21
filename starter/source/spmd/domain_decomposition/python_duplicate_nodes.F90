@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,52 +21,61 @@
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 !! \brief duplicates nodes used by python functions to all processors
-      !||====================================================================
-      !||    python_duplicate_nodes       ../starter/source/spmd/domain_decomposition/python_duplicate_nodes.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                       ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus                   ../starter/source/spmd/node/frontplus.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
-      subroutine python_duplicate_nodes(itab, numnod, nspmd)
+!||====================================================================
+!||    python_duplicate_nodes_mod   ../starter/source/spmd/domain_decomposition/python_duplicate_nodes.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                       ../starter/source/starter/lectur.F
+!||====================================================================
+      module python_duplicate_nodes_mod
+        implicit none
+      contains
+!||====================================================================
+!||    python_duplicate_nodes       ../starter/source/spmd/domain_decomposition/python_duplicate_nodes.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                       ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus                   ../starter/source/spmd/node/frontplus.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
+        subroutine python_duplicate_nodes(itab, numnod, nspmd)
 
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Modules
 ! ----------------------------------------------------------------------------------------------------------------------
-        use python_funct_mod, only : python_get_number_of_nodes, python_get_nodes
+          use python_funct_mod, only : python_get_number_of_nodes, python_get_nodes
 ! ----------------------------------------------------------------------------------------------------------------------
-        implicit none
+          implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
-        integer, intent(in) :: numnod          !< global number of nodes (NUMNOD)
-        integer, intent(in) :: nspmd           !< number of processors (NSPMD)
-        integer, intent(in) :: itab(numnod)    !< global (user) node ids
+          integer, intent(in) :: numnod          !< global number of nodes (NUMNOD)
+          integer, intent(in) :: nspmd           !< number of processors (NSPMD)
+          integer, intent(in) :: itab(numnod)    !< global (user) node ids
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-        integer :: number_of_nodes_in_python
-        integer, dimension(:), allocatable :: nodes_global_ids
-        integer :: i,j,p
+          integer :: number_of_nodes_in_python
+          integer, dimension(:), allocatable :: nodes_global_ids
+          integer :: i,j,p
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                      Body
 ! ----------------------------------------------------------------------------------------------------------------------
 
-        call python_get_number_of_nodes(number_of_nodes_in_python)
-        !write(6,*) "number of nodes = ", number_of_nodes_in_python, " numnod = ", numnod
-        allocate(nodes_global_ids(number_of_nodes_in_python))
-        call python_get_nodes(nodes_global_ids)
+          call python_get_number_of_nodes(number_of_nodes_in_python)
+          !write(6,*) "number of nodes = ", number_of_nodes_in_python, " numnod = ", numnod
+          allocate(nodes_global_ids(number_of_nodes_in_python))
+          call python_get_nodes(nodes_global_ids)
 
-        ! the number of nodes in python should be very small, so we can do a double loop
-        do i = 1, number_of_nodes_in_python
-          do j = 1, numnod
-            if(nodes_global_ids(i) == itab(j)) then
-              do p = 1, nspmd
-                call ifrontplus(j,p)
-                !write(6,*) "python_front: node ", nodes_global_ids(i), " is on processor ", p
-              enddo
-            endif
-          enddo
-        end do
-      end subroutine
+          ! the number of nodes in python should be very small, so we can do a double loop
+          do i = 1, number_of_nodes_in_python
+            do j = 1, numnod
+              if(nodes_global_ids(i) == itab(j)) then
+                do p = 1, nspmd
+                  call ifrontplus(j,p)
+                  !write(6,*) "python_front: node ", nodes_global_ids(i), " is on processor ", p
+                end do
+              end if
+            end do
+          end do
+        end subroutine python_duplicate_nodes
+      end module python_duplicate_nodes_mod

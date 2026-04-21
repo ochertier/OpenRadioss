@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21els3                ../starter/source/interfaces/inter3d1/i21els3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    incoq3                 ../starter/source/interfaces/inter3d1/incoq3.F
-      !||    ineltc                 ../starter/source/interfaces/inter3d1/inelt.F
-      !||    inelts                 ../starter/source/interfaces/inter3d1/inelt.F
-      !||    insol3                 ../starter/source/interfaces/inter3d1/insol3.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i21els3                 ../starter/source/interfaces/inter3d1/i21els3.F
+!||--- called by ------------------------------------------------------
+!||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
+!||    incoq3                  ../starter/source/interfaces/inter3d1/incoq3.F
+!||    ineltc                  ../starter/source/interfaces/inter3d1/inelt.F
+!||    inelts                  ../starter/source/interfaces/inter3d1/inelt.F
+!||    insol3                  ../starter/source/interfaces/inter3d1/insol3.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I21ELS3(
      1 X        ,IRECTS   ,IRECTM    ,NRTS    ,NRTM  ,
      2 GEO      ,IXS      ,PM        ,IXC     ,IXTG  ,
@@ -42,14 +43,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6 NOD2ELTG ,IGRSURFS ,IGRSURFM  ,IELEM21 ,
      7 THK      ,AS        ,BS       ,IXS10   ,IXS16    ,
      8 IXS20    ,ID        ,TITR     ,IGEO    ,SH4TREE  ,
-     9 SH3TREE  ,IPART    ,IPARTC    ,IPARTTG ,PM_STACK , 
-     A IWORKSH )
+     9 SH3TREE  ,IPART     ,IPARTC   ,IPARTTG ,PM_STACK , 
+     A IWORKSH  ,INTFRIC   ,TAGPRT_FRIC,IPARTFRICS,IPARTFRICM,
+     B INTBUF_FRIC_TAB,IPARTS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE INTBUF_FRIC_MOD
+      use element_mod , only :nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,13 +63,13 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "remesh_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRTS, NRTM, NINT, NTY, NOINT, NSN, NMN
+      INTEGER , INTENT(IN) :: INTFRIC
       INTEGER IRECTS(4,*), IRECTM(4,*), IXS(NIXS,*), IXC(NIXC,*),
      .   NSV(*), IXTG(NIXTG,*), 
      .   KNOD2ELS(*), KNOD2ELC(*), KNOD2ELTG(*), NOD2ELS(*), NOD2ELC(*),
@@ -81,11 +85,15 @@ C     REAL
       CHARACTER(LEN=NCHARTITLE) :: TITR
       TYPE (SURF_) :: IGRSURFS
       TYPE (SURF_) :: IGRSURFM
+      TYPE(INTBUF_FRIC_STRUCT_),INTENT(INOUT) ::  INTBUF_FRIC_TAB(NINTERFRIC)
+      INTEGER,INTENT(INOUT) ::  IPARTFRICS(NSN),IPARTFRICM(NRTM)
+      INTEGER,INTENT(IN) ::  TAGPRT_FRIC(NPART)
+      INTEGER, DIMENSION(NUMELS), INTENT(IN) :: IPARTS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, INRT, NELS, NELC, NELTG, IE, II, MAT,N,LLT,L,N1,N2,N3,N4
-      INTEGER ITMP(NUMNOD),NLEV, MYLEV,IP,NELEM,STAT
+      INTEGER I, J, INRT, NELS, NELC, NELTG, IE, II, MAT,N1,N2,N3,N4
+      INTEGER ITMP(NUMNOD),NLEV, MYLEV,IP,NELEM,STAT,IPG,IPL,IPFMAX,IPFLMAX
       INTEGER, DIMENSION(:),ALLOCATABLE ::INRTIE
 C     REAL
       my_real
@@ -150,41 +158,22 @@ C---------------------
       ENDIF
 C
       IF(NELS+NELC+NELTG==0)THEN
-       IF (IMACH/=3) THEN
-         IF(NINT>0) THEN
-            CALL ANCMSG(MSGID=92,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-         IF(NINT<0) THEN
-            CALL ANCMSG(MSGID=93,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-       ELSE
-         IF(NINT>0) THEN
-            CALL ANCMSG(MSGID=481,
-     .                  MSGTYPE=MSGERROR,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-         IF(NINT<0) THEN
-            CALL ANCMSG(MSGID=482,
-     .                  MSGTYPE=MSGERROR,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-       ENDIF
+        IF(NINT>0) THEN
+           CALL ANCMSG(MSGID=481,
+     .                 MSGTYPE=MSGERROR,
+     .                 ANMODE=ANINFO_BLIND_2,
+     .                 I1=ID,
+     .                 C1=TITR,
+     .                 I2=I)
+        ENDIF
+        IF(NINT<0) THEN
+           CALL ANCMSG(MSGID=482,
+     .                 MSGTYPE=MSGERROR,
+     .                 ANMODE=ANINFO_BLIND_2,
+     .                 I1=ID,
+     .                 C1=TITR,
+     .                 I2=I)
+        ENDIF
       ENDIF
   250 CONTINUE
       DO 500 I=1,NRTM
@@ -195,15 +184,48 @@ C----------------------
      .            IGRSURFM%ELEM)
       IF(NELS/=0)THEN
         IELEM21(NELS)=1
+C -----Friction model ------
+        IF(INTFRIC > 0) THEN
+           IP= IPARTS(NELS)
+           IPG = TAGPRT_FRIC(IP)
+           IF(IPG > 0) THEN
+              CALL FRICTION_PARTS_SEARCH (
+     .             IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .             INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL )
+              IPARTFRICM(I) = IPL
+           ENDIF
+        ENDIF
         GO TO 500
       ELSE
         CALL INELTC(NELC ,NELTG ,INRT ,IGRSURFM%ELTYP, IGRSURFM%ELEM)
         IF(NELTG/=0) THEN
           IELEM21(NUMELS+NUMELQ+NUMELC+NUMELT
      .                     +NUMELP+NUMELR+NELTG)=1
+C -----Friction model ------
+         IF(INTFRIC > 0) THEN
+            IP= IPARTTG(NELTG)
+            IPG = TAGPRT_FRIC(IP)
+            IF(IPG > 0) THEN
+              CALL FRICTION_PARTS_SEARCH (
+     .             IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .             INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL )
+              IPARTFRICM(I) = IPL
+            ENDIF
+          ENDIF
           GO TO 500
         ELSEIF(NELC/=0) THEN
           IELEM21(NUMELS+NUMELQ+NELC)=1
+C -----Friction model ------
+         IF(INTFRIC > 0) THEN
+            IP= IPARTC(NELC)
+            IPG = TAGPRT_FRIC(IP)
+            IF(IPG > 0) THEN
+              CALL FRICTION_PARTS_SEARCH (
+     .             IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .             INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL )
+              IPARTFRICM(I) = IPL
+            ENDIF
+          ENDIF
           GO TO 500
         END IF
       END IF
@@ -222,24 +244,7 @@ C---------------------
      .            PM_STACK , IWORKSH )
 C
       IF(NELS+NELC+NELTG==0)THEN
-       IF (IMACH/=3) THEN
-         IF(NINT>0) THEN
-            CALL ANCMSG(MSGID=92,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-         IF(NINT<0) THEN
-            CALL ANCMSG(MSGID=93,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=I)
-         ENDIF
-       ELSE
+
          IF(NINT>0) THEN
             CALL ANCMSG(MSGID=481,
      .                  MSGTYPE=MSGERROR,
@@ -256,12 +261,51 @@ C
      .                  C1=TITR,
      .                  I2=I)
          ENDIF
-       ENDIF
+
       ELSE
-        IF(NELS/=0)  IELEM21(NELS)=1
-        IF(NELTG/=0) IELEM21(NUMELS+NUMELQ+NUMELC+NUMELT
+        IF(NELS/=0)  THEN
+          IELEM21(NELS)=1
+C -----Friction model ------
+          IF(INTFRIC > 0) THEN
+            IP= IPARTS(NELS)
+            IPG = TAGPRT_FRIC(IP)
+            IF(IPG > 0) THEN
+              CALL FRICTION_PARTS_SEARCH (
+     .             IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .             INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL )
+              IPARTFRICM(I) = IPL
+            ENDIF
+           ENDIF
+        ENDIF
+        IF(NELTG/=0) THEN
+           IELEM21(NUMELS+NUMELQ+NUMELC+NUMELT
      .                     +NUMELP+NUMELR+NELTG)=1
-        IF(NELC/=0)  IELEM21(NUMELS+NUMELQ+NELC)=1
+C -----Friction model ------
+          IF(INTFRIC > 0) THEN
+            IP= IPARTTG(NELTG)
+            IPG = TAGPRT_FRIC(IP)
+            IF(IPG > 0) THEN
+              CALL FRICTION_PARTS_SEARCH (
+     .             IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .             INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL )
+              IPARTFRICM(I) = IPL
+            ENDIF
+          ENDIF
+        ENDIF
+        IF(NELC/=0) THEN
+          IELEM21(NUMELS+NUMELQ+NELC)=1
+C -----Friction model ------
+          IF(INTFRIC > 0) THEN
+            IP= IPARTC(NELC)
+            IPG = TAGPRT_FRIC(IP)
+            IF(IPG > 0) THEN
+              CALL FRICTION_PARTS_SEARCH (
+     .             IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .             INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL )
+              IPARTFRICM(I) = IPL
+            ENDIF
+          ENDIF
+        ENDIF
       END IF
   500 CONTINUE
 C---------------------------
@@ -483,6 +527,76 @@ C overwrite
       IF(INTTH > 0) THEN
         DEALLOCATE(CONTRIB_KEY,CONTRIB_VALUE)
       ENDIF
+
+C ---- FRICTION MODEL DRAD NODES PARTS ------
+      IF(INTFRIC > 0) THEN
+        IF(NUMELS  /= 0)THEN
+          DO I = 1,NSN   
+             IPFMAX = 0
+             IPFLMAX = 0
+             DO J= KNOD2ELS(NSV(I))+1,KNOD2ELS(NSV(I)+1)
+               IE = NOD2ELS(J)
+               IP = IPARTS(IE)
+               IPG = TAGPRT_FRIC(IP)
+               IF(IPG > 0 .AND. IP > IPFMAX) THEN
+                  CALL FRICTION_PARTS_SEARCH (
+     .                           IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .                           INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL ) 
+                  IF(IPL /= 0) THEN
+                     IPFMAX = IP
+                     IPFLMAX = IPL
+                  ENDIF
+               ENDIF
+            ENDDO
+            IF(IPFMAX /= 0) THEN
+              IPARTFRICS(I) = IPFLMAX
+            ENDIF
+
+          ENDDO
+        ENDIF  
+
+        IF(NUMELC /= 0 .OR. NUMELTG  /= 0) THEN
+          DO I = 1,NSN  
+             IPFMAX = 0
+             IPFLMAX = 0
+             DO J= KNOD2ELC(NSV(I))+1,KNOD2ELC(NSV(I)+1)
+               IE = NOD2ELC(J)
+               IP = IPARTC(IE)
+               IPG = TAGPRT_FRIC(IP)
+               IF(IPG > 0 .AND. IP > IPFMAX) THEN
+                  CALL FRICTION_PARTS_SEARCH (
+     .                           IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .                             INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL )  
+                  IF(IPL /= 0) THEN
+                     IPFMAX = IP
+                     IPFLMAX = IPL
+                  ENDIF
+               ENDIF
+            ENDDO
+C
+            DO J= KNOD2ELTG(NSV(I))+1,KNOD2ELTG(NSV(I)+1) 
+               IE = NOD2ELTG(J)
+               IP = IPARTTG(IE)
+               IPG = TAGPRT_FRIC(IP)
+               IF(IPG > 0.AND.IP > IPFMAX) THEN 
+                  CALL FRICTION_PARTS_SEARCH (
+     .                           IPG,INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC,
+     .                           INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC,IPL ) 
+
+                  IF(IPL /= 0) THEN
+                     IPFMAX = IP
+                     IPFLMAX = IPL
+                  ENDIF
+               ENDIF
+            ENDDO
+            IF(IPFMAX /= 0) THEN
+              IPARTFRICS(I) = IPFLMAX
+            ENDIF
+
+          ENDDO
+        ENDIF  
+      ENDIF
+
 C---------------------------
       RETURN
       END

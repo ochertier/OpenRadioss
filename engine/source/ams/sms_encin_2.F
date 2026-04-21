@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_encin_2       ../engine/source/ams/sms_encin_2.F
-      !||--- called by ------------------------------------------------------
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg            ../engine/source/output/message/message.F
-      !||    arret             ../engine/source/system/arret.F
-      !||    my_barrier        ../engine/source/system/machine.F
-      !||    sms_bcs           ../engine/source/ams/sms_bcs.F
-      !||    sms_bcscyc        ../engine/source/ams/sms_bcscyc.F
-      !||    sms_fixvel        ../engine/source/ams/sms_fixvel.F
-      !||    sms_mav_lt        ../engine/source/ams/sms_pcg.F
-      !||    sms_rbe3t1        ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe_cnds      ../engine/source/ams/sms_rbe2.F
-      !||    sms_rbe_corr      ../engine/source/ams/sms_rbe2.F
-      !||    spmd_exch_a_rb6   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
-      !||    spmd_list_sms     ../engine/source/mpi/ams/spmd_sms.F
-      !||    spmd_mij_sms      ../engine/source/mpi/ams/spmd_sms.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_mod      ../engine/share/modules/intstamp_mod.F
-      !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||    output_mod        ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod        ../common_source/modules/sensor_mod.F90
-      !||    timer_mod         ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sms_encin_2       ../engine/source/ams/sms_encin_2.F
+!||--- called by ------------------------------------------------------
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg            ../engine/source/output/message/message.F
+!||    arret             ../engine/source/system/arret.F
+!||    my_barrier        ../engine/source/system/machine.F
+!||    sms_bcs           ../engine/source/ams/sms_bcs.F
+!||    sms_bcscyc        ../engine/source/ams/sms_bcscyc.F
+!||    sms_fixvel        ../engine/source/ams/sms_fixvel.F
+!||    sms_mav_lt        ../engine/source/ams/sms_pcg.F
+!||    sms_rbe3t1        ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe_cnds      ../engine/source/ams/sms_rbe2.F
+!||    sms_rbe_corr      ../engine/source/ams/sms_rbe2.F
+!||    spmd_exch_a_rb6   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
+!||    spmd_list_sms     ../engine/source/mpi/ams/spmd_sms.F
+!||    spmd_mij_sms      ../engine/source/mpi/ams/spmd_sms.F
+!||--- uses       -----------------------------------------------------
+!||    intstamp_mod      ../engine/share/modules/intstamp_mod.F
+!||    message_mod       ../engine/share/message_module/message_mod.F
+!||    output_mod        ../common_source/modules/output/output_mod.F90
+!||    sensor_mod        ../common_source/modules/sensor_mod.F90
+!||    timer_mod         ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE SMS_ENCIN_2(TIMERS,
      1        ITASK    ,NODFT    ,NODLT    ,NODXI_SMS,
      2        MS       ,JAD_SMS  ,JDI_SMS  ,LT_SMS    ,INDX1_SMS,
@@ -130,10 +130,10 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER NODFT1_SMS, NODLT1_SMS
       INTEGER NODFT2_SMS, NODLT2_SMS
-      INTEGER N, IBID, IPRI, INFO, ITHIS, IT, M, MSR, NN, IERROR,
-     .        I, IAD, NSN, K, KI, NRBDIM
+      INTEGER N, IPRI, INFO, ITHIS, IT, M, MSR, IERROR,
+     .        I, K, NRBDIM
       my_real
-     .        RBID, DT05, MAS, P1, P2, P3
+     .         DT05, MAS
 C-----
       INTEGER, DIMENSION(:), ALLOCATABLE :: IMV
       my_real
@@ -233,7 +233,7 @@ C
 C
         CALL MY_BARRIER()
 C
-        IF(ITASK==0) THEN   ! comm sur 1er thread
+        IF(ITASK==0) THEN   ! communication on the first thread
           CALL SPMD_MIJ_SMS(
      1           ISKYI_SMS,FR_SMS,FR_RMS,LIST_RMS,MSKYI_SMS,
      2           MSKYI_FI_SMS)
@@ -330,7 +330,7 @@ C
      3                  WEIGHT  ,D     ,IFRAME ,XFRAME ,SENSORS%NSENSOR,
      4                  -(IT+1),DIAG_SMS,NODXI_SMS,CPTREAC,
      5                  NODREAC,FTHREAC ,AR     ,VR       ,DR  ,
-     6                  IN     ,RBY     ,OUTPUT%WFEXT)
+     6                  IN     ,RBY     ,OUTPUT%TH%WFEXT)
       END IF
 C
       CALL MY_BARRIER

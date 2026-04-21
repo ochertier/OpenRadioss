@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,33 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    polygon_mod            ../common_source/tools/clipping/polygon_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    polygon_clipping_mod   ../common_source/tools/clipping/polygon_clipping_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    polygon_mod            ../common_source/tools/clipping/polygon_mod.F90
+!||--- called by ------------------------------------------------------
+!||    polygon_clipping_mod   ../common_source/tools/clipping/polygon_clipping_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    precision_mod          ../common_source/modules/precision_mod.F90
+!||====================================================================
       module polygon_mod
+        use precision_mod, only : WP
         implicit none
-#include  "my_real.inc"
+        private :: WP
 
         type polygon_point_
-          my_real :: y
-          my_real :: z
+          real(kind=WP) :: y
+          real(kind=WP) :: z
         end type polygon_point_
 
         type polygon_
           type(polygon_point_), allocatable, dimension(:) :: point
           integer :: numpoint ! defined points
           integer :: size ! allocated size numpoint <= size)
-          my_real :: area
-          my_real :: diag ! maximum dimension along y and z
+          real(kind=WP) :: area
+          real(kind=WP) :: diag ! maximum dimension along y and z
         end type polygon_
 
         type polygon_list_
-          integer num_polygons
+          integer :: num_polygons
           type(polygon_),allocatable,dimension(:) :: polygon
         end type polygon_list_
 
@@ -54,17 +57,16 @@
 ! ======================================================================================================================
 !! \brief add 'point' in poly data structure.
 !! \details  pre-condition, allocation must be correctly sized, otherwise an error message is displayed
-      !||====================================================================
-      !||    polygon_addpoint           ../common_source/tools/clipping/polygon_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    clipping_weiler_atherton   ../common_source/tools/clipping/polygon_clipping_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod               ../common_source/modules/constant_mod.F
-      !||====================================================================
+!||====================================================================
+!||    polygon_addpoint           ../common_source/tools/clipping/polygon_mod.F90
+!||--- called by ------------------------------------------------------
+!||    clipping_weiler_atherton   ../common_source/tools/clipping/polygon_clipping_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    constant_mod               ../common_source/modules/constant_mod.F
+!||====================================================================
         function polygon_addpoint(poly, point) result(ierr)
           use constant_mod , only : zero
           implicit none
-#include  "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +76,7 @@
 !                                                   Local Variables
 ! ----------------------------------------------------------------------------------------------------------------------
           integer :: numpt, isize
-          integer ierr
+          integer :: ierr
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -87,8 +89,8 @@
           end if
           numpt = numpt+1
           poly%numpoint = numpt
-          poly%point(numpt)%y = point%y;
-          poly%point(numpt)%z = point%z;
+          poly%point(numpt)%y = point%y
+          poly%point(numpt)%z = point%z
           ierr = 0
           !area not recomputed for performance reason. It has to be calculated once the polygon is fully built
         end function polygon_addpoint
@@ -100,14 +102,14 @@
 ! ======================================================================================================================
 !! \brief allocate poly with size numnode and zeroing
 !! \details
-      !||====================================================================
-      !||    polygon_create             ../common_source/tools/clipping/polygon_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    clipping_weiler_atherton   ../common_source/tools/clipping/polygon_clipping_mod.F90
-      !||    init_inivol_2d_polygons    ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod               ../common_source/modules/constant_mod.F
-      !||====================================================================
+!||====================================================================
+!||    polygon_create             ../common_source/tools/clipping/polygon_mod.F90
+!||--- called by ------------------------------------------------------
+!||    clipping_weiler_atherton   ../common_source/tools/clipping/polygon_clipping_mod.F90
+!||    init_inivol_2d_polygons    ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
+!||--- uses       -----------------------------------------------------
+!||    constant_mod               ../common_source/modules/constant_mod.F
+!||====================================================================
         subroutine polygon_create(poly, numnodes)
           use constant_mod , only : zero
           implicit none
@@ -121,9 +123,9 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           poly%size = numnodes
           poly%numpoint = 0
-          allocate(poly%point(numnodes));
-          poly%point(1:numnodes)%y = zero;
-          poly%point(1:numnodes)%z = zero;
+          allocate(poly%point(numnodes))
+          poly%point(1:numnodes)%y = zero
+          poly%point(1:numnodes)%z = zero
           poly%area = zero
           poly%diag = zero
         end subroutine polygon_create
@@ -133,15 +135,14 @@
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
-      !||====================================================================
-      !||    polygon_zeroing   ../common_source/tools/clipping/polygon_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod      ../common_source/modules/constant_mod.F
-      !||====================================================================
+!||====================================================================
+!||    polygon_zeroing   ../common_source/tools/clipping/polygon_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    constant_mod      ../common_source/modules/constant_mod.F
+!||====================================================================
         subroutine polygon_zeroing(poly)
           use constant_mod , only : zero
           implicit none
-#include  "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -149,14 +150,14 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local Variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer ii
+          integer :: ii
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
           poly%numpoint = 0
           do ii=1,poly%size
-            poly%point(ii)%y = zero;
-            poly%point(ii)%z = zero;
+            poly%point(ii)%y = zero
+            poly%point(ii)%z = zero
             poly%diag = zero
             poly%area = zero
           end do
@@ -167,15 +168,14 @@
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
-      !||====================================================================
-      !||    polygon_destroy           ../common_source/tools/clipping/polygon_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    init_inivol_2d_polygons   ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
-      !||    polygon_list_destroy      ../common_source/tools/clipping/polygon_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    polygon_destroy           ../common_source/tools/clipping/polygon_mod.F90
+!||--- called by ------------------------------------------------------
+!||    init_inivol_2d_polygons   ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
+!||    polygon_list_destroy      ../common_source/tools/clipping/polygon_mod.F90
+!||====================================================================
         subroutine polygon_destroy(poly)
           implicit none
-#include  "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -191,17 +191,16 @@
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
-      !||====================================================================
-      !||    polygon_list_destroy   ../common_source/tools/clipping/polygon_mod.F90
-      !||--- calls      -----------------------------------------------------
-      !||    polygon_destroy        ../common_source/tools/clipping/polygon_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod           ../common_source/modules/constant_mod.F
-      !||====================================================================
+!||====================================================================
+!||    polygon_list_destroy   ../common_source/tools/clipping/polygon_mod.F90
+!||--- calls      -----------------------------------------------------
+!||    polygon_destroy        ../common_source/tools/clipping/polygon_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    constant_mod           ../common_source/modules/constant_mod.F
+!||====================================================================
         subroutine polygon_list_destroy(list)
           use constant_mod , only : zero
           implicit none
-#include  "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -225,12 +224,11 @@
 ! ======================================================================================================================
 !! \brief copy Base_polygon into Target_polygon (allocated inside this subroutine)
 !! \details
-      !||====================================================================
-      !||    polygon_copy   ../common_source/tools/clipping/polygon_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    polygon_copy   ../common_source/tools/clipping/polygon_mod.F90
+!||====================================================================
         subroutine polygon_copy(Base_polygon, Target_polygon)
           implicit none
-#include  "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -239,7 +237,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local Variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer Base_size
+          integer :: Base_size
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -258,4 +256,4 @@
         end subroutine polygon_copy
 
 
-    end module polygon_mod
+      end module polygon_mod

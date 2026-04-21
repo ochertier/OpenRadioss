@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r6def3             ../engine/source/elements/spring/r6def3.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3             ../engine/source/elements/spring/rforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    repla3             ../engine/source/elements/spring/repla3.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod   ../common_source/modules/python_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    r6def3             ../engine/source/elements/spring/r6def3.F
+!||--- called by ------------------------------------------------------
+!||    rforc3             ../engine/source/elements/spring/rforc3.F
+!||--- calls      -----------------------------------------------------
+!||    redef3             ../engine/source/elements/spring/redef3.F90
+!||    repla3             ../engine/source/elements/spring/repla3.F
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    redef3_mod         ../engine/source/elements/spring/redef3.F90
+!||====================================================================
       SUBROUTINE R6DEF3(PYTHON,
      1   SKEW,    GEO,     FX,      FY,
      2   FZ,      E,       DX,      DY,
@@ -103,7 +105,7 @@ C     REAL
      .   EXX2(MVSIZ), EYX2(MVSIZ), EZX2(MVSIZ),
      .   EXY2(MVSIZ), EYY2(MVSIZ), EZY2(MVSIZ),
      .   EXZ2(MVSIZ), EYZ2(MVSIZ), EZZ2(MVSIZ),
-     .   FR(MVSIZ), MR(MVSIZ), X0_ERR(MVSIZ),YIELDX(*),YIELDY(*),
+     .   FR(MVSIZ), X0_ERR(MVSIZ),YIELDX(*),YIELDY(*),
      .   YIELDX2(*),YIELDY2(*),XCR(MVSIZ), RX1(MVSIZ), RX2(MVSIZ),
      .   RY1(MVSIZ), RY2(MVSIZ), RZ1(MVSIZ), RZ2(MVSIZ),XIN(MVSIZ),
      .   AK(MVSIZ),XM(MVSIZ),XKM(MVSIZ),XCM(MVSIZ),XKR(MVSIZ),
@@ -128,11 +130,11 @@ C     REAL
      .   B(MVSIZ), D(MVSIZ), EPLA(MVSIZ),
      .   DV(MVSIZ),VRT(MVSIZ),VRR(MVSIZ),FF(MVSIZ),EE(MVSIZ),
      .   DMN(MVSIZ),DMX(MVSIZ),XL0(MVSIZ),CRIT(MVSIZ),RMOM(MVSIZ),
-     .   XN(MVSIZ) ,DR(MVSIZ),ST(MVSIZ),CT(MVSIZ),BID(MVSIZ),
-     .   LSCALE(MVSIZ),GF3(MVSIZ),HX(MVSIZ), HY(MVSIZ), HZ(MVSIZ)
+     .   DR(MVSIZ),ST(MVSIZ),CT(MVSIZ),
+     .   LSCALE(MVSIZ),GF3(MVSIZ),HX(MVSIZ), HY(MVSIZ)
       my_real
-     .   AT,C,CP,DT05,CC,CN,XA,XB,DLIM,VFAIL,XKA,YKA,X21,Y21,Z21,
-     .   VX21,VY21,VZ21, EPXY,EPXZ,EYZP,EXZP,RYAV,RZAV,RYAV1,RZAV1,
+     .   AT,DT05,CC,CN,XA,XB,DLIM,VFAIL,XKA,YKA,X21,Y21,Z21,
+     .   VX21,VY21,VZ21, EPXY,EPXZ,RYAV,RZAV,RYAV1,RZAV1,
      .   NOT_USED,NOT_USED2(2)
       DOUBLE PRECISION X0DP(MVSIZ)
       my_real ,DIMENSION(:), POINTER :: XX_OLD
@@ -266,7 +268,7 @@ C
       ENDDO
 C
       NINDX = 0
-C---- Tension / Compression
+C---- Voltage / compression
       DO I=1,NEL
         IECROU(I)= IGEO(101,MGN(I))
         IFUNC(I) = IGEO(102,MGN(I))

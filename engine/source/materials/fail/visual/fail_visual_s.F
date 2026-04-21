@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_visual_s   ../engine/source/materials/fail/visual/fail_visual_s.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain           ../engine/source/materials/mat_share/mmain.F90
-      !||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8          ../engine/source/materials/mat_share/mulaw8.F90
-      !||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
-      !||====================================================================
+!||====================================================================
+!||    fail_visual_s   ../engine/source/materials/fail/visual/fail_visual_s.F
+!||--- called by ------------------------------------------------------
+!||    mmain           ../engine/source/materials/mat_share/mmain.F90
+!||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8          ../engine/source/materials/mat_share/mulaw8.F90
+!||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
+!||====================================================================
        SUBROUTINE FAIL_VISUAL_S(
      .            NEL    ,NUPARAM ,NUVAR  ,TIME   ,TIMESTEP,UPARAM ,
      .            EPSXX  ,EPSYY   ,EPSZZ  ,EPSXY  ,EPSYZ   ,EPSZX  ,
@@ -80,7 +80,7 @@ C-----------------------------------------------
 C L o c a l V a r i a b l e s
 C-----------------------------------------------
         INTEGER I,J,NINDX,INDX(NEL),TYPE_MAX,F_FLAG,STRDEF,STRFLAG
-        my_real I1,I2,I3,E11,E22,E33,E_EQ,E_EQ1,E_EQ2,Q,R,R_INTER,PHI,
+        my_real I1,I2,I3,E11,E22,E33,Q,R,R_INTER,PHI,
      .    C_MIN,C_MAX,EMA,DAMAGE
         DOUBLE PRECISION :: A0(2),A1(2),A2(2),C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,
      .    X1,X2,X3,Y1,Y2,Y3,Z1,Z2,Z3,F,FF,D,DD,D2,DP,E,G
@@ -222,7 +222,7 @@ c
 c! ---    EMA or Butterworth filtering
           IF (EMA == ONE .and. FF /= ZERO .and. F_FLAG > 1) THEN
 C-----------------------------------------------
-C           INITIALIALISATION OF THE FILTER-COEFFICIENTS 
+C           INITIALISATION OF THE FILTER-COEFFICIENTS
 C-----------------------------------------------
 C         
             D  = TAN(PI*F*TIMESTEP)  

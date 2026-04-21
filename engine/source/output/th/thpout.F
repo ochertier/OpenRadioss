@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thpout         ../engine/source/output/th/thpout.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2          ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar           ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    thpout         ../engine/source/output/th/thpout.F
+!||--- called by ------------------------------------------------------
+!||    hist2          ../engine/source/output/th/hist2.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE THPOUT(IPARG , NTHGRP2  , ITHGRP ,GEO,  IXP,  
      .                  ITHBUF, ELBUF_TAB, WA     )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixp
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -62,20 +62,21 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER II,I,J,K,L,N,IP,IH,NG,IPT,NPT,ITY,MTE,LWA,JJ,IK,
+      INTEGER II,I,K,L,N,IP,IH,NG,IPT,NPT,ITY,MTE,JJ,IK,
      .        ILAYER,NEL,NFT,IGTYP,IPA,KK(3)
       INTEGER :: NITER,IAD,NN,IADV,NVAR,ITYP,IJK,PID
 C
       my_real
      .        AREA,AREAPT,SX,SXY,SZX,IDX     
       TYPE(G_BUFEL_)  ,POINTER :: GBUF
-      TYPE(BUF_LAY_)  ,POINTER :: BUFLY
+ 
       TYPE(L_BUFEL_)  ,POINTER :: LBUF
 C-----------------------------------------------
-
+         AREA = -HUGE(AREA)
 C-------------------------
 C           ELEMENTS POUTRE
 C-------------------------
+ 
         IJK = 0
         IPA  = 400        
         DO NITER=1,NTHGRP2
@@ -96,10 +97,9 @@ C-------------------------
                 IF (IH >= IAD+NN) GOTO 666                
 C
                 DO NG=1,NGROUP
-                    ITY=IPARG(5,NG)
-                    GBUF => ELBUF_TAB(NG)%GBUF
+                    ITY = IPARG(5,NG)
                     ILAYER = 1
-                    BUFLY => ELBUF_TAB(NG)%BUFLY(ILAYER)
+                    GBUF => ELBUF_TAB(NG)%GBUF
 
                     IF (ITY == 5) THEN
                         MTE=IPARG(1,NG)
@@ -107,9 +107,12 @@ C
                         NFT=IPARG(3,NG)
                         NPT  = IPARG(6,NG)
                         IGTYP =IPARG(38,NG)
+                        IF (IGTYP == 18) THEN
+                          !BUFLY => ELBUF_TAB(NG)%BUFLY(ILAYER)
+                        END IF
 
                         DO I=1,3
-                            KK(I) = NEL*(I-1)
+                          KK(I) = NEL*(I-1)
                         ENDDO
 
                         DO I=1,NEL
@@ -161,10 +164,10 @@ C
                                            SX   = GBUF%FOR(KK(1)+I)/AREA
                                            WA(IJK)=SX 
                                         ELSEIF(IGTYP == 18 ) THEN
-                                           IF (BUFLY%L_SIG > 0) THEN
+                                           IF (ELBUF_TAB(NG)%BUFLY(ILAYER)%L_SIG > 0) THEN
                                             DO IPT = 1,NPT
                                              AREAPT  = GEO(IPA+IPT,PID) 
-                                             LBUF  => BUFLY%LBUF(1,1,IPT)
+                                             LBUF  => ELBUF_TAB(NG)%BUFLY(ILAYER)%LBUF(1,1,IPT)
                                              WA(IJK) = WA(IJK)+ LBUF%SIG(KK(1)+I) * AREAPT/AREA
                                             ENDDO 
                                            END IF !(BUFLY%L_SIG > 0) 
@@ -176,10 +179,10 @@ C
                                            SXY  = GBUF%FOR(KK(2)+I)/AREA
                                            WA(IJK)=SXY 
                                         ELSEIF(IGTYP == 18 ) THEN
-                                           IF (BUFLY%L_SIG > 0) THEN
+                                           IF (ELBUF_TAB(NG)%BUFLY(ILAYER)%L_SIG > 0) THEN
                                             DO IPT = 1,NPT
                                              AREAPT  = GEO(IPA+IPT,PID) 
-                                             LBUF  => BUFLY%LBUF(1,1,IPT)
+                                             LBUF  => ELBUF_TAB(NG)%BUFLY(ILAYER)%LBUF(1,1,IPT)
                                              WA(IJK) = WA(IJK)+ LBUF%SIG(KK(2)+I)*AREAPT/AREA
                                             ENDDO 
                                            END IF !(BUFLY%L_SIG > 0) 
@@ -191,10 +194,10 @@ C
                                            SZX  = GBUF%FOR(KK(3)+I)/AREA
                                            WA(IJK)=SZX 
                                         ELSEIF(IGTYP == 18 ) THEN
-                                           IF (BUFLY%L_SIG > 0) THEN                                            
+                                           IF (ELBUF_TAB(NG)%BUFLY(ILAYER)%L_SIG > 0) THEN                                            
                                             DO IPT = 1,NPT
                                              AREAPT  = GEO(IPA+IPT,PID) 
-                                             LBUF  => BUFLY%LBUF(1,1,IPT)
+                                             LBUF  => ELBUF_TAB(NG)%BUFLY(ILAYER)%LBUF(1,1,IPT)
                                              WA(IJK) = WA(IJK)+ LBUF%SIG(KK(3)+I) * AREAPT/AREA
                                             ENDDO 
                                            END IF !(BUFLY%L_SIG > 0) 
@@ -205,7 +208,7 @@ C
                                             JJ  = NINT(IDX)
                                             IPT = JJ + 1
                                             IK  = MOD((ITHBUF(L) - 12),3) + 1
-                                            LBUF  => BUFLY%LBUF(1,1,IPT) 
+                                            LBUF  => ELBUF_TAB(NG)%BUFLY(ILAYER)%LBUF(1,1,IPT) 
                                             WA(IJK) = LBUF%SIG(KK(IK)+I)
                                         ENDIF
                                     ELSEIF (ITHBUF(L) == 255) THEN
@@ -215,19 +218,19 @@ C
                                             WA(IJK)=GBUF%PLA(I) 
                                           ENDIF
                                         ELSEIF(IGTYP == 18 ) THEN
-                                           IF (BUFLY%L_PLA > 0) THEN                                            
+                                           IF (ELBUF_TAB(NG)%BUFLY(ILAYER)%L_PLA > 0) THEN                                            
                                             DO IPT = 1,NPT
                                              AREAPT  = GEO(IPA+IPT,PID) 
-                                             LBUF  => BUFLY%LBUF(1,1,IPT)
+                                             LBUF  => ELBUF_TAB(NG)%BUFLY(ILAYER)%LBUF(1,1,IPT)
                                              WA(IJK) = WA(IJK)+ LBUF%PLA(I) * AREAPT/AREA
                                             ENDDO 
                                            END IF 
                                         END IF! (IGTYP) 
                                     ELSEIF (ITHBUF(L) > 255 .AND.ITHBUF(L) <= 336 ) THEN
                                         IF(IGTYP == 18 ) THEN
-                                           IF (BUFLY%L_PLA > 0) THEN                                                                                     
+                                           IF (ELBUF_TAB(NG)%BUFLY(ILAYER)%L_PLA > 0) THEN 
                                             IPT = ITHBUF(L) - 255 
-                                            LBUF  => BUFLY%LBUF(1,1,IPT) 
+                                            LBUF  => ELBUF_TAB(NG)%BUFLY(ILAYER)%LBUF(1,1,IPT) 
                                             WA(IJK) = LBUF%PLA(I)
                                            ENDIF
                                         ENDIF

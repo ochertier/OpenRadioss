@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,33 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps41                ../engine/source/materials/mat/mat041/sigeps41.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw                   ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8                  ../engine/source/materials/mat_share/mulaw8.F90
-      !||--- calls      -----------------------------------------------------
-      !||    burn_fraction_ireac1    ../engine/source/materials/mat/mat041/sigeps41.F
-      !||    burn_fraction_ireac2    ../engine/source/materials/mat/mat041/sigeps41.F
-      !||    mixture_equilibrium     ../engine/source/materials/mat/mat041/sigeps41.F
-      !||--- uses       -----------------------------------------------------
-      !||    output_mod              ../common_source/modules/output/output_mod.F90
-      !||    root_finding_algo_mod   ../common_source/modules/root_finding_algo_mod.F90
-      !||====================================================================
-      SUBROUTINE SIGEPS41 (
+!||====================================================================
+!||    sigeps41                ../engine/source/materials/mat/mat041/sigeps41.F
+!||--- called by ------------------------------------------------------
+!||    mulaw                   ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8                  ../engine/source/materials/mat_share/mulaw8.F90
+!||--- calls      -----------------------------------------------------
+!||    burn_fraction_ireac1    ../engine/source/materials/mat/mat041/sigeps41.F
+!||    burn_fraction_ireac2    ../engine/source/materials/mat/mat041/sigeps41.F
+!||    mixture_equilibrium     ../engine/source/materials/mat/mat041/sigeps41.F
+!||--- uses       -----------------------------------------------------
+!||    output_mod              ../common_source/modules/output/output_mod.F90
+!||    root_finding_algo_mod   ../common_source/modules/root_finding_algo_mod.F90
+!||====================================================================
+      SUBROUTINE SIGEPS41(OUTPUT,
      1     NEL    ,NUPARAM,NUVAR   ,
      2     TIME   ,TIMESTEP,UPARAM  ,RHO0    ,RHO    ,
      3     VOLUME ,EINT   ,
      7     SIGOXX ,SIGOYY ,SIGOZZ  ,
      8     SIGNXX ,SIGNYY ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
      9     SIGVXX ,SIGVYY ,SIGVZZ  ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
-     A     SOUNDSP,VISCMAX,UVAR    ,DELTVOL ,BFRAC  ,
-     B     TEMP)
+     A     SOUNDSP,VISCMAX,UVAR    ,DELTVOL ,BFRAC   ,TEMP   )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
       USE ROOT_FINDING_ALGO_MOD
-      USE OUTPUT_MOD , ONLY : WFEXT
+      USE OUTPUT_MOD, ONLY : OUTPUT_
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -132,6 +131,7 @@ C---------+---------+---+---+--------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER NEL, NUPARAM, NUVAR
 
       my_real, INTENT(IN) ::
@@ -159,7 +159,7 @@ C-----------------------------------------------
      .        cappa,chi,ccrit,tol,cv,dedv,
      .        artvisc,dt,pres,fc,cburn,enq,SHEAR,vol_rel,dvol_rel
       my_real oldfc,tem1,tem2,chydro,chydro2,dpdmu,dpde,heat
-      my_real mt,pold,er,WFEXTt,wr,wp
+      my_real mt,pold,er,WFEXTt,wr,wp_coef
       integer  itrmax,i_reac,i
       my_real :: beta !volumic fraction of reagent
       my_real, dimension(25) :: funct_parameter
@@ -195,7 +195,7 @@ C-----------------------------------------------
       r1p = uparam(10)
       r2p = uparam(11)
       r3p = uparam(12)
-      wp = uparam(13)
+      wp_coef = uparam(13)
       cvp = uparam(15)
       enq = uparam(16)
       epsil = uparam(17)
@@ -229,11 +229,11 @@ c
       funct_parameter(5) = r3r
       funct_parameter(6) = cvr
       ! funct_parameter(7) = tmp output
-      ! funct_parameter(8) = dedvr output
+      ! funct_parameter (8) = dedvr output
       ! funct_parameter(9) = preac output
       ! funct_parameter(10) = bthr ! output
-      ! funct_parameter(11) = dpdtr! output
-      ! funct_parameter(12) = enr! output
+      ! FUNCT_PARAMER (11) = DPDTR!output
+      ! Funct_parameter (12) = ENR!output
 
       funct_parameter(13) = ap
       funct_parameter(14) = bp
@@ -293,7 +293,7 @@ c  hydrodynamic state (pass 2)
      .           dpdmu,dpde,ftol,enq,
      .           tmp,heat,vol_rel ,fc,cv,dedv,pres, beta,funct_parameter)
 c
-c  dF/dt (F function)
+c  DF/DT (F Function)
         !ORIGINAL 2-TERM-MODEL
         if (i_reac == 1) CALL BURN_FRACTION_IREAC1(I_,B_,X_,G1,D_,Y_,cappa,artvisc,dt,pres,etar,fc,cburn,oldfc)
         !EXTENDED 3-TERM-MODEL
@@ -302,7 +302,7 @@ c  dF/dt (F function)
         tmp = tmp + (fc - oldfc) * heat/cv
 c  sound speed (time step criteria)
         chydro2 = dpdmu + abs(pres)*(vol_rel*vol_rel)*dpde + ONEP33*SHEAR
-        chydro2=max(chydro2,max(wr+ONE,wp+ONE)*abs(pres)/max(em30,RHO(I)))
+        chydro2=max(chydro2,max(wr+ONE,wp_coef+ONE)*abs(pres)/max(em30,RHO(I)))
         chydro = sqrt(chydro2)
 c
 C       BUFFER STORAGE
@@ -342,20 +342,19 @@ C       EINT(I)=EINT(I)-0.5*(pres+pold)*DELTVOL(I) done in mulaw.
         TEMP(I) = tmp !temperature
       enddo
 c
-#include "atomic.inc"
-      WFEXT=WFEXT+WFEXTT
-#include "atomend.inc"
+!$OMP ATOMIC
+      OUTPUT%TH%WFEXT=OUTPUT%TH%WFEXT+WFEXTT
 C-----------------------------------------------
       RETURN
       END
 C-----------------------------------------------
 
 C-----------------------------------------------
-      !||====================================================================
-      !||    burn_fraction_ireac1   ../engine/source/materials/mat/mat041/sigeps41.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps41               ../engine/source/materials/mat/mat041/sigeps41.F
-      !||====================================================================
+!||====================================================================
+!||    burn_fraction_ireac1   ../engine/source/materials/mat/mat041/sigeps41.F
+!||--- called by ------------------------------------------------------
+!||    sigeps41               ../engine/source/materials/mat/mat041/sigeps41.F
+!||====================================================================
       SUBROUTINE BURN_FRACTION_IREAC1(I_,B_,X_,G1,D_,Y_,cappa,artvisc,dt,pres,etar,fc,cburn,oldfc)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -414,11 +413,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 
 
-      !||====================================================================
-      !||    burn_fraction_ireac2   ../engine/source/materials/mat/mat041/sigeps41.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps41               ../engine/source/materials/mat/mat041/sigeps41.F
-      !||====================================================================
+!||====================================================================
+!||    burn_fraction_ireac2   ../engine/source/materials/mat/mat041/sigeps41.F
+!||--- called by ------------------------------------------------------
+!||    sigeps41               ../engine/source/materials/mat/mat041/sigeps41.F
+!||====================================================================
       SUBROUTINE BURN_FRACTION_IREAC2(I_,B_,X_,G1,D_,Y_,G2,Z_,G_,C_,E_,Figmax,FG1max,FG2min,cappa,chi,ccrit,tol,
      .                 artvisc,dt,pres,etar,fc,cburn,oldfc)
 C-----------------------------------------------
@@ -489,17 +488,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 
 
-      !||====================================================================
-      !||    mixture_equilibrium     ../engine/source/materials/mat/mat041/sigeps41.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps41                ../engine/source/materials/mat/mat041/sigeps41.F
-      !||--- calls      -----------------------------------------------------
-      !||    jwl_eos_delta           ../engine/source/materials/mat/mat041/jwl_eos_mod.F90
-      !||    jwl_eos_state           ../engine/source/materials/mat/mat041/jwl_eos_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    jwl_eos_mod             ../engine/source/materials/mat/mat041/jwl_eos_mod.F90
-      !||    root_finding_algo_mod   ../common_source/modules/root_finding_algo_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    mixture_equilibrium     ../engine/source/materials/mat/mat041/sigeps41.F
+!||--- called by ------------------------------------------------------
+!||    sigeps41                ../engine/source/materials/mat/mat041/sigeps41.F
+!||--- calls      -----------------------------------------------------
+!||    jwl_eos_delta           ../engine/source/materials/mat/mat041/jwl_eos_mod.F90
+!||    jwl_eos_state           ../engine/source/materials/mat/mat041/jwl_eos_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    jwl_eos_mod             ../engine/source/materials/mat/mat041/jwl_eos_mod.F90
+!||    root_finding_algo_mod   ../common_source/modules/root_finding_algo_mod.F90
+!||====================================================================
       SUBROUTINE MIXTURE_EQUILIBRIUM(
      .               ar   ,br   ,r1r    ,r2r  ,r3r   ,cvr ,etar,
      .               ap   ,bp   ,r1p    ,r2p  ,r3p   ,cvp ,etap,
@@ -516,7 +515,7 @@ c  T,v,fc known : find beta such as Pr=Pp  (hypothesis : equilibrium between two
 c  Iterative method : iterate on b value until delta = Pp-Pr < eps
 c
 c  input : vol_rel, etar, etap, fc, tmp
-c  output : etar, etap, pres, dedv,cv,heat,dpde,dpdmu
+c  Output: Etar, Etap, Pres, Dedv, CV, Heat, DPDE, DPDMU
 c  local : beta
 c
 C-----------------------------------------------
@@ -581,11 +580,11 @@ c
       funct_parameter(24) = etac
       funct_parameter(25) = fc
 
-      funct_parameter(8) = zero !dedvr output
+      funct_parameter(8) = zero !Dedvr Output
       funct_parameter(9) = zero !preac output
       funct_parameter(10) = zero !bthr ! output
-      funct_parameter(11) = zero !dpdtr! output
-      funct_parameter(12) = zero !enr! output
+      funct_parameter(11) = zero !DPDTR!output
+      funct_parameter(12) = zero !ENR!output
 
       funct_parameter(19) = zero !dedvp
       funct_parameter(20) = zero !pprod
@@ -634,7 +633,7 @@ c    detrdf = d(etar)/d(fc) at equilibrium
       detrdf = -(etac+etar*dbdf) / beta
       detpdf = (etac+etap*dbdf) / (ONE-beta)
 c
-c   output derivatives
+c   Derivatives output
 c    dedv = de/dv (for constant T & fc values)
       dedv = -etac**2 * (fc1*dedr*detar+fc*dedp*detap)
 c    cv = de/dT(for constant V & fc values)

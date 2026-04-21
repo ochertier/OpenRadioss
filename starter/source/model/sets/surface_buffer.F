@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    surface_buffer                ../starter/source/model/sets/surface_buffer.F
-      !||--- called by ------------------------------------------------------
-      !||    create_surface_from_element   ../starter/source/model/sets/create_surface_from_element.F
-      !||--- calls      -----------------------------------------------------
-      !||    quad_surface_buffer           ../starter/source/model/sets/quad_surface_buffer.F
-      !||    shell_surface_buffer          ../starter/source/model/sets/shell_surface_buffer.F
-      !||    shell_surface_buffer_remesh   ../starter/source/model/sets/shell_surface_buffer_remesh.F
-      !||    solid_surface_buffer          ../starter/source/model/sets/solid_surface_buffer.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    surface_buffer                ../starter/source/model/sets/surface_buffer.F
+!||--- called by ------------------------------------------------------
+!||    create_surface_from_element   ../starter/source/model/sets/create_surface_from_element.F
+!||--- calls      -----------------------------------------------------
+!||    quad_surface_buffer           ../starter/source/model/sets/quad_surface_buffer.F
+!||    shell_surface_buffer          ../starter/source/model/sets/shell_surface_buffer.F
+!||    shell_surface_buffer_remesh   ../starter/source/model/sets/shell_surface_buffer_remesh.F
+!||    solid_surface_buffer          ../starter/source/model/sets/solid_surface_buffer.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SURFACE_BUFFER(
      .                          IXS       ,IXS10    ,IXC       ,SH4TREE   ,SH3TREE   ,
      .                          IXTG      ,KNOD2ELS ,NOD2ELS   ,KNOD2ELC  ,NOD2ELC   ,
      .                          KNOD2ELTG ,NOD2ELTG ,NSEG      ,IEXT      ,IPARTC    ,
      .                          IPARTS    ,IPARTG   ,CLAUSE    ,BUFTMPSURF,IAD_SURF  ,
      .                          OPT_O     ,IPART    ,KNOD2ELQ  ,NOD2ELQ   ,X         ,
-     .                          IXQ       ,KEYSET)
+     .                          IXQ       ,KEYSET   ,IPARTQ)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE SETDEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
+      use element_mod , only : nixs,nixq,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,7 +59,7 @@ C-----------------------------------------------
      .        KNOD2ELC(*),NOD2ELC(*),KNOD2ELTG(*),NOD2ELTG(*),
      .        IXC(NIXC,*),IXTG(NIXTG,*),IPARTC(*),IPARTG(*),
      .        BUFTMPSURF(*),IPARTS(*),SH4TREE(*),SH3TREE(*),
-     .        IPART(LIPART1,*),KNOD2ELQ(*),NOD2ELQ(*),IXQ(NIXQ,*)
+     .        IPART(LIPART1,*),KNOD2ELQ(*),NOD2ELQ(*),IXQ(NIXQ,*),IPARTQ(NUMELQ)
       INTEGER IEXT,NSEG,IAD_SURF,OPT_O
       CHARACTER(LEN=NCHARFIELD) :: KEYSET
       my_real X(3,*)
@@ -77,7 +78,7 @@ C=======================================================================
      .                            IXS      ,IXS10    ,IXC      ,IXTG      ,CLAUSE   ,
      .                            KNOD2ELS ,NOD2ELS  ,KNOD2ELC ,NOD2ELC   ,KNOD2ELTG,
      .                            NOD2ELTG ,NSEG     ,IEXT     ,BUFTMPSURF,IPARTS   ,
-     .                            IAD_SURF ,KEYSET)
+     .                            IPARTC   ,IPARTG   ,IAD_SURF ,KEYSET)
 !
 !     ---  shell + sh3n ---
 !
@@ -105,7 +106,7 @@ C=======================================================================
 !
       IF ( CLAUSE%NB_QUAD > 0 ) CALL QUAD_SURFACE_BUFFER(
      .                           IXQ     ,IAD_SURF ,BUFTMPSURF ,NSEG  ,KNOD2ELQ ,
-     .                           NOD2ELQ ,IEXT     ,X          ,CLAUSE)
+     .                           NOD2ELQ ,IEXT     ,X          ,CLAUSE,IPARTQ)
 !---
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_msgfile           ../engine/source/output/message/read_msgfile.F
-      !||--- called by ------------------------------------------------------
-      !||    execargcheck           ../engine/source/engine/execargcheck.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../engine/source/output/message/message.F
-      !||    arret                  ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_msgfile           ../engine/source/output/message/read_msgfile.F
+!||--- called by ------------------------------------------------------
+!||    execargcheck           ../engine/source/engine/execargcheck.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../engine/source/output/message/message.F
+!||    arret                  ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE READ_MSGFILE(LENI,INPUTR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -50,10 +50,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       CHARACTER(LEN=NCHARLINE100) :: ERRMSGLINE
-      CHARACTER(LEN=NCHARLINE100) :: CTMP
+ 
       INTEGER ISTDEML
-      INTEGER NBLINE,NBLINETOT,J1,J,ID,MAXID,MSGTYPE,
-     .        IADT,IADD,IO_ERR
+      INTEGER NBLINE, NBLINETOT, 
+     . IO_ERR
       
       ISTDEML=81
       OPEN(UNIT=ISTDEML,FORM='FORMATTED',FILE=INPUTR,
@@ -66,7 +66,7 @@ C
         CALL ARRET(2)
         RETURN
       ENDIF
-C lecture du fichier ...
+C reading the file ...
       NBLINE=0
       NBLINETOT=0
    10 READ(ISTDEML,'(A)',END=20,ERR=910) ERRMSGLINE

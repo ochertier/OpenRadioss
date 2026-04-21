@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i14ist          ../engine/source/interfaces/int14/i14ist.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i14ist          ../engine/source/interfaces/int14/i14ist.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I14IST(IPARI,INTBUF_TAB,IGRSURF,BUFSF)
 C-----------------------------------------------
 C   M o d u l e s
@@ -53,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, NRTM, NTY, NRTS
+      INTEGER N, NRTM, NTY
       INTEGER ISRF, ADRBUF
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -61,21 +62,21 @@ C-----------------------------------------------
       DO N=1,NINTER
         NTY=IPARI(7,N)
         IF (NTY==14 .OR. NTY==15) THEN
-          !Surfaces mains (une seule surface ...).
+          !main surfaces (one surface ...).
           NRTM   = IPARI(4,N)
           ISRF   = INTBUF_TAB(N)%KSURF(1)
           ADRBUF = IGRSURF(ISRF)%IAD_BUFR
-          !Forces exercees sur l'ellipsoide (somme des ... / interfaces).
+          !forces applied to the ellipsoid (sum of ... / interfaces)
           BUFSF(ADRBUF+25)=ZERO
           BUFSF(ADRBUF+26)=ZERO
           BUFSF(ADRBUF+27)=ZERO   
-          !Moments exerces sur l'ellipsoide (somme des ... / interfaces).
+          !moments applied to the ellipsoid (sum of ... / interfaces)
           BUFSF(ADRBUF+28)=ZERO
           BUFSF(ADRBUF+29)=ZERO
           BUFSF(ADRBUF+30)=ZERO   
-          !Rigidites d'interface en translation (somme des ... / interfaces).
+          !Translation interface rigiditis (sum of ... / interfaces).
           BUFSF(ADRBUF+31)=ZERO
-          !Rigidites d'interface en rotation (somme des ... / interfaces).
+          !Rotating interface rigiditis (sum of ... / interfaces).
           BUFSF(ADRBUF+32)=ZERO
         ENDIF
       ENDDO !next N

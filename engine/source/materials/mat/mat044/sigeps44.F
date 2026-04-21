@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps44       ../engine/source/materials/mat/mat044/sigeps44.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw          ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8         ../engine/source/materials/mat_share/mulaw8.F90
-      !||--- calls      -----------------------------------------------------
-      !||    mstrain_rate   ../engine/source/materials/mat_share/mstrain_rate.F
-      !||    vinter         ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps44       ../engine/source/materials/mat/mat044/sigeps44.F
+!||--- called by ------------------------------------------------------
+!||    mulaw          ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8         ../engine/source/materials/mat_share/mulaw8.F90
+!||--- calls      -----------------------------------------------------
+!||    mstrain_rate   ../engine/source/materials/mat_share/mstrain_rate.F
+!||    vinter         ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE SIGEPS44(
      1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC   ,NPF    ,
      2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0    ,RHO    ,
@@ -99,7 +99,7 @@ C OFF     | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
       INTEGER ,INTENT(IN) :: IEOS
       INTEGER NEL, NUPARAM, NUVAR,IPT,NVARTMP,
-     .   NGL(NEL),MAT(NEL),IPM(NPROPMI,*), IPLA,IEXPAN,
+     .   NGL(NEL),MAT(NEL),IPM(NPROPMI,*), IPLA,
      .   ISRATE
       my_real
      .   TIME,TIMESTEP,UPARAM(NUPARAM),
@@ -133,7 +133,7 @@ C-----------------------------------------------
       my_real, DIMENSION(NEL), INTENT(INOUT) :: 
      .    ET
 C-------------------------
-C    variables non utilisees (fonctions utilisateur)
+C    Variables not used (user functions)
 C-------------------------
       INTEGER NPF(*),MFUNC,KFUNC(MFUNC)
       my_real
@@ -141,7 +141,7 @@ C-------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IADBUF,ICC,VFLAG,IPOS(MVSIZ),IAD(MVSIZ),ILEN(MVSIZ),IDEV
+      INTEGER I,ICC,VFLAG,IPOS(MVSIZ),IAD(MVSIZ),ILEN(MVSIZ),IDEV
       my_real
      . E,NU,P,DAV,VM,R,EPST,E1,E2,E3,E4,E5,E6,C,CD,D,
      .        Y,YP,E42,E52,E62,EPST2,RQ,BULK,

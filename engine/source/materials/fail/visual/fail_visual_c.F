@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_visual_c   ../engine/source/materials/fail/visual/fail_visual_c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc          ../engine/source/materials/mat_share/mulawc.F90
-      !||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
-      !||====================================================================
+!||====================================================================
+!||    fail_visual_c   ../engine/source/materials/fail/visual/fail_visual_c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc          ../engine/source/materials/mat_share/mulawc.F90
+!||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
+!||====================================================================
        SUBROUTINE FAIL_VISUAL_C(
      .     NEL    ,NUVAR   ,TIME   ,TIMESTEP,UPARAM  ,NGL    ,
      .     SIGNXX ,SIGNYY  ,SIGNXY ,EPSXX   ,EPSYY   ,EPSXY  ,
@@ -68,14 +68,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C I N P U T O U T P U T A r g u m e n t s
 C-----------------------------------------------
-       my_real UVAR(NEL,NUVAR), OFF(NEL),OFFL(NEL),
+       my_real UVAR(NEL,NUVAR), OFF(NEL),
      .   SIGNXX(NEL),SIGNYY(NEL),SIGNXY(NEL)
 C-----------------------------------------------
 C VARIABLES FOR FUNCTION INTERPOLATION
 C-----------------------------------------------
 C L o c a l V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I,J,LENG,NINDX,INDX(NEL),TYPE_MAX,F_FLAG,STRDEF,STRFLAG
+        INTEGER I,J,NINDX,INDX(NEL),TYPE_MAX,F_FLAG,STRDEF,STRFLAG
         my_real E11,SIG_A,SIG_B,SIG_11,EPS_A,EPS_B,
      .          C_MIN,C_MAX,EMA,DAMAGE 
         DOUBLE PRECISION :: A0(2),A1(2),A2(2),C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,
@@ -151,13 +151,13 @@ c! strains EPSXX  ,EPSYY  ,EPSXY
                E11 = LOG(SQRT(E11+ONE))
              END IF
            ENDIF    
-c!  ***********************       
-c!  *** NEW ... 23.02.2020  
-c!  ***********************      
+c!  ***********************
+c!  *** NEW ... 23.02.2020
+c!  ***********************
 c! --- EMA or Butterworth filtering
         IF (EMA == ONE .and. FF /= ZERO .and. F_FLAG > 1) THEN
 C-----------------------------------------------
-C INITIALIALISATION OF THE FILTER-COEFFICIENTS 
+C INITIALISATION OF THE FILTER-COEFFICIENTS
 C-----------------------------------------------
           F  = MIN(FF,ZEP4 / MAX(TIMESTEP,EM20))
           D  = TAN(PI*F*MAX(TIMESTEP,EM20))

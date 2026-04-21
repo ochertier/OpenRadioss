@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,130 +20,150 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rdresb                 ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2               ../engine/source/engine/radioss2.F
-      !||--- calls      -----------------------------------------------------
-      !||    alelag_rrest           ../engine/source/output/restart/rdresb.F
-      !||    ancmsg                 ../engine/source/output/message/message.F
-      !||    arret                  ../engine/source/system/arret.F
-      !||    cfieldrest             ../engine/source/output/restart/rdresb.F
-      !||    convrrest              ../engine/source/output/restart/rdresb.F
-      !||    crkxfem_rrest          ../engine/source/output/restart/rdresb.F
-      !||    crkxfem_rrestanim      ../engine/source/output/restart/rdresb.F
-      !||    cur_fil_c              ../common_source/tools/input_output/write_routtines.c
-      !||    decompress_i_nnz       ../common_source/comm/decompress_nnz.F
-      !||    decompress_r_nnz       ../common_source/comm/decompress_nnz.F
-      !||    drape_rrest            ../engine/source/output/restart/rdresb.F
-      !||    eigrrest               ../engine/source/output/restart/rdresb.F
-      !||    elbuf_ini              ../engine/source/elements/elbuf/elbuf_ini.F
-      !||    fillxdp                ../engine/source/output/restart/fillxdp.F
-      !||    fvrrest                ../engine/source/output/restart/rdresb.F
-      !||    fxbresb                ../engine/source/output/restart/rdresb.F
-      !||    fxfluxrrest            ../engine/source/constraints/thermic/fxfluxrrest.F
-      !||    fxtemprrest            ../engine/source/output/restart/rdresb.F
-      !||    group_ini              ../engine/source/groups/group_ini.F
-      !||    imprrest               ../engine/source/output/restart/rdresb.F
-      !||    init_global_node_id    ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||    init_global_shell_id   ../common_source/modules/connectivity.F90
-      !||    intbuf_ini             ../common_source/interf/intbuf_ini.F
-      !||    intfric_rresti         ../common_source/modules/interfaces/intbuf_fric_mod.F90
-      !||    intfric_rrestr         ../common_source/modules/interfaces/intbuf_fric_mod.F90
-      !||    intstamp_rresti        ../engine/share/modules/intstamp_mod.F
-      !||    intstamp_rrestr        ../engine/share/modules/intstamp_mod.F
-      !||    knotlocelrest          ../engine/source/output/restart/rdresb.F
-      !||    knotlocpcrest          ../engine/source/output/restart/rdresb.F
-      !||    knotrest               ../engine/source/output/restart/rdresb.F
-      !||    line_ini               ../engine/source/groups/line_ini.F
-      !||    loadprest              ../engine/source/output/restart/rdresb.F
-      !||    nfrrest                ../engine/source/output/restart/rdresb.F
-      !||    nitscherrest           ../engine/source/output/restart/rdresb.F
-      !||    ply_info_rest          ../engine/source/output/restart/rdresb.F
-      !||    plyxfem_ravuply        ../engine/source/output/restart/rdresb.F
-      !||    plyxfem_rrest          ../engine/source/output/restart/rdresb.F
-      !||    plyxfem_rrestanim      ../engine/source/output/restart/rdresb.F
-      !||    python_deserialize     ../common_source/modules/python_mod.F90
-      !||    r_bufbric_22           ../engine/source/interfaces/int22/r_bufbric_22.F
-      !||    radiarrest             ../engine/source/output/restart/rdresb.F
-      !||    rdcomr                 ../engine/source/output/restart/rdcomm.F
-      !||    read_ale_grid          ../engine/source/output/restart/read_ale_grid.F90
-      !||    read_bcs_wall          ../engine/source/output/restart/read_bcs_wall.F90
-      !||    read_cluster           ../engine/source/output/cluster/read_cluster.F
-      !||    read_db                ../common_source/tools/input_output/read_db.F
-      !||    read_dpdb              ../common_source/tools/input_output/read_db.F
-      !||    read_elgroup_param     ../engine/source/output/restart/read_elgroup_param.F
-      !||    read_failwave          ../engine/source/output/restart/read_failwave.F
-      !||    read_i_c               ../common_source/tools/input_output/write_routtines.c
-      !||    read_inivel            ../engine/source/output/restart/read_inivel.F90
-      !||    read_joint             ../engine/source/output/restart/read_joint.F
-      !||    read_matparam          ../engine/source/output/restart/read_matparam.F
-      !||    read_nloc_struct       ../engine/source/output/restart/read_nloc_struct.F
-      !||    read_pcyl              ../engine/source/output/restart/read_pcyl.F
-      !||    read_sensors           ../engine/source/output/restart/read_sensors.F
-      !||    read_th_restart        ../engine/source/output/th/read_th_restart.F
-      !||    read_units             ../common_source/comm/write_units.F
-      !||    rmatrrest              ../engine/source/output/restart/rdresb.F
-      !||    rthbufrest             ../engine/source/output/restart/rdresb.F
-      !||    spmd_inisph            ../engine/source/mpi/sph/spmd_sptool.F
-      !||    spmd_initfi            ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    stack_rrest            ../engine/source/output/restart/rdresb.F
-      !||    subset_ini             ../engine/source/groups/subset_ini.F
-      !||    surf_ini               ../engine/source/groups/surf_ini.F
-      !||    table_rresti           ../engine/source/tools/curve/table_tools.F
-      !||    table_rrestr           ../engine/source/tools/curve/table_tools.F
-      !||    thcrrest               ../engine/source/output/restart/rdresb.F
-      !||    thsurf_read_restart    ../common_source/modules/interfaces/th_surf_mod.F
-      !||    userwi_read            ../engine/source/user_interface/userwindow_interface_routines.F
-      !||    wigerest               ../engine/source/output/restart/rdresb.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
-      !||    bcs_mod                ../common_source/modules/boundary_conditions/bcs_mod.F90
-      !||    cluster_mod            ../engine/share/modules/cluster_mod.F
-      !||    connectivity_mod       ../common_source/modules/connectivity.F90
-      !||    damp_mod               ../engine/share/modules/damp_mod.F
-      !||    drape_mod              ../engine/share/modules/drape_mod.F
-      !||    ebcs_mod               ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||    ecnd_mod               ../engine/share/modules/ecdn_mod.F
-      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    intstamp_glob_mod      ../engine/share/modules/intstamp_glob_mod.F
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    monvol_struct_mod      ../engine/share/modules/monvol_struct_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
-      !||    nodal_arrays_mod       ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||    outmax_mod             ../common_source/modules/outmax_mod.F
-      !||    output_mod             ../common_source/modules/output/output_mod.F90
-      !||    outputs_mod            ../common_source/modules/outputs_mod.F
-      !||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
-      !||    pload_cyl_mod          ../common_source/modules/loads/pload_cyl_mod.F
-      !||    python_funct_mod       ../common_source/modules/python_mod.F90
-      !||    rbe3_mod               ../common_source/modules/constraints/rbe3_mod.F90
-      !||    read_inivel_mod        ../engine/source/output/restart/read_inivel.F90
-      !||    restmod                ../engine/share/modules/restart_mod.F
-      !||    seatbelt_mod           ../common_source/modules/seatbelt_mod.F
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    skew_mod               ../common_source/modules/skew_mod.F90
-      !||    sph_mod                ../engine/share/modules/sph_mod.F
-      !||    stack_mod              ../engine/share/modules/stack_mod.F
-      !||    state_mod              ../common_source/modules/state_mod.F
-      !||    table_glob_mod         ../engine/share/modules/table_glob_mod.F
-      !||    time_mod               ../engine/share/modules/time_mod.F
-      !||    unitab_mod             ../common_source/modules/unitab_mod.F
-      !||    user_windows_mod       ../common_source/modules/user_windows_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rdresb                       ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    radioss2                     ../engine/source/engine/radioss2.F
+!||--- calls      -----------------------------------------------------
+!||    alelag_rrest                 ../engine/source/output/restart/rdresb.F
+!||    ancmsg                       ../engine/source/output/message/message.F
+!||    arret                        ../engine/source/system/arret.F
+!||    cfieldrest                   ../engine/source/output/restart/rdresb.F
+!||    checksum_restart_read        ../common_source/modules/output/checksum_mod.F90
+!||    convrrest                    ../engine/source/output/restart/rdresb.F
+!||    crkxfem_rrest                ../engine/source/output/restart/rdresb.F
+!||    crkxfem_rrestanim            ../engine/source/output/restart/rdresb.F
+!||    cur_fil_c                    ../common_source/tools/input_output/write_routines.c
+!||    decompress_i_nnz             ../common_source/comm/decompress_nnz.F
+!||    decompress_r_nnz             ../common_source/comm/decompress_nnz.F
+!||    drape_rrest                  ../engine/source/output/restart/rdresb.F
+!||    eigrrest                     ../engine/source/output/restart/rdresb.F
+!||    elbuf_ini                    ../engine/source/elements/elbuf/elbuf_ini.F
+!||    fillxdp                      ../engine/source/output/restart/fillxdp.F
+!||    fvrrest                      ../engine/source/output/restart/rdresb.F
+!||    fxbresb                      ../engine/source/output/restart/rdresb.F
+!||    fxfluxrrest                  ../engine/source/constraints/thermic/fxfluxrrest.F
+!||    fxtemprrest                  ../engine/source/output/restart/rdresb.F
+!||    get_nrbe3pen_l               ../engine/source/output/restart/restart_rbe3pen.F90
+!||    get_nrwallpen_l              ../engine/source/output/restart/restart_rwallpen.F90
+!||    group_ini                    ../engine/source/groups/group_ini.F
+!||    imprrest                     ../engine/source/output/restart/rdresb.F
+!||    init_global_node_id          ../common_source/modules/nodal_arrays.F90
+!||    init_global_shell_id         ../common_source/modules/connectivity.F90
+!||    intbuf_ini                   ../common_source/interf/intbuf_ini.F
+!||    intfric_rresti               ../common_source/modules/interfaces/intbuf_fric_mod.F90
+!||    intfric_rrestr               ../common_source/modules/interfaces/intbuf_fric_mod.F90
+!||    intstamp_rresti              ../engine/share/modules/intstamp_mod.F
+!||    intstamp_rrestr              ../engine/share/modules/intstamp_mod.F
+!||    knotlocelrest                ../engine/source/output/restart/rdresb.F
+!||    knotlocpcrest                ../engine/source/output/restart/rdresb.F
+!||    knotrest                     ../engine/source/output/restart/rdresb.F
+!||    line_ini                     ../engine/source/groups/line_ini.F
+!||    loadprest                    ../engine/source/output/restart/rdresb.F
+!||    nfrrest                      ../engine/source/output/restart/rdresb.F
+!||    nitscherrest                 ../engine/source/output/restart/rdresb.F
+!||    pblast_init_tables           ../common_source/modules/loads/pblast_mod.F90
+!||    pblast_load                  ../common_source/modules/loads/pblast_mod.F90
+!||    ply_info_rest                ../engine/source/output/restart/rdresb.F
+!||    plyxfem_ravuply              ../engine/source/output/restart/rdresb.F
+!||    plyxfem_rrest                ../engine/source/output/restart/rdresb.F
+!||    plyxfem_rrestanim            ../engine/source/output/restart/rdresb.F
+!||    python_deserialize           ../common_source/modules/python_mod.F90
+!||    r_bufbric_22                 ../engine/source/interfaces/int22/r_bufbric_22.F
+!||    radiarrest                   ../engine/source/output/restart/rdresb.F
+!||    rdcomr                       ../engine/source/output/restart/rdcomm.F
+!||    read_ale_grid                ../engine/source/output/restart/read_ale_grid.F90
+!||    read_bcs_nrf                 ../engine/source/output/restart/read_bcs_nrf.F90
+!||    read_bcs_wall                ../engine/source/output/restart/read_bcs_wall.F90
+!||    read_cluster                 ../engine/source/output/cluster/read_cluster.F
+!||    read_db                      ../common_source/tools/input_output/read_db.F
+!||    read_dpdb                    ../common_source/tools/input_output/read_db.F
+!||    read_elgroup_param           ../engine/source/output/restart/read_elgroup_param.F
+!||    read_failwave                ../engine/source/output/restart/read_failwave.F
+!||    read_i_c                     ../common_source/tools/input_output/write_routines.c
+!||    read_inivel                  ../engine/source/output/restart/read_inivel.F90
+!||    read_joint                   ../engine/source/output/restart/read_joint.F
+!||    read_matparam                ../engine/source/output/restart/read_matparam.F
+!||    read_nloc_struct             ../engine/source/output/restart/read_nloc_struct.F
+!||    read_pcyl                    ../engine/source/output/restart/read_pcyl.F
+!||    read_rrbe3pen                ../engine/source/output/restart/restart_rbe3pen.F90
+!||    read_rrwallpen               ../engine/source/output/restart/restart_rwallpen.F90
+!||    read_sensors                 ../engine/source/output/restart/read_sensors.F
+!||    read_th_restart              ../engine/source/output/th/read_th_restart.F
+!||    read_units                   ../common_source/comm/write_units.F
+!||    rmatrrest                    ../engine/source/output/restart/rdresb.F
+!||    rthbufrest                   ../engine/source/output/restart/rdresb.F
+!||    spmd_inisph                  ../engine/source/mpi/sph/spmd_sptool.F
+!||    spmd_initfi                  ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    stack_rrest                  ../engine/source/output/restart/rdresb.F
+!||    subset_ini                   ../engine/source/groups/subset_ini.F
+!||    surf_ini                     ../engine/source/groups/surf_ini.F
+!||    table_rresti                 ../engine/source/tools/curve/table_tools.F
+!||    table_rrestr                 ../engine/source/tools/curve/table_tools.F
+!||    thcrrest                     ../engine/source/output/restart/rdresb.F
+!||    thsurf_read_restart          ../common_source/modules/interfaces/th_surf_mod.F
+!||    userwi_read                  ../engine/source/user_interface/userwindow_interface_routines.F
+!||    wigerest                     ../engine/source/output/restart/rdresb.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
+!||    ale_mod                      ../common_source/modules/ale/ale_mod.F
+!||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
+!||    bcs_mod                      ../common_source/modules/boundary_conditions/bcs_mod.F90
+!||    checksum_output_option_mod   ../common_source/modules/output/checksum_mod.F90
+!||    cluster_mod                  ../engine/share/modules/cluster_mod.F
+!||    connectivity_mod             ../common_source/modules/connectivity.F90
+!||    damp_mod                     ../engine/share/modules/damp_mod.F
+!||    drape_mod                    ../engine/share/modules/drape_mod.F
+!||    ebcs_mod                     ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||    ecnd_mod                     ../engine/share/modules/ecdn_mod.F
+!||    element_mod                  ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    h3d_mod                      ../engine/share/modules/h3d_mod.F
+!||    interfaces_mod               ../common_source/modules/interfaces/interfaces_mod.F90
+!||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
+!||    loads_mod                    ../common_source/modules/loads/loads_mod.F90
+!||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    message_mod                  ../engine/share/message_module/message_mod.F
+!||    monvol_struct_mod            ../engine/share/modules/monvol_struct_mod.F
+!||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+!||    nlocal_reg_mod               ../common_source/modules/nlocal_reg_mod.F
+!||    nodal_arrays_mod             ../common_source/modules/nodal_arrays.F90
+!||    outmax_mod                   ../common_source/modules/outmax_mod.F
+!||    output_mod                   ../common_source/modules/output/output_mod.F90
+!||    pblast_mod                   ../common_source/modules/loads/pblast_mod.F90
+!||    pinchtype_mod                ../common_source/modules/pinchtype_mod.F
+!||    pload_cyl_mod                ../common_source/modules/loads/pload_cyl_mod.F
+!||    python_funct_mod             ../common_source/modules/python_mod.F90
+!||    rbe3_mod                     ../common_source/modules/constraints/rbe3_mod.F90
+!||    read_ale_grid_mod            ../engine/source/output/restart/read_ale_grid.F90
+!||    read_bcs_nrf_mod             ../engine/source/output/restart/read_bcs_nrf.F90
+!||    read_bcs_wall_mod            ../engine/source/output/restart/read_bcs_wall.F90
+!||    read_inivel_mod              ../engine/source/output/restart/read_inivel.F90
+!||    restart_rbe3pen_mod          ../engine/source/output/restart/restart_rbe3pen.F90
+!||    restart_rwallpen_mod         ../engine/source/output/restart/restart_rwallpen.F90
+!||    restmod                      ../engine/share/modules/restart_mod.F
+!||    rwall_mod                    ../common_source/modules/constraints/rwall_mod.F90
+!||    seatbelt_mod                 ../common_source/modules/seatbelt_mod.F
+!||    sensor_mod                   ../common_source/modules/sensor_mod.F90
+!||    sfem_mod                     ../common_source/modules/elements/sfem_mod.F90
+!||    skew_mod                     ../common_source/modules/skew_mod.F90
+!||    sph_mod                      ../engine/share/modules/sph_mod.F
+!||    stack_mod                    ../engine/share/modules/stack_mod.F
+!||    state_mod                    ../common_source/modules/state_mod.F
+!||    table_glob_mod               ../engine/share/modules/table_glob_mod.F
+!||    time_mod                     ../engine/share/modules/time_mod.F
+!||    unitab_mod                   ../common_source/modules/unitab_mod.F
+!||    user_windows_mod             ../common_source/modules/user_windows_mod.F
+!||====================================================================
       SUBROUTINE RDRESB( AF               ,IAF        ,LVARREA      ,IRUNN      ,
      .                   MULTI_FVM        ,H3D_DATA   ,PINCH_DATA   ,ALE_CONNECTIVITY ,T_MONVOL   ,
      .                   SENSORS          ,EBCS_TAB   ,DYNAIN_DATA  ,USER_WINDOWS     ,OUTPUT     ,
      .                   INTERFACES       ,LOADS      ,MAT_ELEM     ,PYTHON           ,IFLOW      ,
      .                   SKEWS            ,RFLOW      ,LIFLOW       ,LRFLOW           ,IMPL_S0    ,
-     .                   MCP              ,TEMP       ,FORNEQS      ,UNITAB           ,
+     .                   FORNEQS      ,UNITAB           ,
      .                   STACK            ,DRAPE_SH4N ,DRAPE_SH3N   ,DRAPEG           ,NDRAPE     ,
-     .                   GLOB_THERM       ,PBLAST     ,ELEMENT      ,NODES            ,RBE3)
+     .                   GLOB_THERM       ,PBLAST     ,ELEMENT      ,NODES            ,RBE3       ,
+     .                   RWALL            ,SFEM       )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -169,7 +189,6 @@ C-----------------------------------------------
       USE SEATBELT_MOD
       USE PBLAST_MOD
       USE OUTMAX_MOD
-      USE OUTPUTS_MOD
       USE PLOAD_CYL_MOD
       USE STATE_MOD
       USE USER_WINDOWS_MOD
@@ -190,7 +209,14 @@ C-----------------------------------------------
       use glob_therm_mod
       use read_ale_grid_mod, only : read_ale_grid
       use read_bcs_wall_mod, only : read_bcs_wall
+      use read_bcs_nrf_mod, only : read_bcs_nrf
       use rbe3_mod
+      use restart_rbe3pen_mod, only : get_nrbe3pen_l,read_rrbe3pen
+      use checksum_output_option_mod
+      use element_mod , only : nixc
+      use rwall_mod
+      use restart_rwallpen_mod, only : get_nrwallpen_l,read_rrwallpen
+      use sfem_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -255,14 +281,14 @@ C-----------------------------------------------
       TYPE(connectivity_)   ,INTENT(INOUT)                 :: ELEMENT
       TYPE(nodal_arrays_)   ,INTENT(INOUT)                 :: NODES
       TYPE(RBE3_)           ,INTENT(INOUT)                 :: RBE3
+      TYPE(RWALL_)          ,INTENT(INOUT)                 :: RWALL
+      TYPE(SFEM_)           ,INTENT(INOUT)                 :: SFEM
       INTEGER, INTENT(IN) :: LIFLOW
       INTEGER, INTENT(IN) :: LRFLOW
       my_real, INTENT(INOUT) :: FORNEQS(3,NUMNOD)
       INTEGER, INTENT(INOUT) :: IFLOW(LIFLOW)
       my_real, INTENT(INOUT) :: RFLOW(LRFLOW)
       INTEGER, INTENT(IN) :: IMPL_S0
-      my_real, INTENT(INOUT) :: MCP(NUMNOD)
-      my_real, INTENT(INOUT) :: TEMP(NUMNOD)
       INTEGER, INTENT(IN) :: NDRAPE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -282,7 +308,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: BUFFER
       INTEGER :: SKEW_LEN
       LOGICAL :: IS_EBCS_PARALLEL
-      INTEGER :: NPT
+      INTEGER :: NPT,NRBE3PEN_L
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -296,15 +322,17 @@ C-----------------------------------------------
 C--------------------------------------
 C     READING INTEGERS
 C--------------------------------------
-C fichier de restart au format binaire ieee
+C Restart file in binary format ieee
       LEN_G = NPROPGI*NUMGEO
       LEN_M = NPROPMI*NUMMAT
 C
         CALL CUR_FIL_C(0)
 
-        CALL READ_I_C(NODGLOB,SNODGLOB)
+        CALL checksum_restart_read(OUTPUT%CHECKSUM)
 
-        CALL READ_I_C(MAIN_PROC,SWEIGHT)
+        CALL READ_I_C(NODES%NODGLOB,SNODGLOB)
+
+        CALL READ_I_C(NODES%MAIN_PROC,SWEIGHT)
 
         CALL READ_I_C(NODES%WEIGHT,SWEIGHT)
 
@@ -515,18 +543,18 @@ C
            CALL EBCS_TAB%read_type_data(INT0, INTEGER_DATA)
            ALLOCATE(EBCS_TAB%my_typ(INT0))
            ALLOCATE(EBCS_TAB%need_to_compute(INT0))
-           ! save the type of /EBCS ( /EBCS/NRF --> typ = 10) ( /EBCS/PROPERGOL --> typ = 11)
+           ! save the type of /EBCS ( /EBCS/NRF --> typ = 10) ( /EBCS/PROPELLANT --> typ = 11)
            EBCS_TAB%my_typ(1:INT0) = INTEGER_DATA(1:INT0)
            ! -------------
            ! check if the current proc needs to compute an /EBCS
-           ! multifluid /EBCS, /EBCS/NRF, and /EBCS/PROPERGOL are parallelized, can be computed by several proc
+           ! multifluid /EBCS, /EBCS/NRF, and /EBCS/PROPELLANT are parallelized, can be computed by several proc
            ! the others are sequential, only the main proc (ispmd=0) computes the other /EBCS
            DO II=1,INT0
                 EBCS_TAB%need_to_compute(II) = .FALSE.
                 IF(ISPMD /= 0) THEN
                     IS_EBCS_PARALLEL = .FALSE.
                     IF(EBCS_TAB%my_typ(II) == 10 .or. EBCS_TAB%my_typ(II) == 11)IS_EBCS_PARALLEL = .TRUE.
-                    IF(IS_EBCS_PARALLEL) EBCS_TAB%need_to_compute(II) = .TRUE. ! /EBCS/NRF and /EBCS/PROPERGOL are //
+                    IF(IS_EBCS_PARALLEL) EBCS_TAB%need_to_compute(II) = .TRUE. ! /EBCS/NRF and /EBCS/PROPELLANT are //
                 ELSE
                     EBCS_TAB%need_to_compute(II) = .TRUE.   ! other /EBCS sequential
                 ENDIF
@@ -576,17 +604,21 @@ C
 
         CALL READ_I_C(RBE3%IRBE3,RBE3%nrbe3*irbe3_variables)
 
+        CALL GET_NRBE3PEN_L(RBE3%nrbe3,irbe3_variables,RBE3%IRBE3,NRBE3PEN_L)  
+
         CALL READ_I_C(RBE3%LRBE3,RBE3%lrbe3_sz)
 
         CALL READ_I_C(IACTIV,SIACTIV)
 
         CALL READ_I_C(IBMPC,SIBMPC)
 
-        CALL READ_I_C(KINET,SKINET)
+        CALL READ_I_C(NODES%KINET,NUMNOD)
 
         CALL READ_I_C(FASOLFR,SFASOLFR)
 
         CALL READ_I_C(SEGQUADFR,SSEGQUADFR)
+
+        CALL READ_I_C(sfem%in_sfem,sfem%ne_sfem)
 
         CALL READ_I_C(IPARI,SIPARI)
 
@@ -597,9 +629,9 @@ c        CALL READ_I_C(INBUF,SINBUF)
         !read new structure INTBUF_TAB
         CALL INTBUF_INI(INTERFACES%INTBUF_TAB)
 
-        CALL READ_I_C(NPRW,SNPRW)
+        CALL READ_I_C(RWALL%NPRW,RWALL%NNPRW*RWALL%NRWALL)
 
-        CALL READ_I_C(LPRW,SLPRW)
+        CALL READ_I_C(RWALL%LPRW,RWALL%SZ_LPRW)
 
         CALL READ_I_C(ICONX,SICONX)
 
@@ -659,7 +691,7 @@ c        CALL READ_I_C(INBUF,SINBUF)
 
         CALL READ_I_C(FR_MV,SFR_MV)
 
-        CALL READ_I_C(IAD_ELEM,SIAD_ELEM)
+        CALL READ_I_C(NODES%BOUNDARY_ADD,SIAD_ELEM)
 
         CALL READ_I_C(IAD_RBY,SIAD_RBY)
 
@@ -685,11 +717,11 @@ C
 
         CALL READ_I_C(IAD_RBYM2,SIAD_RBYM2)
 C
-        CALL READ_I_C(FR_ELEM,SFR_ELEM)
+        CALL READ_I_C(NODES%BOUNDARY,SFR_ELEM)
 
         CALL READ_I_C(FR_RBY,SFR_RBY)
 
-        CALL READ_I_C(FR_WALL,SFR_WALL)
+        CALL READ_I_C(RWALL%FR_WALL,SFR_WALL)
 
         CALL READ_I_C(FR_RBY2,SFR_RBY2)
 
@@ -800,15 +832,13 @@ C
         CALL READ_I_C(IAD_CNDM,SIAD_CNDM)
         CALL READ_I_C(FR_CNDM,SFR_CNDM)
 C
-c        IF (IMACH==3) THEN
+C Part Parith/We read in SPM in all cases
 C
-C Partie Parith/ON lue en SPM dans tous les cas
-C
-C lecture directe de ADDCNE
+C direct reading of ADDCNE
         IF(IPARIT==1) THEN
           CALL READ_I_C(ELEMENT%PON%ADSKY,NUMNOD+1)
-C lecture directe de PROCNE
-          CALL READ_I_C(PROCNE,LCNE0)
+C direct reading of PROCNE
+          CALL READ_I_C(ELEMENT%PON%PROCNE,LCNE0)
 C lecture directe structure interface type2
           IF (I2NSNT > 0) THEN
             CALL READ_I_C(ADDCNI2,NUMNOD+1)
@@ -819,7 +849,7 @@ C---Itet2 of S10
            CALL READ_I_C(ADDCNCND,SADDCNCND)
           ENDIF
           CALL READ_I_C(PROCNCND,SPROCNCND)
-C lecture directe de IADS+IADWAL+IADRBK+IADI2+IADMV2+IADMV3+IADLL+IADRBM+IADI18+
+C Direct reading of IADS+IADWAL+IADRBK+IADI2+IADMV2+IADMV3+IADLL+IADRBM+IADI18+
 C  IADRBMK
           CALL READ_I_C(ELEMENT%PON%IADS       ,SIZE(ELEMENT%PON%IADS))       !< 1 ; 8xNUMELS  solid indexes to FSKY
           CALL READ_I_C(ELEMENT%PON%IADS10     ,SIZE(ELEMENT%PON%IADS10 ))    !< 6* NUMELS10 
@@ -863,7 +893,7 @@ C  ply xfem
 C
           IF(IPLYXFEM > 0) THEN
             CALL READ_I_C(ADSKY_PXFEM,NPLYXFE+1 )
-C lecture directe de PROCNE
+C direct reading of PROCNE
             CALL READ_I_C(PROCNE_PXFEM,LCNEPXFEM)
             CALL READ_I_C(IADC_PXFEM,4*EPLYXFE)
           ENDIF
@@ -879,7 +909,7 @@ C
           ENDIF
 C
         ELSEIF(IPARI0==1)THEN
-C saut de lecture
+C skip reading
           LEN = NUMNOD+1+LCNE0+(NUMNOD+1)*MIN(1,I2NSNT)+LCNI2
      +        + NISKY0+NSKYRW0+NSKYRBK0+NISKYI2+NSKYMV0+NSKYMVC0
      +        + NSKYLL0+NSKYRBM0+NSKYI18+NSKYRBE30+NSKYRBMK0
@@ -925,13 +955,13 @@ C--------------------------------------
         CALL READ_I_C(SH3TRIM,LEN)
       END IF
 C--------------------------------------
-C allocation + lecture struture interface partie entiere
+C Allowance + Reading Structure Interface Entiere Party
 C--------------------------------------
         CALL SPMD_INITFI(IPARI,1,H3D_DATA,INTERFACES%PARAMETERS,
      .                   GLOB_THERM%IDT_THERM,GLOB_THERM%INTHEAT)
 C
 C--------------------------------------
-C     Lecture + Init Frontiere SPMD pour SPH (partie entiere)
+C     Reading + Intit Frontiere SPMD for SPH (integer part)
 C--------------------------------------
       CALL SPMD_INISPH(1)
 C--------------------------------------
@@ -945,7 +975,7 @@ C--------------------------------------
         CALL INTFRIC_RRESTI(INTERFACES%INTBUF_FRIC_TAB,NINTERFRIC)
       END IF
 C--------------------------------------
-C  Structure table partie entiere
+C  Table structure
 C--------------------------------------
       IF(NTABLE /= 0)THEN
         CALL TABLE_RRESTI(TABLE)
@@ -998,7 +1028,15 @@ C----------------------------------
         CALL READ_BCS_WALL()
       ENDIF
 C----------------------------------
-C     LECTURE DES VARIABLES REELLES
+C /BCS/NRF
+C----------------------------------
+      CALL READ_I_C(ITMP,1)
+      BCS%NUM_NRF = ITMP
+      IF(BCS%NUM_NRF > 0)THEN
+        CALL READ_BCS_NRF()
+      ENDIF      
+C----------------------------------
+C     reading real variables
 C--------------------------------------
 C      warning to radioss developers :
 C      IF(LVARREA>LMXVREA)THEN
@@ -1124,6 +1162,8 @@ C--------------------------------------
 
         CALL READ_DB(RBE3%FRBE3,RBE3%frbe3_sz)
 
+        CALL READ_RRBE3PEN(RBE3%PEN,NRBE3PEN_L)
+
         CALL READ_DB(FACTIV,LRACTIV*NACTIV)
 
         CALL READ_DB(GRAV,SGRAV)
@@ -1142,9 +1182,13 @@ C--------------------------------------
 
         CALL READ_CLUSTER(CLUSTER)
 
-        CALL READ_DB(RWBUF,SRWBUF)
+        CALL READ_DB(RWALL%RWBUF,RWALL%nrwlp*RWALL%nrwall)
 
-        CALL READ_DB(RWSAV,SRWSAV)
+        CALL READ_DB(RWALL%RWSAV,RWALL%SZ_RWSAV)
+
+        CALL get_nrwallpen_l(RWALL%nrwall,RWALL%nnprw,RWALL%nprw,RWALL%nrwall_pen,RWALL%pen%lnspen)
+
+        CALL read_rrwallpen(RWALL%nrwall_pen,RWALL%pen,RWALL%pen%lnspen)
 
         CALL READ_DB(RBY,SRBY)
 
@@ -1168,7 +1212,7 @@ C lecture struture interface partie reelle si irunn > 1
         IF(IRUNN>1.OR.MCHECK/=0) CALL SPMD_INITFI(IPARI,2,H3D_DATA,INTERFACES%PARAMETERS,
      .                                            GLOB_THERM%IDT_THERM,GLOB_THERM%INTHEAT)
 C--------------------------------------
-C     Lecture + Init Frontiere SPMD pour SPH (partie reelle)
+C     Reading + Intit Frontier SPMD for SPH (real part)
 C--------------------------------------
         CALL SPMD_INISPH(2)
 C--------------------------------------
@@ -1206,9 +1250,9 @@ C Read DDP
            IRXDP=0
          ENDIF
        ENDIF
-       NPSAV = 28
+       NPSAV = 29
 C   ----------------------------------------------------------------------
-C     Utilise pour les checks point restart.
+C     used for checkpoint restarts.
        IF(MCHECK/=0)THEN
         CALL READ_I_C(MY_ILEN,1)
         CALL READ_I_C(MY_RLEN,1)
@@ -1314,13 +1358,13 @@ C   ----------------------------------------------------------------------
          CALL READ_DB(NPCONT2_MIN, 3*NUMNOD)
       ENDIF
 C--------Frictional energy output-------
-      IF(S_EFRICINT >0)THEN
-         IF(NINEFRIC > 0) CALL READ_DB(EFRIC, NINEFRIC*NUMNOD)
-         IF(NINEFRIC_STAMP > 0) CALL READ_DB(EFRIC_STAMP, NINEFRIC_STAMP*NUMNODG)
+      IF(OUTPUT%DATA%S_EFRICINT >0)THEN
+         IF(OUTPUT%DATA%NINEFRIC > 0) CALL READ_DB(OUTPUT%DATA%EFRIC, OUTPUT%DATA%NINEFRIC*NUMNOD)
+         IF(OUTPUT%DATA%NINEFRIC_STAMP > 0) CALL READ_DB(OUTPUT%DATA%EFRIC_STAMP, OUTPUT%DATA%NINEFRIC_STAMP*NUMNODG)
       ENDIF
-      IF(S_EFRIC >0)THEN
-         CALL READ_DB(EFRICG, NUMNOD)
-         IF(NINTSTAMP/=0) CALL READ_DB(EFRICG_STAMP, NUMNODG)
+      IF(OUTPUT%DATA%S_EFRIC >0)THEN
+         CALL READ_DB(OUTPUT%DATA%EFRICG, NUMNOD)
+         IF(NINTSTAMP/=0) CALL READ_DB(OUTPUT%DATA%EFRICG_STAMP, NUMNODG)
       ENDIF
 C--------------------------------------
 C  Interface friction buffer (Reals )
@@ -1355,7 +1399,7 @@ Cfor TYPE2
         CALL READ_I_C(NATIV0_SMS,NUMNOD)
       ENDIF
 C--------------------------------------
-C structure tables partie reelle
+C Structure Tables Real Party
 C--------------------------------------
       IF(NTABLE /= 0)THEN
         CALL TABLE_RRESTR(TABLE)
@@ -1388,7 +1432,7 @@ C--------------------------------------
          CALL EIGRREST()
       ENDIF
 C--------------------------------------
-C   SEATBELTS - SLIPRING / RETRACTOR-
+C   SEATBELTS - SLIPRING / RETRACTOR / GUIDE-
 C--------------------------------------
       DO I = 1, NSLIPRING
 C
@@ -1489,6 +1533,39 @@ C
           ENDIF
         ENDDO
       ENDDO
+C      
+      DO I = 1, NGUIDED_CABLE
+C
+        CALL READ_I_C(GUIDE(I)%ID, 1)
+        CALL READ_I_C(GUIDE(I)%ID_G, 1)        
+        CALL READ_I_C(GUIDE(I)%ISTIFF, 1)
+        CALL READ_I_C(GUIDE(I)%NODE_SET, 1)
+        CALL READ_I_C(GUIDE(I)%PART_SET, 1)
+        CALL READ_I_C(GUIDE(I)%NCONT, 1)  
+        CALL READ_I_C(GUIDE(I)%ELTYPE, 1)
+        CALL READ_I_C(GUIDE(I)%N_REMOTE_PROC, 1)
+C        
+        CALL READ_DB(GUIDE(I)%STFAC, 1)
+        CALL READ_DB(GUIDE(I)%FRIC, 1)
+C
+        ALLOCATE(GUIDE(I)%CONT(GUIDE(I)%NCONT))        
+C        
+        DO J=1,GUIDE(I)%NCONT
+C
+          CALL READ_I_C(GUIDE(I)%CONT(J)%UPDATE, 1)
+          CALL READ_I_C(GUIDE(I)%CONT(J)%ACTIVE_SEGMENT, 1)
+          CALL READ_I_C(GUIDE(I)%CONT(J)%ANCHOR_NODE, 1)
+          CALL READ_I_C(GUIDE(I)%CONT(J)%NODE, 3)
+          CALL READ_I_C(GUIDE(I)%CONT(J)%NODE_NEXT, 2)
+          CALL READ_I_C(GUIDE(I)%CONT(J)%NODE_IREMOTE, 4)
+C
+          CALL READ_DB(GUIDE(I)%CONT(J)%FORC, 3)
+          CALL READ_DB(GUIDE(I)%CONT(J)%FORC_AD, 3)
+          CALL READ_DB(GUIDE(I)%CONT(J)%DIST, 1)
+C
+        ENDDO
+C
+      ENDDO      
 C
       IF (N_ANCHOR_REMOTE > 0) THEN
         CALL READ_I_C(ANCHOR_REMOTE%ADD_PROC, NSPMD+1)
@@ -1557,7 +1634,7 @@ C--------------------------------------
 
       ! heat  transfer
       IF(GLOB_THERM%ITHERM_FE > 0   ) THEN
-        CALL THCRREST(MCP,TEMP)
+        CALL THCRREST(NODES%MCP,NODES%TEMP)
       ENDIF
 
       ! Nitsche formulation
@@ -1635,21 +1712,21 @@ C--------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    fxbresb           ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb            ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_getpid         ../engine/source/system/pid.c
-      !||    read_db           ../common_source/tools/input_output/read_db.F
-      !||    read_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi            ../engine/source/output/tools/redsqi.F
-      !||    redsqr            ../engine/source/output/tools/redsqr.F
-      !||    tmpenvf           ../engine/source/system/tmpenv_c.c
-      !||--- uses       -----------------------------------------------------
-      !||    fxb_mod           ../engine/share/modules/fxb_mod.F
-      !||    scratchfile_mod   ../engine/share/modules/scratchfiles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fxbresb           ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb            ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    my_getpid         ../engine/source/system/pid.c
+!||    read_db           ../common_source/tools/input_output/read_db.F
+!||    read_i_c          ../common_source/tools/input_output/write_routines.c
+!||    redsqi            ../engine/source/output/tools/redsqi.F
+!||    redsqr            ../engine/source/output/tools/redsqr.F
+!||    tmpenvf           ../engine/source/system/tmpenv_c.c
+!||--- uses       -----------------------------------------------------
+!||    fxb_mod           ../engine/share/modules/fxb_mod.F
+!||    scratchfile_mod   ../engine/share/modules/scratchfiles_mod.F
+!||====================================================================
       SUBROUTINE FXBRESB()
 C-----------------------------------------------
 C   M o d u l e s
@@ -1728,7 +1805,7 @@ C--------------------------------------
         IF (LENSIG>0) CALL READ_DB(FXBSIG,LENSIG)
         IF (LENGRVR>0) CALL READ_DB(FXBGRVR,LENGRVR)
       ENDIF
-C Lecture des fichiers de modes et de contraintes
+C reading mode and constraint files
       INQUIRE(IOLENGTH=RCLEN) VV
 
       TLEN=4096
@@ -1773,21 +1850,21 @@ C Lecture des fichiers de modes et de contraintes
 C
       RETURN
       END
-      !||====================================================================
-      !||    eigrrest          ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb            ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_getpid         ../engine/source/system/pid.c
-      !||    read_db           ../common_source/tools/input_output/read_db.F
-      !||    read_i_c          ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi            ../engine/source/output/tools/redsqi.F
-      !||    redsqr            ../engine/source/output/tools/redsqr.F
-      !||    tmpenvf           ../engine/source/system/tmpenv_c.c
-      !||--- uses       -----------------------------------------------------
-      !||    eig_mod           ../engine/share/modules/eig_mod.F
-      !||    scratchfile_mod   ../engine/share/modules/scratchfiles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    eigrrest          ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb            ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    my_getpid         ../engine/source/system/pid.c
+!||    read_db           ../common_source/tools/input_output/read_db.F
+!||    read_i_c          ../common_source/tools/input_output/write_routines.c
+!||    redsqi            ../engine/source/output/tools/redsqi.F
+!||    redsqr            ../engine/source/output/tools/redsqr.F
+!||    tmpenvf           ../engine/source/system/tmpenv_c.c
+!||--- uses       -----------------------------------------------------
+!||    eig_mod           ../engine/share/modules/eig_mod.F
+!||    scratchfile_mod   ../engine/share/modules/scratchfiles_mod.F
+!||====================================================================
       SUBROUTINE EIGRREST()
 C-----------------------------------------------
 C   M o d u l e s
@@ -1835,7 +1912,7 @@ C--------------------------------------
       ELSE
         CALL READ_DB(EIGRPM,NEIG*NERPM)
       ENDIF
-C Lecture du fichier de modes additionnels
+C reading the additional modes file
       INQUIRE(IOLENGTH=RCLEN) VV
 
       CALL MY_GETPID(MY_PID)
@@ -1866,16 +1943,16 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    dsrrest       ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||    read_i_c      ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi        ../engine/source/output/tools/redsqi.F
-      !||    redsqr        ../engine/source/output/tools/redsqr.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dsrrest       ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||    read_i_c      ../common_source/tools/input_output/write_routines.c
+!||    redsqi        ../engine/source/output/tools/redsqi.F
+!||    redsqr        ../engine/source/output/tools/redsqr.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE DSRREST(GRAPHE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1890,7 +1967,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "scr05_c.inc"
-*
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1904,7 +1980,7 @@ C-----------------------------------------------
 C
       DO I=1,NSPROC
 C--------------------------------------
-C Lecture des parametres entiers
+C reading integer parameters
 C--------------------------------------
          N=7
          IF (IRFORM/5<=1) THEN
@@ -2021,16 +2097,16 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    nfrrest    ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb     ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db    ../common_source/tools/input_output/read_db.F
-      !||    read_i_c   ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi     ../engine/source/output/tools/redsqi.F
-      !||    redsqr     ../engine/source/output/tools/redsqr.F
-      !||====================================================================
+!||====================================================================
+!||    nfrrest    ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb     ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db    ../common_source/tools/input_output/read_db.F
+!||    read_i_c   ../common_source/tools/input_output/write_routines.c
+!||    redsqi     ../engine/source/output/tools/redsqi.F
+!||    redsqr     ../engine/source/output/tools/redsqr.F
+!||====================================================================
       SUBROUTINE NFRREST(IFLOW, RFLOW)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2071,17 +2147,17 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    imprrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb     ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    cp_real    ../engine/source/implicit/produt_v.F
-      !||    read_db    ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_dyna   ../engine/share/modules/impbufdef_mod.F
-      !||    imp_rest   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imprrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb     ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    cp_real    ../engine/source/implicit/produt_v.F
+!||    read_db    ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    imp_dyna   ../engine/share/modules/impbufdef_mod.F
+!||    imp_rest   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE IMPRREST(NIMPR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -2135,22 +2211,22 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    fvrrest                  ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb                   ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../engine/source/output/message/message.F
-      !||    arret                    ../engine/source/system/arret.F
-      !||    read_db                  ../common_source/tools/input_output/read_db.F
-      !||    read_i_c                 ../common_source/tools/input_output/write_routtines.c
-      !||    spmd_comm_split          ../engine/source/mpi/generic/spmd_comm_split.F
-      !||    spmd_fvb_comm_pattern    ../engine/source/mpi/airbags/spmd_fvb_comm_pattern.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
-      !||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
-      !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvrrest                  ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb                   ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../engine/source/output/message/message.F
+!||    arret                    ../engine/source/system/arret.F
+!||    read_db                  ../common_source/tools/input_output/read_db.F
+!||    read_i_c                 ../common_source/tools/input_output/write_routines.c
+!||    spmd_comm_split          ../engine/source/mpi/generic/spmd_comm_split.F
+!||    spmd_fvb_comm_pattern    ../engine/source/mpi/airbags/spmd_fvb_comm_pattern.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
+!||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
+!||    message_mod              ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FVRREST(MONVOL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -2165,7 +2241,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
@@ -2234,17 +2309,15 @@ C--------------------------------------
         FVDATA_OLD(I)%PDISP = ZERO
       ENDDO
 
-      IF (IMACH==3) THEN
-         ALLOCATE(FVSPMD(NFVBAG))
-         DO I=1,NFVBAG
-           NULLIFY(FVSPMD(I)%IBUF_L)
-           NULLIFY(FVSPMD(I)%IBUFA_L)
-           NULLIFY(FVSPMD(I)%IBUFSA_L)
-           NULLIFY(FVSPMD(I)%IXSA)
-           NULLIFY(FVSPMD(I)%ELEMSA)
-           NULLIFY(FVSPMD(I)%ITAB)
-         ENDDO
-      ENDIF
+      ALLOCATE(FVSPMD(NFVBAG))
+      DO I=1,NFVBAG
+        NULLIFY(FVSPMD(I)%IBUF_L)
+        NULLIFY(FVSPMD(I)%IBUFA_L)
+        NULLIFY(FVSPMD(I)%IBUFSA_L)
+        NULLIFY(FVSPMD(I)%IXSA)
+        NULLIFY(FVSPMD(I)%ELEMSA)
+        NULLIFY(FVSPMD(I)%ITAB)
+      ENDDO
 C
       
       ALLOCATE(KMESH(NFVBAG))
@@ -2257,78 +2330,76 @@ C
          CALL READ_DB(FVDATA_OLD(I)%CFL_COEF,1)
          CALL READ_DB(FVDATA_OLD(I)%DTMIN,1)      
       
-         IF (IMACH==3) THEN
-            LEN=8
-            CALL READ_I_C(TABI,LEN)
-            NN_L=TABI(1)
-            NNI_L=TABI(8)
-            NNA_L=TABI(2)
-            NNSA_L=TABI(3)
-            NSA=TABI(4)
-            NELSA=TABI(6)
-            FVSPMD(I)%NN_L=NN_L
-            FVSPMD(I)%NNI_L=NNI_L
-            FVSPMD(I)%NNA_L=NNA_L
-            FVSPMD(I)%NNSA_L=NNSA_L
-            FVSPMD(I)%NSA=NSA
-            FVSPMD(I)%NNSA=TABI(5)
-            FVSPMD(I)%NELSA=NELSA
-            FVSPMD(I)%PMAIN=TABI(7)
-            FVSPMD(I)%NNA_L_GLOB = NNA_L
+         LEN=8
+         CALL READ_I_C(TABI,LEN)
+         NN_L=TABI(1)
+         NNI_L=TABI(8)
+         NNA_L=TABI(2)
+         NNSA_L=TABI(3)
+         NSA=TABI(4)
+         NELSA=TABI(6)
+         FVSPMD(I)%NN_L=NN_L
+         FVSPMD(I)%NNI_L=NNI_L
+         FVSPMD(I)%NNA_L=NNA_L
+         FVSPMD(I)%NNSA_L=NNSA_L
+         FVSPMD(I)%NSA=NSA
+         FVSPMD(I)%NNSA=TABI(5)
+         FVSPMD(I)%NELSA=NELSA
+         FVSPMD(I)%PMAIN=TABI(7)
+         FVSPMD(I)%NNA_L_GLOB = NNA_L
 
-            COLOR = MIN(1,NN_L+NNI_L+NNA_L+NNSA_L) 
-            IF(ISPMD == FVSPMD(I)%PMAIN - 1) THEN
-            ! PMAIN will be zero in the subcommunicator
-              KEY = 0 
-              COLOR = 1
-            ELSE
-              KEY = 1
-            ENDIF
-
-
-            ! COLOR == 0 => ISPMD does not belong to the fvm
-            ! COLOR == 1 => ISPMD belongs to the fvm
-            FVSPMD(I)%MPI_COMM = 0
-            FVSPMD(I)%RANK = 0
-            FVSPMD(I)%NSPMD = 1
-            CALL SPMD_COMM_SPLIT(COLOR,KEY,FVSPMD(I)%MPI_COMM,
-     .                          FVSPMD(I)%RANK, FVSPMD(I)%NSPMD)
+         COLOR = MIN(1,NN_L+NNI_L+NNA_L+NNSA_L) 
+         IF(ISPMD == FVSPMD(I)%PMAIN - 1) THEN
+         ! PMAIN will be zero in the subcommunicator
+           KEY = 0 
+           COLOR = 1
+         ELSE
+           KEY = 1
+         ENDIF
 
 
-            ALLOCATE(FVSPMD(I)%ITAB(4,NSPMD-1))
+         ! COLOR == 0 => ISPMD does not belong to the fvm
+         ! COLOR == 1 => ISPMD belongs to the fvm
+         FVSPMD(I)%MPI_COMM = 0
+         FVSPMD(I)%RANK = 0
+         FVSPMD(I)%NSPMD = 1
+         CALL SPMD_COMM_SPLIT(COLOR,KEY,FVSPMD(I)%MPI_COMM,
+     .                       FVSPMD(I)%RANK, FVSPMD(I)%NSPMD)
 
-            ! Compute the size of the comm. involved in SPMD_FVB_GATHER
-            CALL SPMD_FVB_COMM_PATTERN(I)
 
-            ALLOCATE(FVSPMD(I)%IBUF_L(2,NN_L+NNI_L))
-            LEN=2*(NN_L+NNI_L)
-            IF (LEN>0) THEN
-              CALL READ_I_C(FVSPMD(I)%IBUF_L,LEN)
-            ENDIF
-            ALLOCATE(FVSPMD(I)%IBUFA_L(2,NNA_L))
-            LEN=2*NNA_L
-            IF (LEN>0) THEN
-              CALL READ_I_C(FVSPMD(I)%IBUFA_L,LEN)
-            ENDIF
-            ALLOCATE(FVSPMD(I)%IBUFSA_L(2,NNSA_L))
-            LEN=2*NNSA_L
-            IF (LEN>0) THEN
-              CALL READ_I_C(FVSPMD(I)%IBUFSA_L,LEN)
-            ENDIF
-            LEN = 1
-            CALL READ_I_C(KMESH(I), LEN)
-            IF (ISPMD/=FVSPMD(I)%PMAIN-1) CYCLE
+         ALLOCATE(FVSPMD(I)%ITAB(4,NSPMD-1))
+
+         ! Compute the size of the comm. involved in SPMD_FVB_GATHER
+         CALL SPMD_FVB_COMM_PATTERN(I)
+
+         ALLOCATE(FVSPMD(I)%IBUF_L(2,NN_L+NNI_L))
+         LEN=2*(NN_L+NNI_L)
+         IF (LEN>0) THEN
+           CALL READ_I_C(FVSPMD(I)%IBUF_L,LEN)
+         ENDIF
+         ALLOCATE(FVSPMD(I)%IBUFA_L(2,NNA_L))
+         LEN=2*NNA_L
+         IF (LEN>0) THEN
+           CALL READ_I_C(FVSPMD(I)%IBUFA_L,LEN)
+         ENDIF
+         ALLOCATE(FVSPMD(I)%IBUFSA_L(2,NNSA_L))
+         LEN=2*NNSA_L
+         IF (LEN>0) THEN
+           CALL READ_I_C(FVSPMD(I)%IBUFSA_L,LEN)
+         ENDIF
+         LEN = 1
+         CALL READ_I_C(KMESH(I), LEN)
+         IF (ISPMD/=FVSPMD(I)%PMAIN-1) CYCLE
 C
-            ALLOCATE(FVSPMD(I)%IXSA(8,NSA))
-            LEN=8*NSA
-            IF (LEN>0) THEN
-              CALL READ_I_C(FVSPMD(I)%IXSA,LEN)
-            ENDIF
-            ALLOCATE(FVSPMD(I)%ELEMSA(3,NELSA))
-            LEN=3*NELSA
-            IF (LEN>0) THEN
-              CALL READ_I_C(FVSPMD(I)%ELEMSA,LEN)
-            ENDIF
+         ALLOCATE(FVSPMD(I)%IXSA(8,NSA))
+         LEN=8*NSA
+         IF (LEN>0) THEN
+           CALL READ_I_C(FVSPMD(I)%IXSA,LEN)
+         ENDIF
+         ALLOCATE(FVSPMD(I)%ELEMSA(3,NELSA))
+         LEN=3*NELSA
+         IF (LEN>0) THEN
+           CALL READ_I_C(FVSPMD(I)%ELEMSA,LEN)
          ENDIF
          LEN=11
          CALL READ_I_C(TABI,LEN)
@@ -2599,14 +2670,14 @@ C--------------------------------------
       END
 
 C shell heat transfer
-      !||====================================================================
-      !||    thcrrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb     ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db    ../common_source/tools/input_output/read_db.F
-      !||    redsqr     ../engine/source/output/tools/redsqr.F
-      !||====================================================================
+!||====================================================================
+!||    thcrrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb     ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db    ../common_source/tools/input_output/read_db.F
+!||    redsqr     ../engine/source/output/tools/redsqr.F
+!||====================================================================
       SUBROUTINE THCRREST(MCP, TEMP)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2644,14 +2715,14 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    nitscherrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb         ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db        ../common_source/tools/input_output/read_db.F
-      !||    redsqr         ../engine/source/output/tools/redsqr.F
-      !||====================================================================
+!||====================================================================
+!||    nitscherrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb         ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db        ../common_source/tools/input_output/read_db.F
+!||    redsqr         ../engine/source/output/tools/redsqr.F
+!||====================================================================
       SUBROUTINE NITSCHERREST(FORNEQS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2687,19 +2758,19 @@ C
       RETURN
       END
 C
-C convection flux
-      !||====================================================================
-      !||    convrrest        ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb           ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db          ../common_source/tools/input_output/read_db.F
-      !||    read_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi           ../engine/source/output/tools/redsqi.F
-      !||    redsqr           ../engine/source/output/tools/redsqr.F
-      !||--- uses       -----------------------------------------------------
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||====================================================================
+C convection flow
+!||====================================================================
+!||    convrrest        ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb           ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db          ../common_source/tools/input_output/read_db.F
+!||    read_i_c         ../common_source/tools/input_output/write_routines.c
+!||    redsqi           ../engine/source/output/tools/redsqi.F
+!||    redsqr           ../engine/source/output/tools/redsqr.F
+!||--- uses       -----------------------------------------------------
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||====================================================================
       SUBROUTINE CONVRREST(IBCV, FCONV,GLOB_THERM)
       
       use glob_therm_mod
@@ -2741,18 +2812,18 @@ C
       RETURN
       END
 C radiative flux
-      !||====================================================================
-      !||    radiarrest       ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb           ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db          ../common_source/tools/input_output/read_db.F
-      !||    read_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi           ../engine/source/output/tools/redsqi.F
-      !||    redsqr           ../engine/source/output/tools/redsqr.F
-      !||--- uses       -----------------------------------------------------
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    radiarrest       ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb           ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db          ../common_source/tools/input_output/read_db.F
+!||    read_i_c         ../common_source/tools/input_output/write_routines.c
+!||    redsqi           ../engine/source/output/tools/redsqi.F
+!||    redsqr           ../engine/source/output/tools/redsqr.F
+!||--- uses       -----------------------------------------------------
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||====================================================================
       SUBROUTINE RADIARREST(IBCR, FRADIA, GLOB_THERM)
       
       use glob_therm_mod
@@ -2794,18 +2865,18 @@ C
       RETURN
       END
 C imposed temperature
-      !||====================================================================
-      !||    fxtemprrest      ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb           ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db          ../common_source/tools/input_output/read_db.F
-      !||    read_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi           ../engine/source/output/tools/redsqi.F
-      !||    redsqr           ../engine/source/output/tools/redsqr.F
-      !||--- uses       -----------------------------------------------------
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    fxtemprrest      ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb           ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db          ../common_source/tools/input_output/read_db.F
+!||    read_i_c         ../common_source/tools/input_output/write_routines.c
+!||    redsqi           ../engine/source/output/tools/redsqi.F
+!||    redsqr           ../engine/source/output/tools/redsqr.F
+!||--- uses       -----------------------------------------------------
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||====================================================================
       SUBROUTINE FXTEMPRREST(IBFTEMP, FBFTEMP,GLOB_THERM)
 
       use glob_therm_mod
@@ -2847,16 +2918,16 @@ C
       RETURN
       END
 C rigid material
-      !||====================================================================
-      !||    rmatrrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb      ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db     ../common_source/tools/input_output/read_db.F
-      !||    read_i_c    ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi      ../engine/source/output/tools/redsqi.F
-      !||    redsqr      ../engine/source/output/tools/redsqr.F
-      !||====================================================================
+!||====================================================================
+!||    rmatrrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb      ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db     ../common_source/tools/input_output/read_db.F
+!||    read_i_c    ../common_source/tools/input_output/write_routines.c
+!||    redsqi      ../engine/source/output/tools/redsqi.F
+!||    redsqr      ../engine/source/output/tools/redsqr.F
+!||====================================================================
       SUBROUTINE RMATRREST(RBYM,IRBYM, LNRBYM,WEIGHT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2899,14 +2970,14 @@ C
       RETURN
       END
 C shell xfem
-      !||====================================================================
-      !||    plyxfem_rrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb          ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db         ../common_source/tools/input_output/read_db.F
-      !||    read_i_c        ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    plyxfem_rrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb          ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db         ../common_source/tools/input_output/read_db.F
+!||    read_i_c        ../common_source/tools/input_output/write_routines.c
+!||====================================================================
       SUBROUTINE PLYXFEM_RREST(MS_LAYER,ZI_LAYER,INOD,IEL,ICODE,ISKEW,
      .                         MSZ2)
 C-----------------------------------------------
@@ -2951,15 +3022,15 @@ C BCS ply
       RETURN
       END
 C shell xfem
-      !||====================================================================
-      !||    plyxfem_rrestanim   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb              ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_i_c            ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod         ../engine/share/modules/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    plyxfem_rrestanim   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb              ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_i_c            ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod         ../engine/share/modules/plyxfem_mod.F
+!||====================================================================
       SUBROUTINE PLYXFEM_RRESTANIM()
 C-----------------------------------------------
       USE PLYXFEM_MOD
@@ -3021,15 +3092,15 @@ C
       RETURN
       END
 C centrifugal force
-      !||====================================================================
-      !||    cfieldrest    ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cfieldrest    ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CFIELDREST(CFIELD)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3064,15 +3135,15 @@ C--------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    loadprest     ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    loadprest     ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LOADPREST(LOADP)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3107,13 +3178,13 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    crkxfem_rrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb          ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_i_c        ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    crkxfem_rrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb          ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_i_c        ../common_source/tools/input_output/write_routines.c
+!||====================================================================
       SUBROUTINE CRKXFEM_RREST(INOD_CRKXFEM,IEL_CRKXFEM,NODLEVXF)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -3138,17 +3209,17 @@ C=======================================================================
 C---
       RETURN
       END
-      !||====================================================================
-      !||    crkxfem_rrestanim   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb              ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db             ../common_source/tools/input_output/read_db.F
-      !||    read_i_c            ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    restmod             ../engine/share/modules/restart_mod.F
-      !||    xfem2vars_mod       ../engine/share/modules/xfem2vars_mod.F
-      !||====================================================================
+!||====================================================================
+!||    crkxfem_rrestanim   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb              ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db             ../common_source/tools/input_output/read_db.F
+!||    read_i_c            ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    restmod             ../engine/share/modules/restart_mod.F
+!||    xfem2vars_mod       ../engine/share/modules/xfem2vars_mod.F
+!||====================================================================
       SUBROUTINE CRKXFEM_RRESTANIM()
 C-----------------------------------------------
       USE XFEM2VARS_MOD
@@ -3317,15 +3388,15 @@ C---
       END
 
 C shell xfem
-      !||====================================================================
-      !||    plyxfem_ravuply   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb            ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db           ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod       ../engine/share/modules/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    plyxfem_ravuply   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb            ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db           ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod       ../engine/share/modules/plyxfem_mod.F
+!||====================================================================
       SUBROUTINE PLYXFEM_RAVUPLY()
 C-----------------------------------------------
       USE PLYXFEM_MOD
@@ -3354,15 +3425,15 @@ C
       RETURN
       END
 C air + faom
-      !||====================================================================
-      !||    alelag_rrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb         ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db        ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    aleflow_mod    ../engine/share/modules/aleflow_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alelag_rrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb         ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db        ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    aleflow_mod    ../engine/share/modules/aleflow_mod.F
+!||====================================================================
       SUBROUTINE ALELAG_RREST()
 C-----------------------------------------------
       USE ALEFLOW_MOD
@@ -3387,15 +3458,15 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    rthbufrest    ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rthbufrest    ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE RTHBUFREST(RTHBUF,SRTHBUF)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3428,15 +3499,15 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    knotrest      ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    knotrest      ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE KNOTREST(KNOT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3469,15 +3540,15 @@ C--------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    knotlocpcrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb          ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db         ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    knotlocpcrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb          ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db         ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE KNOTLOCPCREST(KNOTLOCPC)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3510,15 +3581,15 @@ C--------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    knotlocelrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb          ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db         ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    knotlocelrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb          ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db         ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE KNOTLOCELREST(KNOTLOCEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3550,15 +3621,15 @@ C--------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    wigerest      ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    wigerest      ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE WIGEREST(WIGE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3590,14 +3661,14 @@ C
       RETURN
       END
 C STACk PART
-      !||====================================================================
-      !||    stack_rrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||    read_i_c      ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    stack_rrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||    read_i_c      ../common_source/tools/input_output/write_routines.c
+!||====================================================================
       SUBROUTINE STACK_RREST(IGEO,GEO,PM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -3626,16 +3697,16 @@ C-----------------------------------------------
         CALL READ_DB(PM,     LSIZ)
        RETURN
       END
-      !||====================================================================
-      !||    drape_rrest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||    read_i_c      ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod     ../engine/share/modules/drape_mod.F
-      !||====================================================================
+!||====================================================================
+!||    drape_rrest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb        ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db       ../common_source/tools/input_output/read_db.F
+!||    read_i_c      ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    drape_mod     ../engine/share/modules/drape_mod.F
+!||====================================================================
       SUBROUTINE DRAPE_RREST(DRAPE_SH4N,DRAPE_SH3N,DRAPEG)
 C
         USE DRAPE_MOD
@@ -3658,6 +3729,7 @@ C-----------------------------------------------
       INTEGER LEN,OFF,II,J,IS,NSLICE,NPT,NDIM_INDX_PLY,NDIM,NDIM_SLICE,
      .        NPT_DRAPE
       my_real, DIMENSION(:,:), ALLOCATABLE :: RTMP
+      my_real, DIMENSION(:)  , ALLOCATABLE :: THK
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: ITMP
       INTEGER, DIMENSION(:)  , ALLOCATABLE :: NPTDRP_ELT,ISLICE,INDX_PLY,
      .                                        NPT_ELT
@@ -3676,7 +3748,9 @@ C     4 node Shell
         DRAPEG%NDIM_INDX_PLY_SH4N = NDIM_INDX_PLY
         !
         ALLOCATE(NPT_ELT(NUMELC_DRAPE),ITMP(NDIM,2),RTMP(NDIM,2),
-     .         NPTDRP_ELT(NUMELC_DRAPE),ISLICE(NDIM_SLICE),INDX_PLY(NDIM_INDX_PLY))
+     .         NPTDRP_ELT(NUMELC_DRAPE),ISLICE(NDIM_SLICE),INDX_PLY(NDIM_INDX_PLY),
+     .         THK(NUMELC_DRAPE)  )
+         THK = ZERO
         CALL READ_I_C(DRAPEG%INDX_SH4N,NUMELC)
         CALL READ_I_C(NPTDRP_ELT,NUMELC_DRAPE)
         CALL READ_I_C(NPT_ELT,NUMELC_DRAPE)
@@ -3684,12 +3758,14 @@ C     4 node Shell
         CALL READ_I_C(INDX_PLY,NDIM_INDX_PLY)  
         CALL READ_I_C(ITMP,2*NDIM)            
         CALL READ_DB(RTMP,2*NDIM)
+        CALL READ_DB(THK,NUMELC_DRAPE) 
         NDIM_INDX_PLY = 0
         NDIM_SLICE = 0
         NDIM = 0
         DO II= 1,NUMELC_DRAPE
            DRAPE_SH4N(II)%NPLY_DRAPE = NPTDRP_ELT(II)
            DRAPE_SH4N(II)%NPLY       = NPT_ELT(II)
+           DRAPE_SH4N(II)%THICK      = THK(II)
            NPT = DRAPE_SH4N(II)%NPLY 
            ALLOCATE(DRAPE_SH4N(II)%INDX_PLY(NPT))
            DRAPE_SH4N(II)%INDX_PLY = 0
@@ -3715,7 +3791,7 @@ C     4 node Shell
            ENDDO
            NDIM_SLICE = NDIM_SLICE + NPT_DRAPE
         ENDDO ! NUMELC_DRAPE
-        DEALLOCATE(NPT_ELT,ITMP,RTMP,NPTDRP_ELT,ISLICE,INDX_PLY)
+        DEALLOCATE(NPT_ELT,ITMP,RTMP,NPTDRP_ELT,ISLICE,INDX_PLY, THK)
         SCDRAPE = NUMELC
       ENDIF
 C
@@ -3728,7 +3804,9 @@ C     3 Node Shell
         DRAPEG%NDIM_SLICE_SH3N    = NDIM_SLICE 
         DRAPEG%NDIM_INDX_PLY_SH3N = NDIM_INDX_PLY
         ALLOCATE( NPT_ELT(NUMELTG_DRAPE),ITMP(NDIM,2),RTMP(NDIM,2),
-     .         NPTDRP_ELT(NUMELTG_DRAPE),ISLICE(NDIM_SLICE),INDX_PLY(NDIM_INDX_PLY))
+     .         NPTDRP_ELT(NUMELTG_DRAPE),ISLICE(NDIM_SLICE),INDX_PLY(NDIM_INDX_PLY),
+     .         THK(NUMELTG_DRAPE))
+        THK = ZERO
         CALL READ_I_C(DRAPEG%INDX_SH3N,NUMELTG)
         CALL READ_I_C(NPTDRP_ELT,NUMELTG_DRAPE)
         CALL READ_I_C(NPT_ELT,NUMELTG_DRAPE)
@@ -3736,12 +3814,14 @@ C     3 Node Shell
         CALL READ_I_C(INDX_PLY,NDIM_INDX_PLY)  
         CALL READ_I_C(ITMP,2*NDIM)            
         CALL READ_DB(RTMP,2*NDIM)
+        CALL READ_DB(THK,NUMELTG_DRAPE)
         NDIM_INDX_PLY = 0
         NDIM_SLICE = 0
         NDIM = 0
         DO II= 1,NUMELTG_DRAPE
            DRAPE_SH3N(II)%NPLY_DRAPE = NPTDRP_ELT(II)
            DRAPE_SH3N(II)%NPLY       = NPT_ELT(II)
+           DRAPE_SH3N(II)%THICK      = THK(II)
            NPT = DRAPE_SH3N(II)%NPLY 
            ALLOCATE(DRAPE_SH3N(II)%INDX_PLY(NPT))
            DRAPE_SH3N(II)%INDX_PLY = 0
@@ -3767,21 +3847,21 @@ C     3 Node Shell
            ENDDO
            NDIM_SLICE = NDIM_SLICE + NPT_DRAPE
         ENDDO ! NUMELTG_DRAPE
-        DEALLOCATE( NPT_ELT,ITMP,RTMP,NPTDRP_ELT,ISLICE,INDX_PLY)
+        DEALLOCATE( NPT_ELT,ITMP,RTMP,NPTDRP_ELT,ISLICE,INDX_PLY,THK)
         STDRAPE = NUMELTG
       ENDIF  
 C
       RETURN
       END
-      !||====================================================================
-      !||    ply_info_rest   ../engine/source/output/restart/rdresb.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb          ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_i_c        ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ply_info_rest   ../engine/source/output/restart/rdresb.F
+!||--- called by ------------------------------------------------------
+!||    rdresb          ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_i_c        ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE PLY_INFO_REST(PLY_INFO)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3806,7 +3886,7 @@ C
 C--------------------------------------
 C     READING INTEGERS
 C--------------------------------------
-      CALL READ_I_C(PLY_INFO,2*NUMPLY)
+      CALL READ_I_C(PLY_INFO,3*NUMPLY)
 C--------------------------------------
 C     READING REALS
 C--------------------------------------

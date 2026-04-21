@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10therm   ../engine/source/elements/solid/solide10/s10therm.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3   ../engine/source/elements/solid/solide10/s10forc3.F
-      !||====================================================================
+!||====================================================================
+!||    s10therm   ../engine/source/elements/solid/solide10/s10therm.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3   ../engine/source/elements/solid/solide10/s10forc3.F
+!||====================================================================
       SUBROUTINE S10THERM(
      1   PM,      IMAT,     NC,      VOL,
      2   PX,      PY,      PZ,      NI,
@@ -84,7 +84,7 @@ C
         PHIZ(I) = KC*PHIZ(I)
       ENDDO
 C
-C force thermique nodale
+C nodal thermal force
 C
       DO N=1,10
        DO I=1,NEL

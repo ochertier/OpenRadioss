@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,19 +21,22 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    rad_spmd_send   ../engine/source/mpi/generic/rad_spmd_send.F
-      !||--- called by ------------------------------------------------------
-      !||    aniskewf        ../engine/source/output/anim/generate/aniskewf.F
-      !||    printime        ../engine/source/system/timer.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    rad_spmd_send         ../engine/source/mpi/generic/rad_spmd_send.F
+!||--- called by ------------------------------------------------------
+!||    aniskewf              ../engine/source/output/anim/generate/aniskewf.F
+!||    printime              ../engine/source/system/printime.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE RAD_SPMD_SEND(A,SIZ,ISPMD,IT_SPMD,MSGTAG,INTSIZE)
-C routine speciale smp
+C special smp routine
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-C#include      "implicit_f.inc"
+       use SPMD_COMM_WORLD_MOD, only: SPMD_COMM_WORLD
+       implicit none
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -47,9 +50,9 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER INFO,BUFSIZMAX,ADD,LEN,SIZ_I
+      INTEGER BUFSIZMAX,ADD,LEN,SIZ_I
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR
-C segment de memoire partagee doit etre superieur a 10 MB
+C shared memory segment must be superior to 10 Mb
       DATA BUFSIZMAX/10000000/
 C-----------------------------------------------
 C   S o u r c e  L i n e s

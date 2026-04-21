@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21cor3t   ../engine/source/interfaces/int21/i21cor3t.F
-      !||--- called by ------------------------------------------------------
-      !||    i21sto     ../engine/source/interfaces/int21/i21sto.F
-      !||====================================================================
+!||====================================================================
+!||    i21cor3t   ../engine/source/interfaces/int21/i21cor3t.F
+!||--- called by ------------------------------------------------------
+!||    i21sto     ../engine/source/interfaces/int21/i21sto.F
+!||====================================================================
       SUBROUTINE I21COR3T(JLT    ,XLOC  ,IRECT ,CAND_E ,
      1                   CAND_N  ,IGAP  ,GAP   ,X1    ,X2     ,
      2                   X3      ,X4    ,Y1    ,Y2    ,Y3     ,
@@ -45,14 +45,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), CAND_E(*), CAND_N(*),
-     .    JLT,IDT, NOINT, NSN, IGAP ,ITYP
+     .    JLT, NSN, IGAP 
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ)
 C     REAL
       my_real
      .   XLOC(3,*), GAPV(*), GAP_S(*),CURV_MAX(*),
      .   GAP, GAPMAX, GAPMIN, DEPTH, XM0(3,*)
       my_real , INTENT(IN) :: DGAPLOAD,DRAD
-C     REAL ou REAL*8
+C     REAL or REAL*8
       my_real
      .   X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ),
      .   Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
@@ -61,7 +61,7 @@ C     REAL ou REAL*8
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,IL, L, NN, IG,JFT
+      INTEGER I   , L, IG
 C-----------------------------------------------
       IF(IGAP==0)THEN
         DO I=1,JLT

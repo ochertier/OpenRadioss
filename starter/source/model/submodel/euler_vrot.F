@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,15 +22,15 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C   This function uses a 3d rotation matrix to turn a point x around a
 C   center X0.
-      !||====================================================================
-      !||    euler_vrot    ../starter/source/model/submodel/euler_vrot.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_skw   ../starter/source/tools/skew/hm_read_skw.F
-      !||    lecsubmod     ../starter/source/model/submodel/lecsubmod.F
-      !||    lectrans      ../starter/source/model/transformation/lectrans.F
-      !||    subrotpoint   ../starter/source/model/submodel/subrot.F
-      !||    subrotvect    ../starter/source/model/submodel/subrot.F
-      !||====================================================================
+!||====================================================================
+!||    euler_vrot    ../starter/source/model/submodel/euler_vrot.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_skw   ../starter/source/tools/skew/hm_read_skw.F
+!||    lecsubmod     ../starter/source/model/submodel/lecsubmod.F
+!||    lectrans      ../starter/source/model/transformation/lectrans.F
+!||    subrotpoint   ../starter/source/model/submodel/subrot.F
+!||    subrotvect    ../starter/source/model/submodel/subrot.F
+!||====================================================================
       SUBROUTINE EULER_VROT (X0,X,ROT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

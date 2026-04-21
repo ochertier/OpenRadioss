@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,33 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25main_slid             ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri                   ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    allocate_comm_struct     ../engine/share/modules/mpi_comm_mod.F
-      !||    ancmsg                   ../engine/source/output/message/message.F
-      !||    arret                    ../engine/source/system/arret.F
-      !||    deallocate_comm_struct   ../engine/share/modules/mpi_comm_mod.F
-      !||    i25comp_1                ../engine/source/interfaces/int25/i25comp_1.F
-      !||    i25prep_add              ../engine/source/interfaces/int25/i25slid.F
-      !||    i25prep_nindex           ../engine/source/interfaces/int25/i25slid.F
-      !||    i25prep_send             ../engine/source/interfaces/int25/i25slid.F
-      !||    i25prep_sizbufs          ../engine/source/interfaces/int25/i25slid.F
-      !||    i25prep_slid_2           ../engine/source/interfaces/int25/i25slid.F
-      !||    my_barrier               ../engine/source/system/machine.F
-      !||    spmd_i25_slide_exch      ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||    spmd_i25_slide_gat       ../engine/source/mpi/interfaces/spmd_i25slide.F
-      !||    upgrade_cand_opt         ../common_source/interf/upgrade_multimp.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
-      !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||    mpi_commod               ../engine/share/modules/mpi_comm_mod.F
-      !||    parameters_mod           ../common_source/modules/interfaces/parameters_mod.F
-      !||    sensor_mod               ../common_source/modules/sensor_mod.F90
-      !||    tri7box                  ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25main_slid             ../engine/source/interfaces/int25/i25main_slid.F
+!||--- called by ------------------------------------------------------
+!||    inttri                   ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    allocate_comm_struct     ../engine/share/modules/mpi_comm_mod.F
+!||    ancmsg                   ../engine/source/output/message/message.F
+!||    arret                    ../engine/source/system/arret.F
+!||    deallocate_comm_struct   ../engine/share/modules/mpi_comm_mod.F
+!||    i25comp_1                ../engine/source/interfaces/int25/i25comp_1.F
+!||    i25prep_add              ../engine/source/interfaces/int25/i25slid.F
+!||    i25prep_nindex           ../engine/source/interfaces/int25/i25slid.F
+!||    i25prep_send             ../engine/source/interfaces/int25/i25slid.F
+!||    i25prep_sizbufs          ../engine/source/interfaces/int25/i25slid.F
+!||    i25prep_slid_2           ../engine/source/interfaces/int25/i25slid.F
+!||    my_barrier               ../engine/source/system/machine.F
+!||    spmd_i25_slide_exch      ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||    spmd_i25_slide_gat       ../engine/source/mpi/interfaces/spmd_i25slide.F
+!||    upgrade_cand_opt         ../common_source/interf/upgrade_multimp.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                  ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod            ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod              ../engine/share/message_module/message_mod.F
+!||    mpi_commod               ../engine/share/modules/mpi_comm_mod.F
+!||    parameters_mod           ../common_source/modules/interfaces/parameters_mod.F
+!||    sensor_mod               ../common_source/modules/sensor_mod.F90
+!||    tri7box                  ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25MAIN_SLID(
      1       IPARI    ,IAD_ELEM ,FR_ELEM  ,ITAB     ,SENSOR_TAB,
      2       NSENSOR  ,INTLIST25,INTBUF_TAB ,IAD_FRNOR,FR_NOR ,
@@ -101,23 +102,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER KK, NIN, NI25, ISENS, LENT25, IERROR, ITYP,
+      INTEGER NIN, NI25, LENT25, IERROR, ITYP, 
      .        IFQ, IGAP, INTTH, ILEV, IVIS2,
-     .        I_STOK_GLO, I_STOK, I,J, LINDMAX, NSNR, INACTI, NADMSR,
-     .        LENADD, MG, L, N, N_OLD_IMPACT,
-     .        P, RSIZ(NINTER25), ISIZ(NINTER25), SIZBUFS(NSPMD), IADBUFR(NSPMD+1),
+     . I_STOK_GLO, I,J, NSNR, INACTI, NADMSR,
+     . P, RSIZ(NINTER25), ISIZ(NINTER25), SIZBUFS(NSPMD),
      .        NADMAX, LADMAX, NSLIDMX, NSENDTOT, NSNF, NSNL, NSNRF, NSNRL,INTFRIC ,
      .        FLAGREMN, LREMNORMAX, ISTIF_MSDT, IFSUB_CAREA
       INTEGER SIZOPT, K_STOK, I_OPT_STOK
-      my_real
-     .       TS, STARTT, STOPT
-      INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX2, BUFR, NADD, KADD,
+      INTEGER, DIMENSION(:), ALLOCATABLE :: NADD, KADD, 
      .                                      NSLIDE, FR_SLIDE, INDXTOSEND
 C
       TYPE(real_pointer),    DIMENSION(NSPMD,NINTER25) :: RBUFS,RBUFR
       TYPE(int_pointer) ,    DIMENSION(NSPMD,NINTER25) :: IBUFS,IBUFR  
 
-C     rassembler les trois structures + COMM_PATTERN 
+C     Gather the three structures + comm_pattern 
       TYPE(MPI_COMM_STRUCT) :: COMM_INT
       TYPE(MPI_COMM_STRUCT) :: COMM_REAL
       TYPE(MPI_COMM_STRUCT) :: COMM_SIZ
@@ -158,7 +156,7 @@ C
       CALL MY_BARRIER
 C
 C-----------------------------------------------------------------------
-C       Secnd node leaving its previous impacted segment ...
+C       Second node leaving its previous impacted segment ...
 C-----------------------------------------------------------------------  
 !$OMP SINGLE
       DO NI25=1,NINTER25
@@ -193,8 +191,8 @@ C
         RSIZ(1:NINTER25) = 0
 
 
-!        : remplir COMM_PATTERN tel que COMM_PATTERN(P,NIN) = 1 => comm entre ISPMD et P
-!       pour l interface NIN (symmetrie necessaire entre processeurs)
+!        : fill comm_pattern such that comm_pattern (p, nin) = 1 => comm between ISPMD and P
+!       For the NIN interface (necessary symmetry between processors)
         COMM_PATTERN(1:NSPMD,1:NINTER25) = 0
         DO NI25=1,NINTER25
 C
@@ -254,7 +252,7 @@ C-----------------------------------------------------------------------
 
         ELSE
 C-----------------------------------------------------------------------
-C         SPMD only <=> envoi de nds secnds qui glissent sur un sommet frontire
+C         spmd only <=> sending secondary nodes that slide on a boundary vertex
 C-----------------------------------------------------------------------
 C
           ALLOCATE(NADD(NADMAX+1),STAT=IERROR)
@@ -300,7 +298,7 @@ C
              IF(IPARI(36,NIN)> 0.AND.PARAMETERS%INTCAREA > 0) IFSUB_CAREA = 1
              ITYP  = 25
 C
-C            NADD(1:NADMSR+1), KADD <=> liste sky line des noeuds secnd concerns / tous les sommets frontires
+C            Nadd (1: Nadmsr+1), Kadd <=> Sky Line list of the send nodes concerns / All the Sommets Frontiers
              NADD(1:NADMSR+1)=0
              CALL I25PREP_ADD(
      1      NIN    ,NI25     ,NSN          ,NSNR      ,ITAB     ,
@@ -412,17 +410,17 @@ C
           IF(IPARI(36,NIN)> 0.AND.PARAMETERS%INTCAREA > 0) IFSUB_CAREA = 1
           ITYP  = 25
 
-C         filtrer => ne garder que les anciens impacts + les candidats au glissement 
+C         filter => keep only old impacts + candidates for sliding
           IF(NSPMD > 1) THEN
-C           Output : Pour cette interface , liste de nds a ajouter a NSNFI
+C           output: for this interface, list of nodes to add to nsnfi
 
 
 C ============================================================================
-C Deux approches possibles:
+C Two possible approaches:
 C                    1                                2
-C    -Wait toutes les procs (synchro)   |  - Wait sur une taille
-C    -Allocation de XREM/IREM           |  - Reception dans dans RBUFR/IBUFR 
-C    -Reception dans XREM/IREM          |  - Copie de *BUFR -> *REM
+C    wait for all procs (sync) | wait on a size
+C    allocation of xrem/irem | reception in rbufr/ibufr
+C    reception in xrem/irem | copy from *bufr to *rem
 C
 C  Ici on teste (2)  
             NB_TOT = 0
@@ -461,8 +459,8 @@ C===============================================================================
            I_STOK_GLO = INTBUF_TAB(NIN)%I_STOK(2)
 
            IF(NSPMD > 1) THEN
-C : on ne change pas NSNR dans IPARI depuis SPMD_I25_SLIDE_GAT, donc NSNR n est plus la taille
-C : des structures FI 
+C : we do not change nsnr in iPari since SPMD_I25_Slide_gat, so nsnr is no longer the size
+C of fi structures
 C
              CALL SPMD_I25_SLIDE_GAT(NSN  ,NIN, NI25,
      2                               IGAP  ,NSNR   ,INTTH   ,ILEV, INTBUF_TAB(NIN), 
@@ -470,11 +468,11 @@ C
      4                               INTFRIC,FLAGREMN,LREMNORMAX,NRTM,IVIS2       ,
      5                               ISTIF_MSDT,IFSUB_CAREA,NODADT_THERM)
         ! Passer intbuftab(nin)
-C : Les noeuds qui glissent de P0 vers P1 et qui sont locaux a P1 se trouvent quand
-C : meme dans la structure frontiere *FI(NIN)%P a la position du proc P1
-C : Soit  - remplir les structures locales au lieu des structures *FI directement dans SPMD_I25_SLIDE_GAT
-C :       - remplir les structures locales dans une routine a partir des *FI(NIN)%P([P0 ; P1 ; P2 ... ... ]) 
-C :       - Retirer ces NS de XREM et IREM lors de la copie des [IR]BUFR vers [IX]REM  
+C nodes that slide from p0 to p1 and are local to p1 are found when
+C even in the boundary structure *fi(nin)%p at the position of proc p1
+C either - fill the local structures instead of the *fi structures directly in spmd_i25_slide_gat
+C - fill the local structures in a routine from *fi(nin)%p([p0 ; p1 ; p2 ... ... ])
+C - remove these ns from xrem and irem when copying from [ir]bufr to [ix]rem
 
               IPARI(24,NIN) = NSNR
            ENDIF

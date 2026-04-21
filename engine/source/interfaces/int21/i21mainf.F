@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21mainf           ../engine/source/interfaces/int21/i21mainf.F
-      !||--- called by ------------------------------------------------------
-      !||    intfop2            ../engine/source/interfaces/interf/intfop2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../engine/source/output/message/message.F
-      !||    arret              ../engine/source/system/arret.F
-      !||    i21ass3            ../engine/source/interfaces/int21/i21ass3.F
-      !||    i21cor3            ../engine/source/interfaces/int21/i21cor3.F
-      !||    i21for3            ../engine/source/interfaces/int21/i21for3.F
-      !||    i21sms2            ../engine/source/interfaces/int21/i21sms2.F
-      !||    i21therm           ../engine/source/interfaces/int21/i21therm.F
-      !||    i7cdcor3           ../engine/source/interfaces/int07/i7cdcor3.F
-      !||    startime           ../engine/source/system/timer_mod.F90
-      !||    stoptime           ../engine/source/system/timer_mod.F90
-      !||    sum_6_float_sens   ../engine/source/system/parit.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||    intstamp_mod       ../engine/share/modules/intstamp_mod.F
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||    outputs_mod        ../common_source/modules/outputs_mod.F
-      !||    timer_mod          ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE I21MAINF(TIMERS,
+!||====================================================================
+!||    i21mainf                   ../engine/source/interfaces/int21/i21mainf.F
+!||--- called by ------------------------------------------------------
+!||    intfop2                    ../engine/source/interfaces/interf/intfop2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../engine/source/output/message/message.F
+!||    arret                      ../engine/source/system/arret.F
+!||    frictionparts_model_isot   ../engine/source/interfaces/int07/frictionparts_model.F
+!||    i21ass3                    ../engine/source/interfaces/int21/i21ass3.F
+!||    i21cor3                    ../engine/source/interfaces/int21/i21cor3.F
+!||    i21for3                    ../engine/source/interfaces/int21/i21for3.F
+!||    i21sms2                    ../engine/source/interfaces/int21/i21sms2.F
+!||    i21therm                   ../engine/source/interfaces/int21/i21therm.F
+!||    i7cdcor3                   ../engine/source/interfaces/int07/i7cdcor3.F
+!||    startime                   ../engine/source/system/timer_mod.F90
+!||    stoptime                   ../engine/source/system/timer_mod.F90
+!||    sum_6_float_sens           ../engine/source/system/parit.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                    ../engine/share/modules/h3d_mod.F
+!||    intbuf_fric_mod            ../common_source/modules/interfaces/intbuf_fric_mod.F90
+!||    intbufdef_mod              ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    intstamp_mod               ../engine/share/modules/intstamp_mod.F
+!||    message_mod                ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod               ../common_source/tools/memory/my_alloc.F90
+!||    output_mod                 ../common_source/modules/output/output_mod.F90
+!||    timer_mod                  ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE I21MAINF(output,TIMERS,
      1                   IPARI  ,INTBUF_TAB         ,X        ,A      ,
      2                   ICODT  ,FSAV    ,V         ,MS       ,ITAB   ,
      3                   STIFN  ,FSKYI   ,ISKY      ,FCONT    ,NIN    ,
@@ -57,16 +61,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      B                   CONDNSKYI,DT2T   ,NELTST   ,ITYPTST ,KINET    ,
      C                   FBSAV6  ,ISENSINT,DIMFB    ,NISKYFI ,H3D_DATA ,
      D                   PSKIDS  ,TAGNCONT,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,
-     E                   DGAPLOADINT,S_LOADPINTER,INTEREFRIC ,NODADT_THERM,THEACCFACT)                   
+     E                   DGAPLOADINT,S_LOADPINTER,INTEREFRIC ,NODADT_THERM,THEACCFACT,
+     F                   INTBUF_FRIC_TAB)                   
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE OUTPUT_MOD
       USE TIMER_MOD
       USE INTSTAMP_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE MESSAGE_MOD
-      USE OUTPUTS_MOD
+      USE MY_ALLOC_MOD
+      USE INTBUF_FRIC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -88,14 +95,16 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "timeri_c.inc"
 #include      "warn_c.inc"
+#include      "macro.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(output_), intent(inout) :: output
       TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER NELTST, ITYPTST, NIN, NSTRF(*), NRTMDIM
       INTEGER IPARI(NPARI,NINTER), ICODT(*),ICONTACT(*),
      .        ITAB(*), ISKY(*), ISKYI_SMS(*), NODNX_SMS(*),
-     .        TAGMSR_I21_SMS, NODGLOB(*), NPC(*),INDEXCONT(*),
+     .         NODGLOB(*), NPC(*),INDEXCONT(*),
      .        TAGCONT(*),KINET(*),
      .        TAGNCONT(NLOADP_HYD_INTER,NUMNOD)
       INTEGER NB_JLT,NB_JLT_NEW,NB_STOK_N,JTASK,
@@ -103,10 +112,12 @@ C-----------------------------------------------
       INTEGER NUM_IMP,NS_IMP(*),NE_IMP(*),IND_IMP(*), WEIGHT(*), 
      .        ISENSINT(*),DIMFB
       INTEGER  , INTENT(IN) :: S_LOADPINTER
-      INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
-     .         LOADP_HYD_INTER(NLOADP_HYD)
+      INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1)
+      INTEGER  , INTENT(IN) :: LOADPINTER(S_LOADPINTER)
+      INTEGER  , INTENT(IN) :: LOADP_HYD_INTER(NLOADP_HYD)
       INTEGER  , INTENT(IN) :: INTEREFRIC
       INTEGER  , INTENT(IN) :: NODADT_THERM
+      ! 
       my_real  , intent(in) :: theaccfact
       my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
       my_real 
@@ -120,25 +131,28 @@ C-----------------------------------------------
       TYPE(INTSTAMP_DATA) INTSTAMP
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE(INTBUF_FRIC_STRUCT_), TARGET, DIMENSION(NINTERFRIC) ::  INTBUF_FRIC_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I_STOK, JLT_NEW, JLT , NFT, J,
-     .        IBC, NOINT, NSEG, ISECIN, IBAG, IADM,
+      INTEGER I, I_STOK, JLT , NFT, J,
+     .        IBC, NOINT, ISECIN, IBAG, IADM,
      .        IGAP, INACTI, IFQ, MFROT, IGSTI, NISUB,
      .        NB_LOC, I_STOK_LOC,DEBUT,
-     .        INTTH,IFORM, NCAND, MSTR, ILEV, IKTHE, IROT, H,
-     .        IFORM_THE,INVN,IFTLIM, IERROR, NINSKID
+     .        INTTH,IFORM, MSTR, ILEV, IKTHE, IROT, H,
+     .        IFORM_THE,INVN,IFTLIM, IERROR, NINSKID,INTFRIC, 
+     .        NSETPRTS ,NPARTFRIC,JJ,IORTHFRIC,NTY
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ),
-     .        CAND_N_N(MVSIZ), CAND_E_N(MVSIZ), INDEX2(LINDMAX),
+     .        CAND_N_N(MVSIZ), CAND_E_N(MVSIZ), 
      .        NSMS(MVSIZ)
+      INTEGER,DIMENSION(:),ALLOCATABLE :: INDEX2
       INTEGER :: NSN 
 C     REAL
       my_real
      .   STARTT, FRIC, GAP, STOPT,
-     .   VISC,STIGLO,GAPMIN,
-     .   KMIN, KMAX, GAPMAX, KTHE, XTHE, TINT, RHOH, DTI ,PMAXSKID
+     .   VISC,STIGLO,GAPMIN,VISCF,
+     .   KMIN, KMAX, GAPMAX, KTHE, XTHE, TINT, DTI ,PMAXSKID
 C-----------------------------------------------
 C     REAL
       my_real
@@ -159,17 +173,35 @@ C     REAL
      .   EFRIC_L(MVSIZ)
       my_real
      .     RCURVI(MVSIZ), ANGLMI(MVSIZ), ANGLT, PADM
-      INTEGER NRTMFT, NRTMLT, NRADM, ITRIA(MVSIZ)
+      INTEGER   NRADM, ITRIA(MVSIZ)
       my_real
      .    FNI(MVSIZ),
      .    FXT(MVSIZ), FYT(MVSIZ), FZT(MVSIZ),
      .    FXN(MVSIZ), FYN(MVSIZ), FZN(MVSIZ),
-     .    VXM, VYM, VZM, FX, FY, FZ, STF, PMAX,
+     .    VXM, VYM, VZM, PMAX,
      .    XG(3), ROT(9), WXM, WYM, WZM, FRAD, DRAD, FHEAT, XFRIC,DCOND
       INTEGER ICURV,SFSAVPARIT,IFRIC,FCOND
       my_real
      .     , DIMENSION(:,:,:), ALLOCATABLE :: FSAVPARIT
-C---------------------------------------------------- 
+      my_real
+     .    FRIC_COEFS(MVSIZ,10),VISCFFRIC(MVSIZ),FRICC(MVSIZ)
+
+      INTEGER IPARTFRICSI(MVSIZ), IPARTFRICMI(MVSIZ)
+
+      INTEGER, DIMENSION(:) ,POINTER  :: TABCOUPLEPARTS_FRIC
+      INTEGER, DIMENSION(:) ,POINTER  :: TABPARTS_FRIC 
+      INTEGER, DIMENSION(:) ,POINTER  :: ADPARTS_FRIC
+      INTEGER, DIMENSION(:) ,POINTER  :: IFRICORTH  
+      my_real, DIMENSION(:) ,POINTER  :: TABCOEF_FRIC
+ 
+      INTEGER,TARGET, DIMENSION(1):: TABCOUPLEPARTS_FRIC_BID
+      INTEGER,TARGET, DIMENSION(1):: TABPARTS_FRIC_BID
+      INTEGER,TARGET, DIMENSION(1):: ADPARTS_FRIC_BID
+      INTEGER,TARGET, DIMENSION(1):: IFRICORTH_BID
+      my_real,TARGET, DIMENSION(1):: TABCOEF_FRIC_BID
+C----------------------------------------------------
+      CALL MY_ALLOC(INDEX2,LINDMAX)
+C----------------------------------------------------
 C
       NSN   =IPARI(5,NIN) 
       IBC   =IPARI(11,NIN)
@@ -244,6 +276,25 @@ C
        NINSKID = H3D_DATA%N_SKID_INTER(NIN)
       ENDIF
       PMAXSKID=INTBUF_TAB%VARIABLES(35)
+
+C--- Corresponding Friction model  
+      INTFRIC=IPARI(72,NIN)
+      NSETPRTS = 0
+      NPARTFRIC = 0
+      IF(INTFRIC /= 0) THEN 
+         TABCOUPLEPARTS_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABCOUPLEPARTS_FRIC
+         TABCOEF_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABCOEF_FRIC
+         TABPARTS_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABPARTS_FRIC
+         ADPARTS_FRIC   => INTBUF_FRIC_TAB(INTFRIC)%ADPARTS_FRIC 
+         NSETPRTS =   INTBUF_FRIC_TAB(INTFRIC)%NSETPRTS
+         NPARTFRIC =   INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC
+      ELSE
+         TABCOUPLEPARTS_FRIC  => TABCOUPLEPARTS_FRIC_BID
+         TABPARTS_FRIC  => TABPARTS_FRIC_BID
+         TABCOEF_FRIC  => TABCOEF_FRIC_BID 
+         ADPARTS_FRIC   => ADPARTS_FRIC_BID
+         IFRICORTH   => IFRICORTH_BID
+      ENDIF
 C
 c----------------------------------------------------
 C   IADM!=0 + Icurv!=0 non available (starter error).
@@ -251,7 +302,7 @@ c----------------------------------------------------
         I_STOK = INTBUF_TAB%I_STOK(1)
 
 C
-C decoupage statique
+C static decoupage
         NB_LOC = I_STOK / NTHREAD
         IF (JTASK==NTHREAD) THEN
           I_STOK_LOC = I_STOK-NB_LOC*(NTHREAD-1)
@@ -316,11 +367,11 @@ c------------------------------------------------
 C
         DO NFT = 0 , I_STOK - 1 , NVSIZ
           JLT = MIN( NVSIZ, I_STOK - NFT )
-C preparation candidats retenus
+C preparation CANDIDATES retenus
             CALL I7CDCOR3(
      1         JLT,INDEX2(NFT+1),INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
      2         CAND_E_N,CAND_N_N)
-C cand_n et cand_e remplace par cand_n_n et cand_e_n
+C cand_n and cand_e replaced by cand_n_n and cand_e_n
             CALL I21COR3(
      1  JLT    ,NIN       ,X   ,INTBUF_TAB%IRECTM,NSN   ,
      2  INTBUF_TAB%NSV,CAND_E_N ,CAND_N_N ,INTBUF_TAB%STF,
@@ -347,7 +398,27 @@ C cand_n et cand_e remplace par cand_n_n et cand_e_n
      K  Y4   ,Z4      ,DRAD    ,PENRAD  ,TINT   ,
      L  TEMPM   ,IFORM_THE ,H1           ,H2      ,H3           ,
      M  H4       ,DIST      ,ITAB         ,NOINT   ,INTBUF_TAB%VARIABLES(23),
-     N  INVN     )
+     N  INVN  , INTFRIC,INTBUF_TAB%IPARTFRICS,IPARTFRICSI,INTBUF_TAB%IPARTFRICM,
+     O  IPARTFRICMI,IPARI(5,NIN) )
+
+C-------------------------------------------------------------------------------
+C Friction model : computation of friction coefficients based on Material of connected Parts
+C-------------------------------------------------------------------------------
+        IF(JTASK==1) CALL STARTIME(TIMERS,MACRO_TIMER_FRIC)
+        VISCF = ZERO
+        IORTHFRIC = 0
+        JJ = 0
+        NTY = 21
+        CALL FRICTIONPARTS_MODEL_ISOT(
+     1       INTFRIC        ,JLT          ,IPARTFRICSI  ,IPARTFRICMI  ,ADPARTS_FRIC   ,
+     2       NSETPRTS       ,TABCOUPLEPARTS_FRIC,NPARTFRIC,TABPARTS_FRIC,TABCOEF_FRIC ,
+     3       FRIC           ,VISCF        ,INTBUF_TAB%FRIC_P,FRIC_COEFS   , FRICC     ,
+     4       VISCFFRIC      ,NTY          ,MFROT            ,IORTHFRIC    ,IFRIC       ,
+     5       JJ             , TINT        ,TEMPI            ,NPC          ,TF          ,
+     6       TEMP           , H1          ,H2               ,H3           ,H4          ,
+     7       IX1            , IX2         ,IX3              ,IX4          ,IFORM       ) 
+
+        IF(JTASK==1) CALL STOPTIME(TIMERS,MACRO_TIMER_FRIC)
           
           IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
 
@@ -356,30 +427,29 @@ C cand_n et cand_e remplace par cand_n_n et cand_e_n
      .      NB_JLT_NEW = NB_JLT_NEW + JLT         
 C
               CALL I21FOR3(
-     1  JLT       ,NIN  ,NOINT        ,IBC  ,ICODT        ,
-     2  FSAV       ,GAP  ,STIGLO       ,FRIC  ,VISC        ,
-     3  INACTI       ,MFROT  ,IFQ        ,IBAG  ,IADM        ,
-     4  IPARI(39,NIN),STIF  ,GAPV        ,ITAB  ,
-     5  INTBUF_TAB%PENIS,INTBUF_TAB%FROT_P,INTBUF_TAB%ALPHA0,INTBUF_TAB%IFPEN,
-     6  ICONTACT  ,   RCONTACT  ,ACONTACT ,PCONTACT  ,
-     7  NSVG       ,X1  ,Y1        ,Z1  ,X2        ,
-     8  Y2       ,Z2  ,X3        ,Y3  ,Z3        ,
-     9  X4       ,Y4  ,Z4        ,XI  ,YI        ,
-     A  ZI       ,VXI  ,VYI        ,VZI  ,MSI        ,
-     B  VXM       ,VYM  ,VZM        ,NX  ,NY        ,
-     C  NZ       ,PENE  ,FXT        ,FYT  ,FZT        ,
-     D  FXN       ,FYN  ,FZN        ,RCURVI  ,ANGLMI       ,
-     E  PADM       ,CAND_N_N  ,WEIGHT       ,IGAP  ,GAP0        ,
-     F  AREA0       ,PMAX  ,IROT        ,XG  ,MXI        ,
-     G  MYI       ,MZI  ,STRI        ,WXM  ,WYM        ,
-     H  WZM       ,XP  ,YP        ,ZP  ,KT        ,
-     I  C       ,ILEV  ,FNI        ,INTTH  ,FHEAT        ,
-     J  EFRICT       ,QFRICINT(NIN),IFRIC     ,XFRIC    ,TEMPI        ,
-     K  TEMPM        ,NPC       ,TF           ,IX1      ,IX2          ,
-     L  IX3          ,IX4       ,DT2T         ,NELTST   ,ITYPTST      ,
-     M  KINET        ,NISUB     ,ISENSINT     ,FSAVPARIT,NFT          ,
-     N  IFTLIM       ,NINSKID   ,PRATIO       ,PMAXSKID ,INTEREFRIC   ,
-     O  EFRIC_L      )
+     1  JLT       ,NIN    ,NOINT        ,IBC    ,ICODT             ,
+     2  FSAV      ,GAP    ,STIGLO       ,VISC   ,INACTI            ,
+     3  MFROT     ,IFQ    ,IBAG         ,IADM   ,IPARI(39,NIN)     ,
+     4  STIF      ,GAPV   ,ITAB ,INTBUF_TAB%PENIS,INTBUF_TAB%ALPHA0,
+     5  INTBUF_TAB%IFPEN  ,ICONTACT     ,RCONTACT,ACONTACT ,PCONTACT,
+     6  NSVG      ,X1     ,Y1           ,Z1      ,X2                ,
+     7  Y2        ,Z2     ,X3           ,Y3      ,Z3                ,
+     8  X4        ,Y4     ,Z4           ,XI      ,YI                ,
+     9  ZI        ,VXI    ,VYI          ,VZI     ,MSI               ,
+     A  VXM       ,VYM    ,VZM          ,NX      ,NY                ,
+     B  NZ        ,PENE   ,FXT          ,FYT     ,FZT               ,
+     C  FXN       ,FYN    ,FZN          ,RCURVI  ,ANGLMI            ,
+     D  PADM      ,CAND_N_N,WEIGHT      ,IGAP    ,GAP0              ,
+     E  AREA0     ,PMAX   ,IROT         ,XG      ,MXI               ,
+     G  MYI       ,MZI    ,STRI         ,WXM     ,WYM               ,
+     H  WZM       ,XP     ,YP           ,ZP      ,KT                ,
+     I  C         ,ILEV   ,FNI          ,INTTH   ,FHEAT             ,
+     J  EFRICT    ,QFRICINT(NIN),IFRIC  ,XFRIC    ,TEMPI            ,
+     K  TEMPM     ,NPC       ,TF        ,IX1      ,IX2              ,
+     L  IX3       ,IX4       ,DT2T      ,NELTST   ,ITYPTST          ,
+     M  KINET     ,NISUB     ,ISENSINT  ,FSAVPARIT,NFT              ,
+     N  IFTLIM    ,NINSKID   ,PRATIO    ,PMAXSKID ,INTEREFRIC       ,
+     O  EFRIC_L   ,FRICC     ,FRIC_COEFS)
 C
           IF( INTTH > 0 ) THEN 
            CALL I21THERM(JLT   ,XI     ,YI    ,ZI    ,KTHE  ,
@@ -412,7 +482,7 @@ C
             STIF(1:JLT)=ZERO
           END IF
 C
-            CALL I21ASS3(JLT       ,A        ,NIN      ,NOINT    ,FXN    ,
+            CALL I21ASS3(output, JLT       ,A        ,NIN      ,NOINT    ,FXN    ,
      2      FYN      ,FZN      ,FXT      ,FYT      ,FZT    ,
      3      IX1      ,IX2      ,IX3      ,IX4      ,NSVG   ,
      4      FCONT    ,FNCONT   ,FTCONT   ,LB       ,LC     ,
@@ -443,6 +513,7 @@ c
      .                            FBSAV6, 12, 6, DIMFB, ISENSINT )
         ENDIF
         IF (ALLOCATED(FSAVPARIT)) DEALLOCATE (FSAVPARIT)
+        DEALLOCATE(INDEX2)
 C
       RETURN
       END

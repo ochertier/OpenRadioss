@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    load_pressure         ../engine/source/loads/general/load_pressure/load_pressure.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    get_u_numsens         ../engine/source/user_interface/usensor.F
-      !||    get_u_sens_fpar       ../engine/source/user_interface/usensor.F
-      !||    get_u_sens_ipar       ../engine/source/user_interface/usensor.F
-      !||    get_u_sens_value      ../engine/source/user_interface/usensor.F
-      !||    set_u_sens_value      ../engine/source/user_interface/usensor.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||    th_surf_mod           ../common_source/modules/interfaces/th_surf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    load_pressure         ../engine/source/loads/general/load_pressure/load_pressure.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    finter                ../engine/source/tools/curve/finter.F
+!||    get_u_numsens         ../engine/source/user_interface/usensor.F
+!||    get_u_sens_fpar       ../engine/source/user_interface/usensor.F
+!||    get_u_sens_ipar       ../engine/source/user_interface/usensor.F
+!||    get_u_sens_value      ../engine/source/user_interface/usensor.F
+!||    set_u_sens_value      ../engine/source/user_interface/usensor.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod               ../engine/share/modules/h3d_mod.F
+!||    pblast_mod            ../common_source/modules/loads/pblast_mod.F90
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||    th_surf_mod           ../common_source/modules/interfaces/th_surf_mod.F
+!||====================================================================
       SUBROUTINE LOAD_PRESSURE (ILOADP          ,LOADP       ,LLOADP   ,NPC     ,TF        ,
      2                          A               ,V           ,X       ,SKEW     ,SENSOR_TAB,
      3                          IADC            ,FSKY        ,FEXT    ,TAGNCONT ,NSENSOR   ,
@@ -316,7 +317,7 @@ C
                     AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
                     DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
                        KSURF = TH_SURF%LOADP_SEGS(NS)
-                       th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AA
+                       th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AREA*AA
                        th_surf%channels(5,KSURF)= th_surf%channels(5,KSURF) + AREA
                     ENDDO
                   ENDIF
@@ -437,7 +438,7 @@ C
                     AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
                     DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
                        KSURF = TH_SURF%LOADP_SEGS(NS)
-                       th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AA
+                       th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AREA*AA
                        th_surf%channels(5,KSURF)= th_surf%channels(5,KSURF) + AREA
                     ENDDO
                   ENDIF
@@ -453,9 +454,8 @@ C
 C
        ENDDO
 C
-#include "atomic.inc"
+!$OMP ATOMIC
        WFEXT = WFEXT + WFEXTT
-#include "atomend.inc"
 C
       ELSE
 C-------------------------
@@ -689,7 +689,7 @@ C
                     AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
                     DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
                        KSURF = TH_SURF%LOADP_SEGS(NS)
-                       th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AA
+                       th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AREA*AA
                        th_surf%channels(5,KSURF)= th_surf%channels(5,KSURF) + AREA
                     ENDDO
                   ENDIF
@@ -813,7 +813,7 @@ C
                     AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
                     DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
                        KSURF = TH_SURF%LOADP_SEGS(NS)
-                       th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AA
+                       th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AREA*AA
                        th_surf%channels(5,KSURF)= th_surf%channels(5,KSURF) + AREA
                     ENDDO
                   ENDIF
@@ -830,9 +830,8 @@ C
 C
        ENDDO
 C
-#include "atomic.inc"
+!$OMP ATOMIC
         WFEXT = WFEXT + WFEXTT
-#include "atomend.inc"
 C
       ENDIF
       RETURN

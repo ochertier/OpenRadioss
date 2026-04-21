@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sortho12   ../engine/source/elements/solid/solide/sortho12.F
-      !||--- called by ------------------------------------------------------
-      !||    srcoor12   ../engine/source/elements/solid/solide/srcoor12.F
-      !||====================================================================
+!||====================================================================
+!||    sortho12   ../engine/source/elements/solid/solide/sortho12.F
+!||--- called by ------------------------------------------------------
+!||    srcoor12   ../engine/source/elements/solid/solide/srcoor12.F
+!||====================================================================
       SUBROUTINE SORTHO12(
      1   OFF,     RX,      RY,      RZ,
      2   SX,      SY,      SZ,      TX,
@@ -123,7 +123,7 @@ c
 c
  100  CONTINUE
       IF (N < NITER) GOTO 111
-c     norme et orthogonalisation
+c     norm and orthogonalization
 c~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       DO 200 I=1,NEL
        IF (OFF(I) <= ONE ) CYCLE 

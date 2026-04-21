@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10bilan              ../engine/source/elements/solid/solide10/s10bilan.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3              ../engine/source/elements/solid/solide10/s10forc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s10bilan              ../engine/source/elements/solid/solide10/s10bilan.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3              ../engine/source/elements/solid/solide10/s10forc3.F
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE S10BILAN(PARTSAV,EINT,RHO,RK,VOL,
      .   VX, VY, VZ, NX, VNEW,IPARTS,
      .   GRESAV,GRTH,IGRTH,IEXPAN,EINTTH,
-     .   FILL  ,X, Y, Z,ITASK,IPARG,OFFG,SENSORS)
+     .   FILL  ,X, Y, Z,ITASK,IPARG,OFFG,SENSORS, 
+     .   NEL, L_WPLA, WPLA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -60,18 +61,20 @@ C     REAL
      .  VX(MVSIZ,10),VY(MVSIZ,10),VZ(MVSIZ,10),
      .  NX(MVSIZ,10),VNEW(*),GRESAV(*),EINTTH(*),
      .  FILL(*),
-     .  X(MVSIZ,10),Y(MVSIZ,10),Z(MVSIZ,10)
+     .  X(MVSIZ,10),Y(MVSIZ,10),Z(MVSIZ,10)   
       INTEGER IEXPAN,ITASK,
      .  IPARTS(*),GRTH(*),IGRTH(*),IPARG(*)
       my_real, INTENT(IN) :: OFFG(MVSIZ)
       type (sensors_),INTENT(INOUT) :: SENSORS
+      INTEGER, INTENT(IN) :: NEL,L_WPLA
+      my_real,DIMENSION(NEL*L_WPLA),INTENT(IN) :: WPLA   
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, M,N, FLAG
 C     REAL
       my_real
-     .   X1,Y1,Z1,VXM,VYM,VZM,
+     .   
      .   VXA(MVSIZ), VYA(MVSIZ) , VZA(MVSIZ), 
      .   VA2(MVSIZ), XMAS(MVSIZ),
      .   OFF(MVSIZ), EI(MVSIZ) , EK(MVSIZ),
@@ -85,15 +88,15 @@ C     REAL
      .   IXY(MVSIZ), IYZ(MVSIZ), IZX(MVSIZ),
      .   REI(MVSIZ), REK(MVSIZ), FAC, AM, BM, CM,
      .   OFF_L(MVSIZ)
-      INTEGER IPERM1(10),IPERM2(10),N1,N2
+      INTEGER IPERM1(10),IPERM2(10)
       DATA IPERM1/0,0,0,0,1,2,3,1,2,3/
       DATA IPERM2/0,0,0,0,2,3,1,4,4,4/
 C-----------------------------------------------
-      FLAG = IPARG(80) ! Flag pour sorties additionnelles
+      FLAG = IPARG(80) ! flag for additional outputs
 C-----------------------------------------------
 C     CALCUL BILAN SORTIES DEF 
 C-----------------------------------------------
-      FAC=TRHEE_OVER_14
+      FAC=THREE_OVER_14
 C
       IF(ISROT == 0)THEN
         AM = FAC/(FOUR*FAC + SIX)
@@ -171,6 +174,7 @@ C
         PARTSAV(4,M)=PARTSAV(4,M) + YM(I)
         PARTSAV(5,M)=PARTSAV(5,M) + ZM(I)
         IF (OFFG(I) >= ONE) PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I)
+        IF (L_WPLA > 0)  PARTSAV(29,M)=PARTSAV(29,M) + WPLA(I)
       ENDDO
 C
 C-----------------------------------------------

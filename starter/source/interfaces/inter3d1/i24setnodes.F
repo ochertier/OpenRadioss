@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24setnodes     ../starter/source/interfaces/inter3d1/i24setnodes.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur          ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||    ifrontplus      ../starter/source/spmd/node/frontplus.F
-      !||    intersurfl      ../starter/source/spmd/node/ddtools.F
-      !||    nlocal          ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    front_mod       ../starter/share/modules1/front_mod.F
-      !||    i7i10splitmod   ../starter/share/modules1/i710split_mod.F
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i24setnodes     ../starter/source/interfaces/inter3d1/i24setnodes.F
+!||--- called by ------------------------------------------------------
+!||    lectur          ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../starter/source/output/message/message.F
+!||    ifrontplus      ../starter/source/spmd/node/frontplus.F
+!||    intersurfl      ../starter/source/spmd/node/ddtools.F
+!||    nlocal          ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    front_mod       ../starter/share/modules1/front_mod.F
+!||    i7i10splitmod   ../starter/share/modules1/i710split_mod.F
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I24SETNODES(IPARI,INTBUF_TAB,INTERCEP,ITAB,I24MAXNSNE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -90,7 +90,7 @@ C domain than MAIN surface
           I24MAXNSNE = MAX(I24MAXNSNE,NSNE)
           IF (IEDGE4 > 0 ) THEN
             IF (.NOT.(ASSOCIATED(INTERCEP(2,NI)%P)))THEN
-C             In Type24 INTERCEP(2 gives Edge MPI Domain
+C             In Type24 INTERCEP(2) gives Edge MPI Domain
               ALLOCATE(INTERCEP(2,NI)%P(NRTSE))
             ENDIF    
 C 
@@ -131,14 +131,14 @@ C
       END
 
 
-      !||====================================================================
-      !||    secnd_surface_on_domain   ../starter/source/interfaces/inter3d1/i24setnodes.F
-      !||--- called by ------------------------------------------------------
-      !||    ipari_l_ini               ../starter/source/restart/ddsplit/ipari_l_ini.F
-      !||    prepare_split_i24         ../starter/source/restart/ddsplit/inter_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    front_mod                 ../starter/share/modules1/front_mod.F
-      !||====================================================================
+!||====================================================================
+!||    secnd_surface_on_domain   ../starter/source/interfaces/inter3d1/i24setnodes.F
+!||--- called by ------------------------------------------------------
+!||    ipari_l_ini               ../starter/source/restart/ddsplit/ipari_l_ini.F
+!||    prepare_split_i24         ../starter/source/restart/ddsplit/inter_tools.F
+!||--- uses       -----------------------------------------------------
+!||    front_mod                 ../starter/share/modules1/front_mod.F
+!||====================================================================
       INTEGER FUNCTION SECND_SURFACE_ON_DOMAIN(INTERCEP,SE,PROC)
 C-----------------------------------------------
 C   M o d u l e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mintp_rt             ../common_source/eos/mintp_rt.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_eos_sesame   ../starter/source/materials/eos/hm_read_eos_sesame.F
-      !||    hm_read_mat26        ../starter/source/materials/mat/mat026/hm_read_mat26.F
-      !||    m26th                ../engine/source/materials/mat/mat026/m26th.F
-      !||    sesa20               ../engine/source/materials/mat/mat026/sesa20.F
-      !||    sesame               ../common_source/eos/sesame.F
-      !||--- calls      -----------------------------------------------------
-      !||    minter1d_rat         ../common_source/eos/minter1d_rat.F
-      !||====================================================================
+!||====================================================================
+!||    mintp_rt             ../common_source/eos/mintp_rt.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_eos_sesame   ../starter/source/materials/eos/hm_read_eos_sesame.F
+!||    hm_read_mat26        ../starter/source/materials/mat/mat026/hm_read_mat26.F
+!||    m26th                ../engine/source/materials/mat/mat026/m26th.F
+!||    sesa20               ../engine/source/materials/mat/mat026/sesa20.F
+!||    sesame               ../common_source/eos/sesame.F
+!||--- calls      -----------------------------------------------------
+!||    minter1d_rat         ../common_source/eos/minter1d_rat.F
+!||====================================================================
       SUBROUTINE MINTP_RT(XX,NX,YY,NY,ZZ,X,Y,Z,DZDX)
 C=======================================================================
 C
@@ -66,87 +66,87 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NX, NY
+        INTEGER NX, NY
 C     REAL
-      my_real
-     .   X, Y, Z, DZDX
+        my_real
+     .     X, Y, Z, DZDX
 C     REAL
-      my_real
-     .   XX(NX), YY(NY), ZZ(NX,NY)
+        my_real
+     .     XX(NX), YY(NY), ZZ(NX,NY)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IX, IY, IXM1, IXP1, IXP2, IYM1, IYP1, IYP2
+        INTEGER IX, IY, IXM1, IXP1, IXP2, IYM1, IYP1, IYP2
 C     REAL
-      my_real
-     .   XX0, XX1, XX2, XX3, ZZ00, ZZ10, ZZ20, ZZ30, ZZ01, ZZ11, ZZ21,
-     .   ZZ31, ZZ02, ZZ12, ZZ22, ZZ32, ZZ03, ZZ13, ZZ23, ZZ33, Z0,
-     .   DZDX0, Z1, DZDX1, Z2, DZDX2, Z3, DZDX3, DZDY, D2ZDXDY
+        my_real
+     .     XX0, XX1, XX2, XX3, ZZ00, ZZ10, ZZ20, ZZ30, ZZ01, ZZ11, ZZ21,
+     .     ZZ31, ZZ02, ZZ12, ZZ22, ZZ32, ZZ03, ZZ13, ZZ23, ZZ33, Z0,
+     .     DZDX0, Z1, DZDX1, Z2, DZDX2, Z3, DZDX3, DZDY, D2ZDXDY
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER MINDEX
+        INTEGER MINDEX
 C-----------------------------------------------
-      IX = MINDEX(XX,1,NX,X)
-      IY = MINDEX(YY,1,NY,Y)
+        IX = MINDEX(XX,1,NX,X)
+        IY = MINDEX(YY,1,NY,Y)
 C
-      IX = MAX(1,MIN(NX-1,IX))
-      IY = MAX(1,MIN(NY-1,IY))
+        IX = MAX(1,MIN(NX-1,IX))
+        IY = MAX(1,MIN(NY-1,IY))
 C
-      IX = MAX(1,MIN(NX-1,IX))
-      IY = MAX(1,MIN(NY-1,IY))
+        IX = MAX(1,MIN(NX-1,IX))
+        IY = MAX(1,MIN(NY-1,IY))
 C
-      IXM1 = MAX(1,IX-1)
-      IXP1 = IX+1
-      IXP2 = MIN(NX,IX+2)
+        IXM1 = MAX(1,IX-1)
+        IXP1 = IX+1
+        IXP2 = MIN(NX,IX+2)
 C
-      IYM1 = MAX(1,IY-1)
-      IYP1 = IY+1
-      IYP2 = MIN(NY,IY+2)
+        IYM1 = MAX(1,IY-1)
+        IYP1 = IY+1
+        IYP2 = MIN(NY,IY+2)
 C
-      XX0 = XX(IXM1)
-      XX1 = XX(IX)
-      XX2 = XX(IXP1)
-      XX3 = XX(IXP2)
+        XX0 = XX(IXM1)
+        XX1 = XX(IX)
+        XX2 = XX(IXP1)
+        XX3 = XX(IXP2)
 C
-      ZZ00 = ZZ(IXM1,IYM1)
-      ZZ10 = ZZ(IX  ,IYM1)
-      ZZ20 = ZZ(IXP1,IYM1)
-      ZZ30 = ZZ(IXP2,IYM1)
+        ZZ00 = ZZ(IXM1,IYM1)
+        ZZ10 = ZZ(IX  ,IYM1)
+        ZZ20 = ZZ(IXP1,IYM1)
+        ZZ30 = ZZ(IXP2,IYM1)
 C
-      ZZ01 = ZZ(IXM1,IY)
-      ZZ11 = ZZ(IX  ,IY)
-      ZZ21 = ZZ(IXP1,IY)
-      ZZ31 = ZZ(IXP2,IY)
+        ZZ01 = ZZ(IXM1,IY)
+        ZZ11 = ZZ(IX  ,IY)
+        ZZ21 = ZZ(IXP1,IY)
+        ZZ31 = ZZ(IXP2,IY)
 C
-      ZZ02 = ZZ(IXM1,IYP1)
-      ZZ12 = ZZ(IX  ,IYP1)
-      ZZ22 = ZZ(IXP1,IYP1)
-      ZZ32 = ZZ(IXP2,IYP1)
+        ZZ02 = ZZ(IXM1,IYP1)
+        ZZ12 = ZZ(IX  ,IYP1)
+        ZZ22 = ZZ(IXP1,IYP1)
+        ZZ32 = ZZ(IXP2,IYP1)
 C
-      ZZ03 = ZZ(IXM1,IYP2)
-      ZZ13 = ZZ(IX  ,IYP2)
-      ZZ23 = ZZ(IXP1,IYP2)
-      ZZ33 = ZZ(IXP2,IYP2)
+        ZZ03 = ZZ(IXM1,IYP2)
+        ZZ13 = ZZ(IX  ,IYP2)
+        ZZ23 = ZZ(IXP1,IYP2)
+        ZZ33 = ZZ(IXP2,IYP2)
 C
-      CALL MINTER1D_RAT(
-     +  XX0 ,XX1 ,XX2 ,XX3 ,ZZ00 ,ZZ10 ,ZZ20 ,ZZ30 ,X ,Z0 ,DZDX0,IX,NX)
-      CALL MINTER1D_RAT(
-     +  XX0 ,XX1 ,XX2 ,XX3 ,ZZ01 ,ZZ11 ,ZZ21 ,ZZ31 ,X ,Z1 ,DZDX1,IX,NX)
-      CALL MINTER1D_RAT(
-     +  XX0 ,XX1 ,XX2 ,XX3 ,ZZ02 ,ZZ12 ,ZZ22 ,ZZ32 ,X ,Z2 ,DZDX2,IX,NX)
-      CALL MINTER1D_RAT(
-     +  XX0 ,XX1 ,XX2 ,XX3 ,ZZ03 ,ZZ13 ,ZZ23 ,ZZ33 ,X ,Z3 ,DZDX3,IX,NX)
+        CALL MINTER1D_RAT(
+     +    XX0 ,XX1 ,XX2 ,XX3 ,ZZ00 ,ZZ10 ,ZZ20 ,ZZ30 ,X ,Z0 ,DZDX0,IX,NX)
+        CALL MINTER1D_RAT(
+     +    XX0 ,XX1 ,XX2 ,XX3 ,ZZ01 ,ZZ11 ,ZZ21 ,ZZ31 ,X ,Z1 ,DZDX1,IX,NX)
+        CALL MINTER1D_RAT(
+     +    XX0 ,XX1 ,XX2 ,XX3 ,ZZ02 ,ZZ12 ,ZZ22 ,ZZ32 ,X ,Z2 ,DZDX2,IX,NX)
+        CALL MINTER1D_RAT(
+     +    XX0 ,XX1 ,XX2 ,XX3 ,ZZ03 ,ZZ13 ,ZZ23 ,ZZ33 ,X ,Z3 ,DZDX3,IX,NX)
 C
-      CALL MINTER1D_RAT(
-     +         YY(IYM1) ,YY(IY) ,YY(IYP1) ,YY(IYP2),
-     +         Z0       ,Z1     ,Z2       ,Z3      ,
-     +         Y        ,Z      ,DZDY     ,IY      ,NY)
+        CALL MINTER1D_RAT(
+     +           YY(IYM1) ,YY(IY) ,YY(IYP1) ,YY(IYP2),
+     +           Z0       ,Z1     ,Z2       ,Z3      ,
+     +           Y        ,Z      ,DZDY     ,IY      ,NY)
 C
-      CALL MINTER1D_RAT(
-     +         YY(IYM1) ,YY(IY) ,YY(IYP1) ,YY(IYP2),
-     +         DZDX0    ,DZDX1  ,DZDX2    ,DZDX3   ,
-     +         Y        ,DZDX   ,D2ZDXDY  ,IY      ,NY)
+        CALL MINTER1D_RAT(
+     +           YY(IYM1) ,YY(IY) ,YY(IYP1) ,YY(IYP2),
+     +           DZDX0    ,DZDX1  ,DZDX2    ,DZDX3   ,
+     +           Y        ,DZDX   ,D2ZDXDY  ,IY      ,NY)
 C
-      RETURN
+        RETURN
       END

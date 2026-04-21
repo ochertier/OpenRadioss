@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_sphvox           ../engine/source/mpi/sph/spmd_sphvox.F
-      !||--- called by ------------------------------------------------------
-      !||    sphtri0               ../engine/source/elements/sph/sphtri0.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                ../engine/source/output/message/message.F
-      !||    arret                 ../engine/source/system/arret.F
-      !||    spmd_iallgather       ../engine/source/mpi/generic/spmd_iallgather.F
-      !||    spmd_iallgather_int   ../engine/source/mpi/generic/spmd_iallgather_int.F
-      !||    spmd_ialltoall_int    ../engine/source/mpi/generic/spmd_ialltoall_int.F
-      !||    spmd_ialltoallv       ../engine/source/mpi/generic/spmd_ialltoallv.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||    sphbox                ../engine/share/modules/sphbox.F
-      !||    tri7box               ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphvox           ../engine/source/mpi/sph/spmd_sphvox.F
+!||--- called by ------------------------------------------------------
+!||    sphtri0               ../engine/source/elements/sph/sphtri0.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||    spmd_iallgather       ../engine/source/mpi/generic/spmd_iallgather.F
+!||    spmd_iallgather_int   ../engine/source/mpi/generic/spmd_iallgather_int.F
+!||    spmd_ialltoall_int    ../engine/source/mpi/generic/spmd_ialltoall_int.F
+!||    spmd_ialltoallv       ../engine/source/mpi/generic/spmd_ialltoallv.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    sphbox                ../engine/share/modules/sphbox.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_SPHVOX(KXSP ,SPBUF,WSP2SORT,BMINMAL,X)
 C-----------------------------------------------
 C   M o d u l e s
@@ -46,6 +47,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -62,33 +64,34 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER KXSP(NISP,*), WSP2SORT(*)
       my_real 
-     .        X(3,*),BMINMAL(*), SPBUF(NSPBUF,*)
+     .        X(3,*),BMINMAL(6), SPBUF(NSPBUF,*)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER P, KK, I, J, NOD, N, MSGTYP, LOC_PROC, NBIRECV,
-     .        IERROR, IERROR1, L, LEN, IDEB, INDEXI, NB,
+      INTEGER P, I, J, NOD, N, LOC_PROC, NBIRECV, 
+     . IERROR, IERROR1, L, IDEB,
      .        NBX, NBY, NBZ,
      .        IX1, IX2, IY1, IY2, IZ1, IZ2, IX, IY, IZ,
-     .        REQ_RB(NSPMD), REQ_SB(NSPMD), REQ_SD(NSPMD),
-     .        REQ_RD(NSPMD), REQ_SD2(NSPMD), REQ_SC(NSPMD),
-     .        REQ_RC(NSPMD),
-     .        IRINDEXI(NSPMD), ISINDEXI(NSPMD), NBO(NSPMD), 
-     .        INDEX(NSP2SORT), STATUS(MPI_STATUS_SIZE),
+     .
+     .
+     .
+     . ISINDEXI(NSPMD), NBO(NSPMD),
+     . STATUS(MPI_STATUS_SIZE),
      .        MSGOFF,MSGOFF2,MSGOFF3,MSGOFF4
       my_real 
-     .        BMINMA(6,NSPMD),ALPHA_MARGE,
+     .        ALPHA_MARGE,
      .        XMAXB,YMAXB,ZMAXB,XMINB,YMINB,ZMINB,
      .        AAA
-      TYPE(real_pointer), DIMENSION(NSPMD) :: BUF
-      my_real, dimension(:), allocatable :: sbuf,rbuf
+      my_real BMINMA(6,NSPMD)
+ 
+      my_real, dimension(:), allocatable :: sbuf
       DATA MSGOFF/2023/
       DATA MSGOFF2/2024/
       DATA MSGOFF3/2025/
       DATA MSGOFF4/2026/
 
-      INTEGER :: P_LOC
+ 
       INTEGER :: SEND_SIZE_BMINMA
       INTEGER :: REQUEST_BMINMA
       INTEGER :: RCV_SIZE_BMINMA,TOTAL_RCV_SIZE_BMINMA
@@ -113,8 +116,8 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
 C=======================================================================
-C     tag des boites contenant des facettes
-C     et creation des candidats
+C     tag of boxes containing facets
+C     and creation of candidates
 C=======================================================================
       ALLOCATE( INDEX_P(NSP2SORT,NSPMD) )
       ALPHA_MARGE = SQRT(ONE +SPASORT)
@@ -133,7 +136,7 @@ C
       BMINMA(5,LOC_PROC) = BMINMAL(5)
       BMINMA(6,LOC_PROC) = BMINMAL(6)
 C
-C   envoi voxel + boite min/max
+C   Voxel shipment + min/max box
 C
       SEND_SIZE_BMINMA = 6
       RCV_SIZE_BMINMA = 6
@@ -160,7 +163,7 @@ C
      .                         REQUEST_CRVOX,SPMD_COMM_WORLD)
 !   -------------------------
 C
-C   envoi de XREM
+C   sending xrem
 C
 
 #if _PLMPI
@@ -170,7 +173,7 @@ C
 #else
 !   -------------------------
 !   wait the previous comms : BMINMAL --> BMINMAL
-!                             CRVOXEL_LOC --> CRVOXEL
+!                             CRVOXEL_LOC -> CRVOXEL
       CALL MPI_WAIT(REQUEST_BMINMA,STATUS,IERROR)
       CALL MPI_WAIT(REQUEST_CRVOX,STATUS,IERROR)
 !   -------------------------

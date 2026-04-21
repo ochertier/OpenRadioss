@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i22datainit          ../engine/source/interfaces/int22/i22datainit.F
-      !||--- called by ------------------------------------------------------
-      !||    r_bufbric_22         ../engine/source/interfaces/int22/r_bufbric_22.F
-      !||--- uses       -----------------------------------------------------
-      !||    i22bufbric_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22tri_mod           ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    i22datainit          ../engine/source/interfaces/int22/i22datainit.F
+!||--- called by ------------------------------------------------------
+!||    r_bufbric_22         ../engine/source/interfaces/int22/r_bufbric_22.F
+!||--- uses       -----------------------------------------------------
+!||    i22bufbric_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22tri_mod           ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
+!||====================================================================
       SUBROUTINE I22DATAINIT()
       USE I22TRI_MOD
       USE I22BUFBRIC_MOD
@@ -58,7 +58,7 @@ C=======================================================================
 C=======================================================================
 C definitions from subvolumes.inc
 C=======================================================================
-      INTEGER Itmpindex22,I,NIN,J,K, IFLG
+      INTEGER I,NIN,J,K, IFLG
 
       DATA LSECTYP/14/
 
@@ -1059,7 +1059,7 @@ C=======================================================================
 
       !iRightEdge(Face,nodeID)
       !next edge is clockwise edge when face is looked from cell centroid.
-      ! "-" : means centripetal
+      ! "-": Means centripetal
       ! "+" : means centrifugal
       INT22_BUF%iLeftEdge(1,1)=+02; INT22_BUF%iLeftEdge(1,2)=-01; INT22_BUF%iLeftEdge(1,3)=+04; INT22_BUF%iLeftEdge(1,4)=-05;  !1234  <-  nodFACE(1,1:4) = (/1,2,3,4/) 
       INT22_BUF%iLeftEdge(2,1)=-10; INT22_BUF%iLeftEdge(2,2)=+05; INT22_BUF%iLeftEdge(2,3)=-06; INT22_BUF%iLeftEdge(2,4)=+12;  !4378  <-  nodFACE(2,1:4) = (/4,3,7,8/) 

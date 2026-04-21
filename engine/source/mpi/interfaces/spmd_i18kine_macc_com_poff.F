@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spmd_i18kine_macc_com_poff   ../engine/source/mpi/interfaces/spmd_i18kine_macc_com_poff.F
-      !||--- called by ------------------------------------------------------
-      !||    i18main_kine_1               ../engine/source/interfaces/int18/i18main_kine.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box                      ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i18kine_macc_com_poff   ../engine/source/mpi/interfaces/spmd_i18kine_macc_com_poff.F
+!||--- called by ------------------------------------------------------
+!||    i18main_kine_1               ../engine/source/interfaces/int18/i18main_kine.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod          ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box                      ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE  SPMD_I18KINE_MACC_COM_POFF(MTF,A,
      *                                       IAD_ELEM,FR_ELEM,ITAB)
 C-----------------------------------------------
@@ -38,6 +39,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -60,10 +62,8 @@ C-----------------------------------------------
 #ifdef MPI
       INTEGER STATUS(MPI_STATUS_SIZE),
      *        REQ_SI(NSPMD),REQ_RI(NSPMD),MSGTYP,IERROR,MSGOFF
-      INTEGER L,NNOD,P,J,LOC_PROC,PTR,SIZ,NB,NOD
+      INTEGER L, NNOD, P, J, LOC_PROC, SIZ, NB, NOD
       INTEGER IADS(NSPMD+1),IADR(NSPMD+1),LENRV
-      my_real
-     *   TESTVAL
       my_real ,
      *      DIMENSION(:), ALLOCATABLE :: BBUFS,BBUFR
       DATA MSGOFF/155/
@@ -73,7 +73,7 @@ C--------------------------------------------------------------------
       LOC_PROC=ISPMD+1
 C
       BBUFR=-1.
-C Preparation du recv
+C preparation of recv
       IADR(1) = 1
       L=1
       DO P=1,NSPMD
@@ -119,7 +119,7 @@ C--------------------------------------------------------------------
 C Recv
 
       DO P = 1, NSPMD
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
         NB = IAD_ELEM(1,P+1)-IAD_ELEM(1,P)
         IF(NB>0)THEN
           CALL MPI_WAIT(REQ_RI(P),STATUS,IERROR)
@@ -136,7 +136,7 @@ C   test si msg necessaire a envoyer a completer par test interface
         ENDIF
       ENDDO
 
-C Fin du send
+C end of send
       DO P = 1, NSPMD
           SIZ=IADS(P+1)-IADS(P)
           IF(SIZ>0) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21_icrit         ../engine/source/interfaces/intsort/i21_icrit.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri            ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_glob_isum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_i21crit      ../engine/source/mpi/interfaces/spmd_i21crit.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_mod      ../engine/share/modules/intstamp_mod.F
-      !||    sensor_mod        ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    i21_icrit         ../engine/source/interfaces/intsort/i21_icrit.F
+!||--- called by ------------------------------------------------------
+!||    inttri            ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_glob_isum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_i21crit      ../engine/source/mpi/interfaces/spmd_i21crit.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    intstamp_mod      ../engine/share/modules/intstamp_mod.F
+!||    sensor_mod        ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE I21_ICRIT(
      1  INTBUF_TAB     ,IPARI  ,DT2T   ,NELTST ,NSENSOR ,
      2  ITYPTST,XSLV   ,XMSR   ,VSLV   ,VMSR   ,
@@ -78,7 +79,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,KK,
-     .        N,ITY,IMESS, ISENS,INTERACT
+     .        ITY,IMESS, ISENS,INTERACT
       my_real
      .        XX,XY,XZ,DIST0(NINTSTAMP),
      .        VX(NINTSTAMP),VY(NINTSTAMP),VZ(NINTSTAMP),DTI,
@@ -138,7 +139,7 @@ C
                END IF
               END IF
 C
-C      Prepare test sur pas de temps sur l'interface
+C      prepare test on timestep on the interface
 C
               VX(KK) = MAX(VSLV(1,I)-VMSR(4,I),
      .                 VMSR(1,I)-VSLV(4,I),ZERO)
@@ -152,7 +153,7 @@ C
         END IF
       END DO
 C
-C test sur pas de temps sur l'interface (parith on spmd)
+C test on timestep on the interface (parith on spmd)
       IF(NSPMD>1) THEN
        CALL SPMD_I21CRIT(CRITERL,VX,VY,VZ,DIST0)
        IF(NBINTC21>0) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_setcol_array    ../starter/source/model/sets/create_setcol_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                 ../starter/source/model/sets/hm_set.F
-      !||    sort_set               ../starter/source/model/sets/sort_sets.F
-      !||--- calls      -----------------------------------------------------
-      !||    create_setcol_list     ../starter/source/model/sets/create_setcol_clause.F
-      !||    create_setcol_list_g   ../starter/source/model/sets/create_setcol_clause.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_setcol_array    ../starter/source/model/sets/create_setcol_clause.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                 ../starter/source/model/sets/hm_set.F
+!||    sort_set               ../starter/source/model/sets/sort_sets.F
+!||--- calls      -----------------------------------------------------
+!||    create_setcol_list     ../starter/source/model/sets/create_setcol_clause.F
+!||    create_setcol_list_g   ../starter/source/model/sets/create_setcol_clause.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SETCOL_ARRAY(SET,SETCOL_ARRAY ,ARRAY_SIZE, 
      .                               ISETCOLM  , NSET_COLLECT,
      .                               JCLAUSE ,OPT_G ,IS_AVAILABLE ,
@@ -88,19 +88,19 @@ C-----------------------------------------------
         ENDIF
 C-----------------------------------------------
       END
-      !||====================================================================
-      !||    create_setcol_list          ../starter/source/model/sets/create_setcol_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_setcol_array         ../starter/source/model/sets/create_setcol_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_setcol_list          ../starter/source/model/sets/create_setcol_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_setcol_array         ../starter/source/model/sets/create_setcol_clause.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SETCOL_LIST(
      .               SET,ARRAY, ARRAY_SIZE, ISETCOLM ,NSET_COLLECT ,JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -213,19 +213,19 @@ C-------------------------
       RETURN
       END
 
-      !||====================================================================
-      !||    create_setcol_list_g        ../starter/source/model/sets/create_setcol_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_setcol_array         ../starter/source/model/sets/create_setcol_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_setcol_list_g        ../starter/source/model/sets/create_setcol_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_setcol_array         ../starter/source/model/sets/create_setcol_clause.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SETCOL_LIST_G(
      .               SET,ARRAY, ARRAY_SIZE,  ISETCOLM, NSET_COLLECT, JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -346,13 +346,13 @@ C=======================================================================
       DEALLOCATE (PART_READ_TMP)
       DEALLOCATE (RESULT)
       END
-      !||====================================================================
-      !||    create_setcol_clause   ../starter/source/model/sets/create_setcol_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
-      !||--- uses       -----------------------------------------------------
-      !||    set_mod                ../starter/share/modules1/set_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_setcol_clause   ../starter/source/model/sets/create_setcol_clause.F
+!||--- calls      -----------------------------------------------------
+!||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
+!||--- uses       -----------------------------------------------------
+!||    set_mod                ../starter/share/modules1/set_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SETCOL_CLAUSE(SET,
      *                                SETL,SETL_SIZE,
      *                                CLAUSE,
@@ -362,7 +362,8 @@ C=======================================================================
      .                                SH3TREE   ,KNOD2ELS ,NOD2ELS   ,KNOD2ELC  ,NOD2ELC,
      .                                KNOD2ELTG ,NOD2ELTG ,IPARTC    ,IPARTG    ,IPARTS ,
      .                                IPART     ,OPT_A    ,OPT_O     ,KNOD2ELQ  ,NOD2ELQ,
-     .                                X         ,KEYSET   ,OPT_E     ,DELBUF    )
+     .                                X         ,KEYSET   ,OPT_E     ,DELBUF    ,IPARTQ ,
+     *                                NUMELQ    )
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -386,6 +387,7 @@ C-----------------------------------------------
       USE SET_SCRATCH_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
       USE SET_MOD , ONLY : SET_ADD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -396,7 +398,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SETL_SIZE
+      INTEGER SETL_SIZE,NUMELQ
       INTEGER, DIMENSION(NSETS),    INTENT(IN) :: SETL
       TYPE (SET_),DIMENSION(NSETS), INTENT(IN) :: SET
       TYPE (SET_) :: CLAUSE
@@ -408,7 +410,7 @@ C
      .        IXP(NIXP,*),IXR(NIXR,*),
      .        SH4TREE(*),SH3TREE(*),KNOD2ELS(*),KNOD2ELC(*),KNOD2ELTG(*),
      .        KNOD2ELQ(*),NOD2ELS(*),NOD2ELC(*),NOD2ELTG(*),NOD2ELQ(*),
-     .        IPARTS(*),IPARTC(*),IPARTG(*),IPART(LIPART1,*)
+     .        IPARTS(*),IPARTC(*),IPARTG(*),IPART(LIPART1,*),IPARTQ(NUMELQ)
       my_real
      .    X(3,*)
       CHARACTER(LEN=NCHARFIELD) :: KEYSET
@@ -430,21 +432,21 @@ C-----------------------------------------------
      .                              SH3TREE   ,KNOD2ELS ,NOD2ELS   ,KNOD2ELC  ,NOD2ELC,
      .                              KNOD2ELTG ,NOD2ELTG ,IPARTC    ,IPARTG    ,IPARTS ,
      .                              IPART     ,OPT_A    ,OPT_O     ,KNOD2ELQ  ,NOD2ELQ,
-     .                              X         ,KEYSET   ,OPT_E     ,DELBUF    )
+     .                              X         ,KEYSET   ,OPT_E     ,DELBUF    ,IPARTQ)
 C
        ENDDO
 C-----------------------------------------------
        END
 
-      !||====================================================================
-      !||    create_set_collect     ../starter/source/model/sets/create_setcol_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                 ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
-      !||--- uses       -----------------------------------------------------
-      !||    set_mod                ../starter/share/modules1/set_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_set_collect     ../starter/source/model/sets/create_setcol_clause.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                 ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
+!||--- uses       -----------------------------------------------------
+!||    set_mod                ../starter/share/modules1/set_mod.F
+!||====================================================================
       SUBROUTINE CREATE_SET_COLLECT(SET       ,SET_ID   ,IGS   ,SETCOL_ARRAY ,ARRAY_SIZE,
      *                              IXS       ,IXS10    ,                      IXQ    ,
      *                              IXC       ,IXTG     ,IXT       ,IXP       ,IXR    ,
@@ -452,7 +454,8 @@ C-----------------------------------------------
      *                              SH3TREE   ,KNOD2ELS ,NOD2ELS   ,KNOD2ELC  ,NOD2ELC,
      *                              KNOD2ELTG ,NOD2ELTG ,IPARTC    ,IPARTG    ,IPARTS ,
      *                              IPART     ,OPT_A    ,OPT_O     ,KNOD2ELQ  ,NOD2ELQ,
-     *                              X         ,KEYSET   ,OPT_E     ,DELBUF    )
+     *                              X         ,KEYSET   ,OPT_E     ,DELBUF    ,IPARTQ ,
+     *                              NUMELQ    )
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -476,6 +479,7 @@ C-----------------------------------------------
       USE SET_SCRATCH_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
       USE SET_MOD , ONLY : SET_ADD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -486,7 +490,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SET_ID,ARRAY_SIZE ,IGS
+      INTEGER SET_ID,ARRAY_SIZE ,IGS, NUMELQ
       INTEGER  OPT_A,OPT_O,OPT_E
       INTEGER, DIMENSION(ARRAY_SIZE,2),    INTENT(IN) :: SETCOL_ARRAY
       TYPE (SET_),DIMENSION(NSETS), INTENT(INOUT) :: SET
@@ -496,7 +500,7 @@ C-----------------------------------------------
      .        IXP(NIXP,*),IXR(NIXR,*),
      .        SH4TREE(*),SH3TREE(*),KNOD2ELS(*),KNOD2ELC(*),KNOD2ELTG(*),
      .        KNOD2ELQ(*),NOD2ELS(*),NOD2ELC(*),NOD2ELTG(*),NOD2ELQ(*),
-     .        IPARTS(*),IPARTC(*),IPARTG(*),IPART(LIPART1,*)
+     .        IPARTS(*),IPARTC(*),IPARTG(*),IPART(LIPART1,*),IPARTQ(NUMELQ)
       my_real X(3,*)
       CHARACTER(LEN=NCHARFIELD) :: KEYSET
 C-----------------------------------------------
@@ -520,7 +524,7 @@ C-----------------------------------------------
      .                                 SH3TREE   ,KNOD2ELS ,NOD2ELS   ,KNOD2ELC  ,NOD2ELC,
      .                                 KNOD2ELTG ,NOD2ELTG ,IPARTC    ,IPARTG    ,IPARTS ,
      .                                 IPART     ,OPT_A    ,OPT_O     ,KNOD2ELQ  ,NOD2ELQ,
-     .                                 X         ,KEYSET   ,OPT_E     ,DELBUF    )
+     .                                 X         ,KEYSET   ,OPT_E     ,DELBUF    ,IPARTQ)
           ENDIF
 C
        ENDDO

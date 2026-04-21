@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    movfra1       ../engine/source/tools/skew/movfram.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_rbcast   ../engine/source/mpi/generic/spmd_rbcast.F
-      !||====================================================================
+!||====================================================================
+!||    movfra1       ../engine/source/tools/skew/movfram.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_rbcast   ../engine/source/mpi/generic/spmd_rbcast.F
+!||====================================================================
       SUBROUTINE MOVFRA1(XFRAME,IFRAME ,X, V ,A ,AR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -49,7 +49,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, N1, N2, N3, K, IMOV, IDIR
+      INTEGER N, N1, N2, N3, IMOV, IDIR
       my_real O(3), P(9), PP1, PP3, PP2, POLD(9),
      .        DR11, DR12, DR13,
      .        DR21, DR22, DR23,
@@ -359,14 +359,14 @@ C
       END SUBROUTINE MOVFRA1
 
 
-      !||====================================================================
-      !||    movfra2       ../engine/source/tools/skew/movfram.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    rotbmr        ../engine/source/tools/skew/rotbmr.F
-      !||    spmd_rbcast   ../engine/source/mpi/generic/spmd_rbcast.F
-      !||====================================================================
+!||====================================================================
+!||    movfra2       ../engine/source/tools/skew/movfram.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    rotbmr        ../engine/source/tools/skew/rotbmr.F
+!||    spmd_rbcast   ../engine/source/mpi/generic/spmd_rbcast.F
+!||====================================================================
       SUBROUTINE MOVFRA2(XFRAME ,IFRAME ,X ,V ,VR , D)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -390,11 +390,11 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N, N1, N2, N3, K, IMOV, IDIR
-      my_real O(3), P(9), PP1, PP3, PP2, POLD(9),PT(9),VRN(3),
-     .        DR11, DR12, DR13,
-     .        DR21, DR22, DR23,
-     .        DR31, DR32, DR33,
-     .        XPI, CS, R, SN, RS2, DRX, DRY, DRZ, VRX, VRY, VRZ
+      my_real O(3), P(9), PP1, PP3, PP2, POLD(9),VRN(3),
+     .          
+     .          
+     .          
+     .        XPI, VRX, VRY, VRZ
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -676,14 +676,14 @@ C-----------------------------------------------
       RETURN
       END SUBROUTINE MOVFRA2
 
-      !||====================================================================
-      !||    movfra_imp    ../engine/source/tools/skew/movfram.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    rotbmr        ../engine/source/tools/skew/rotbmr.F
-      !||    spmd_rbcast   ../engine/source/mpi/generic/spmd_rbcast.F
-      !||====================================================================
+!||====================================================================
+!||    movfra_imp    ../engine/source/tools/skew/movfram.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    rotbmr        ../engine/source/tools/skew/rotbmr.F
+!||    spmd_rbcast   ../engine/source/mpi/generic/spmd_rbcast.F
+!||====================================================================
       SUBROUTINE MOVFRA_IMP(XFRAME,IFRAME ,X, V ,A ,VR ,AR ,D )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

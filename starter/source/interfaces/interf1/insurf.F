@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    insurf                 ../starter/source/interfaces/interf1/insurf.F
-      !||--- called by ------------------------------------------------------
-      !||    lecins                 ../starter/source/interfaces/interf1/lecins.F
-      !||    lecint                 ../starter/source/interfaces/interf1/lecint.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    count3                 ../starter/source/interfaces/interf1/count3.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    insurf                 ../starter/source/interfaces/interf1/insurf.F
+!||--- called by ------------------------------------------------------
+!||    lecins                 ../starter/source/interfaces/interf1/lecins.F
+!||    lecint                 ../starter/source/interfaces/interf1/lecint.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    count3                 ../starter/source/interfaces/interf1/count3.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INSURF(NRT       ,MSN   ,IR    ,IRECT ,
      .                  SURF_NODES,ITAB  ,MSV   ,ID    ,TITR   ,
      .                  NTAG      ,S_MSV  ,SIRECT, TYPE18)
@@ -70,12 +69,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N23, IT, J, NSGOLD,ITG,K,L,IR1,K4
+      INTEGER I, N23, J, K, L, IR1, K4
       INTEGER OLDIRECT,OLDIRECT1
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER USR2SYS
 C=======================================================================
       I=1                                                   
       L=1                                                   
@@ -86,7 +84,7 @@ C=======================================================================
           ENDDO                                             
           L=L+2                                             
       ENDDO                                                 
-C     SEGMENTS 3 NOEUDS MISE DE N4 = N3                     
+C     SEGMENTS WITH 3 NODES SET N4 = N3                     
       DO I=1,NRT                                            
         IF(IRECT(4,I)==0) IRECT(4,I)=IRECT(3,I)           
         IF(IRECT(1,I)==IRECT(4,I)) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    volprep      ../engine/source/airbag/volpresp.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol0      ../engine/source/airbag/monvol0.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter       ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod      ../engine/share/modules/h3d_mod.F
-      !||    sensor_mod   ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    volprep            ../engine/source/airbag/volpresp.F
+!||--- called by ------------------------------------------------------
+!||    monvol0            ../engine/source/airbag/monvol0.F
+!||--- uses       -----------------------------------------------------
+!||    finter_mixed_mod   ../engine/source/tools/finter_mixed.F90
+!||    h3d_mod            ../engine/share/modules/h3d_mod.F
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE VOLPREP(IVOLU  ,RVOLU   ,NJET    ,IBAGJET ,RBAGJET   ,
      2                   NSENSOR,SENSOR_TAB,X       ,V       ,A         ,
      3                   NORMAL ,NPC     ,TF      ,NN      ,SURF_NODES,
      4                   IADMV  ,FSKY    ,FSKYV   ,FEXT    ,H3D_DATA  ,
      5                   SURF_ELTYP,SURF_ELEM,NODE_NUMBER,TOTAL_CONTRIBUTION_NUMBER, 
      6                   CONTRIBUTION_INDEX,CONTRIBUTION_NUMBER,
-     7                   NODE_ID,CONTRIBUTION,WFEXT)
+     7                   NODE_ID,CONTRIBUTION,WFEXT,PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE python_funct_mod
+      USE finter_mixed_mod
       USE H3D_MOD 
       USE SENSOR_MOD
 C-----------------------------------------------
@@ -53,7 +55,6 @@ C  o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
-!#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
@@ -71,23 +72,22 @@ C-----------------------------------------------
       INTEGER, DIMENSION(NODE_NUMBER+1), INTENT(in) :: CONTRIBUTION_NUMBER !< number of contribution per node
       INTEGER, DIMENSION(NODE_NUMBER), INTENT(in) :: NODE_ID !< node id
       my_real, DIMENSION(TOTAL_CONTRIBUTION_NUMBER,3), INTENT(inout) :: CONTRIBUTION !< contribution array, the force are saved here
-
       my_real RVOLU(*),RBAGJET(NRBJET,*),X(3,*), V(3,*), A(3,*), NORMAL(3,NN),TF(*),FSKY(8,LSKY),FSKYV(LSKY,8),FEXT(3,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
+      TYPE(PYTHON_), intent(inout) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,II,NJ1,NJ2,NJ3,IPT,IPA,IPZ,N1,N2,N3,N4,IJ,ISENS,K,ITYP
+      INTEGER I,J,II,NJ1,NJ2,NJ3,IPT,IPA,IPZ,N1,N2,N3,N4,IJ,ISENS,ITYP
       INTEGER :: ADDRESS,NOD,LOCAL_CONTRIBUTION_NUMBER
-      my_real :: PRES,FX,FY,FZ,P,PEXT,DP,Q,PJ,PJ0,DYDX,XX,YY,ZZ,
+      my_real :: PRES,FX,FY,FZ,P,PEXT,DP,Q,PJ,PJ0,XX,YY,ZZ,
      .           THETA,NX1,NX2,NY1,NY2,NZ1,NZ2,AN1,AN,
      .           XM,YM,ZM,NX3,NY3,NZ3,
      .           PS1,PS2,PS3,AN2,AN3,DET,MU,FACR,
      .           API,DIST,TSTART,TS,TMPO,FPT,FPA,FPZ,SCALT,SCALA,SCALD
       my_real, DIMENSION(3) :: TMP
-      my_real FINTER
 C-----------------------------------------------
       API=HUNDRED80/PI
 C-----------------------------------------------
@@ -289,7 +289,7 @@ C-------------------------------------------
 
         IF(NJ1/=0.AND.TT>=TSTART)THEN
           TS=TT-TSTART
-          PJ0=FPT*FINTER(IPT,TS*SCALT,NPC,TF,DYDX)
+          PJ0=FPT*FINTER_MIXED(PYTHON,NFUNCT,IPT,TS*SCALT,NPC,TF)
 !$OMP DO SCHEDULE(guided)
           DO I=1,TOTAL_CONTRIBUTION_NUMBER
             CONTRIBUTION(I,1) = ZERO
@@ -327,7 +327,7 @@ C-------------------------------------------
               NY1 = YY-YM
               NZ1 = ZZ-ZM
 
-              ! decomposition de (M,P) sur (M,N2) et (M,N3)
+              ! decomposition of (M,P) on (M,N2) and (M,N3)
               NX2 = X(1,NJ2)-XM
               NY2 = X(2,NJ2)-YM
               NZ2 = X(3,NJ2)-ZM
@@ -357,9 +357,9 @@ C-------------------------------------------
               TMPO = (NX1*NX2+NY1*NY2+NZ1*NZ2)/AN
               TMPO = SIGN(MIN(ONE,ABS(TMPO)),TMPO)
               THETA=API*ACOS(TMPO)
-              PJ=PJ*FPA*FINTER(IPA,THETA*SCALA,NPC,TF,DYDX)
+              PJ=PJ*FPA*FINTER_MIXED(PYTHON,NFUNCT,IPA,THETA*SCALA,NPC,TF)
               DIST = SQRT(AN1)
-              IF(IPZ/=0)PJ=PJ*FPZ*FINTER(IPZ,DIST*SCALD,NPC,TF,DYDX)
+              IF(IPZ/=0)PJ=PJ*FPZ*FINTER_MIXED(PYTHON,NFUNCT,IPZ,DIST*SCALD,NPC,TF)
 
               FX=PJ*NORMAL(1,I)
               FY=PJ*NORMAL(2,I)
@@ -425,7 +425,7 @@ C-------------------------------------------
               NY1 = YY-YM
               NZ1 = ZZ-ZM
 
-              ! decomposition de (M,P) sur (M,N2) et (M,N3)
+              ! decomposition of (M,P) on (M,N2) and (M,N3)
               NX2 = X(1,NJ2)-XM
               NY2 = X(2,NJ2)-YM
               NZ2 = X(3,NJ2)-ZM
@@ -455,9 +455,9 @@ C-------------------------------------------
               TMPO = (NX1*NX2+NY1*NY2+NZ1*NZ2)/AN
               TMPO = SIGN(MIN(ONE,ABS(TMPO)),TMPO)
               THETA=API*ACOS(TMPO)
-              PJ=PJ*FPA*FINTER(IPA,THETA*SCALA,NPC,TF,DYDX)
+              PJ=PJ*FPA*FINTER_MIXED(PYTHON,NFUNCT,IPA,THETA*SCALA,NPC,TF)
               DIST = SQRT(AN1)
-              IF(IPZ/=0)PJ=PJ*FPZ*FINTER(IPZ,DIST*SCALD,NPC,TF,DYDX)
+              IF(IPZ/=0)PJ=PJ*FPZ*FINTER_MIXED(PYTHON,NFUNCT,IPZ,DIST*SCALD,NPC,TF)
 
               FX=PJ*NORMAL(1,I)
               FY=PJ*NORMAL(2,I)
@@ -516,7 +516,7 @@ C-------------------------------------------
               NY1 = YY-YM
               NZ1 = ZZ-ZM
 
-              ! decomposition de (M,P) sur (M,N2) et (M,N3)
+              ! decomposition of (M,P) on (M,N2) and (M,N3)
               NX2 = X(1,NJ2)-XM
               NY2 = X(2,NJ2)-YM
               NZ2 = X(3,NJ2)-ZM
@@ -546,9 +546,9 @@ C-------------------------------------------
               TMPO = (NX1*NX2+NY1*NY2+NZ1*NZ2)/AN
               TMPO = SIGN(MIN(ONE,ABS(TMPO)),TMPO)
               THETA=API*ACOS(TMPO)
-              PJ=PJ*FPA*FINTER(IPA,THETA*SCALA,NPC,TF,DYDX)
+              PJ=PJ*FPA*FINTER_MIXED(PYTHON,NFUNCT,IPA,THETA*SCALA,NPC,TF)
               DIST = SQRT(AN1)
-              IF(IPZ/=0)PJ=PJ*FPZ*FINTER(IPZ,DIST*SCALD,NPC,TF,DYDX)
+              IF(IPZ/=0)PJ=PJ*FPZ*FINTER_MIXED(PYTHON,NFUNCT,IPZ,DIST*SCALD,NPC,TF)
 
               FX=PJ*NORMAL(1,I)
               FY=PJ*NORMAL(2,I)

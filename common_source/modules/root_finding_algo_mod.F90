@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,55 +21,54 @@
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    root_finding_algo_mod   ../common_source/modules/root_finding_algo_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    mixture_equilibrium     ../engine/source/materials/mat/mat041/sigeps41.F
-      !||    sigeps41                ../engine/source/materials/mat/mat041/sigeps41.F
-      !||====================================================================
+!||====================================================================
+!||    root_finding_algo_mod   ../common_source/modules/root_finding_algo_mod.F90
+!||--- called by ------------------------------------------------------
+!||    mixture_equilibrium     ../engine/source/materials/mat/mat041/sigeps41.F
+!||    sigeps41                ../engine/source/materials/mat/mat041/sigeps41.F
+!||====================================================================
       module root_finding_algo_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \brief root finding algo based on Brent's algo
 !! \details
-      !||====================================================================
-      !||    brent_algo     ../common_source/modules/root_finding_algo_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod   ../common_source/modules/constant_mod.F
-      !||====================================================================
+!||====================================================================
+!||    brent_algo      ../common_source/modules/root_finding_algo_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    constant_mod    ../common_source/modules/constant_mod.F
+!||    precision_mod   ../common_source/modules/precision_mod.F90
+!||====================================================================
         function brent_algo( a,b,tolerance,funct,funct_parameter_size,funct_parameter)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
+          use precision_mod, only : WP
           use constant_mod, only : zero,half,one,two,three
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
-! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
-          my_real, intent(in) :: a !< lower bound of the interval
-          my_real, intent(in) :: b !< upper bound of the interval
-          my_real, intent(in) :: tolerance !< tolerance
-          my_real, external :: funct !< function
+          real(kind=WP), intent(in) :: a !< lower bound of the interval
+          real(kind=WP), intent(in) :: b !< upper bound of the interval
+          real(kind=WP), intent(in) :: tolerance !< tolerance
+          real(kind=WP), external :: funct !< function
           integer, intent(in) :: funct_parameter_size !< size of funct_parameter array
-          my_real, dimension(funct_parameter_size), intent(inout) :: funct_parameter !< parameter of the function funct
-          my_real :: brent_algo !< root value
+          real(kind=WP), dimension(funct_parameter_size), intent(inout) :: funct_parameter !< parameter of the function funct
+          real(kind=WP) :: brent_algo !< root value
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
           logical :: condition
-          my_real :: save_a,save_b,c,delta,d,s,length
-          my_real :: f_a,f_b,f_c
-          my_real :: r1,r2,r3
-          my_real :: new_tol
+          real(kind=WP) :: save_a,save_b,c,delta,d,s,length
+          real(kind=WP) :: f_a,f_b,f_c
+          real(kind=WP) :: r1,r2,r3
+          real(kind=WP) :: new_tol
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   External functions
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -97,7 +96,7 @@
           if(sign(one, f_a) == sign(one, f_b)) then
             condition = .false.
             stop
-          endif
+          end if
           ! -----------------
 
           c = save_a
@@ -116,7 +115,7 @@
               f_a = f_b
               f_b = f_c
               f_c = f_a
-            endif
+            end if
             ! compute the tolerance
             new_tol = two * epsilon (save_b) * abs(save_b) + tolerance
             length = half * ( c - save_b )
@@ -139,13 +138,13 @@
                   ! q = 1 - f(b)/f(a)
                   r3 = two * length * s
                   r1 = one - s
-                endif
+                end if
 
                 if (r3<=zero) then
                   r3 = - r3
                 else
                   r1 = -r1
-                endif
+                end if
 
                 s = delta
                 delta = d
@@ -155,13 +154,13 @@
                   d = delta
                 else
                   d = r3 / r1
-                endif
+                end if
               else
                 ! -----------------
                 ! bisection algo
                 delta = length
                 d = delta
-              endif
+              end if
 
               save_a = save_b
               f_a = f_b
@@ -172,7 +171,7 @@
                 save_b = save_b + new_tol
               else
                 save_b = save_b - new_tol
-              endif
+              end if
 
               f_b = funct(save_b,funct_parameter)
 
@@ -181,11 +180,11 @@
                 f_c = f_a
                 delta = save_b - save_a
                 d = delta
-              endif
+              end if
             else
               condition=.false.
-            endif
-          enddo
+            end if
+          end do
 
 
           brent_algo = save_b

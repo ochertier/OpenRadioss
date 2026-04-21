@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_convert_2d_elements_seatbelt      ../starter/source/devtools/hm_reader/hm_convert_2d_elements_seatbelt.F
-      !||--- called by ------------------------------------------------------
-      !||    starter0                             ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv                          ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count                      ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_next                       ../starter/source/devtools/hm_reader/hm_option_next.F
-      !||    hm_option_read_key                   ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start                      ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod                   ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                          ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                         ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_convert_2d_elements_seatbelt      ../starter/source/devtools/hm_reader/hm_convert_2d_elements_seatbelt.F
+!||--- called by ------------------------------------------------------
+!||    starter0                             ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv                          ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count                      ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_next                       ../starter/source/devtools/hm_reader/hm_option_next.F
+!||    hm_option_read_key                   ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start                      ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod                   ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                          ../starter/share/message_module/message_mod.F
+!||    submodel_mod                         ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_CONVERT_2D_ELEMENTS_SEATBELT(IDMAX_PART,IDMAX_PROP,IDMAX_MAT,IDMAX_ELEM,IDMAX_TH,
      .                                          SEATBELT_CONVERTED_ELEMENTS,NB_SEATBELT_SHELLS,LSUBMODEL)
 C-----------------------------------------------
@@ -77,13 +77,10 @@ C INPUT ARGUMENTS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,SUBMODEL_INDEX,OFFSET,NB_PART,
-     .        NB_MAT,NB_MAT_119,MAT_ID,ELEM_INDEX,CPT,NB_THSHELL
+      INTEGER :: I,J,ID,SUBMODEL_INDEX,OFFSET,NB_PART,NB_MAT,NB_MAT_119,MAT_ID,ELEM_INDEX,NB_THSHELL,PART_ID
       INTEGER, DIMENSION(:), ALLOCATABLE :: PART_SUB,PART_MAT119,MAT119_IDS
       CHARACTER(LEN=NCHARLINE) :: KEY
-      LOGICAL IS_AVAILABLE
-      INTEGER :: WORK(70000)
-      INTEGER :: INDEX(2*NB_SEATBELT_SHELLS)
+      LOGICAL :: IS_AVAILABLE
 C-----------------------------------------------
       NB_MAT_119 = 0
 C-----------------------------------------------
@@ -123,7 +120,6 @@ C-----------------------------------------------
         CALL HM_OPTION_COUNT('/PART',NB_PART)
         ALLOCATE(PART_SUB(NB_PART))
         ALLOCATE(PART_MAT119(NB_PART))
-        PART_SUB(1:NB_PART) = 0
         PART_MAT119(1:NB_PART) = 0
 c
         CALL HM_OPTION_START('/PART')
@@ -133,22 +129,19 @@ c
      .                       SUBMODEL_INDEX = SUBMODEL_INDEX)
           CALL HM_GET_INTV('materialid',MAT_ID,IS_AVAILABLE,LSUBMODEL)
           DO J=1,NB_MAT_119
-            IF(MAT_ID == MAT119_IDS(J)) PART_MAT119(I) = MAT119_IDS(J)
+            IF(MAT_ID == MAT119_IDS(J)) PART_MAT119(I) = ID
           ENDDO
-          PART_SUB(I) = SUBMODEL_INDEX
         ENDDO
 C-----------------------------------------------
 C   Translate /SHELL -> /SPRING /PART /PROP/TYPE23 & /MAT/LAW114
 C-----------------------------------------------
 c
         ELEM_INDEX = 0
-        CALL HM_OPTION_START('/PART')
         DO I=1,NB_PART
-          CALL HM_OPTION_NEXT()
           IF(PART_MAT119(I) /= 0) THEN
-            CALL CPP_GET_SUBMODEL_INDEX(SUBMODEL_INDEX)
             OFFSET = 0
-            CALL CPP_CONVERT_2D_ELEMENTS_SEATBELT(PART_MAT119,IDMAX_PART,IDMAX_PROP,IDMAX_MAT,
+            PART_ID = PART_MAT119(I)
+            CALL CPP_CONVERT_2D_ELEMENTS_SEATBELT(PART_ID,IDMAX_PART,IDMAX_PROP,IDMAX_MAT,
      .                                           IDMAX_ELEM,OFFSET,SEATBELT_CONVERTED_ELEMENTS,ELEM_INDEX)
           ENDIF
         ENDDO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7trivox        ../engine/source/interfaces/intsort/i7trivox.F
-      !||--- called by ------------------------------------------------------
-      !||    i7buce_vox      ../engine/source/interfaces/intsort/i7buce.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||    i7sto           ../engine/source/interfaces/intsort/i7sto.F
-      !||    my_barrier      ../engine/source/system/machine.F
-      !||    spmd_oldnumcd   ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i7trivox        ../engine/source/interfaces/intsort/i7trivox.F
+!||--- called by ------------------------------------------------------
+!||    i7buce_vox      ../engine/source/interfaces/intsort/i7buce.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../engine/source/output/message/message.F
+!||    arret           ../engine/source/system/arret.F
+!||    i7sto           ../engine/source/interfaces/intsort/i7sto.F
+!||    my_barrier      ../engine/source/system/machine.F
+!||    spmd_oldnumcd   ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||    tri7box         ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I7TRIVOX(
      1      NSN    ,RENUM       ,NSNR    ,ISZNSNR  ,I_MEM    ,
      2      IRECT  ,X           ,STF     ,STFN     ,XYZM     ,
@@ -72,40 +72,40 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "ige3d_c.inc"
 C-----------------------------------------------
-C   ROLE DE LA ROUTINE:
-C   ===================
-C   CLASSE LES NOEUDS DANS DES BOITES
-C   RECHERCHE POUR CHAQUE FACETTE DES BOITES CONCERNES
-C   RECHERCHE DES CANDIDATS
+C   ROUTINE PURPOSE:
+C   ================
+C   CLASSIFIES NODES INTO BOXES
+C   SEARCHES FOR BOXES CONCERNED FOR EACH FACET
+C   SEARCHES FOR CANDIDATES
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C
-C     NOM          DESCRIPTION                       E/S
+C     NAME         DESCRIPTION                       I/O
 C
-C     IRECT(4,*)   TABLEAU DES CONEC FACETTES        E
-C     X(3,*)       COORDONNEES NODALES               E
-C     NSV          NOS SYSTEMES DES NOEUDS           E
-C     XMAX         plus grande abcisse existante     E
-C     XMAX         plus grande ordonn. existante     E
-C     XMAX         plus grande cote    existante     E
-C     I_STOK       niveau de stockage des couples
-C                                candidats impact    E/S
-C     CAND_N       boites resultats noeuds
-C     CAND_E       adresses des boites resultat elements
-C                  MULNSN = MULTIMP*NSN TAILLE MAX ADMISE MAINTENANT POUR LES
-C                  COUPLES NOEUDS,ELT CANDIDATS
-C     NOINT        NUMERO USER DE L'INTERFACE
-C     TZINF        TAILLE ZONE INFLUENCE
+C     IRECT(4,*)   FACET CONNECTIVITY ARRAY          I
+C     X(3,*)       NODAL COORDINATES                 I
+C     NSV          NODE NUMBERS                      I
+C     XMAX         largest existing abscissa         I
+C     XMAX         largest existing ordinate         I
+C     XMAX         largest existing coordinate       I
+C     I_STOK       storage level of candidate
+C                                I/O impact couples
+C     CAND_N       node result boxes
+C     CAND_E       element result box addresses
+C                  MULNSN = MULTIMP*NSN MAX SIZE ALLOWED NOW FOR
+C                  NODE,ELEMENT CANDIDATE COUPLES
+C     NOINT        USER INTERFACE NUMBER
+C     TZINF        INFLUENCE ZONE SIZE
 C
-C     PROV_N       CAND_N provisoire (variable static dans i7tri)
-C     PROV_E       CAND_E provisoire (variable static dans i7tri)
+C     PROV_N       provisional CAND_N (static variable in i7tri)
+C     PROV_E       provisional CAND_E (static variable in i7tri)
 
-C     VOXEL(ix,iy,iz) contient le numero local du premier noeud de
-C                  la boite
-C     NEXT_NOD(i)  noeud suivant dans la meme boite (si /= 0)
-C     LAST_NOD(i)  dernier noeud dans la meme boite (si /= 0)
-C                  utilise uniquement pour aller directement du premier
-C                       noeud au dernier
+C     VOXEL(ix,iy,iz) contains the local number of the first node in
+C                  the box
+C     NEXT_NOD(i)  next node in the same box (if /= 0)
+C     LAST_NOD(i)  last node in the same box (if /= 0)
+C                  used only to go directly from first
+C                       node to last
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -129,19 +129,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NB_NCN,NB_NCN1,NB_ECN,I,J,DIR,NB_NC,NB_EC,
-     .        N1,N2,N3,N4,NN,NE,K,L,NCAND_PROV,J_STOK,II,JJ,
+      INTEGER I,J,
+     .        NN,NE,K,L,J_STOK,JJ,
      .        PROV_N(MVSIZ),PROV_E(MVSIZ),
      .        OLDNUM(ISZNSNR), NSNF, NSNL,DELNOD,M
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGREMNODE
       my_real
-     .   DX,DY,DZ,XS,YS,ZS,XX,SX,SY,SZ,S2,
-     .   XMIN, XMAX,YMIN, YMAX,ZMIN, ZMAX, TZ, GAPSMX, GAPL,
+     .   XS,YS,ZS,SX,SY,SZ,S2,
+     .   XMIN, XMAX,YMIN, YMAX,ZMIN, ZMAX,
      .   XX1,XX2,XX3,XX4,YY1,YY2,YY3,YY4,ZZ1,ZZ2,ZZ3,ZZ4,
-     .   D1X,D1Y,D1Z,D2X,D2Y,D2Z,DD1,DD2,D2,A2,GS
-c provisoire
+     .   D1X,D1Y,D1Z,D2X,D2Y,D2Z,DD1,DD2,D2,A2
+c temporary
       INTEGER  LAST_NOD(NSN+NSNR)
-      INTEGER  IX,IY,IZ,NEXT,M1,M2,M3,M4,
+      INTEGER  IX,IY,IZ,M1,M2,M3,M4,
      .         IX1,IY1,IZ1,IX2,IY2,IZ2
       INTEGER,  DIMENSION(:),ALLOCATABLE :: IIX,IIY,IIZ
       my_real
@@ -149,7 +149,7 @@ c provisoire
      .   XMINE,YMINE,ZMINE,XMAXE,YMAXE,ZMAXE,AAA
       INTEGER CPT_VOX0
       LOGICAL TEST_V0
-      INTEGER FIRST,NEW,LAST,IERROR
+      INTEGER FIRST,LAST,IERROR
       LOGICAL DBG_type18_fvm
       SAVE IIX,IIY,IIZ
 C-----------------------------------------------
@@ -170,9 +170,9 @@ C-----------------------------------------------
         ENDIF
       END IF
 
-      CALL MY_BARRIER !Barrier to wait init voxel and allocation NEX_NOD
+      CALL MY_BARRIER !Barrier to wait init voxel and allocation NEXT_NOD
 
-! Phase initiale de construction de BPE et BPN deplacee de I7BUCE => I7TRI
+! Initial phase of BPE and BPN construction moved from I7BUCE => I7TRI
 
       XMIN = XYZM(1)
       YMIN = XYZM(2)
@@ -181,7 +181,7 @@ C-----------------------------------------------
       YMAX = XYZM(5)
       ZMAX = XYZM(6)
 
-      !dev future: xminb plus grand que xmin...
+      !dev future: xminb larger than xmin...
       IF( TO_TRIM(NIN) ) THEN
         XMINB = XYZM(7)
         YMINB = XYZM(8)
@@ -203,7 +203,7 @@ C-----------------------------------------------
         ZMAXB = ZMAX
       ENDIF
 
-      ! En SPMD, pour inacti ou IFQ, retrouve ancienne numerotation des candidats non locaux
+      ! In SPMD, for inacti or IFQ, retrieves old numbering of non-local candidates
       IF(NSPMD>1.AND.(INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.IFQ>0.OR.ITIED/=0)) THEN
         CALL SPMD_OLDNUMCD(RENUM,OLDNUM,ISZNSNR,NSNROLD,INTHEAT,IDT_THERM,NODADT_THERM)
       END IF
@@ -220,8 +220,8 @@ C=======================================================================
           IIZ(I)=0
           IF(STFN(I) == ZERO)CYCLE
           J=NSV(I)
-          !C Optimisation // recherche les noeuds compris dans xmin xmax des
-          !C elements du processeur
+          !C Optimization // search for nodes within xmin xmax of
+          !C processor elements
           IF(X(1,J) < XMIN)  CYCLE
           IF(X(1,J) > XMAX)  CYCLE
           IF(X(2,J) < YMIN)  CYCLE
@@ -243,7 +243,7 @@ C=======================================================================
             ENDIF
           ENDIF
           IF(FIRST == 0)THEN
-            !empty cell
+            !Empty Cell
             VOXEL(IIX(I),IIY(I),IIZ(I)) = I ! first
             NEXT_NOD(I)                 = 0 ! last one
             LAST_NOD(I)                 = 0 ! no last
@@ -294,7 +294,7 @@ C=======================================================================
           ENDIF
 
           IF(FIRST == 0)THEN
-            ! empty cell
+            ! Empty Cell
             VOXEL(IIX(NSN+J),IIY(NSN+J),IIZ(NSN+J)) = NSN+J ! first
             NEXT_NOD(NSN+J)     = 0 ! last one
             LAST_NOD(NSN+J)     = 0 ! no last
@@ -339,7 +339,7 @@ C=======================================================================
         ENDDO
       ENDIF
       DO NE=1,NRTM
-        IF(STF(NE) == ZERO)CYCLE ! on ne retient pas les facettes detruites
+        IF(STF(NE) == ZERO)CYCLE ! do not keep destroyed facets
         IF(FLAGREMNODE == 2) THEN
           K = KREMNOD(2*(NE-1)+1)+1
           L = KREMNOD(2*(NE-1)+2)
@@ -352,8 +352,8 @@ C=======================================================================
         ELSE
           AAA = MARGE+CURV_MAX(NE)+MAX(MIN(GAPMAX,MAX(GAPMIN,BGAPSMX+GAP_M(NE)))+DGAPLOAD,DRAD)
         ENDIF
-        !il est possible d'ameliorer l'algo en decoupant la facette
-        !en 2(4,3,6,9...) si la facette est grande devant AAA et inclinee
+        !it is possible to improve the algorithm by subdividing the facet
+        !into 2(4,3,6,9...) if the facet is large compared to AAA and inclined
         M1 = IRECT(1,NE)
         M2 = IRECT(2,NE)
         M3 = IRECT(3,NE)
@@ -380,13 +380,13 @@ C=======================================================================
         ZMAXE=MAX(ZZ1,ZZ2,ZZ3,ZZ4)
         ZMINE=MIN(ZZ1,ZZ2,ZZ3,ZZ4)
 
-        !calcul de la surface (pour elimination future de candidats)
+        !surface calculation (for future candidate elimination)
         SX = (YY3-YY1)*(ZZ4-ZZ2) - (ZZ3-ZZ1)*(YY4-YY2)
         SY = (ZZ3-ZZ1)*(XX4-XX2) - (XX3-XX1)*(ZZ4-ZZ2)
         SZ = (XX3-XX1)*(YY4-YY2) - (YY3-YY1)*(XX4-XX2)
         S2 = SX*SX + SY*SY + SZ*SZ
 
-        !indice des voxels occupes par la facette
+        !index of voxels occupied by the facet
         IF(NBX>1) THEN
           IX1=INT(NBX*(XMINE-AAA-XMINB)/(XMAXB-XMINB))
           IX2=INT(NBX*(XMAXE+AAA-XMINB)/(XMAXB-XMINB))
@@ -482,7 +482,7 @@ C=======================================================================
                 IF(ZS<=ZMINE-AAA)GOTO 200
                 IF(ZS>=ZMAXE+AAA)GOTO 200
 
-                !sousestimation de la distance**2 pour elimination de candidats
+                !underestimation of distance**2 for candidate elimination
                 !nnr0pelem = nnr0pelem + 1
 
                 D1X = XS - XX1

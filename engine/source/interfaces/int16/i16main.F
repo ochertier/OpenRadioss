@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i16main         ../engine/source/interfaces/int16/i16main.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult        ../engine/source/tools/lagmul/lag_mult.F
-      !||--- calls      -----------------------------------------------------
-      !||    i10lagm         ../engine/source/interfaces/int16/i10lagm.F
-      !||    i16buce         ../engine/source/interfaces/int16/i16buce.F
-      !||    i16crit         ../engine/source/interfaces/int16/i16crit.F
-      !||    i16lagm         ../engine/source/interfaces/int16/i16lagm.F
-      !||    i20lagm         ../engine/source/interfaces/int16/i20lagm.F
-      !||    i8lagm          ../engine/source/interfaces/int16/i8lagm.F
-      !||    my_barrier      ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i16main         ../engine/source/interfaces/int16/i16main.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult        ../engine/source/tools/lagmul/lag_mult.F
+!||--- calls      -----------------------------------------------------
+!||    i10lagm         ../engine/source/interfaces/int16/i10lagm.F
+!||    i16buce         ../engine/source/interfaces/int16/i16buce.F
+!||    i16crit         ../engine/source/interfaces/int16/i16crit.F
+!||    i16lagm         ../engine/source/interfaces/int16/i16lagm.F
+!||    i20lagm         ../engine/source/interfaces/int16/i20lagm.F
+!||    i8lagm          ../engine/source/interfaces/int16/i8lagm.F
+!||    my_barrier      ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I16MAIN(
      1          NIN    ,IPARI    ,INTBUF_TAB ,X      ,V      ,
      2          A      ,ITASK    ,IGRNOD     ,EMINX  ,WAT    ,
@@ -46,6 +48,7 @@ C   M o d u l e s
 C----------------------------------------------- 
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C
@@ -53,13 +56,13 @@ C-------------------------------------------------------------------------------
 C     NOM    DIMENSION               DESCRIPTION                       E/S
 C-------------------------------------------------------------------------------
 C
-C    NIN    1                        NUMERO INTERFACE                   E
+C    NIN    1                        INTERFACE NUMBER                   E
 C                  
 C   IPARI   NPARI,NINTER             PARAMETRES D'INTERFACE             E
 C                  
 C     X     3,NUMNOD                 COORDONNEES                        E
 C                  
-C     V     3,NUMNOD                 VITESSES                           E
+C     V     3,NUMNOD                 VELOCITIES                           E
 C                  
 C    EMINX  6*NME<6*NUMELS           MIN MAX DE CHAQUE ELEMENT        TMP_GLOBAL
 C                  
@@ -98,8 +101,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSN,NME,NAD,EAD,
-     .        NME_T,ESH_T,IGN,IGE,MULTIMP,NOINT,I,MX_CAND,itri 
+      INTEGER NSN,NME,
+     .        NME_T,ESH_T,IGN,IGE,MULTIMP,NOINT,MX_CAND,itri 
 C     REAL
       my_real
      .   STARTT, STOPT,XX,XY,XZ,TZINF,MINBOX
@@ -140,7 +143,7 @@ C -------------------------------------------------------------
 C -------------------------------------------------------------
        CALL MY_BARRIER
 C=======================================================================
-C      TEST pour savoir s'il faut retrier + initialisation
+C      Test to know whether to retriate + initialization
 C=======================================================================
        CALL I16CRIT(
      1   X    ,IGRNOD(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY ,NSN  ,EMINX      ,

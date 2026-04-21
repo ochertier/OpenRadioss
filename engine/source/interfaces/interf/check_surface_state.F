@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    check_surface_state             ../engine/source/interfaces/interf/check_surface_state.F
-      !||--- called by ------------------------------------------------------
-      !||    find_surface_from_remote_proc   ../engine/source/interfaces/interf/find_surface_from_remote_proc.F
-      !||    resol                           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    check_active_elem_edge          ../engine/source/interfaces/interf/check_active_elem_edge.F
-      !||    my_barrier                      ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    shooting_node_mod               ../engine/share/modules/shooting_node_mod.F
-      !||====================================================================
+!||====================================================================
+!||    check_surface_state             ../engine/source/interfaces/interf/check_surface_state.F
+!||--- called by ------------------------------------------------------
+!||    find_surface_from_remote_proc   ../engine/source/interfaces/interf/find_surface_from_remote_proc.F
+!||    resol                           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    check_active_elem_edge          ../engine/source/interfaces/interf/check_active_elem_edge.F
+!||    my_barrier                      ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod                     ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod                   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    shooting_node_mod               ../engine/share/modules/shooting_node_mod.F90
+!||====================================================================
         SUBROUTINE CHECK_SURFACE_STATE( ITASK,SURFARCE_NB,SURFACE_ID,SHIFT_INTERFACE,INTBUF_TAB,
      .                                  IPARI,GEO,
      .                                  IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
@@ -47,6 +49,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !$ENDCOMMENT
         USE INTBUFDEF_MOD
         USE SHOOTING_NODE_MOD
+        use element_mod , only : nixs,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -134,7 +137,6 @@ C-----------------------------------------------
           IDEL = IPARI(17,NIN)
           ACTIVATION =.FALSE.
           TYPE_INTER = (ITY==7.OR.ITY==10.OR.ITY==22.OR.ITY==24.OR.(IPARI(100,NIN)==0.AND.ITY==25))
-
           ! --------------
           IF(ITASK==-1) THEN
             IF((TYPE_INTER.AND.IDEL==1).OR.(IPARI(100,NIN)/=0.AND.ITY==25)) THEN
@@ -148,7 +150,6 @@ C-----------------------------------------------
             SHOOT_STRUCT%INTER(NIN)%NB_ELM_M(K) = SHOOT_STRUCT%INTER(NIN)%NB_ELM_M(K) - 1
           ENDIF
           ! --------------
-
           ! --------------
           DEACTIVATION = .FALSE.
           IF((TYPE_INTER.AND.IDEL==1).OR.(IPARI(100,NIN)/=0.AND.ITY==25)) THEN
@@ -169,12 +170,13 @@ C-----------------------------------------------
           ELSEIF(TYPE_INTER.AND.IDEL==2) THEN
               DEACTIVATION = .TRUE.
           ENDIF
+
           IF(.NOT.DEACTIVATION.AND.(IPARI(100,NIN)/=0.AND.ITY==25)) THEN
             NB_CONNECTED_ELM = SHOOT_STRUCT%INTER(NIN)%NB_ELM_M(K)
             ! ---------
-            IF((NB_CONNECTED_ELM<1).AND.(INTBUF_TAB(NIN)%STFM(k)>ZERO)) THEN
-              DEACTIVATION=.TRUE.
-            ELSEIF(NB_CONNECTED_ELM==1.AND.(INTBUF_TAB(NIN)%STFM(k)<ZERO)) THEN
+c            IF((NB_CONNECTED_ELM<1).AND.(INTBUF_TAB(NIN)%STFM(k)>ZERO)) THEN
+c              DEACTIVATION=.TRUE.
+            IF(NB_CONNECTED_ELM==1.AND.(INTBUF_TAB(NIN)%STFM(k)<ZERO)) THEN
               ACTIVATION = .TRUE.
             ENDIF
             ! ---------
@@ -200,6 +202,7 @@ C-----------------------------------------------
             NEW_SURFACE(NUMBER_NEW_SURFACE(MY_REAL_TASK_ID)) = SURFACE_ID(I)
           ENDIF
           ! --------------
+
         ENDDO
         ! --------------------------
        
@@ -235,6 +238,7 @@ C-----------------------------------------------
               DEALLOCATE( SAVED_SURFACE )
             ENDIF
           ENDIF
+
           IF(ITASK/=-1) CALL MY_BARRIER()
           LOW_BOUND = 1
           UP_BOUND = NUMBER_SAVED_SURFACE_TYP24_25(MY_REAL_TASK_ID)

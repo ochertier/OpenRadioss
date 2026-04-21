@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_anim_ply_init   ../starter/source/spmd/spmd_anim_ply_init.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur               ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod          ../starter/share/modules1/plyxfem_mod.F
-      !||    stack_mod            ../starter/share/modules1/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_anim_ply_init   ../starter/source/spmd/spmd_anim_ply_init.F
+!||--- called by ------------------------------------------------------
+!||    lectur               ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod          ../starter/share/modules1/plyxfem_mod.F
+!||    stack_mod            ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE SPMD_ANIM_PLY_INIT (IGEO, GEO  ,IPARG  ,IXC  ,IXTG ,
      .                          IPARTC,IPARTQ,IPARTTG,STACK)
 C-----------------------------------------------
@@ -35,6 +35,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE PLYXFEM_MOD
       USE STACK_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,9 +60,9 @@ C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
       LOGICAL :: COMPUTATION_NEEDED
-      INTEGER IE,NG, ITY, LFT, LLT, NPT, N, I, J,
-     .        IPRT, NEL, IAD, NPAR, NFT, IMID,IALEL,MTN,
-     .        JJ, K, SH_IH, IHBE,BUF,ISHPLYXFEM,IPID,IPT,
+      INTEGER IE,NG, ITY, LFT, LLT, NPT, N, I,
+     .        IPRT, NEL, IAD, NFT,MTN,
+     .         K, IHBE,ISHPLYXFEM,IPID,IPT,
      .        IPLY,IPPID,JPID,
      .        NCOUNT,SHCOUNT,MATER(NPART),ISUBSTACK
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_ARRAY,TAG_SHELLS
@@ -233,7 +234,7 @@ C-------------------------------
       ENDDO
 
 C-------------------------------
-C Numeros globaux des noeuds ply
+C Global numbers of the ply nodes
 C-------------------------------
       NCOUNT = 0
       DO K=1,NPLYMAX
@@ -269,13 +270,13 @@ C-------------------------------
 
       RETURN
       END
-      !||====================================================================
-      !||    get_ply_nod   ../starter/source/spmd/spmd_anim_ply_init.F
-      !||--- called by ------------------------------------------------------
-      !||    w_anim_ply    ../starter/source/restart/ddsplit/w_anim_ply.F
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod   ../starter/share/modules1/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_ply_nod   ../starter/source/spmd/spmd_anim_ply_init.F
+!||--- called by ------------------------------------------------------
+!||    w_anim_ply    ../starter/source/restart/ddsplit/w_anim_ply.F
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod   ../starter/share/modules1/plyxfem_mod.F
+!||====================================================================
       INTEGER FUNCTION GET_PLY_NOD(IPLY,NODID)
 C-----------------------------------------------
 C   M o d u l e s
@@ -341,11 +342,11 @@ C-----------------------------------------------
       END
 
 
-      !||====================================================================
-      !||    get_ply_nodid   ../starter/source/spmd/spmd_anim_ply_init.F
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod     ../starter/share/modules1/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_ply_nodid   ../starter/source/spmd/spmd_anim_ply_init.F
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod     ../starter/share/modules1/plyxfem_mod.F
+!||====================================================================
       INTEGER FUNCTION GET_PLY_NODID(IPLY,NODID,OFFSET)
 C-----------------------------------------------
 C   M o d u l e s

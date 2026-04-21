@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multifluid_init2       ../starter/source/multifluid/multifluid_init2.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    m5in2                  ../starter/source/initial_conditions/detonation/m5in2.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    qcoor2                 ../starter/source/elements/solid_2d/quad/qcoor2.F
-      !||    qdlen2                 ../starter/source/elements/solid_2d/quad/qdlen2.F
-      !||    qvoli2                 ../starter/source/elements/solid_2d/quad/qvoli2.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    multifluid_init2       ../starter/source/multifluid/multifluid_init2.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    m5in2                  ../starter/source/initial_conditions/detonation/m5in2.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    qcoor2                 ../starter/source/elements/solid_2d/quad/qcoor2.F
+!||    qdlen2                 ../starter/source/elements/solid_2d/quad/qdlen2.F
+!||    qvoli2                 ../starter/source/elements/solid_2d/quad/qvoli2.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE MULTIFLUID_INIT2(NEL, NSIGS, 
      .     IPARG, IXQ, IPM, ALE_CONNECTIVITY, IGEO, IPART, IPARTQ, NPF,
      .     PTQUAD, ILOADP, X, PM, 
@@ -48,6 +48,7 @@ C-----------------------------------------------
       USE DETONATORS_MOD
       USE ALE_CONNECTIVITY_MOD
       USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
+      use element_mod , only : nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -95,6 +96,7 @@ C-----------------------------------------------
       my_real :: Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ),Y4(MVSIZ),
      .           Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ),Z4(MVSIZ),
      .           SY(MVSIZ), SZ(MVSIZ), TY(MVSIZ),TZ(MVSIZ),PRES,VFRAC
+      my_real :: TEMPEL(NEL)
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(G_BUFEL_) ,POINTER :: GBUF  
       TYPE(BUF_MAT_) ,POINTER :: MBUF
@@ -122,7 +124,7 @@ C     Compute deltax
      .        Y1, Y2, Y3, Y4,
      .        Z1, Z2, Z3, Z4)
       ENDIF
-
+      TEMPEL(:) = ZERO
       PM(104,IXQ(1, 1 + NFT)) = ZERO  !global pressure
 
 C     Loop over the materials
@@ -146,7 +148,7 @@ C     Material initialization
      .        MAT, IPM, NSIGS, NUMQUAD, PTQUAD,
      .        IP, NGL,NPF, TF, BUFMAT,
      .        GBUF, LBUF, MBUF, ELBUF_STR, ILOADP,
-     .        FACLOAD, GBUF%DELTAX)
+     .        FACLOAD, GBUF%DELTAX,TEMPEL,MAT_PARAM )
      
          VFRAC = MAT_PARAM( IXQ(1,1+NFT) )%MULTIMAT%VFRAC(ILAY)
          PRES  = PM(104, MAT_PARAM( IXQ(1,1+NFT) )%MULTIMAT%MID(ILAY) )
@@ -162,7 +164,7 @@ C     Material initialization
                ENDIF
                ERROR_THROWN = .TRUE.
             ENDIF
-            CALL M5IN2(PM, MAT, IPM(1, IXQ(1,1+NFT)), DETONATORS, LBUF%TB, NGL, X, IXQ, NIXQ)
+            CALL M5IN2(PM, MAT, IPM(1, IXQ(1,1+NFT)), DETONATORS, LBUF%TB, X, IXQ, NIXQ)
          ENDIF
       ENDDO
 

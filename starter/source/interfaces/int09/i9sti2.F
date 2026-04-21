@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,17 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    i9sti2                 ../starter/source/interfaces/int09/i9sti2.F
-      !||--- called by ------------------------------------------------------
-      !||    inint2                 ../starter/source/interfaces/inter2d1/inint2.F
-      !||--- calls      -----------------------------------------------------
-      !||    inare2                 ../starter/source/interfaces/inter2d1/inare2.F
-      !||    inori2                 ../starter/source/interfaces/inter2d1/inori2.F
-      !||    inrch2                 ../starter/source/interfaces/inter2d1/inrch2.F
-      !||    local_index            ../starter/source/interfaces/interf1/local_index.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i9sti2                 ../starter/source/interfaces/int09/i9sti2.F
+!||--- called by ------------------------------------------------------
+!||    inint2                 ../starter/source/interfaces/inter2d1/inint2.F
+!||--- calls      -----------------------------------------------------
+!||    inare2                 ../starter/source/interfaces/inter2d1/inare2.F
+!||    inori2                 ../starter/source/interfaces/inter2d1/inori2.F
+!||    inrch2                 ../starter/source/interfaces/inter2d1/inrch2.F
+!||    local_index            ../starter/source/interfaces/interf1/local_index.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I9STI2(
      1 X     ,IRECT  ,IXQ   ,
      2 NRT   ,NINT   ,
@@ -60,7 +60,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, II, NEL, J, IG, IL
+      INTEGER I, II, NEL, IG, IL
 C
       my_real AREA, XL2, YM1, YM2, ZM1, ZM2, YE(4), ZE(4)
 C-----------------------------------------------
@@ -83,7 +83,7 @@ C
      .              YE, ZE )
       ENDDO
 C-----------------------------------------------------
-C     MISE DANS IRECT DU NUMERO LOCAL DU NOEUD
+C     PLACING THE LOCAL NODE NUMBER IN IRECT
 C-----------------------------------------------------
       DO  I=1,NRT
         IG=IRECT(1,I)

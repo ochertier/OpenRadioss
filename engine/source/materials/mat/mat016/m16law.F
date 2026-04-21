@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m16law   ../engine/source/materials/mat/mat016/m16law.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain    ../engine/source/materials/mat_share/mmain.F90
-      !||====================================================================
+!||====================================================================
+!||    m16law   ../engine/source/materials/mat/mat016/m16law.F
+!||--- called by ------------------------------------------------------
+!||    mmain    ../engine/source/materials/mat_share/mmain.F90
+!||====================================================================
       SUBROUTINE M16LAW(PM   ,OFF   ,SIG ,NEL  ,
      2                  EPXE ,THETA ,EPD ,XIST ,
      3                  MAT  ,D1    ,D2  ,D3   ,
@@ -82,7 +82,7 @@ C
         G2(I)  =TWO*G1(I)
       ENDDO
 C-------------------------------
-C     CONTRAINTES DEVIATORIQUES
+C     DEVIATORIC STRESSES
 C-------------------------------
       DO I=1,NEL
         SIG(I,1)=SIG(I,1)+POLD(I)+G2(I)*(D1(I)+DAV(I))

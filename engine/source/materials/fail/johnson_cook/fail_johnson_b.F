@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_johnson_b   ../engine/source/materials/fail/johnson_cook/fail_johnson_b.F
-      !||--- called by ------------------------------------------------------
-      !||    fail_beam3       ../engine/source/elements/beam/fail_beam3.F
-      !||====================================================================
+!||====================================================================
+!||    fail_johnson_b   ../engine/source/materials/fail/johnson_cook/fail_johnson_b.F
+!||--- called by ------------------------------------------------------
+!||    fail_beam3       ../engine/source/elements/beam/fail_beam3.F
+!||====================================================================
       SUBROUTINE FAIL_JOHNSON_B(
      .           NEL      ,NGL      ,NUPARAM  ,UPARAM   ,
      .           TIME     ,TSTAR    ,SVM      ,PRESSURE ,
@@ -55,9 +55,9 @@ C-----------------------------------------------
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: PRESSURE! element pressure
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: EPSD    ! strain rate
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: TSTAR   ! normalized temperature
-      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: OFF     ! element desactivation flag
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: OFF     ! element deactivation flag
       my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: DFMAX   ! maximum damage
-      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: TDEL    ! desactivation time
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: TDEL    ! deactivation time
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

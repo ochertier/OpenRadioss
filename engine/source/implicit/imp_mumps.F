@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    imp_mumps1         ../engine/source/implicit/imp_mumps.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv           ../engine/source/implicit/imp_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    mumps_set2         ../engine/source/implicit/imp_mumps.F
-      !||    print_stiff_mat    ../engine/source/implicit/imp_mumps.F
-      !||    spmd_cddl          ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_inf_g         ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_mumps_count   ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_mumps_deal    ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_mumps_gath    ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_mumps_ini     ../engine/source/mpi/implicit/imp_spmd.F
-      !||    tmpenvf            ../engine/source/system/tmpenv_c.c
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm           ../engine/share/modules/imp_intm.F
-      !||    imp_kbcs           ../engine/share/modules/impbufdef_mod.F
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_mumps1            ../engine/source/implicit/imp_mumps.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv              ../engine/source/implicit/imp_solv.F
+!||--- calls      -----------------------------------------------------
+!||    mumps_set2            ../engine/source/implicit/imp_mumps.F
+!||    print_stiff_mat       ../engine/source/implicit/imp_mumps.F
+!||    spmd_cddl             ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_inf_g            ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_mumps_count      ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_mumps_deal       ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_mumps_gath       ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_mumps_ini        ../engine/source/mpi/implicit/imp_spmd.F
+!||    tmpenvf               ../engine/source/system/tmpenv_c.c
+!||--- uses       -----------------------------------------------------
+!||    imp_intm              ../engine/share/modules/imp_intm.F
+!||    imp_kbcs              ../engine/share/modules/impbufdef_mod.F
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE IMP_MUMPS1(NDDL0  , NNZK0    , NDDL  , NNZK , NNMAX   ,
      .                      NODGLOB, IDDL     , NDOF  , INLOC, IKC     ,
      .                      IADK   , JDIK     , DIAG_K, LT_K , IAD_ELEM,
@@ -54,6 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -280,18 +282,21 @@ c      WRITE(IOUT,*) "NCYCLE,IT=",NCYCLE,IT
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    print_stiff_mat          ../engine/source/implicit/imp_mumps.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_mumps1               ../engine/source/implicit/imp_mumps.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_int_allreduce_max   ../engine/source/mpi/implicit/imp_spmd.F
-      !||====================================================================
+!||====================================================================
+!||    print_stiff_mat          ../engine/source/implicit/imp_mumps.F
+!||--- called by ------------------------------------------------------
+!||    imp_mumps1               ../engine/source/implicit/imp_mumps.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_int_allreduce_max   ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod      ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE PRINT_STIFF_MAT(MUMPS_PAR, NDDL, NODGLOB, IDDL, NDOF,  
      .                           CDDLP, INLOC, IKC, NDDLG, NDDLP)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -398,7 +403,7 @@ C All processes: write local stiffness coefficients (at MPI domain level) in Mat
 #ifdef MPI
       CALL MPI_BARRIER(SPMD_COMM_WORLD,IERROR)
 #endif
-C Process 0: read stiff. coeff. from all processes, sort (bubble) and write stiffness coefficients in MatrixMarket format         
+C Process 0: read stiffness coefficients from all processes, sort (bubble) and write stiffness coefficients in MatrixMarket format         
       IF (ISPMD == 0) THEN
          ALLOCATE(NENTRIEStmp(NSPMD))
          WRITE(CSPMD,'(I1)') NSPMD
@@ -447,7 +452,7 @@ C Bubble sort in ascending order of ICOLS and then IROWS
              ENDDO 
              I = I - 1
          ENDDO  
-C Write stiff. coeff. in only one file (suppress duplications) 
+C Write stiffness coefficients in only one file (suppress duplications) 
          IND = 1 
          DO WHILE (IND <= NENTRIES)
            tmpK = K(IND)
@@ -479,18 +484,21 @@ C
 #endif
       RETURN
       END                
-      !||====================================================================
-      !||    imp_mumps2        ../engine/source/implicit/imp_mumps.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solvp2        ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_mumps_exec   ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_mumps_rhs    ../engine/source/mpi/implicit/imp_spmd.F
-      !||====================================================================
+!||====================================================================
+!||    imp_mumps2            ../engine/source/implicit/imp_mumps.F
+!||--- called by ------------------------------------------------------
+!||    lin_solvp2            ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_mumps_exec       ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_mumps_rhs        ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE IMP_MUMPS2(MUMPS_PAR, CDDLP, F, X, NDDL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -531,7 +539,7 @@ C
 C
       CALL SPMD_MUMPS_RHS(X,     CDDLP, MUMPS_PAR%RHS, NDDL, 2,
      .                    NDDLG)
-C----FLAG for MUMPS: IF (IMPL_S>0.AND.ISOLV==3.AND.IMACH==3)
+C----FLAG for MUMPS: IF (IMPL_S>0.AND.ISOLV==3)
           LENT = 1024*MUMPS_PAR%INFO(16)                   
         MUMPSFILESIZE = MAX(MUMPSFILESIZE,LENT)       
 C
@@ -539,13 +547,14 @@ C
 #endif
       END  
 
-      !||====================================================================
-      !||    mumps_set   ../engine/source/implicit/imp_mumps.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_ifri   ../engine/source/mpi/implicit/imp_spmd.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm    ../engine/share/modules/imp_intm.F
-      !||====================================================================
+!||====================================================================
+!||    mumps_set             ../engine/source/implicit/imp_mumps.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_ifri             ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm              ../engine/share/modules/imp_intm.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE MUMPS_SET(IADK , JDIK    , DIAG_K , LT_K  , CDDLP,
      .                     NKLOC, NKFRONT , ITK    , RTK   , IDDL ,
      .                     INLOC, IAD_ELEM, FR_ELEM, NDOF  , IKC  ,
@@ -558,6 +567,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -763,7 +773,7 @@ C
             ENDDO 
          ENDDO
       ENDIF
-C Complement de la matrice de rigidite d'interface pour secnds remote     
+C Complement to the interface stiffness matrix for remote seconds
       DO I=1,NDDL_SL
         II=IDDL_SL(I)
          DO J=IAD_SS(I),IAD_SS(I+1)-1
@@ -803,7 +813,7 @@ C Complement de la matrice de rigidite d'interface pour secnds remote
             ENDIF
          ENDDO
       ENDDO
-C----- il manque DIAG_SL--------
+C----- It lacks diag_sl ---------
       DO N=1,NDDL_SL
        I=IDDL_SL(N)
        IF (IACTI(I)==0) CYCLE
@@ -852,16 +862,17 @@ C
       END
 
 
-      !||====================================================================
-      !||    mumps_set2   ../engine/source/implicit/imp_mumps.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_buck     ../engine/source/implicit/imp_buck.F
-      !||    imp_mumps1   ../engine/source/implicit/imp_mumps.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_ifri    ../engine/source/mpi/implicit/imp_spmd.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm     ../engine/share/modules/imp_intm.F
-      !||====================================================================
+!||====================================================================
+!||    mumps_set2            ../engine/source/implicit/imp_mumps.F
+!||--- called by ------------------------------------------------------
+!||    imp_buck              ../engine/source/implicit/imp_buck.F
+!||    imp_mumps1            ../engine/source/implicit/imp_mumps.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_ifri             ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm              ../engine/share/modules/imp_intm.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE MUMPS_SET2(IADK , JDIK    , DIAG_K , LT_K  , CDDLP,
      .                     NKLOC, NKFRONT , ITK    , RTK   , IDDL ,
      .                     INLOC, IAD_ELEM, FR_ELEM, NDOF  , IKC  ,
@@ -874,6 +885,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -960,7 +972,7 @@ C Matrice de rigidite d'interface
             ENDDO 
          ENDDO
       ENDIF
-C Complement de la matrice de rigidite d'interface pour secnds remote     
+C Complement to the interface stiffness matrix for remote seconds
       DO I=1,NDDL_SL
         II=IDDL_SL(I)
          DO J=IAD_SS(I),IAD_SS(I+1)-1

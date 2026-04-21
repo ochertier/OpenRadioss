@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inter_cell_color    ../engine/source/interfaces/generic/inter_cell_color.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_color_voxel   ../engine/source/interfaces/generic/inter_color_voxel.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_sorting_mod   ../engine/share/modules/inter_sorting_mod.F
-      !||    inter_struct_mod    ../engine/share/modules/inter_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inter_cell_color    ../engine/source/interfaces/generic/inter_cell_color.F
+!||--- called by ------------------------------------------------------
+!||    inter_color_voxel   ../engine/source/interfaces/generic/inter_color_voxel.F
+!||--- uses       -----------------------------------------------------
+!||    inter_sorting_mod   ../engine/share/modules/inter_sorting_mod.F
+!||    inter_struct_mod    ../engine/share/modules/inter_struct_mod.F
+!||====================================================================
         SUBROUTINE INTER_CELL_COLOR(X,IGAP   ,NRTM  ,STF   ,
      2              TZINF  ,CURV_MAX,
      3              GAPMIN ,GAPMAX,GAP_M ,
@@ -82,7 +82,7 @@ C-----------------------------------------------
      .        XMINE,YMINE,ZMINE,XMAXE,YMAXE,ZMAXE,
      .        XX1,XX2,XX3,XX4,YY1,YY2,YY3,YY4,ZZ1,ZZ2,ZZ3,ZZ4
         INTEGER :: IX_COARSE,IY_COARSE,IZ_COARSE
-        my_real :: VALUE
+        my_real :: VALUE,real_value
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -154,17 +154,19 @@ C-----------------------------------------------
             IY2=MAX(1,MIN(NBY,IY2))
             IZ2=MAX(1,MIN(NBZ,IZ2))
 
+            real_value = float(NB_BOX_COARSE_GRID)
+
             !   loop over the cell and cell coloration
             DO IZ = IZ1, IZ2             
-                VALUE = 4.*float(IZ)/float(NB_CELL_Z)
+                VALUE = real_value*float(IZ)/float(NB_CELL_Z)
                 IZ_COARSE = MIN(INT(VALUE),NB_BOX_COARSE_GRID)
                 IZ_COARSE = MAX(IZ_COARSE,1)
                 DO IY = IY1, IY2
-                    VALUE = 4.*float(IY)/float(NB_CELL_Y)
+                    VALUE = real_value*float(IY)/float(NB_CELL_Y)
                     IY_COARSE = MIN(INT(VALUE),NB_BOX_COARSE_GRID)
                     IY_COARSE = MAX(IY_COARSE,1)
                     DO IX = IX1, IX2
-                        VALUE = 4.*float(IX)/float(NB_CELL_X)
+                        VALUE = real_value*float(IX)/float(NB_CELL_X)
                         IX_COARSE = MIN(INT(VALUE),NB_BOX_COARSE_GRID)
                         IX_COARSE = MAX(IX_COARSE,1)
                         IF(CELL_BOOL(IX,IY,IZ)) THEN

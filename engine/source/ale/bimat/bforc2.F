@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,55 +20,55 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    bforc2                 ../engine/source/ale/bimat/bforc2.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain                ../engine/source/ale/alemain.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../engine/source/output/message/message.F
-      !||    arret                  ../engine/source/system/arret.F
-      !||    bafil2                 ../engine/source/ale/bimat/bafil2.F
-      !||    balph2                 ../engine/source/ale/bimat/balph2.F
-      !||    bamom2                 ../engine/source/ale/bimat/bamom2.F
-      !||    bcumu2                 ../engine/source/ale/bimat/bcumu2.F
-      !||    bcumu2p                ../engine/source/ale/bimat/bcumu2.F
-      !||    bcumu2pa               ../engine/source/ale/bimat/bcumu2.F
-      !||    befil2                 ../engine/source/ale/bimat/befil2.F
-      !||    bemom2                 ../engine/source/ale/bimat/bemom2.F
-      !||    blero2                 ../engine/source/ale/bimat/blero2.F
-      !||    brest2                 ../engine/source/ale/bimat/brest2.F
-      !||    check_off_ale          ../engine/source/elements/solid/solide/check_off_ale.F
-      !||    edefo2                 ../engine/source/ale/euler2d/edefo2.F
-      !||    mmain                  ../engine/source/materials/mat_share/mmain.F90
-      !||    qbilan                 ../engine/source/elements/solid_2d/quad/qbilan.F
-      !||    qcoor2                 ../engine/source/elements/solid_2d/quad/qcoor2.F
-      !||    qdefo2                 ../engine/source/elements/solid_2d/quad/qdefo2.F
-      !||    qdlen2                 ../engine/source/elements/solid_2d/quad/qdlen2.F
-      !||    qfint2                 ../engine/source/elements/solid_2d/quad/qfint2.F
-      !||    qhvis2                 ../engine/source/elements/solid_2d/quad/qhvis2.F
-      !||    qmass2                 ../engine/source/elements/solid_2d/quad/qmass2.F
-      !||    qmass2ap               ../engine/source/elements/solid_2d/quad/qmass2ap.F
-      !||    qmass2p                ../engine/source/elements/solid_2d/quad/qmass2p.F
-      !||    qmassreal2             ../engine/source/elements/solid_2d/quad/qmassreal2.F
-      !||    qmassreal2ap           ../engine/source/elements/solid_2d/quad/qmassreal2ap.F
-      !||    qmassreal2p            ../engine/source/elements/solid_2d/quad/qmassreal2p.F
-      !||    qrota2                 ../engine/source/elements/solid_2d/quad/qrota2.F
-      !||    qvolu2                 ../engine/source/elements/solid_2d/quad/qvolu2.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    dt_mod                 ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
-      !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
-      !||    output_mod             ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    table_mod              ../engine/share/modules/table_mod.F
-      !||    timer_mod              ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE BFORC2(TIMERS, ELBUF_TAB   ,NG        ,
+!||====================================================================
+!||    bforc2                 ../engine/source/ale/bimat/bforc2.F
+!||--- called by ------------------------------------------------------
+!||    alemain                ../engine/source/ale/alemain.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../engine/source/output/message/message.F
+!||    arret                  ../engine/source/system/arret.F
+!||    bafil2                 ../engine/source/ale/bimat/bafil2.F
+!||    balph2                 ../engine/source/ale/bimat/balph2.F
+!||    bamom2                 ../engine/source/ale/bimat/bamom2.F
+!||    bcumu2                 ../engine/source/ale/bimat/bcumu2.F
+!||    bcumu2p                ../engine/source/ale/bimat/bcumu2.F
+!||    bcumu2pa               ../engine/source/ale/bimat/bcumu2.F
+!||    befil2                 ../engine/source/ale/bimat/befil2.F
+!||    bemom2                 ../engine/source/ale/bimat/bemom2.F
+!||    blero2                 ../engine/source/ale/bimat/blero2.F
+!||    brest2                 ../engine/source/ale/bimat/brest2.F
+!||    check_off_ale          ../engine/source/elements/solid/solide/check_off_ale.F
+!||    edefo2                 ../engine/source/ale/euler2d/edefo2.F
+!||    mmain                  ../engine/source/materials/mat_share/mmain.F90
+!||    qbilan                 ../engine/source/elements/solid_2d/quad/qbilan.F
+!||    qcoor2                 ../engine/source/elements/solid_2d/quad/qcoor2.F
+!||    qdefo2                 ../engine/source/elements/solid_2d/quad/qdefo2.F
+!||    qdlen2                 ../engine/source/elements/solid_2d/quad/qdlen2.F
+!||    qfint2                 ../engine/source/elements/solid_2d/quad/qfint2.F
+!||    qhvis2                 ../engine/source/elements/solid_2d/quad/qhvis2.F
+!||    qmass2                 ../engine/source/elements/solid_2d/quad/qmass2.F
+!||    qmass2ap               ../engine/source/elements/solid_2d/quad/qmass2ap.F
+!||    qmass2p                ../engine/source/elements/solid_2d/quad/qmass2p.F
+!||    qmassreal2             ../engine/source/elements/solid_2d/quad/qmassreal2.F
+!||    qmassreal2ap           ../engine/source/elements/solid_2d/quad/qmassreal2ap.F
+!||    qmassreal2p            ../engine/source/elements/solid_2d/quad/qmassreal2p.F
+!||    qrota2                 ../engine/source/elements/solid_2d/quad/qrota2.F
+!||    qvolu2                 ../engine/source/elements/solid_2d/quad/qvolu2.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    dt_mod                 ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
+!||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    table_mod              ../engine/share/modules/table_mod.F
+!||    timer_mod              ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE BFORC2(TIMERS,  ELBUF_TAB   ,NG        ,
      1                   PM         ,GEO       ,IC         ,X       ,
      2                   A          ,V         ,MS         ,W       ,FLUX    ,
      3                   FLU1       ,VEUL      ,ALE_CONNECT,IPARG   ,
@@ -83,7 +83,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      C                   NSVOIS     , IRESP    ,IDEL7NOK   ,
      D                   IDTMIN     , MAXFUNC  ,IMON_MAT   ,
      E                   USERL_AVAIL, impl_s     ,idyna  ,DT       ,
-     F                   GLOB_THERM,SENSORS)
+     F                   GLOB_THERM,SENSORS,s_flux,nv46)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -135,10 +135,12 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
       INTEGER, INTENT(IN) :: IMON_MAT
+      integer, intent(in) :: s_flux !< first dimension of flux array
+      integer, intent(in) :: nv46 !< second dimension of flux array        
       INTEGER IC(*), IPARG(NPARG,NGROUP), JPARG(*), IMS(*), NPF(*),IPARTQ(NUMELQ),IPM(*),IGEO(*),ITASK,H3D_STRAIN
       INTEGER NELTST,ITYPTST, IADQ(4,*),GRTH(*),IGRTH(*)
       my_real DT2T
-      my_real PM(*), GEO(*), X(*), A(*), V(*), MS(*), W(*), FLUX(4,*),
+      my_real PM(*), GEO(*), X(*), A(*), V(*), MS(*), W(*), FLUX(s_flux,nv46),
      .        FLU1(*), VEUL(*),FILL(NUMNOD,*),EANI(*),FSKY(*),
      .        DFILL(NUMNOD,*), TF(*), BUFMAT(*), PARTSAV(*), STIFN(*),
      .        BUFVOIS(6,*),GRESAV(*),VOLN(MVSIZ),MS_2D(*),FSKYM(*)
@@ -159,7 +161,7 @@ C-----------------------------------------------
       INTEGER MAT(MVSIZ),NC1(MVSIZ),NC2(MVSIZ),NC3(MVSIZ),NC4(MVSIZ),
      .        NGL(MVSIZ),NGEO(MVSIZ), IBIDV(1) ,L_TEMP, L_PLA, L_BFRAC,L_BULK,SZ_IX
       INTEGER :: ILAY
-      my_real  SOFF
+      integer :: offset_flux
       my_real Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
      .        Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
      .        AIRE(MVSIZ),AIRES(MVSIZ),AIREM(MVSIZ),VD2(MVSIZ),DVOL(MVSIZ),
@@ -226,6 +228,7 @@ C------------
 C------------
 C      A.L.E.
 C------------
+      offset_flux = NUMELQ
       IF (JALE /= 0) THEN
        CALL QVOLU2(
      1   GBUF%OFF,AIRE,    VOLN,    NGL,
@@ -249,20 +252,18 @@ C------------
      C   NC2,     NC3,     NC4,     NEL)
        CALL BALPH2(PM,LBUF1%FRAC,LBUF2%FRAC,GBUF%VOL,FILL,
      .             LBUF1%SIG,LBUF1%EINT,LBUF1%VOL,LBUF1%RHO,
-     .             FLUX(1,NF1),FLU1(NF1),LBUF1%OFF,
+     .             FLUX,FLU1(NF1),LBUF1%OFF,
      .             LBUF2%SIG,LBUF2%EINT,LBUF2%VOL,LBUF2%RHO,
-     .             FLUX(1,NF2),FLU1(NF2),LBUF2%OFF,
+     .             FLU1(NF2),LBUF2%OFF,
      .             GBUF%SIG,GBUF%EINT,GBUF%RHO,GBUF%TEMP,
-     .             MTN1,MTN2,NGL,GBUF%G_TEMP,GBUF%BFRAC,GBUF%G_BFRAC,
+     .             GBUF%G_TEMP,GBUF%BFRAC,GBUF%G_BFRAC,
      .             GBUF%PLA,GBUF%G_PLA,VOLN,GBUF%QVIS,GBUF%G_QVIS,NEL, 
      .             AIRE, AIRES, 
      .             EYY, EZZ, ETT, EYZ, EYT, EZT,
      .             EYYS, EZZS, ETTS, EYZS, EYTS, EZTS, 
      .             MAT, NC1, NC2, NC3, NC4, 
-     .             DALPH1, DALPH2)
-       CALL BAFIL2(PM,V,W,FILL,DFILL,IMS,X,LBUF1%FRAC,LBUF2%FRAC, 
-     .      AIRE, PY1, PY2, PZ1, PZ2, DALPH1, DALPH2, 
-     .      MAT, NC1, NC2, NC3, NC4)
+     .             DALPH1, DALPH2,s_flux,nv46,offset_flux)
+       CALL BAFIL2(V,W,FILL,DFILL,IMS,X, DALPH1, DALPH2, NC1, NC2, NC3, NC4)
 C-----------
 C      EULER
 C-----------
@@ -276,20 +277,20 @@ C-----------
      .                  NC1,NC2,NC3,NC4)
        CALL BALPH2(PM,LBUF1%FRAC,LBUF2%FRAC,GBUF%VOL,FILL,
      .             LBUF1%SIG,LBUF1%EINT,LBUF1%VOL,LBUF1%RHO,
-     .             FLUX(1,NF1),FLU1(NF1),LBUF1%OFF,
+     .             FLUX,FLU1(NF1),LBUF1%OFF,
      .             LBUF2%SIG,LBUF2%EINT,LBUF2%VOL,LBUF2%RHO,
-     .             FLUX(1,NF2),FLU1(NF2),LBUF2%OFF,
+     .             FLU1(NF2),LBUF2%OFF,
      .             GBUF%SIG,GBUF%EINT,GBUF%RHO,GBUF%TEMP,
-     .             MTN1,MTN2,NGL,GBUF%G_TEMP,GBUF%BFRAC,GBUF%G_BFRAC,
+     .             GBUF%G_TEMP,GBUF%BFRAC,GBUF%G_BFRAC,
      .             GBUF%PLA,GBUF%G_PLA,VOLN,GBUF%QVIS,GBUF%G_QVIS,NEL, 
      .             AIRE, AIRES, 
      .             EYY, EZZ, ETT, EYZ, EYT, EZT,
      .             EYYS, EZZS, ETTS, EYZS, EYTS, EZTS, 
      .             MAT, NC1, NC2, NC3, NC4, 
-     .             DALPH1, DALPH2)
-       CALL BEFIL2(PM,V,FILL,DFILL,IMS,X,LBUF1%FRAC,LBUF2%FRAC, 
-     .      AIRE, PY1, PY2, PZ1, PZ2, DALPH1, DALPH2, 
-     .      MAT, NC1, NC2, NC3, NC4)
+     .             DALPH1, DALPH2,s_flux,nv46,offset_flux)
+       CALL BEFIL2(V,FILL,DFILL,IMS,X,
+     .      DALPH1, DALPH2,
+     .      NC1, NC2, NC3, NC4)
       ENDIF
 C-----------------------------------------------------
 C     SUBMATERIAL 1 (MAT LAW20)
@@ -304,19 +305,18 @@ C-----------------------------------------------------
       L_BFRAC= ELBUF_TAB(NG)%BUFLY(JMULT)%L_BFRAC 
       L_BULK = ELBUF_TAB(NG)%BUFLY(JMULT)%L_QVIS
 
-      CALL BREST2(LBUF1%FRAC,GBUF%VOL,PM,
-     .            LBUF1%OFF,LBUF1%VOL,SOFF,IC(LCO),VOLN,
+      CALL BREST2(GBUF%VOL,IC(LCO),VOLN,
      .            AIRE, AIRES, 
      .            EYY, EZZ, ETT, EYZ, EYT, EZT,
      .            EYYS, EZZS, ETTS, EYZS, EYTS, EZTS,
-     .            VD2, DVOL,
      .            MAT,MAT_ELEM%MAT_PARAM, NUMMAT)
-      CALL BLERO2(LBUF1%FRAC,LBUF2%FRAC,LBUF1%VOL,LBUF1%RHO,
-     .            FLUX(1,NF1),FLU1(NF1),LBUF1%OFF,PM,NGL,VOLN, 
-     .            AIRE, EYY, EZZ, ETT, EYZ, EYT, EZT, VD2, DVOL, 
+      offset_flux = 0
+      CALL BLERO2(LBUF1%FRAC,LBUF1%VOL,LBUF1%RHO,
+     .            FLUX,FLU1(NF1),LBUF1%OFF,PM,NGL,VOLN,
+     .            AIRE, EYY, EZZ, ETT, EYZ, EYT, EZT, VD2, DVOL,
      .            VY1, VY2, VY3, VY4, 
      .            VZ1, VZ2, VZ3, VZ4,
-     .            MAT)
+     .            MAT,s_flux,nv46,offset_flux)
       CALL QROTA2( LBUF1%SIG,S1,       S2,       S3,
      2             S4,       S5,       S6,       WYZ,
      3             NEL,      JCVT)
@@ -344,7 +344,7 @@ C-----------------------------------------------------
 C-----------------------------------------------------
 C     STRESS TENSOR
 C-----------------------------------------------------
-      CALL MMAIN(TIMERS,
+      CALL MMAIN(TIMERS, OUTPUT,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -379,7 +379,7 @@ C-----------------------------------------------------
      .   numgeo,      numnod,      numels,            
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, impl_s,
-     .   idyna,       DT         ,BID     )
+     .   idyna,       DT         ,BID     ,sensors)
 C----------------------------------
 C     PETROV-GALERKIN PSEUDO MASSES & ALE MASSES
 C----------------------------------
@@ -439,7 +439,8 @@ C--------------------------
      5   EHOU,     BID,      BID,      BID,
      6   BID,      GRESAV,   GRTH,     IGRTH,
      7   IBID,     BID,      ITASK,    NEL,
-     8   JTUR,     JCVT,     IGRE,     SENSORS)
+     8   JTUR,     JCVT,     IGRE,     SENSORS,
+     9   GBUF%G_WPLA,GBUF%WPLA)
 C
 C--------------------
 C     INTERNAL FORCES
@@ -483,7 +484,7 @@ C--------------
      5                                      1,NEL,NEL)
 
       IF (IPARIT == 0) THEN
-      CALL BCUMU2 (LBUF1%FRAC,LBUF2%FRAC,A,FILL(1,1),
+      CALL BCUMU2 (LBUF1%FRAC,A,
      .             LBUF%SIG,LBUF%EINT,LBUF%RHO,LBUF%QVIS,GBUF%QVIS,
      .             GBUF%SIG,GBUF%EINT,GBUF%RHO,GBUF%TEMP,LBUF%TEMP,
      .             GBUF%PLA,LBUF%PLA,GBUF%BFRAC,LBUF%BFRAC,    
@@ -491,16 +492,16 @@ C--------------
      .             T11,T12,T13,T14,T21,T22,T23,T24, 
      .             B11,B12,B13,B14,B21,B22,B23,B24,
      .             NC1,NC2,NC3,NC4,STI,STIFN,
-     .             L_TEMP, L_PLA, L_BFRAC, L_BULK,NEL)
+     .             L_TEMP, L_PLA, L_BFRAC, L_BULK, NEL)
       ELSE
-       CALL BCUMU2P(LBUF1%FRAC,LBUF2%FRAC,FILL(1,1),
+       CALL BCUMU2P(LBUF1%FRAC,
      .              LBUF%SIG,LBUF%EINT,LBUF%RHO,LBUF%QVIS,GBUF%QVIS,
      .              GBUF%SIG,GBUF%EINT,GBUF%RHO,GBUF%TEMP,LBUF%TEMP,
      .              GBUF%PLA,LBUF%PLA,GBUF%BFRAC,LBUF%BFRAC,    
      .              F11, F12, F21, F22, AX1,AX2,
      .              T11,T12,T13,T14,T21,T22,T23,T24, 
      .              B11,B12,B13,B14,B21,B22,B23,B24,
-     .              FSKY,FSKY,IADQ,STI,NC1,NC2,NC3,NC4,
+     .              FSKY,FSKY,IADQ,STI,
      .              L_TEMP,L_PLA,L_BFRAC,L_BULK,NEL)
       ENDIF
       
@@ -522,19 +523,18 @@ C-----------------------------------------------------
         L_BFRAC= ELBUF_TAB(NG)%BUFLY(JMULT)%L_BFRAC
         L_BULK = ELBUF_TAB(NG)%BUFLY(JMULT)%L_QVIS
 
-      CALL BREST2(LBUF2%FRAC,GBUF%VOL,PM,
-     .            LBUF%OFF,LBUF%VOL,SOFF,IC(LCO),VOLN,
+      CALL BREST2(GBUF%VOL,IC(LCO),VOLN,
      .            AIRE, AIRES, 
      .            EYY, EZZ, ETT, EYZ, EYT, EZT,
      .            EYYS, EZZS, ETTS, EYZS, EYTS, EZTS,
-     .            VD2, DVOL,
      .            MAT, MAT_ELEM%MAT_PARAM, NUMMAT)
-      CALL BLERO2(LBUF2%FRAC,LBUF1%FRAC,LBUF%VOL,LBUF%RHO,
-     .            FLUX(1,NF2),FLU1(NF2),LBUF%OFF,PM,NGL,VOLN, 
+      offset_flux = numelq
+      CALL BLERO2(LBUF2%FRAC,LBUF%VOL,LBUF%RHO,
+     .            FLUX,FLU1(NF2),LBUF%OFF,PM,NGL,VOLN, 
      .            AIRE, EYY, EZZ, ETT, EYZ, EYT, EZT, VD2, DVOL, 
      .            VY1, VY2, VY3, VY4, 
      .            VZ1, VZ2, VZ3, VZ4,
-     .            MAT)
+     .            MAT,s_flux,nv46,offset_flux)
       CALL QROTA2(
      1   LBUF%SIG,S1,      S2,      S3,
      2   S4,      S5,      S6,      WYZ,
@@ -563,7 +563,7 @@ C-----------------------------------------------------
 C-----------------------------------------------------
 C     STREE TENSOR
 C-----------------------------------------------------
-      CALL MMAIN(TIMERS,
+      CALL MMAIN(TIMERS, OUTPUT,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -598,7 +598,7 @@ C-----------------------------------------------------
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, impl_s,
-     .   idyna,       DT         ,BID )
+     .   idyna,       DT         ,BID ,sensors)
 C----------------------------------
 C     PETROV-GALERKIN PSEUDO MASSES & MASSES ALE
 C----------------------------------
@@ -659,7 +659,8 @@ c
      5   EHOU,     BID,      BID,      BID,
      6   BID,      GRESAV,   GRTH,     IGRTH,
      7   IBID,     BID,      ITASK,    NEL,
-     8   JTUR,     JCVT,     IGRE,     SENSORS)
+     8   JTUR,     JCVT,     IGRE,     SENSORS,
+     9   GBUF%G_WPLA,GBUF%WPLA)
 C--------------------
 C       INTERNAL FORCES
 C--------------------
@@ -701,23 +702,24 @@ C--------------
      4                                      BIDM,BIDM,BIDM,BIDM,GBUF%OFF,
      5                                      1,NEL,NEL)
         IF(IPARIT == 0)THEN
-          CALL BCUMU2(LBUF2%FRAC,LBUF1%FRAC,A,FILL(1,2),
+          CALL BCUMU2(LBUF2%FRAC,A,
      .             LBUF%SIG,LBUF%EINT,LBUF%RHO,LBUF%QVIS,GBUF%QVIS,
      .             GBUF%SIG,GBUF%EINT,GBUF%RHO,GBUF%TEMP,LBUF%TEMP,
      .             GBUF%PLA,LBUF%PLA,GBUF%BFRAC,LBUF%BFRAC,
      .             F11, F12, F21, F22, AX1,AX2,
      .             T11,T12,T13,T14,T21,T22,T23,T24, 
      .             B11,B12,B13,B14,B21,B22,B23,B24,
-     .             NC1,NC2,NC3,NC4,STI,STIFN,L_TEMP,L_PLA,L_BFRAC,L_BULK,NEL)
+     .             NC1,NC2,NC3,NC4,STI,STIFN,
+     .             L_TEMP,L_PLA,L_BFRAC,L_BULK,NEL)
         ELSE
-          CALL BCUMU2PA(LBUF2%FRAC,LBUF1%FRAC,FILL(1,2),
+          CALL BCUMU2PA(LBUF2%FRAC,
      .                 LBUF%SIG,LBUF%EINT,LBUF%RHO,LBUF%QVIS,GBUF%QVIS,
      .                 GBUF%SIG,GBUF%EINT,GBUF%RHO,GBUF%TEMP,LBUF%TEMP,
      .                 GBUF%PLA,LBUF%PLA,GBUF%BFRAC,LBUF%BFRAC,     
      .                 F11, F12, F21, F22, AX1,AX2,
      .                 T11,T12,T13,T14,T21,T22,T23,T24, 
      .                 B11,B12,B13,B14,B21,B22,B23,B24,
-     .                 FSKY,FSKY,IADQ,STI,NC1,NC2,NC3,NC4,L_TEMP,L_PLA,
+     .                 FSKY,FSKY,IADQ,STI,L_TEMP,L_PLA,
      .                 L_BFRAC,L_BULK,NEL)
         ENDIF
       ENDIF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sponfprs       ../engine/source/elements/sph/sponfprs.F
-      !||--- called by ------------------------------------------------------
-      !||    forintp        ../engine/source/elements/forintp.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf        ../engine/share/resol/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod    ../engine/share/resol/initbuf.F
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    sponfprs       ../engine/source/elements/sph/sponfprs.F
+!||--- called by ------------------------------------------------------
+!||    forintp        ../engine/source/elements/forintp.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf        ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    initbuf_mod    ../engine/share/resol/initbuf.F
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPONFPRS(X ,V        ,A       ,MS      ,
      2              SPBUF   ,ITAB     ,KXSP    ,IXSP    ,NOD2SP  ,
      3              ISPHIO  ,VSPHIO   ,NPC     ,PLD     ,PM      ,
@@ -79,7 +79,7 @@ C-----------------------------------------------
      .        IPRT,IPPV,J,M,JNOD,IMPOSE,JMPOSE,
      .        IMAT,IFPRES,NP,JMPOSE2,NN,KK(6)
       my_real
-     .       PENTP,PN,PSHFT,PX,
+     .       PENTP,PN,PX,
      .       XI,YI,ZI,XJ,YJ,ZJ,DMIN,DD,VX,VY,VZ,
      .       PMIN,VN,VO,PO,RHOI,SSPI,PINFINI,LC,ALP,
      .       WFEXTT,DVOL
@@ -90,7 +90,7 @@ C=======================================================================
       PINFINI = ZERO
       PN = ZERO
 C-----------------------------------------------
-C     1.  GENERAL OUTLET : REIMPOSE P=f(t) ou Pvoisin.
+C     1. General Outlet: reimpose p = f (t) or pvoisin.
 C-----------------------------------------------       
       DO NS=1,NSPHACT
        N=WASPACT(NS)
@@ -208,7 +208,7 @@ C
      .           +GBUF%SIG(KK(2)+K)
      .           +GBUF%SIG(KK(3)+K))*THIRD
 
-          ELSEIF(IPPV<0)THEN !cas IPPV negatif on se sert des infos recuperes ds la routine de com
+          ELSEIF(IPPV<0)THEN !negative IPPV case, we use info recovered in the communication routine
 
             PN=-( WAR(1,-IPPV)
      .           +WAR(2,-IPPV)
@@ -416,9 +416,8 @@ C
        ENDIF
       ENDDO
 C-------------------------------------------
-#include "atomic.inc"
+!$OMP ATOMIC
       WFEXT=WFEXT+WFEXTT
-#include "atomend.inc"
 C-------------------------------------------
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    surface_deactivation         ../engine/source/interfaces/interf/surface_deactivation.F
-      !||--- called by ------------------------------------------------------
-      !||    check_remote_surface_state   ../engine/source/interfaces/interf/check_remote_surface_state.F
-      !||====================================================================
+!||====================================================================
+!||    surface_deactivation         ../engine/source/interfaces/interf/surface_deactivation.F
+!||--- called by ------------------------------------------------------
+!||    check_remote_surface_state   ../engine/source/interfaces/interf/check_remote_surface_state.F
+!||====================================================================
         SUBROUTINE SURFACE_DEACTIVATION(ITY,NRTM,GLOCAL_SURFACE_ID,MSEGLO,MVOISIN)
 !$COMMENT
 !       SURFACE_DEACTIVATION description

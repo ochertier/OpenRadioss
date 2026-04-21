@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11main_opt_tri   ../engine/source/interfaces/intsort/i11main_opt_tri.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_tripi         ../engine/source/implicit/imp_int_k.F
-      !||    inttri            ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11optcd          ../engine/source/interfaces/intsort/i11optcd.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i11main_opt_tri   ../engine/source/interfaces/intsort/i11main_opt_tri.F
+!||--- called by ------------------------------------------------------
+!||    imp_tripi         ../engine/source/implicit/imp_int_k.F
+!||    inttri            ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    i11optcd          ../engine/source/interfaces/intsort/i11optcd.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I11MAIN_OPT_TRI(
      1                  IPARI   ,INTBUF_TAB  ,X     ,V      ,
      2                  NIN     ,ITASK,COUNT_REMSLV,
@@ -67,12 +68,12 @@ C     REAL
      .   STARTT, GAP, STOPT, DRAD, DGAPLOADP
       INTEGER :: NRTS
 C-----------------------------------------------
-C  Calcul des adresses des buffers d'interfaces. 
-C  Les adresses des buffers J10-JFI et K10-KFI 
-C  sont remplaces systematiquement par des tableaux
-C  JD(i) et KD(i), en gardant les memes numeros d'indexes.
-C  Les anciens adresses directs Jn, Kn sont modifies
-C  dans la routine sans commentaires additionnels habituels
+C  calculation of interface buffer addresses.
+C  the addresses of buffers J10-JFI and K10-KFI
+C  are systematically replaced by arrays
+C  JD(i) and KD(i), keeping the same index numbers.
+C  the old direct addresses Jn, Kn are modified
+C  in the routine without usual additional comments
 C----------------------------------------------------
 C
       STARTT=INTBUF_TAB%VARIABLES(3)
@@ -85,8 +86,8 @@ C
       DGAPLOADP = INTBUF_TAB%VARIABLES(46)
       NRTS   =IPARI(3,NIN)
 C-----------------------------------------------------------
-C     Filtrage des candidats a l'impact
-C     (si candidat retenu, cand_n(i) = - cand_n(i))
+C     Filtering of impact candidates
+C     (if candidate retained, cand_n(i) = - cand_n(i))
 C-----------------------------------------------------------
       CALL I11OPTCD(
      1  INTBUF_TAB%CAND_E, INTBUF_TAB%CAND_N, X  , INTBUF_TAB%I_STOK(1),

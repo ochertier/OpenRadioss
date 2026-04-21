@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,20 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_i21crit   ../engine/source/mpi/interfaces/spmd_i21crit.F
-      !||--- called by ------------------------------------------------------
-      !||    i21_icrit      ../engine/source/interfaces/intsort/i21_icrit.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_rbcast    ../engine/source/mpi/generic/spmd_rbcast.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i21crit          ../engine/source/mpi/interfaces/spmd_i21crit.F
+!||--- called by ------------------------------------------------------
+!||    i21_icrit             ../engine/source/interfaces/intsort/i21_icrit.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_rbcast           ../engine/source/mpi/generic/spmd_rbcast.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_I21CRIT(GAPINF,VX,VY,VZ,DIST)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -52,7 +55,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, N, MSGTYP, IERROR, LOC_PROC,
+      INTEGER I, N, IERROR, LOC_PROC,
      .        SIZE
       my_real
      .        RBUF(5,NINTSTAMP,NSPMD),RRBUF(5,NINTSTAMP)

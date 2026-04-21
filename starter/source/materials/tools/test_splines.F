@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    test_spline          ../starter/source/materials/tools/test_splines.F
-      !||--- calls      -----------------------------------------------------
-      !||    spline_interpol_2d   ../starter/source/materials/tools/spline_interpol_2d.F
-      !||====================================================================
+!||====================================================================
+!||    test_spline          ../starter/source/materials/tools/test_splines.F
+!||--- calls      -----------------------------------------------------
+!||    spline_interpol_2d   ../starter/source/materials/tools/spline_interpol_2d.F
+!||====================================================================
        SUBROUTINE TEST_SPLINE(NPT0,NSUB,XF,YF,XX,YY)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
        !compute SPLINE length with third order method (SIMPSON)
-       !  INPUT  - LOCAL_PT : 4 control points P0,P1,P2,P3
+       !  INPUT - Local_pt: 4 control points P0, P1, P2, P3
        !  INPUT  - ALPHA : CCR SPLINE PARAMETER
        !  INPUT  - T : position [0,1] on SPLINE [T1,T2].  1.0 means full spline length
        !  OUTPUT - LEN : length of the curve parametrised with t in [0,T]  T<=1.0
@@ -106,7 +106,7 @@ c
         ENDDO                                            
         
       ENDDO 
-      ! last point                                           
+      ! Last point                                           
       TT = ONE
       K = K + 1
       XX(K) = XF(NPT0)

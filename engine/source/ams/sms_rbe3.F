@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    sms_rbe3_nodxi         ../engine/source/ams/sms_rbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_build_diag         ../engine/source/ams/sms_build_diag.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe3                ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    spmd_exch_rbe3_nodnx   ../engine/source/mpi/ams/spmd_sms.F
-      !||    spmd_max_ii            ../engine/source/mpi/implicit/imp_spmd.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rbe3_nodxi         ../engine/source/ams/sms_rbe3.F
+!||--- called by ------------------------------------------------------
+!||    sms_build_diag         ../engine/source/ams/sms_build_diag.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe3                ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    spmd_exch_rbe3_nodnx   ../engine/source/mpi/ams/spmd_sms.F
+!||    spmd_max_ii            ../engine/source/mpi/implicit/imp_spmd.F
+!||====================================================================
       SUBROUTINE SMS_RBE3_NODXI(
      1   IRBE3 ,LRBE3 ,NODXI_SMS,IAD_M ,FR_M   )
 C-----------------------------------------------
@@ -121,21 +121,21 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    sms_rbe3t1             ../engine/source/ams/sms_rbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_encin_2            ../engine/source/ams/sms_encin_2.F
-      !||    sms_mass_scale_2       ../engine/source/ams/sms_mass_scale_2.F
-      !||    sms_pcg                ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    foat_to_6_float        ../engine/source/system/parit.F
-      !||    prerbe3                ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    prerbe3p               ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    sms_rbe3_1             ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3_2             ../engine/source/ams/sms_rbe3.F
-      !||    spmd_exch_rbe3_a_pon   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3_a_pon.F
-      !||    zero1                  ../engine/source/system/zero.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rbe3t1             ../engine/source/ams/sms_rbe3.F
+!||--- called by ------------------------------------------------------
+!||    sms_encin_2            ../engine/source/ams/sms_encin_2.F
+!||    sms_mass_scale_2       ../engine/source/ams/sms_mass_scale_2.F
+!||    sms_pcg                ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float        ../engine/source/system/parit.F
+!||    prerbe3                ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    prerbe3p               ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    sms_rbe3_1             ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3_2             ../engine/source/ams/sms_rbe3.F
+!||    spmd_exch_rbe3_a_pon   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3_a_pon.F
+!||    zero1                  ../engine/source/system/zero.F
+!||====================================================================
       SUBROUTINE SMS_RBE3T1(
      1                  IRBE3 ,LRBE3  ,X     ,A      ,FRBE3  ,
      2                  SKEW  ,WEIGHT ,IAD_M ,FR_M   ,FR_MPON,
@@ -163,10 +163,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, MAX_M,IROTG,JT(3,NRBE3),JR(3,NRBE3),IERR,NMT,
-     .        IADA,IADMS,IADFN,IADAR,IADIN,IADFR,IADM0,IADI0,IADL,
-     .        IPA,IPMS,IPFN,IPAR,IPIN,IPFR,NMP,IADLP,NS,NML,ICOM,
-     .        IADLP1,IADM1,IADI1,NMT0,IADMP(SLRBE3/2),IML(SLRBE3/2),
+      INTEGER    MAX_M,IROTG,JT(3,NRBE3),JR(3,NRBE3),NMT,
+     .        IADA,IADMS,IADFN,IADAR,IADIN,IADFR,IADL,
+     .        IPA,IPMS,IPFN,IPAR,IPIN,IPFR,NMP,IADLP,ICOM,
+     .        NMT0,IADMP(SLRBE3/2),IML(SLRBE3/2),
      .        ISIZE
 C     REAL
 C------------allacation will be removed to ini_ uniforming smp spmd in v11
@@ -240,15 +240,15 @@ C---
       RETURN
       END
 
-      !||====================================================================
-      !||    sms_rbe3t2   ../engine/source/ams/sms_rbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_pcg      ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    prerbe3      ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    prerbe3p     ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3cl       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rbe3t2   ../engine/source/ams/sms_rbe3.F
+!||--- called by ------------------------------------------------------
+!||    sms_pcg      ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    prerbe3      ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    prerbe3p     ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3cl       ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE SMS_RBE3T2(IRBE3 ,LRBE3 ,X    ,A     ,FRBE3 ,
      2                      SKEW  ,R     ,PREC_SMS3)
 C-----------------------------------------------
@@ -272,8 +272,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, M, NS ,NML, IAD,JJ,IROT,IADS,MAX_M,IROTG,
-     .        JT(3,NRBE3),JR(3,NRBE3),NM,NN,K,
+      INTEGER I, J, N, M, NS ,NML, IAD,IROT,IADS,MAX_M,IROTG,
+     .        JT(3,NRBE3),JR(3,NRBE3),K,
      .        NMT,NMT0,IADMP(SLRBE3/2),IML(SLRBE3/2)
 C     REAL
       my_real 
@@ -329,19 +329,19 @@ C---
       END
 
 
-      !||====================================================================
-      !||    sms_rbe3_prec          ../engine/source/ams/sms_rbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_pcg                ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    foat_to_6_float        ../engine/source/system/parit.F
-      !||    prerbe3                ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    prerbe3p               ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    sms_rbe3_1             ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3_3             ../engine/source/ams/sms_rbe3.F
-      !||    spmd_exch_rbe3_a_pon   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3_a_pon.F
-      !||    zero1                  ../engine/source/system/zero.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rbe3_prec          ../engine/source/ams/sms_rbe3.F
+!||--- called by ------------------------------------------------------
+!||    sms_pcg                ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    foat_to_6_float        ../engine/source/system/parit.F
+!||    prerbe3                ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    prerbe3p               ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    sms_rbe3_1             ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3_3             ../engine/source/ams/sms_rbe3.F
+!||    spmd_exch_rbe3_a_pon   ../engine/source/mpi/kinematic_conditions/spmd_exch_rbe3_a_pon.F
+!||    zero1                  ../engine/source/system/zero.F
+!||====================================================================
       SUBROUTINE SMS_RBE3_PREC(
      1                  IRBE3 ,LRBE3  ,X     ,DIAG_SMS,DIAG_SMS3,
      2                  FRBE3 ,SKEW  ,WEIGHT ,IAD_M   ,FR_M     ,
@@ -370,10 +370,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, MAX_M,IROTG,JT(3,NRBE3),JR(3,NRBE3),IERR,NMT,
-     .        IADA,IADMS,IADFN,IADAR,IADIN,IADFR,IADM0,IADI0,IADL,
-     .        IPA,IPMS,IPFN,IPAR,IPIN,IPFR,NMP,IADLP,NS,NML,ICOM,
-     .        IADLP1,IADM1,IADI1,NMT0,IADMP(SLRBE3/2),IML(SLRBE3/2),
+      INTEGER    MAX_M,IROTG,JT(3,NRBE3),JR(3,NRBE3),NMT,
+     .        IADA,IADMS,IADFN,IADAR,IADIN,IADFR,IADL,
+     .        IPA,IPMS,IPFN,IPAR,IPIN,IPFR,NMP,IADLP,ICOM,
+     .        NMT0,IADMP(SLRBE3/2),IML(SLRBE3/2),
      .        ISIZE
 C     REAL
 C------------allacation will be removed to ini_ uniforming smp spmd in v11
@@ -447,15 +447,15 @@ C---
       RETURN
       END
 
-      !||====================================================================
-      !||    sms_rbe3_1      ../engine/source/ams/sms_rbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rbe3_prec   ../engine/source/ams/sms_rbe3.F
-      !||    sms_rbe3t1      ../engine/source/ams/sms_rbe3.F
-      !||--- calls      -----------------------------------------------------
-      !||    mfac_rbe3       ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||    rbe3cl          ../engine/source/constraints/general/rbe3/rbe3f.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rbe3_1      ../engine/source/ams/sms_rbe3.F
+!||--- called by ------------------------------------------------------
+!||    sms_rbe3_prec   ../engine/source/ams/sms_rbe3.F
+!||    sms_rbe3t1      ../engine/source/ams/sms_rbe3.F
+!||--- calls      -----------------------------------------------------
+!||    mfac_rbe3       ../engine/source/constraints/general/rbe3/rbe3f.F
+!||    rbe3cl          ../engine/source/constraints/general/rbe3/rbe3f.F
+!||====================================================================
       SUBROUTINE SMS_RBE3_1(
      1                 IRBE3 ,LRBE3 ,X     ,A     ,FRBE3 ,
      2                 SKEW  ,WEIGHT,JT    ,IROTG ,MAX_M ,
@@ -526,11 +526,11 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    sms_rbe3_2   ../engine/source/ams/sms_rbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rbe3t1   ../engine/source/ams/sms_rbe3.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rbe3_2   ../engine/source/ams/sms_rbe3.F
+!||--- called by ------------------------------------------------------
+!||    sms_rbe3t1   ../engine/source/ams/sms_rbe3.F
+!||====================================================================
       SUBROUTINE SMS_RBE3_2(IRBE3 ,LRBE3 ,A     ,WEIGHT,DA    ,
      2                      NMT   ,IML   ,JT    )
 C-----------------------------------------------
@@ -589,11 +589,11 @@ C---
       RETURN
       END
 
-      !||====================================================================
-      !||    sms_rbe3_3      ../engine/source/ams/sms_rbe3.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rbe3_prec   ../engine/source/ams/sms_rbe3.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rbe3_3      ../engine/source/ams/sms_rbe3.F
+!||--- called by ------------------------------------------------------
+!||    sms_rbe3_prec   ../engine/source/ams/sms_rbe3.F
+!||====================================================================
       SUBROUTINE SMS_RBE3_3(IRBE3 ,LRBE3 ,DIAG_SMS3,WEIGHT,DA    ,
      2                      NMT   ,IML   ,JT    )
 C-----------------------------------------------
@@ -614,7 +614,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, M, N, NS
+      INTEGER I, J, K, M
 C     REAL
       my_real
      .   DD

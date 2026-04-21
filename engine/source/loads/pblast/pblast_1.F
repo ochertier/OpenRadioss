@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    pblast_1                      ../engine/source/loads/pblast/pblast_1.F
-      !||--- called by ------------------------------------------------------
-      !||    pblast_load_computation       ../engine/source/loads/pblast/pblast.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                         ../engine/source/system/arret.F
-      !||    my_barrier                    ../engine/source/system/machine.F
-      !||    omp_get_thread_num            ../engine/source/engine/openmp_stub.F90
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod                  ../common_source/modules/groupdef_mod.F
-      !||    h3d_inc_mod                   ../engine/share/modules/h3d_inc_mod.F
-      !||    h3d_mod                       ../engine/share/modules/h3d_mod.F
-      !||    th_surf_mod                   ../common_source/modules/interfaces/th_surf_mod.F
-      !||====================================================================
-      SUBROUTINE PBLAST_1(PBLAST,ILOADP  ,FAC      ,A       ,V         ,X       ,
-     1                    IADC    ,FSKY     ,LLOADP  ,FEXT      ,
-     2                    ITAB    ,H3D_DATA ,NL      ,DTMIN_LOC ,WFEXT_LOC,
+!||====================================================================
+!||    pblast_1                      ../engine/source/loads/pblast/pblast_1.F
+!||--- called by ------------------------------------------------------
+!||    pblast_load_computation       ../engine/source/loads/pblast/pblast.F
+!||--- calls      -----------------------------------------------------
+!||    arret                         ../engine/source/system/arret.F
+!||    my_barrier                    ../engine/source/system/machine.F
+!||    omp_get_thread_num            ../engine/source/engine/openmp_stub.F90
+!||    pblast_parameters__free_air   ../common_source/modules/loads/pblast_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod                  ../common_source/modules/groupdef_mod.F
+!||    h3d_inc_mod                   ../engine/share/modules/h3d_inc_mod.F
+!||    h3d_mod                       ../engine/share/modules/h3d_mod.F
+!||    names_and_titles_mod          ../common_source/modules/names_and_titles_mod.F
+!||    output_mod                    ../common_source/modules/output/output_mod.F90
+!||    pblast_mod                    ../common_source/modules/loads/pblast_mod.F90
+!||    th_mod                        ../engine/share/modules/th_mod.F
+!||    th_surf_mod                   ../common_source/modules/interfaces/th_surf_mod.F
+!||====================================================================
+      SUBROUTINE PBLAST_1(OUTPUT, PBLAST  ,ILOADP   ,FAC     ,A         ,V         ,X        ,
+     1                    IADC    ,FSKY     ,LLOADP  ,FEXT      ,NODA_SURF ,NODA_PEXT,
+     2                    ITAB    ,H3D_DATA ,NL      ,DTMIN_LOC ,WFEXT_LOC ,
      3                    TH_SURF ,NSEGPL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -46,6 +51,9 @@ C-----------------------------------------------
       USE GROUPDEF_MOD      
       USE H3D_INC_MOD 
       USE TH_SURF_MOD , ONLY : TH_SURF_
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
+      USE TH_MOD , ONLY : TH_HAS_NODA_PEXT
+      USE OUTPUT_MOD 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,6 +75,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(output_), intent(inout) :: OUTPUT
       INTEGER,INTENT(IN) :: LLOADP(SLLOADP)
       INTEGER,INTENT(INOUT) :: ILOADP(SIZLOADP,NLOADP)
       INTEGER,INTENT(IN) :: IADC(*)
@@ -75,7 +84,10 @@ C-----------------------------------------------
       DOUBLE PRECISION,INTENT(INOUT) :: WFEXT_LOC
       my_real,INTENT(IN) :: V(3,NUMNOD),X(3,NUMNOD)
       my_real,INTENT(INOUT) :: FAC(LFACLOAD,NLOADP)
-      my_real,INTENT(INOUT) :: A(3,NUMNOD),FSKY(8,SFSKY/8),FEXT(3,NUMNOD)
+      my_real,INTENT(INOUT) :: A(3,NUMNOD),FSKY(8,SFSKY/8)
+      my_real,INTENT(INOUT) :: FEXT(3,NUMNOD)
+      my_real,INTENT(INOUT) :: NODA_SURF(NUMNOD)
+      my_real,INTENT(INOUT) :: NODA_PEXT(NUMNOD)
       TYPE(H3D_DATABASE),INTENT(IN) :: H3D_DATA
       TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
       INTEGER, INTENT(INOUT) :: NSEGPL
@@ -86,19 +98,24 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: N1, N2, N3, N4,IL,IS,IAD,I,IANIM_OR_H3D,IZ_UPDATE,ABAC_ID,ISIZ_SEG,IERR1,
      .           ID, ITA_SHIFT,IMODEL,NN(4),NS,KSURF,NDT
-     
+      INTEGER :: NWARN !< number of segment for which it is not possible to correlate the positive impulse. It may happen that for a given Pmax and dt0 value even building a triangle shape leads to a lower impulse that the targeted one.
+
       my_real :: Zx,Zy,Zz,NORM,Nx,Ny,Nz,AREA,
-     .           LAMBDA,cos_theta, alpha_inci, alpha_refl, P_inci, P_refl_,P_inci_, P_refl,Z,
+     .           cos_theta, alpha_inci, alpha_refl, P_inci, P_refl_,P_inci_, P_refl,Z,
      .           I_inci,I_refl,I_inci_,I_refl_, dt_0, t_a,dt_0_,
      .           WAVE_refl,WAVE_inci, W13,
      .           DNORM, Xdet,Ydet,Zdet,Tdet,Wtnt,PMIN,T_STOP,Dx,Dy,Dz,P,
      .           FAC_M_bb, FAC_L_bb, FAC_T_bb, FAC_P_bb, FAC_I_bb, TA_FIRST, TT_STAR, Z1_,
      .           DECAY_inci,DECAY_refl,ZETA,
-     .           cst_255_div_ln_Z1_on_ZN,  log10_, NPT, FF(3), TA_INF_LOC
+     .           cst_255_div_ln_Z1_on_ZN,  log10_, NPT, FF(3), TA_INF_LOC,
+     .           SURF_PATCH
       
       INTEGER, EXTERNAL :: OMP_GET_THREAD_NUM
 
-      LOGICAL IS_UPDATED,IS_DECAY_TO_BE_COMPUTED
+      LOGICAL,SAVE ::  IS_UPDATED
+      LOGICAL :: IS_DECAY_TO_BE_COMPUTED
+
+      CHARACTER(LEN=NCHARLINE) ::  MSGOUT1,MSGOUT2
       
       DATA cst_255_div_ln_Z1_on_ZN/-38.147316611455952998/
       DATA log10_ /2.30258509299405000000/
@@ -125,7 +142,7 @@ C-----------------------------------------------
       TT_STAR = TT + PBLAST%PBLAST_DT%TA_INF
       IZ_UPDATE = ILOADP(06,NL)
       TDET = FAC(01,NL)
-      TA_FIRST = FAC(07,NL) ! arrival time for first segment to be loaded
+      TA_FIRST = FAC(07,NL) + PBLAST%PBLAST_DT%TA_INF ! arrival time for first segment to be loaded
       IF(IZ_UPDATE ==1)THEN
         !if no update during engine
         DTMIN_LOC = (ONE+EM06)*(TA_FIRST - TT)
@@ -157,6 +174,7 @@ C-----------------------------------------------
       FAC_I_bb = FAC_M_bb/FAC_L_bb/FAC_T_bb
 
       IS_UPDATED=.FALSE.
+      CALL MY_BARRIER
 
       !-----------------------------------------------,                                                 
       !   FREE AIR BURST                                                                                
@@ -185,6 +203,7 @@ C-----------------------------------------------
 
       IS_DECAY_TO_BE_COMPUTED = .FALSE.
       IF(IMODEL == 2)IS_DECAY_TO_BE_COMPUTED=.TRUE.
+      NWARN = 0
 
       !---------------------------------------------                                                                  
       !   LOOP ON SEGMENTS (4N or 3N)                                                                  
@@ -205,7 +224,7 @@ C-----------------------------------------------
           !3-NODE-SEGMENT                                                                 
           PBLAST%PBLAST_TAB(IL)%NPt(I)   = THREE
           NPT = THREE                                                           
-          !Segment Centroid                                                                   
+          !Centroid segment                                                                   
           Zx = X(1,N1)+X(1,N2)+X(1,N3)                                                                  
           Zy = X(2,N1)+X(2,N2)+X(2,N3)                                                                  
           Zz = X(3,N1)+X(3,N2)+X(3,N3)                                                                  
@@ -222,7 +241,7 @@ C-----------------------------------------------
           !4-NODE-SEGMENT 
           PBLAST%PBLAST_TAB(IL)%NPt(I)   = FOUR
           NPT = FOUR 
-          !Face Centroid 
+          !Centroid side 
           Zx = X(1,N1)+X(1,N2)+X(1,N3)+X(1,N4)
           Zy = X(2,N1)+X(2,N2)+X(2,N3)+X(2,N4)
           Zz = X(3,N1)+X(3,N2)+X(3,N3)+X(3,N4)
@@ -258,7 +277,7 @@ C-----------------------------------------------
           Dz    = (Zdet - Zz)*FAC_L_bb  ! => ... to cm                                                                                                                                                
           DNORM = SQRT(Dx*Dx+Dy*Dy+Dz*Dz)                                                                                                                                                             
 
-          !Angle from detonation point
+          !Angle from Detonation Point
           cos_theta = Dx*Nx + Dy*Ny + Dz*Nz
           cos_theta = cos_theta/MAX(EM20,NORM*DNORM)
 
@@ -267,30 +286,32 @@ C-----------------------------------------------
           !display warning message if out of bounds
           ! precondition for SUBROUTINE PBLAST_PARAMETERS__FREE_AIR
           IF(Z <= 0.5 .AND. PBLAST%PBLAST_TAB(IL)%TAGMSG(I) == 0 )THEN
-            if (N4 == 0)then
-              write(IOUT,FMT='(A,3I11)')
-     .         "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3)
-              write(ISTDO,FMT='(A,3I11)')
-     .         "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3)
+            write(iout, fmt='(A,I0,A)')   "Warning : /LOAD/PBLAST id=",ID," R/W**(1/3) < 0.5 cm/g**(1/3)"
+            write(istdo,fmt='(A,I0,A)')   "Warning : /LOAD/PBLAST id=",ID," R/W**(1/3) < 0.5 cm/g**(1/3)"
+            write(iout, fmt='(A)')        "          Radial Distance R too close to the charge"
+            write(istdo,fmt='(A)')        "          Radial Distance R too close to the charge"
+
+            if (N4 == 0 .OR. N3 == N4)then
+             write(iout, fmt='(A,3I11)')  "         -> Segment nodes : ", itab(n1),itab(n2),itab(n3)
+             write(istdo,fmt='(A,3I11)')  "         -> Segment nodes : ", itab(n1),itab(n2),itab(n3)
             else
-              write(IOUT,FMT='(A,4I11)')
-     .         "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
-              write(ISTDO,FMT='(A,4I11)')
-     .         "Warning : /LOAD/PBLAST, R/W**(1/3) < 0.5   cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
+             write(iout, fmt='(A,4I11)')  "         -> Segment nodes : ", itab(n1),itab(n2),itab(n3),itab(n4)
+             write(istdo,fmt='(A,4I11)')  "         -> Segment nodes : ", itab(n1),itab(n2),itab(n3),itab(n4)
             endif
             PBLAST%PBLAST_TAB(IL)%TAGMSG(I) = 1
+
           ELSEIF(Z > 400. AND. PBLAST%PBLAST_TAB(IL)%TAGMSG(I) == 0)THEN
-              if (N4 == 0)then
-              write(IOUT,FMT='(A,3I11)')
-     .         "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3)
-              write(ISTDO,FMT='(A,3I11)')
-     .         "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3)
-              else
-              write(IOUT,FMT='(A,4I11)')
-     .         "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
-              write(ISTDO,FMT='(A,4I11)')
-     .         "Warning : /LOAD/PBLAST, R/W**(1/3) > 400.0 cm/g**(1/3)    .Segment nodes : ",ITAB(N1),ITAB(N2),ITAB(N3),ITAB(N4)
-              endif
+            write(iout, fmt='(A,I0,A)')   "Warning : /LOAD/PBLAST id=",ID," R/W**(1/3) > 400. cm/g**(1/3)"
+            write(istdo,fmt='(A,I0,A)')   "Warning : /LOAD/PBLAST id=",ID," R/W**(1/3) > 400. cm/g**(1/3)"
+            WRITE(iout, FMT='(A)')        "          Radial Distance R too far from the charge"
+            WRITE(istdo,FMT='(A)')        "          Radial Distance R too far from the charge"
+            if (N4 == 0 .OR. N3 == N4)then
+             write(iout, fmt='(A,3I11)')  "         -> Segment nodes : ", itab(n1),itab(n2),itab(n3)
+             write(istdo,fmt='(A,3I11)')  "         -> Segment nodes : ", itab(n1),itab(n2),itab(n3)
+            else
+             write(iout, fmt='(A,4I11)')  "         -> Segment nodes : ", itab(n1),itab(n2),itab(n3),itab(n4)
+             write(istdo,fmt='(A,4I11)')  "         -> Segment nodes : ", itab(n1),itab(n2),itab(n3),itab(n4)
+            endif
               PBLAST%PBLAST_TAB(IL)%TAGMSG(I) = 1
           ENDIF
 
@@ -298,7 +319,7 @@ C-----------------------------------------------
           CALL PBLAST_PARAMETERS__FREE_AIR(PBLAST,Z, W13, TDET,
      +                                     FAC_P_bb, FAC_I_bb, FAC_T_bb,
      +                                     IS_DECAY_TO_BE_COMPUTED,
-     +                                     FRIEDLANDER_PARAMS)
+     +                                     FRIEDLANDER_PARAMS,NWARN)
 
           P_inci     = FRIEDLANDER_PARAMS%P_inci
           P_inci_    = FRIEDLANDER_PARAMS%P_inci_
@@ -329,7 +350,6 @@ C-----------------------------------------------
           DTMIN_LOC = MIN(DTMIN_LOC,DT_0/NDT)
           IS_UPDATED = .TRUE.
 
-                                                                                                                                                                                                      
         ELSE! => IZ_UPDATE=1
                                                                                                                                                                                                       
           !use wave parameters from Starter
@@ -368,12 +388,13 @@ C-----------------------------------------------
         ENDIF                                                                                                                                                                                         
         P = alpha_refl * WAVE_REFL + alpha_inci * WAVE_INCI
         P = MAX(P,PMIN)                                                                                                                                                                               
-        IF (NUMSKINP > 0) PBLAST%PBLAST_TAB(IL)%PRES(I) = P                                                                                                                                                  
+        PBLAST%PBLAST_TAB(IL)%PRES(I) = P
 
         !!Expand Pressure load to nodes
         ! FF is nodal force which applied on each node N1,N2,N3, and also N4 if relevant
         ! FF = FF_elem / NPT = Pload.S.n / NPT  where n is the unitary normal vector
         ! NX,NY,NZ = 2S.n (in all cases:quadrangles & triangles)
+        SURF_PATCH = HALF*SQRT(NX*NX+NY*NY+NZ*NZ) / NPT
         FF(1) = -P * HALF*NX / NPT       !  -P*S/NPT . nx
         FF(2) = -P * HALF*NY / NPT       !  -P*S/NPT . ny
         FF(3) = -P * HALF*NZ / NPT       !  -P*S/NPT . nz
@@ -381,6 +402,7 @@ C-----------------------------------------------
         PBLAST%PBLAST_TAB(IL)%FX(I) = FF(1)
         PBLAST%PBLAST_TAB(IL)%FY(I) = FF(2)
         PBLAST%PBLAST_TAB(IL)%FZ(I) = FF(3)
+        PBLAST%PBLAST_TAB(IL)%SURF_PATCH(I) = SURF_PATCH
 
         !External Force work
         ! on a given node : DW = <F,V>*dt
@@ -390,17 +412,28 @@ C-----------------------------------------------
 C----- /TH/SURF -------
         IF(TH_SURF%LOADP_FLAG > 0 ) THEN
           NSEGPL = NSEGPL + 1
-          AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+          AREA = SURF_PATCH * NPT
           DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
              KSURF = TH_SURF%LOADP_SEGS(NS)
-             th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + P
-             th_surf%channels(5,KSURF)= th_surf%channels(5,KSURF) + AREA
+             th_surf%channels(4,KSURF)= th_surf%channels(4,KSURF) + AREA*P ! mean pressure
+             th_surf%channels(5,KSURF)= th_surf%channels(5,KSURF) + AREA   ! suface where pressure is applied
           ENDDO
         ENDIF
 
       ENDDO!next I                                                                                                                                                                                    
 !$OMP END DO
-         
+
+      IF(IMODEL == 2 .AND. NWARN > 0)THEN
+        MSGOUT1=''
+        WRITE(MSGOUT1,FMT='(I0,A)') NWARN,
+     .  ' SEGMENT(S) HAS EXCESSIVE POSITIVE IMPULSE REGARDING THE PEAK PRESSURE AND POSITIVE DURATION.'
+        MSGOUT2=''
+        MSGOUT2='A TRIANGULAR WAVEFORM WILL BE USED INSTEAD TO MAXIMIZE THE IMPULSE. DEFINING A PMIN VALUE IS STRONGLY RECOMMENDED'
+        write(IOUT , FMT='(A,I10,/A,/A)') "Updated parameters for /LOAD/PBLAST id=", ID, MSGOUT1, MSGOUT2
+        write(ISTDO, FMT='(A,I10,/A,/A)') "Updated parameters for /LOAD/PBLAST id=", ID, MSGOUT1, MSGOUT2
+      ENDIF
+
+      CALL MY_BARRIER
       IF(IS_UPDATED)THEN
 #include "lockon.inc"
         !---arrival time
@@ -413,7 +446,6 @@ C----- /TH/SURF -------
         IZ_UPDATE = 1 !update done
         ILOADP(06,NL) = IZ_UPDATE
 #include "lockoff.inc"
-        CALL MY_BARRIER()
 !$OMP SINGLE
         write(IOUT,FMT='(A,I10,A,E16.8,A,E16.8)') "Updated parameters for /LOAD/PBLAST id=",
      .                                         ID,' previous first arrival time :',ZETA,
@@ -484,28 +516,48 @@ C----- /TH/SURF -------
       !   H3D FILE         /H3D/NODA/FEXT         !
       !-------------------------------------------!                                                                                                                       
 !$OMP SINGLE
-      IF(IANIM_OR_H3D>0) THEN
+      IF(IANIM_OR_H3D > 0) THEN
         DO I = 1,ISIZ_SEG                                                                        
-          N1=PBLAST%PBLAST_TAB(IL)%N(1,I)                                                                              
-          N2=PBLAST%PBLAST_TAB(IL)%N(2,I)                                                                              
-          N3=PBLAST%PBLAST_TAB(IL)%N(3,I)                                                                              
-          N4=PBLAST%PBLAST_TAB(IL)%N(4,I)                                                                              
-          FEXT(1,N1) = FEXT(1,N1)+PBLAST%PBLAST_TAB(IL)%FX(I)                                                          
-          FEXT(2,N1) = FEXT(2,N1)+PBLAST%PBLAST_TAB(IL)%FY(I)                                                          
-          FEXT(3,N1) = FEXT(3,N1)+PBLAST%PBLAST_TAB(IL)%FZ(I)                                                          
-          FEXT(1,N2) = FEXT(1,N2)+PBLAST%PBLAST_TAB(IL)%FX(I)                                                          
-          FEXT(2,N2) = FEXT(2,N2)+PBLAST%PBLAST_TAB(IL)%FY(I)                                                          
-          FEXT(3,N2) = FEXT(3,N2)+PBLAST%PBLAST_TAB(IL)%FZ(I)                                                          
-          FEXT(1,N3) = FEXT(1,N3)+PBLAST%PBLAST_TAB(IL)%FX(I)                                                          
-          FEXT(2,N3) = FEXT(2,N3)+PBLAST%PBLAST_TAB(IL)%FY(I)                                                          
-          FEXT(3,N3) = FEXT(3,N3)+PBLAST%PBLAST_TAB(IL)%FZ(I)                                                          
-          IF(PBLAST%PBLAST_TAB(IL)%NPt(I)==FOUR)THEN                                                                   
-            FEXT(1,N4) = FEXT(1,N4)+PBLAST%PBLAST_TAB(IL)%FX(I)                                                        
-            FEXT(2,N4) = FEXT(2,N4)+PBLAST%PBLAST_TAB(IL)%FY(I)                                                        
-            FEXT(3,N4) = FEXT(3,N4)+PBLAST%PBLAST_TAB(IL)%FZ(I)                                                        
+          N1=PBLAST%PBLAST_TAB(IL)%N(1,I)
+          N2=PBLAST%PBLAST_TAB(IL)%N(2,I)
+          N3=PBLAST%PBLAST_TAB(IL)%N(3,I)
+          N4=PBLAST%PBLAST_TAB(IL)%N(4,I)
+          FEXT(1,N1) = FEXT(1,N1)+PBLAST%PBLAST_TAB(IL)%FX(I)
+          FEXT(2,N1) = FEXT(2,N1)+PBLAST%PBLAST_TAB(IL)%FY(I)
+          FEXT(3,N1) = FEXT(3,N1)+PBLAST%PBLAST_TAB(IL)%FZ(I)
+          FEXT(1,N2) = FEXT(1,N2)+PBLAST%PBLAST_TAB(IL)%FX(I)
+          FEXT(2,N2) = FEXT(2,N2)+PBLAST%PBLAST_TAB(IL)%FY(I)
+          FEXT(3,N2) = FEXT(3,N2)+PBLAST%PBLAST_TAB(IL)%FZ(I)
+          FEXT(1,N3) = FEXT(1,N3)+PBLAST%PBLAST_TAB(IL)%FX(I)
+          FEXT(2,N3) = FEXT(2,N3)+PBLAST%PBLAST_TAB(IL)%FY(I)
+          FEXT(3,N3) = FEXT(3,N3)+PBLAST%PBLAST_TAB(IL)%FZ(I)
+          IF(PBLAST%PBLAST_TAB(IL)%NPt(I)==FOUR)THEN
+            FEXT(1,N4) = FEXT(1,N4)+PBLAST%PBLAST_TAB(IL)%FX(I)
+            FEXT(2,N4) = FEXT(2,N4)+PBLAST%PBLAST_TAB(IL)%FY(I)
+            FEXT(3,N4) = FEXT(3,N4)+PBLAST%PBLAST_TAB(IL)%FZ(I)
           ENDIF                                                                                  
         ENDDO                                                                                           
-      ENDIF  
+      ENDIF
+      IF(TH_HAS_NODA_PEXT > 0 .OR. OUTPUT%DATA%ANIM_HAS_NODA_PEXT > 0 .OR. OUTPUT%DATA%H3D_HAS_NODA_PEXT > 0) THEN
+        DO I = 1,ISIZ_SEG
+          N1 = PBLAST%PBLAST_TAB(IL)%N(1,I)
+          N2 = PBLAST%PBLAST_TAB(IL)%N(2,I)
+          N3 = PBLAST%PBLAST_TAB(IL)%N(3,I)
+          N4 = PBLAST%PBLAST_TAB(IL)%N(4,I)
+          SURF_PATCH = PBLAST%PBLAST_TAB(IL)%SURF_PATCH(I)
+          NODA_SURF(N1) = NODA_SURF(N1) + SURF_PATCH
+          NODA_SURF(N2) = NODA_SURF(N2) + SURF_PATCH
+          NODA_SURF(N3) = NODA_SURF(N3) + SURF_PATCH
+          P = PBLAST%PBLAST_TAB(IL)%PRES(I) * SURF_PATCH
+          NODA_PEXT(N1) = NODA_PEXT(N1) + P
+          NODA_PEXT(N2) = NODA_PEXT(N2) + P
+          NODA_PEXT(N3) = NODA_PEXT(N3) + P
+          IF(PBLAST%PBLAST_TAB(IL)%NPT(I) == FOUR)THEN
+            NODA_SURF(N4) = NODA_SURF(N4) + SURF_PATCH
+            NODA_PEXT(N4) = NODA_PEXT(N4) + P
+          ENDIF
+        ENDDO
+      ENDIF
 !$OMP END SINGLE    
 
       RETURN
@@ -517,5 +569,4 @@ C-----------------------------------------------
          CALL ARRET(2)
        END IF
 C-----------------------------------------------
-       
-      END SUBROUTINE
+      END SUBROUTINE PBLAST_1

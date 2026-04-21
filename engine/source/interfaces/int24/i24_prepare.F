@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_i24_prepare   ../engine/source/interfaces/int24/i24_prepare.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||    tri7box            ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i24_prepare   ../engine/source/interfaces/int24/i24_prepare.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod      ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod        ../engine/share/message_module/message_mod.F
+!||    tri7box            ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_I24_PREPARE(MODE,IPARI, INTBUF_TAB,
      *                         IAD_ELEM, FR_ELEM,INTLIST,NBINTC,
      *                         IAD_I24 , SFR_I24, FR_I24,I24MAXNSNE)
@@ -62,7 +63,7 @@ C-----------------------------------------------
       INTEGER ITAG(NUMNOD),SZFRI24,IAFR24
       INTEGER P,I,J,NI,NIN,NOD,NTY,NSN,SN,NSNE
 C-----------------------------------------------
-C Partie 1, calcul des tailles de FR_I24
+C part 1, calculation of fr_i24 sizes
 C-----------------------------------------------
       ITAG(1:NUMNOD)=0
       IF (MODE==1)THEN
@@ -101,7 +102,7 @@ C Flush ITAG to zero again for next CPU
         ENDDO
         SFR_I24=SZFRI24
 C-----------------------------------------------
-C Partie 2, on remplis FR_I24 et IAD_I24
+C Part 2, we fill out Fr_i24 and IAD_I24
 C-----------------------------------------------
       ELSEIF(MODE==2)THEN
         IAD_I24(1,1)=1

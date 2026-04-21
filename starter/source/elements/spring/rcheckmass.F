@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rcheckmass             ../starter/source/elements/spring/rcheckmass.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rcheckmass             ../starter/source/elements/spring/rcheckmass.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE RCHECKMASS(
      .                  IXR      ,GEO      ,PM       ,MSR      ,INR    ,
      .                  MS       ,IN       ,ITAB     ,IGEO     ,IPM    ,
@@ -40,6 +40,7 @@ C-----------------------------------------------
       USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -125,26 +126,22 @@ C
             N2  =IXR(3,NR)
             IF((TAGSLV(N1)==0.AND.(MS(N1)==ZERO.OR.IN(N1)==ZERO)).OR.
      .         (TAGSLV(N2)==0.AND.(MS(N2)==ZERO.OR.IN(N2)==ZERO)))THEN
- 
-              IF(IP/=IPREV.AND.NERR/=0)THEN
+C 
+              IF(IP/=IPREV)THEN
+                IF (NERR /= 0) THEN  
+C                 Depile messages...
+                  CALL FRETITL2(TITL,IPART(LIPART1-LTITR+1,IP),LTITR)
+                  CALL ANCMSG(MSGID=1870,
+     .                       MSGTYPE=MSGERROR,
+     .                       ANMODE=ANINFO_BLIND_1,
+     .                       I1=IPART(4,IPREV),
+     .                       C1=TITL,
+     .                       PRMOD=MSG_PRINT) 
+                  NERR=0
+                ENDIF 
                 IPREV=IP
-C
-                CALL FRETITL2(TITL,IPART(LIPART1-LTITR+1,IP),LTITR)
-                CALL ANCMSG(MSGID=1870,
-     .                      MSGTYPE=MSGERROR,
-     .                      ANMODE=ANINFO_BLIND_1,
-     .                      I1=IPART(4,IP),
-     .                      C1=TITL)
-C
-C               Depile messages...
-                CALL ANCMSG(MSGID=1871,
-     .                      MSGTYPE=MSGERROR,
-     .                      ANMODE=ANINFO_BLIND_1,
-     .                      PRMOD=MSG_PRINT)
-C
-                NERR = 0
-C
               END IF
+C              
               XKM= MAX(UPARAM(IADBUF + K11 + 1)*UPARAM(IADBUF + K1 + 1),
      .                 UPARAM(IADBUF + K11 + 2)*UPARAM(IADBUF + K1 + 2),
      .                 UPARAM(IADBUF + K11 + 3)*UPARAM(IADBUF + K1 + 3))   ! /XL(I)
@@ -161,10 +158,10 @@ C
               END IF
             END IF
           END IF
-        END IF 
+        END IF         
         IF(IERR2/=0)THEN
           NERR=NERR+1
-          CALL ANCMSG(MSGID=1871,
+          CALL ANCMSG(MSGID=1870,
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO_BLIND_1,
      .                I1=IXR(NIXR,NR),
@@ -173,11 +170,16 @@ C
      .                PRMOD=MSG_CUMU)
         END IF
       END DO
-C
-      CALL ANCMSG(MSGID=1871,
-     .            MSGTYPE=MSGERROR,
-     .            ANMODE=ANINFO_BLIND_1,
-     .            PRMOD=MSG_PRINT)
+C     
+      IF (NERR /= 0) THEN
+        CALL FRETITL2(TITL,IPART(LIPART1-LTITR+1,IP),LTITR)
+        CALL ANCMSG(MSGID=1870,
+     .              MSGTYPE=MSGERROR,
+     .              ANMODE=ANINFO_BLIND_1,
+     .              I1=IPART(4,IP),
+     .              C1=TITL,
+     .             PRMOD=MSG_PRINT) 
+      END IF
 C
       DEALLOCATE(INDEX,ITRI,TAGSLV)
 C------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_h3d_skin_vector   ../engine/source/output/h3d/h3d_build_fortran/create_h3d_skin_vector.F
-      !||--- called by ------------------------------------------------------
-      !||    lech3d                   ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                    ../engine/source/system/arret.F
-      !||    nvar                     ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
-      !||    names_and_titles_mod     ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_h3d_skin_vector           ../engine/source/output/h3d/h3d_build_fortran/create_h3d_skin_vector.F
+!||--- called by ------------------------------------------------------
+!||    lech3d                           ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
+!||--- calls      -----------------------------------------------------
+!||    arret                            ../engine/source/system/arret.F
+!||    create_h3d_output_per_part       ../engine/source/output/h3d/h3d_build_fortran/create_h3d_output_per_part.F90
+!||--- uses       -----------------------------------------------------
+!||    create_h3d_output_per_part_mod   ../engine/source/output/h3d/h3d_build_fortran/create_h3d_output_per_part.F90
+!||    groupdef_mod                     ../common_source/modules/groupdef_mod.F
+!||    h3d_mod                          ../engine/share/modules/h3d_mod.F
+!||    names_and_titles_mod             ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE CREATE_H3D_SKIN_VECTOR(H3D_DATA,ID_SKIN_VECTOR,ID_INPUT,TEXT1,STEXT1,
-     .                                  COMMENT,SCOMMENT,IPART,KEY3_GLOB,LAYER,IR,IS,IT,IUVAR)
+     .                                  COMMENT,SCOMMENT,IPART,KEY3_GLOB,LAYER,IR,IS,IT,IUVAR,IGRPART)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+      USE GROUPDEF_MOD
+      USE CREATE_H3D_OUTPUT_PER_PART_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,6 +55,7 @@ C-----------------------------------------------
       CHARACTER(LEN=STEXT1) :: TEXT1
       CHARACTER(LEN=SCOMMENT) :: COMMENT
       CHARACTER(LEN=NCHARLINE100) :: KEY3_GLOB
+      TYPE(GROUP_)  ,DIMENSION(NGRPART) ,INTENT(IN) :: IGRPART
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -59,12 +64,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER NVAR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=NCHARLINE100) ::CARTE,CARTE1
-      INTEGER I,J,L,N_H3D_PART
+      INTEGER I,N_H3D_PART
 C=========================================================================
       H3D_DATA%N_OUTP_H3D = H3D_DATA%N_OUTP_H3D + 1
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%OK = 1
@@ -101,17 +104,9 @@ c
         ENDDO
       ENDIF
 
- 
-      DO J=1,N_H3D_PART
-        DO I=1,NPART
-          IF(H3D_DATA%INPUT_LIST(ID_INPUT)%PART_LIST(J) == IPART(4,I)) THEN
-              H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%PART(I) = 1
-          ENDIF
-        ENDDO
-      ENDDO
+      CALL CREATE_H3D_OUTPUT_PER_PART(N_H3D_PART,H3D_DATA,ID_INPUT,LIPART1,NPART,IPART,NGRPART,IGRPART)
 
 
       RETURN
- 999  print *,'error lecture'
       CALL ARRET(0)
       END

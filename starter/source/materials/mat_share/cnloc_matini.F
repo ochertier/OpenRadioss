@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cnloc_matini       ../starter/source/materials/mat_share/cnloc_matini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3fint_reg_ini     ../starter/source/elements/sh3n/coque3n/c3fint_reg_ini.F
-      !||    cbafint_reg_ini    ../starter/source/elements/shell/coqueba/cbafint_reg_ini.F
-      !||    cdkfint_reg_ini    ../starter/source/elements/sh3n/coquedk/cdkfint_reg_ini.F
-      !||    cfint_reg_ini      ../starter/source/elements/shell/coque/cfint_reg_ini.F
-      !||--- calls      -----------------------------------------------------
-      !||    cnloc_mat104_ini   ../starter/source/materials/mat/mat104/cnloc_mat104_ini.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cnloc_matini       ../starter/source/materials/mat_share/cnloc_matini.F
+!||--- called by ------------------------------------------------------
+!||    c3fint_reg_ini     ../starter/source/elements/sh3n/coque3n/c3fint_reg_ini.F
+!||    cbafint_reg_ini    ../starter/source/elements/shell/coqueba/cbafint_reg_ini.F
+!||    cdkfint_reg_ini    ../starter/source/elements/sh3n/coquedk/cdkfint_reg_ini.F
+!||    cfint_reg_ini      ../starter/source/elements/shell/coque/cfint_reg_ini.F
+!||--- calls      -----------------------------------------------------
+!||    cnloc_mat104_ini   ../starter/source/materials/mat/mat104/cnloc_mat104_ini.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod        ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CNLOC_MATINI(ELBUF_STR,NEL      ,IPM      ,
      .                        BUFMAT   ,TIME     ,VARNL    ,
      .                        FAILURE  )
@@ -89,7 +89,7 @@ C
       ! Material properties and parameters
       IADBUF  = MAX(1,IPM(7,IMAT))
       NUPARAM = IPM(9,IMAT) 
-      UPARAM  => BUFMAT(IADBUF:IADBUF+NUPARAM)       
+      UPARAM  => BUFMAT(IADBUF:IADBUF+NUPARAM-1)
 C
       DO K=1,5
         IJ(K) = NEL*(K-1)

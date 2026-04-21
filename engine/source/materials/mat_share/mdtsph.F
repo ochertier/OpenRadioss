@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mdtsph          ../engine/source/materials/mat_share/mdtsph.F
-      !||--- called by ------------------------------------------------------
-      !||    m1law           ../engine/source/materials/mat/mat001/m1law.F
-      !||    m1lawi          ../engine/source/materials/mat/mat001/m1lawi.F
-      !||    m1lawtot        ../engine/source/materials/mat/mat001/m1lawtot.F
-      !||    m22law          ../engine/source/materials/mat/mat022/m22law.F
-      !||    m24law          ../engine/source/materials/mat/mat024/m24law.F
-      !||    m2law           ../engine/source/materials/mat/mat002/m2law.F
-      !||    mmain           ../engine/source/materials/mat_share/mmain.F90
-      !||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
-      !||    sboltlaw        ../engine/source/elements/solid/solide/sboltlaw.F
-      !||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
-      !||====================================================================
+!||====================================================================
+!||    mdtsph          ../engine/source/materials/mat_share/mdtsph.F
+!||--- called by ------------------------------------------------------
+!||    m1law           ../engine/source/materials/mat/mat001/m1law.F
+!||    m1lawi          ../engine/source/materials/mat/mat001/m1lawi.F
+!||    m1lawtot        ../engine/source/materials/mat/mat001/m1lawtot.F
+!||    m22law          ../engine/source/materials/mat/mat022/m22law.F
+!||    m24law          ../engine/source/materials/mat/mat024/m24law.F
+!||    m2law           ../engine/source/materials/mat/mat002/m2law.F
+!||    mmain           ../engine/source/materials/mat_share/mmain.F90
+!||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
+!||    sboltlaw        ../engine/source/elements/solid/solide/sboltlaw.F
+!||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
+!||====================================================================
       SUBROUTINE MDTSPH(
      1   PM,      OFF,     RHO,     RK,
      2   T,       RE,      STI,     DT2T,
@@ -84,7 +84,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J, MT
+      INTEGER I, MT
       my_real
      .   AL(MVSIZ),DTX(MVSIZ), QX(MVSIZ), CX(MVSIZ), QXMATER(MVSIZ),
      .   QA, QB, VISI, FACQ,
@@ -164,7 +164,7 @@ C-----------------------------------------------
         IF(OFF(I)==ZERO) CYCLE
         STI(I) = TWO*RHO(I) * VOL(I) / (DTX(I)*DTX(I))
         DTX(I)= DTFAC1(ITY)*DTX(I)
-        !dt2 remplace par dt2t
+        !dt2 replaced by dt2t
         IF(NODADT==0)DT2T= MIN(DTX(I),DT2T)
       ENDDO
       
@@ -209,7 +209,7 @@ C-----------------------------------------------
        
        DO I=1,NEL
          IF(DTX(I)>DT2T.OR.OFF(I)==ZERO) CYCLE
-         !nelts et itypts remplaces par neltst et itypst
+         !nelts and itypts replaced by neltst and itypst
          NELTST =NGL(I)
          ITYPTST=ITY
        ENDDO

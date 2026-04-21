@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    nolib_usermat99        ../engine/source/user_interface/nolib_usermat99.F
-      !||--- called by ------------------------------------------------------
-      !||    usermat_shell          ../engine/source/materials/mat_share/usermat_shell.F
-      !||    usermat_solid          ../engine/source/materials/mat_share/usermat_solid.F
-      !||--- uses       -----------------------------------------------------
-      !||    law_usersh             ../engine/source/user_interface/law_usersh.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    nolib_usermat99        ../engine/source/user_interface/nolib_usermat99.F
+!||--- called by ------------------------------------------------------
+!||    usermat_shell          ../engine/source/materials/mat_share/usermat_shell.F
+!||    usermat_solid          ../engine/source/materials/mat_share/usermat_solid.F
+!||--- uses       -----------------------------------------------------
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE NOLIB_USERMAT99(ILAW_USER, IUSER_KEY)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -45,7 +44,6 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE LAW_USERSH
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   C o m m o n   B l o c k s

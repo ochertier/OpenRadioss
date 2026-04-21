@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecinv         ../engine/source/input/lecinv.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../engine/source/input/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||    fxbvini        ../common_source/fxbody/fxbvini.F
-      !||    ngr2usr        ../engine/source/input/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecinv         ../engine/source/input/lecinv.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../engine/source/input/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../engine/source/output/message/message.F
+!||    arret          ../engine/source/system/arret.F
+!||    fxbvini        ../common_source/fxbody/fxbvini.F
+!||    ngr2usr        ../engine/source/input/freform.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||    message_mod    ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LECINV(NINIV ,X, V ,VR  ,ITAB  ,
      .                  IFRAME,XFRAME, IGRNOD, FXBIPM, FXBVIT,
      .                  FXBRPM)
@@ -51,7 +51,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "units_c.inc"
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 #include      "fxbcom.inc"
@@ -70,8 +69,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,JJ,K,N,N1,N2,K1,K2,K3,NGR2USR,II
-      INTEGER IDIR,CPT0,CPT1,IFM,IFRA,IGN,CPT20,CPT21
+      INTEGER I,J,K,N,N1,N2,K1,K2,K3,NGR2USR,II
+      INTEGER IDIR,CPT0,CPT1,IFRA,IGN,CPT20,CPT21
 C     REAL
       my_real
      .   VV  ,VTX ,VTY ,VTZ , NIXJ(6),
@@ -79,9 +78,8 @@ C     REAL
       EXTERNAL NGR2USR
 C-----------------------------------------------
 C
-      IF(IMACH/=3.OR.ISPMD==0) THEN
+      IF(ISPMD==0) THEN
         WRITE(IOUT,'(//,A,/)')' VELOCITY REINITIALISATION'
-C
       ENDIF
 C
       CPT0=0
@@ -106,7 +104,7 @@ C-----
        ENDIF
 C
        IF (IDIR < 0) THEN
-         IF(IMACH/=3.OR.ISPMD==0) THEN
+         IF(ISPMD==0) THEN
            IF (N1 < 0) THEN
              IF (CPT20==0) WRITE(IOUT,3000)
              WRITE(IOUT,3100) -N1,VV,VTX,VTY,VTZ,IFRA
@@ -259,7 +257,7 @@ C
            ENDDO
          ENDIF
         ELSE
-         IF(IMACH/=3.OR.ISPMD==0) THEN
+         IF(ISPMD==0) THEN
            IF (CPT1==0) WRITE(IOUT,2000)
            WRITE(IOUT,2100)N1,N2,IDIR,VV
            CPT1=CPT1+1

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_list_sph_scalar   ../engine/source/output/h3d/input_list/h3d_list_sph_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    lech3d                ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_list_sph_scalar   ../engine/source/output/h3d/input_list/h3d_list_sph_scalar.F
+!||--- called by ------------------------------------------------------
+!||    lech3d                ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod               ../engine/share/modules/h3d_mod.F
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE H3D_LIST_SPH_SCALAR(H3D_KEYWORD_SPH_SCALAR,GEO,IGEO,NKEY)
 C-----------------------------------------------
 C   M o d u l e s
@@ -53,7 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NIPMAX
+      INTEGER I
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -237,6 +237,9 @@ c-----------------------------------------------
       H3D_KEYWORD_SPH_SCALAR(I)%TEXT1  = 'Volumetric Strain'
       H3D_KEYWORD_SPH_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
 c-----------------------------------------------
-
-      NKEY=I
+      I = I + 1
+      H3D_KEYWORD_SPH_SCALAR(I)%KEY3  = 'DT'
+      H3D_KEYWORD_SPH_SCALAR(I)%TEXT1 = 'Time Step'
+c-----------------------------------------------  
+      NKEY=I   
       END

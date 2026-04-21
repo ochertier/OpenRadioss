@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    w_ibcscyc   ../starter/source/restart/ddsplit/w_ibcscyc.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal      ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    w_ibcscyc   ../starter/source/restart/ddsplit/w_ibcscyc.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal      ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE W_IBCSCYC(IBCSCYC,LBCSCYC,NODLOCAL ,PROC    ,LLCYC_L,
      .                     NBCSCYC_L,LEN_IA )
 C-----------------------------------------------
@@ -54,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, KL, NSNL, NSN, ILP, NLL, NN, M, N,PROC1,
+      INTEGER I, J, K, KL, NSNL, NSN,PROC1,
      .        IBVTMP(4,NBCSCYC_L), LBVTMP(2,LLCYC_L),IAD,N1,N2
 C-----------------------------------------------
 C

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r2r_exchange           ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                  ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    check_dtnoda_c         ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    get_ibuf_c             ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    get_stiff_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    get_stiff_spmd         ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||    r2r_block_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    r2r_sem_c              ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    r2r_unlock_threads_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    send_data_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    send_data_nl_c         ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    send_data_spmd         ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||    send_ibuf_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    spmd_exch_r2r          ../engine/source/mpi/r2r/spmd_r2r.F
-      !||    spmd_ibcast            ../engine/source/mpi/generic/spmd_ibcast.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
-      !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
-      !||    rad2r_mod              ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_exchange           ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- called by ------------------------------------------------------
+!||    resol                  ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    check_dtnoda_c         ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    get_ibuf_c             ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    get_stiff_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    get_stiff_spmd         ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||    r2r_block_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    r2r_sem_c              ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    r2r_unlock_threads_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    send_data_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    send_data_nl_c         ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    send_data_spmd         ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||    send_ibuf_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    spmd_exch_r2r          ../engine/source/mpi/r2r/spmd_r2r.F
+!||    spmd_ibcast            ../engine/source/mpi/generic/spmd_ibcast.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod           ../common_source/modules/groupdef_mod.F
+!||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+!||    rad2r_mod              ../engine/share/modules/rad2r.F
+!||====================================================================
       SUBROUTINE R2R_EXCHANGE(
      1    IEXLNK   ,IGRNOD   ,DX       ,V        ,VR        ,
      2    A        ,AR       ,MS       ,IN       ,STX       ,STR       ,
@@ -88,7 +88,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I,IEX,IDP,IDG,NNG,OLD_ACTIV,BID,LENR,SIZE,NTOP
+        INTEGER IEX, IDP, IDG, NNG, OLD_ACTIV, BID, LENR, SIZE, NTOP
 C
         INTEGER, DIMENSION(:), POINTER :: GRNOD
         my_real, POINTER, DIMENSION(:) :: MSNL,VNL,FNL
@@ -120,7 +120,7 @@ C----------simple precision : DX is replaced by XDP--------------
      .          ADD_RBY(IEX) ,RBYLNK(IEX),KINLNK(IEX),R2R_KINE,DT1,IEX,
      .          OFF_SPH_R2R  ,NUMSPH_GLO_R2R, NRBY)
             ELSE
-C---------double precision---------------------------------------
+C-------- Double precision -----------------------------------------------------------------------------------
               CALL SEND_DATA_C(
      .          IDP    ,NNG    ,GRNOD  ,A      ,AR     ,
      .          STX    ,STR    ,V      ,VR     ,MS     ,IN     ,
@@ -143,7 +143,7 @@ C----------simple precision : DX is replaced by XDP--------------
      .            IN ,XDP ,DD_R2R(1,IEX),DD_R2R(NSPMD+1,IEX),WEIGHT,
      .            TYPLNK(IEX),ROTLNK(IEX),RBYLNK(IEX),RBY,IEX)
             ELSE
-C----------double precision -------------------------------------
+C--------- Double precision ---------------------------------------------------------------------------
               CALL SEND_DATA_SPMD(
      .            IDP,NNG,GRNOD        ,A                    ,AR     ,
      .            STX,STR,V            ,VR                   ,MS     ,
@@ -171,7 +171,7 @@ C----- Check activation flag of current subdomain
           CALL GET_IBUF_C(R2R_ACTIV,1)
 
           IF (OLD_ACTIV == 1 .AND. R2R_ACTIV == 0) THEN
-            WRITE(IOUT,*)' PROCESS DESACTIVATION'
+            WRITE(IOUT,*)' PROCESS DEACTIVATION'
           ENDIF
 C------------------------------------------------------
           IF (R2R_ACTIV /= -1) THEN
@@ -276,17 +276,17 @@ C-----------------------------------------------------------------
         RETURN
       END SUBROUTINE R2R_EXCHANGE
 C
-      !||====================================================================
-      !||    send_data_spmd      ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_exchange        ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- calls      -----------------------------------------------------
-      !||    send_data_spmd_c    ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    spmd_r2r_rby        ../engine/source/mpi/r2r/spmd_r2r.F
-      !||    spmd_r2r_rget       ../engine/source/mpi/r2r/spmd_r2r.F
-      !||    spmd_r2r_rget3      ../engine/source/mpi/r2r/spmd_r2r.F
-      !||    spmd_r2r_rget3_dp   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||====================================================================
+!||====================================================================
+!||    send_data_spmd      ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- called by ------------------------------------------------------
+!||    r2r_exchange        ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- calls      -----------------------------------------------------
+!||    send_data_spmd_c    ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    spmd_r2r_rby        ../engine/source/mpi/r2r/spmd_r2r.F
+!||    spmd_r2r_rget       ../engine/source/mpi/r2r/spmd_r2r.F
+!||    spmd_r2r_rget3      ../engine/source/mpi/r2r/spmd_r2r.F
+!||    spmd_r2r_rget3_dp   ../engine/source/mpi/r2r/spmd_r2r.F
+!||====================================================================
       SUBROUTINE SEND_DATA_SPMD(
      1   IDP  ,NNG   ,GRNOD  ,A    ,AR    ,
      2   STX  ,STR   ,V      ,VR   ,MS    ,
@@ -304,7 +304,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER IDP, NNG, NGLOB,i,TYP,
+        INTEGER IDP, NNG, NGLOB, TYP, 
      .          GRNOD(*),FLAG_ROT, FLAG_RBY,
      .          WEIGHT(*), DD_R2R(*), IEX
 C     REAL
@@ -315,7 +315,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER II,J
+ 
         my_real
      .          BUFR1(3,NGLOB), BUFR2(3,NGLOB), BUFR3(NGLOB),
      .          BUFR4(NGLOB), BUFR5(3,NGLOB), BUFR6(3,NGLOB),
@@ -354,14 +354,14 @@ C-----------------------------------------------------------------
         RETURN
       END SUBROUTINE SEND_DATA_SPMD
 C
-      !||====================================================================
-      !||    get_stiff_spmd     ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_exchange       ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_stiff_spmd_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    spmd_r2r_rset      ../engine/source/mpi/r2r/spmd_r2r.F
-      !||====================================================================
+!||====================================================================
+!||    get_stiff_spmd     ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- called by ------------------------------------------------------
+!||    r2r_exchange       ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- calls      -----------------------------------------------------
+!||    get_stiff_spmd_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    spmd_r2r_rset      ../engine/source/mpi/r2r/spmd_r2r.F
+!||====================================================================
       SUBROUTINE GET_STIFF_SPMD(
      1   IDP     ,NNG    ,GRNOD  ,MS   ,IN     ,
      2   STX     ,STR    ,DD_R2R ,NGLOB,WEIGHT ,
@@ -385,7 +385,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER LRBUF,i
+        INTEGER LRBUF
         my_real
      .          BUFR1(NGLOB), BUFR2(NGLOB), BUFR3(NGLOB), BUFR4(NGLOB)
 C
@@ -418,13 +418,13 @@ C-----------------------------------------------------------------
         RETURN
       END SUBROUTINE GET_STIFF_SPMD
 C
-      !||====================================================================
-      !||    r2r_tagel   ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- called by ------------------------------------------------------
-      !||    tagoff3n    ../engine/source/interfaces/interf/chkstfn3.F
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod   ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_tagel   ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- called by ------------------------------------------------------
+!||    tagoff3n    ../engine/source/interfaces/interf/chkstfn3.F
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod   ../engine/share/modules/rad2r.F
+!||====================================================================
       SUBROUTINE R2R_TAGEL(NTAGEL_R2R_SEND,ID_EL,ID_NODE,ITY,OFUR,TAGEL_SIZE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -477,15 +477,15 @@ C-----------------------------------------------------------------
         RETURN
       END SUBROUTINE R2R_TAGEL
 
-      !||====================================================================
-      !||    r2r_exch_itag   ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- called by ------------------------------------------------------
-      !||    tagoff3n        ../engine/source/interfaces/interf/chkstfn3.F
-      !||--- calls      -----------------------------------------------------
-      !||    exch_itag_c     ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_exch_itag   ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- called by ------------------------------------------------------
+!||    tagoff3n        ../engine/source/interfaces/interf/chkstfn3.F
+!||--- calls      -----------------------------------------------------
+!||    exch_itag_c     ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE R2R_EXCH_ITAG(IEXLNK,IGRNOD,ITAG, FLAG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -509,7 +509,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I, IEX, IDP, IDG, NNG,NMOD_R2R, OFF
+        INTEGER IEX, IDP, IDG, NNG, OFF
         INTEGER, DIMENSION(:), POINTER :: GRNOD
 C=======================================================================
 

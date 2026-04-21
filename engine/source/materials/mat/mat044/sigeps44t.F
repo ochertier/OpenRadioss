@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps44t   ../engine/source/materials/mat/mat044/sigeps44t.F
-      !||--- called by ------------------------------------------------------
-      !||    tforc3      ../engine/source/elements/truss/tforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter      ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps44t   ../engine/source/materials/mat/mat044/sigeps44t.F
+!||--- called by ------------------------------------------------------
+!||    tforc3      ../engine/source/elements/truss/tforc3.F
+!||--- calls      -----------------------------------------------------
+!||    finter      ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE SIGEPS44T(NEL     ,NGL     ,MAT     ,PID     ,UPARAM  ,
      .                     IPM     ,GEO     ,OFF     ,FOR     ,STI     ,
      .                     PLA     ,EINT    ,AREA    ,AL0     ,AL      ,
@@ -184,7 +184,7 @@ c
         FOR(I) = CVMGT(SIGN(YLD(I)*AREA(I),FOR(I)),FOR(I),FF(I) > ZERO)
       ENDDO
 C--------------------------------
-C     TEST DE RUPTURE DUCTILE
+C     ductile failure test
 C-------------------------------
       DO I=1,NEL
         IF (OFF(I) < EM01) OFF(I) = ZERO

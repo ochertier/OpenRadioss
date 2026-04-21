@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,17 +23,22 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 
 
 
-      !||====================================================================
-      !||    outp_arsz_ss    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp         ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_ss   ../engine/source/output/sty/outp_s_s.F
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_ss          ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_ss         ../engine/source/output/sty/outp_s_s.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_SS(IPARG,DD_IAD,IPM,IXS,P0ARS,WASZ,WASZ_WR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+      use element_mod , only : nixs
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -55,11 +60,11 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NN,NG,SZP0(2*NSPGROUP+2),RSZP0(2*NSPGROUP+2),NGF,NGL,JJ,
-     .        WASZ26,P0ARS26,MLW,NEL,NPT,JHBE,ISOLNOD, 
-     .        NUVAR,I,LFT,LLT,NFT,ITY
+      INTEGER SZP0(2*NSPGROUP+2), RSZP0(2*NSPGROUP+2), 
+     .
+     . I
 
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER IERROR
 C-----------------------------------------------
       P0ARS = 0
       WASZ = 0
@@ -96,18 +101,23 @@ C-----------------------------------------------
       END
  
 
-      !||====================================================================
-      !||    outp_arsz_cs    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp         ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_cs   ../engine/source/output/sty/outp_c_s.F
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_cs          ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_cs         ../engine/source/output/sty/outp_c_s.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_CS(IPARG,IXC,IXTG,IGEO,IPM,DD_IAD,
      .                         P0ARS,WASZ,WASZ_WR) 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+      use element_mod , only : nixc,nixtg
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -131,10 +141,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER JJ,NGF,NGL,NN,ITY,IAD,NFT,LFT,LLT,NPT,
-     .        IHBE,IGTYP,NUVAR,MLW,NG,NEL,NBX,I,NPG,MPT,
-     .        SZP0(2*NSPGROUP+2),RSZP0(2*NSPGROUP+2),P0ARSZ26
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER 
+     . I,
+     . SZP0(2*NSPGROUP+2),RSZP0(2*NSPGROUP+2)
+      INTEGER IERROR
 
 
       P0ARS = 0
@@ -177,15 +187,16 @@ C-----------------------------------------------
       RETURN
       END
 c
-      !||====================================================================
-      !||    outp_arsz_st    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp         ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_st   ../engine/source/output/sty/outp_s_t.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_st          ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_st         ../engine/source/output/sty/outp_s_t.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_ST(IPARG,DD_IAD,WASZ,WASZ_WR,P0ARS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -194,6 +205,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -214,10 +226,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NGL,ITY,NRL,KHBE,MLW,NPT,ISOLNOD,NGF,NN,NEL,
-     .        NG,NLAY,NPTR,NPTS,NPTT,NPTG,JJ,I,
+      INTEGER 
+     . I,
      .        SZP0(3*NSPGROUP+3),RSZP0(3*NSPGROUP+3)
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER IERROR
 C=======================================================================
       WASZ = 0
       P0ARS = 0
@@ -247,15 +259,16 @@ c------------------------------
       END
 
 
-      !||====================================================================
-      !||    outp_arsz_ct    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp         ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_ct   ../engine/source/output/sty/outp_c_t.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_ct          ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_ct         ../engine/source/output/sty/outp_c_t.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_CT(IPARG,DD_IAD,WASZ,WASZP,WASZ_WR,ELBUF_TAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -264,6 +277,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -285,12 +299,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-        INTEGER NGF,NGL,NN,ITY,MLW,NEL,NPT,IHBE,NPG,MPT,NG,JJ,COUNT,I,
-     .          SZP0(3*NSPGROUP+3),RSZP0(3*NSPGROUP+3),
-     .          IL,NLAY,IGTYP,NPT_ALL,
-     .          NPTR,NPTS
+        INTEGER COUNT, I, 
+     .          SZP0(3*NSPGROUP+3),RSZP0(3*NSPGROUP+3)
 C-----------------------------------------------
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER IERROR
 
       WASZ = 0
       WASZP = 0
@@ -363,17 +375,20 @@ c-----------
       END
 
 
-      !||====================================================================
-      !||    outp_arsz_rs    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp         ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_rs   ../engine/source/output/sty/outp_r_s.F
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_rs          ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_rs         ../engine/source/output/sty/outp_r_s.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_RS(IPARG,DD_IAD,WASZ,WASZP,WASZ_WR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -394,10 +409,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NGF,NGL,NN,ITY,NEL,NG,JJ,SZP0(NSPGROUP+1),RSZP0(NSPGROUP+1),
-     .        P0ARSZ2,WASZ2,I
+      INTEGER SZP0(NSPGROUP+1), RSZP0(NSPGROUP+1), 
+     . I
 
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER IERROR
 C-----------------------------------------------
 
       WASZP = 0
@@ -425,17 +440,22 @@ C-----------------------------------------------
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    outp_arsz_rt    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp         ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_rt   ../engine/source/output/sty/outp_r_t.F
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_rt          ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_rt         ../engine/source/output/sty/outp_r_t.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_RT(IPARG,IGEO,GEO,IXR,DD_IAD,WASZ,WASZP,WASZ_WR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+      use element_mod , only : nixr
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -459,10 +479,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NGF,NGL,NN,ITY,NEL,NG,JJ,SZP0(NSPGROUP+1),RSZP0(NSPGROUP+1),
-     .        P0ARSZ2,WASZ2,IPROP,NUVAR,IGTYP,NFT,I
+      INTEGER SZP0(NSPGROUP+1), RSZP0(NSPGROUP+1), 
+     . I
 
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER IERROR
 C-----------------------------------------------
 
       WASZP = 0
@@ -489,17 +509,20 @@ C-----------------------------------------------
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    outp_arsz_sps    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp          ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_sps   ../engine/source/output/sty/outp_sp_s.F
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_sps         ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_sps        ../engine/source/output/sty/outp_sp_s.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_SPS(IPARG,DD_IAD,WASZ,WASZP,WASZ_WR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -520,10 +543,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NGF,NGL,NN,ITY,NEL,NG,JJ,SZP0(NSPGROUP+1),RSZP0(NSPGROUP+1),
-     .        P0ARSZ2,WASZ2,I
+      INTEGER SZP0(NSPGROUP+1), RSZP0(NSPGROUP+1), 
+     . I
 
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER IERROR
 C-----------------------------------------------
       WASZP = 0
       WASZ = 0
@@ -557,17 +580,20 @@ C-----------------------------------------------
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    outp_arsz_spt    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp          ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_spt   ../engine/source/output/sty/outp_sp_t.F
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_spt         ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_spt        ../engine/source/output/sty/outp_sp_t.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_SPT(IPARG,DD_IAD,WASZ,WASZP,WASZ_WR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -588,10 +614,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NGF,NGL,NN,ITY,NEL,NG,JJ,SZP0(NSPGROUP+1),RSZP0(NSPGROUP+1),
-     .        P0ARSZ2,WASZ2,I
+      INTEGER SZP0(NSPGROUP+1), RSZP0(NSPGROUP+1), 
+     . I
 
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER IERROR
 C-----------------------------------------------
       WASZP = 0
       WASZ = 0
@@ -617,17 +643,20 @@ C-----------------------------------------------
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    outp_arsz_sptt    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp           ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    count_arsz_sptt   ../engine/source/output/sty/outp_sp_t.F
-      !||====================================================================
+!||====================================================================
+!||    outp_arsz_sptt        ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    count_arsz_sptt       ../engine/source/output/sty/outp_sp_t.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE OUTP_ARSZ_SPTT(IPARG,DD_IAD,WASZ,WASZP,WASZ_WR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M P I   I n c l u d e s
@@ -648,10 +677,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER NGF,NGL,NN,ITY,NEL,NG,JJ,SZP0(NSPGROUP+1),RSZP0(NSPGROUP+1),
-     .        P0ARSZ2,WASZ2,I
+      INTEGER SZP0(NSPGROUP+1), RSZP0(NSPGROUP+1), 
+     . I
 
-      INTEGER IERROR,STATUS(MPI_STATUS_SIZE)
+      INTEGER IERROR
 C-----------------------------------------------
       WASZP = 0
       WASZ = 0
@@ -677,16 +706,19 @@ C-----------------------------------------------
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_doutp_vgath   ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    outp_n_v           ../engine/source/output/sty/outp_n_v.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_doutp_vgath      ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    outp_n_v              ../engine/source/output/sty/outp_n_v.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_DOUTP_VGATH(V,NODGLOB,WEIGHT,VGATH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -701,7 +733,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
        my_real
      .   V(3,*),VGATH(3,*)
-       INTEGER WEIGHT(*),NODGLOB(*),NUM,SRECBUF
+       INTEGER WEIGHT(*), NODGLOB(*)
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -714,7 +746,7 @@ C-----------------------------------------------
       my_real 
      .       BUFSR(3,NUMNODM)
       INTEGER IBUF(NUMNODM)
-C   Tableau utilise par proc 0
+C   Table used by Pro 0
          
        IF (ISPMD/=0) THEN
 
@@ -729,9 +761,9 @@ C   Tableau utilise par proc 0
            END IF
          END DO
 
-C   a cause de la version simple precision, on ne peux pas metre l'entier
-C   dans le buffer flottant car on n a que 2puiss 24 bits dispo ~ 16 Million
-C   de noeuds au max
+C   Because of the simple precision version, we cannot put the integer
+C   In the floating buffer because there are only 2 24 bits available ~ 16 million
+C   of nodes at most
 
          MSGTYP = MSGOFF2
          CALL MPI_SEND(IBUF,SIZ,MPI_INTEGER,IT_SPMD(1),MSGTYP,
@@ -756,7 +788,7 @@ C   de noeuds au max
 
           DO I=2,NSPMD
 
-C   Reception du buffer entier des adresses NODGLOB
+C   Reception of the entire buffer of NODGLOB addresses
             MSGTYP = MSGOFF2
 
             CALL MPI_PROBE(IT_SPMD(I),MSGTYP,
@@ -766,7 +798,7 @@ C   Reception du buffer entier des adresses NODGLOB
             CALL MPI_RECV(IBUF,SIZ,MPI_INTEGER,IT_SPMD(I),MSGTYP,
      .                  SPMD_COMM_WORLD,STATUS,ierror)
 
-C   Reception du buffer flottant double des adresses NODGLOB
+C   Reception of the double floating buffer of NODGLOB addresses
 
             MSGTYP = MSGOFF
             CALL MPI_RECV(BUFSR,3*SIZ,REAL,IT_SPMD(I),MSGTYP,
@@ -788,16 +820,19 @@ C   Reception du buffer flottant double des adresses NODGLOB
        RETURN
        END
 
-      !||====================================================================
-      !||    spmd_doutp_gath   ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    outp_no           ../engine/source/output/sty/outp_no.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_doutp_gath       ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    outp_no               ../engine/source/output/sty/outp_no.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_DOUTP_GATH(V,NODGLOB,WEIGHT,VGATH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -812,7 +847,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
        my_real
      .   V(*),VGATH(*)
-       INTEGER WEIGHT(*),NODGLOB(*),NUM,SRECBUF
+       INTEGER WEIGHT(*), NODGLOB(*)
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -825,7 +860,7 @@ C-----------------------------------------------
       my_real 
      .       BUFSR(NUMNODM)
       INTEGER IBUF(NUMNODM)
-C   Tableau utilise par proc 0
+C   Table used by Pro 0
          
        IF (ISPMD/=0) THEN
 
@@ -838,9 +873,9 @@ C   Tableau utilise par proc 0
            END IF
          END DO
 
-C   a cause de la version simple precision, on ne peux pas metre l'entier
-C   dans le buffer flottant car on n a que 2puiss 24 bits dispo ~ 16 Million
-C   de noeuds au max
+C   Because of the simple precision version, we cannot put the integer
+C   In the floating buffer because there are only 2 24 bits available ~ 16 million
+C   of nodes at most
 
          MSGTYP = MSGOFF2 
          CALL MPI_SEND(IBUF,SIZ,MPI_INTEGER,IT_SPMD(1),MSGTYP,
@@ -861,7 +896,7 @@ C   de noeuds au max
 
           DO I=2,NSPMD
 
-C   Reception du buffer entier des adresses NODGLOB
+C   Reception of the entire buffer of NODGLOB addresses
             MSGTYP = MSGOFF2
 
             CALL MPI_PROBE(IT_SPMD(I),MSGTYP,
@@ -871,7 +906,7 @@ C   Reception du buffer entier des adresses NODGLOB
             CALL MPI_RECV(IBUF,SIZ,MPI_INTEGER,IT_SPMD(I),MSGTYP,
      .                  SPMD_COMM_WORLD,STATUS,ierror)
 
-C   Reception du buffer flottant double des adresses NODGLOB
+C   Reception of the double floating buffer of NODGLOB addresses
 
             MSGTYP = MSGOFF
             CALL MPI_RECV(BUFSR,SIZ,REAL,IT_SPMD(I),MSGTYP,
@@ -892,14 +927,17 @@ C   Reception du buffer flottant double des adresses NODGLOB
        END
 
 
-      !||====================================================================
-      !||    spmd_rgather9   ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_rgather9         ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_RGATHER9(V,LEN,VP0,LENP0,IAD)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -918,8 +956,8 @@ C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,
-     .        MSGTYP,I,SIZ,LENP(NSPMD),DISP(NSPMD)
+      INTEGER IERROR, 
+     . I,LENP(NSPMD),DISP(NSPMD)
 
 C=======================================================================
         CALL MPI_GATHER(
@@ -945,40 +983,43 @@ c------------
        END
 
 
-      !||====================================================================
-      !||    spmd_rgather9_dp   ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    dynain_c_strag     ../engine/source/output/dynain/dynain_c_strag.F
-      !||    dynain_c_strsg     ../engine/source/output/dynain/dynain_c_strsg.F
-      !||    dynain_shel_spmd   ../engine/source/output/dynain/dynain_shel_spmd.F
-      !||    stat_c_auxf        ../engine/source/output/sta/stat_c_auxf.F
-      !||    stat_c_epspf       ../engine/source/output/sta/stat_c_epspf.F
-      !||    stat_c_fail        ../engine/source/output/sta/stat_c_fail.F
-      !||    stat_c_off         ../engine/source/output/sta/stat_c_off.F
-      !||    stat_c_orth_loc    ../engine/source/output/sta/stat_c_orth_loc.F
-      !||    stat_c_straf       ../engine/source/output/sta/stat_c_straf.F
-      !||    stat_c_strafg      ../engine/source/output/sta/stat_c_strafg.F
-      !||    stat_c_strsf       ../engine/source/output/sta/stat_c_strsf.F
-      !||    stat_c_strsfg      ../engine/source/output/sta/stat_c_strsfg.F
-      !||    stat_c_thk         ../engine/source/output/sta/stat_c_thk.F
-      !||    stat_p_aux         ../engine/source/output/sta/stat_p_aux.F
-      !||    stat_p_full        ../engine/source/output/sta/stat_p_full.F
-      !||    stat_r_full        ../engine/source/output/sta/stat_r_full.F
-      !||    stat_s_auxf        ../engine/source/output/sta/stat_s_auxf.F
-      !||    stat_s_eref        ../engine/source/output/sta/stat_s_eref.F
-      !||    stat_s_fail        ../engine/source/output/sta/stat_s_fail.F
-      !||    stat_s_ortho       ../engine/source/output/sta/stat_s_ortho.F
-      !||    stat_s_straf       ../engine/source/output/sta/stat_s_straf.F
-      !||    stat_s_strsf       ../engine/source/output/sta/stat_s_strsf.F
-      !||    stat_shel_spmd     ../engine/source/output/sta/stat_shel_spmd.F
-      !||    stat_sphcel_full   ../engine/source/output/sta/stat_sphcel_full.F90
-      !||    stat_t_full        ../engine/source/output/sta/stat_t_full.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_rgather9_dp      ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    dynain_c_strag        ../engine/source/output/dynain/dynain_c_strag.F
+!||    dynain_c_strsg        ../engine/source/output/dynain/dynain_c_strsg.F
+!||    dynain_shel_spmd      ../engine/source/output/dynain/dynain_shel_spmd.F
+!||    stat_c_auxf           ../engine/source/output/sta/stat_c_auxf.F
+!||    stat_c_epspf          ../engine/source/output/sta/stat_c_epspf.F
+!||    stat_c_fail           ../engine/source/output/sta/stat_c_fail.F
+!||    stat_c_off            ../engine/source/output/sta/stat_c_off.F
+!||    stat_c_orth_loc       ../engine/source/output/sta/stat_c_orth_loc.F
+!||    stat_c_straf          ../engine/source/output/sta/stat_c_straf.F
+!||    stat_c_strafg         ../engine/source/output/sta/stat_c_strafg.F
+!||    stat_c_strsf          ../engine/source/output/sta/stat_c_strsf.F
+!||    stat_c_strsfg         ../engine/source/output/sta/stat_c_strsfg.F
+!||    stat_c_thk            ../engine/source/output/sta/stat_c_thk.F
+!||    stat_p_aux            ../engine/source/output/sta/stat_p_aux.F
+!||    stat_p_full           ../engine/source/output/sta/stat_p_full.F
+!||    stat_r_full           ../engine/source/output/sta/stat_r_full.F
+!||    stat_s_auxf           ../engine/source/output/sta/stat_s_auxf.F
+!||    stat_s_eref           ../engine/source/output/sta/stat_s_eref.F
+!||    stat_s_fail           ../engine/source/output/sta/stat_s_fail.F
+!||    stat_s_ortho          ../engine/source/output/sta/stat_s_ortho.F
+!||    stat_s_straf          ../engine/source/output/sta/stat_s_straf.F
+!||    stat_s_strsf          ../engine/source/output/sta/stat_s_strsf.F
+!||    stat_shel_spmd        ../engine/source/output/sta/stat_shel_spmd.F
+!||    stat_sphcel_full      ../engine/source/output/sta/stat_sphcel_full.F90
+!||    stat_t_full           ../engine/source/output/sta/stat_t_full.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_RGATHER9_DP(V,LEN,VP0,LENP0,IAD)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -997,8 +1038,8 @@ C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,
-     .        MSGTYP,I,SIZ,LENP(NSPMD),DISP(NSPMD)
+      INTEGER IERROR, 
+     . I,LENP(NSPMD),DISP(NSPMD)
 
 
 
@@ -1024,20 +1065,23 @@ C
        RETURN
        END
 
-      !||====================================================================
-      !||    spmd_outpitab    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    gendynain        ../engine/source/output/dynain/gendynain.F
-      !||    genh3d           ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||    genoutp          ../engine/source/output/sty/genoutp.F
-      !||    genstat          ../engine/source/output/sta/genstat.F
-      !||    spmd_vgath_err   ../engine/source/mpi/anim/spmd_vgath_err.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_outpitab         ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    gendynain             ../engine/source/output/dynain/gendynain.F
+!||    genh3d                ../engine/source/output/h3d/h3d_results/genh3d.F
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||    genstat               ../engine/source/output/sta/genstat.F
+!||    spmd_vgath_err        ../engine/source/mpi/anim/spmd_vgath_err.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_OUTPITAB(V,WEIGHT,NODGLOB,VGLOB)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -1053,7 +1097,7 @@ C-----------------------------------------------
        INTEGER
      .   VGLOB(*),V(*)
 
-       INTEGER WEIGHT(*),NODGLOB(*),NUM,SRECBUF
+       INTEGER WEIGHT(*), NODGLOB(*)
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -1091,7 +1135,7 @@ C-----------------------------------------------
 
           DO I=2,NSPMD
 
-C   Reception du buffer entier des adresses NODGLOB
+C   Reception of the entire buffer of NODGLOB addresses
             MSGTYP = MSGOFF
 
             CALL MPI_PROBE(IT_SPMD(I),MSGTYP,
@@ -1115,26 +1159,29 @@ C   Reception du buffer entier des adresses NODGLOB
 #endif
        RETURN
        END
-      !||====================================================================
-      !||    spmd_rgather9_1comm   ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- called by ------------------------------------------------------
-      !||    outp_c_s              ../engine/source/output/sty/outp_c_s.F
-      !||    outp_c_t              ../engine/source/output/sty/outp_c_t.F
-      !||    outp_c_tf             ../engine/source/output/sty/outp_c_t.F
-      !||    outp_r_s              ../engine/source/output/sty/outp_r_s.F
-      !||    outp_r_t              ../engine/source/output/sty/outp_r_t.F
-      !||    outp_s_s              ../engine/source/output/sty/outp_s_s.F
-      !||    outp_s_t              ../engine/source/output/sty/outp_s_t.F
-      !||    outp_s_tt             ../engine/source/output/sty/outp_s_t.F
-      !||    outp_sp_s             ../engine/source/output/sty/outp_sp_s.F
-      !||    outp_sp_t             ../engine/source/output/sty/outp_sp_t.F
-      !||    outp_sp_tt            ../engine/source/output/sty/outp_sp_t.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_rgather9_1comm   ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- called by ------------------------------------------------------
+!||    outp_c_s              ../engine/source/output/sty/outp_c_s.F
+!||    outp_c_t              ../engine/source/output/sty/outp_c_t.F
+!||    outp_c_tf             ../engine/source/output/sty/outp_c_t.F
+!||    outp_r_s              ../engine/source/output/sty/outp_r_s.F
+!||    outp_r_t              ../engine/source/output/sty/outp_r_t.F
+!||    outp_s_s              ../engine/source/output/sty/outp_s_s.F
+!||    outp_s_t              ../engine/source/output/sty/outp_s_t.F
+!||    outp_s_tt             ../engine/source/output/sty/outp_s_t.F
+!||    outp_sp_s             ../engine/source/output/sty/outp_sp_s.F
+!||    outp_sp_t             ../engine/source/output/sty/outp_sp_t.F
+!||    outp_sp_tt            ../engine/source/output/sty/outp_sp_t.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_RGATHER9_1COMM(V,SIZV,LEN,VP0,SIZV0,ADRESS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -1153,10 +1200,10 @@ C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,
-     .        MSGTYP,I,SIZ,DISP(NSPMD),
+      INTEGER IERROR, 
+     . I,DISP(NSPMD),
      .        LENP(NSPMD*NSPGROUP),LENP_LOC(NSPMD)
-      INTEGER IAD,J,LEN_LOC
+      INTEGER IAD, J
 C=======================================================================
         CALL MPI_GATHER(
      S    LEN           ,NSPGROUP ,MPI_INTEGER,

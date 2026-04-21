@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alew1                  ../engine/source/ale/grid/alew1.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx                 ../engine/source/ale/grid/alewdx.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_xvois             ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alew1                  ../engine/source/ale/grid/alew1.F
+!||--- called by ------------------------------------------------------
+!||    alewdx                 ../engine/source/ale/grid/alewdx.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_xvois             ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    ale_mod                ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE ALEW1( 
-     1   X              ,D       ,V       ,W       ,
-     2   ALE_NN_CONNECT ,NALE    ,NODFT   ,NODLT   ,ITASK   ,
-     3   NBRCVOIS       ,NBSDVOIS,LNRCVOIS,LNSDVOIS,ITAB         )
+     1   D              ,V       ,W       ,
+     2   ALE_NN_CONNECT ,NALE    ,NODFT   ,NODLT   ,
+     3   NBRCVOIS       ,NBSDVOIS,LNRCVOIS,LNSDVOIS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------      
@@ -67,10 +67,10 @@ C-----------------------------------------------
 !  (1:3, NUMNOD+1:) additional nodes (also on adjacent domains but connected to the boundary of the current domain)
 !      idem with D(SD), and V(SV)
 C-----------------------------------------------
-      INTEGER NALE(NUMNOD), NODFT, NODLT, ITASK,
+      INTEGER NALE(NUMNOD), NODFT, NODLT,
      .        NBRCVOIS(*),NBSDVOIS(*),
-     .        LNRCVOIS(*),LNSDVOIS(*),ITAB(NUMNOD)
-      my_real X(3,SX/3), D(3,SD/3), V(3,SV/3), W(3,SW/3)     
+     .        LNRCVOIS(*),LNSDVOIS(*)
+      my_real D(3,SD/3), V(3,SV/3), W(3,SW/3)
       TYPE(t_connectivity), INTENT(IN) :: ALE_NN_CONNECT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

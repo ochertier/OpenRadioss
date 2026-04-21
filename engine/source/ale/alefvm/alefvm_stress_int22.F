@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alefvm_stress_int22   ../engine/source/ale/alefvm/alefvm_stress_int22.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3                ../engine/source/elements/solid/solide/sforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    alefvm_mod            ../common_source/modules/ale/alefvm_mod.F
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    i22bufbric_mod        ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alefvm_stress_int22   ../engine/source/ale/alefvm/alefvm_stress_int22.F
+!||--- called by ------------------------------------------------------
+!||    sforc3                ../engine/source/elements/solid/solide/sforc3.F
+!||--- uses       -----------------------------------------------------
+!||    alefvm_mod            ../common_source/modules/ale/alefvm_mod.F
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    i22bufbric_mod        ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||====================================================================
       SUBROUTINE ALEFVM_STRESS_INT22 (
-     1                          IXS,      NV46, SIG,  QVIS, 
+     1                          IXS,      SIG,  QVIS,
      2                          N1X,      N2X,  N3X,  N4X,  N5X,  N6X,
      3                          N1Y,      N2Y,  N3Y,  N4Y,  N5Y,  N6Y,
      4                          N1Z,      N2Z,  N3Z,  N4Z,  N5Z,  N6Z,
-     5                          X  ,      IPM,  RHO,  VOL,  A  ,  IAD22,
-     6                          ELBUF_TAB,NEL,  MOM,  SSP,  ITASK,SVIS)
+     5                          IPM,      RHO,  VOL,  IAD22,
+     6                          NEL,      MOM,  SSP,  SVIS)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -51,6 +52,7 @@ C-----------------------------------------------
       USE ALEFVM_MOD
       USE ELBUFDEF_MOD     !TYPE(ELBUF_STRUCT_)
       USE I22BUFBRIC_MOD   !BRICK_LIST
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,28 +78,25 @@ C subroutine is unplugged
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER :: NEL, ITASK
-      INTEGER :: IXS(NIXS,*),NV46,IPM(NPROPMI,*)
-      my_real :: SIG(NEL,6),QVIS(NEL),X(3,*),RHO(NEL), VOL(NEL), A(3,*), IAD22(*)
+      INTEGER :: NEL
+      INTEGER :: IXS(NIXS,*),IPM(NPROPMI,*)
+      my_real :: SIG(NEL,6),QVIS(NEL),RHO(NEL), VOL(NEL), IAD22(*)
       my_real :: N1X(*), N2X(*),  N3X(*), N4X(*), N5X(*), N6X(*),
      .           N1Y(*), N2Y(*),  N3Y(*), N4Y(*), N5Y(*), N6Y(*),
      .           N1Z(*), N2Z(*),  N3Z(*), N4Z(*), N5Z(*), N6Z(*),
      .           MOM(NEL,3), SSP(NEL), ISGN, V(3), W(3), VmW(3)
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
-      TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB     
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I, II, J, K, IMAT, IALEFVM_FLG, IB, NIN, IBM, NGM, IDLOCM, ICUT,MCELL,NUM,IBv,ICELLv
-      INTEGER :: ISECND, ID, NP, IBs, ICELLs, Js, NumSECND
+      INTEGER :: I, II, K, IMAT, IALEFVM_FLG, IB, NIN, IBM, NGM, IDLOCM, ICUT,MCELL,NUM
+      INTEGER :: ISECND, ID, IBs, ICELLs, Js, NumSECND
       
       my_real :: P(MVSIZ) , 
      .           S1(MVSIZ)     , S2(MVSIZ)          , S3(MVSIZ), 
      .           S4(MVSIZ)     , S5(MVSIZ)          , S6(MVSIZ),
-     .           PVOIS(6,MVSIZ), NORM    , S(0:6), S0(14)
-      my_real
-     .   N0X(14), N0Y(14), N0Z(14),
-     .   NS(3,0:6), MASS,U_N(0:6), SURF(6)
+     .           NORM          , S(0:6)             , S0(14)
+      my_real :: N0X(14), N0Y(14), N0Z(14),MASS,U_N(0:6)
      
       INTEGER :: idbf,idbl,ICELL,NBCUT,NCELL,NBCUTv,IDEB,IFIN
       LOGICAL :: debug_outp
@@ -115,9 +114,9 @@ C-----------------------------------------------
       !inter22
       NIN = 1
       
-      ! attention : il faut que mmain soit traite pour chacun des groupes 
-      ! afin de connaitre les tenseurs voisins (SIG,SVIS,QVIS) !
-      ! l'assemblage est ensuite realise apres tous les appel de 
+      ! attention: mmain must be processed for each group
+      ! in order to know the neighboring tensors (SIG,SVIS,QVIS) !
+      ! the assembly is then carried out after all calls to
       ! ALEMAIN>SFORC3() pour chaque groupe.
 
       !-------------------------------------------------------------!

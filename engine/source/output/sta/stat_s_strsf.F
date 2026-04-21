@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_s_strsf        ../engine/source/output/sta/stat_s_strsf.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat             ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf             ../engine/share/resol/initbuf.F
-      !||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
-      !||    srota6              ../engine/source/output/anim/generate/srota6.F
-      !||    strs_txt50          ../engine/source/output/sta/sta_txt.F
-      !||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod         ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    stat_s_strsf        ../engine/source/output/sta/stat_s_strsf.F
+!||--- called by ------------------------------------------------------
+!||    genstat             ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf             ../engine/share/resol/initbuf.F
+!||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
+!||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
+!||    srota6              ../engine/source/output/anim/generate/srota6.F
+!||    strs_txt50          ../engine/source/output/sta/sta_txt.F
+!||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod         ../engine/share/resol/initbuf.F
+!||    my_alloc_mod        ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE STAT_S_STRSF(ELBUF_TAB,IPARG ,IPM ,IGEO ,IXS ,
      2                        WA,WAP0 ,IPARTS, IPART_STATE,
      3                        STAT_INDXS,X,IGLOB,IPART,SIZP0)
@@ -42,7 +44,9 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
-      USE ELBUFDEF_MOD         
+      USE ELBUFDEF_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs         
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,7 +65,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SIZLOC,SIZP0,IGLOB
+      INTEGER SIZP0,IGLOB
       INTEGER IXS(NIXS,*),IPARG(NPARG,*),IPM(NPROPMI,*),IGEO(NPROPGI,*),
      .        IPARTS(*), IPART_STATE(*), STAT_INDXS(*),IPART(LIPART1,*)
       my_real  X(3,*)
@@ -70,11 +74,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,N,J,K,JJ,LEN,ISOLNOD,IUS,MT,TSHELL,
-     .        NLAY,NPTR,NPTS,NPTT,NPTG,NGF,NGL,NN,NG,NEL,MLW,
-     .        ID, IPRT0, IPRT, NPG, IPG, IPT, IE,IP,IL,IR,IS,IT,PID,IOFF,
+      INTEGER I,N,J,K,JJ,LEN,ISOLNOD,TSHELL,
+     .        NLAY,NPTR,NPTS,NPTT,NPTG,NG,NEL,MLW,
+     .        ID, IPRT0, IPRT, IPT, IE,IL,IR,IS,IT,PID,IOFF,
      .        KK(6),KHBE
-      INTEGER PTWA(STAT_NUMELS), PTWA_P0(0:MAX(1,STAT_NUMELS_G))
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA_P0
       my_real
      .   GAMA(6),WATMP(6)
       CHARACTER*100 DELIMIT,LINE
@@ -84,7 +89,10 @@ C-----------------------------------------------
      ./'----7----|----8----|----9----|----10---|'/
 C----  
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
-      TYPE(G_BUFEL_) ,POINTER :: GBUF     
+      TYPE(G_BUFEL_) ,POINTER :: GBUF    
+C-----------------------------------------------
+      CALL MY_ALLOC(PTWA,STAT_NUMELS)
+      ALLOCATE(PTWA_P0(0:MAX(1,STAT_NUMELS_G)))
 C======================================================================|
       JJ = 0
       IF (STAT_NUMELS==0) GOTO 200
@@ -191,7 +199,7 @@ c---
                   ENDDO
                 ENDDO
               ENDDO                                                      
-C             pointeur de fin de zone dans WA
+C             end-of-zone pointer in wa
               IE=IE+1
               PTWA(IE)=JJ
             ENDDO  !  I=LFT,LLT
@@ -264,7 +272,7 @@ c---
                   ENDDO
                 ENDDO
               ENDDO                                                      
-C             pointeur de fin de zone dans WA
+C             end-of-zone pointer in wa
               IE=IE+1
               PTWA(IE)=JJ
             ENDDO  !  I=LFT,LLT
@@ -338,7 +346,7 @@ c---
                   ENDDO
                 ENDDO
               ENDDO                                                      
-C             pointeur de fin de zone dans WA
+C             end-of-zone pointer in wa
               IE=IE+1
               PTWA(IE)=JJ
             ENDDO  !  I=LFT,LLT
@@ -416,7 +424,7 @@ c---
                 ENDDO
               ENDDO                                                      
 c---
-C             pointeur de fin de zone dans WA
+C             end-of-zone pointer in wa
               IE=IE+1
               PTWA(IE)=JJ
             ENDDO                                                      
@@ -473,7 +481,7 @@ c---
                 JJ = JJ + 9
               ENDDO                                                        
 c---
-C             pointeur de fin de zone dans WA
+C             end-of-zone pointer in wa
               IE=IE+1
               PTWA(IE)=JJ
             ENDDO                                                      
@@ -549,7 +557,7 @@ c---
                 ENDDO
               ENDDO                                                      
 c---
-C               pointeur de fin de zone dans WA
+C               end-of-zone pointer in wa
                 IE=IE+1
                 PTWA(IE)=JJ
             ENDDO  !  I=LFT,LLT
@@ -624,7 +632,7 @@ c---
                 ENDDO
               ENDDO                                                      
 c---
-C             pointeur de fin de zone dans WA
+C             end-of-zone pointer in wa
               IE=IE+1
               PTWA(IE)=JJ
             ENDDO  !  I=LFT,LLT
@@ -635,7 +643,7 @@ C             pointeur de fin de zone dans WA
 c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
       IF (NSPMD == 1) THEN
-C       recopies inutiles pour simplification du code.
+C       unnecessary copies for code simplification
         PTWA_P0(0)=0
         DO N=1,STAT_NUMELS
           PTWA_P0(N) = PTWA(N)
@@ -645,7 +653,7 @@ C       recopies inutiles pour simplification du code.
           WAP0(J) = WA(J)
         END DO
       ELSE
-C       construit les pointeurs dans le tableau global WAP0
+C       builds the pointers in the global array wap0
         CALL SPMD_STAT_PGATHER(PTWA,STAT_NUMELS,PTWA_P0,STAT_NUMELS_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
@@ -656,9 +664,9 @@ c-----------------------------------------------------------------------
 
         IPRT0=0
         DO N=1,STAT_NUMELS_G
-C         retrouve le nieme elt dans l'ordre d'id croissant
+C         find the nieme elt in the order of an increasing id
           K=STAT_INDXS(N)
-C         retrouve l'adresse dans WAP0
+C         Find the address in WAP0
           J=PTWA_P0(K-1)
 
           IPRT    = NINT(WAP0(J + 2))
@@ -692,7 +700,7 @@ c
      .        '# IF (NPT /= 0) REPEAT K=1,NPT : REPEAT I=1,NPG :'
                IF ((ISOLNOD == 8 .AND. 
      .         (JHBE==1.OR.JHBE==2.OR.JHBE==12.OR.JHBE==24.OR.JHBE==17 .OR. JHBE == 18)
-     .         .AND.IGTYP /= 43).OR. (ISOLNOD == 4 .AND. ISROT == 0)) THEN
+     .         .AND.IGTYP /= 43).OR. (ISOLNOD == 4 .AND. ISROT == 0).OR.JHBE==5) THEN
                  WRITE(IUGEO,'(A)') '#  EINT, RHO'
 c----------------------------------------------------------------------
                WRITE(IUGEO,'(A/A)') '#    S1,  S2,  S3',
@@ -737,7 +745,7 @@ c----------------------------------------------------------------------
               CALL STRS_TXT50(LINE,100)
               IF ((ISOLNOD == 8 .AND. 
      .         (JHBE==1.OR.JHBE==2.OR.JHBE==12.OR.JHBE==24.OR.JHBE==17 .OR. JHBE == 18)
-     .         .AND.IGTYP /= 43).OR. (ISOLNOD == 4 .AND. ISROT == 0)) THEN
+     .         .AND.IGTYP /= 43).OR. (ISOLNOD == 4 .AND. ISROT == 0).OR.JHBE==5) THEN
                 WRITE(LINE,'(A)') '#  EINT, RHO'
                 CALL STRS_TXT50(LINE,100) 
                 IF (IGLOB == 1)THEN 
@@ -822,7 +830,7 @@ c-------------------
           IF ((ISOLNOD == 8 .AND. 
      .         (JHBE==1.OR.JHBE==2.OR.JHBE==12.OR.JHBE==24.OR.JHBE==17 .OR. JHBE == 18)
      .         .AND.IGTYP /= 43).OR. (ISOLNOD == 4 .AND. ISROT == 0)
-     .         .OR.(ISOLNOD == 4 .AND. ISROT == 3)) THEN
+     .         .OR.(ISOLNOD == 4 .AND. ISROT == 3).OR.JHBE==5) THEN
             DO IPT = 1, NPTG
               IF (IZIPSTRS == 0) THEN
                 WRITE(IUGEO,'(1P2E20.13)')(WAP0(J + K),K=8,9) ! EINT,RHO
@@ -852,6 +860,8 @@ c---
 c---
         ENDDO    !  N=1,STAT_NUMELS_G      
       ENDIF
+      DEALLOCATE(PTWA)
+      DEALLOCATE(PTWA_P0)
 c-----------
       RETURN
       END

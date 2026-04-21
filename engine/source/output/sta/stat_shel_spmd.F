@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_shel_spmd        ../engine/source/output/sta/stat_shel_spmd.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat               ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders             ../common_source/tools/sort/my_orders.c
-      !||    spmd_iget_partn_sta   ../engine/source/mpi/output/spmd_stat.F
-      !||    spmd_rgather9_dp      ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    stat_shel_spmd        ../engine/source/output/sta/stat_shel_spmd.F
+!||--- called by ------------------------------------------------------
+!||    genstat               ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders             ../common_source/tools/sort/my_orders.c
+!||    spmd_iget_partn_sta   ../engine/source/mpi/output/spmd_stat.F
+!||    spmd_rgather9_dp      ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod          ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE STAT_SHEL_SPMD(ITAB,ITABG,LENG,IPART,IGEO,
      .            IXC,IXTG,IPARTC,IPARTTG,IPART_STATE,
      .            NODTAG,STAT_INDXC,STAT_INDXTG,LENGC,LENGTG,
@@ -41,6 +43,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,16 +74,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, JJ, IPRT, BUF, IPRT0, K, II
+      INTEGER I, N, JJ, IPRT, IPRT0, K, II
       INTEGER NG, NEL, NFT, LFT, LLT, ITY, LEN, ITHK, MLW,IOFF
-      INTEGER IADD(NPART+1), IADG(NSPMD,NPART)
-      INTEGER NP(MAX(7*NUMELC,6*NUMELTG)),
-     .        NPGLOB(MAX(7*LENGC,6*LENGTG)),
-     .        WORK(70000),CLEF(2,MAX(NUMELCG,NUMELTGG))
+      INTEGER WORK(70000)
       INTEGER THK_LEN,THK0_LEN
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IADD
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: IADG
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NP
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NPGLOB
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: CLEF
       DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: THK    ! Gather Thickness from Shell & Triangle elements
       DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: THK0   ! ISPMD=0 : Shell & Triangle Thicknesses after gather.
       TYPE(G_BUFEL_)  ,POINTER :: GBUF   
+C-----------------------------------------------
+      CALL MY_ALLOC(NP,MAX(7*NUMELC,6*NUMELTG))
+      CALL MY_ALLOC(NPGLOB,MAX(7*LENGC,6*LENGTG))
+      CALL MY_ALLOC(CLEF,2,MAX(NUMELCG,NUMELTGG))
+      CALL MY_ALLOC(IADG,NSPMD,NPART)
+      CALL MY_ALLOC(IADD,NPART+1)
 C-----------------------------------------------
 C INITIALIZATION
 C-----------------------------------------------
@@ -266,6 +278,11 @@ C-----
 
       DEALLOCATE(THK)
       DEALLOCATE(THK0)
+      DEALLOCATE(NP)
+      DEALLOCATE(NPGLOB)
+      DEALLOCATE(CLEF)
+      DEALLOCATE(IADG)
+      DEALLOCATE(IADD)
 C-----------------------------------------------
       RETURN
       END

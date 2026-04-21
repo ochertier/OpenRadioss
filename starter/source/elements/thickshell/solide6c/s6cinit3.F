@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s6cinit3               ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    failini                ../starter/source/elements/solid/solide/failini.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    s6ccoor3               ../starter/source/elements/thickshell/solide6c/s6ccoor3.F
-      !||    s6cderi3               ../starter/source/elements/thickshell/solide6c/s6cderi3.F
-      !||    s6mass3                ../starter/source/elements/thickshell/solide6c/s6mass3.F
-      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
-      !||    scmorth3               ../starter/source/elements/thickshell/solidec/scmorth3.F
-      !||    sczero3                ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sdlensh3n              ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
-      !||    svalue0                ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s6cinit3               ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    failini                ../starter/source/elements/solid/solide/failini.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    s6ccoor3               ../starter/source/elements/thickshell/solide6c/s6ccoor3.F
+!||    s6cderi3               ../starter/source/elements/thickshell/solide6c/s6cderi3.F
+!||    s6mass3                ../starter/source/elements/thickshell/solide6c/s6mass3.F
+!||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+!||    scmorth3               ../starter/source/elements/thickshell/solidec/scmorth3.F
+!||    sczero3                ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sdlensh3n              ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
+!||    svalue0                ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S6CINIT3(
      .                    ELBUF_STR,MAS     ,IXS     ,PM       ,X     ,
      .                    DETONATORS,GEO     ,VEUL    ,ALE_CONNECTIVITY,IPARG ,
@@ -71,6 +71,7 @@ C-----------------------------------------------
       USE DEFAULTS_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -135,6 +136,7 @@ C-----------------------------------------------
      .   E3X(MVSIZ),E3Y(MVSIZ),E3Z(MVSIZ),
      .   F1X(MVSIZ) ,F1Y(MVSIZ) ,F1Z(MVSIZ) ,LLSH(MVSIZ) ,
      .   F2X(MVSIZ) ,F2Y(MVSIZ) ,F2Z(MVSIZ) ,RHOCP(MVSIZ),TEMP0(MVSIZ), DELTAX(MVSIZ), AIRE(MVSIZ)
+      my_real :: TEMPEL(NEL)
 C-----------------------------------------------
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -273,7 +275,20 @@ C
      .     DELTAX(I)=MAX(LLSH(I),DELTAX(I))
         ENDDO
       END IF        
-C
+!
+!     Initialize element temperature from /initemp
+!      
+      IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+        DO I=1,NEL
+          TEMPEL(I) = ONE_OVER_8 *(TEMP(IXS(2,I+NFT)) + TEMP(IXS(3,I+NFT))
+     .                           + TEMP(IXS(4,I+NFT)) + TEMP(IXS(5,I+NFT))        
+     .                           + TEMP(IXS(6,I+NFT)) + TEMP(IXS(7,I+NFT))        
+     .                           + TEMP(IXS(8,I+NFT)) + TEMP(IXS(9,I+NFT))) 
+        ENDDO
+      ELSE
+        TEMPEL(1:NEL) = TEMP0(1:NEL)
+      END IF
+!
       IP=0
       CALL MATINI(PM      ,IXS    ,NIXS       ,X      ,
      .            GEO     ,ALE_CONNECTIVITY  ,DETONATORS ,IPARG  ,
@@ -282,7 +297,7 @@ C
      .            MAT     ,IPM    ,NSIGS  ,NUMSOL     ,PTSOL  ,
      .            IP      ,NGL    ,NPF    ,TF         ,BUFMAT , 
      .            GBUF    ,LBUF   ,MBUF   ,ELBUF_STR  ,ILOADP ,
-     .            FACLOAD, DELTAX)                         
+     .            FACLOAD, DELTAX ,TEMPEL ,MAT_PARAM )
 C
       IF (IGTYP == 22) CALL SCZERO3(GBUF%RHO,GBUF%SIG,GBUF%EINT,NEL)
 C----------------------------------------
@@ -320,6 +335,20 @@ c
      .         E1X  ,E1Y  ,E1Z  ,E2X  ,E2Y  ,E2Z  ,E3X  ,E3Y  ,E3Z  ,
      .         NGL  ,ANGLE,NSIGI,SIGSP,NSIGS,SIGI ,IXS,ILAY,
      .         ORTHOGLOB,PTSOL,NEL)
+!
+!     Initialize element temperature from /initemp
+!      
+        IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+          DO I=1,NEL
+            TEMPEL(I) = ONE_OVER_8 *(TEMP(IXS(2,I+NFT)) + TEMP(IXS(3,I+NFT))
+     .                             + TEMP(IXS(4,I+NFT)) + TEMP(IXS(5,I+NFT))      
+     .                             + TEMP(IXS(6,I+NFT)) + TEMP(IXS(7,I+NFT))      
+     .                             + TEMP(IXS(8,I+NFT)) + TEMP(IXS(9,I+NFT))) 
+          ENDDO
+        ELSE
+          TEMPEL(1:NEL) = TEMP0(1:NEL)
+        END IF
+!
         CALL MATINI(PM      ,IXS    ,NIXS   ,X         ,
      .              GEO     ,ALE_CONNECTIVITY  ,DETONATORS,IPARG  ,
      .              SIGI    ,NEL    ,SKEW      ,IGEO   ,
@@ -327,7 +356,7 @@ c
      .              MAT     ,IPM    ,NSIGS  ,NUMSOL    ,PTSOL  ,
      .              ILAY    ,NGL    ,NPF    ,TF        ,BUFMAT ,
      .              GBUF    ,LBUF   ,MBUF   ,ELBUF_STR ,ILOADP ,
-     .              FACLOAD, DELTAX)
+     .              FACLOAD, DELTAX ,TEMPEL ,MAT_PARAM )
         IF (MTN >= 28) THEN
            NUVAR = IPM(8,IXS(1,NFT+1))
            IDEF =1
@@ -400,7 +429,7 @@ C  Warning : IX1, IX2 ... IX6 <=> NC(MVSIZ,6)
      3              BID ,GBUF%FILL)
       ENDIF
 C------------------------------------------
-C Element time step
+C Time Step element
         AIRE(:) = ZERO
         CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,
      .       LBUF%EINT ,LBUF%TEMP ,LBUF%DELTAX ,LBUF%RK ,LBUF%RE ,BUFMAT, DELTAX, AIRE, 
@@ -440,11 +469,11 @@ c
 C-----------
       RETURN
       END SUBROUTINE S6CINIT3
-      !||====================================================================
-      !||    sdlensh3n   ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cinit3    ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||====================================================================
+!||====================================================================
+!||    sdlensh3n   ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||--- called by ------------------------------------------------------
+!||    s6cinit3    ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||====================================================================
       SUBROUTINE SDLENSH3N(NEL,LLSH3N,
      .                     X1, X2, X3, X4, X5, X6,
      .                     Y1, Y2, Y3, Y4, Y5, Y6,

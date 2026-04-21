@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    admini         ../engine/source/model/remesh/admini.F
-      !||--- called by ------------------------------------------------------
-      !||    resol_init     ../engine/source/engine/resol_init.F
-      !||--- calls      -----------------------------------------------------
-      !||    admmap3        ../engine/source/model/remesh/admmap3.F
-      !||    admmap4        ../engine/source/model/remesh/admmap4.F
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||    remesh_mod     ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    admini         ../engine/source/model/remesh/admini.F
+!||--- called by ------------------------------------------------------
+!||    resol_init     ../engine/source/engine/resol_init.F
+!||--- calls      -----------------------------------------------------
+!||    admmap3        ../engine/source/model/remesh/admmap3.F
+!||    admmap4        ../engine/source/model/remesh/admmap4.F
+!||    ancmsg         ../engine/source/output/message/message.F
+!||    arret          ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    message_mod    ../engine/share/message_module/message_mod.F
+!||    remesh_mod     ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE ADMINI(IXC ,IPARTC ,IXTG    ,IPARTTG  ,IPART ,
      .                  IGEO,IPM    ,IPARG   ,X        ,MS    ,
      .                  IN  ,ELBUF_TAB,SH4TREE ,IPADMESH ,MSC   ,
@@ -46,7 +47,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE REMESH_MOD
       USE MESSAGE_MOD
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixc,nixtg 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -334,7 +336,7 @@ C             goes to sleep
 
             ELSE  
 C
-C             mapping et descente au niveau suivant
+C             mapping and descent at the next level
 C
               IF(ITRIM==-1)THEN
               NG   =SH4TREE(4,N)
@@ -459,7 +461,7 @@ C             goes to sleep
 C
           IDEL7NOK=1
 C
-C         compactage de LSH4ACT
+C         compaction of LSH4ACT
           NTMP   =NSH4ACT
           NSH4ACT=0
           DO NN=1,NTMP
@@ -594,7 +596,7 @@ C         goes to sleep
 
       IF(KINILEV/=0)THEN
 C
-C     compactage de LSH4ACT
+C     compaction of LSH4ACT
         NTMP   =NSH4ACT
         NSH4ACT=0
         DO NN=1,NTMP
@@ -660,7 +662,7 @@ C             goes to sleep
 
             ELSE  
 C
-C             mapping et descente au niveau suivant
+C             mapping and descent at the next level
 
               DO IB=1,4
 
@@ -760,7 +762,7 @@ C             goes to sleep
 C
           IDEL7NOK=1
 C
-C         compactage de LSH4ACT
+C         compaction of LSH4ACT
           NTMP   =NSH3ACT
           NSH3ACT=0
           DO NN=1,NTMP
@@ -877,7 +879,7 @@ C         goes to sleep
 
       IF(KINILEV/=0)THEN
 C
-C     compactage de LSH4ACT
+C     compaction of LSH4ACT
         NTMP   =NSH3ACT
         NSH3ACT=0
         DO NN=1,NTMP
@@ -891,10 +893,11 @@ C     compactage de LSH4ACT
       END IF
 C
 C     Tag element that are inactifs and one of its sons is actif for Idel in interface
-       IF(NADMESH/=0.AND.IDEL7NG>=1)THEN
+       IF(NADMESH/=0.AND.IDEL7NG>=1.AND.(LSH4TRIM>0.OR.LSH3TRIM>0))THEN
          TAGTRIMC(1:NUMELC) = 0 
          TAGTRIMTG(1:NUMELTG) = 0 
-         DO N=1,NUMELC
+         IF(LSH4TRIM>0)THEN
+          DO N=1,NUMELC
 
            IF(IPART(10,IPARTC(N)) > 0)THEN
              LEVEL = SH4TREE(3,N)
@@ -928,7 +931,7 @@ C     Tag element that are inactifs and one of its sons is actif for Idel in int
                 LELT1 =LELT2
                 LELT2 =LELT
                ENDDO
-c            ELSEIF (LEVEL==(-LEVELMAX-1)) THEN
+C            ELSEIF (LEVEL==(-LEVELMAX-1)) THEN
             ELSEIF (LEVEL <0.AND.ITRIM == -1) THEN
                 TAGTRIMC(N) = 1
                 NG   =SH4TREE(4,N)
@@ -938,8 +941,11 @@ c            ELSEIF (LEVEL==(-LEVELMAX-1)) THEN
             ENDIF
           ENDIF
 
-        ENDDO
-        DO N=1,NUMELTG
+         ENDDO
+        ENDIF
+
+        IF(LSH3TRIM>0)THEN
+         DO N=1,NUMELTG
 
           IF(IPART(10,IPARTTG(N)) > 0)THEN
             LEVEL = SH3TREE(3,N)
@@ -979,10 +985,11 @@ c            ELSEIF (LEVEL==(-LEVELMAX-1)) THEN
                 ELBUF_TAB(NG)%GBUF%OFF(I) = ZERO ! off
              ENDIF
           ENDIF
-        ENDDO
+         ENDDO
+       ENDIF 
       ENDIF
 C
-C     tableaux de travail.
+C     working arrays.
       ALLOCATE(TAGNOD(NUMNOD),STAT=IERR)
       IF (IERR /= 0) CALL ARRET(2)
 

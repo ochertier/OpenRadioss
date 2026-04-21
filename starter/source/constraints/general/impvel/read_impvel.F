@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_impvel            ../starter/source/constraints/general/impvel/read_impvel.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_impvel         ../starter/source/constraints/general/impvel/hm_read_impvel.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    kinset                 ../starter/source/constraints/general/kinset.F
-      !||    nodgrnr5               ../starter/source/starter/freform.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_impvel            ../starter/source/constraints/general/impvel/read_impvel.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_impvel         ../starter/source/constraints/general/impvel/hm_read_impvel.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl                ../starter/source/starter/freform.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    kinset                 ../starter/source/constraints/general/kinset.F
+!||    nodgrnr5               ../starter/source/starter/freform.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE READ_IMPVEL(
      .           NFVEL    ,INUM     ,IOPT     ,FBFVEL   ,IBFVEL   ,
      .           ITAB     ,ITABM1   ,IKINE    ,IKINE1LAG,NOM_OPT  ,
@@ -82,9 +82,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,JJ,NN,IVEL,IDIS,INOD,NODID,NOD,NOSKEW,NOFRAME,SENS_ID,
+      INTEGER J,JJ,NN,IVEL,IDIS,INOD,NODID,NOSKEW,NOFRAME,SENS_ID,
      .   OPTID,SYS_TYPE,UID,FCT_ID,SKEW_ID,FRAME_ID,GRN,IGS,LEN,
-     .   ILAGM,FGEO,ICOOR,IUNIT,FLAGUNIT,SUBID,NOSUB
+     .   ILAGM,FGEO,ICOOR,IUNIT,FLAGUNIT,SUBID,NOSUB,NN_FM(3)
       INTEGER ,DIMENSION(NFXVEL)   :: NODENUM
       INTEGER ,DIMENSION(3*NUMNOD) :: IKINE1
       my_real :: YSCALE,TSTART,TSTOP,XSCALE,FSCAL_T,FSCAL_V
@@ -112,6 +112,7 @@ C======================================================================|
       IS_AVAILABLE = .FALSE.
 c
       IKINE1(:) = 0
+      NN_FM(1:3)=0
 c--------------------------------------------------
 c     START browsing /IMPVEL options
 c--------------------------------------------------
@@ -214,6 +215,7 @@ c----
             JJ = JJ+1
             IF (FRAME_ID == ISKN(4,JJ)) THEN               
               NOFRAME = J+1                         
+              NN_FM(1:3) = ISKN(1:3,JJ) 
               EXIT                           
             ENDIF                                   
           ENDDO            
@@ -263,7 +265,7 @@ c--------------------------------------------------
           IBFVEL(3 ,INUM) = FCT_ID
           IBFVEL(4 ,INUM) = SENS_ID
           IBFVEL(5 ,INUM) = 0
-          IBFVEL(6 ,INUM) = 0  ! init dans lecrby (si vitesse de rotation sur main)
+          IBFVEL(6 ,INUM) = 0  ! initialization in lecrby (if rotation velocity on main)
           IBFVEL(7 ,INUM) = IDIS
           IBFVEL(8 ,INUM) = ILAGM
           IBFVEL(9 ,INUM) = NOFRAME
@@ -314,6 +316,16 @@ c
             WRITE (IOUT, 3000) NODID,NOSKEW,FRAME_ID,XYZ(1:LEN),FCT_ID,SENS_ID,
      .                         YSCALE,ONE/XSCALE,TSTART,TSTOP,ICOOR
 c
+c---------------
+c         check for N1,N2,N3 of frame not the imposed node
+c---------------
+            IF (INOD==NN_FM(1) .OR. INOD==NN_FM(2) .OR. INOD==NN_FM(3)) THEN
+              CALL ANCMSG(MSGID=3091, MSGTYPE=MSGERROR, ANMODE=ANINFO,
+     .                    I1=OPTID,
+     .                    C1=TITR,
+     .                    I2=NODID,
+     .                    I3=FRAME_ID)
+            END IF
 c
           ELSE  ! SKEW
             IF(XYZ(1:2) == XX)THEN
@@ -362,13 +374,6 @@ c--------------------------------------------------
      .'            START_TIME                 STOP_TIME',
      .'         COORDINATE SYSTEM')
 c--------------------------------------------------
- 2000 FORMAT(//
-     .'     IMPOSED VELOCITIES BY LAGRANGE MULTIPLIERS  '/
-     .'     ------------------------------------------  '/
-     .'         NODE         SKEW        FRAME  DIRECTION   LOAD_CURVE',
-     .'       SENSOR            FSCALE                ASCALE',
-     .'            START_TIME                 STOP_TIME',
-     .'         COORDINATE SYSTEM')
  3000 FORMAT(3X,I10,3X,I10,3X,I10,9X,A2,3X,I10,3X,I10,
      .       2X,1PG20.13,2X,1PG20.13,2X,G20.13,2X,G20.13,16X,I10)
  4000 FORMAT(3X,I10,3X,I10,3X,I10,9X,A2,3X,I10,3X,I10,

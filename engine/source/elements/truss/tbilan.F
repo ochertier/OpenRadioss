@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tbilan                ../engine/source/elements/truss/tbilan.F
-      !||--- called by ------------------------------------------------------
-      !||    tforc3                ../engine/source/elements/truss/tforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tbilan                ../engine/source/elements/truss/tbilan.F
+!||--- called by ------------------------------------------------------
+!||    tforc3                ../engine/source/elements/truss/tforc3.F
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod               ../engine/share/modules/h3d_mod.F
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE TBILAN(
      1   PM,      V,       EINT,    AREA,
      2   PARTSAV, IPARTT,  TANI,    FOR,
@@ -75,12 +75,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, M, J, FLAG
+      INTEGER I, M, FLAG
       my_real
      .   VXA(MVSIZ), VYA(MVSIZ),VZA(MVSIZ), VA2(MVSIZ), XMAS(MVSIZ), 
      .   EI(MVSIZ), EK(MVSIZ), XM(MVSIZ),
      .   YM(MVSIZ), ZM(MVSIZ), 
-     .   RBIDON(1),OFF(MVSIZ),RHO(MVSIZ),
+     .   OFF(MVSIZ),RHO(MVSIZ),
      .   XCG(MVSIZ), YCG(MVSIZ), ZCG(MVSIZ),
      .   XX(MVSIZ) , YY(MVSIZ) , ZZ(MVSIZ) ,
      .   REI(MVSIZ), REK(MVSIZ), INEL,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat04            ../starter/source/materials/mat/mat004/hm_read_mat04.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat04            ../starter/source/materials/mat/mat004/hm_read_mat04.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT04(
      .           LSUBMODEL ,MTAG     ,UNITAB   ,IPM    ,PM      ,
      .           MAT_ID    ,TITR     ,ISRATE   ,MAT_PARAM)
@@ -84,15 +84,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED,IS_EOS, EOS_EMBEDDED
-      INTEGER JTUR, I, EMPTY_LINE,COUNT,IEOS,LAW6_OPT
-      INTEGER JTHE, IFLAGR
+      INTEGER COUNT, IEOS
       my_real
      .   YOUNG, ANU, CA, CB, CN, EPSM, SIGM, BULK, 
-     .   PMIN, CC, EPS0, CM, TMELT, TMAX, CS, T0, SPH, AS, BS,
-     .   AL, BL, G, TBA, TBK, PCO, FAC_L, FAC_T, FAC_M, FAC_C,
-     .   BID2 ,BID3 ,BID4 ,BID5 ,
-     .   BID2_,BID3_,BID4_,BID5_,
-     .   C0,C1,C2,C3,C4,C5,E0,PSH,TI,RHO0,RHOR
+     .   PMIN, CC, EPS0, CM, TMELT, TMAX, CS, T0, SPH,
+     .     G,
+     .   
+     .   
+     .   C0,C1,C2,C3,C4,C5,E0,PSH,RHO0,RHOR
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -160,15 +159,28 @@ C-----------------------------------------------
         CALL HM_GET_FLOATV('MAT_C4'       ,C4       ,IS_AVAILABLE, LSUBMODEL, UNITAB)               
         CALL HM_GET_FLOATV('MAT_C5'       ,C5       ,IS_AVAILABLE, LSUBMODEL, UNITAB)               
         CALL HM_GET_FLOATV('MAT_E0'       ,E0       ,IS_AVAILABLE, LSUBMODEL, UNITAB)               
-        CALL HM_GET_FLOATV('MAT_PSH'      ,PSH      ,IS_AVAILABLE, LSUBMODEL, UNITAB)               
+        CALL HM_GET_FLOATV('MAT_PSH'      ,PSH      ,IS_AVAILABLE, LSUBMODEL, UNITAB)
+        ! allocate EoS data structure
+        MAT_PARAM%IEOS = 1
+        MAT_PARAM%EOS%NUPARAM = 7
+        MAT_PARAM%EOS%NIPARAM = 0
+        MAT_PARAM%EOS%NFUNC = 0
+        MAT_PARAM%EOS%NTABLE = 0
+        CALL MAT_PARAM%EOS%CONSTRUCT() !allocations
+        MAT_PARAM%EOS%UPARAM(1) = C0-PSH
+        MAT_PARAM%EOS%UPARAM(2) = C1
+        MAT_PARAM%EOS%UPARAM(3) = C2
+        MAT_PARAM%EOS%UPARAM(4) = C3
+        MAT_PARAM%EOS%UPARAM(5) = C4
+        MAT_PARAM%EOS%UPARAM(6) = C5
+        MAT_PARAM%EOS%UPARAM(7) = ZERO
+        MAT_PARAM%EOS%PSH = PSH
+        MAT_PARAM%EOS%E0 = E0
         BULK  = C1                                                                                  
         PM(23)= E0                                                                                  
-        PM(31)= C0-PSH                                                                              
-        PM(32)= C1                                                                                  
-        PM(33)= C2                                                                                  
-        PM(34)= C3                                                                                  
-        PM(35)= C4                                                                                  
-        PM(36)= C5                                                                                  
+        PM(31)= C0-PSH
+        PM(32)=C1 !legacy value
+        !!PM(32)= C1+C4*ABS(E0) !bulk modulus
         PM(88)= PSH                                                                                 
         IEOS  = 1   ! Polynomial EOS
       ELSE

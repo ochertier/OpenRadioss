@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stop_sensor   ../engine/source/tools/sensor/stop_sensor.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod      ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod       ../engine/share/modules/h3d_mod.F
-      !||    imp_dyna      ../engine/share/modules/impbufdef_mod.F
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    output_mod    ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod    ../common_source/modules/sensor_mod.F90
-      !||    state_mod     ../common_source/modules/state_mod.F
-      !||====================================================================
+!||====================================================================
+!||    stop_sensor   ../engine/source/tools/sensor/stop_sensor.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod       ../engine/share/modules/h3d_mod.F
+!||    imp_dyna      ../engine/share/modules/impbufdef_mod.F
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||    output_mod    ../common_source/modules/output/output_mod.F90
+!||    sensor_mod    ../common_source/modules/sensor_mod.F90
+!||    state_mod     ../common_source/modules/state_mod.F
+!||====================================================================
       SUBROUTINE STOP_SENSOR(SENSORS   ,H3D_DATA  ,DYNAIN_DATA,OUTPUT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -43,7 +42,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
       USE SENSOR_MOD
-      USE ANIM_MOD
+      USE OUTPUT_MOD
       USE STATE_MOD
       USE OUTPUT_MOD
 C-----------------------------------------------
@@ -86,7 +85,7 @@ C-----------------------------------------------
             MREST = 1
 
             IF (SENSORS%STOP_NSTH   > 0) OUTPUT%TH%THIS  = TT
-            IF (SENSORS%STOP_NSANIM > 0) TANIM = TT
+            IF (SENSORS%STOP_NSANIM > 0) OUTPUT%TANIM = TT
             IF (SENSORS%STOP_NSSTAT > 0) TSTAT = TT
             IF (SENSORS%STOP_NSOUTP > 0) TOUTP = TT
             IF (SENSORS%STOP_NSH3D  > 0) H3D_DATA%TH3D = TT

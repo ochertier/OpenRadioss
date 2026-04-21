@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_state_inimap1d_exch_data   ../engine/source/output/sta/spmd_state_inimap1d_exch_data.F
-      !||--- called by ------------------------------------------------------
-      !||    stat_inimap1d_file_spmd         ../engine/source/output/sta/stat_inimap1d_file_spmd.F
-      !||    stat_inimap1d_spmd              ../engine/source/output/sta/stat_inimap1d_spmd.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    state_inimap_mod                ../engine/share/modules/state_inimap_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_state_inimap1d_exch_data   ../engine/source/output/sta/spmd_state_inimap1d_exch_data.F
+!||--- called by ------------------------------------------------------
+!||    stat_inimap1d_file_spmd         ../engine/source/output/sta/stat_inimap1d_file_spmd.F
+!||    stat_inimap1d_spmd              ../engine/source/output/sta/stat_inimap1d_spmd.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod             ../engine/source/mpi/spmd_comm_world.F90
+!||    state_inimap_mod                ../engine/share/modules/state_inimap_mod.F
+!||====================================================================
        SUBROUTINE SPMD_STATE_INIMAP1D_EXCH_DATA()
 C-----------------------------------------------
 C   M o d u l e s
@@ -37,6 +38,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -53,7 +55,7 @@ C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR,MSGOFF
-      INTEGER SIZ,MSGTYP,I,J,K,L,NG,NREC,MSGOFF2,IDOM,IPOS
+      INTEGER SIZ,MSGTYP,I,J,K,L
       INTEGER NCELL, NPTS, NBMAT
 
       DATA MSGOFF/10002/
@@ -92,7 +94,7 @@ C-----------------------------------------------
       ELSE                                                                                    
         NCELL = STATE_INIMAP_BUF(1)%NUM_CENTROIDS                                             
         DO I=2,NSPMD                                                                          
-          ! Reception du buffer flottant double des adresses DATA_I                           
+          ! reception of the double-precision floating buffer of data_i addresses
           MSGTYP = MSGOFF                                                                     
           NCELL = STATE_INIMAP_BUF(I)%NUM_CENTROIDS                                           
           NBMAT = STATE_INIMAP_BUF(I)%NSUBMAT                                                 
@@ -157,7 +159,7 @@ C-----------------------------------------------
           STATE_INIMAP_BUF(1)%POS_NODES(I)=STATE_INIMAP_BUF(1)%POS_NODES(I)
         ENDDO                                             
         DO I=2,NSPMD                                                
-          ! Reception du buffer flottant double des adresses DATA_I                        
+          ! reception of the double-precision floating buffer of data_i addresses
           MSGTYP = MSGOFF                                                
           NPTS = STATE_INIMAP_BUF(I)%NUM_POINTS                                            
           SIZ = 2*NPTS                                         

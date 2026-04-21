@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    setlenwa   ../starter/source/restart/ddsplit/setlenwa.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit    ../starter/source/restart/ddsplit/ddsplit.F
-      !||    lectur     ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    setlenwa   ../starter/source/restart/ddsplit/setlenwa.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit    ../starter/source/restart/ddsplit/ddsplit.F
+!||    lectur     ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE SETLENWA(
      1      LENWA0 ,NTHWA0  ,NAIRWA0   ,NUMELS0  ,NUMELQ0,
      2      NUMELC0,NUMELTG0,NUMELT0   ,NUMELP0  ,NUMELR0,
      3      NUMNOD0,NMNT0   ,L_MUL_LAG1,L_MUL_LAG,MAXNX0 ,
-     4      LWASPH0,NUMSPH0   ,LWASPIO  , NRCVVOIS0 ,
+     4      LWASPH0,NUMSPH0   ,LWASPIO  , NRCVVOIS0 ,NGROUP_L,
      5      LWAMP_L, LWANMP_L ,ITHERM   )
-C Attention les dummy peuvent etre soit locaux soit globaux suivant appel
+C Please note the dummy can be either local or global following appeal
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,7 +42,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com09_c.inc"
-#include      "scr05_c.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -51,6 +50,7 @@ C-----------------------------------------------
       INTEGER, INTENT(INOUT) :: LWAMP_L
       INTEGER, INTENT(INOUT) :: LWANMP_L
       INTEGER, INTENT(IN)    :: ITHERM
+      INTEGER, INTENT(IN)    :: NGROUP_L
       INTEGER LENWA0,NTHWA0,NAIRWA0,
      .        NUMELS0,NUMELQ0,NUMELC0,NUMELTG0,NUMELT0,NUMELP0,
      .        NUMELR0,NUMNOD0,NMNT0,L_MUL_LAG1,L_MUL_LAG,MAXNX0,
@@ -59,7 +59,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NFLUWA, NBHOLWA, NAIRWA, NINTWA, NXELWA, NSPHWA,
-     .        NASSNMP, NASSMP, NIDELWA, NWASPH, MSPR,
+     .        NASSNMP, NASSMP, NIDELWA, MSPR,
      .        IUN,LENVOISWA
 C-----------------------------------------------
       IUN = 1
@@ -77,44 +77,35 @@ C ALE / CFD
       NBHOLWA = MAX(IALE,ITHERM,IEULER) * NMULT * NUMELQ0
       LENVOISWA = 3 * ( NUMNOD0 + NRCVVOIS0 ) 
 C AirBag 
-      NAIRWA  = MAX(NAIRWA0, 4 * (NUMELC0 + NUMELTG0 + IBAGSURF))   ! en toute rigueur NAIRWA0 et IBAGSURF locaux
+      NAIRWA  = MAX(NAIRWA0, 4 * (NUMELC0 + NUMELTG0 + IBAGSURF))   ! In all nairwa0 and local Ibagsurf
 C Interface
-      NINTWA  = NMNT0+L_MUL_LAG1                                    ! en toute rigueur NMNT local
+      NINTWA  = NMNT0+L_MUL_LAG1                                    ! Rigorously local nmnt
 C
-C Assemblage
-      IF(IMACH/=3) THEN
-C SMP : allocation memoire partagee dans le WA (appel asspar2)
-        NASSNMP = 4*NUMNOD0+2
-C valeur precedente divisee par 2 car au moins 2 taches
-        NASSMP  = 2*NUMNOD0+1
-      ELSE
-C SPMD : tout en dynamique
-        NASSNMP = 0
-        NASSMP  = 0
-      END IF
+C SPMD assembly: all in dynamics
+      NASSNMP = 0
+      NASSMP  = 0
 C shooting nodes
       NIDELWA = 3*NUMNOD0
 C lenwa non parallele
       LWANMP_L   = MAX(NTHWA0,NASSNMP,L_MUL_LAG)
 C---------------------------------------------------------------------
-      NXELWA   = 22*MAXNX0                                         ! en toute rigueur MAXNX local
+      NXELWA   = 22*MAXNX0                                         ! Rigorously Maxnx Local
 C lenwa parallele
       LWAMP_L    = MAX(NAIRWA,NINTWA,NFLUWA+NBHOLWA,NASSMP,NXELWA,NSPHWA,
      +               NIDELWA,LENVOISWA)
-C
-C MSPR utilise dans le starter
-      MSPR    = MAX(4*NUMELR0,NPARG*NGROUP)
+C MSPR used in the starter
+      MSPR    = MAX(4*NUMELR0,NPARG*NGROUP_L)
 C
       LENWA0  = MAX(LWAMP_L,LWANMP_L,MSPR)
 C
       RETURN
       END
 C
-      !||====================================================================
-      !||    setmulti   ../starter/source/restart/ddsplit/setlenwa.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur     ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    setmulti   ../starter/source/restart/ddsplit/setlenwa.F
+!||--- called by ------------------------------------------------------
+!||    lectur     ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE SETMULTI(IPARI)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -124,7 +115,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "spmd_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
@@ -138,28 +128,26 @@ C-----------------------------------------------
       INTEGER I, MULTIMP, ICONT, ITY
 C-----------------------------------------------
 C
-C MULTIMAX : parametre servant a allouer les buffer de comm interface engine (SPMD)
+C MultiMAX: parameter used to allocate the Buffer of Comm Engine (SPMD)
 C
       MULTIMAX = 0
       ICONT = 0
-      IF(IMACH==3) THEN
-        DO I = 1, NINTER
-          MULTIMP = IPARI(23,I)
-            IF(MULTIMP<=4) THEN
-              MULTIMAX = MAX(MULTIMAX,4*MULTIMP)
-            ELSEIF(MULTIMP<=12)THEN
-              MULTIMAX= MAX(MULTIMAX,3*MULTIMP)
-            ELSEIF(MULTIMP>12)THEN
-              MULTIMAX= MAX(MULTIMAX,2*MULTIMP)
-            END IF
-          ITY = IPARI(7,I)
-          IF(ITY==7.OR.ITY==10.OR.ITY==11.OR.
-     .       ITY==22)ICONT=1
-        END DO
-        IF(NUMSPH/=0.AND.MULTIMAX==0)MULTIMAX=1
-        IF(NUMELX/=0.AND.MULTIMAX==0)MULTIMAX=4
-        IF(NINTER>0.AND.ICONT==0)MULTIMAX=100
-      END IF
+      DO I = 1, NINTER
+        MULTIMP = IPARI(23,I)
+          IF(MULTIMP<=4) THEN
+            MULTIMAX = MAX(MULTIMAX,4*MULTIMP)
+          ELSEIF(MULTIMP<=12)THEN
+            MULTIMAX= MAX(MULTIMAX,3*MULTIMP)
+          ELSEIF(MULTIMP>12)THEN
+            MULTIMAX= MAX(MULTIMAX,2*MULTIMP)
+          END IF
+        ITY = IPARI(7,I)
+        IF(ITY==7.OR.ITY==10.OR.ITY==11.OR. ITY==22)ICONT=1
+      END DO
+      IF(NUMSPH/=0.AND.MULTIMAX==0)MULTIMAX=1
+      IF(NUMELX/=0.AND.MULTIMAX==0)MULTIMAX=4
+      IF(NINTER>0.AND.ICONT==0)MULTIMAX=100
+
 C
       RETURN
       END

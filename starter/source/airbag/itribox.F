@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    itribox   ../starter/source/airbag/itribox.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh1   ../starter/source/airbag/fvmesh.F
-      !||--- calls      -----------------------------------------------------
-      !||    polclip   ../starter/source/airbag/itribox.F
-      !||====================================================================
+!||====================================================================
+!||    itribox   ../starter/source/airbag/itribox.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh1   ../starter/source/airbag/fvmesh.F
+!||--- calls      -----------------------------------------------------
+!||    polclip   ../starter/source/airbag/itribox.F
+!||====================================================================
       SUBROUTINE ITRIBOX(TRI, BOX, NORM, NVERTS, POLY, NVMAX)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -77,7 +77,7 @@ C
             POLY(3,J)=POLYOUT(3,J)
          ENDDO
       ENDDO   
-C Elimination des noeuds doubles
+C Elimination of double nodes
       NN=0
       DO I=1,NVERTS
          X1=POLY(1,I)
@@ -107,11 +107,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    polclip   ../starter/source/airbag/itribox.F
-      !||--- called by ------------------------------------------------------
-      !||    itribox   ../starter/source/airbag/itribox.F
-      !||====================================================================
+!||====================================================================
+!||    polclip   ../starter/source/airbag/itribox.F
+!||--- called by ------------------------------------------------------
+!||    itribox   ../starter/source/airbag/itribox.F
+!||====================================================================
       SUBROUTINE POLCLIP(POLYIN, NPIN, A, N, POLYOUT, NPOUT )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -121,17 +121,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPIN, NPOUT
-      my_real
-     .        POLYIN(3,*), A(*), N(*), POLYOUT(3,*)   
+      my_real POLYIN(3,*), A(*), N(*), POLYOUT(3,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, II, IC1, IC2
-      my_real
-     .        X1, Y1, Z1, X2, Y2, Z2, SS1, SS2, X12, Y12, Z12,
-     .        XA1, YA1, ZA1, ALPHA, XM, YM, ZM, SSN
-C
-C Clipping d'un polygone par un plan
+      INTEGER I, II
+      my_real X1, Y1, Z1, X2, Y2, Z2, SS1, SS2, X12, Y12, Z12, XA1, YA1, ZA1, ALPHA, XM, YM, ZM, SSN
+
+C polygon clipping with a plane
       NPOUT=0
       DO I=1,NPIN
          IF (I/=NPIN) THEN

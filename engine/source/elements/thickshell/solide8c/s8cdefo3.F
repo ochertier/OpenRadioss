@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8cdefo3   ../engine/source/elements/thickshell/solide8c/s8cdefo3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s8cdefo3   ../engine/source/elements/thickshell/solide8c/s8cdefo3.F
+!||--- called by ------------------------------------------------------
+!||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
+!||====================================================================
       SUBROUTINE S8CDEFO3(
      1   PXC1,    PXC2,    PXC3,    PXC4,
      2   PYC1,    PYC2,    PYC3,    PYC4,
@@ -146,7 +146,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, ICOR
+      INTEGER I
 C     REAL
       my_real
      .   DVC(MVSIZ),DVCA(MVSIZ),DT1D2,TOL,DT1D
@@ -244,7 +244,7 @@ C-------------R,S,T--direction------
           IF(ISMDISP==0.AND.OFFS(I)/=TWO)DVCA(I)= DVCA(I)-DST(I)
          ENDDO
         ENDIF 
-C-------------Volume traitement------
+C----------- Volume treatment ------
         DO I=1,NEL
           DVP=DVCA(I)-DVC(I)
           DV =DVP*OFF(I)

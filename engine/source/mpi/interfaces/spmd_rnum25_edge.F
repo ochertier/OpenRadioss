@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_rnum25_edge   ../engine/source/mpi/interfaces/spmd_rnum25_edge.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_tri        ../engine/source/interfaces/intsort/i25main_tri.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri25ebox          ../engine/share/modules/tri25ebox.F
-      !||    tri7box            ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_rnum25_edge   ../engine/source/mpi/interfaces/spmd_rnum25_edge.F
+!||--- called by ------------------------------------------------------
+!||    i25main_tri        ../engine/source/interfaces/intsort/i25main_tri.F
+!||--- uses       -----------------------------------------------------
+!||    tri25ebox          ../engine/share/modules/tri25ebox.F
+!||    tri7box            ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_RNUM25_EDGE(NIN,NEDGE,CAND_E2E,ISTOK_E2E, CAND_E2S,ISTOK_E2S)
 C-----------------------------------------------
 C   M o d u l e s
@@ -51,8 +51,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, P, I_STOK, IDEB, JDEB, NI
-      INTEGER EID,N_REMOTE_OLD
+      INTEGER I, J, P, IDEB, JDEB, NI
+      INTEGER N_REMOTE_OLD
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -98,7 +98,7 @@ C
 
           ELSEIF(IREM_EDGE(E_LOCAL_ID,J+JDEB)>
      +           NSVFIE(NIN)%P(I+IDEB)) THEN
-Cas candidat non penetre et non retenu
+Cas candidate not penetrating and not selected
             I = I + 1
           END IF
         END DO

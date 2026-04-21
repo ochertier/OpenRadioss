@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_igath   ../engine/source/mpi/anim/spmd_igath.F
-      !||--- called by ------------------------------------------------------
-      !||    aniskew      ../engine/source/output/anim/generate/aniskew.F
-      !||    aniskewf     ../engine/source/output/anim/generate/aniskewf.F
-      !||    dsphnor      ../engine/source/output/anim/generate/dsphnor.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_igath            ../engine/source/mpi/anim/spmd_igath.F
+!||--- called by ------------------------------------------------------
+!||    aniskew               ../engine/source/output/anim/generate/aniskew.F
+!||    aniskewf              ../engine/source/output/anim/generate/aniskewf.F
+!||    dsphnor               ../engine/source/output/anim/generate/dsphnor.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_IGATH(SRBUF,LEN,LRECV)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -50,7 +53,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGOFF,MSGOFF2,MSGTYP,INFO,I,K,ATID,ATAG,ALEN,RLEN,S1
+      INTEGER MSGOFF,MSGOFF2,MSGTYP,I,RLEN,S1
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR
       DATA MSGOFF/7013/
       DATA MSGOFF2/7068/

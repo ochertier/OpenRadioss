@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,65 +20,67 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s6cforc3               ../engine/source/elements/thickshell/solide6c/s6cforc3.F
-      !||--- called by ------------------------------------------------------
-      !||    forint                 ../engine/source/elements/forint.F
-      !||--- calls      -----------------------------------------------------
-      !||    csmall3                ../engine/source/elements/solid/solide/csmall3.F
-      !||    mmain                  ../engine/source/materials/mat_share/mmain.F90
-      !||    s6cbilan               ../engine/source/elements/thickshell/solide6c/s6cbilan.F
-      !||    s6cdefc3               ../engine/source/elements/thickshell/solide6c/s6cdefo3.F
-      !||    s6cderi3               ../engine/source/elements/thickshell/solide6c/s6cderi3.F
-      !||    s6cfint3               ../engine/source/elements/thickshell/solide6c/s6cfint3.F
-      !||    s6cfint_reg            ../engine/source/elements/thickshell/solide6c/s6cfint_reg.F
-      !||    s6chour3               ../engine/source/elements/thickshell/solide6c/s6chourg3.F
-      !||    s6chour_ctl            ../engine/source/elements/thickshell/solide6c/s6chour_ctl.F90
-      !||    s6ctherm               ../engine/source/elements/thickshell/solide6c/s6ctherm.F
-      !||    s6cumu3                ../engine/source/elements/thickshell/solide6c/s6cumu3.F
-      !||    s6cumu3p               ../engine/source/elements/thickshell/solide6c/s6cumu3p.F
-      !||    s6czero3               ../engine/source/elements/thickshell/solide6c/s6czero3.F
-      !||    s6fillopt              ../engine/source/elements/thickshell/solide6c/s6fillopt.F
-      !||    s6for_distor           ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
-      !||    s6get_xv               ../engine/source/elements/thickshell/solide6c/s6get_xv.F90
-      !||    s6proj3                ../engine/source/elements/thickshell/solide6c/s6proj3.F
-      !||    s6rcoor3               ../engine/source/elements/thickshell/solide6c/s6rcoor3.F
-      !||    s6sav3                 ../engine/source/elements/thickshell/solide6c/s6sav3.F
-      !||    s8csigp3               ../engine/source/elements/thickshell/solide8c/s8csigp3.F
-      !||    scdefo3                ../engine/source/elements/thickshell/solidec/scdefo3.F
-      !||    scordef3               ../engine/source/elements/thickshell/solidec/scordef3.F
-      !||    scroto_sig             ../engine/source/elements/thickshell/solidec/scroto_sig.F
-      !||    scumualpha6            ../engine/source/elements/thickshell/solidec/scumualpha6.F
-      !||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
-      !||    sdlen3                 ../engine/source/elements/solid/solide/sdlen3.F
-      !||    sdlensh3n              ../engine/source/elements/thickshell/solidec/sdlensh3n.F
-      !||    sdlensh3n2             ../engine/source/elements/thickshell/solide6c/sdlensh3n2.F
-      !||    sgetdir3               ../engine/source/elements/thickshell/solidec/sgetdir3.F
-      !||    sgparav3               ../engine/source/elements/solid/solide/sgparav3.F
-      !||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
-      !||    srho3                  ../engine/source/elements/solid/solide/srho3.F
-      !||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
-      !||    tshgeodel3             ../engine/source/elements/thickshell/solidec/tshgeodel3.F
-      !||    vrrota3                ../engine/source/elements/thickshell/solide6c/vrrota3.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    dt_mod                 ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
-      !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
-      !||    s6chour_ctl_mod        ../engine/source/elements/thickshell/solide6c/s6chour_ctl.F90
-      !||    s6for_distor_mod       ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
-      !||    s6get_xv_mod           ../engine/source/elements/thickshell/solide6c/s6get_xv.F90
-      !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
-      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
-      !||    table_mod              ../engine/share/modules/table_mod.F
-      !||    timer_mod              ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE S6CFORC3(TIMERS, ELBUF_TAB,NG     , 
+!||====================================================================
+!||    s6cforc3               ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+!||--- called by ------------------------------------------------------
+!||    forint                 ../engine/source/elements/forint.F
+!||--- calls      -----------------------------------------------------
+!||    csmall3                ../engine/source/elements/solid/solide/csmall3.F
+!||    mmain                  ../engine/source/materials/mat_share/mmain.F90
+!||    s6cbilan               ../engine/source/elements/thickshell/solide6c/s6cbilan.F
+!||    s6cdefc3               ../engine/source/elements/thickshell/solide6c/s6cdefo3.F
+!||    s6cderi3               ../engine/source/elements/thickshell/solide6c/s6cderi3.F
+!||    s6cfint3               ../engine/source/elements/thickshell/solide6c/s6cfint3.F
+!||    s6cfint_reg            ../engine/source/elements/thickshell/solide6c/s6cfint_reg.F
+!||    s6chour3               ../engine/source/elements/thickshell/solide6c/s6chourg3.F
+!||    s6chour_ctl            ../engine/source/elements/thickshell/solide6c/s6chour_ctl.F90
+!||    s6ctherm               ../engine/source/elements/thickshell/solide6c/s6ctherm.F
+!||    s6cumu3                ../engine/source/elements/thickshell/solide6c/s6cumu3.F
+!||    s6cumu3p               ../engine/source/elements/thickshell/solide6c/s6cumu3p.F
+!||    s6czero3               ../engine/source/elements/thickshell/solide6c/s6czero3.F
+!||    s6fillopt              ../engine/source/elements/thickshell/solide6c/s6fillopt.F
+!||    s6for_distor           ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
+!||    s6get_xv               ../engine/source/elements/thickshell/solide6c/s6get_xv.F90
+!||    s6proj3                ../engine/source/elements/thickshell/solide6c/s6proj3.F
+!||    s6rcoor3               ../engine/source/elements/thickshell/solide6c/s6rcoor3.F
+!||    s6sav3                 ../engine/source/elements/thickshell/solide6c/s6sav3.F
+!||    s8csigp3               ../engine/source/elements/thickshell/solide8c/s8csigp3.F
+!||    scdefo3                ../engine/source/elements/thickshell/solidec/scdefo3.F
+!||    scordef3               ../engine/source/elements/thickshell/solidec/scordef3.F
+!||    scroto_sig             ../engine/source/elements/thickshell/solidec/scroto_sig.F
+!||    scumualpha6            ../engine/source/elements/thickshell/solidec/scumualpha6.F
+!||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
+!||    sdlen3                 ../engine/source/elements/solid/solide/sdlen3.F
+!||    sdlensh3n              ../engine/source/elements/thickshell/solidec/sdlensh3n.F
+!||    sdlensh3n2             ../engine/source/elements/thickshell/solide6c/sdlensh3n2.F
+!||    sgetdir3               ../engine/source/elements/thickshell/solidec/sgetdir3.F
+!||    sgparav3               ../engine/source/elements/solid/solide/sgparav3.F
+!||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
+!||    srho3                  ../engine/source/elements/solid/solide/srho3.F
+!||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
+!||    tshgeodel3             ../engine/source/elements/thickshell/solidec/tshgeodel3.F
+!||    vrrota3                ../engine/source/elements/thickshell/solide6c/vrrota3.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    dt_mod                 ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
+!||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    s6chour_ctl_mod        ../engine/source/elements/thickshell/solide6c/s6chour_ctl.F90
+!||    s6for_distor_mod       ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
+!||    s6get_xv_mod           ../engine/source/elements/thickshell/solide6c/s6get_xv.F90
+!||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
+!||    sensor_mod             ../common_source/modules/sensor_mod.F90
+!||    table_mod              ../engine/share/modules/table_mod.F
+!||    timer_mod              ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE S6CFORC3(TIMERS, OUTPUT, ELBUF_TAB,NG     , 
      1                   PM       ,GEO     ,IXS     ,X      ,
-     2                   A        ,V       ,MS      ,W      ,FLUX   ,
+     2                   A        ,V       ,MS      ,W      ,
      3                   FLU1     ,VEUL    ,FV      ,ALE_CONNECT  ,IPARG  ,
      4                   TF       ,NPF     ,BUFMAT  ,PARTSAV,
      5                   DT2T     ,NELTST  ,ITYPTST ,STIFN  ,FSKY   ,
@@ -100,6 +102,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TIMER_MOD
+      USE OUTPUT_MOD, only : OUTPUT_
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -113,6 +116,7 @@ C-----------------------------------------------
       USE S6CHOUR_CTL_MOD ,ONLY : S6CHOUR_CTL
       use glob_therm_mod
       USE SENSOR_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -137,6 +141,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(TIMER_), INTENT(inout) :: TIMERS
+      TYPE(OUTPUT_), INTENT(inout) :: OUTPUT
       INTEGER,INTENT(IN):: SNPC
       INTEGER,INTENT(IN):: STF
       INTEGER, INTENT(IN) :: SBUFMAT
@@ -156,7 +161,7 @@ C-----------------------------------------------
      .   DT2T
       my_real
      .   PM(NPROPM,*),  X(*), A(*), V(*), MS(*), W(*),
-     .   FLUX(6,*),GEO(NPROPG,*),
+     .   GEO(NPROPG,*),
      .   FLU1(*), VEUL(*), FV(*), TF(*), BUFMAT(*),
      .   PARTSAV(*),STIFN(*), FSKY(*),EANI(*),
      .   F11(MVSIZ),F21(MVSIZ),F31(MVSIZ),
@@ -169,6 +174,7 @@ C-----------------------------------------------
       my_real, INTENT(INOUT) :: TEMP(NUMNOD),FTHE(IFTHE),FTHESKY(LSKY),
      .   CONDN(ICONDN),CONDNSKY(LSKY)
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
+C     ENSURE DOUBLE-PRECISION (64-BIT) FLOATING-POINT CALCULATIONS, EVEN WHEN COMPILING IN SINGLE-PRECISION MODE.
       DOUBLE PRECISION, DIMENSION(3,NUMNOD), INTENT(IN   ) :: XDP
       TYPE (TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
@@ -181,15 +187,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,LCO,NF1,IFLAG,NUVAR,CURRENT_LAYER,IMAT,
-     .   ILAY,NLAY,IR,IS,IT,IP,IBID,MX,L_PLA,L_EPSD
+      INTEGER I,J,NF1,IFLAG,CURRENT_LAYER,IMAT,
+     .   ILAY,NLAY,IR,IS,IT,IBID,MX,L_PLA,L_EPSD
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),IBIDON(1)
-c     Variables utilisees dans les routines solides uniquement (en arguments).
+c     variables used only in solid routines (as arguments).
       INTEGER NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ), 
-     .        NC5(MVSIZ), NC6(MVSIZ), NC7(MVSIZ), NC8(MVSIZ)
+     .        NC5(MVSIZ), NC6(MVSIZ)
 C----------
       my_real
-     .   C1,DTI, MBID(1)
+     .   C1,DTI
       my_real
      . VD2(MVSIZ) , DVOL(MVSIZ),DELTAX(MVSIZ),
      . VIS(MVSIZ) , QVIS(MVSIZ), CXX(MVSIZ) ,
@@ -221,11 +227,11 @@ C
      .  VZ1(MVSIZ),VZ2(MVSIZ),VZ3(MVSIZ),VZ4(MVSIZ),
      .  VZ5(MVSIZ),VZ6(MVSIZ),
      .  PX1(MVSIZ),PX2(MVSIZ),PX3(MVSIZ),PX4(MVSIZ),
-     .  PX5(MVSIZ),PX6(MVSIZ),
+     .  
      .  PY1(MVSIZ),PY2(MVSIZ),PY3(MVSIZ),PY4(MVSIZ),
-     .  PY5(MVSIZ),PY6(MVSIZ),
+     .  
      .  PZ1(MVSIZ),PZ2(MVSIZ),PZ3(MVSIZ),PZ4(MVSIZ),
-     .  PZ5(MVSIZ),PZ6(MVSIZ),
+     .  
      .  PX1H(MVSIZ),PX2H(MVSIZ),PX3H(MVSIZ),
      .  PY1H(MVSIZ),PY2H(MVSIZ),PY3H(MVSIZ),
      .  PZ1H(MVSIZ),PZ2H(MVSIZ),PZ3H(MVSIZ),
@@ -243,7 +249,7 @@ C
      .   R31(MVSIZ),R32(MVSIZ),R33(MVSIZ),GAMA(MVSIZ,6)
 C                                                                     12
       my_real
-     .   SIGYM(MVSIZ),G(MVSIZ),NU(MVSIZ),VOLG(MVSIZ),SIGY(MVSIZ),
+     .   NU(MVSIZ),VOLG(MVSIZ),SIGY(MVSIZ),
      .   B1122(MVSIZ),B1221(MVSIZ),B2212(MVSIZ),B1121(MVSIZ),
      .   B1122H(MVSIZ),B1221H(MVSIZ),B2212H(MVSIZ),B1121H(MVSIZ),
      .   B1X(MVSIZ,2),B1Y(MVSIZ,2),B2X(MVSIZ,2),B2Y(MVSIZ,2),
@@ -253,9 +259,9 @@ C                                                                     12
      .   DC5(MVSIZ),DC6(MVSIZ),VZL(MVSIZ),JACI33(MVSIZ),
      .   DHXX(MVSIZ),DHXY(MVSIZ),DHYX(MVSIZ),DHYY(MVSIZ),DHYZ(MVSIZ),
      .   DHZX(MVSIZ),DHZY(MVSIZ),DHZZ(MVSIZ),DH4(MVSIZ),DHXZ(MVSIZ),
-     .   DH5(MVSIZ),DH6(MVSIZ),EINTM(MVSIZ),DDHV(MVSIZ),DD(MVSIZ,6),
+     .   DH5(MVSIZ),DH6(MVSIZ),DDHV(MVSIZ),DD(MVSIZ,6),
      .   SIGZM(MVSIZ),VOLM(MVSIZ),USB(MVSIZ),ET(MVSIZ),
-     .   R1_FREE(MVSIZ),R3_FREE(MVSIZ),R4_FREE(MVSIZ),
+     .   R1_FREE(MVSIZ),R3_FREE(MVSIZ),
      .   STIN(MVSIZ),BID(MVSIZ),DSV(MVSIZ),ALPHA_E(MVSIZ),LLSH(MVSIZ)
 C     
       INTEGER PID,MTN0,IPTHK,IPPOS,IPMAT,NLYMAX,MID,IPANG,IOFFS
@@ -273,6 +279,7 @@ C
      .   N4Z(MVSIZ), N5Z(MVSIZ), N6Z(MVSIZ),AMU(MVSIZ),AREA(MVSIZ)
       my_real THEM(MVSIZ,6),TEMPEL(MVSIZ),DIE(MVSIZ),CONDEN(MVSIZ)
       my_real, dimension(mvsiz) :: fheat
+C     ENSURE DOUBLE-PRECISION (64-BIT) FLOATING-POINT CALCULATIONS, EVEN WHEN COMPILING IN SINGLE-PRECISION MODE.
       DOUBLE PRECISION 
      .   VOLDP(MVSIZ),FACDP
       INTEGER INLOC,L_NLOC,IPOS(6),INOD(6)
@@ -281,6 +288,8 @@ C
       my_real, DIMENSION(:), POINTER :: DNL
       my_real :: STI_C(MVSIZ),LL(MVSIZ),FLD(MVSIZ),
      .           CNS2,FQMAX,DN
+      integer :: fake_size = 0
+      my_real, dimension(1) :: fake_array     
 C-----
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -505,7 +514,7 @@ C
      4   F15,        F25,        F35,        F16,
      5   F26,        F36,        GBUF%SIG,   GBUF%EINT,
      6   GBUF%RHO,   GBUF%QVIS,  GBUF%PLA,   GBUF%EPSD,
-     7   GBUF%G_PLA, GBUF%G_EPSD,NEL)
+     7   GBUF%G_PLA, GBUF%G_EPSD,NEL,NLAY)
 C ------------------------------------------------------------------------------
 C  Update reference configuration (possible future change to small strain option)
 C -------------------------------------------------------------------------------
@@ -656,11 +665,12 @@ C
         DIVDE(1:NEL) = DT1*(DXX(1:NEL)+ DYY(1:NEL)+ DZZ(1:NEL))+DSV(1:NEL)  
         CALL SRHO3(
      1   PM,         LBUF%VOL,   LBUF%RHO,   LBUF%EINT,
-     2   DIVDE,      FLUX(1,NF1),FLU1(NF1),  VOLN,
+     2   DIVDE,      fake_array,FLU1(NF1),  VOLN,
      3   DVOL,       NGL,        MXT,        OFF,
      4   0,          GBUF%TAG22, VOLDP,      LBUF%VOL0DP,
      5   AMU,        GBUF%OFF,   NEL,        MTN,
-     6   JALE,       ISMSTR,     JEUL,       JLAG)
+     6   JALE,       ISMSTR,     JEUL,       JLAG,
+     .   fake_size,fake_size,0)
 C
 C-----------------------------
 C Gather stresses
@@ -671,7 +681,7 @@ C------------------------------------------------------
 C Compute new stresses according to constitutive laws
 C------------------------------------------------------
         CURRENT_LAYER=ILAY         ! one treatment pass LAY to negative
-        CALL MMAIN(TIMERS,
+        CALL MMAIN(TIMERS, OUTPUT,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -706,7 +716,7 @@ C------------------------------------------------------
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, impl_s,
-     .   idyna,       DT,         fheat  , OPT_MTN=MTN,OPT_JCVT=JCVT, 
+     .   idyna,       DT,         fheat  ,sensors, OPT_MTN=MTN,OPT_JCVT=JCVT, 
      .   OPT_ISORTH=ISORTH,OPT_ISORTHG=ISORTHG)
 C
         DO I=1,NEL
@@ -755,7 +765,7 @@ C----------------------------
      I   GBUF%QVIS,  GBUF%PLA,   ZT,         WT,
      J   VOLG,       OFF,        NU1,        LBUF%VOL,
      K   GBUF%VOL,   L_PLA,      L_EPSD,     NEL,
-     L   SVIS )
+     L   SVIS,       GBUF%WPLA,  LBUF%WPLA,   GBUF%G_WPLA    )
         ELSE
          CALL S6CFINT3(
      1   LBUF%SIG,          PX1,               PX2,               PX3,
@@ -778,7 +788,7 @@ C----------------------------
      I   GBUF%QVIS,         GBUF%PLA,          A_GAUSS(ILAY,NLAY),W_GAUSS(ILAY,NLAY),
      J   VOLG,              OFF,               NU1,               LBUF%VOL,
      K   GBUF%VOL,          L_PLA,             L_EPSD,            NEL,
-     L   SVIS)
+     L   SVIS,              GBUF%WPLA,         LBUF%WPLA,         GBUF%G_WPLA     )
         ENDIF ! IF (ISORTH > 0)
 C-------------------------
 C Finite element heat transfert  
@@ -890,6 +900,7 @@ C-----------------------------
      .     GBUF%RHO,VOLG,CXX,GBUF%HOURG,
      .     OFF,GBUF%VOL,GBUF%EINT,DT1,STIN,NEL)
         ELSE
+C          
           CALL S6CHOUR3(GBUF%RHO,VOLG,CXX,
      .     X1, X2, X3, X3, X4, X5, X6, X6,
      .     Y1, Y2, Y3, Y3, Y4, Y5, Y6, Y6,
@@ -914,7 +925,7 @@ C--------------------------------------
      .       GRESAV,GRTH,IGRTH,GBUF%OFF,IEXPAN,GBUF%EINTTH,
      .       GBUF%FILL, XGXA, XGYA, XGZA,XGXA2,XGYA2,XGZA2,
      .       XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG),GBUF%OFF,
-     .       SENSORS)
+     .       SENSORS,NEL,GBUF%G_WPLA,GBUF%WPLA)
       ENDIF
 C--------------------------------
 C Convected frame to global frame

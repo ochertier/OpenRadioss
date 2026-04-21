@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alew4             ../engine/source/ale/grid/alew4.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx            ../engine/source/ale/grid/alewdx.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_exalew       ../engine/source/mpi/fluid/spmd_cfd.F
-      !||    spmd_exalew_pon   ../engine/source/mpi/fluid/spmd_cfd.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod           ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alew4             ../engine/source/ale/grid/alew4.F
+!||--- called by ------------------------------------------------------
+!||    alewdx            ../engine/source/ale/grid/alewdx.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_exalew       ../engine/source/mpi/fluid/spmd_cfd.F
+!||    spmd_exalew_pon   ../engine/source/mpi/fluid/spmd_cfd.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod           ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE ALEW4(
      1   X       ,D      ,V       ,W     ,WA    ,
      2   NALE    ,IPARG  ,NC      ,WB    ,
      3   IAD_ELEM,FR_ELEM,FR_NBCC ,SIZEN ,ADDCNE,
      4   PROCNE  ,FSKY   ,FSKYV   ,IADX  ,WMA   ,
-     5   NIX,     NIADX  ,ITAB  )
+     5   NIX,     NIADX  )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -74,7 +74,7 @@ C-----------------------------------------------
 !  (1:3, NUMNOD+1:) additional nodes (also on adjacent domains but connected to the boundary of the current domain)
 !      idem with D(SD), and V(SV)
 C-----------------------------------------------
-      INTEGER NALE(NUMNOD), IPARG(NPARG,NGROUP), NC(NIX,*), ADDCNE(*), PROCNE(*),ITAB(NUMNOD),
+      INTEGER NALE(NUMNOD), IPARG(NPARG,NGROUP), NC(NIX,*), ADDCNE(*), PROCNE(*),
      .        IAD_ELEM(2,*), FR_ELEM(*), FR_NBCC(2,*), IADX(NIADX,*) ,
      .        SIZEN, NIX, NIADX
       my_real X(3,SX/3), D(3,SD/3), V(3,SV/3), W(3,SW/3), WA(3,*), WB(3,*),

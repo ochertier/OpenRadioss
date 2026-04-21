@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inverted_group_init       ../starter/source/model/sets/inverted_group_init.F
-      !||--- called by ------------------------------------------------------
-      !||    compute_connect_partelm   ../starter/source/model/sets/compute_connect_partelm.F
-      !||    lectur                    ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    inverted_group_mod        ../starter/share/modules1/inverted_group_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inverted_group_init       ../starter/source/model/sets/inverted_group_init.F
+!||--- called by ------------------------------------------------------
+!||    compute_connect_partelm   ../starter/source/model/sets/compute_connect_partelm.F
+!||    lectur                    ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    inverted_group_mod        ../starter/share/modules1/inverted_group_mod.F
+!||====================================================================
         SUBROUTINE INVERTED_GROUP_INIT(MODE,INV_GROUP,NUMSPH)
 !$COMMENT
 !       INVERTED_GROUP_INIT description
 !       initialization of INV_GROUP structure (number of elm & part)
 !       
 !       INVERTED_GROUP_INIT organization :
-!           2 different modes :
+!           2 different modes:
 !           - MODE = 0 --> first initialization
 !           - MODE = 1 --> recomputation of the inverted connectivity
 !             the size does not change, the structure was already allocated,

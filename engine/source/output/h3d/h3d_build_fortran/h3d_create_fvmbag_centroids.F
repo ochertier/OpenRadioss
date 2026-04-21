@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_create_fvmbag_centroids   ../engine/source/output/h3d/h3d_build_fortran/h3d_create_fvmbag_centroids.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                        ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    c_h3d_create_nodes            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_nodes.cpp
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod                     ../engine/share/modules/fvbag_mod.F
-      !||    groupdef_mod                  ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_create_fvmbag_centroids   ../engine/source/output/h3d/h3d_build_fortran/h3d_create_fvmbag_centroids.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                        ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    c_h3d_create_nodes            ../engine/source/output/h3d/h3d_build_cpp/c_h3d_create_nodes.cpp
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod                     ../engine/share/modules/fvbag_mod.F
+!||    groupdef_mod                  ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE H3D_CREATE_FVMBAG_CENTROIDS(MONVOL,VOLMON, FVDATA, NFVBAG, SMONVOL, SVOLMON, AIRBAGS_NODE_ID_SHIFT)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -75,15 +75,15 @@ C-----------------------------------------------
       INTEGER :: IH3D_FLAG !< flag for H3D output
       INTEGER :: NNODES    !< number of centroids
       INTEGER :: IFV       !< FVMBAG identifier in [1, NFVBAG] where NFVBAG <= NVOLU
-      INTEGER :: nodeID    !< node identifier (internal)
+ 
       INTEGER :: NPOLH     !< number of polyhedra for a given airbag
-      my_real :: VALUE_X   !< polyhedron centroid X-value
-      my_real :: VALUE_Y   !< polyhedron centroid Y-value
-      my_real :: VALUE_Z   !< polyhedron centroid Z-value            
+ 
+ 
+ 
       
       INTEGER, ALLOCATABLE,DIMENSION(:) :: ITAB_FVMBAG,TAGNOD_FVMBAG
       my_real, ALLOCATABLE,DIMENSION(:,:) :: XYZ_FVMBAG,DISP_FVMBAG
-      INTEGER :: ILEN
+ 
       
 C-----------------------------------------------
 C   S o u r c e   L i n e s

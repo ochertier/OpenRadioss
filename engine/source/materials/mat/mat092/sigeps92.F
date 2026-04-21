@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps92      ../engine/source/materials/mat/mat092/sigeps92.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw         ../engine/source/materials/mat_share/mulaw.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter        ../engine/source/tools/curve/finter.F
-      !||    valpvec_v     ../engine/source/materials/mat/mat033/sigeps33.F
-      !||    valpvecdp_v   ../engine/source/materials/mat/mat033/sigeps33.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps92      ../engine/source/materials/mat/mat092/sigeps92.F
+!||--- called by ------------------------------------------------------
+!||    mulaw         ../engine/source/materials/mat_share/mulaw.F90
+!||--- calls      -----------------------------------------------------
+!||    finter        ../engine/source/tools/curve/finter.F
+!||    valpvec_v     ../engine/source/materials/mat/mat033/sigeps33.F
+!||    valpvecdp_v   ../engine/source/materials/mat/mat033/sigeps33.F
+!||====================================================================
        SUBROUTINE SIGEPS92(
      1      NEL    , NUPARAM, NUVAR   , NFUNC , IFUNC , NPF   ,
      2      TF     , TIME   , TIMESTEP, UPARAM, RHO0  , RHO   ,
@@ -88,7 +88,7 @@ C----------------------------------------------------------------
 C  VARIABLES FOR FUNCTION INTERPOLATION 
 C----------------------------------------------------------------
       INTEGER NPF(*), NFUNC, IFUNC(NFUNC)
-      my_real FINTER,FINTTE,TF(*),FINT2V
+      my_real FINTER,FINTTE,TF(*)
       EXTERNAL FINTER,FINTTE
 C----------------------------------------------------------------
 C  L O C A L  V A R I B L E S
@@ -117,7 +117,7 @@ C material parameters
         C(4)     = UPARAM(9)
         C(5)     = UPARAM(10)   
         MULLINS  = INT(UPARAM(13)) ! computed in updmat 
-C iniialisation des variabesl users 
+C initialization of user variables
       IF(TIME==ZERO)THEN
        DO J = 1,NUVAR
         DO  I = 1, NEL

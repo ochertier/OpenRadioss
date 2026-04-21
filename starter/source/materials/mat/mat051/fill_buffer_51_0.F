@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fill_buffer_51_0       ../starter/source/materials/mat/mat051/fill_buffer_51_0.F
-      !||--- called by ------------------------------------------------------
-      !||    read_material_models   ../starter/source/materials/read_material_models.F
-      !||--- calls      -----------------------------------------------------
-      !||    fill_buffer_51         ../starter/source/materials/mat/mat051/fill_buffer_51.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
-      SUBROUTINE FILL_BUFFER_51_0(MATPARAM_TAB, IPM, PM, BUFMAT, MAT_PARAM)
+!||====================================================================
+!||    fill_buffer_51_0       ../starter/source/materials/mat/mat051/fill_buffer_51_0.F
+!||--- called by ------------------------------------------------------
+!||    read_material_models   ../starter/source/materials/read_material_models.F
+!||--- calls      -----------------------------------------------------
+!||    fill_buffer_51         ../starter/source/materials/mat/mat051/fill_buffer_51.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
+      SUBROUTINE FILL_BUFFER_51_0(MATPARAM_TAB, IPM, PM, BUFMAT, MAT_PARAM, MLAW_TAG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -37,6 +38,7 @@ C-----------------------------------------------
       USE MATPARAM_DEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
+      USE ELBUFTAG_MOD , ONLY : MLAW_TAG_
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -60,6 +62,7 @@ C-----------------------------------------------
       INTEGER,TARGET,INTENT(INOUT) :: IPM(NPROPMI,NUMMAT)
       my_real,TARGET,INTENT(INOUT) :: PM(NPROPM,NUMMAT),BUFMAT(SBUFMAT)
       TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
+      TYPE(MLAW_TAG_) , DIMENSION(NUMMAT)  , INTENT(INOUT) :: MLAW_TAG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -81,8 +84,9 @@ C-----------------------------------------------
         IPM(62, II) = IFORM
         MAT_ID = IPM(1,II)
         IF(IFORM == 12)THEN
-          CALL FILL_BUFFER_51( IPM, PM, UPARAM, BUFMAT, MAT_ID, TITR, II, MAT_PARAM)
+          CALL FILL_BUFFER_51( IPM, PM, UPARAM, BUFMAT, MAT_ID, TITR, II, MAT_PARAM, MLAW_TAG)
           PM(38,II) = UPARAM(42)
+          IF(PM(38,II)==ZERO)PM(38,II)=-1E20
         ENDIF
       ENDDO
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    outp_n_v           ../engine/source/output/sty/outp_n_v.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp            ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_doutp_vgath   ../engine/source/mpi/interfaces/spmd_outp.F
-      !||====================================================================
+!||====================================================================
+!||    outp_n_v           ../engine/source/output/sty/outp_n_v.F
+!||--- called by ------------------------------------------------------
+!||    genoutp            ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_doutp_vgath   ../engine/source/mpi/interfaces/spmd_outp.F
+!||====================================================================
       SUBROUTINE OUTP_N_V(KEY,TEXT,LEN,VECT,NUMNOD,ITAB,ITABG,LENG,
      .                    NODGLOB,WEIGHT)
 C-----------------------------------------------
@@ -53,7 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K
+      INTEGER I,J
 
       my_real
      . VGLOB(3,LENG)
@@ -96,13 +96,13 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    outp_n_v2         ../engine/source/output/sty/outp_n_v.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp           ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||====================================================================
+!||====================================================================
+!||    outp_n_v2         ../engine/source/output/sty/outp_n_v.F
+!||--- called by ------------------------------------------------------
+!||    genoutp           ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||====================================================================
       SUBROUTINE OUTP_N_V2(FOPT ,NPBY ,NOM_SECT ,NOM_WALL )
 C-----------------------------------------------
 C   M o d u l e s
@@ -232,13 +232,13 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    outp_n_vc         ../engine/source/output/sty/outp_n_v.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp           ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||====================================================================
+!||====================================================================
+!||    outp_n_vc         ../engine/source/output/sty/outp_n_v.F
+!||--- called by ------------------------------------------------------
+!||    genoutp           ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||====================================================================
       SUBROUTINE OUTP_N_VC(KEY,TEXT,LEN,VECT,NUMNOD,ITAB,ITABG,LENG,
      .                    NODGLOB,WEIGHT)
 C-----------------------------------------------

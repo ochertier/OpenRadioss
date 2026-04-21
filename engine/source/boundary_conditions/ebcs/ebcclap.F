@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ebcclap    ../engine/source/boundary_conditions/ebcs/ebcclap.F
-      !||--- called by ------------------------------------------------------
-      !||    resol      ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ebcclap1   ../engine/source/boundary_conditions/ebcs/ebcclap.F
-      !||    ebcvit4    ../engine/source/boundary_conditions/ebcs/ebcvit4.F
-      !||    ebcvit5    ../engine/source/boundary_conditions/ebcs/ebcvit5.F
-      !||    ebcvit7    ../engine/source/boundary_conditions/ebcs/ebcvit7.F
-      !||--- uses       -----------------------------------------------------
-      !||    ebcs_mod   ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ebcclap    ../engine/source/boundary_conditions/ebcs/ebcclap.F
+!||--- called by ------------------------------------------------------
+!||    resol      ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ebcclap1   ../engine/source/boundary_conditions/ebcs/ebcclap.F
+!||    ebcvit4    ../engine/source/boundary_conditions/ebcs/ebcvit4.F
+!||    ebcvit5    ../engine/source/boundary_conditions/ebcs/ebcvit5.F
+!||    ebcvit7    ../engine/source/boundary_conditions/ebcs/ebcvit7.F
+!||--- uses       -----------------------------------------------------
+!||    ebcs_mod   ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||====================================================================
       SUBROUTINE EBCCLAP(V, A, FV, EBCS_TAB)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE EBCS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -45,14 +48,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .       V(*),A(*),FV(*)
+      my_real V(*),A(*),FV(*)
       TYPE(t_ebcs_tab), TARGET, INTENT(INOUT) :: EBCS_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,TYP,
-     .        NOD,J
+      INTEGER I,TYP,NOD
       CLASS(t_ebcs), POINTER :: EBCS
 
       DO I=1,NEBCS
@@ -67,7 +68,7 @@ C-----------------------------------------------
          ELSE IF(TYP == 4)THEN
             select type (twf => EBCS_TAB%tab(i)%poly)
             type is(t_ebcs_vel)
-            CALL EBCVIT4(V, A, twf%node_list, NOD, FV, twf%reso,twf%la, twf)
+            CALL EBCVIT4(V, A, twf%node_list, NOD, FV, twf%reso, twf)
             end select
          ELSE IF (TYP == 5)THEN
             select type (twf => EBCS_TAB%tab(i)%poly)
@@ -84,11 +85,11 @@ C
       ENDDO
       RETURN
       END
-      !||====================================================================
-      !||    ebcclap1   ../engine/source/boundary_conditions/ebcs/ebcclap.F
-      !||--- called by ------------------------------------------------------
-      !||    ebcclap    ../engine/source/boundary_conditions/ebcs/ebcclap.F
-      !||====================================================================
+!||====================================================================
+!||    ebcclap1   ../engine/source/boundary_conditions/ebcs/ebcclap.F
+!||--- called by ------------------------------------------------------
+!||    ebcclap    ../engine/source/boundary_conditions/ebcs/ebcclap.F
+!||====================================================================
       SUBROUTINE EBCCLAP1(V,A,LISTE,NOD,NORM,FAC)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

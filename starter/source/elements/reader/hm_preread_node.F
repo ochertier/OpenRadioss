@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,19 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    hm_preread_node        ../starter/source/elements/reader/hm_preread_node.F
-      !||--- called by ------------------------------------------------------
-      !||    contrl                 ../starter/source/starter/contrl.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    auto_node_merge        ../starter/source/elements/nodes/auto_node_merge.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_preread_node        ../starter/source/elements/reader/hm_preread_node.F
+!||--- called by ------------------------------------------------------
+!||    contrl                 ../starter/source/starter/contrl.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    auto_node_merge        ../starter/source/elements/nodes/auto_node_merge.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_PREREAD_NODE(UNITAB,LSUBMODEL,NUMNUSR,IS_DYNA)
 C-----------------------------------------------
 C   M o d u l e s
@@ -64,16 +64,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,I,J,IERROR, STAT
-      INTEGER FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,IFLAGUNIT, UID, ID
-      my_real FAC_L
+      INTEGER :: N,I,J,STAT
+      INTEGER :: IFLAGUNIT, UID
+      my_real :: FAC_L
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_NOD,UID_NOD
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAB
       my_real, DIMENSION(:,:), ALLOCATABLE :: X
       REAL*8, DIMENSION(:,:), ALLOCATABLE :: HM_X
       REAL*8, DIMENSION(:), ALLOCATABLE :: DMERGE
-      CHARACTER(LEN=NCHARFIELD) :: KEY
-      LOGICAL IS_AVAILABLE
 C-----------------------------------------------      
       FAC_L = ONE
 C--------------------------------------------------
@@ -95,7 +93,7 @@ C--------------------------------------------------
       UID_NOD(1:NUMNUSR+NUMCNOD) = 0
       DMERGE(1:NUMCNOD) = ZERO
 C--------------------------------------------------
-C      PRE-LECTURE DES NODES INPUTS DANS HM STRUCTURE
+C      PRE-READING OF INPUT NODES IN HM STRUCTURE
 C-------------------------------------------------- 
       CALL CPP_NODES_READ(ITAB,HM_X,DMERGE,SUB_NOD,UID_NOD)
 C--------------------------------------------------

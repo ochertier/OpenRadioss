@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ig3dmass3   ../starter/source/elements/ige3d/ig3dmass3.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3dinit3   ../starter/source/elements/ige3d/ig3dinit3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    ig3dmass3   ../starter/source/elements/ige3d/ig3dmass3.F
+!||--- called by ------------------------------------------------------
+!||    ig3dinit3   ../starter/source/elements/ige3d/ig3dinit3.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE IG3DMASS3(
      1  RHO    ,MS    ,PARTSAV,X     ,Y      ,
      2  Z      ,VX    ,VY     ,VZ    ,IPART  ,
@@ -49,7 +49,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IPART(*),NDDIM, NCTRL, I, KXIG3D(NIXIG3D,*),IXIG3D(*)
+      INTEGER IPART(*), NCTRL, I, KXIG3D(NIXIG3D,*), IXIG3D(*)
       my_real
      .   RHO(*),MS(*),X(NCTRL,*),
      .   Y(NCTRL,*),Z(NCTRL,*),
@@ -69,8 +69,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,IP,I1,I2,I3,I4,I5,I6,I7,I8, ITNCTRL, INCTRL
-      my_real XX,YY,ZZ,XY,YZ,ZX,INER,RCP
+      INTEGER IP, ITNCTRL, INCTRL
+      my_real XX, YY, ZZ, XY, YZ, ZX
       my_real MASS(MVSIZ),MASSF(MVSIZ)
 
 C=======================================================================

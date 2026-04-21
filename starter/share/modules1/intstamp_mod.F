@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intstamp_mod          ../starter/share/modules1/intstamp_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit               ../starter/source/restart/ddsplit/ddsplit.F
-      !||    fsdcod                ../starter/source/system/fsdcod.F
-      !||    inint3_thkvar         ../starter/source/interfaces/inter3d1/inint3_thkvar.F
-      !||    inintr_thkvar         ../starter/source/interfaces/interf1/inintr_thkvar.F
-      !||    inter_dcod_friction   ../starter/source/interfaces/reader/inter_dcod_friction.F
-      !||    inter_dcod_function   ../starter/source/interfaces/reader/inter_dcod_function.F
-      !||    inter_dcod_sensor     ../starter/source/interfaces/reader/inter_dcod_sensor.F
-      !||    intstamp_glob_mod     ../starter/share/modules1/intstamp_glob_mod.F
-      !||    lecstamp              ../starter/source/interfaces/interf1/lecstamp.F
-      !||    sms_ini_jad_2         ../starter/source/ams/sms_init.F
-      !||    sms_ini_jad_3         ../starter/source/ams/sms_init.F
-      !||====================================================================
+!||====================================================================
+!||    intstamp_mod          ../starter/share/modules1/intstamp_mod.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit               ../starter/source/restart/ddsplit/ddsplit.F
+!||    fsdcod                ../starter/source/system/fsdcod.F
+!||    inint3_thkvar         ../starter/source/interfaces/inter3d1/inint3_thkvar.F
+!||    inintr_thkvar         ../starter/source/interfaces/interf1/inintr_thkvar.F
+!||    inter_dcod_friction   ../starter/source/interfaces/reader/inter_dcod_friction.F
+!||    inter_dcod_function   ../starter/source/interfaces/reader/inter_dcod_function.F
+!||    inter_dcod_sensor     ../starter/source/interfaces/reader/inter_dcod_sensor.F
+!||    intstamp_glob_mod     ../starter/share/modules1/intstamp_glob_mod.F
+!||    lecstamp              ../starter/source/interfaces/interf1/lecstamp.F
+!||    sms_ini_jad_2         ../starter/source/ams/sms_init.F
+!||    sms_ini_jad_3         ../starter/source/ams/sms_init.F
+!||====================================================================
       MODULE INTSTAMP_MOD
 C-----------------------------------------------
 C   m y _ r e a l
@@ -73,7 +73,7 @@ C---------
           my_real
      .            DW, BRACKET(3)
 C---------
-C         vitesse, deplacement, force
+C         Speed, Displacement, Force
 C---------
           my_real
      .           V(3), FC(3),STF, 
@@ -86,11 +86,11 @@ C-----------------------------------------------
 C    S p e c i f i c   F u n c t i o n s 
 C-----------------------------------------------
       CONTAINS
-      !||====================================================================
-      !||    intstamp_zero   ../starter/share/modules1/intstamp_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur          ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    intstamp_zero   ../starter/share/modules1/intstamp_mod.F
+!||--- called by ------------------------------------------------------
+!||    lectur          ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE INTSTAMP_ZERO(INTSTAMP)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -101,7 +101,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "intstamp_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -112,7 +111,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N, J, K
 C--------------------------------------
-C     ECRITURE DES DIMENSIONS
+C     WRITING OF DIMENSIONS
 C--------------------------------------
       DO N=1,NINTSTAMP
         INTSTAMP(N)%NOINTER=0
@@ -157,12 +156,12 @@ C--------------------------------------
       END DO
       RETURN
       END SUBROUTINE INTSTAMP_ZERO
-      !||====================================================================
-      !||    intstamp_wresti   ../starter/share/modules1/intstamp_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit           ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    intstamp_wresti   ../starter/share/modules1/intstamp_mod.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit           ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INTSTAMP_WRESTI(INTSTAMP, LENI, NODLOCAL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -173,7 +172,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "intstamp_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -183,9 +181,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LEN, N, J, NCOND
+      INTEGER LEN, N
 C--------------------------------------
-C     ECRITURE DES DIMENSIONS
+C     WRITING OF DIMENSIONS
 C--------------------------------------
       LENI=0
       DO N=1,NINTSTAMP
@@ -202,12 +200,12 @@ C--------------------------------------
       END DO
       RETURN
       END SUBROUTINE INTSTAMP_WRESTI
-      !||====================================================================
-      !||    intstamp_wrestr   ../starter/share/modules1/intstamp_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit           ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    intstamp_wrestr   ../starter/share/modules1/intstamp_mod.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit           ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INTSTAMP_WRESTR(INTSTAMP, LENI)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -218,7 +216,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "intstamp_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -228,7 +225,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LEN, N, J, NCOND
+      INTEGER LEN, N
 C--------------------------------------
       LENI=0
       DO N=1,NINTSTAMP
@@ -269,10 +266,10 @@ C--------------------------------------
       END DO
       RETURN
       END SUBROUTINE INTSTAMP_WRESTR
-      !||====================================================================
-      !||    intstamp_rresti   ../starter/share/modules1/intstamp_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    intstamp_rresti   ../starter/share/modules1/intstamp_mod.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INTSTAMP_RRESTI(INTSTAMP)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -283,7 +280,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "intstamp_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -292,9 +288,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LEN, N, NCOND, J, STAT
+      INTEGER LEN, N
 C--------------------------------------
-C     ECRITURE DES DIMENSIONS
+C     WRITING OF DIMENSIONS
 C--------------------------------------
       DO N=1,NINTSTAMP
         LEN    =1
@@ -310,10 +306,10 @@ C--------------------------------------
       END DO
       RETURN
       END SUBROUTINE INTSTAMP_RRESTI
-      !||====================================================================
-      !||    intstamp_rrestr   ../starter/share/modules1/intstamp_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    intstamp_rrestr   ../starter/share/modules1/intstamp_mod.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INTSTAMP_RRESTR(INTSTAMP)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -324,7 +320,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "intstamp_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -333,7 +328,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LEN, N, NCOND, J, STAT
+      INTEGER LEN, N
 C--------------------------------------
       DO N=1,NINTSTAMP
         LEN    =1

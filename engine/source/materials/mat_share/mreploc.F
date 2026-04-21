@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mreploc         ../engine/source/materials/mat_share/mreploc.F
-      !||--- called by ------------------------------------------------------
-      !||    m25law          ../engine/source/materials/mat/mat025/m25law.F
-      !||    mmain           ../engine/source/materials/mat_share/mmain.F90
-      !||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8          ../engine/source/materials/mat_share/mulaw8.F90
-      !||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
-      !||====================================================================
+!||====================================================================
+!||    mreploc         ../engine/source/materials/mat_share/mreploc.F
+!||--- called by ------------------------------------------------------
+!||    m25law          ../engine/source/materials/mat/mat025/m25law.F
+!||    mmain           ../engine/source/materials/mat_share/mmain.F90
+!||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8          ../engine/source/materials/mat_share/mulaw8.F90
+!||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
+!||====================================================================
       SUBROUTINE MREPLOC(
      1   ANG,     R11,     R12,     R13,
      2   R21,     R22,     R23,     R31,
@@ -62,11 +62,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
+      INTEGER I
       my_real 
      .   S11, S12, S13, S21, 
      .   S22, S23, S31,
-     .   S32, S33, RR,  RRD
+     .   S32, S33, RR
 C
 
       IF(JSPH==0)THEN
@@ -99,10 +99,10 @@ C
  110      CONTINUE
         ELSE
 C---------------------------------------------
-C     EN 2D LES CONTRAINTES SONT :
+C     in 2d the stresses are:
 C     1=YY 2=ZZ 3=TT 4=YZ 5=0 6=0
-C     EN CONTRADICTION AVEC X=T
-C     ATTENTION DANGER!
+C     CONTRADICTS X=T
+C     CAUTION DANGER!
 C---------------------------------------------
           DO 120 I=1,NEL
               RR= MAX(SQRT(SY(I)**2+SZ(I)**2),EM20)

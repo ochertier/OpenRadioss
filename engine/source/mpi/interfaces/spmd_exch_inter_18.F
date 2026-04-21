@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_inter_18         ../engine/source/mpi/interfaces/spmd_exch_inter_18.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                      ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    alloc_my_real_1d_array     ../common_source/modules/array_mod.F
-      !||    dealloc_my_real_1d_array   ../common_source/modules/array_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod       ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    array_mod                  ../common_source/modules/array_mod.F
-      !||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    tri7box                    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_inter_18         ../engine/source/mpi/interfaces/spmd_exch_inter_18.F
+!||--- called by ------------------------------------------------------
+!||    resol                      ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    alloc_my_real_1d_array     ../common_source/modules/array_mod.F
+!||    dealloc_my_real_1d_array   ../common_source/modules/array_mod.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod       ../common_source/modules/ale/ale_connectivity_mod.F
+!||    array_mod                  ../common_source/modules/array_mod.F
+!||    intbufdef_mod              ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F90
+!||    spmd_comm_world_mod        ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box                    ../engine/share/modules/tri7box.F
+!||====================================================================
         SUBROUTINE SPMD_EXCH_INTER_18(NINTER,NSPMD,NUMBER_INTER18,SXCELL,INTER18_LIST,
      .                 XCELL,MULTI_FVM,XCELL_REMOTE,INTBUF_TAB,ALE_CONNECTIVITY)
 !$COMMENT
@@ -57,6 +59,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -72,9 +75,9 @@ C-----------------------------------------------
         INTEGER, INTENT(in) :: NINTER !< number of interface
         INTEGER, INTENT(in) :: NSPMD !< number of mpi tasks
         INTEGER, INTENT(inout) :: NUMBER_INTER18 !< number of interface 18
-        INTEGER, INTENT(in) :: SXCELL !< size of characteristic lenght array
+        INTEGER, INTENT(in) :: SXCELL !< size of characteristic length array
         INTEGER, DIMENSION(NUMBER_INTER18), INTENT(inout) :: INTER18_LIST !< list of interface 18
-        my_real, DIMENSION(3,SXCELL), INTENT(in) :: XCELL !< characteristic lenght
+        my_real, DIMENSION(3,SXCELL), INTENT(in) :: XCELL !< characteristic length
         TYPE(MULTI_FVM_STRUCT), INTENT(inout) :: MULTI_FVM
         TYPE(array_type), DIMENSION(NINTER), INTENT(inout) :: XCELL_REMOTE !< remote data structure for interface 18 
         TYPE(INTBUF_STRUCT_), DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    !< interface data 

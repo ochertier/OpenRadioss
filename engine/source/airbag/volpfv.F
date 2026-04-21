@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    volpfv    ../engine/source/airbag/volpfv.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol0   ../engine/source/airbag/monvol0.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter    ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    volpfv             ../engine/source/airbag/volpfv.F
+!||--- called by ------------------------------------------------------
+!||    monvol0            ../engine/source/airbag/monvol0.F
+!||--- uses       -----------------------------------------------------
+!||    finter_mixed_mod   ../engine/source/tools/finter_mixed.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||====================================================================
       SUBROUTINE VOLPFV(IVOLU,RVOLU  ,VOL,FSAV,NPC,
-     2                  TF   ,PMAIN, WFEXT)
+     2                  TF   ,PMAIN, WFEXT,PYTHON,NFUNCT)
+         USE python_funct_mod
+         USE finter_mixed_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,16 +48,16 @@ C-----------------------------------------------
       INTEGER NPC(*),IVOLU(*), PMAIN
       my_real TF(*),RVOLU(*),FSAV(*)
       DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
+      TYPE(PYTHON_), intent(inout) :: PYTHON
+      INTEGER, intent(in) :: NFUNCT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ITFUN,ITYPFUN
-      my_real VOL,P0,V0,DYDX,AREA,VEPS,VINC,POLD,VOLP,PEXT,VOLD,PRES,Q,QOLD,DV,SCALE,XFUN
-      my_real FINTER 
-      EXTERNAL FINTER
+      my_real VOL,V0,AREA,VEPS,VINC,POLD,PEXT,VOLD,PRES,Q,QOLD,DV,SCALE,XFUN
 C-----------------------------------------------
 C
-C CALCUL DE LA PRESSION
+C CALCULATION OF PRESSURE
 C
       ITFUN  =IVOLU(7)
       ITYPFUN=IVOLU(19)
@@ -79,7 +82,7 @@ C
       CASE DEFAULT
          
       END SELECT
-      PRES = SCALE * FINTER(ITFUN,XFUN,NPC,TF,DYDX)
+      PRES = SCALE * FINTER_MIXED(PYTHON,NFUNCT,ITFUN,XFUN,NPC,TF)
       IF (ITYPFUN == 3) THEN
          PRES = PRES * (V0-VINC) / (VOL-VINC)
       ENDIF

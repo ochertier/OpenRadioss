@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,17 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    qdlen2             ../starter/source/elements/solid_2d/quad/qdlen2.F
-      !||--- called by ------------------------------------------------------
-      !||    binit2             ../starter/source/ale/bimat/binit2.F
-      !||    multifluid_init2   ../starter/source/multifluid/multifluid_init2.F
-      !||    q4init2            ../starter/source/elements/solid_2d/quad4/q4init2.F
-      !||    qinit2             ../starter/source/elements/solid_2d/quad/qinit2.F
-      !||--- calls      -----------------------------------------------------
-      !||    loi_fluid          ../starter/source/fluid/loi_fluid.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    qdlen2             ../starter/source/elements/solid_2d/quad/qdlen2.F
+!||--- called by ------------------------------------------------------
+!||    binit2             ../starter/source/ale/bimat/binit2.F
+!||    multifluid_init2   ../starter/source/multifluid/multifluid_init2.F
+!||    q4init2            ../starter/source/elements/solid_2d/quad4/q4init2.F
+!||    qinit2             ../starter/source/elements/solid_2d/quad/qinit2.F
+!||--- calls      -----------------------------------------------------
+!||    loi_fluid          ../starter/source/fluid/loi_fluid.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE QDLEN2(IPARG, 
      .     AIRE, DELTAX, 
      .     Y1, Y2, Y3, Y4, 

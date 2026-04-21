@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sfor_n2s4      ../engine/source/elements/solid/solide/sfor_n2s4.F
-      !||--- called by ------------------------------------------------------
-      !||    s6for_distor   ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
-      !||    s8for_distor   ../engine/source/elements/solid/solide/s8for_distor.F
-      !||--- calls      -----------------------------------------------------
-      !||    ssort_n4       ../engine/source/elements/solid/solide/ssort_n4.F
-      !||====================================================================
+!||====================================================================
+!||    sfor_n2s4      ../engine/source/elements/solid/solide/sfor_n2s4.F
+!||--- called by ------------------------------------------------------
+!||    s6for_distor   ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
+!||    s8for_distor   ../engine/source/elements/solid/solide/s8for_distor.F
+!||--- calls      -----------------------------------------------------
+!||    ssort_n4       ../engine/source/elements/solid/solide/ssort_n4.F
+!||====================================================================
       SUBROUTINE SFOR_N2S4( XI,      YI,     ZI,   STIF,     
      .                      X1,      X2,     X3,     X4,
      .                      Y1,      Y2,     Y3,     Y4,
@@ -75,7 +75,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IFCTL1,ITG(MVSIZ),IFC2(MVSIZ),ie
+      INTEGER I,IFCTL1,ITG(MVSIZ),IFC2(MVSIZ)
 C                                                                     12
       my_real
      .   NX(MVSIZ),NY(MVSIZ),NZ(MVSIZ),
@@ -84,15 +84,15 @@ C                                                                     12
      .   XB(MVSIZ),YB(MVSIZ),ZB(MVSIZ),FN(MVSIZ),
      .   XC(MVSIZ),YC(MVSIZ),ZC(MVSIZ),AREA(MVSIZ),
      .   LA(MVSIZ),LB(MVSIZ),LC(MVSIZ),FKT,
-     .   RX, RY, RZ, SX, SY, SZ,VXC,VYC,VZC,
-     .   X42,Y42, Z42, X31, Y31, Z31,FX,FY,FZ,
-     .   SAX,SAY,SAZ,SBX,SBY,SBZ,SCX,SCY,SCZ,
-     .   TRX,TRY,TRZ,TSX,TSY,TSZ,TTX,TTY,TTZ,
-     .   TR2,TS2,TT2,AAA,BBB,VR,VS,VT,NNX,NNY,NNZ,
+     .   RX, RY, RZ, SX, SY, SZ,
+     .    FX,FY,FZ,
+     .   SAX,SAY,SAZ,SBX,SBY,SBZ,
+     .   
+     .   AAA,BBB,
      .   XAB,XBC,XCA,YAB,YBC,YCA,ZAB,ZBC,ZCA,
      .   XIA,  XIB,  XIC, YIA,  YIB,  YIC,
      .   ZIA,  ZIB,  ZIC, H0,NORM,S2,FAC,
-     .   F_Q,F_C,KTS,ZEROM,TX,TY,TZ,PENE3,PENE4,PENDR,LJ,
+     .   F_Q,ZEROM,PENE3,PENE4,PENDR,LJ,
      .   DX,DY,DZ,DN
 C----------------------------
          IFC2(1:NEL) = IFC1(1:NEL)

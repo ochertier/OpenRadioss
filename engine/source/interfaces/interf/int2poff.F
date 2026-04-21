@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    int2poff        ../engine/source/interfaces/interf/int2poff.F
-      !||--- called by ------------------------------------------------------
-      !||    intti1          ../engine/source/interfaces/interf/intti1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2ipoff         ../engine/source/interfaces/interf/int2poff.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    int2poff        ../engine/source/interfaces/interf/int2poff.F
+!||--- called by ------------------------------------------------------
+!||    intti1          ../engine/source/interfaces/interf/intti1.F
+!||--- calls      -----------------------------------------------------
+!||    i2ipoff         ../engine/source/interfaces/interf/int2poff.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INT2POFF(IPARI,X    ,V     ,
      .                   A     ,VR   ,AR   ,MS   ,IN    ,
      .                   WEIGHT,STIFN,STIFR,MCP  ,CONDN  ,
@@ -91,14 +92,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    int2poffh       ../engine/source/interfaces/interf/int2poff.F
-      !||--- called by ------------------------------------------------------
-      !||    intti1          ../engine/source/interfaces/interf/intti1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2ipoffh        ../engine/source/interfaces/interf/int2poff.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    int2poffh       ../engine/source/interfaces/interf/int2poff.F
+!||--- called by ------------------------------------------------------
+!||    intti1          ../engine/source/interfaces/interf/intti1.F
+!||--- calls      -----------------------------------------------------
+!||    i2ipoffh        ../engine/source/interfaces/interf/int2poff.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INT2POFFH(IPARI,X     ,V     ,
      .                   A     ,VR   ,AR    ,MS    ,IN    ,
      .                   WEIGHT,STIFN,STIFR ,TAGNOD,INTBUF_TAB)
@@ -140,11 +142,11 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    i2ipoff    ../engine/source/interfaces/interf/int2poff.F
-      !||--- called by ------------------------------------------------------
-      !||    int2poff   ../engine/source/interfaces/interf/int2poff.F
-      !||====================================================================
+!||====================================================================
+!||    i2ipoff    ../engine/source/interfaces/interf/int2poff.F
+!||--- called by ------------------------------------------------------
+!||    int2poff   ../engine/source/interfaces/interf/int2poff.F
+!||====================================================================
       SUBROUTINE I2IPOFF(NMN  ,A     ,MSR   ,MS    ,WEIGHT,
      2                   AR   ,IN    ,STIFN ,STIFR ,ILEV  ,
      3                   MCP  ,CONDN ,MMASS ,FTHE  ,ITHERM_FE,NODADT_THERM)
@@ -326,7 +328,7 @@ C-----------------------------------------------
 C---
       ENDIF
 C-----------------------------------------------
-C  Thermal Analysis (quelque soit ILEV et IRODDL)
+C  Thermal analysis (whatever Ilev and Iroddl)
 C-----------------------------------------------
       IF(ITHERM_FE > 0) THEN
         DO II=1,NMN
@@ -344,11 +346,11 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    i2ipoffh    ../engine/source/interfaces/interf/int2poff.F
-      !||--- called by ------------------------------------------------------
-      !||    int2poffh   ../engine/source/interfaces/interf/int2poff.F
-      !||====================================================================
+!||====================================================================
+!||    i2ipoffh    ../engine/source/interfaces/interf/int2poff.F
+!||--- called by ------------------------------------------------------
+!||    int2poffh   ../engine/source/interfaces/interf/int2poff.F
+!||====================================================================
       SUBROUTINE I2IPOFFH(NMN  ,A    ,MSR  ,MS    ,WEIGHT,
      2                   AR   ,IN   ,STIFN,STIFR ,ILEV  ,
      3                   MMASS,TAGNOD )

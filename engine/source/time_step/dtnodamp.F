@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dtnodamp       ../engine/source/time_step/dtnodamp.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dtnodamp       ../engine/source/time_step/dtnodamp.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE DTNODAMP(ITAB           ,MS       ,IN    ,STIFN ,STIFR ,DT2T,
      1                    WEIGHT         ,IGRNOD   ,DAMPR ,ISTOP ,
      2                    I_DAMP_RDOF_TAB,ICONTACT ,IXC   ,X     )
@@ -34,6 +35,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,7 +55,7 @@ C-----------------------------------------------
       INTEGER ITAB(*),WEIGHT(*),ISTOP,
      .   I_DAMP_RDOF_TAB(*),ICONTACT(*),IXC(NIXC,*)
 C     REAL
-      my_real DT2T, DMAST, DINERT, STIFN(*), STIFR(*), 
+      my_real DT2T, STIFN(*), STIFR(*), 
      .   MS(*) ,IN(*) ,DAMPR(NRDAMP,*),X(3,*)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD) :: IGRNOD
@@ -62,11 +64,11 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N,I,J,ISK,IGR,ND,K,L,LL
       my_real FACTB,DAMPBR,DAMPAR,D_TSTART,D_TSTOP,DAMPT,
-     .   DT2N(NUMNOD),BB,COEFF,STIF_MOD,DT_CIBLE,ETA,BETA,
+     .   DT2N(NUMNOD),BB,COEFF,DT_CIBLE,ETA,BETA,
      .   ALPHA,DAMPA0          
 C----------------------------------------------------------
 
-C--------> TAG des elements
+C--------> TAG of elements
         DO ND=1,NDAMP
           IF (DAMPR(20,ND)>0) THEN
           DO I=1,NUMELC
@@ -103,7 +105,7 @@ C-------->
 C-------->    
           IGR   = NINT(DAMPR(2,ND))
           ISK   = NINT(DAMPR(15,ND))
-          FACTB = DAMPR(16,ND)
+          FACTB = ONE
           D_TSTART = DAMPR(17,ND)
           D_TSTOP  = DAMPR(18,ND)
           IF (TT>=D_TSTART .AND. TT<=D_TSTOP) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,1689 +20,1149 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    upgrade_multimp   ../common_source/interf/upgrade_multimp.F
-      !||--- called by ------------------------------------------------------
-      !||    i10main_tri       ../engine/source/interfaces/intsort/i10main_tri.F
-      !||    i11main_tri       ../engine/source/interfaces/intsort/i11main_tri.F
-      !||    i20main_tri       ../engine/source/interfaces/intsort/i20main_tri.F
-      !||    i21main_tri       ../engine/source/interfaces/intsort/i21main_tri.F
-      !||    i22main_tri       ../engine/source/interfaces/intsort/i22main_tri.F
-      !||    i23main_tri       ../engine/source/interfaces/intsort/i23main_tri.F
-      !||    i24main_tri       ../engine/source/interfaces/intsort/i24main_tri.F
-      !||    i25main_tri       ../engine/source/interfaces/intsort/i25main_tri.F
-      !||    i25trivox1        ../starter/source/interfaces/inter3d1/i25trivox1.F
-      !||    i7main_tri        ../engine/source/interfaces/intsort/i7main_tri.F
-      !||    i7trivox1         ../starter/source/interfaces/inter3d1/i7trivox1.F
-      !||    inintr            ../starter/source/interfaces/interf1/inintr.F
-      !||    inintr_thkvar     ../starter/source/interfaces/interf1/inintr_thkvar.F
-      !||    inter_sort_07     ../engine/source/interfaces/int07/inter_sort_07.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret             ../engine/source/system/arret.F
-      !||    arret_message     ../engine/source/system/arret_message.F
-      !||--- uses       -----------------------------------------------------
-      !||    restmod           ../engine/share/modules/restart_mod.F
-      !||====================================================================
-      SUBROUTINE UPGRADE_MULTIMP(NI,MULTIMP_PARAMETER,INTBUF_TAB)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE RESTMOD
-      USE INTBUFDEF_MOD
-C-------------------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
+!||====================================================================
+!||    upgrade_multimp   ../common_source/interf/upgrade_multimp.F
+!||--- called by ------------------------------------------------------
+!||    i10main_tri       ../engine/source/interfaces/intsort/i10main_tri.F
+!||    i11main_tri       ../engine/source/interfaces/intsort/i11main_tri.F
+!||    i20main_tri       ../engine/source/interfaces/intsort/i20main_tri.F
+!||    i21main_tri       ../engine/source/interfaces/intsort/i21main_tri.F
+!||    i22main_tri       ../engine/source/interfaces/intsort/i22main_tri.F
+!||    i23main_tri       ../engine/source/interfaces/intsort/i23main_tri.F
+!||    i24main_tri       ../engine/source/interfaces/intsort/i24main_tri.F
+!||    i25main_tri       ../engine/source/interfaces/intsort/i25main_tri.F
+!||    i25trivox1        ../starter/source/interfaces/inter3d1/i25trivox1.F
+!||    i7main_tri        ../engine/source/interfaces/intsort/i7main_tri.F
+!||    i7trivox1         ../starter/source/interfaces/inter3d1/i7trivox1.F
+!||    inintr            ../starter/source/interfaces/interf1/inintr.F
+!||    inintr_thkvar     ../starter/source/interfaces/interf1/inintr_thkvar.F
+!||    inter_sort_07     ../engine/source/interfaces/int07/inter_sort_07.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    restmod           ../engine/share/modules/restart_mod.F
+!||====================================================================
+      subroutine upgrade_multimp(ni, multimp_parameter, intbuf_tab)
+!-----------------------------------------------
+!   M o d u l e s
+!-----------------------------------------------
+        use restmod
+        use intbufdef_mod
+!-------------------------------------------------------
+!   I m p l i c i t   T y p e s
+!-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+!-----------------------------------------------
+!   C o m m o n   B l o c k s
+!-----------------------------------------------
 #include      "tabsiz_c.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "scr03_c.inc"
 #include      "scr05_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NI, MULTIMP_PARAMETER
+!-----------------------------------------------
+!   D u m m y   A r g u m e n t s
+!-----------------------------------------------
+        integer, intent(in)    :: ni, multimp_parameter
+        type(intbuf_struct_), intent(inout) :: intbuf_tab
+!-----------------------------------------------
+!   L o c a l   V a r i a b l e s
+!-----------------------------------------------
+        integer :: ity, ifq, inacti, mfrot, ncont, itied, nconte
+        integer :: old_size, multimp
+        integer :: old_size2
+        integer :: old_size_opt, new_size_opt
+        integer :: iedge1
+        integer,  dimension(:), allocatable :: old_tab_i
+        my_real,  dimension(:), allocatable :: old_tab_r
+!======================================================================
+        multimp  = ipari(npari*(ni-1)+23)
+        ncont    = ipari(npari*(ni-1)+18)
+        old_size = multimp * ncont
 
-      TYPE(INTBUF_STRUCT_) INTBUF_TAB
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER ITY,IFQ,INACTI,MFROT,NCONT,ITIED,
-     .        NCONTE,NSN,NRTM,IEDGE1,FLAGREMNODE
-      INTEGER I,N,OLD_SIZE,NEW_SIZE,MULTIMP,
-     .        OLD_SIZE2,NEW_SIZE2,IERR,
-     .        OLD_SIZE_OPT, NEW_SIZE_OPT
+        !use for type20
+        nconte    = ncont
+        old_size2 = multimp * nconte
+!  Set the new MULTIMP parameter for the given Interface
+        ipari(npari*(ni-1)+23) = multimp_parameter
+!  Set Global parameters
+        ity    =     ipari(npari*(ni-1)+7)
+        inacti = abs(ipari(npari*(ni-1)+22))
+        mfrot  = ipari(npari*(ni-1)+30)
+        ifq    =     ipari(npari*(ni-1)+31)
+        iedge1 =     ipari(npari*(ni-1)+58)
+        itied  =     ipari(npari*(ni-1)+85)
 
-      INTEGER, DIMENSION (:), ALLOCATABLE :: OLD_TAB_I, OLD_TAB2_I, OLD_TAB3_I
-      my_real, DIMENSION (:), ALLOCATABLE :: OLD_TAB_R, OLD_TAB2_R
-C======================================================================|
-      IERR=0
-
-      MULTIMP  = IPARI(NPARI*(NI-1)+23)
-      NCONT    = IPARI(NPARI*(NI-1)+18)
-      OLD_SIZE = MULTIMP * NCONT
-      NEW_SIZE = MULTIMP_PARAMETER * NCONT
-
-      !use for type20
-      NCONTE    = NCONT
-      OLD_SIZE2 = MULTIMP * NCONTE
-      NEW_SIZE2 = MULTIMP_PARAMETER * NCONTE
-
-C Set the new MULTIMP parameter for the given Interface
-      IPARI(NPARI*(NI-1)+23) = MULTIMP_PARAMETER
-C Set Global parameters
-      ITY    =     IPARI(NPARI*(NI-1)+7)
-      INACTI = ABS(IPARI(NPARI*(NI-1)+22))
-      MFROT  = IPARI(NPARI*(NI-1)+30)
-      IFQ    =     IPARI(NPARI*(NI-1)+31)
-      NSN    =     IPARI(NPARI*(NI-1)+5)
-      NRTM   =     IPARI(NPARI*(NI-1)+4)
-      IEDGE1 =     IPARI(NPARI*(NI-1)+58)
-      FLAGREMNODE= IPARI(NPARI*(NI-1)+63)
-      ITIED  =     IPARI(NPARI*(NI-1)+85)
-
-C=======================================================================
-      IF (ITY == 7)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        IF(ITIED/=0)THEN
-          ALLOCATE (OLD_TAB2_R(8*OLD_SIZE),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-        ELSE
-          ALLOCATE (OLD_TAB2_R(0),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-        END IF
-        
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO   
-   
-        IF (IFQ /= 0)THEN
-          !-----------!
-          ! IFPEN
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_I(I)=INTBUF_TAB%IFPEN(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%IFPEN)
-          INTBUF_TAB%S_IFPEN = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%IFPEN(INTBUF_TAB%S_IFPEN),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%IFPEN(1:INTBUF_TAB%S_IFPEN)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%IFPEN(I) = OLD_TAB_I(I)
-          ENDDO   
+!======================================================================
+        if (ity == 7) then
+!======================================================================
 
           !-----------!
-          ! FTSAVX
+          ! CAND_E
           !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVX(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVX)
-          INTBUF_TAB%S_FTSAVX = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%FTSAVX(INTBUF_TAB%S_FTSAVX),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVX(1:INTBUF_TAB%S_FTSAVX)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVX(I) = OLD_TAB_R(I)
-          ENDDO    
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
           !-----------!
-          ! FTSAVY
+          ! CAND_N
           !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVY(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVY)
-          INTBUF_TAB%S_FTSAVY = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%FTSAVY(INTBUF_TAB%S_FTSAVY),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVY(1:INTBUF_TAB%S_FTSAVY)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVY(I) = OLD_TAB_R(I)
-          ENDDO   
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-          !-----------!
-          ! FTSAVZ
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVZ(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVZ)
-          INTBUF_TAB%S_FTSAVZ = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%FTSAVZ(INTBUF_TAB%S_FTSAVZ),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVZ(1:INTBUF_TAB%S_FTSAVZ)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVZ(I) = OLD_TAB_R(I)
-          ENDDO   
-        ENDIF
+          if (ifq /= 0) then
+            !-----------!
+            ! IFPEN
+            !-----------!
+            call move_alloc(intbuf_tab%ifpen, old_tab_i)
+            intbuf_tab%s_ifpen = multimp_parameter * ncont
+            allocate(intbuf_tab%ifpen(intbuf_tab%s_ifpen))
+            intbuf_tab%ifpen = 0
+            intbuf_tab%ifpen(1:old_size) = old_tab_i
+            deallocate(old_tab_i)
 
-        IF(ITIED/=0)THEN
-          !-----------! 
-          ! CAND_F 
-          !-----------!
-          DO I=1,8*OLD_SIZE
-            OLD_TAB2_R(I)=INTBUF_TAB%CAND_F(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%CAND_F)
-          INTBUF_TAB%S_CAND_F = 8 * MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%CAND_F(INTBUF_TAB%S_CAND_F),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_F(1:INTBUF_TAB%S_CAND_F)=0
-          DO I=1,8*OLD_SIZE
-            INTBUF_TAB%CAND_F(I) = OLD_TAB2_R(I)
-          ENDDO           
-        END IF
+            !-----------!
+            ! FTSAVX
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavx, old_tab_r)
+            intbuf_tab%s_ftsavx = multimp_parameter * ncont
+            allocate(intbuf_tab%ftsavx(intbuf_tab%s_ftsavx))
+            intbuf_tab%ftsavx = 0
+            intbuf_tab%ftsavx(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
 
-        IF(INACTI == 5 .OR. INACTI == 6 .OR. INACTI == 7) THEN 
-          !-----------! 
-          ! CAND_P
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%CAND_P(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%CAND_P)
-          INTBUF_TAB%S_CAND_P = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%CAND_P(INTBUF_TAB%S_CAND_P),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_P(1:INTBUF_TAB%S_CAND_P)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%CAND_P(I) = OLD_TAB_R(I)
-          ENDDO           
-        ENDIF
+            !-----------!
+            ! FTSAVY
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavy, old_tab_r)
+            intbuf_tab%s_ftsavy = multimp_parameter * ncont
+            allocate(intbuf_tab%ftsavy(intbuf_tab%s_ftsavy))
+            intbuf_tab%ftsavy = 0
+            intbuf_tab%ftsavy(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
 
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R,OLD_TAB2_R)
+            !-----------!
+            ! FTSAVZ
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavz, old_tab_r)
+            intbuf_tab%s_ftsavz = multimp_parameter * ncont
+            allocate(intbuf_tab%ftsavz(intbuf_tab%s_ftsavz))
+            intbuf_tab%ftsavz = 0
+            intbuf_tab%ftsavz(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+          end if
 
-C=======================================================================
-      ELSEIF(ITY == 10)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB2_R(6*OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999 ! specific CAND_F array
+          if (itied /= 0) then
+            !-----------!
+            ! CAND_F
+            !-----------!
+            call move_alloc(intbuf_tab%cand_f, old_tab_r)
+            intbuf_tab%s_cand_f = 8 * multimp_parameter * ncont
+            allocate(intbuf_tab%cand_f(intbuf_tab%s_cand_f))
+            intbuf_tab%cand_f = 0
+            intbuf_tab%cand_f(1:8*old_size) = old_tab_r
+            deallocate(old_tab_r)
+          end if
 
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO   
-   
-        !-----------!
-        ! CAND_F
-        !-----------!
-        DO I=1,6*OLD_SIZE
-          OLD_TAB2_R(I)=INTBUF_TAB%CAND_F(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_F)
-        INTBUF_TAB%S_CAND_F = 6*MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_F(INTBUF_TAB%S_CAND_F),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_F(1:INTBUF_TAB%S_CAND_F)=0
-        DO I=1,6*OLD_SIZE
-          INTBUF_TAB%CAND_F(I) = OLD_TAB2_R(I)
-        ENDDO           
-
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R,OLD_TAB2_R)
-
-C=======================================================================
-      ELSEIF(ITY == 11)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB2_I(2*OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999 !specific CHAIN array (2*MUTIMP*NCONT)
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CHAIN
-        !-----------!
-        DO I=1,2*OLD_SIZE
-          OLD_TAB2_I(I)=INTBUF_TAB%CHAIN(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CHAIN)
-        INTBUF_TAB%S_CHAIN = 2*MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CHAIN(INTBUF_TAB%S_CHAIN),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CHAIN(1:INTBUF_TAB%S_CHAIN)=0
-        DO I=1,2*OLD_SIZE
-          INTBUF_TAB%CHAIN(I) = OLD_TAB2_I(I)
-        ENDDO   
-
-        IF (MFROT == 2) THEN 
-          !-----------!
-          ! IFPEN
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_I(I)=INTBUF_TAB%IFPEN(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%IFPEN)
-          INTBUF_TAB%S_IFPEN = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%IFPEN(INTBUF_TAB%S_IFPEN),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%IFPEN(1:INTBUF_TAB%S_IFPEN)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%IFPEN(I) = OLD_TAB_I(I)
-          ENDDO    
-
-          !-----------!
-          ! FTSAVX
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVX(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVX)
-          INTBUF_TAB%S_FTSAVX = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%FTSAVX(INTBUF_TAB%S_FTSAVX),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVX(1:INTBUF_TAB%S_FTSAVX)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVX(I) = OLD_TAB_R(I)
-          ENDDO    
-
-          !-----------!
-          ! FTSAVY
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVY(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVY)
-          INTBUF_TAB%S_FTSAVY = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%FTSAVY(INTBUF_TAB%S_FTSAVY),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVY(1:INTBUF_TAB%S_FTSAVY)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVY(I) = OLD_TAB_R(I)
-          ENDDO   
-
-          !-----------!
-          ! FTSAVZ
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVZ(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVZ)
-          INTBUF_TAB%S_FTSAVZ = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%FTSAVZ(INTBUF_TAB%S_FTSAVZ),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVZ(1:INTBUF_TAB%S_FTSAVZ)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVZ(I) = OLD_TAB_R(I)
-          ENDDO   
-        ENDIF
- 
-        DEALLOCATE (OLD_TAB_I,OLD_TAB2_I,OLD_TAB_R)
-
-C=======================================================================
-      ELSEIF(ITY == 16)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE))
-        ALLOCATE (OLD_TAB_R(OLD_SIZE))
-
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
-
-C=======================================================================
-      ELSEIF(ITY == 17)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
-
-C=======================================================================
-      ELSEIF(ITY == 20)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB2_I(OLD_SIZE2),STAT=IERR)
-        IF(IERR/=0)GOTO 999   !specific MUTIMP*NCONTE arrays
-        ALLOCATE (OLD_TAB3_I(2*OLD_SIZE2),STAT=IERR)
-        IF(IERR/=0)GOTO 999 !specific CHAIN20 array (2*MUTIMP*NCONTE )
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! LCAND_N
-        !-----------!
-        DO I=1,OLD_SIZE2
-          OLD_TAB2_I(I)=INTBUF_TAB%LCAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%LCAND_N)
-        INTBUF_TAB%S_LCAND_N = MULTIMP_PARAMETER * NCONTE
-        ALLOCATE(INTBUF_TAB%LCAND_N(INTBUF_TAB%S_LCAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%LCAND_N(1:INTBUF_TAB%S_LCAND_N)=0
-        DO I=1,OLD_SIZE2
-          INTBUF_TAB%LCAND_N(I) = OLD_TAB2_I(I)
-        ENDDO   
-
-        !-----------!
-        ! LCAND_S
-        !-----------!
-        DO I=1,OLD_SIZE2
-          OLD_TAB2_I(I)=INTBUF_TAB%LCAND_S(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%LCAND_S)
-        INTBUF_TAB%S_LCAND_S = MULTIMP_PARAMETER * NCONTE
-        ALLOCATE(INTBUF_TAB%LCAND_S(INTBUF_TAB%S_LCAND_S),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%LCAND_S(1:INTBUF_TAB%S_LCAND_S)=0
-        DO I=1,OLD_SIZE2
-          INTBUF_TAB%LCAND_S(I) = OLD_TAB2_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CHAIN20
-        !-----------!
-        DO I=1,2*OLD_SIZE2
-          OLD_TAB3_I(I)=INTBUF_TAB%CHAIN20(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CHAIN20)
-        INTBUF_TAB%S_CHAIN20 = 2*MULTIMP_PARAMETER*NCONTE
-        ALLOCATE(INTBUF_TAB%CHAIN20(INTBUF_TAB%S_CHAIN20),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CHAIN20(1:INTBUF_TAB%S_CHAIN20)=0
-        DO I=1,2*OLD_SIZE2
-          INTBUF_TAB%CHAIN20(I) = OLD_TAB3_I(I)
-        ENDDO  
-
-        IF(INACTI == 5 .OR. INACTI == 6 .OR. INACTI == 7) THEN  
-          !-----------!
-          ! CAND_P
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%CAND_P(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%CAND_P)
-          INTBUF_TAB%S_CAND_P = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%CAND_P(INTBUF_TAB%S_CAND_P),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_P(1:INTBUF_TAB%S_CAND_P)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%CAND_P(I) = OLD_TAB_R(I)
-          ENDDO           
-        ENDIF
-
-        IF (IFQ/=0) THEN 
-          !-----------!
-          ! IFPEN
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_I(I)=INTBUF_TAB%IFPEN(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%IFPEN)
-          INTBUF_TAB%S_IFPEN = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%IFPEN(INTBUF_TAB%S_IFPEN),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%IFPEN(1:INTBUF_TAB%S_IFPEN)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%IFPEN(I) = OLD_TAB_I(I)
-          ENDDO    
-
-          !-----------!
-          ! CAND_FX
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%CAND_FX(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%CAND_FX)
-          INTBUF_TAB%S_CAND_FX = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%CAND_FX(INTBUF_TAB%S_CAND_FX),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_FX(1:INTBUF_TAB%S_CAND_FX)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%CAND_FX(I) = OLD_TAB_R(I)
-          ENDDO    
-
-          !-----------!
-          ! CAND_FY
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%CAND_FY(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%CAND_FY)
-          INTBUF_TAB%S_CAND_FY = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%CAND_FY(INTBUF_TAB%S_CAND_FY),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_FY(1:INTBUF_TAB%S_CAND_FY)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%CAND_FY(I) = OLD_TAB_R(I)
-          ENDDO   
-
-          !-----------!
-          ! CAND_FZ
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%CAND_FZ(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%CAND_FZ)
-          INTBUF_TAB%S_CAND_FZ = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%CAND_FZ(INTBUF_TAB%S_CAND_FZ),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_FZ(1:INTBUF_TAB%S_CAND_FZ)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%CAND_FZ(I) = OLD_TAB_R(I)
-          ENDDO   
-        ENDIF
-
-        DEALLOCATE (OLD_TAB_I,OLD_TAB2_I,OLD_TAB3_I,OLD_TAB_R)
-
-C=======================================================================
-      ELSEIF(ITY == 21)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
-
-C=======================================================================
-      ELSEIF(ITY == 22)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO  
-
-        IF (IFQ /= 0)THEN
-          !-----------!
-          ! IFPEN
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_I(I)=INTBUF_TAB%IFPEN(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%IFPEN)
-          INTBUF_TAB%S_IFPEN = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%IFPEN(INTBUF_TAB%S_IFPEN),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%IFPEN(1:INTBUF_TAB%S_IFPEN)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%IFPEN(I) = OLD_TAB_I(I)
-          ENDDO 
-        ENDIF 
-
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
-
-C=======================================================================
-      ELSEIF(ITY == 23)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO 
-
-        !-----------!
-        ! IFPEN
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%IFPEN(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%IFPEN)
-        INTBUF_TAB%S_IFPEN = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%IFPEN(INTBUF_TAB%S_IFPEN),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%IFPEN(1:INTBUF_TAB%S_IFPEN)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%IFPEN(I) = OLD_TAB_I(I)
-        ENDDO 
-
-            !-----------! 
+          if (inacti == 5 .or. inacti == 6 .or. inacti == 7) then
+            !-----------!
             ! CAND_P
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_R(I)=INTBUF_TAB%CAND_P(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_P)
-        INTBUF_TAB%S_CAND_P = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_P(INTBUF_TAB%S_CAND_P),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_P(1:INTBUF_TAB%S_CAND_P)=0
-        DO I=1,OLD_SIZE
-           INTBUF_TAB%CAND_P(I) = OLD_TAB_R(I)
-        ENDDO  
+            !-----------!
+            call move_alloc(intbuf_tab%cand_p, old_tab_r)
+            intbuf_tab%s_cand_p = multimp_parameter * ncont
+            allocate(intbuf_tab%cand_p(intbuf_tab%s_cand_p))
+            intbuf_tab%cand_p = 0
+            intbuf_tab%cand_p(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+          end if
 
-        !-----------!
-        ! FTSAVX
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_R(I)=INTBUF_TAB%FTSAVX(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%FTSAVX)
-        INTBUF_TAB%S_FTSAVX = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%FTSAVX(INTBUF_TAB%S_FTSAVX),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVX(1:INTBUF_TAB%S_FTSAVX)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%FTSAVX(I) = OLD_TAB_R(I)
-        ENDDO    
+!======================================================================
+        elseif (ity == 10) then
+!======================================================================
 
-        !-----------!
-        ! FTSAVY
-        !-----------!
-        DO I=1,OLD_SIZE
-           OLD_TAB_R(I)=INTBUF_TAB%FTSAVY(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%FTSAVY)
-        INTBUF_TAB%S_FTSAVY = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%FTSAVY(INTBUF_TAB%S_FTSAVY),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%FTSAVY(1:INTBUF_TAB%S_FTSAVY)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%FTSAVY(I) = OLD_TAB_R(I)
-        ENDDO   
-
-        !-----------!
-        ! FTSAVZ
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_R(I)=INTBUF_TAB%FTSAVZ(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%FTSAVZ)
-        INTBUF_TAB%S_FTSAVZ = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%FTSAVZ(INTBUF_TAB%S_FTSAVZ),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%FTSAVZ(1:INTBUF_TAB%S_FTSAVZ)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%FTSAVZ(I) = OLD_TAB_R(I)
-        ENDDO  
- 
-
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
-
-C=======================================================================
-      ELSEIF(ITY == 24)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
-
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO 
-
-        IF (IEDGE1 > 0) THEN
           !-----------!
-          ! CAND_T
+          ! CAND_E
           !-----------!
-          DO I=1,OLD_SIZE 
-            OLD_TAB_I(I)=INTBUF_TAB%CAND_T(I) 
-          ENDDO 
-          DEALLOCATE(INTBUF_TAB%CAND_T) 
-          INTBUF_TAB%S_CAND_T = MULTIMP_PARAMETER * NCONT
-          ALLOCATE(INTBUF_TAB%CAND_T(INTBUF_TAB%S_CAND_T),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_T(1:INTBUF_TAB%S_CAND_T)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%CAND_T(I) = OLD_TAB_I(I)
-          ENDDO 
-        ENDIF
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-C=======================================================================
-      ELSEIF(ITY == 25)THEN
-C=======================================================================
-C
-        OLD_SIZE_OPT=INTBUF_TAB%S_CAND_OPT_N
-        NEW_SIZE_OPT=MAX(MULTIMP_PARAMETER * NCONT,OLD_SIZE_OPT)
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-        ALLOCATE (OLD_TAB_I(MAX(OLD_SIZE,4*OLD_SIZE_OPT)),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(MAX(OLD_SIZE,4*OLD_SIZE_OPT)),STAT=IERR)
-        IF(IERR/=0)GOTO 999
+          !-----------!
+          ! CAND_F
+          !-----------!
+          call move_alloc(intbuf_tab%cand_f, old_tab_r)
+          intbuf_tab%s_cand_f = 6 * multimp_parameter * ncont
+          allocate(intbuf_tab%cand_f(intbuf_tab%s_cand_f))
+          intbuf_tab%cand_f = 0
+          intbuf_tab%cand_f(1:6*old_size) = old_tab_r
+          deallocate(old_tab_r)
 
-        !-----------!
-        ! CAND_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_E)
-        INTBUF_TAB%S_CAND_E = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_E(INTBUF_TAB%S_CAND_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_E(1:INTBUF_TAB%S_CAND_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_E(I) = OLD_TAB_I(I)
-        ENDDO   
+!======================================================================
+        elseif (ity == 11) then
+!======================================================================
 
-        !-----------!
-        ! CAND_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_N)
-        INTBUF_TAB%S_CAND_N = MULTIMP_PARAMETER * NCONT
-        ALLOCATE(INTBUF_TAB%CAND_N(INTBUF_TAB%S_CAND_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_N(1:INTBUF_TAB%S_CAND_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_N(I) = OLD_TAB_I(I)
-        ENDDO 
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-        !-----------!
-        ! FARM
-        !-----------!
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-        DO I=1,4*OLD_SIZE_OPT
-          OLD_TAB_I(I)=INTBUF_TAB%FARM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%FARM)
-        INTBUF_TAB%S_FARM = 4 * NEW_SIZE_OPT
-        ALLOCATE(INTBUF_TAB%FARM(INTBUF_TAB%S_FARM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        DO I=1,4*OLD_SIZE_OPT
-          INTBUF_TAB%FARM(I) = OLD_TAB_I(I)
-        ENDDO 
+          !-----------!
+          ! CHAIN  (size is 2*MULTIMP*NCONT)
+          !-----------!
+          call move_alloc(intbuf_tab%chain, old_tab_i)
+          intbuf_tab%s_chain = 2 * multimp_parameter * ncont
+          allocate(intbuf_tab%chain(intbuf_tab%s_chain))
+          intbuf_tab%chain = 0
+          intbuf_tab%chain(1:2*old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-        !-----------!
-        ! CAND_OPT_N
-        !-----------!
-        DO I=1,OLD_SIZE_OPT
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_OPT_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_OPT_N)
-        INTBUF_TAB%S_CAND_OPT_N = NEW_SIZE_OPT
-        ALLOCATE(INTBUF_TAB%CAND_OPT_N(INTBUF_TAB%S_CAND_OPT_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_OPT_N(1:INTBUF_TAB%S_CAND_OPT_N)=0
-        DO I=1,OLD_SIZE_OPT
-          INTBUF_TAB%CAND_OPT_N(I) = OLD_TAB_I(I)
-        ENDDO 
+          if (mfrot == 2) then
+            !-----------!
+            ! IFPEN
+            !-----------!
+            call move_alloc(intbuf_tab%ifpen, old_tab_i)
+            intbuf_tab%s_ifpen = multimp_parameter * ncont
+            allocate(intbuf_tab%ifpen(intbuf_tab%s_ifpen))
+            intbuf_tab%ifpen = 0
+            intbuf_tab%ifpen(1:old_size) = old_tab_i
+            deallocate(old_tab_i)
 
-        !-----------!
-        ! CAND_OPT_E
-        !-----------!
-        DO I=1,OLD_SIZE_OPT
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_OPT_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_OPT_E)
-        INTBUF_TAB%S_CAND_OPT_E = NEW_SIZE_OPT
-        ALLOCATE(INTBUF_TAB%CAND_OPT_E(INTBUF_TAB%S_CAND_OPT_E),STAT=IERR)
-        INTBUF_TAB%CAND_OPT_E(1:INTBUF_TAB%S_CAND_OPT_E)=0
-        IF(IERR/=0)GOTO 999
-        DO I=1,OLD_SIZE_OPT
-          INTBUF_TAB%CAND_OPT_E(I) = OLD_TAB_I(I)
-        ENDDO 
+            !-----------!
+            ! FTSAVX
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavx, old_tab_r)
+            intbuf_tab%s_ftsavx = multimp_parameter * ncont
+            allocate(intbuf_tab%ftsavx(intbuf_tab%s_ftsavx))
+            intbuf_tab%ftsavx = 0
+            intbuf_tab%ftsavx(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
 
-        !-----------!
-        ! PENM
-        !-----------!
-        DO I=1,4*OLD_SIZE_OPT
-          OLD_TAB_R(I)=INTBUF_TAB%PENM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%PENM)
-        INTBUF_TAB%S_PENM = 4 * NEW_SIZE_OPT
-        ALLOCATE(INTBUF_TAB%PENM(INTBUF_TAB%S_PENM),STAT=IERR)
-        INTBUF_TAB%PENM(1:INTBUF_TAB%S_PENM)=ZERO
-        IF(IERR/=0)GOTO 999
-        DO I=1,4*OLD_SIZE_OPT
-          INTBUF_TAB%PENM(I) = OLD_TAB_R(I)
-        ENDDO 
+            !-----------!
+            ! FTSAVY
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavy, old_tab_r)
+            intbuf_tab%s_ftsavy = multimp_parameter * ncont
+            allocate(intbuf_tab%ftsavy(intbuf_tab%s_ftsavy))
+            intbuf_tab%ftsavy = 0
+            intbuf_tab%ftsavy(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
 
-        !-----------!
-        ! DISTM
-        !-----------!
-        DO I=1,OLD_SIZE_OPT
-          OLD_TAB_R(I)=INTBUF_TAB%DISTM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%DISTM)
-        INTBUF_TAB%S_DISTM = NEW_SIZE_OPT
-        ALLOCATE(INTBUF_TAB%DISTM(INTBUF_TAB%S_DISTM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        DO I=1,OLD_SIZE_OPT
-          INTBUF_TAB%DISTM(I) = OLD_TAB_R(I)
-        ENDDO 
+            !-----------!
+            ! FTSAVZ
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavz, old_tab_r)
+            intbuf_tab%s_ftsavz = multimp_parameter * ncont
+            allocate(intbuf_tab%ftsavz(intbuf_tab%s_ftsavz))
+            intbuf_tab%ftsavz = 0
+            intbuf_tab%ftsavz(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+          end if
 
-        !-----------!
-        ! LBM
-        !-----------!
-        DO I=1,4*OLD_SIZE_OPT
-          OLD_TAB_R(I)=INTBUF_TAB%LBM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%LBM)
-        INTBUF_TAB%S_LBM= 4 * NEW_SIZE_OPT
-        ALLOCATE(INTBUF_TAB%LBM(INTBUF_TAB%S_LBM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        DO I=1,4*OLD_SIZE_OPT
-          INTBUF_TAB%LBM(I) = OLD_TAB_R(I)
-        ENDDO 
+!======================================================================
+        elseif (ity == 16) then
+!======================================================================
 
-        !-----------!
-        ! LCM
-        !-----------!
-        DO I=1,4*OLD_SIZE_OPT
-          OLD_TAB_R(I)=INTBUF_TAB%LCM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%LCM)
-        INTBUF_TAB%S_LCM = 4 * NEW_SIZE_OPT
-        ALLOCATE(INTBUF_TAB%LCM(INTBUF_TAB%S_LCM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        DO I=1,4*OLD_SIZE_OPT
-          INTBUF_TAB%LCM(I) = OLD_TAB_R(I)
-        ENDDO 
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-      ENDIF !end all interfaces type
+!======================================================================
+        elseif (ity == 17) then
+!======================================================================
 
-c===================================================================== 
-cc      print*,'----------- Upgrade MultiMP -----------'
-cc      print*,'INTERFACE Number NI:',NI
-cc      print*,'INTERFACE Type :',ITY
-cc      print*,'NSN - NRTM :',NSN,NRTM
-cc      print*,'NCONT   :',NCONT
-cc      print*,'User Number : ',IPARI(NPARI*(NI-1)+15)
-cc      print*,' '
-cc      print*,'OLD MULTIMP:',MULTIMP
-cc      print*,'NEW MULTIMP:',MULTIMP_PARAMETER
-cc      print*,' '
-cc      print*,'OLD SIZE MULTIMP*NCONT =',OLD_SIZE
-cc      print*,'NEW SIZE MULTIMP*NCONT =',NEW_SIZE
-cc      print*,'---------------------------------------'
-cc      call my_flush(6)
-C=======================================================================
-      RETURN
- 999  CONTINUE
-      CALL ARRET_MESSAGE(ITY,IPARI(NPARI*(NI-1)+15),INTBUF_TAB%VARIABLES(37))
-      
-      CALL ARRET(2)
-      END
-      !||====================================================================
-      !||    upgrade_cand_opt     ../common_source/interf/upgrade_multimp.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_opt_tri      ../engine/source/interfaces/intsort/i25main_opt_tri.F
-      !||    i25main_slid         ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                ../engine/source/system/arret.F
-      !||    arret_message_slid   ../engine/source/system/arret_message.F
-      !||--- uses       -----------------------------------------------------
-      !||    restmod              ../engine/share/modules/restart_mod.F
-      !||====================================================================
-      SUBROUTINE UPGRADE_CAND_OPT(NI,K_STOK,INTBUF_TAB)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE RESTMOD
-      USE INTBUFDEF_MOD
-C-------------------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "tabsiz_c.inc"
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NI, K_STOK
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-      TYPE(INTBUF_STRUCT_) INTBUF_TAB
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER ITY,IFQ,INACTI,MFROT,NCONT,
-     .        NCONTE,NSN,NRTM,IEDGE1,FLAGREMNODE
-      INTEGER I,N,OLD_SIZE,NEW_SIZE,MULTIMP,
-     .        OLD_SIZE2,NEW_SIZE2,IERR
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-      INTEGER, DIMENSION (:), ALLOCATABLE :: OLD_TAB_I
-      my_real, DIMENSION (:), ALLOCATABLE :: OLD_TAB_R
-C======================================================================|
-      IERR=0
+!======================================================================
+        elseif (ity == 20) then
+!======================================================================
 
-      OLD_SIZE = INTBUF_TAB%S_CAND_OPT_N
-      NEW_SIZE = INTBUF_TAB%I_STOK(2)+K_STOK
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-C Set Global parameters
-      ITY    =     IPARI(NPARI*(NI-1)+7)
-      INACTI = ABS(IPARI(NPARI*(NI-1)+22))
-      MFROT  = IPARI(NPARI*(NI-1)+30)
-      IFQ    =     IPARI(NPARI*(NI-1)+31)
-      NSN    =     IPARI(NPARI*(NI-1)+5)
-      NRTM   =     IPARI(NPARI*(NI-1)+4)
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-C=======================================================================
-      IF(ITY == 25)THEN
-C=======================================================================
-        ALLOCATE (OLD_TAB_I(4*OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(4*OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
+          !-----------!
+          ! LCAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%lcand_n, old_tab_i)
+          intbuf_tab%s_lcand_n = multimp_parameter * nconte
+          allocate(intbuf_tab%lcand_n(intbuf_tab%s_lcand_n))
+          intbuf_tab%lcand_n = 0
+          intbuf_tab%lcand_n(1:old_size2) = old_tab_i
+          deallocate(old_tab_i)
 
-        !-----------!
-        ! FARM
-        !-----------!
-        DO I=1,4*OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%FARM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%FARM)
-        INTBUF_TAB%S_FARM = 4 * NEW_SIZE
-        ALLOCATE(INTBUF_TAB%FARM(INTBUF_TAB%S_FARM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%FARM(1:INTBUF_TAB%S_FARM)=0
-        DO I=1,4*OLD_SIZE
-          INTBUF_TAB%FARM(I)=OLD_TAB_I(I)
-        END DO
+          !-----------!
+          ! LCAND_S
+          !-----------!
+          call move_alloc(intbuf_tab%lcand_s, old_tab_i)
+          intbuf_tab%s_lcand_s = multimp_parameter * nconte
+          allocate(intbuf_tab%lcand_s(intbuf_tab%s_lcand_s))
+          intbuf_tab%lcand_s = 0
+          intbuf_tab%lcand_s(1:old_size2) = old_tab_i
+          deallocate(old_tab_i)
 
-        !-----------!
-        ! CAND_OPT_N
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_OPT_N(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_OPT_N)
-        INTBUF_TAB%S_CAND_OPT_N = NEW_SIZE
-        ALLOCATE(INTBUF_TAB%CAND_OPT_N(INTBUF_TAB%S_CAND_OPT_N),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_OPT_N(1:INTBUF_TAB%S_CAND_OPT_N)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_OPT_N(I) = OLD_TAB_I(I)
-        ENDDO   
+          !-----------!
+          ! CHAIN20  (size is 2*MULTIMP*NCONTE)
+          !-----------!
+          call move_alloc(intbuf_tab%chain20, old_tab_i)
+          intbuf_tab%s_chain20 = 2 * multimp_parameter * nconte
+          allocate(intbuf_tab%chain20(intbuf_tab%s_chain20))
+          intbuf_tab%chain20 = 0
+          intbuf_tab%chain20(1:2*old_size2) = old_tab_i
+          deallocate(old_tab_i)
 
-        !-----------!
-        ! CAND_OPT_E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CAND_OPT_E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CAND_OPT_E)
-        INTBUF_TAB%S_CAND_OPT_E = NEW_SIZE
-        ALLOCATE(INTBUF_TAB%CAND_OPT_E(INTBUF_TAB%S_CAND_OPT_E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CAND_OPT_E(1:INTBUF_TAB%S_CAND_OPT_E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CAND_OPT_E(I) = OLD_TAB_I(I)
-        ENDDO   
+          if (inacti == 5 .or. inacti == 6 .or. inacti == 7) then
+            !-----------!
+            ! CAND_P
+            !-----------!
+            call move_alloc(intbuf_tab%cand_p, old_tab_r)
+            intbuf_tab%s_cand_p = multimp_parameter * ncont
+            allocate(intbuf_tab%cand_p(intbuf_tab%s_cand_p))
+            intbuf_tab%cand_p = 0
+            intbuf_tab%cand_p(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+          end if
 
-        !-----------!
-        ! PENM
-        !-----------!
-        DO I=1,4*OLD_SIZE
-          OLD_TAB_R(I)=INTBUF_TAB%PENM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%PENM)
-        INTBUF_TAB%S_PENM = 4 * NEW_SIZE
-        ALLOCATE(INTBUF_TAB%PENM(INTBUF_TAB%S_PENM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%PENM(1:INTBUF_TAB%S_PENM)=ZERO
-        DO I=1,4*OLD_SIZE
-          INTBUF_TAB%PENM(I) = OLD_TAB_R(I)
-        ENDDO   
+          if (ifq /= 0) then
+            !-----------!
+            ! IFPEN
+            !-----------!
+            call move_alloc(intbuf_tab%ifpen, old_tab_i)
+            intbuf_tab%s_ifpen = multimp_parameter * ncont
+            allocate(intbuf_tab%ifpen(intbuf_tab%s_ifpen))
+            intbuf_tab%ifpen = 0
+            intbuf_tab%ifpen(1:old_size) = old_tab_i
+            deallocate(old_tab_i)
 
-        !-----------!
-        ! DISTM
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_R(I)=INTBUF_TAB%DISTM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%DISTM)
-        INTBUF_TAB%S_DISTM = NEW_SIZE
-        ALLOCATE(INTBUF_TAB%DISTM(INTBUF_TAB%S_DISTM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%DISTM(1:INTBUF_TAB%S_DISTM)=ZERO
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%DISTM(I) = OLD_TAB_R(I)
-        ENDDO   
+            !-----------!
+            ! CAND_FX
+            !-----------!
+            call move_alloc(intbuf_tab%cand_fx, old_tab_r)
+            intbuf_tab%s_cand_fx = multimp_parameter * ncont
+            allocate(intbuf_tab%cand_fx(intbuf_tab%s_cand_fx))
+            intbuf_tab%cand_fx = 0
+            intbuf_tab%cand_fx(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
 
-        !-----------!
-        ! LBM
-        !-----------!
-        DO I=1,4*OLD_SIZE
-          OLD_TAB_R(I)=INTBUF_TAB%LBM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%LBM)
-        INTBUF_TAB%S_LBM= 4 * NEW_SIZE
-        ALLOCATE(INTBUF_TAB%LBM(INTBUF_TAB%S_LBM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%LBM(1:INTBUF_TAB%S_LBM)=ZERO
-        DO I=1,4*OLD_SIZE
-          INTBUF_TAB%LBM(I) = OLD_TAB_R(I)
-        ENDDO   
+            !-----------!
+            ! CAND_FY
+            !-----------!
+            call move_alloc(intbuf_tab%cand_fy, old_tab_r)
+            intbuf_tab%s_cand_fy = multimp_parameter * ncont
+            allocate(intbuf_tab%cand_fy(intbuf_tab%s_cand_fy))
+            intbuf_tab%cand_fy = 0
+            intbuf_tab%cand_fy(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
 
-        !-----------!
-        ! LCM
-        !-----------!
-        DO I=1,4*OLD_SIZE
-          OLD_TAB_R(I)=INTBUF_TAB%LCM(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%LCM)
-        INTBUF_TAB%S_LCM = 4 * NEW_SIZE
-        ALLOCATE(INTBUF_TAB%LCM(INTBUF_TAB%S_LCM),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%LCM(1:INTBUF_TAB%S_LCM)=ZERO
-        DO I=1,4*OLD_SIZE
-          INTBUF_TAB%LCM(I) = OLD_TAB_R(I)
-        ENDDO   
+            !-----------!
+            ! CAND_FZ
+            !-----------!
+            call move_alloc(intbuf_tab%cand_fz, old_tab_r)
+            intbuf_tab%s_cand_fz = multimp_parameter * ncont
+            allocate(intbuf_tab%cand_fz(intbuf_tab%s_cand_fz))
+            intbuf_tab%cand_fz = 0
+            intbuf_tab%cand_fz(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+          end if
 
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
+!======================================================================
+        elseif (ity == 21) then
+!======================================================================
 
-      ENDIF !end all interfaces type
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-c===================================================================== 
-cc      print*,'----------- Upgrade MultiMP -----------'
-cc      print*,'INTERFACE Number NI:',NI
-cc      print*,'INTERFACE Type :',ITY
-cc      print*,'NSN - NRTM :',NSN,NRTM
-cc      print*,'NCONT   :',NCONT
-cc      print*,'User Number : ',IPARI(NPARI*(NI-1)+15)
-cc      print*,' '
-cc      print*,'OLD MULTIMP:',MULTIMP
-cc      print*,'NEW MULTIMP:',MULTIMP_PARAMETER
-cc      print*,' '
-cc      print*,'OLD SIZE MULTIMP*NCONT =',OLD_SIZE
-cc      print*,'NEW SIZE MULTIMP*NCONT =',NEW_SIZE
-cc      print*,'---------------------------------------'
-cc      call my_flush(6)
-C=======================================================================
-      RETURN
- 999  CONTINUE
-      CALL ARRET_MESSAGE_SLID(ITY,IPARI(NPARI*(NI-1)+15))
-      
-      CALL ARRET(2)
-      END
-      !||====================================================================
-      !||    upgrade_lcand_edg   ../common_source/interf/upgrade_multimp.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_tri         ../engine/source/interfaces/intsort/i25main_tri.F
-      !||    inint3              ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret               ../engine/source/system/arret.F
-      !||    arret_message       ../engine/source/system/arret_message.F
-      !||--- uses       -----------------------------------------------------
-      !||    restmod             ../engine/share/modules/restart_mod.F
-      !||====================================================================
-      SUBROUTINE UPGRADE_LCAND_EDG(NI,MULTIMP_PARAMETER,INTBUF_TAB)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE RESTMOD
-      USE INTBUFDEF_MOD
-C-------------------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "tabsiz_c.inc"
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NI, MULTIMP_PARAMETER
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-      TYPE(INTBUF_STRUCT_) INTBUF_TAB
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER ITY,INACTI,NCONTE
-      INTEGER I,N,OLD_SIZE,NEW_SIZE,MULTIMP,IERR,IFQ
+!======================================================================
+        elseif (ity == 22) then
+!======================================================================
 
-      INTEGER, DIMENSION (:), ALLOCATABLE :: OLD_TAB_I
-      my_real, DIMENSION (:), ALLOCATABLE :: OLD_TAB_R
-C======================================================================|
-      IERR=0
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-      MULTIMP  = IPARI(NPARI*(NI-1)+87)
-      NCONTE   = IPARI(NPARI*(NI-1)+88)
-      OLD_SIZE = MULTIMP * NCONTE
-      NEW_SIZE = MULTIMP_PARAMETER * NCONTE
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-C Set the new MULTIMP parameter for the given Interface
-      IPARI(NPARI*(NI-1)+87) = MULTIMP_PARAMETER
-C Set Global parameters
-      ITY    =     IPARI(NPARI*(NI-1)+7)
-      INACTI = ABS(IPARI(NPARI*(NI-1)+22))
-      IFQ    =     IPARI(NPARI*(NI-1)+31)
-C=======================================================================
-      IF(ITY == 25)THEN
+          if (ifq /= 0) then
+            !-----------!
+            ! IFPEN
+            !-----------!
+            call move_alloc(intbuf_tab%ifpen, old_tab_i)
+            intbuf_tab%s_ifpen = multimp_parameter * ncont
+            allocate(intbuf_tab%ifpen(intbuf_tab%s_ifpen))
+            intbuf_tab%ifpen = 0
+            intbuf_tab%ifpen(1:old_size) = old_tab_i
+            deallocate(old_tab_i)
+          end if
 
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        !-----------!
-        ! CANDM_E2E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CANDM_E2E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CANDM_E2E)
-        INTBUF_TAB%S_CANDM_E2E = MULTIMP_PARAMETER * NCONTE
-        ALLOCATE(INTBUF_TAB%CANDM_E2E(INTBUF_TAB%S_CANDM_E2E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CANDM_E2E(1:INTBUF_TAB%S_CANDM_E2E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CANDM_E2E(I) = OLD_TAB_I(I)
-        ENDDO   
+!======================================================================
+        elseif (ity == 23) then
+!======================================================================
 
-        !-----------!
-        ! CANDS_E2E
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CANDS_E2E(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CANDS_E2E)
-        INTBUF_TAB%S_CANDS_E2E = MULTIMP_PARAMETER * NCONTE
-        ALLOCATE(INTBUF_TAB%CANDS_E2E(INTBUF_TAB%S_CANDS_E2E),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CANDS_E2E(1:INTBUF_TAB%S_CANDS_E2E)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CANDS_E2E(I) = OLD_TAB_I(I)
-        ENDDO   
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-C       IF(INACTI == 5) THEN  
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! IFPEN
+          !-----------!
+          call move_alloc(intbuf_tab%ifpen, old_tab_i)
+          intbuf_tab%s_ifpen = multimp_parameter * ncont
+          allocate(intbuf_tab%ifpen(intbuf_tab%s_ifpen))
+          intbuf_tab%ifpen = 0
+          intbuf_tab%ifpen(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
           !-----------!
           ! CAND_P
           !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%CAND_P(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%CAND_P)
-          INTBUF_TAB%S_CAND_P = MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%CAND_P(INTBUF_TAB%S_CAND_P),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_P(1:INTBUF_TAB%S_CAND_P)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%CAND_P(I) = OLD_TAB_R(I)
-          ENDDO           
-C       ENDIF
-
-        IF (IFQ /= 0)THEN
-          !-----------!
-          ! IFPEN_E2E
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_I(I)=INTBUF_TAB%IFPEN_E(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%IFPEN_E)
-          INTBUF_TAB%S_IFPEN_E = MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%IFPEN_E(INTBUF_TAB%S_IFPEN_E),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%IFPEN_E(1:INTBUF_TAB%S_IFPEN_E)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%IFPEN_E(I) = OLD_TAB_I(I)
-          ENDDO   
+          call move_alloc(intbuf_tab%cand_p, old_tab_r)
+          intbuf_tab%s_cand_p = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_p(intbuf_tab%s_cand_p))
+          intbuf_tab%cand_p = 0
+          intbuf_tab%cand_p(1:old_size) = old_tab_r
+          deallocate(old_tab_r)
 
           !-----------!
-          ! FTSAVX_E
+          ! FTSAVX
           !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVX_E(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVX_E)
-          INTBUF_TAB%S_FTSAVX_E = MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%FTSAVX_E(INTBUF_TAB%S_FTSAVX_E),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVX_E(1:INTBUF_TAB%S_FTSAVX_E)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVX_E(I) = OLD_TAB_R(I)
-          ENDDO    
+          call move_alloc(intbuf_tab%ftsavx, old_tab_r)
+          intbuf_tab%s_ftsavx = multimp_parameter * ncont
+          allocate(intbuf_tab%ftsavx(intbuf_tab%s_ftsavx))
+          intbuf_tab%ftsavx = 0
+          intbuf_tab%ftsavx(1:old_size) = old_tab_r
+          deallocate(old_tab_r)
 
           !-----------!
-          ! FTSAVY_E
+          ! FTSAVY
           !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVY_E(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVY_E)
-          INTBUF_TAB%S_FTSAVY_E = MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%FTSAVY_E(INTBUF_TAB%S_FTSAVY_E),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVY_E(1:INTBUF_TAB%S_FTSAVY_E)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVY_E(I) = OLD_TAB_R(I)
-          ENDDO   
+          call move_alloc(intbuf_tab%ftsavy, old_tab_r)
+          intbuf_tab%s_ftsavy = multimp_parameter * ncont
+          allocate(intbuf_tab%ftsavy(intbuf_tab%s_ftsavy))
+          intbuf_tab%ftsavy = 0
+          intbuf_tab%ftsavy(1:old_size) = old_tab_r
+          deallocate(old_tab_r)
 
           !-----------!
-          ! FTSAVZ_E
+          ! FTSAVZ
           !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVZ_E(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVZ_E)
-          INTBUF_TAB%S_FTSAVZ_E = MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%FTSAVZ_E(INTBUF_TAB%S_FTSAVZ_E),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVZ_E(1:INTBUF_TAB%S_FTSAVZ_E)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVZ_E(I) = OLD_TAB_R(I)
-          ENDDO   
-        ENDIF
+          call move_alloc(intbuf_tab%ftsavz, old_tab_r)
+          intbuf_tab%s_ftsavz = multimp_parameter * ncont
+          allocate(intbuf_tab%ftsavz(intbuf_tab%s_ftsavz))
+          intbuf_tab%ftsavz = 0
+          intbuf_tab%ftsavz(1:old_size) = old_tab_r
+          deallocate(old_tab_r)
 
+!======================================================================
+        elseif (ity == 24) then
+!======================================================================
 
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-C=======================================================================
-      ENDIF !end all interfaces type
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-c===================================================================== 
-cc      print*,'----------- Upgrade MultiMP -----------'
-cc      print*,'INTERFACE Number NI:',NI
-cc      print*,'INTERFACE Type :',ITY
-cc      print*,'NSN - NRTM :',NSN,NRTM
-cc      print*,'NCONT   :',NCONT
-cc      print*,'User Number : ',IPARI(NPARI*(NI-1)+15)
-cc      print*,' '
-cc      print*,'OLD MULTIMP:',MULTIMP
-cc      print*,'NEW MULTIMP:',MULTIMP_PARAMETER
-cc      print*,' '
-cc      print*,'OLD SIZE MULTIMP*NCONT =',OLD_SIZE
-cc      print*,'NEW SIZE MULTIMP*NCONT =',NEW_SIZE
-cc      print*,'---------------------------------------'
-cc      call my_flush(6)
-C=======================================================================
-      RETURN
- 999  CONTINUE
-      CALL ARRET_MESSAGE(ITY,IPARI(NPARI*(NI-1)+15),INTBUF_TAB%VARIABLES(37))
-      
-      CALL ARRET(2)
-      END
-      !||====================================================================
-      !||    upgrade_lcand_e2s   ../common_source/interf/upgrade_multimp.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_tri         ../engine/source/interfaces/intsort/i25main_tri.F
-      !||    inint3              ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret               ../engine/source/system/arret.F
-      !||    arret_message       ../engine/source/system/arret_message.F
-      !||--- uses       -----------------------------------------------------
-      !||    restmod             ../engine/share/modules/restart_mod.F
-      !||====================================================================
-      SUBROUTINE UPGRADE_LCAND_E2S(NI,MULTIMP_PARAMETER,INTBUF_TAB)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE RESTMOD
-      USE INTBUFDEF_MOD
-C-------------------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
+          if (iedge1 > 0) then
+            !-----------!
+            ! CAND_T
+            !-----------!
+            call move_alloc(intbuf_tab%cand_t, old_tab_i)
+            intbuf_tab%s_cand_t = multimp_parameter * ncont
+            allocate(intbuf_tab%cand_t(intbuf_tab%s_cand_t))
+            intbuf_tab%cand_t = 0
+            intbuf_tab%cand_t(1:old_size) = old_tab_i
+            deallocate(old_tab_i)
+          end if
+
+!======================================================================
+        elseif (ity == 25) then
+!======================================================================
+
+          old_size_opt = intbuf_tab%s_cand_opt_n
+          new_size_opt = max(multimp_parameter * ncont, old_size_opt)
+
+          !-----------!
+          ! CAND_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_e, old_tab_i)
+          intbuf_tab%s_cand_e = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_e(intbuf_tab%s_cand_e))
+          intbuf_tab%cand_e = 0
+          intbuf_tab%cand_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! CAND_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_n, old_tab_i)
+          intbuf_tab%s_cand_n = multimp_parameter * ncont
+          allocate(intbuf_tab%cand_n(intbuf_tab%s_cand_n))
+          intbuf_tab%cand_n = 0
+          intbuf_tab%cand_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! FARM
+          !-----------!
+          call move_alloc(intbuf_tab%farm, old_tab_i)
+          intbuf_tab%s_farm = 4 * new_size_opt
+          allocate(intbuf_tab%farm(intbuf_tab%s_farm))
+          intbuf_tab%farm(1:4*old_size_opt) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! CAND_OPT_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_opt_n, old_tab_i)
+          intbuf_tab%s_cand_opt_n = new_size_opt
+          allocate(intbuf_tab%cand_opt_n(intbuf_tab%s_cand_opt_n))
+          intbuf_tab%cand_opt_n = 0
+          intbuf_tab%cand_opt_n(1:old_size_opt) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! CAND_OPT_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_opt_e, old_tab_i)
+          intbuf_tab%s_cand_opt_e = new_size_opt
+          allocate(intbuf_tab%cand_opt_e(intbuf_tab%s_cand_opt_e))
+          intbuf_tab%cand_opt_e = 0
+          intbuf_tab%cand_opt_e(1:old_size_opt) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! PENM
+          !-----------!
+          call move_alloc(intbuf_tab%penm, old_tab_r)
+          intbuf_tab%s_penm = 4 * new_size_opt
+          allocate(intbuf_tab%penm(intbuf_tab%s_penm))
+          intbuf_tab%penm = zero
+          intbuf_tab%penm(1:4*old_size_opt) = old_tab_r
+          deallocate(old_tab_r)
+
+          !-----------!
+          ! DISTM
+          !-----------!
+          call move_alloc(intbuf_tab%distm, old_tab_r)
+          intbuf_tab%s_distm = new_size_opt
+          allocate(intbuf_tab%distm(intbuf_tab%s_distm))
+          intbuf_tab%distm(1:old_size_opt) = old_tab_r
+          deallocate(old_tab_r)
+
+          !-----------!
+          ! LBM
+          !-----------!
+          call move_alloc(intbuf_tab%lbm, old_tab_r)
+          intbuf_tab%s_lbm = 4 * new_size_opt
+          allocate(intbuf_tab%lbm(intbuf_tab%s_lbm))
+          intbuf_tab%lbm(1:4*old_size_opt) = old_tab_r
+          deallocate(old_tab_r)
+
+          !-----------!
+          ! LCM
+          !-----------!
+          call move_alloc(intbuf_tab%lcm, old_tab_r)
+          intbuf_tab%s_lcm = 4 * new_size_opt
+          allocate(intbuf_tab%lcm(intbuf_tab%s_lcm))
+          intbuf_tab%lcm(1:4*old_size_opt) = old_tab_r
+          deallocate(old_tab_r)
+
+        end if !end all interfaces type
+
+      end subroutine upgrade_multimp
+
+!||====================================================================
+!||    upgrade_cand_opt   ../common_source/interf/upgrade_multimp.F
+!||--- called by ------------------------------------------------------
+!||    i25main_opt_tri    ../engine/source/interfaces/intsort/i25main_opt_tri.F
+!||    i25main_slid       ../engine/source/interfaces/int25/i25main_slid.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod      ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    restmod            ../engine/share/modules/restart_mod.F
+!||====================================================================
+      subroutine upgrade_cand_opt(ni, k_stok, intbuf_tab)
+!-----------------------------------------------
+!   M o d u l e s
+!-----------------------------------------------
+        use restmod
+        use intbufdef_mod
+!-------------------------------------------------------
+!   I m p l i c i t   T y p e s
+!-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+!-----------------------------------------------
+!   C o m m o n   B l o c k s
+!-----------------------------------------------
 #include      "tabsiz_c.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "scr03_c.inc"
 #include      "scr05_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NI, MULTIMP_PARAMETER
+!-----------------------------------------------
+!   D u m m y   A r g u m e n t s
+!-----------------------------------------------
+        integer, intent(in)    :: ni, k_stok
+        type(intbuf_struct_), intent(inout) :: intbuf_tab
+!-----------------------------------------------
+!   L o c a l   V a r i a b l e s
+!-----------------------------------------------
+        integer :: ity, ifq, inacti, mfrot, nsn, nrtm
+        integer :: old_size, new_size
 
-      TYPE(INTBUF_STRUCT_) INTBUF_TAB
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER ITY,INACTI,NCONTE
-      INTEGER I,N,OLD_SIZE,NEW_SIZE,MULTIMP,IERR,IFQ
+        integer,  dimension(:), allocatable :: old_tab_i
+        my_real,  dimension(:), allocatable :: old_tab_r
+!======================================================================
 
-      INTEGER, DIMENSION (:), ALLOCATABLE :: OLD_TAB_I
-      my_real, DIMENSION (:), ALLOCATABLE :: OLD_TAB_R
-C======================================================================|
-      IERR=0
+        old_size = intbuf_tab%s_cand_opt_n
+        new_size = intbuf_tab%i_stok(2) + k_stok
 
-      MULTIMP  = IPARI(NPARI*(NI-1)+89)
-      NCONTE   = IPARI(NPARI*(NI-1)+88)
-      OLD_SIZE = MULTIMP * NCONTE
-      NEW_SIZE = MULTIMP_PARAMETER * NCONTE
+!  Set Global parameters
+        ity    =     ipari(npari*(ni-1)+7)
+        inacti = abs(ipari(npari*(ni-1)+22))
+        mfrot  = ipari(npari*(ni-1)+30)
+        ifq    =     ipari(npari*(ni-1)+31)
+        nsn    =     ipari(npari*(ni-1)+5)
+        nrtm   =     ipari(npari*(ni-1)+4)
 
-C Set the new MULTIMP parameter for the given Interface
-      IPARI(NPARI*(NI-1)+89) = MULTIMP_PARAMETER
-C Set Global parameters
-      ITY    =     IPARI(NPARI*(NI-1)+7)
-      INACTI = ABS(IPARI(NPARI*(NI-1)+22))
-      IFQ    =     IPARI(NPARI*(NI-1)+31)
-C=======================================================================
-      IF(ITY == 25)THEN
+!======================================================================
+        if (ity == 25) then
+!======================================================================
 
-        ALLOCATE (OLD_TAB_I(OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        ALLOCATE (OLD_TAB_R(4*OLD_SIZE),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        !-----------!
-        ! CANDM_E2S
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CANDM_E2S(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CANDM_E2S)
-        INTBUF_TAB%S_CANDM_E2S = MULTIMP_PARAMETER * NCONTE
-        ALLOCATE(INTBUF_TAB%CANDM_E2S(INTBUF_TAB%S_CANDM_E2S),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CANDM_E2S(1:INTBUF_TAB%S_CANDM_E2S)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CANDM_E2S(I) = OLD_TAB_I(I)
-        ENDDO   
+          !-----------!
+          ! FARM
+          !-----------!
+          call move_alloc(intbuf_tab%farm, old_tab_i)
+          intbuf_tab%s_farm = 4 * new_size
+          allocate(intbuf_tab%farm(intbuf_tab%s_farm))
+          intbuf_tab%farm = 0
+          intbuf_tab%farm(1:4*old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-        !-----------!
-        ! CANDS_E2S
-        !-----------!
-        DO I=1,OLD_SIZE
-          OLD_TAB_I(I)=INTBUF_TAB%CANDS_E2S(I)
-        ENDDO
-        DEALLOCATE(INTBUF_TAB%CANDS_E2S)
-        INTBUF_TAB%S_CANDS_E2S = MULTIMP_PARAMETER * NCONTE
-        ALLOCATE(INTBUF_TAB%CANDS_E2S(INTBUF_TAB%S_CANDS_E2S),STAT=IERR)
-        IF(IERR/=0)GOTO 999
-        INTBUF_TAB%CANDS_E2S(1:INTBUF_TAB%S_CANDS_E2S)=0
-        DO I=1,OLD_SIZE
-          INTBUF_TAB%CANDS_E2S(I) = OLD_TAB_I(I)
-        ENDDO   
+          !-----------!
+          ! CAND_OPT_N
+          !-----------!
+          call move_alloc(intbuf_tab%cand_opt_n, old_tab_i)
+          intbuf_tab%s_cand_opt_n = new_size
+          allocate(intbuf_tab%cand_opt_n(intbuf_tab%s_cand_opt_n))
+          intbuf_tab%cand_opt_n = 0
+          intbuf_tab%cand_opt_n(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
 
-C       IF(INACTI == 5) THEN  
+          !-----------!
+          ! CAND_OPT_E
+          !-----------!
+          call move_alloc(intbuf_tab%cand_opt_e, old_tab_i)
+          intbuf_tab%s_cand_opt_e = new_size
+          allocate(intbuf_tab%cand_opt_e(intbuf_tab%s_cand_opt_e))
+          intbuf_tab%cand_opt_e = 0
+          intbuf_tab%cand_opt_e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! PENM
+          !-----------!
+          call move_alloc(intbuf_tab%penm, old_tab_r)
+          intbuf_tab%s_penm = 4 * new_size
+          allocate(intbuf_tab%penm(intbuf_tab%s_penm))
+          intbuf_tab%penm = zero
+          intbuf_tab%penm(1:4*old_size) = old_tab_r
+          deallocate(old_tab_r)
+
+          !-----------!
+          ! DISTM
+          !-----------!
+          call move_alloc(intbuf_tab%distm, old_tab_r)
+          intbuf_tab%s_distm = new_size
+          allocate(intbuf_tab%distm(intbuf_tab%s_distm))
+          intbuf_tab%distm = zero
+          intbuf_tab%distm(1:old_size) = old_tab_r
+          deallocate(old_tab_r)
+
+          !-----------!
+          ! LBM
+          !-----------!
+          call move_alloc(intbuf_tab%lbm, old_tab_r)
+          intbuf_tab%s_lbm = 4 * new_size
+          allocate(intbuf_tab%lbm(intbuf_tab%s_lbm))
+          intbuf_tab%lbm = zero
+          intbuf_tab%lbm(1:4*old_size) = old_tab_r
+          deallocate(old_tab_r)
+
+          !-----------!
+          ! LCM
+          !-----------!
+          call move_alloc(intbuf_tab%lcm, old_tab_r)
+          intbuf_tab%s_lcm = 4 * new_size
+          allocate(intbuf_tab%lcm(intbuf_tab%s_lcm))
+          intbuf_tab%lcm = zero
+          intbuf_tab%lcm(1:4*old_size) = old_tab_r
+          deallocate(old_tab_r)
+
+        end if !end all interfaces type
+
+      end subroutine upgrade_cand_opt
+
+!||====================================================================
+!||    upgrade_lcand_edg   ../common_source/interf/upgrade_multimp.F
+!||--- called by ------------------------------------------------------
+!||    i25main_tri         ../engine/source/interfaces/intsort/i25main_tri.F
+!||    inint3              ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod       ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    restmod             ../engine/share/modules/restart_mod.F
+!||====================================================================
+      subroutine upgrade_lcand_edg(ni, multimp_parameter, intbuf_tab)
+!-----------------------------------------------
+!   M o d u l e s
+!-----------------------------------------------
+        use restmod
+        use intbufdef_mod
+!-------------------------------------------------------
+!   I m p l i c i t   T y p e s
+!-----------------------------------------------
+#include      "implicit_f.inc"
+!-----------------------------------------------
+!   C o m m o n   B l o c k s
+!-----------------------------------------------
+#include      "tabsiz_c.inc"
+#include      "param_c.inc"
+#include      "com04_c.inc"
+#include      "scr03_c.inc"
+#include      "scr05_c.inc"
+!-----------------------------------------------
+!   D u m m y   A r g u m e n t s
+!-----------------------------------------------
+        integer, intent(in)    :: ni, multimp_parameter
+        type(intbuf_struct_), intent(inout) :: intbuf_tab
+!-----------------------------------------------
+!   L o c a l   V a r i a b l e s
+!-----------------------------------------------
+        integer :: ity, inacti, nconte
+        integer :: old_size, new_size, multimp, ifq
+
+        integer,  dimension(:), allocatable :: old_tab_i
+        my_real,  dimension(:), allocatable :: old_tab_r
+!======================================================================
+
+        multimp  = ipari(npari*(ni-1)+87)
+        nconte   = ipari(npari*(ni-1)+88)
+        old_size = multimp * nconte
+        new_size = multimp_parameter * nconte
+
+!  Set the new MULTIMP parameter for the given Interface
+        ipari(npari*(ni-1)+87) = multimp_parameter
+!  Set Global parameters
+        ity    =     ipari(npari*(ni-1)+7)
+        inacti = abs(ipari(npari*(ni-1)+22))
+        ifq    =     ipari(npari*(ni-1)+31)
+
+!======================================================================
+        if (ity == 25) then
+
+          !-----------!
+          ! CANDM_E2E
+          !-----------!
+          call move_alloc(intbuf_tab%candm_e2e, old_tab_i)
+          intbuf_tab%s_candm_e2e = multimp_parameter * nconte
+          allocate(intbuf_tab%candm_e2e(intbuf_tab%s_candm_e2e))
+          intbuf_tab%candm_e2e = 0
+          intbuf_tab%candm_e2e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! CANDS_E2E
+          !-----------!
+          call move_alloc(intbuf_tab%cands_e2e, old_tab_i)
+          intbuf_tab%s_cands_e2e = multimp_parameter * nconte
+          allocate(intbuf_tab%cands_e2e(intbuf_tab%s_cands_e2e))
+          intbuf_tab%cands_e2e = 0
+          intbuf_tab%cands_e2e(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
+!       IF(INACTI == 5) THEN
+          !-----------!
+          ! CAND_P
+          !-----------!
+          call move_alloc(intbuf_tab%cand_p, old_tab_r)
+          intbuf_tab%s_cand_p = multimp_parameter * nconte
+          allocate(intbuf_tab%cand_p(intbuf_tab%s_cand_p))
+          intbuf_tab%cand_p = 0
+          intbuf_tab%cand_p(1:old_size) = old_tab_r
+          deallocate(old_tab_r)
+!       ENDIF
+
+          if (ifq /= 0) then
+            !-----------!
+            ! IFPEN_E2E
+            !-----------!
+            call move_alloc(intbuf_tab%ifpen_e, old_tab_i)
+            intbuf_tab%s_ifpen_e = multimp_parameter * nconte
+            allocate(intbuf_tab%ifpen_e(intbuf_tab%s_ifpen_e))
+            intbuf_tab%ifpen_e = 0
+            intbuf_tab%ifpen_e(1:old_size) = old_tab_i
+            deallocate(old_tab_i)
+
+            !-----------!
+            ! FTSAVX_E
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavx_e, old_tab_r)
+            intbuf_tab%s_ftsavx_e = multimp_parameter * nconte
+            allocate(intbuf_tab%ftsavx_e(intbuf_tab%s_ftsavx_e))
+            intbuf_tab%ftsavx_e = 0
+            intbuf_tab%ftsavx_e(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+
+            !-----------!
+            ! FTSAVY_E
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavy_e, old_tab_r)
+            intbuf_tab%s_ftsavy_e = multimp_parameter * nconte
+            allocate(intbuf_tab%ftsavy_e(intbuf_tab%s_ftsavy_e))
+            intbuf_tab%ftsavy_e = 0
+            intbuf_tab%ftsavy_e(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+
+            !-----------!
+            ! FTSAVZ_E
+            !-----------!
+            call move_alloc(intbuf_tab%ftsavz_e, old_tab_r)
+            intbuf_tab%s_ftsavz_e = multimp_parameter * nconte
+            allocate(intbuf_tab%ftsavz_e(intbuf_tab%s_ftsavz_e))
+            intbuf_tab%ftsavz_e = 0
+            intbuf_tab%ftsavz_e(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+          end if
+
+            !-----------!
+            ! PENE_OLD_E
+            !-----------!
+
+          call move_alloc(intbuf_tab%pene_old_e, old_tab_r)
+          intbuf_tab%s_pene_old_e = multimp_parameter * nconte
+          allocate(intbuf_tab%pene_old_e(intbuf_tab%s_pene_old_e))
+          intbuf_tab%pene_old_e = 0
+          intbuf_tab%pene_old_e(1:old_size) = old_tab_r
+          deallocate(old_tab_r)
+
+            !-----------!
+            ! STIF_OLD_E
+            !-----------!
+          call move_alloc(intbuf_tab%stif_old_e, old_tab_r)
+          intbuf_tab%s_stif_old_e = multimp_parameter * nconte
+          allocate(intbuf_tab%stif_old_e(intbuf_tab%s_pene_old_e))
+          intbuf_tab%stif_old_e = 0
+          intbuf_tab%stif_old_e(1:old_size) = old_tab_r
+          deallocate(old_tab_r)
+
+        end if !end all interfaces type
+
+      end subroutine upgrade_lcand_edg
+
+!||====================================================================
+!||    upgrade_lcand_e2s   ../common_source/interf/upgrade_multimp.F
+!||--- called by ------------------------------------------------------
+!||    i25main_tri         ../engine/source/interfaces/intsort/i25main_tri.F
+!||    inint3              ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod       ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    restmod             ../engine/share/modules/restart_mod.F
+!||====================================================================
+      subroutine upgrade_lcand_e2s(ni, multimp_parameter, intbuf_tab)
+!-----------------------------------------------
+!   M o d u l e s
+!-----------------------------------------------
+        use restmod
+        use intbufdef_mod
+!-------------------------------------------------------
+!   I m p l i c i t   T y p e s
+!-----------------------------------------------
+#include      "implicit_f.inc"
+!-----------------------------------------------
+!   C o m m o n   B l o c k s
+!-----------------------------------------------
+#include      "tabsiz_c.inc"
+#include      "param_c.inc"
+#include      "com04_c.inc"
+#include      "scr03_c.inc"
+#include      "scr05_c.inc"
+!-----------------------------------------------
+!   D u m m y   A r g u m e n t s
+!-----------------------------------------------
+        integer, intent(in)    :: ni, multimp_parameter
+        type(intbuf_struct_), intent(inout) :: intbuf_tab
+!-----------------------------------------------
+!   L o c a l   V a r i a b l e s
+!-----------------------------------------------
+        integer :: ity, inacti, nconte
+        integer :: old_size, new_size, multimp, ifq
+
+        integer,  dimension(:), allocatable :: old_tab_i
+        my_real,  dimension(:), allocatable :: old_tab_r
+!======================================================================
+
+        multimp  = ipari(npari*(ni-1)+89)
+        nconte   = ipari(npari*(ni-1)+88)
+        old_size = multimp * nconte
+        new_size = multimp_parameter * nconte
+
+!  Set the new MULTIMP parameter for the given Interface
+        ipari(npari*(ni-1)+89) = multimp_parameter
+!  Set Global parameters
+        ity    =     ipari(npari*(ni-1)+7)
+        inacti = abs(ipari(npari*(ni-1)+22))
+        ifq    =     ipari(npari*(ni-1)+31)
+
+!======================================================================
+        if (ity == 25) then
+
+          !-----------!
+          ! CANDM_E2S
+          !-----------!
+          call move_alloc(intbuf_tab%candm_e2s, old_tab_i)
+          intbuf_tab%s_candm_e2s = multimp_parameter * nconte
+          allocate(intbuf_tab%candm_e2s(intbuf_tab%s_candm_e2s))
+          intbuf_tab%candm_e2s = 0
+          intbuf_tab%candm_e2s(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
+          !-----------!
+          ! CANDS_E2S
+          !-----------!
+          call move_alloc(intbuf_tab%cands_e2s, old_tab_i)
+          intbuf_tab%s_cands_e2s = multimp_parameter * nconte
+          allocate(intbuf_tab%cands_e2s(intbuf_tab%s_cands_e2s))
+          intbuf_tab%cands_e2s = 0
+          intbuf_tab%cands_e2s(1:old_size) = old_tab_i
+          deallocate(old_tab_i)
+
+!       IF(INACTI == 5) THEN
           !-----------!
           ! CAND_PS
           !-----------!
-          DO I=1,4*OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%CAND_PS(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%CAND_PS)
-          INTBUF_TAB%S_CAND_PS = 4 * MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%CAND_PS(INTBUF_TAB%S_CAND_PS),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%CAND_PS(1:INTBUF_TAB%S_CAND_PS)=0
-          DO I=1,4*OLD_SIZE
-            INTBUF_TAB%CAND_PS(I) = OLD_TAB_R(I)
-          ENDDO           
-C       ENDIF
+          call move_alloc(intbuf_tab%cand_ps, old_tab_r)
+          intbuf_tab%s_cand_ps = 4 * multimp_parameter * nconte
+          allocate(intbuf_tab%cand_ps(intbuf_tab%s_cand_ps))
+          intbuf_tab%cand_ps = 0
+          intbuf_tab%cand_ps(1:4*old_size) = old_tab_r
+          deallocate(old_tab_r)
+!       ENDIF
 
-        IF (IFQ /= 0)THEN
-          !-----------!
-          ! IFPEN_E2S
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_I(I)=INTBUF_TAB%IFPEN_E2S(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%IFPEN_E2S)
-          INTBUF_TAB%S_IFPEN_E2S =  MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%IFPEN_E2S(INTBUF_TAB%S_IFPEN_E2S),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%IFPEN_E2S(1:INTBUF_TAB%S_IFPEN_E2S)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%IFPEN_E2S(I) = OLD_TAB_I(I)
-          ENDDO   
+          if (ifq /= 0) then
+            !-----------!
+            ! IFPEN_E2S
+            !-----------!
+            call move_alloc(intbuf_tab%ifpen_e2s, old_tab_i)
+            intbuf_tab%s_ifpen_e2s = multimp_parameter * nconte
+            allocate(intbuf_tab%ifpen_e2s(intbuf_tab%s_ifpen_e2s))
+            intbuf_tab%ifpen_e2s = 0
+            intbuf_tab%ifpen_e2s(1:old_size) = old_tab_i
+            deallocate(old_tab_i)
 
-          !-----------!
-          ! FTSAVX_E2S
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVX_E2S(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVX_E2S)
-          INTBUF_TAB%S_FTSAVX_E2S =  4 * MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%FTSAVX_E2S(INTBUF_TAB%S_FTSAVX_E2S),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVX_E2S(1:INTBUF_TAB%S_FTSAVX_E2S)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVX_E2S(I) = OLD_TAB_R(I)
-          ENDDO    
+            !-----------!
+            ! FTSAVX_E2S
+            !-----------!
 
-          !-----------!
-          ! FTSAVY_E2S
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVY_E2S(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVY_E2S)
-          INTBUF_TAB%S_FTSAVY_E2S =  4 * MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%FTSAVY_E2S(INTBUF_TAB%S_FTSAVY_E2S),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVY_E2S(1:INTBUF_TAB%S_FTSAVY_E2S)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVY_E2S(I) = OLD_TAB_R(I)
-          ENDDO   
+            call move_alloc(intbuf_tab%ftsavx_e2s, old_tab_r)
+            intbuf_tab%s_ftsavx_e2s = 4 * multimp_parameter * nconte
+            allocate(intbuf_tab%ftsavx_e2s(intbuf_tab%s_ftsavx_e2s))
+            intbuf_tab%ftsavx_e2s = 0
+            intbuf_tab%ftsavx_e2s(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
 
-          !-----------!
-          ! FTSAVZ
-          !-----------!
-          DO I=1,OLD_SIZE
-            OLD_TAB_R(I)=INTBUF_TAB%FTSAVZ_E2S(I)
-          ENDDO
-          DEALLOCATE(INTBUF_TAB%FTSAVZ_E2S)
-          INTBUF_TAB%S_FTSAVZ_E2S = 4 * MULTIMP_PARAMETER * NCONTE
-          ALLOCATE(INTBUF_TAB%FTSAVZ_E2S(INTBUF_TAB%S_FTSAVZ_E2S),STAT=IERR)
-          IF(IERR/=0)GOTO 999
-          INTBUF_TAB%FTSAVZ_E2S(1:INTBUF_TAB%S_FTSAVZ_E2S)=0
-          DO I=1,OLD_SIZE
-            INTBUF_TAB%FTSAVZ_E2S(I) = OLD_TAB_R(I)
-          ENDDO   
-        ENDIF
 
-        DEALLOCATE (OLD_TAB_I,OLD_TAB_R)
+            !-----------!
+            ! FTSAVY_E2S
+            !-----------!
 
-C=======================================================================
-      ENDIF !end all interfaces type
+            call move_alloc(intbuf_tab%ftsavy_e2s, old_tab_r)
+            intbuf_tab%s_ftsavy_e2s = 4 * multimp_parameter * nconte
+            allocate(intbuf_tab%ftsavy_e2s(intbuf_tab%s_ftsavy_e2s))
+            intbuf_tab%ftsavy_e2s = 0
+            intbuf_tab%ftsavy_e2s(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
 
-c===================================================================== 
-cc      print*,'----------- Upgrade MultiMP -----------'
-cc      print*,'INTERFACE Number NI:',NI
-cc      print*,'INTERFACE Type :',ITY
-cc      print*,'NSN - NRTM :',NSN,NRTM
-cc      print*,'NCONT   :',NCONT
-cc      print*,'User Number : ',IPARI(NPARI*(NI-1)+15)
-cc      print*,' '
-cc      print*,'OLD MULTIMP:',MULTIMP
-cc      print*,'NEW MULTIMP:',MULTIMP_PARAMETER
-cc      print*,' '
-cc      print*,'OLD SIZE MULTIMP*NCONT =',OLD_SIZE
-cc      print*,'NEW SIZE MULTIMP*NCONT =',NEW_SIZE
-cc      print*,'---------------------------------------'
-cc      call my_flush(6)
-C=======================================================================
-      RETURN
- 999  CONTINUE
-      CALL ARRET_MESSAGE(ITY,IPARI(NPARI*(NI-1)+15),INTBUF_TAB%VARIABLES(37))
-      
-      CALL ARRET(2)
-      END
+
+            !-----------!
+            ! FTSAVZ_E2S
+            !-----------!
+
+            call move_alloc(intbuf_tab%ftsavz_e2s, old_tab_r)
+            intbuf_tab%s_ftsavz_e2s = 4 * multimp_parameter * nconte
+            allocate(intbuf_tab%ftsavz_e2s(intbuf_tab%s_ftsavz_e2s))
+            intbuf_tab%ftsavz_e2s = 0
+            intbuf_tab%ftsavz_e2s(1:old_size) = old_tab_r
+            deallocate(old_tab_r)
+          end if
+
+            !-------------!
+            ! PENE_OLD_E2S
+            !-------------!
+          call move_alloc(intbuf_tab%pene_old_e2s, old_tab_r)
+          intbuf_tab%s_pene_old_e2s = 4 * multimp_parameter * nconte
+          allocate(intbuf_tab%pene_old_e2s(intbuf_tab%s_pene_old_e2s))
+          intbuf_tab%pene_old_e2s = 0
+          intbuf_tab%pene_old_e2s(1:4*old_size) = old_tab_r
+          deallocate(old_tab_r)
+
+            !-------------!
+            ! STIF_OLD_E2S
+            !-------------!
+          call move_alloc(intbuf_tab%stif_old_e2s, old_tab_r)
+          intbuf_tab%s_stif_old_e2s = 4 * multimp_parameter * nconte
+          allocate(intbuf_tab%stif_old_e2s(intbuf_tab%s_stif_old_e2s))
+          intbuf_tab%stif_old_e2s = 0
+          intbuf_tab%stif_old_e2s(1:4*old_size) = old_tab_r
+          deallocate(old_tab_r)
+
+
+        end if !end all interfaces type
+
+      end subroutine upgrade_lcand_e2s

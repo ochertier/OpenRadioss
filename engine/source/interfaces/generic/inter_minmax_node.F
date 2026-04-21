@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inter_minmax_node    ../engine/source/interfaces/generic/inter_minmax_node.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_prepare_sort   ../engine/source/interfaces/generic/inter_prepare_sort.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier           ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_sorting_mod    ../engine/share/modules/inter_sorting_mod.F
-      !||    inter_struct_mod     ../engine/share/modules/inter_struct_mod.F
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||====================================================================
-        SUBROUTINE INTER_MINMAX_NODE( ITASK,X )
+!||====================================================================
+!||    inter_minmax_node      ../engine/source/interfaces/generic/inter_minmax_node.F
+!||--- called by ------------------------------------------------------
+!||    inter_init_component   ../engine/source/interfaces/generic/inter_init_component.F90
+!||--- calls      -----------------------------------------------------
+!||    my_barrier             ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod          ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    inter_struct_mod       ../engine/share/modules/inter_struct_mod.F
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||====================================================================
+        SUBROUTINE INTER_MINMAX_NODE( ITASK,box_limit,X )
 !$COMMENT
 !       INTER_MINMAX_NODE description :
 !       compute the minimal & maximal positions      
@@ -44,7 +44,6 @@ C   M o d u l e s
 C-----------------------------------------------
         USE INTBUFDEF_MOD  
         USE INTER_STRUCT_MOD
-        USE INTER_SORTING_MOD
         USE MESSAGE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -60,6 +59,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
         INTEGER, INTENT(in) :: ITASK
+        my_real, dimension(6), intent(inout) :: box_limit !< upper & lower bound of the box
         my_real, DIMENSION(3,NUMNOD), INTENT(in) :: X            !   position
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

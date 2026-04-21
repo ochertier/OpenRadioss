@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,19 @@
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spring_functions_mod   ../common_source/modules/spring_functions_mod.F90
-      !||====================================================================
-       module spring_functions_mod
-#include "my_real.inc"
+!||====================================================================
+!||    spring_functions_mod   ../common_source/modules/spring_functions_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    precision_mod          ../common_source/modules/precision_mod.F90
+!||====================================================================
+      module spring_functions_mod
+        use precision_mod, only : WP
+        implicit none
+        private :: WP
 #include "mvsiz_p.inc"
         type chunk_of_table_type
-          my_real, pointer :: X(:) !< X values for a chunk of a table
-          my_real, pointer :: Y(:) !< Y values for a chunk of a table
+          real(kind=WP), pointer :: X(:) !< X values for a chunk of a table
+          real(kind=WP), pointer :: Y(:) !< Y values for a chunk of a table
         end type chunk_of_table_type
         type :: spring_functions_type
           integer, dimension(MVSIZ) :: Hi !< Hardening type for each spring, simimar to IECROU

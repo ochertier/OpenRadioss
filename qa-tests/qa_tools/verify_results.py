@@ -1,5 +1,5 @@
 # Copyright>        OpenRadioss
-# Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+# Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 # Copyright>    
 # Copyright>        This program is free software: you can redistribute it and/or modify
 # Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -188,7 +188,7 @@ def verify_integer_tolerance(word,ref,res,test_json):
 # res       : run Result
 # test_json : Json file with Tolerance if present in data directory
 # ----------------------------------------------------------------------------------
-# Compute the tolerance for Intger results with Tolerance mechanism
+# Compute the tolerance for Integer results with Tolerance mechanism
 # Supported Tolerance
 #    Abs_tolerance  : Absolute Tolerance diff between Result & run must be in Range 
 # ----------------------------------------------------------------------------------

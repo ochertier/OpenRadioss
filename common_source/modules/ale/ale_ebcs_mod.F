@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ale_ebcs_mod        ../common_source/modules/ale/ale_ebcs_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    contrl              ../starter/source/starter/contrl.F
-      !||    ddsplit             ../starter/source/restart/ddsplit/ddsplit.F
-      !||    domdec2             ../starter/source/spmd/domdec2.F
-      !||    fillcne             ../starter/source/spmd/domdec2.F
-      !||    iniebcs             ../starter/source/boundary_conditions/ebcs/iniebcs.F
-      !||    iniebcs_propergol   ../starter/source/boundary_conditions/ebcs/iniebcs_propergol.F90
-      !||    iniebcsp0           ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
-      !||    lectur              ../engine/source/input/lectur.F
-      !||    read_ebcs           ../starter/source/boundary_conditions/ebcs/read_ebcs.F
-      !||    split_ebcs          ../starter/source/boundary_conditions/ebcs/split_ebcs.F
-      !||    st_qaprint_driver   ../starter/source/output/qaprint/st_qaprint_driver.F
-      !||    st_qaprint_ebcs     ../starter/source/output/qaprint/st_qaprint_ebcs.F
-      !||    wrcomip             ../starter/source/restart/ddsplit/wrcommp.F
-      !||====================================================================
+!||====================================================================
+!||    ale_ebcs_mod         ../common_source/modules/ale/ale_ebcs_mod.F
+!||--- called by ------------------------------------------------------
+!||    contrl               ../starter/source/starter/contrl.F
+!||    ddsplit              ../starter/source/restart/ddsplit/ddsplit.F
+!||    domdec2              ../starter/source/spmd/domdec2.F
+!||    fillcne              ../starter/source/spmd/domdec2.F
+!||    iniebcs              ../starter/source/boundary_conditions/ebcs/iniebcs.F
+!||    iniebcs_propellant   ../starter/source/boundary_conditions/ebcs/iniebcs_propellant.F90
+!||    iniebcsp0            ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
+!||    lectur               ../engine/source/input/lectur.F
+!||    read_ebcs            ../starter/source/boundary_conditions/ebcs/read_ebcs.F
+!||    split_ebcs           ../starter/source/boundary_conditions/ebcs/split_ebcs.F
+!||    st_qaprint_driver    ../starter/source/output/qaprint/st_qaprint_driver.F
+!||    st_qaprint_ebcs      ../starter/source/output/qaprint/st_qaprint_ebcs.F
+!||    wrcomip              ../starter/source/restart/ddsplit/wrcommp.F
+!||====================================================================
       MODULE ALE_EBCS_MOD
         IMPLICIT NONE
 #include      "my_real.inc"
-      INTEGER NEBCS   
+        INTEGER NEBCS
 
       END MODULE ALE_EBCS_MOD

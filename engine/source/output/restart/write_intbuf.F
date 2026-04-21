@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,17 +22,20 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
      
 
-      !||====================================================================
-      !||    write_intbuf      ../engine/source/output/restart/write_intbuf.F
-      !||--- called by ------------------------------------------------------
-      !||    wrrestp           ../engine/source/output/restart/wrrestp.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret             ../engine/source/system/arret.F
-      !||    write_db          ../common_source/tools/input_output/write_db.F
-      !||    write_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||    write_intbuf_t8   ../engine/source/output/restart/write_intbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    write_intbuf      ../engine/source/output/restart/write_intbuf.F
+!||--- called by ------------------------------------------------------
+!||    wrrestp           ../engine/source/output/restart/wrrestp.F
+!||--- calls      -----------------------------------------------------
+!||    arret             ../engine/source/system/arret.F
+!||    compress_i_nnz    ../common_source/comm/compress_nnz.F
+!||    compress_r_nnz    ../common_source/comm/compress_nnz.F
+!||    write_db          ../common_source/tools/input_output/write_db.F
+!||    write_i_c         ../common_source/tools/input_output/write_routines.c
+!||    write_intbuf_t8   ../engine/source/output/restart/write_intbuf.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE WRITE_INTBUF(INTBUF_TAB)  
 C-----------------------------------------------
 C   M o d u l e s
@@ -58,7 +61,7 @@ c     .
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,N,NI,SIZ,L_INTBUF_SIZE
+      INTEGER N,NI,SIZ,L_INTBUF_SIZE
 C=======================================================================
       ALLOCATE(INTBUF_SIZE(L_INTBUF_SIZE_MAX))
       INTBUF_SIZE(1:L_INTBUF_SIZE_MAX) = 0
@@ -311,6 +314,8 @@ C------- to be cleaned later
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_IELEM_M         
         N = N+1
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_PROC_MVOISIN  
+        N = N+1
+        INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_MSR_1D 
 
 C=======================================================================
 C real arrays sizes
@@ -592,6 +597,17 @@ C=======================================================================
         N = N+1
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_E2S_NOD_NORMAL
 
+        N = N+1
+        INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_PENE_OLD_E
+
+        N = N+1
+        INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_STIF_OLD_E
+
+        N = N+1
+        INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_PENE_OLD_E2S
+
+        N = N+1
+        INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_STIF_OLD_E2S
 C=======================================================================
 C write all INTBUF_TAB arrays sizes on disk
 C=======================================================================
@@ -932,10 +948,10 @@ c       CALL WRITE_I_C(INTBUF_TAB(NI)%FARM,SIZ)
         CALL WRITE_I_C(INTBUF_TAB(NI)%NOR2MSR,SIZ)
         
         SIZ = INTBUF_TAB(NI)%S_CAND_OPT_N
-        CALL WRITE_I_C(INTBUF_TAB(NI)%CAND_OPT_N,SIZ)
+        IF(SIZ > 0) CALL COMPRESS_I_NNZ(INTBUF_TAB(NI)%CAND_OPT_N,SIZ)
         
         SIZ = INTBUF_TAB(NI)%S_CAND_OPT_E
-        CALL WRITE_I_C(INTBUF_TAB(NI)%CAND_OPT_E,SIZ)
+        IF(SIZ > 0) CALL COMPRESS_I_NNZ(INTBUF_TAB(NI)%CAND_OPT_E,SIZ)
 
         SIZ = INTBUF_TAB(NI)%S_IF_ADH
         CALL WRITE_I_C(INTBUF_TAB(NI)%IF_ADH,SIZ)
@@ -973,6 +989,9 @@ C we can avoid to write 0
         
         SIZ = INTBUF_TAB(NI)%S_PROC_MVOISIN
         CALL WRITE_I_C(INTBUF_TAB(NI)%PROC_MVOISIN,SIZ)   
+
+        SIZ = INTBUF_TAB(NI)%S_MSR_1D
+        CALL WRITE_I_C(INTBUF_TAB(NI)%MSR_1D,SIZ)  
 
 C=======================================================================
 C write REAL arrays on disk
@@ -1086,6 +1105,24 @@ C=======================================================================
         IF(SIZ > 0) THEN
           SIZ =INTBUF_TAB(NI)%I_STOK_E(2)*4
           CALL WRITE_DB(INTBUF_TAB(NI)%CAND_PS,SIZ)
+        ENDIF
+
+        SIZ = INTBUF_TAB(NI)%S_PENE_OLD_E
+        CALL WRITE_DB(INTBUF_TAB(NI)%PENE_OLD_E,SIZ)
+
+        SIZ = INTBUF_TAB(NI)%S_STIF_OLD_E
+        CALL WRITE_DB(INTBUF_TAB(NI)%STIF_OLD_E,SIZ)
+
+        SIZ = INTBUF_TAB(NI)%S_PENE_OLD_E2S
+        IF(SIZ > 0) THEN
+          SIZ =INTBUF_TAB(NI)%I_STOK_E(2)*4
+          CALL WRITE_DB(INTBUF_TAB(NI)%PENE_OLD_E2S,SIZ)
+        ENDIF
+
+        SIZ = INTBUF_TAB(NI)%S_STIF_OLD_E2S
+        IF(SIZ > 0) THEN
+          SIZ =INTBUF_TAB(NI)%I_STOK_E(2)*4
+          CALL WRITE_DB(INTBUF_TAB(NI)%STIF_OLD_E2S,SIZ)
         ENDIF
 
         SIZ = INTBUF_TAB(NI)%S_GAPE
@@ -1326,21 +1363,6 @@ C=======================================================================
         SIZ = INTBUF_TAB(NI)%S_MSFIC
         CALL WRITE_DB(INTBUF_TAB(NI)%MSFIC,SIZ)
 
-!type 25
-c       SIZ = INTBUF_TAB(NI)%S_PENM
-c       CALL WRITE_DB(INTBUF_TAB(NI)%PENM,SIZ)
-
-c       SIZ = INTBUF_TAB(NI)%S_DISTM
-c       CALL WRITE_DB(INTBUF_TAB(NI)%DISTM,SIZ)
-
-c       SIZ = INTBUF_TAB(NI)%S_LBM
-c       CALL WRITE_DB(INTBUF_TAB(NI)%LBM,SIZ)
-
-c       SIZ = INTBUF_TAB(NI)%S_LCM
-c       CALL WRITE_DB(INTBUF_TAB(NI)%LCM,SIZ)
-
-c       SIZ = INTBUF_TAB(NI)%S_VTX_BISECTOR
-c       CALL WRITE_DB(INTBUF_TAB(NI)%VTX_BISECTOR,SIZ)
 
 !type 21 & 25
         SIZ = INTBUF_TAB(NI)%S_NOD_NORMAL
@@ -1360,25 +1382,25 @@ c       CALL WRITE_DB(INTBUF_TAB(NI)%VTX_BISECTOR,SIZ)
         CALL WRITE_DB(INTBUF_TAB(NI)%GAPMSAV,SIZ)
 
         SIZ = INTBUF_TAB(NI)%S_FTSAVX_E
-        CALL WRITE_DB(INTBUF_TAB(NI)%FTSAVX_E,SIZ)
+        IF(SIZ > 0) CALL COMPRESS_R_NNZ(INTBUF_TAB(NI)%FTSAVX_E,SIZ)
 
         SIZ = INTBUF_TAB(NI)%S_FTSAVY_E
-        CALL WRITE_DB(INTBUF_TAB(NI)%FTSAVY_E,SIZ)
+        IF(SIZ > 0) CALL COMPRESS_R_NNZ(INTBUF_TAB(NI)%FTSAVY_E,SIZ)
 
         SIZ = INTBUF_TAB(NI)%S_FTSAVZ_E
-        CALL WRITE_DB(INTBUF_TAB(NI)%FTSAVZ_E,SIZ)
+        IF(SIZ > 0) CALL COMPRESS_R_NNZ(INTBUF_TAB(NI)%FTSAVZ_E,SIZ)
 
         SIZ = INTBUF_TAB(NI)%S_FTSAVX_E2S
         IF(SIZ > 0) SIZ = 4*INTBUF_TAB(NI)%I_STOK_E(2)
-        CALL WRITE_DB(INTBUF_TAB(NI)%FTSAVX_E2S,SIZ)
+        IF(SIZ > 0) CALL COMPRESS_R_NNZ(INTBUF_TAB(NI)%FTSAVX_E2S,SIZ)
 
         SIZ = INTBUF_TAB(NI)%S_FTSAVY_E2S
         IF(SIZ > 0) SIZ = 4*INTBUF_TAB(NI)%I_STOK_E(2)
-        CALL WRITE_DB(INTBUF_TAB(NI)%FTSAVY_E2S,SIZ)
+        IF(SIZ > 0) CALL COMPRESS_R_NNZ(INTBUF_TAB(NI)%FTSAVY_E2S,SIZ)
 
         SIZ = INTBUF_TAB(NI)%S_FTSAVZ_E2S
         IF(SIZ > 0) SIZ = 4*INTBUF_TAB(NI)%I_STOK_E(2)
-        CALL WRITE_DB(INTBUF_TAB(NI)%FTSAVZ_E2S,SIZ)
+        IF(SIZ > 0) CALL COMPRESS_R_NNZ(INTBUF_TAB(NI)%FTSAVZ_E2S,SIZ)
 
       ENDDO !NI=1,NINTER
 
@@ -1388,14 +1410,15 @@ C-----
 
       END SUBROUTINE WRITE_INTBUF
 C-----
-      !||====================================================================
-      !||    write_intbuf_t8   ../engine/source/output/restart/write_intbuf.F
-      !||--- called by ------------------------------------------------------
-      !||    write_intbuf      ../engine/source/output/restart/write_intbuf.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    write_intbuf_t8   ../engine/source/output/restart/write_intbuf.F
+!||--- called by ------------------------------------------------------
+!||    write_intbuf      ../engine/source/output/restart/write_intbuf.F
+!||--- calls      -----------------------------------------------------
+!||    write_i_c         ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    int8_mod          ../common_source/modules/interfaces/int8_mod.F90
+!||====================================================================
       SUBROUTINE WRITE_INTBUF_T8(T8)  
 C-----------------------------------------------
 C   M o d u l e s
@@ -1416,7 +1439,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,K,NBS_INTERF,NBM_INTERF,SIZ,P2
+      INTEGER K,NBS_INTERF,NBM_INTERF,SIZ,P2
 
       IF(NSPMD > 1) THEN
          SIZ = T8%S_COMM 

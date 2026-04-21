@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    law70_upd              ../starter/source/materials/mat/mat070/law70_upd.F
-      !||--- called by ------------------------------------------------------
-      !||    updmat                 ../starter/source/materials/updmat.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    law70_table            ../starter/source/materials/mat/mat070/law70_table.F
-      !||    table_slope            ../starter/source/materials/tools/table_slope.F
-      !||    vw_smooth              ../starter/source/tools/curve/vw_smooth.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    law70_upd              ../starter/source/materials/mat/mat070/law70_upd.F
+!||--- called by ------------------------------------------------------
+!||    updmat                 ../starter/source/materials/updmat.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    law70_table            ../starter/source/materials/mat/mat070/law70_table.F
+!||    table_slope            ../starter/source/materials/tools/table_slope.F
+!||    vw_smooth              ../starter/source/tools/curve/vw_smooth.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LAW70_UPD(MAT_PARAM,TITR     ,MAT_ID   ,NUPARAM  ,UPARAM   ,
      .                     NFUNC    ,IFUNC    ,NPC      ,PLD      ,IOUT     ,
-     .                     NFUNCT   ,FUNC_ID  ,NPROPM   ,PM       )
+     .                     NFUNCT   ,FUNC_ID  ,NPROPM   ,PM       ,YOUNG0 )
 C----------------------------------------------- 
 C   M o d u l e s
 C-----------------------------------------------
@@ -61,6 +61,7 @@ C-----------------------------------------------
       CHARACTER(LEN=NCHARTITLE) ,INTENT(IN):: TITR
       my_real ,DIMENSION(NPROPM)  ,INTENT(INOUT) :: PM
       my_real ,DIMENSION(NUPARAM) ,INTENT(INOUT) :: UPARAM
+      my_real ,INTENT(INOUT) :: YOUNG0
       TYPE (MATPARAM_STRUCT_)     ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -73,10 +74,14 @@ C-----------------------------------------------
       my_real :: E0,EMAX,EPSMAX,STIFFMIN,STIFFMAX,STIFFINI,C1,G,NU,XMAX,
      .   S1,S2,T1,T2,X1,X2,Y1,Y2,DERI,YY,EPS0,EPST
       INTEGER ,DIMENSION(NFUNC) :: FUNC,PERM,LEN
-      my_real ,DIMENSION(NFUNC) :: RATE,YFAC
+      my_real ,DIMENSION(NFUNC*2) :: RATE,YFAC
       my_real ,DIMENSION(:)   ,ALLOCATABLE :: XF
       my_real ,DIMENSION(:,:) ,ALLOCATABLE :: XI,YI,YF
 C=======================================================================
+      S2 = -HUGE(S2)
+      T2 = -HUGE(T2)
+      Y1 = -HUGE(Y1)
+      Y2 = -HUGE(Y2)
       NCURV  = INT(UPARAM(1))
       NLOAD  = INT(UPARAM(7))
       NULOAD = INT(UPARAM(8))
@@ -181,7 +186,7 @@ c
         DO I = 1,NULOAD
           K  = NLOAD + I
           FUNC(I) = IFUNC (K)
-          RATE(I) = UPARAM(K + 8)
+          RATE(I+NLOAD) = UPARAM(K + 8)
           YFAC(I) = UPARAM(K + 8 + NFUNC)
           LEN(I)  = (NPC(FUNC(I)+1) - NPC(FUNC(I))) / 2
           LMAX    = MAX(LMAX,LEN(I))
@@ -244,7 +249,7 @@ c       reduce number of points if necessary
         END DO
 c--------------------------------------------------------
         CALL LAW70_TABLE(
-     .       MAT_PARAM%TABLE(UNLOAD)  ,NULOAD  ,LEN     ,LMAX   ,RATE  ,
+     .       MAT_PARAM%TABLE(UNLOAD)  ,NULOAD  ,LEN     ,LMAX   ,RATE(NLOAD+1)  ,
      .       XI    , YI     )      
       
         DEALLOCATE (YI)
@@ -270,9 +275,11 @@ c
       IFLAG  = 0
       IFLAG0 = 0
       IF (E0 < STIFFINI) THEN
+        E0 = STIFFINI
         IF (EMAX < E0) EMAX = E0        
         IFLAG0 = 1
       END IF
+      YOUNG0 = STIFFINI
 c--------------------------------------------------------
 c     Automatic modification of EPST and E0
 c--------------------------------------------------------
@@ -354,7 +361,7 @@ c------------------------------------
       PM(24) = EMAX   ! E0/(ONE - NU**2)
       PM(32) = C1 
 c------------------------------------
-c     Output new tables definition
+c     Output New Tables Definition
 c------------------------------------
       IF (IS_ENCRYPTED == 0)THEN
         WRITE(IOUT,1000)     
@@ -416,7 +423,7 @@ c-----------
      .       5X,/'      X,              Y')
  1102 FORMAT(5X,/,'YIELD STRESS FUNCTION=',I10,
      .       5X,'STRAIN RATE = ',1PG20.13,/,
-     .       5X,'      X,              Y')
- 2000 FORMAT(2G16.9)
+     .       5X,'              X                   Y')
+ 2000 FORMAT(2G20.13)
 c------------------------------------
       END

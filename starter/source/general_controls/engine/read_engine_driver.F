@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_engine_driver            ../starter/source/general_controls/engine/read_engine_driver.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                        ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_option_count               ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_start               ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_engine_driver            ../starter/source/general_controls/engine/read_engine_driver.F
+!||--- called by ------------------------------------------------------
+!||    lectur                        ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_option_count               ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_start               ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||====================================================================
        SUBROUTINE READ_ENGINE_DRIVER(IGRPART,IS_DYNA,NB_DYNA_INCLUDE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -59,7 +59,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
        CHARACTER FILNAM*512
-       INTEGER I,IOUT_1RAD,LEN_FILNAM,CPT,NRUN,NPARITH_ENG
+       INTEGER LEN_FILNAM,CPT,NRUN,NPARITH_ENG,NTH_TITLE_ENG,
+     .         NSTATE_ENG,NDYNAIN_ENG
 C=======================================================================
 C WRITE /ANIM OPTIONS THAT ARE IN MEMORY(HM MODEL) IN 1.RAD FILE 
 C=======================================================================
@@ -155,6 +156,39 @@ C--------------------------------------------------
 C WRITE PARITH OPTIONS IN 1.RAD FILE
 C--------------------------------------------------
       DO CPT=1,NPARITH_ENG
+        CALL CPP_GLOBAL_ENTITY_SDI_WRITE(IS_DYNA)
+      ENDDO
+C--------------------------------------------------
+C START BROWSING /TH/TITLE OPTIONS
+C--------------------------------------------------
+      CALL HM_OPTION_COUNT('/TH/TITLE',NTH_TITLE_ENG)
+      CALL HM_OPTION_START('/TH/TITLE')
+C--------------------------------------------------
+C WRITE /TH/TITLE OPTIONS IN 1.RAD FILE
+C--------------------------------------------------
+      DO CPT=1,NTH_TITLE_ENG
+        CALL CPP_GLOBAL_ENTITY_SDI_WRITE(IS_DYNA)
+      ENDDO
+C--------------------------------------------------
+C START BROWSING /STATE OPTIONS
+C--------------------------------------------------
+      CALL HM_OPTION_COUNT('/STATE',NSTATE_ENG)
+      CALL HM_OPTION_START('/STATE')
+C--------------------------------------------------
+C WRITE /STATE OPTIONS IN 1.RAD FILE
+C--------------------------------------------------
+      DO CPT=1,NSTATE_ENG
+        CALL CPP_GLOBAL_ENTITY_SDI_WRITE(IS_DYNA)
+      ENDDO
+C--------------------------------------------------
+C START BROWSING /DYNAIN OPTIONS
+C--------------------------------------------------
+      CALL HM_OPTION_COUNT('/DYNAIN',NDYNAIN_ENG)
+      CALL HM_OPTION_START('/DYNAIN')
+C--------------------------------------------------
+C WRITE /DYNAIN OPTIONS IN 1.RAD FILE
+C--------------------------------------------------
+      DO CPT=1,NDYNAIN_ENG
         CALL CPP_GLOBAL_ENTITY_SDI_WRITE(IS_DYNA)
       ENDDO
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,29 +21,29 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    hm_read_inivel             ../starter/source/initial_conditions/general/inivel/hm_read_inivel.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                     ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    freerr                     ../starter/source/starter/freform.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string              ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_count            ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    subrotvect                 ../starter/source/model/submodel/subrot.F
-      !||    udouble                    ../starter/source/system/sysfus.F
-      !||    usr2sys                    ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inivel             ../starter/source/initial_conditions/general/inivel/hm_read_inivel.F
+!||--- called by ------------------------------------------------------
+!||    lectur                     ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    freerr                     ../starter/source/starter/freform.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string              ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_count            ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    subrotvect                 ../starter/source/model/submodel/subrot.F
+!||    udouble                    ../starter/source/system/sysfus.F
+!||    usr2sys                    ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INIVEL(V         , W      , ITAB     , ITABM1 , VR         ,
      .                          IGRNOD    , IGRBRIC, ISKN     , SKEW   , INIVIDS    ,
      .                          X         , UNITAB , LSUBMODEL, RTRANS , XFRAME     ,
@@ -91,17 +91,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(IN) :: NINIVELT
-      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB
-      INTEGER ITAB(*), ITABM1(*),ISKN(LISKN,*),
-     .        INIVIDS(*),IFRAME(LISKN,*),KXSP(NISP,*),RBY_MSN(2,*)
+      TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB
+      INTEGER :: ITAB(*), ITABM1(*),ISKN(LISKN,*),INIVIDS(*),IFRAME(LISKN,*),KXSP(NISP,*),RBY_MSN(2,*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
-      my_real
-     .   V(3,*),W(3,*),VR(3,*),SKEW(LSKEW,*),X(3,*),
-     .   RTRANS(NTRANSF,*),XFRAME(NXFRAME,*),VFLOW(3,*) ,WFLOW(3,*),
-     .   RBY_INIAXIS(7,*)
+      my_real :: V(3,*),W(3,*),VR(3,*),SKEW(LSKEW,*),X(3,*),RTRANS(NTRANSF,*),XFRAME(NXFRAME,*),VFLOW(3,*) ,WFLOW(3,*)
+      my_real :: RBY_INIAXIS(7,*)
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       TYPE(FVM_INIVEL_STRUCT), INTENT(INOUT) :: FVM_INIVEL(*)
-      TYPE (SENSORS_) ,INTENT(IN)                       :: SENSORS          
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
       TYPE(INIVEL_), DIMENSION(NINIVELT), INTENT(INOUT) :: INIVEL_T
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
@@ -112,19 +109,19 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,J,K,N,NRB,KPRI,KROT,NNOD,NOSYS,ITYPE,ID,ISK,IGR,IGRS,NBVEL
-      INTEGER :: USER_UNIT_ID,NODID,NODID1,SUB_INDEX,IDIR,SENS_ID,NINIT,SENSID
+      INTEGER :: USER_UNIT_ID,SUB_INDEX,IDIR,SENS_ID,NINIT,SENSID
       INTEGER :: IDGRBRICK, IDGRQUAD, IDGRTRIA, IDGRBRICK_LOC, IDGRQUAD_LOC, IDGRTRIA_LOC
-      INTEGER :: IAD1, IAD2,NODE,NL,JREC,NOD_COUNT,IAD,NODINIVEL,CPT,SUB_ID
-      INTEGER :: FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,IFRA,IFM,IUN,JJ,K1,K2,K3,INOD,NB_NODES, ID_NODE,IOK
+      INTEGER :: NOD_COUNT,NODINIVEL,CPT,SUB_ID
+      INTEGER :: IFRA,IFM,IUN,K1,K2,K3,INOD,NB_NODES, ID_NODE,IOK
       INTEGER :: NINIVEL_FVM,NINIVEL_TOTAL
       INTEGER :: FVM_GRBRIC_USER_ID(NINVEL), FVM_GRQUAD_USER_ID(NINVEL), FVM_GRTRIA_USER_ID(NINVEL) ! printout only
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNO_RBY
-      my_real :: V1, V2, V3, V4, V5, V6, VL1, VL2, VL3,VRA, OX, OY, OZ, NIXJ(6),VR1,VR2,VR3,VRL1,VRL2,VRL3,BID
+      my_real :: V1, V2, V3, V4, V5, V6, VL1, VL2, VL3,VRA, OX, OY, OZ, NIXJ(6),VR1,VR2,VR3,BID
       CHARACTER MESS*40
       CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER(LEN=NCHARKEY) :: KEY
       CHARACTER(LEN=NCHARFIELD) ::XYZ
-      LOGICAL LV,LVR
+      CHARACTER*16 :: LABEL
       LOGICAL IS_AVAILABLE, IS_FOUND_UNIT_ID, IS_FOUND
       my_real :: TSTART
 C-----------------------------------------------
@@ -137,7 +134,6 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       IS_AVAILABLE = .FALSE.
-      FLAG_FMT = 0
       NBVEL = 0
       ISK = 0
       IFRA = 0
@@ -184,24 +180,32 @@ C--------------------------------------------------
         FVM_INIVEL(I)%FLAG = .FALSE.
         TSTART = ZERO
         SENS_ID = 0
+        LABEL='/INIVEL'
         IF(KEY(1:3)=='TRA')THEN
           ITYPE=0
+          LABEL='/INIVEL/TRA'
         ELSEIF(KEY(1:3)=='ROT')THEN
           ITYPE=1
+          LABEL='/INIVEL/ROT'
         ELSEIF(KEY(1:3)=='T+G')THEN
           ITYPE=2
+          LABEL='/INIVEL/T+G'
         ELSEIF(KEY(1:3)=='GRI')THEN
           ITYPE=3
+          LABEL='/INIVEL/GRID'
         ELSEIF(KEY(1:4)=='AXIS')THEN
           IF(INVERS < 120) THEN
             CALL ANCMSG(MSGID=2046,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='/INIVEL/AXIS',I1=INVERS)
           ENDIF
           ITYPE=4
+          LABEL='/INIVEL/AXIS'
         ELSEIF(KEY(1:3) == 'FVM') THEN
           ITYPE=5
 !          FVM_INIVEL(I)%FLAG = .TRUE.
+          LABEL='/INIVEL/FVM'
         ELSEIF(KEY(1:4)=='NODE')THEN
           ITYPE=6
+          LABEL='/INIVEL/NODE'
         ELSE
           CALL FREERR(1)
           RETURN
@@ -214,13 +218,12 @@ C--------------------------------------------------
        IF(ITYPE < 6) THEN 
           CALL HM_GET_FLOATV('tstart',TSTART,IS_AVAILABLE,LSUBMODEL,UNITAB)
           CALL HM_GET_INTV('sensor_id',SENSID,IS_AVAILABLE,LSUBMODEL)
-          IF (SENSID>0) THEN
+          IF (SENSID > 0) THEN
             DO J=1,SENSORS%NSENSOR
-              IF(SENSORS%SENSOR_TAB(J)%SENS_ID==SENSID) SENS_ID=J
+              IF(SENSORS%SENSOR_TAB(J)%SENS_ID == SENSID) SENS_ID=J
             ENDDO
-            IF(SENS_ID==0)THEN
-              CALL ANCMSG(MSGID=521,ANMODE=ANINFO,MSGTYPE=MSGERROR,             
-     .                    I2=SENSID,I1=ID,C1=TITR)
+            IF(SENS_ID == 0)THEN
+              CALL ANCMSG(MSGID=1252,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1=LABEL, I1=ID, C2=LABEL, C3=TITR, I2=SENSID)
             ENDIF
           END IF
        END IF 
@@ -231,6 +234,7 @@ C--------------------------------------------------
 
         !---READER /INIVEL/TRA,ROT,T+G,GRID  (0,1,2,3)
         ELSEIF (ITYPE <= 3) THEN
+          ISK = 0
           IFRA  = 0
           CALL HM_GET_INTV('entityid',IGR,IS_AVAILABLE,LSUBMODEL)
           CALL HM_GET_INTV('inputsystem',ISK,IS_AVAILABLE,LSUBMODEL)
@@ -238,6 +242,13 @@ C--------------------------------------------------
           CALL HM_GET_FLOATV('vector_X',VL1,IS_AVAILABLE,LSUBMODEL,UNITAB)
           CALL HM_GET_FLOATV('vector_Y',VL2,IS_AVAILABLE,LSUBMODEL,UNITAB)
           CALL HM_GET_FLOATV('vector_Z',VL3,IS_AVAILABLE,LSUBMODEL,UNITAB)
+          IF(N2D /= 0 .AND. ISK == 0)THEN
+            IF(VL1 /= 0)THEN
+              !2D plane strain warning about X-velocity
+              CALL ANCMSG(MSGID=1256, ANMODE=ANINFO, MSGTYPE=MSGWARNING, C1=LABEL, I1=ID, C2=LABEL, C3=TITR)
+              VL1 = ZERO
+            ENDIF
+          ENDIF
           IF (TSTART>ZERO .OR. SENS_ID>0) THEN 
             NINIT = NINIT + 1
             INIVEL_T(NINIT)%ID = ID
@@ -261,7 +272,15 @@ C--------------------------------------------------
           CALL HM_GET_FLOATV('vector_X',VL1,IS_AVAILABLE,LSUBMODEL,UNITAB)
           CALL HM_GET_FLOATV('vector_Y',VL2,IS_AVAILABLE,LSUBMODEL,UNITAB)
           CALL HM_GET_FLOATV('vector_Z',VL3,IS_AVAILABLE,LSUBMODEL,UNITAB)
-          CALL HM_GET_FLOATV('rad_rotational_velocity',VRA,IS_AVAILABLE,LSUBMODEL,UNITAB)                                                 
+          CALL HM_GET_FLOATV('rad_rotational_velocity',VRA,IS_AVAILABLE,LSUBMODEL,UNITAB)
+          IF(N2D /= 0 .AND. IFRA == 0)THEN
+            IF(VL2 /=0 .OR. VL3 /= 0)THEN
+              !2D plane strain warning about Y or Z rotation (resulting into X-velocity)
+              CALL ANCMSG(MSGID=1256, ANMODE=ANINFO, MSGTYPE=MSGWARNING, C1=LABEL, I1=ID, C2=LABEL, C3=TITR)
+              VL2 = ZERO
+              VL3 = ZERO
+            ENDIF
+          ENDIF
           IF(IFRA == 0 .AND. SUB_INDEX  /=  0) CALL SUBROTVECT(VL1,VL2,VL3,RTRANS,SUB_ID,LSUBMODEL)
           IF(XYZ(1:1)=='X') THEN
             IDIR=1
@@ -297,7 +316,13 @@ C--------------------------------------------------
           CALL HM_GET_INTV('grqd_ID', IDGRQUAD, IS_AVAILABLE, LSUBMODEL)
           CALL HM_GET_INTV('grtria_ID', IDGRTRIA, IS_AVAILABLE, LSUBMODEL)
           CALL HM_GET_INTV('skew_ID', ISK, IS_AVAILABLE, LSUBMODEL)
-
+          IF(N2D /= 0 .AND. ISK == 0)THEN
+            IF(VL1 /= 0)THEN
+              !2D plane strain warning about X-velocity
+              CALL ANCMSG(MSGID=1256, ANMODE=ANINFO, MSGTYPE=MSGWARNING, C1=LABEL, I1=ID, C2=LABEL, C3=TITR)
+              VL1 = ZERO
+            ENDIF
+          ENDIF
           IF (TSTART>ZERO .OR. SENS_ID>0) THEN 
             NINIT = NINIT + 1
             INIVEL_T(NINIT)%ID = ID
@@ -312,7 +337,8 @@ C--------------------------------------------------
             INIVEL_T(NINIT)%FVM%SENSOR_ID = SENSID
             INIVEL_T(NINIT)%FVM%TSTART = TSTART
           END IF
-         !---READER /INIVEL/NODE (6)
+
+       !---READER /INIVEL/NODE (6)
         ELSEIF (ITYPE == 6) THEN
           CALL HM_GET_INTV('NB_NODES', NB_NODES, IS_AVAILABLE, LSUBMODEL)
           DO N=1,NB_NODES
@@ -324,6 +350,15 @@ C--------------------------------------------------
             CALL HM_GET_FLOAT_ARRAY_INDEX('VXRA', VR1, N, IS_AVAILABLE, LSUBMODEL, UNITAB)
             CALL HM_GET_FLOAT_ARRAY_INDEX('VYRA', VR2, N, IS_AVAILABLE, LSUBMODEL, UNITAB)
             CALL HM_GET_FLOAT_ARRAY_INDEX('VZRA', VR3, N, IS_AVAILABLE, LSUBMODEL, UNITAB)
+            IF(N2D /= 0 .AND. ISK == 0)THEN
+              IF(VL1 /=0 .OR. VR2 /= 0 .OR. VR3 /= 0)THEN
+                !plane strain warning about X-direction
+                CALL ANCMSG(MSGID=1256, ANMODE=ANINFO, MSGTYPE=MSGWARNING, C1=LABEL, I1=ID, C2=LABEL, C3=TITR)
+                VL1 = ZERO
+                VR2 = ZERO
+                VR3 = ZERO
+              ENDIF
+            ENDIF
             IOK = 0
             KROT = 1
             IF (ID_NODE > 0) THEN

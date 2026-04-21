@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25cor3t   ../engine/source/interfaces/intsort/i25cor3t.F
-      !||--- called by ------------------------------------------------------
-      !||    i25sto     ../engine/source/interfaces/intsort/i25sto.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25cor3t   ../engine/source/interfaces/intsort/i25cor3t.F
+!||--- called by ------------------------------------------------------
+!||    i25sto     ../engine/source/interfaces/intsort/i25sto.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25COR3T(JLT    ,X     ,IRECT   ,NSV   ,CAND_E ,
      1                   CAND_N  ,X1    ,X2     ,
      2                   X3      ,X4    ,Y1      ,Y2    ,Y3     ,
@@ -58,7 +58,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*), 
-     .    JLT,IDT, NOINT, NSN ,ITYP, NIN, IGAP, MSEGTYP(*), ICODT(*), ISKEW(*)
+     .    JLT, NSN ,ITYP, NIN, IGAP, MSEGTYP(*), ICODT(*), ISKEW(*)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        ETYP(MVSIZ), IBC(MVSIZ)
 C     REAL
@@ -75,13 +75,13 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,IL, L, NN, IG,JFT,IADD,
-     .        IBCS, ISKS, IBCM(4), ISKM(4) 
+      INTEGER I ,J  , L, IG,
+     .        IBCS, IBCM(4) 
       my_real
      .    VDT(MVSIZ)
       my_real
      .        VX,VY,VZ,VXI,VYI,VZI,
-     .        VX1,VX2,VX3,VX4,VY1,VY2,VY3,VY4,VZ1,VZ2,VZ3,VZ4,PMAX
+     .        VX1,VX2,VX3,VX4,VY1,VY2,VY3,VY4,VZ1,VZ2,VZ3,VZ4
 C-----------------------------------------------
 C
       VDT = ZERO

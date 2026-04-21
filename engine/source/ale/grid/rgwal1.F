@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rgwal1                ../engine/source/ale/grid/rgwal1.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx                ../engine/source/ale/grid/alewdx.F
-      !||--- calls      -----------------------------------------------------
-      !||    interp                ../engine/source/tools/curve/interp.F
-      !||    rgwath                ../engine/source/interfaces/int09/rgwath.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||====================================================================
-      SUBROUTINE RGWAL1(X       ,A  ,V    ,W    ,RWBUF   ,
-     2                  LPRW    ,NPRW  , PYTHON,  
-     3                  ICODT   ,ISKEW  ,SKEW    ,MS    ,FSAV    ,
-     4                  IXS     ,IXQ  ,ELBUF_TAB,IPARG  ,
-     5                  PM      ,NALE  ,TF    ,NPF    ,WEIGHT  ,
-     6                  IAD_ELEM,FR_ELEM,FR_WALL ,WFEXT)
+!||====================================================================
+!||    rgwal1                ../engine/source/ale/grid/rgwal1.F
+!||--- called by ------------------------------------------------------
+!||    alewdx                ../engine/source/ale/grid/alewdx.F
+!||--- calls      -----------------------------------------------------
+!||    interp                ../engine/source/tools/curve/interp.F
+!||    rgwath                ../engine/source/interfaces/int09/rgwath.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||====================================================================
+      SUBROUTINE RGWAL1(X       ,A       ,V        ,W      ,
+     2                  RWBUF   ,LPRW    ,NPRW     , PYTHON,
+     3                  MS      ,FSAV    ,
+     4                  IXS     ,IXQ     ,ELBUF_TAB,IPARG  ,
+     5                  PM      ,TF      ,NPF      ,WEIGHT ,
+     6                  IAD_ELEM,FR_ELEM,FR_WALL )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE PYTHON_FUNCT_MOD
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixs,nixq    
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,14 +61,13 @@ C-----------------------------------------------
       TYPE(PYTHON_), INTENT(inout) :: PYTHON
       INTEGER LPRW(*), NPRW(*), IXS(NIXS,NUMELS),
      .        IXQ(NIXQ,NUMELQ),IPARG(NPARG,NGROUP),
-     .        ICODT(*), ISKEW(*), NALE(*),NPF(*),
+     .        NPF(*),
      .        WEIGHT(*),IAD_ELEM(*), FR_ELEM(*),
      .        FR_WALL(NSPMD+2,*)
       my_real X(3,NUMNOD), A(3,NUMNOD), V(3,NUMNOD), W(3,NUMNOD), RWBUF(NRWLP,*), MS(*),
-     .        FSAV(NTHVKI,*), SKEW(LSKEW,*),
+     .        FSAV(NTHVKI,*),
      .        PM(NPROPM,NUMMAT), TF(*)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
-      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

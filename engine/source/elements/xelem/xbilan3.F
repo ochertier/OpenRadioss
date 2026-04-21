@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    xbilan3   ../engine/source/elements/xelem/xbilan3.F
-      !||--- called by ------------------------------------------------------
-      !||    xforc3    ../engine/source/elements/xelem/xforc3.F
-      !||====================================================================
+!||====================================================================
+!||    xbilan3   ../engine/source/elements/xelem/xbilan3.F
+!||--- called by ------------------------------------------------------
+!||    xforc3    ../engine/source/elements/xelem/xforc3.F
+!||====================================================================
       SUBROUTINE XBILAN3(
      1   NX,      KXX,     IXX,     X,
      2   V,       VR,      UMASS,   UINER,
@@ -53,7 +53,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, K, IP, I1, IADNOD,J
+      INTEGER  K, IP, I1, IADNOD,J
 C     REAL
       my_real
      .   EMS, XI

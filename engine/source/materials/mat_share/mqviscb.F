@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mqviscb          ../engine/source/materials/mat_share/mqviscb.F
-      !||--- called by ------------------------------------------------------
-      !||    m1law            ../engine/source/materials/mat/mat001/m1law.F
-      !||    m1lawi           ../engine/source/materials/mat/mat001/m1lawi.F
-      !||    m1lawtot         ../engine/source/materials/mat/mat001/m1lawtot.F
-      !||    m22law           ../engine/source/materials/mat/mat022/m22law.F
-      !||    m24law           ../engine/source/materials/mat/mat024/m24law.F
-      !||    m2law            ../engine/source/materials/mat/mat002/m2law.F
-      !||    m46law           ../engine/source/materials/mat/mat046/m46law.F
-      !||    mmain            ../engine/source/materials/mat_share/mmain.F90
-      !||    mulaw            ../engine/source/materials/mat_share/mulaw.F90
-      !||    sboltlaw         ../engine/source/elements/solid/solide/sboltlaw.F
-      !||    usermat_solid    ../engine/source/materials/mat_share/usermat_solid.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod          ../common_source/modules/ale/ale_mod.F
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    i22bufbric_mod   ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22tri_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mqviscb          ../engine/source/materials/mat_share/mqviscb.F
+!||--- called by ------------------------------------------------------
+!||    m1law            ../engine/source/materials/mat/mat001/m1law.F
+!||    m1lawi           ../engine/source/materials/mat/mat001/m1lawi.F
+!||    m1lawtot         ../engine/source/materials/mat/mat001/m1lawtot.F
+!||    m22law           ../engine/source/materials/mat/mat022/m22law.F
+!||    m24law           ../engine/source/materials/mat/mat024/m24law.F
+!||    m2law            ../engine/source/materials/mat/mat002/m2law.F
+!||    m46law           ../engine/source/materials/mat/mat046/m46law.F
+!||    mmain            ../engine/source/materials/mat_share/mmain.F90
+!||    mulaw            ../engine/source/materials/mat_share/mulaw.F90
+!||    sboltlaw         ../engine/source/elements/solid/solide/sboltlaw.F
+!||    usermat_solid    ../engine/source/materials/mat_share/usermat_solid.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod          ../common_source/modules/ale/ale_mod.F
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    i22bufbric_mod   ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22tri_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||====================================================================
       SUBROUTINE MQVISCB(
      1   PM,      OFF,     RHO,     RK,
-     2   T,       SSP,     RE,      STI,
+     2   TEMP,    SSP,     RE,      STI,
      3   DT2T,    NELTST,  ITYPTST, AIRE,
      4   OFFG,    GEO,     PID,     VOL,
      5   VD2,     DELTAX,  VIS,     D1,
@@ -95,26 +95,27 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: JTUR
       INTEGER, INTENT(IN) :: JTHE
       INTEGER, INTENT(IN) :: JSMS,NPG
-      INTEGER NELTST,ITYPTST,PID(*),MAT(*), NGL(*),IGEO(NPROPGI,NUMGEO),G_DT,IPM(NPROPMI,NUMMAT)
-      my_real DT2T
-      my_real PM(NPROPM,NUMMAT), OFF(*), RHO(*), RK(*), T(*), RE(*),STI(*),
-     .        OFFG(*),GEO(NPROPG,NUMGEO),
-     .        VOL(*), VD2(*), DELTAX(*), SSP(*), AIRE(*), VIS(*), 
-     .        PSH(*), PNEW(*),QVIS(*) ,SSP_EQ(*),CONDE(*), 
-     .        D1(*), D2(*), D3(*), VOL0(*), MSSA(*), DMELS(*),FACQ0
+      INTEGER :: NELTST,ITYPTST,PID(*),MAT(*), NGL(*),IGEO(NPROPGI,NUMGEO),G_DT,IPM(NPROPMI,NUMMAT)
+      my_real :: DT2T
+      my_real :: PM(NPROPM,NUMMAT), OFF(*), RHO(*), RK(*), TEMP(*), RE(*),STI(*),
+     .           OFFG(*),GEO(NPROPG,NUMGEO),
+     .           VOL(*), VD2(*), DELTAX(*), SSP(*), AIRE(*), VIS(*),
+     .           PSH(*), PNEW(*),QVIS(*) ,SSP_EQ(*),CONDE(*),
+     .           D1(*), D2(*), D3(*), VOL0(*), MSSA(*), DMELS(*),FACQ0
       my_real, INTENT(IN) :: RHOREF(MVSIZ), RHOSP(MVSIZ)
       my_real, INTENT(INOUT) :: DTEL(MVSIZ)
       type (glob_therm_) ,intent(inout) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J, MT, K,ICOUNT,LIST(MVSIZ),ERROR, ALE_OR_EULER, ID_MIN
-      my_real DD(MVSIZ), AL(MVSIZ),
-     .        DTX(MVSIZ), AD(MVSIZ), QX(MVSIZ), CX(MVSIZ), RHO0(MVSIZ), NRHO(MVSIZ),
-     .        DTY(MVSIZ), QA, QB, VISI, FACQ,QAA,
-     .        CNS1, CNS2, SPH, AK1, BK1, AK2, BK2, TLI, AKK, XMU, TMU, RPR,
-     .        ATU, QAD, QBD, QAAP, DT, NUI
-      my_real TIDT,TVOL,TRHO,TAIRE,  DTMIN(MVSIZ), RHOS(MVSIZ),FACPG
+      INTEGER :: I,J, MT,ICOUNT,LIST(MVSIZ),ERROR, ALE_OR_EULER, ID_MIN
+      INTEGER :: JALE_FROM_MAT, JALE_FROM_PROP
+      my_real :: DD(MVSIZ), AL(MVSIZ),
+     .           DTX(MVSIZ), AD(MVSIZ), QX(MVSIZ), CX(MVSIZ), RHO0(MVSIZ), NRHO(MVSIZ),
+     .           DTY(MVSIZ), QA, QB, VISI, FACQ,QAA,
+     .           CNS1, CNS2, SPH, AK1, BK1, AK2, BK2, TLI, AKK, XMU, TMU, RPR,
+     .           ATU, DT, NUI
+      my_real :: TIDT,TVOL,TRHO,TAIRE,  DTMIN(MVSIZ),FACPG
       my_real :: CNS1_0,CNS2_0,QAA_0
 #ifdef MYREAL8 
       my_real, PARAMETER :: REAL_THREE = 3.0D0
@@ -128,9 +129,12 @@ C=======================================================================
 
        ! by default don't apply /DT/NODA/* to ALE/EULER cells ; unless if /DT/NODA/ALEON is enabled (hidden card introduced for backward compatibility)
        MT = MAT(1)
-       ALE_OR_EULER = 0 
-       IF(NINT(PM(72,MT))==1 .OR. NINT(PM(72,MT))==2)ALE_OR_EULER = 1
-       IF( ALE%GLOBAL%I_DT_NODA_ALE_ON==1) ALE_OR_EULER = 0   
+       ALE_OR_EULER = 0
+       JALE_FROM_MAT = NINT(PM(72,MT))   !ALE/EULER framework defined from /ALE/MAT or /EULER/MAT
+       JALE_FROM_PROP = IGEO(62,PID(1))  !ALE/EULER framework defined from /PROP/SOLID from 3D and 2d solid elems.
+       IF(JALE_FROM_MAT == 1  .OR. JALE_FROM_MAT == 2) ALE_OR_EULER = 1
+       IF(JALE_FROM_PROP == 1 .OR. JALE_FROM_PROP == 2)ALE_OR_EULER = 1
+       IF(ALE%GLOBAL%I_DT_NODA_ALE_ON==1) ALE_OR_EULER = 0
 
       IF(IMPL==ZERO)THEN
           DO I=1,NEL
@@ -198,7 +202,6 @@ C
         CNS1_0=FACPG*GEO(16,PID(1))
         CNS2_0=FACPG*GEO(17,PID(1))
         PSH(1:NEL)=PM(88,MT)
-        PNEW(1:NEL)=ZERO
         QAA_0 = QA*QA
         DTMIN(1:NEL) = GEO(172,PID(1)) 
         DO I=1,NEL
@@ -209,7 +212,7 @@ C   warns : Stability vs artificial viscosity should use
 C           RHO(I)*AL(I)*(QAA*AL(I)+QB*SSP(I)) / MAX(EM20,RHOREF(I)*DELTAX(I))
 C           Same for VIS(I) since SOUNDSPEED is generally computed wrt RHO0, not RHO ../..
           QAA = QAA_0*AD(I)
-          QX(I)=QB*SSP(I)+DELTAX(I) * QAA
+          QX(I)=QB*SSP(I)+AL(I) * QAA
      .     + VISI*TWO*VIS(I)   / MAX(EM20,RHO(I)*DELTAX(I))
      .     + (CNS1+VISI*CNS2) / MAX(EM20,RHOREF(I)*DELTAX(I))
           QVIS(I)=RHO(I)*AD(I)*AL(I)*(QAA*AL(I)+QB*SSP(I))     
@@ -224,7 +227,6 @@ C           Same for VIS(I) since SOUNDSPEED is generally computed wrt RHO0, not
         QA =FACQ*GEO(14,PID(1))
         QB =FACQ*GEO(15,PID(1))
         PSH(1:NEL)=PM(88,MT)
-        PNEW(1:NEL)=ZERO
         QAA_0 = QA*QA
         DTMIN(1:NEL) = GEO(172,PID(1)) 
 
@@ -286,10 +288,10 @@ C
         BK2 = PM(78,MT)
         TLI = PM(80,MT)
        DO I=1,NEL       
-        IF(T(I)<TLI)THEN
-         AKK=AK1+BK1*T(I)
+        IF(TEMP(I)<TLI)THEN
+         AKK=AK1+BK1*TEMP(I)
         ELSE
-         AKK=AK2+BK2*T(I)
+         AKK=AK2+BK2*TEMP(I)
         ENDIF
         IF(JTUR/=0)THEN
          XMU = RHO(I)*PM(24,MT)
@@ -305,7 +307,7 @@ C
       IF(.NOT.(IDTMINS==2.AND.JSMS/=0))THEN
        IF(KDTSMSTR==1.AND.ISMSTR==1.OR.
      .         ((ISMSTR==2.OR.ISMSTR==12).AND.IDTMIN(1)==3))THEN
-        !   KDTSMSTR==1 en version 5, par defaut.
+        !   Kdtsmstr == 1 in version 5, by default.
         MT  = MAT(1)
         DO I=1,NEL
           RHO0(I)=PM(1,MT)
@@ -333,7 +335,7 @@ C
             TAIRE = AIRE(I) * TIDT
             STI(I) = HALF * TRHO * TAIRE
           ENDIF
-C         dt2 remplace par dt2t
+C         dt2 replaced by dt2t
   50    CONTINUE
         IF(ALE_OR_EULER==0)THEN
           DO I=1,NEL
@@ -392,7 +394,7 @@ C              [ STI(I) = FOURTH * TRHO * TVOL for 8node bricks ]
                TAIRE = AIRE(I) * TIDT
                STI(I) = HALF * TRHO * TAIRE
              ENDIF
-C            dt2 remplace par dt2t
+C            dt2 replaced by dt2t
   60       CONTINUE
          ENDIF ! ISMSTR == 11
         IF(ALE_OR_EULER==0)THEN
@@ -597,10 +599,10 @@ C
           AK2 = PM(77,MT)
           BK2 = PM(78,MT)
           TLI = PM(80,MT)
-          IF(T(I)<TLI)THEN
-           AKK=AK1+BK1*T(I)
+          IF(TEMP(I)<TLI)THEN
+           AKK=AK1+BK1*TEMP(I)
           ELSE
-           AKK=AK2+BK2*T(I)
+           AKK=AK2+BK2*TEMP(I)
           ENDIF
           IF(JTUR/=0)THEN
            XMU = RHO(I)*PM(24,MT)
@@ -619,7 +621,7 @@ C
         ID_MIN=0
         DO I=1,NEL
           IF(DTX(I)>DT2T .OR. OFF(I)<=ZERO .OR. OFFG(I)<=ZERO) CYCLE
-          ! nelts et itypts remplaces par neltst et itypst
+          ! nelts and itypts replaced by neltst and itypst
           IF(VOL(I)<=ZERO)CYCLE
           DT2T     = DTX(I)
           NELTST   = NGL(I)
@@ -648,10 +650,10 @@ C--------------------------
         BK2 = PM(78,MT)
         TLI = PM(80,MT)
        DO I=1,NEL
-        IF(T(I)<TLI)THEN
-         AKK=AK1+BK1*T(I)
+        IF(TEMP(I)<TLI)THEN
+         AKK=AK1+BK1*TEMP(I)
         ELSE
-         AKK=AK2+BK2*T(I)
+         AKK=AK2+BK2*TEMP(I)
         ENDIF
         IF(JTUR/=0)THEN
          XMU = RHO(I)*PM(24,MT)

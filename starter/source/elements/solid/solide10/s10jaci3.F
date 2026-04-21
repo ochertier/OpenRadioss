@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10jaci3       ../starter/source/elements/solid/solide10/s10jaci3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia         ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    s10jacob       ../starter/source/elements/solid/solide10/s10deri3.F
-      !||    s10pijsav      ../starter/source/elements/solid/solide10/s10deri3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    s10jaci3       ../starter/source/elements/solid/solide10/s10jaci3.F
+!||--- called by ------------------------------------------------------
+!||    initia         ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    s10jacob       ../starter/source/elements/solid/solide10/s10deri3.F
+!||    s10pijsav      ../starter/source/elements/solid/solide10/s10deri3.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE S10JACI3(ELBUF_STR,SAV,NPT,NEL)
 C-----------------------------------------------
       USE ELBUFDEF_MOD            
@@ -50,13 +50,13 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,IP,N,K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,
-     .        M,IPERM(10,4)
+     .        IPERM(10,4)
       DOUBLE PRECISION
      .   XX(MVSIZ,10), YY(MVSIZ,10), ZZ(MVSIZ,10)
       DOUBLE PRECISION
      .   XA(MVSIZ,10),YA(MVSIZ,10),ZA(MVSIZ,10),
      .   XB(MVSIZ,10),YB(MVSIZ,10),ZB(MVSIZ,10),
-     .   A4,B4,A4M1,B4M1,AA
+     .   A4,B4,A4M1,B4M1
       my_real
      .   VOL(MVSIZ,5),NX(MVSIZ,10,5),
      .   PX(MVSIZ,10,5),PY(MVSIZ,10,5),PZ(MVSIZ,10,5)

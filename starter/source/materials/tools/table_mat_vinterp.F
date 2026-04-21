@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    table_mat_vinterp_mod   ../starter/source/materials/tools/table_mat_vinterp.F
-      !||--- called by ------------------------------------------------------
-      !||    law87_upd               ../starter/source/materials/mat/mat087/law87_upd.F90
-      !||    sigeps70                ../starter/source/materials/mat/mat070/sigeps70.F
-      !||====================================================================
+!||====================================================================
+!||    table_mat_vinterp_mod        ../starter/source/materials/tools/table_mat_vinterp.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_eos_compaction_tab   ../starter/source/materials/eos/hm_read_eos_compaction_tab.F90
+!||    hm_read_mat133               ../starter/source/materials/mat/mat133/hm_read_mat133.F90
+!||    law133_upd                   ../starter/source/materials/mat/mat133/law133_upd.F90
+!||    law87_upd                    ../starter/source/materials/mat/mat087/law87_upd.F90
+!||    s6zinit3                     ../starter/source/elements/solid/solide6z/s6zinit3.F90
+!||    sigeps70                     ../starter/source/materials/mat/mat070/sigeps70.F
+!||    sigeps88                     ../starter/source/materials/mat/mat088/sigeps88.F90
+!||====================================================================
       MODULE TABLE_MAT_VINTERP_MOD
       CONTAINS
-      !||====================================================================
-      !||    table_mat_vinterp   ../starter/source/materials/tools/table_mat_vinterp.F
-      !||--- called by ------------------------------------------------------
-      !||    law87_upd           ../starter/source/materials/mat/mat087/law87_upd.F90
-      !||    sigeps70            ../starter/source/materials/mat/mat070/sigeps70.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    table_mat_vinterp            ../starter/source/materials/tools/table_mat_vinterp.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_eos_compaction_tab   ../starter/source/materials/eos/hm_read_eos_compaction_tab.F90
+!||    hm_read_mat133               ../starter/source/materials/mat/mat133/hm_read_mat133.F90
+!||    law133_upd                   ../starter/source/materials/mat/mat133/law133_upd.F90
+!||    law87_upd                    ../starter/source/materials/mat/mat087/law87_upd.F90
+!||    sigeps70                     ../starter/source/materials/mat/mat070/sigeps70.F
+!||    sigeps88                     ../starter/source/materials/mat/mat088/sigeps88.F90
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TABLE_MAT_VINTERP(TABLE,DIMX,NEL,IPOS,XX,YY,DYDX)
 C-----------------------------------------------
       USE TABLE4D_MOD
@@ -56,7 +65,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL, DIMENSION(NEL) :: NEED_TO_COMPUTE
-      INTEGER  I,J,K,L,M,N,I1,I2,J1,J2,K1,K2,L1,L2,NDIM
+      INTEGER  I,J,K,M,N,I1,I2,J1,J2,K1,K2,L1,L2,NDIM
       INTEGER :: MINDX_1,MINDX_2
       INTEGER :: NINDX_1,NINDX_2
       INTEGER, DIMENSION(NEL) :: INDX_1,INDX_2

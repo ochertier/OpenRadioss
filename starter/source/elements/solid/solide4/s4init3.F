@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,36 +20,36 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s4init3                ../starter/source/elements/solid/solide4/s4init3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    aturi3                 ../starter/source/ale/ale3d/aturi3.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    failini                ../starter/source/elements/solid/solide/failini.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    m115_perturb           ../starter/source/materials/mat/mat115/m115_perturb.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    s4coor3                ../starter/source/elements/solid/solide4/s4coor3.F
-      !||    s4deri3                ../starter/source/elements/solid/solide4/s4deri3.F
-      !||    s4jaci3                ../starter/source/elements/solid/solide4/s4jaci3.F
-      !||    s4mass3                ../starter/source/elements/solid/solide4/s4mass3.F
-      !||    sboltini               ../starter/source/loads/bolt/sboltini.F
-      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
-      !||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
-      !||    soltosphv4             ../starter/source/elements/sph/soltosph.F
-      !||    sreploc3               ../starter/source/elements/solid/solide/sreploc3.F
-      !||    userin3                ../starter/source/elements/solid/solide/userin3.F
-      !||    ustrsin3               ../starter/source/elements/solid/solide/userin3.F
-      !||--- uses       -----------------------------------------------------
-      !||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
-      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s4init3                ../starter/source/elements/solid/solide4/s4init3.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    aturi3                 ../starter/source/ale/ale3d/aturi3.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    failini                ../starter/source/elements/solid/solide/failini.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    m115_perturb           ../starter/source/materials/mat/mat115/m115_perturb.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    s4coor3                ../starter/source/elements/solid/solide4/s4coor3.F
+!||    s4deri3                ../starter/source/elements/solid/solide4/s4deri3.F
+!||    s4jaci3                ../starter/source/elements/solid/solide4/s4jaci3.F
+!||    s4mass3                ../starter/source/elements/solid/solide4/s4mass3.F
+!||    sboltini               ../starter/source/loads/bolt/sboltini.F
+!||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+!||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
+!||    soltosphv4             ../starter/source/elements/sph/soltosph.F
+!||    sreploc3               ../starter/source/elements/solid/solide/sreploc3.F
+!||    userin3                ../starter/source/elements/solid/solide/userin3.F
+!||    ustrsin3               ../starter/source/elements/solid/solide/userin3.F
+!||--- uses       -----------------------------------------------------
+!||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
+!||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S4INIT3(
      1   ELBUF_STR,MAS     ,IXS     ,PM      ,X       ,
      2   DETONATORS,GEO     ,VEUL    ,ALE_CONNECTIVITY   ,IPARG_GR,
@@ -74,6 +74,7 @@ C-----------------------------------------------
       USE MATPARAM_DEF_MOD
       USE DEFAULTS_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -120,8 +121,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NF1,IBID,I,IGTYP,IREP,NCC, IP, NUVAR, IDEF,
-     .   NUVARR ,JHBE,IPID1,NPTR,NPTS,NPTT,NLAY,L_SIGB,L_PLA,IMAS_DS
+      INTEGER NF1,I,IGTYP,IREP,NCC,IP,NUVAR,IDEF,JHBE,IPID1,NPTR,NPTS,NPTT,NLAY,L_SIGB,L_PLA,IMAS_DS
       INTEGER MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ), IXT4(MVSIZ,4)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ)
       INTEGER NSPHDIR,NCELF,NCELL,IBOLTP
@@ -140,8 +140,9 @@ C-----------------------------------------------
      .   PX1(MVSIZ),PX2(MVSIZ),PX3(MVSIZ),PX4(MVSIZ),
      .   PY1(MVSIZ),PY2(MVSIZ),PY3(MVSIZ),PY4(MVSIZ),
      .   PZ1(MVSIZ),PZ2(MVSIZ),PZ3(MVSIZ),PZ4(MVSIZ),
-     .   V8LOC(51,MVSIZ), VOLU(MVSIZ), DTX(MVSIZ),RHOCP(MVSIZ),
+     .   VOLU(MVSIZ), DTX(MVSIZ),RHOCP(MVSIZ),
      .   TEMP0(MVSIZ), DELTAX(MVSIZ), AIRE(MVSIZ)
+      my_real :: TEMPEL(NEL)
 C-----------------------------------------------
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
@@ -201,7 +202,21 @@ C
      .         RX   ,RY   ,RZ   ,SX   ,SY   ,SZ   ,TX   ,TY   ,TZ   ,
      .         E1X  ,E1Y  ,E1Z  ,E2X  ,E2Y  ,E2Z  ,E3X  ,E3Y  ,E3Z  ,
      .         RX   ,RY   ,RZ   ,SX   ,SY   ,SZ   ,NSIGI,SIGSP,NSIGS,
-     .         SIGI ,IXS  ,X    ,JHBE ,PTSOL,NEL  ,IPARG_GR(28))
+     .         SIGI ,IXS  ,X    ,JHBE ,PTSOL,NEL  ,IPARG_GR(28),JCVT)
+!
+!     Initialize element temperature from /initemp
+!      
+      IF (JTHE == 0 .and. NINTEMP > 0) THEN
+        DO I=1,NEL
+          TEMPEL(I) = ONE_OVER_8 *(TEMP(IXS(2,I+NFT)) + TEMP(IXS(3,I+NFT))
+     .                           + TEMP(IXS(4,I+NFT)) + TEMP(IXS(5,I+NFT))        
+     .                           + TEMP(IXS(6,I+NFT)) + TEMP(IXS(7,I+NFT))        
+     .                           + TEMP(IXS(8,I+NFT)) + TEMP(IXS(9,I+NFT))) 
+        ENDDO
+      ELSE
+        TEMPEL(1:NEL) = TEMP0(1:NEL)
+      END IF
+!
       IP=1
       CALL MATINI(PM      ,IXS     ,NIXS       ,X         ,
      .            GEO     ,ALE_CONNECTIVITY   ,DETONATORS ,IPARG_GR  ,
@@ -210,7 +225,7 @@ C
      .            MAT     ,IPM     ,NSIGS      ,NUMSOL    ,PTSOL  ,
      .            IP      ,NGL     ,NPF        ,TF        ,BUFMAT ,
      .            GBUF    ,LBUF    ,MBUF       ,ELBUF_STR ,ILOADP ,
-     .            FACLOAD, DELTAX)
+     .            FACLOAD, DELTAX  ,TEMPEL     ,MAT_PARAM )
 C
       ! Density perturbation for /MAT/LAW115
       IF (MTN == 115) THEN 
@@ -222,13 +237,13 @@ C
      1                 GBUF%BPRELD,NEL  ,IXS  ,NIXS ,VPRELOAD, IFLAG_BPRELOAD)
       ENDIF
 C----------------------------------------
-C     INITIALISATION DE LA THERMIQUE ET TURBULENCE
+C     initialization of thermal and turbulence
 C----------------------------------------
       IF(JTHE /=0) CALL ATHERI(MAT ,PM ,GBUF%TEMP)
       IF(JTUR /=0) CALL ATURI3(IPARG   ,GBUF%RHO,PM  ,IXS  ,X     ,
      .                         GBUF%RK ,GBUF%RE ,VOLU   )
 C----------------------------------------
-C     INITIALISATION DES MASSES
+C     initialization of masses
 C----------------------------------------
       IF(JLAG+JALE+JEUL/=0) THEN
 C-------- case /INIBRIS/STRS_FGLO missed         
@@ -273,10 +288,10 @@ c
      4      MSSA       ,IX1       ,IX2     ,IX3     ,IX4    ,
      5      GBUF%FILL, VOLU       ,IMAS_DS ,NINTEMP )
 C------------------------------------------
-C       assemblage des Volumes nodaux et Modules nodaux
-C       (pour rigidites d'interface)
+C       assembly of nodal volumes and nodal modules
+C       (for interface stiffnesses)
 C------------------------------------------
-C       attention : IX1, IX2 ... IX4 sont sous la forme NC(MVSIZ,4)
+C       Please note: IX1, IX2 ... IX4 are in the form NC (MVSIZ, 4)
         IF(I7STIFS/=0)THEN
           NCC=4
           IXT4(1:MVSIZ,1) = IX1(1:MVSIZ)
@@ -307,7 +322,7 @@ C----------------------------------------
          CALL S4JACI3(GBUF%SMSTR,GBUF%JAC_I, GBUF%VOL,NEL  ) 
       END IF
 C------------------------------------------
-C     CALCUL DES DT ELEMENTAIRES
+C     calculation of elementary timesteps
 c
       AIRE(:) = ZERO
       CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,

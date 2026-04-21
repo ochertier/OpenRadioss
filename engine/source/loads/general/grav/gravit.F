@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    gravit                ../engine/source/loads/general/grav/gravit.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
-      !||    my_barrier            ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    gravit                ../engine/source/loads/general/grav/gravit.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    finter                ../engine/source/tools/curve/finter.F
+!||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
+!||    my_barrier            ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE GRAVIT(IGRV  ,AGRV  ,NPC   ,TF   ,A     ,
      2                  V     ,X      ,SKEW  ,MS   ,SENSOR_TAB,
      3                  WEIGHT,IB    ,ITASK, NSENSOR, PYTHON, WFEXT)
@@ -165,9 +165,8 @@ C=======================================================================
         CALL MY_BARRIER
         !---------------!
       END DO
-#include "atomic.inc"
+!$OMP ATOMIC
       WFEXT = WFEXT + WFEXTT
-#include "atomend.inc"
 
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
-      !||====================================================================
-      !||    sensor_nic     ../engine/source/tools/sensor/sensor_nic.F
-      !||--- called by ------------------------------------------------------
-      !||    sensor_base    ../engine/source/tools/sensor/sensor_base.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod     ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sensor_nic     ../engine/source/tools/sensor/sensor_nic.F
+!||--- called by ------------------------------------------------------
+!||    sensor_base    ../engine/source/tools/sensor/sensor_base.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||    sensor_mod     ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SENSOR_NIC(SENSOR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -55,8 +55,7 @@ C Local Variables
 C----------------------------------------------------------
       INTEGER NPT,NPH,IADFX,IADFY,IADMX,IADMY,ICRIT
       my_real :: FOR,MOM,DT,TIME,NIJMAX,NIC,ALPHA,BETA,CFC,TMIN,TDELAY,
-     .   WD,WA,WA2,WA3,A0,A1,A2,B1,B2,X0,X1,X2,Y1,Y2,YF,YM,INFINITY
-      PARAMETER (INFINITY = 1.0E20)
+     .   WD,WA,WA2,WA3,A0,A1,A2,B1,B2,X0,X1,X2,Y1,Y2,YF,YM
 c-----------------------------------------------------------------------
 c     Sensor state variables
 c        SENSOR%VAR(1) :  Current non filtered spring force

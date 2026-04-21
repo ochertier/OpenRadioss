@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecm51__check_initial_state   ../starter/source/materials/mat/mat051/lecm51__check_initial_state.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat51                 ../starter/source/materials/mat/mat051/hm_read_mat51.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecm51__check_initial_state   ../starter/source/materials/mat/mat051/lecm51__check_initial_state.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat51                 ../starter/source/materials/mat/mat051/hm_read_mat51.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LECM51__CHECK_INITIAL_STATE(   
      .   AV,  R0,     C0,   C1,   C2, C3, C4,   C5,
      .   E0,  PM,   RHO0, RHOR, IEXP, PEXT,IFLG,
@@ -98,7 +98,7 @@ C===============================================|
       TEST3=0    !Rho not defined
       TEST4=0    !Unbalanced Pressure  t=0              
       TEST5=0    !Global density = mean(rho_i)
-      TEST6=0    !C1,C4,C5 >=0,  C1>0 phase 4
+      TEST6=0    !C1, C4, C5> = 0, C1> 0 Phase 4
 
       IF(IFLG==6)THEN
         SUM=0
@@ -114,7 +114,7 @@ C===============================================|
         ENDIF        
         RETURN
       ENDIF
-      !TEST1 (quel que soit iflg)
+      !Test1 (whatever iflg)
       ! Initial Volume fraction checked : must be between 0 and 1
       ! Otherwise : error
       DO I=1,IMAX
@@ -129,7 +129,7 @@ C===============================================|
       END DO
 
 
-      !TEST2 (quel que soit iflg)
+      !Test2 (whatever iflg)
       ! Initial Volume fraction : Sum must be 1
       ! Otherwise : warning
       ! if TEST1/=0 it is useless to do this test)

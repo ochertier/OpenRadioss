@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_bem                    ../starter/source/loads/bem/hm_read_bem.F
-      !||    hm_read_fail_inievo            ../starter/source/materials/fail/inievo/hm_read_fail_inievo.F
-      !||    hm_read_inject1                ../starter/source/properties/injector/hm_read_inject1.F
-      !||    hm_read_mat36                  ../starter/source/materials/mat/mat036/hm_read_mat36.F
-      !||    hm_read_mat51                  ../starter/source/materials/mat/mat051/hm_read_mat51.F
-      !||    hm_read_mat57                  ../starter/source/materials/mat/mat057/hm_read_mat57.F90
-      !||    hm_read_mat59                  ../starter/source/materials/mat/mat059/hm_read_mat59.F
-      !||    hm_read_mat66                  ../starter/source/materials/mat/mat066/hm_read_mat66.F
-      !||    hm_read_mat70                  ../starter/source/materials/mat/mat070/hm_read_mat70.F
-      !||    hm_read_mat87                  ../starter/source/materials/mat/mat087/hm_read_mat87.F90
-      !||    hm_read_mat88                  ../starter/source/materials/mat/mat088/hm_read_mat88.F
-      !||    hm_read_mat90                  ../starter/source/materials/mat/mat090/hm_read_mat90.F
-      !||    hm_read_monvol_type4           ../starter/source/airbag/hm_read_monvol_type4.F
-      !||    hm_read_monvol_type7           ../starter/source/airbag/hm_read_monvol_type7.F
-      !||    hm_read_prop26                 ../starter/source/properties/spring/hm_read_prop26.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                    ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_bem                    ../starter/source/loads/bem/hm_read_bem.F
+!||    hm_read_fail_inievo            ../starter/source/materials/fail/inievo/hm_read_fail_inievo.F
+!||    hm_read_inject1                ../starter/source/properties/injector/hm_read_inject1.F
+!||    hm_read_mat36                  ../starter/source/materials/mat/mat036/hm_read_mat36.F
+!||    hm_read_mat51                  ../starter/source/materials/mat/mat051/hm_read_mat51.F
+!||    hm_read_mat57                  ../starter/source/materials/mat/mat057/hm_read_mat57.F90
+!||    hm_read_mat59                  ../starter/source/materials/mat/mat059/hm_read_mat59.F
+!||    hm_read_mat66                  ../starter/source/materials/mat/mat066/hm_read_mat66.F
+!||    hm_read_mat70                  ../starter/source/materials/mat/mat070/hm_read_mat70.F
+!||    hm_read_mat87                  ../starter/source/materials/mat/mat087/hm_read_mat87.F90
+!||    hm_read_mat88                  ../starter/source/materials/mat/mat088/hm_read_mat88.F90
+!||    hm_read_mat90                  ../starter/source/materials/mat/mat090/hm_read_mat90.F
+!||    hm_read_monvol_type4           ../starter/source/airbag/hm_read_monvol_type4.F
+!||    hm_read_monvol_type7           ../starter/source/airbag/hm_read_monvol_type7.F
+!||    hm_read_prop26                 ../starter/source/properties/spring/hm_read_prop26.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod                    ../starter/share/message_module/message_mod.F
+!||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_GET_FLOAT_ARRAY_INDEX_DIM(NAME,DIM_FAC,INDEX,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -69,7 +69,7 @@ C-----------------------------------------------
       USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_BOOL 
       USE UNITAB_MOD
       USE MESSAGE_MOD       
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : SUBMODEL_DATA, NSUBMOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -84,19 +84,17 @@ C INPUT ARGUMENTS
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER,INTENT(IN)::INDEX
       CHARACTER*(*),INTENT(IN)::NAME
-      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(NSUBMOD)
 C OUTPUT ARGUMENTS
-      my_real,
-     .  INTENT(OUT)::DIM_FAC
-      LOGICAL,INTENT(OUT)::IS_AVAILABLE
+      my_real,INTENT(OUT) :: DIM_FAC
+      LOGICAL,INTENT(OUT) :: IS_AVAILABLE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,VALUE_TYPE,SUB_ID,IFLAGUNIT,UID
-      my_real
-     .   FAC_L,FAC_M,FAC_T,FAC
-      REAL*8 DVAL,LENGTH_DIM,MASS_DIM,TIME_DIM
-      LOGICAL(KIND=C_BOOL) C_IS_AVAILABLE
+      INTEGER :: J,SUB_ID,IFLAGUNIT,UID
+      my_real :: FAC_L,FAC_M,FAC_T,FAC
+      REAL*8 :: DVAL,LENGTH_DIM,MASS_DIM,TIME_DIM
+      LOGICAL(KIND=C_BOOL) :: C_IS_AVAILABLE
 C-----------------------------------------------
         C_IS_AVAILABLE = .FALSE.
         LENGTH_DIM = ZERO

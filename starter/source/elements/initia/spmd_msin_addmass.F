@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_msin_addmass   ../starter/source/elements/initia/spmd_msin_addmass.F
-      !||--- called by ------------------------------------------------------
-      !||    initia              ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_msin_addmass   ../starter/source/elements/initia/spmd_msin_addmass.F
+!||--- called by ------------------------------------------------------
+!||    initia              ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SPMD_MSIN_ADDMASS(
      1               IXS    ,IXS10  ,IXS20  ,IXS16  ,IXQ      ,
      2               IXC    ,IXT    ,IXP    ,IXR    ,IXTG     ,
@@ -42,6 +42,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE OPTIONDEF_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -484,12 +485,13 @@ C---
 C---
       RETURN
       END
-      !||====================================================================
-      !||    spmd_partsav_pon   ../starter/source/elements/initia/spmd_msin_addmass.F
-      !||--- called by ------------------------------------------------------
-      !||    initia             ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_partsav_pon   ../starter/source/elements/initia/spmd_msin_addmass.F
+!||--- called by ------------------------------------------------------
+!||    initia             ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SPMD_PARTSAV_PON(
      1               IXS    ,IXS10  ,IXS20  ,IXS16        ,IXQ    ,
      2               IXC    ,IXT    ,IXP    ,IXR          ,IXTG   ,
@@ -498,6 +500,7 @@ C---
      5               INDEX  ,ITRI   ,GEO    ,PARTSAV1_PON ,IPARTS ,
      6               IPARTQ ,IPARTC ,IPARTT ,IPARTP       ,IPARTR ,
      7               IPARTTG,IPART  )
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

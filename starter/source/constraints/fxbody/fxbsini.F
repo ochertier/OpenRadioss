@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fxbsini     ../starter/source/constraints/fxbody/fxbsini.F
-      !||--- called by ------------------------------------------------------
-      !||    initia      ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    fsigcini    ../starter/source/constraints/fxbody/fsigcini.F
-      !||    fsigpini    ../starter/source/constraints/fxbody/fsigpini.F
-      !||    fsigsini    ../starter/source/constraints/fxbody/fsigsini.F
-      !||    fsigtini    ../starter/source/constraints/fxbody/fsigtini.F
-      !||    fsigtrini   ../starter/source/constraints/fxbody/fsigtrini.F
-      !||====================================================================
+!||====================================================================
+!||    fxbsini       ../starter/source/constraints/fxbody/fxbsini.F
+!||--- called by ------------------------------------------------------
+!||    initia        ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    fsigcini      ../starter/source/constraints/fxbody/fsigcini.F
+!||    fsigpini      ../starter/source/constraints/fxbody/fsigpini.F
+!||    fsigsini      ../starter/source/constraints/fxbody/fsigsini.F
+!||    fsigtini      ../starter/source/constraints/fxbody/fsigtini.F
+!||    fsigtrini     ../starter/source/constraints/fxbody/fsigtrini.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE FXBSINI(FXBELM, FXBSIG, NELS , NELC  , NELTG,
      .                   X     , IPARG , PM   , FXBMOD, NML  ,
      .                   NSN   , IXS   , IXC  , IXTG  , GEO  ,
      .                   FXBRPM, NFX   , IFILE, LVSIG , NSNI ,
      .                   NME   , IRCS  , IRCM0, NELT  , NELP ,
-     .                   IXT   , IXP   )
+     .                   IXT   , IXP   ,IBEAM_VECTOR,RBEAM_VECTOR)
+      use element_mod , only : nixs,nixc,nixtg,nixt,nixp
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,9 +55,11 @@ C-----------------------------------------------
      .        NSN, IXS(NIXS,*), IXC(NIXC,*), IXTG(NIXTG,*), NFX, IFILE,
      .        LVSIG, NSNI, NME, IRCS, IRCM0, NELT, NELP, IXT(NIXT,*),
      .        IXP(NIXP,*)
+      INTEGER, INTENT (IN   ) :: IBEAM_VECTOR(NELP)
       my_real
      .        FXBSIG(*), X(3,*), PM(NPROPM,*), FXBMOD(*),
      .        GEO(NPROPG,*), FXBRPM(*)
+      my_real, INTENT (IN   ) :: RBEAM_VECTOR(3,NELP)     
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -117,7 +121,8 @@ C   4. Beam elements
         IADS=IADS+NELT*2
         IF (NELP>0) CALL FSIGPINI(
      .     FXBELM(IADEL), IPARG, X,          PM,   IXP, 
-     .     GEO,           VMOD,  VSIG(IADS), RINI, NELP)
+     .     GEO,           VMOD,  VSIG(IADS), RINI, NELP,
+     .     IBEAM_VECTOR ,RBEAM_VECTOR)
 C   5. 3-nodes shell elements
         IADEL=IADEL+NELP*9
         IADS=IADS+NELP*8             

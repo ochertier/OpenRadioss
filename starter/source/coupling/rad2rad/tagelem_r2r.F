@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tagelem_r2r   ../starter/source/coupling/rad2rad/tagelem_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_split     ../starter/source/coupling/rad2rad/r2r_split.F
-      !||====================================================================
+!||====================================================================
+!||    tagelem_r2r   ../starter/source/coupling/rad2rad/tagelem_r2r.F
+!||--- called by ------------------------------------------------------
+!||    r2r_split     ../starter/source/coupling/rad2rad/r2r_split.F
+!||====================================================================
       SUBROUTINE TAGELEM_R2R(NUMEL,IPART,TAGBUF,NPART)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -37,7 +37,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER J,L
+        INTEGER J
 C=======================================================================
 
         DO J=1,NUMEL
@@ -50,17 +50,17 @@ C-----------
         RETURN
       END SUBROUTINE TAGELEM_R2R
 
-      !||====================================================================
-      !||    tag_elem_void_r2r   ../starter/source/coupling/rad2rad/tagelem_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_prelec          ../starter/source/coupling/rad2rad/r2r_prelec.F
-      !||--- calls      -----------------------------------------------------
-      !||    modif_tag           ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||--- uses       -----------------------------------------------------
-      !||    nod2el_mod          ../starter/share/modules1/nod2el_mod.F
-      !||    r2r_mod             ../starter/share/modules1/r2r_mod.F
-      !||    restmod             ../starter/share/modules1/restart_mod.F
-      !||====================================================================
+!||====================================================================
+!||    tag_elem_void_r2r   ../starter/source/coupling/rad2rad/tagelem_r2r.F
+!||--- called by ------------------------------------------------------
+!||    r2r_prelec          ../starter/source/coupling/rad2rad/r2r_prelec.F
+!||--- calls      -----------------------------------------------------
+!||    modif_tag           ../starter/source/coupling/rad2rad/routines_r2r.F
+!||--- uses       -----------------------------------------------------
+!||    nod2el_mod          ../starter/share/modules1/nod2el_mod.F
+!||    r2r_mod             ../starter/share/modules1/r2r_mod.F
+!||    restmod             ../starter/share/modules1/restart_mod.F
+!||====================================================================
       SUBROUTINE TAG_ELEM_VOID_R2R(NB,IPARTS,IPARTC,IPARTG,
      2           IPARTSP,VAL,CONT,MODIF,ITAGL,F2,FLAG,EANI2,
      3           IGRSURF,IGRNOD,GR_ID)
@@ -71,6 +71,7 @@ C-----------------------------------------------
         USE R2R_MOD
         USE NOD2EL_MOD
         USE GROUPDEF_MOD
+        use element_mod , only : nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -88,8 +89,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER J,K,L,NI,N1,EL_ID,FACE(4),ITAG,SUM,CUR_ID,ELTAG,CUR_10,
-     .          CUR_20,CUR_16,OFFSET
+        INTEGER J,K,L,NI,FACE(4),SUM,CUR_ID,ELTAG,CUR_10,CUR_20,CUR_16,OFFSET
 C=======================================================================
 
         IF (FLAG==0) THEN
@@ -219,7 +219,7 @@ C------------------------>  sh3n  <----------------------------------C
                 CALL MODIF_TAG(TAG_ELG(CUR_ID+NPART),1+CONT,MODIF)
               ENDIF
             END DO
-C------------------------>  SPH particles <--------------------------C
+C-----------------------> SPH Particles <-----------------------
             IF (NUMSPH>0) THEN
               CUR_ID = NOD2SP(NI)
               IF ((TAG_ELSP(CUR_ID+NPART)<(1+CONT)).AND.
@@ -235,18 +235,18 @@ C-----------
         RETURN
       END SUBROUTINE TAG_ELEM_VOID_R2R
 
-      !||====================================================================
-      !||    tag_elem_void_r2r_lin   ../starter/source/coupling/rad2rad/tagelem_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_prelec              ../starter/source/coupling/rad2rad/r2r_prelec.F
-      !||--- calls      -----------------------------------------------------
-      !||    modif_tag               ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    r2r_void_1d             ../starter/source/coupling/rad2rad/r2r_void.F
-      !||--- uses       -----------------------------------------------------
-      !||    nod2el_mod              ../starter/share/modules1/nod2el_mod.F
-      !||    r2r_mod                 ../starter/share/modules1/r2r_mod.F
-      !||    restmod                 ../starter/share/modules1/restart_mod.F
-      !||====================================================================
+!||====================================================================
+!||    tag_elem_void_r2r_lin   ../starter/source/coupling/rad2rad/tagelem_r2r.F
+!||--- called by ------------------------------------------------------
+!||    r2r_prelec              ../starter/source/coupling/rad2rad/r2r_prelec.F
+!||--- calls      -----------------------------------------------------
+!||    modif_tag               ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    r2r_void_1d             ../starter/source/coupling/rad2rad/r2r_void.F
+!||--- uses       -----------------------------------------------------
+!||    nod2el_mod              ../starter/share/modules1/nod2el_mod.F
+!||    r2r_mod                 ../starter/share/modules1/r2r_mod.F
+!||    restmod                 ../starter/share/modules1/restart_mod.F
+!||====================================================================
       SUBROUTINE TAG_ELEM_VOID_R2R_LIN(NB,IPARTS,
      2           IPARTC,IPARTG,IPARTT,IPARTP,IPARTR,VAL,CONT,
      3           MODIF,WARN,IGRSLIN)
@@ -257,6 +257,7 @@ C-----------------------------------------------
         USE R2R_MOD
         USE NOD2EL_MOD
         USE GROUPDEF_MOD
+        use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -271,8 +272,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER J,K,L,CUR_ID,CUR_TYP,NI1,NI2,FLAG
-        INTEGER OFFSET,CUR_P,CUR_10,CUR_20,CUR_16
+        INTEGER :: J,K,L,CUR_ID,NI1,NI2,FLAG
+        INTEGER :: OFFSET,CUR_P,CUR_10,CUR_20,CUR_16
 C=======================================================================
 
 C--------------------------------------------------------------------C

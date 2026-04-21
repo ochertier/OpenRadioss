@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    nsvis_stab11   ../engine/source/elements/solid/solidez/nsvis_stab11.F
-      !||--- called by ------------------------------------------------------
-      !||    m1lawtot       ../engine/source/materials/mat/mat001/m1lawtot.F
-      !||====================================================================
+!||====================================================================
+!||    nsvis_stab11   ../engine/source/elements/solid/solidez/nsvis_stab11.F
+!||--- called by ------------------------------------------------------
+!||    m1lawtot       ../engine/source/materials/mat/mat001/m1lawtot.F
+!||====================================================================
       SUBROUTINE NSVIS_STAB11(SIG  ,C1  ,G2    ,VOL  ,D1   ,
      .                       D2    ,D3  ,D4    ,D5   ,D6   ,
      .                       RHOREF,NPG  ,NEL ) 
@@ -51,11 +51,11 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, MT
+      INTEGER I
 C     REAL
       my_real
-     .   DD, AL, CNS1, CNS2, CNS3,SSP1,MU,
-     .   DAV, PVIS, NRHO,JAC,FAC,TOL,FF,RHOSSP,FACG
+     .   DD, AL, CNS2, CNS3,SSP1,MU,
+     .   DAV,FF,RHOSSP
 #ifdef MYREAL8 
       my_real, PARAMETER :: REAL_THREE = 3.0D0
       my_real, PARAMETER :: REAL_ONE = 1.0D0

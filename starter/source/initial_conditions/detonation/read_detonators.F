@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_detonators        ../starter/source/initial_conditions/detonation/read_detonators.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    prelecdet              ../starter/source/initial_conditions/detonation/prelecdet.F
-      !||    read_dfs_detcord       ../starter/source/initial_conditions/detonation/read_dfs_detcord.F
-      !||    read_dfs_detline       ../starter/source/initial_conditions/detonation/read_dfs_detline.F
-      !||    read_dfs_detplan       ../starter/source/initial_conditions/detonation/read_dfs_detplan.F
-      !||    read_dfs_detpoint      ../starter/source/initial_conditions/detonation/read_dfs_detpoint.F
-      !||    read_dfs_wave_shaper   ../starter/source/initial_conditions/detonation/read_dfs_wave_shaper.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
-      SUBROUTINE READ_DETONATORS(ITABM1     ,ITAB   ,IGRNOD,
-     .                           IPM        ,X      ,UNITAB,
-     .                           LSUBMODEL  ,DETONATORS)
+!||====================================================================
+!||    read_detonators        ../starter/source/initial_conditions/detonation/read_detonators.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    prelecdet              ../starter/source/initial_conditions/detonation/prelecdet.F
+!||    read_dfs_detcord       ../starter/source/initial_conditions/detonation/read_dfs_detcord.F
+!||    read_dfs_detline       ../starter/source/initial_conditions/detonation/read_dfs_detline.F
+!||    read_dfs_detplan       ../starter/source/initial_conditions/detonation/read_dfs_detplan.F
+!||    read_dfs_detpoint      ../starter/source/initial_conditions/detonation/read_dfs_detpoint.F
+!||    read_dfs_wave_shaper   ../starter/source/initial_conditions/detonation/read_dfs_wave_shaper.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
+      SUBROUTINE READ_DETONATORS(ITABM1     ,ITAB      ,IGRNOD ,
+     .                           PM         ,IPM       ,X      ,UNITAB,
+     .                           LSUBMODEL  ,DETONATORS,XFRAME ,IFRAME)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -53,7 +53,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
-      USE DETONATORS_MOD
+      USE DETONATORS_MOD , ONLY : DETONATORS_STRUCT_
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -71,18 +71,21 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN)                  :: UNITAB
       INTEGER,INTENT(IN)                            :: ITABM1(SITABM1),ITAB(NUMNOD)
+      my_real,INTENT(INOUT)                         :: PM(NPROPM,NUMMAT)
       INTEGER,INTENT(IN)                            :: IPM(NPROPMI,NUMMAT)
       my_real,INTENT(IN)                            :: X(3,NUMNOD)
       TYPE(SUBMODEL_DATA),INTENT(IN)                :: LSUBMODEL(NSUBMOD)
       TYPE(DETONATORS_STRUCT_),TARGET,INTENT(INOUT) :: DETONATORS
       TYPE (GROUP_),DIMENSION(NGRNOD),INTENT(IN)    :: IGRNOD
+      my_real,INTENT(IN)                            :: XFRAME(NXFRAME,NUMFRAM+1)
+      INTEGER,INTENT(IN)                            :: IFRAME(LISKN,NUMFRAM+1)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER              :: I, MAT, J, NPCM, NPEM, N1,N2,ID,I1,I2,K
+      INTEGER              :: K
       INTEGER              :: IUNIT, UID
       INTEGER              :: IFLAGUNIT
-      INTEGER              :: DET_ID,STAT
+      INTEGER              :: DET_ID
       CHARACTER*40         :: MESS
       CHARACTER(LEN=NCHARKEY) :: KEY, KEY2
       INTEGER              :: NDET,NDFS
@@ -94,6 +97,7 @@ C-----------------------------------------------
 C   P r e - C o n d i t i o n
 C-----------------------------------------------
       NDET = DETONATORS%N_DET
+      DETONATORS%IS_SHADOWING_REQUIRED = .FALSE.
       IF (NDET <= 0) RETURN
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -127,14 +131,12 @@ C-----------------------------------------------
       CALL PRELECDET(IGRNOD, LSUBMODEL, DETONATORS)
 
       ! --- READING ALL DETONATOR TYPES
-      CALL READ_DFS_DETPOINT(DETONATORS,X,IPM,ITABM1,UNITAB,LSUBMODEL,IGRNOD)
+      CALL READ_DFS_DETPOINT(DETONATORS,X,IPM,PM,ITABM1,UNITAB,LSUBMODEL,IGRNOD,XFRAME,IFRAME)
       CALL READ_DFS_DETLINE(DETONATORS,X,IPM,ITABM1,UNITAB,LSUBMODEL)
       CALL READ_DFS_WAVE_SHAPER(DETONATORS,IGRNOD,IPM,ITABM1,UNITAB,LSUBMODEL,ITAB)
       CALL READ_DFS_DETPLAN(DETONATORS,X,IPM,ITABM1,UNITAB,LSUBMODEL)
       CALL READ_DFS_DETCORD(DETONATORS,X,IGRNOD,IPM,ITABM1,UNITAB,LSUBMODEL,ITAB)
       WRITE(IOUT,2000)
-C-------------------------------------------
- 999  RETURN
 C-----------------------------------------------
 C   O u t p u t   F o r m a t
 C-----------------------------------------------

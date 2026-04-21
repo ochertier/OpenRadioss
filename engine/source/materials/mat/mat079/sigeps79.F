@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps79   ../engine/source/materials/mat/mat079/sigeps79.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw      ../engine/source/materials/mat_share/mulaw.F90
-      !||====================================================================
+!||====================================================================
+!||    sigeps79   ../engine/source/materials/mat/mat079/sigeps79.F
+!||--- called by ------------------------------------------------------
+!||    mulaw      ../engine/source/materials/mat_share/mulaw.F90
+!||====================================================================
        SUBROUTINE SIGEPS79(
      1      NEL      ,NUPARAM  ,NUVAR    ,TIME     ,TIMESTEP ,UPARAM   ,                                                                                                          
      2      RHO0     ,RHO      ,NGL      ,SIGY     ,DPLA     ,DEFP     ,
@@ -84,7 +84,7 @@ C----------------------------------------------------------------
      .   SIGYI(NEL),SIGYF(NEL),SIGYOLD(NEL),DMG_OLD(NEL)
       my_real
      .   DAV, CE, SIGSTAR, EPFAIL, P1, YIELD, DELTAU, DPDMU,
-     .   PMIN, RATIO, J2
+     .   PMIN, J2
 C
       !=======================================================================
       ! - INITIALISATION OF COMPUTATION ON TIME STEP

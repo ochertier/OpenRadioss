@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,31 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_sphcel_mp_mod   ../engine/source/output/sta/stat_sphcel_mp.F90
-      !||--- called by ------------------------------------------------------
-      !||    genstat              ../engine/source/output/sta/genstat.F
-      !||====================================================================
+!||====================================================================
+!||    stat_sphcel_mp_mod   ../engine/source/output/sta/stat_sphcel_mp.F90
+!||--- called by ------------------------------------------------------
+!||    genstat              ../engine/source/output/sta/genstat.F
+!||====================================================================
       module stat_sphcel_mp_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \sphcel element state file write for smp
-      !||====================================================================
-      !||    stat_sphcel_mp   ../engine/source/output/sta/stat_sphcel_mp.F90
-      !||--- called by ------------------------------------------------------
-      !||    genstat          ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders        ../common_source/tools/sort/my_orders.c
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    stat_sphcel_mp   ../engine/source/output/sta/stat_sphcel_mp.F90
+!||--- called by ------------------------------------------------------
+!||    genstat          ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders        ../common_source/tools/sort/my_orders.c
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
         subroutine stat_sphcel_mp(numnod      ,numsph      ,nisp          ,npart      ,ngroup       ,  &
-                                  nparg       ,lipart1     ,stat_numelsph ,itab       ,ipart        ,  &
-                                  kxsp        ,ipartsph    ,ipart_state   ,nodtag     ,stat_indxsph ,  &
-                                  iparg       ,elbuf_tab   ,idel          )
+          nparg       ,lipart1     ,stat_numelsph ,itab       ,ipart        ,  &
+          kxsp        ,ipartsph    ,ipart_state   ,nodtag     ,stat_indxsph ,  &
+          iparg       ,elbuf_tab   ,idel          )
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -55,10 +56,8 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 #include "task_c.inc"
 #include "units_c.inc"
-#include "mvsiz_p.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -83,11 +82,10 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer :: i,l,k,m ! small integers can be declared in the same line
-          integer :: pos ! more complex variable should be declared in separate lines, and described 
-          integer n,jj,iprt0,iprt,ii
-          integer ng,nel,nft,lft,llt,ity,ioff
-          integer np(4*numsph),work(70000),clef(2,numsph)
+          integer :: i,k ! small integers can be declared in the same line
+          integer :: n,jj,iprt0,iprt,ii
+          integer :: ng,nel,nft,lft,llt,ity,ioff
+          integer :: np(4*numsph),work(70000),clef(2,numsph)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -98,7 +96,7 @@
               ity = iparg(5,ng)
               if (ity == 51) then
                 nel = iparg(2,ng)
-                nft = iparg(3,ng) 
+                nft = iparg(3,ng)
                 lft=1
                 llt=nel
                 do i=lft,llt
@@ -115,17 +113,17 @@
                     clef(1,ii)=iprt
                     clef(2,ii)=kxsp(nisp,n)
                     nodtag(kxsp(3,n))=1
-                  endif ! if (ipart_state(iprt) /= 0)
-                enddo ! do i=lft,llt
-              endif ! if (ity == 51)
-            enddo ! do ng=1,ngroup
-          endif ! if (numelsph /= 0)
-          
+                  end if ! if (ipart_state(iprt) /= 0)
+                end do ! do i=lft,llt
+              end if ! if (ity == 51)
+            end do ! do ng=1,ngroup
+          end if ! if (numelsph /= 0)
+
           do n=1,numsph
             stat_indxsph(n)=n
-          enddo
+          end do
           call my_orders(0,work,clef,stat_indxsph,stat_numelsph,2)
-          
+
           iprt0=0
           do n=1,stat_numelsph
             k=stat_indxsph(n)
@@ -134,17 +132,17 @@
             ioff=np(jj+4)
             if (idel==0 .or. (idel==1 .and. ioff >= 1)) then
               if (iprt /= iprt0) then
-                write(iugeo,'(a,i10)')'/SPHCEL/',ipart(4,iprt)
-                write(iugeo,'(a)')'#sphcel_id'
+                write(iugeo,"(a,i10)")"/SPHCEL/",ipart(4,iprt)
+                write(iugeo,"(a)")"#sphcel_id"
                 iprt0=iprt
-              endif
-              write(iugeo,'(i10)') np(jj+2)
-            endif !if (idel)
-          enddo ! do n=1,stat_numelsph
-          
+              end if
+              write(iugeo,"(i10)") np(jj+2)
+            end if !if (idel)
+          end do ! do n=1,stat_numelsph
+
           return
 ! ----------------------------------------------------------------------------------------------------------------------
         end subroutine stat_sphcel_mp
       end module stat_sphcel_mp_mod
-      
-      
+
+

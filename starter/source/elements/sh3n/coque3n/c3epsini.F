@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c3epsini       ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3        ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||--- calls      -----------------------------------------------------
-      !||    c3defoi        ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||    c3evec3        ../starter/source/elements/sh3n/coque3n/c3evec3.F
-      !||    c3newve3       ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||    c3pxpyi        ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||    cmlawi         ../starter/source/elements/shell/coque/cepsini.F
-      !||    corth3         ../starter/source/elements/shell/coque/corth3.F
-      !||    shtroto3       ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c3epsini       ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||--- called by ------------------------------------------------------
+!||    c3init3        ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||--- calls      -----------------------------------------------------
+!||    c3defoi        ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||    c3evec3        ../starter/source/elements/sh3n/coque3n/c3evec3.F
+!||    c3newve3       ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||    c3pxpyi        ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||    cmlawi         ../starter/source/elements/shell/coque/cepsini.F
+!||    corth3         ../starter/source/elements/shell/coque/corth3.F
+!||    shtroto3       ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE C3EPSINI(ELBUF_STR,MAT_PARAM,
      1           JFT    ,JLT    ,ISMSTR ,MTN   ,ITHK   ,
      2           PM     ,GEO    ,IXTG   ,X     ,XREFTG ,
@@ -45,7 +45,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MAT_ELEM_MOD            
+      USE MAT_ELEM_MOD          
+      use element_mod , only : nixtg  
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,7 +77,6 @@ C------------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, NT, I1, I2, I3,IDRAPE,IGTYP
-      INTEGER PID(MVSIZ)
       my_real FAC
       my_real ECOS(MVSIZ),ESIN(MVSIZ),
      .   E1X(MVSIZ), E1Y(MVSIZ), E1Z(MVSIZ),
@@ -255,12 +255,12 @@ c-----------
       RETURN
       END SUBROUTINE C3EPSINI
 c
-      !||====================================================================
-      !||    c3pxpyi    ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3epsini   ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||    fsigtini   ../starter/source/constraints/fxbody/fsigtini.F
-      !||====================================================================
+!||====================================================================
+!||    c3pxpyi    ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||--- called by ------------------------------------------------------
+!||    c3epsini   ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||    fsigtini   ../starter/source/constraints/fxbody/fsigtini.F
+!||====================================================================
       SUBROUTINE C3PXPYI(JFT  ,JLT  ,ISMSTR,
      .                   PX1G ,PY1G ,PY2G ,
      .                   PX1  ,PY1  ,PY2  ,
@@ -333,11 +333,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    c3defoi    ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3epsini   ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||====================================================================
+!||====================================================================
+!||    c3defoi    ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||--- called by ------------------------------------------------------
+!||    c3epsini   ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||====================================================================
       SUBROUTINE C3DEFOI(JFT ,JLT ,NEL ,VL  ,GSTR,                        
      .                   PX1 ,PY1 ,PY2 ,AREA,                          
      .                   EXX ,EYY ,EXY ,EYZ ,EZX ,                     
@@ -435,13 +435,13 @@ C
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    c3newve3   ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3epsini   ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||--- calls      -----------------------------------------------------
-      !||    cdkevec3   ../starter/source/elements/sh3n/coquedk/cdkevec3.F
-      !||====================================================================
+!||====================================================================
+!||    c3newve3   ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||--- called by ------------------------------------------------------
+!||    c3epsini   ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||--- calls      -----------------------------------------------------
+!||    cdkevec3   ../starter/source/elements/sh3n/coquedk/cdkevec3.F
+!||====================================================================
       SUBROUTINE C3NEWVE3(JFT ,JLT ,ECOS,ESIN,AREA,
      .                    X1  ,X2  ,X3  ,Y1  ,Y2  ,Y3  ,
      .                    Z1  ,Z2  ,Z3  ,E1X ,E2X ,E3X ,
@@ -469,7 +469,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, II
+      INTEGER I
       my_real AA,BB,
      .   E1X0(MVSIZ), E1Y0(MVSIZ), E1Z0(MVSIZ),
      .   E2X0(MVSIZ), E2Y0(MVSIZ), E2Z0(MVSIZ),
@@ -513,11 +513,11 @@ c
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    shtroto3   ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3epsini   ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||====================================================================
+!||====================================================================
+!||    shtroto3   ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||--- called by ------------------------------------------------------
+!||    c3epsini   ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||====================================================================
       SUBROUTINE SHTROTO3(JFT,JLT,ECOS,ESIN,GSTR,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -530,17 +530,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER JFT, JLT,ISMSTR,NEL
+      INTEGER JFT, JLT,NEL
 C     REAL
       my_real
      .   GSTR(NEL,8),ECOS(MVSIZ),ESIN(MVSIZ)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
+      INTEGER I
 C     REAL
       my_real
-     .  M2(MVSIZ),N2(MVSIZ),MN(MVSIZ),CM(4),MN2(MVSIZ),T1,T2,T3
+     .  M2(MVSIZ),N2(MVSIZ),MN(MVSIZ),CM(4),MN2(MVSIZ),T1
 C-----------------------------------------------
       DO I=JFT,JLT
        M2(I)= ECOS(I)*ECOS(I)

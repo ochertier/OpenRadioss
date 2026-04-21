@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ini_fvminivel   ../starter/source/elements/initia/ini_fvminivel.F
-      !||--- called by ------------------------------------------------------
-      !||    initia          ../starter/source/elements/initia/initia.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    ini_fvminivel   ../starter/source/elements/initia/ini_fvminivel.F
+!||--- called by ------------------------------------------------------
+!||    initia          ../starter/source/elements/initia/initia.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INI_FVMINIVEL(FVM_INIVEL ,MULTI_FVM ,IGRBRIC ,IGRQUAD ,IGRSH3N)
 C-----------------------------------------------
 C     M o d u l e s
@@ -78,7 +78,7 @@ C     Quad groups
                   MULTI_FVM%VEL(3, NOSYS) = FVM_INIVEL(I)%VZ
                ENDDO                 
             ENDIF
-C     SH3N groups
+C     Sh3n Groups
             IF (FVM_INIVEL(I)%GRSH3NID /= -1) THEN
                IGRS = FVM_INIVEL(I)%GRSH3NID
                DO J=1,IGRSH3N(IGRS)%NENTITY

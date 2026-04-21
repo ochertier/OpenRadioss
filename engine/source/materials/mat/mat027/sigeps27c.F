@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps27c   ../engine/source/materials/mat/mat027/sigeps27c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    m27crak     ../engine/source/materials/mat/mat027/m27crak.F
-      !||    m27elas     ../engine/source/materials/mat/mat027/m27elas.F
-      !||    m27plas     ../engine/source/materials/mat/mat027/m27plas.F
-      !||    roto_sig    ../engine/source/airbag/roto.F
-      !||    uroto_sig   ../engine/source/airbag/uroto.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps27c   ../engine/source/materials/mat/mat027/sigeps27c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    m27crak     ../engine/source/materials/mat/mat027/m27crak.F
+!||    m27elas     ../engine/source/materials/mat/mat027/m27elas.F
+!||    m27plas     ../engine/source/materials/mat/mat027/m27plas.F
+!||    roto_sig    ../engine/source/airbag/roto.F
+!||    uroto_sig   ../engine/source/airbag/uroto.F
+!||====================================================================
       SUBROUTINE SIGEPS27C(
      1                   JFT    ,JLT    ,PM     ,THK    ,OFF   ,
-     2                   GSTR   ,IMAT   ,DT1C   ,IPLA   ,SHF   ,
+     2                   GSTR   ,IMAT   ,DT1    ,IPLA   ,SHF   ,
      3                   NGL    ,THK0   ,THKLYL ,CRAK   ,DAM   ,
      4                   SIGY   ,ZCFAC  ,DPLA   ,ILAYER ,IPT   ,
-     5                   ISRATE ,NEL    ,ZZ     ,NPTTOT ,EPSP  ,
+     5                   ISRATE ,NEL    ,ZZ     ,NPTTOT ,EPSD_PG,
      6                   DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX,
      7                   SIGOXX ,SIGOYY ,SIGOXY ,SIGOYZ ,SIGOZX,
      8                   SIGNXX ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX,
-     9                   DIRDMG ,PLA    ,INLOC  ,DPLANL ,LOFF  )
+     9                   DIRDMG ,PLA    ,INLOC  ,DPLANL ,LOFF  ,
+     .                   EPSD   ,ASRATE )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,10 +59,10 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NGL(MVSIZ),IMAT,ILAYER,IPT,ISRATE,NPTTOT,
      .   JFT,JLT,IPLA,NEL,INLOC
-C     REAL
-      my_real
-     .   PM(NPROPM,*),THK(*),OFF(*),GSTR(NEL,8),
-     .   DT1C(*),SHF(*),EPSP(*),SIGY(*),ZCFAC(MVSIZ,2),DPLA(*),
+      my_real, INTENT(IN) :: DT1
+      my_real, INTENT(IN) :: ASRATE
+      my_real PM(NPROPM,*),THK(*),OFF(*),GSTR(NEL,8),
+     .   SHF(*),SIGY(*),ZCFAC(MVSIZ,2),DPLA(*),
      .   THK0(MVSIZ),THKLYL(NEL),DPLANL(NEL)
       my_real
      .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
@@ -70,6 +71,8 @@ C     REAL
      .   SIGNYZ(NEL),SIGNZX(NEL),DIRDMG(NEL,2),
      .   PLA(NEL),CRAK(NEL),DAM(NEL),ZZ(MVSIZ)
       my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
+      my_real ,DIMENSION(NEL), INTENT(IN) :: EPSD_PG
+      my_real, DIMENSION(NEL) ,INTENT(INOUT) :: EPSD
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -107,12 +110,12 @@ C------------------------------------------
 C      CONTRAINTES PLASTIQUEMENT ADMISSIBLES
 C------------------------------------------
       CALL M27PLAS(JFT    ,JLT    ,PM     ,OFF    ,SIG   ,
-     2             PLA    ,IMAT   ,DT1C   ,IPLA   ,EZZ   ,
-     3             EPSP   ,ISRATE ,YLD    ,ETSE   ,DPLA  ,
+     2             PLA    ,IMAT   ,DT1    ,IPLA   ,EZZ   ,
+     3             EPSD_PG,ISRATE ,YLD    ,ETSE   ,DPLA  ,
      4             DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX,
-     5             NEL    )
+     5             NEL    ,EPSD   ,ASRATE )
 C---------------------------------
-C      RETOUR DANS LE REPERE LOCAL
+C      return to the local frame
 C---------------------------------
       CALL UROTO_SIG(JFT,JLT,SIG,DIRDMG,NEL)
 !

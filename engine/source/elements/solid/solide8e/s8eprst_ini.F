@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8eprst_ini   ../engine/source/elements/solid/solide8e/s8eprst_ini.F
-      !||--- called by ------------------------------------------------------
-      !||    s8eforc3      ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    s8sforc3      ../engine/source/elements/solid/solide8s/s8sforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s8eprst_ini   ../engine/source/elements/solid/solide8e/s8eprst_ini.F
+!||--- called by ------------------------------------------------------
+!||    s8eforc3      ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    s8sforc3      ../engine/source/elements/solid/solide8s/s8sforc3.F
+!||====================================================================
       SUBROUTINE S8EPRST_INI(PR ,PS ,PT )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -39,7 +39,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J ,IP
+      INTEGER  IP
       my_real
      .   PG2,KSI(8),ETA(8),ZETA(8),ETAZETA(8),KSIETA(8),KSIZETA(8),PG,MPG
        PARAMETER (PG=.577350269189625D0)

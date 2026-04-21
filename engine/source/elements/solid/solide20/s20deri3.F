@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s20deri3      ../engine/source/elements/solid/solide20/s20deri3.F
-      !||--- called by ------------------------------------------------------
-      !||    s20forc3      ../engine/source/elements/solid/solide20/s20forc3.F
-      !||    s20ke3        ../engine/source/elements/solid/solide20/s20ke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s20deri3      ../engine/source/elements/solid/solide20/s20deri3.F
+!||--- called by ------------------------------------------------------
+!||    s20forc3      ../engine/source/elements/solid/solide20/s20forc3.F
+!||    s20ke3        ../engine/source/elements/solid/solide20/s20ke3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S20DERI3(
      1   NGL,     OFF,     R,       S,
      2   T,       W,       DNIDR,   DNIDS,
@@ -81,7 +81,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,N, ICOR
       my_real
-     .   D, AA, BB, DET(MVSIZ)
+     .   D, DET(MVSIZ)
 C-----------------------------------------------
 C
 C
@@ -337,7 +337,7 @@ c         print *,'dx y z/dt='
 c         print *,DXDT(1),DYDT(1),DZDT(1)
 C-----------------------------------------------------------------------
 C          -1
-C       [J]          Inversion du jacobien
+C       [j] jacobian inversion
 C-----------------------------------------------------------------------
         DRDX(I)=DYDS(I)*DZDT(I)-DZDS(I)*DYDT(I)
         DRDY(I)=DZDS(I)*DXDT(I)-DXDS(I)*DZDT(I)
@@ -386,8 +386,8 @@ C
 C
       DO I=1,NEL
 C-----------------------------------------------------------------------
-C          -1            Inversion du jacobien suite
-C       [J]              et repere local r,s,t
+C          -1 inversion of the Jacobian suite
+C       [J]              and local frame r,s,t
 C-----------------------------------------------------------------------
         D = ONE/DET(I)
         DRDX(I)=D*DRDX(I)
@@ -498,7 +498,6 @@ c        DELTAX(I) = SQRT(2.*BB/AA)
 c      ENDDO
 C
 C
- 2000 FORMAT(/' ZERO OR NEGATIVE VOLUME : DELETE 3D-ELEMENT NB',I10/)
 C
       RETURN
       END

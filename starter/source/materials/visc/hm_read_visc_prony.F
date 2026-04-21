@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_visc_prony         ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_visc               ../starter/source/materials/visc/hm_read_visc.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim          ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    lm_least_square_prony      ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||    lm_least_square_prony_2    ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||    table_mod                  ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_visc_prony         ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_visc               ../starter/source/materials/visc/hm_read_visc.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim          ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    lm_least_square_prony      ../starter/source/materials/visc/hm_read_visc_prony.F
+!||    lm_least_square_prony_2    ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||    table_mod                  ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_VISC_PRONY(VISC     ,IVISC    ,NTABLE  ,TABLE   ,MAT_ID   ,
      .                              UNITAB   ,LSUBMODEL)
 C-----------------------------------------------
@@ -71,7 +71,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,NUPARAM,NIPARAM,NPRONY,NUVAR,IFLAG,IMOD,ITAB,ISHAPE,
+      INTEGER :: I,NUPARAM,NIPARAM,NPRONY,NUVAR,IMOD,ITAB,ISHAPE,
      .   FctID_G,FctID_K,FctID_Gs,FctID_Ks,FctID_Gl,FctID_Kl
       my_real :: G(100),BETA(100),K(100),BETAK(100)
       my_real :: KV,COSTFG,COSTFK,DERIVG,DERIVK,GINFINI,KINFINI,
@@ -187,7 +187,7 @@ C
           YGl_scale = ONE * YGl_scale_UNIT      
         ENDIF 
         !----------------------------------------------------------------------------------
-        ! -> Bulk storage modulus VS frequency
+        ! -> Bulk Storage Modulus vs Frequency
         !----------------------------------------------------------------------------------
         CALL HM_GET_INTV   ('Fct_Ks'    ,FctID_Ks  ,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_FLOATV ('XKs_scale' ,XKs_scale ,IS_AVAILABLE,LSUBMODEL,UNITAB)
@@ -389,16 +389,16 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    lm_least_square_prony   ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_visc_prony      ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||    table_mod               ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lm_least_square_prony   ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_visc_prony      ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||    table_mod               ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE LM_LEAST_SQUARE_PRONY(MAT_ID   ,NPRONY   ,TABLE    ,FCT_ID   ,XGSCALE  ,YGSCALE  ,
      .                                 G        ,BETA     ,COST     ,DERIV    ,ISHAPE   ,GINFINI  )  
 C-----------------------------------------------
@@ -426,7 +426,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: IPIV
       DOUBLE PRECISION :: 
      .        RI2,RI2_OLD,MXVALT,MXVALY,LAMBDA,
-     .        JACTDY_N2,RHO,NU,DENOM,XI_N2
+     .        JACTDY_N2,RHO,NU,DENOM
       DOUBLE PRECISION, PARAMETER :: EPS1   = 1.0D-8
       DOUBLE PRECISION, PARAMETER :: EPS2   = 1.0D-10
       DOUBLE PRECISION, PARAMETER :: ALPHA  = 0.5D0
@@ -643,17 +643,17 @@ C
       DEALLOCATE(XI,XI_TR,JAC,FXI,DELTAY,JACTJAC,ID,JACTDY,IPIV,JACT,FXI_TR,VECT,YI,TIME,MU)      
       END
 
-      !||====================================================================
-      !||    lm_least_square_prony_2   ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_visc_prony        ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                    ../starter/source/output/message/message.F
-      !||    qsort                     ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod               ../starter/share/message_module/message_mod.F
-      !||    table_mod                 ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lm_least_square_prony_2   ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_visc_prony        ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                    ../starter/source/output/message/message.F
+!||    qsort                     ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod               ../starter/share/message_module/message_mod.F
+!||    table_mod                 ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE LM_LEAST_SQUARE_PRONY_2(MAT_ID   ,NPRONY   ,TABLE    ,FCT_IDS  ,XGS_SCALE,YGS_SCALE,
      .                                   FCT_IDL  ,XGL_SCALE,YGL_SCALE,G        ,BETA     ,COST     ,
      .                                   DERIV    ,ISHAPE   ,GINFINI  )  
@@ -683,7 +683,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: IPIV,IDX
       DOUBLE PRECISION ::
      .        RI2,RI2_OLD,LAMBDA,JACTDY_N2,
-     .        RHO,NU,DENOM,XI_N2,MXFREQ,MXNORM
+     .        RHO,NU,DENOM,MXFREQ,MXNORM
       DOUBLE PRECISION, PARAMETER :: EPS1   = 1.0D-8
       DOUBLE PRECISION, PARAMETER :: EPS2   = 1.0D-10
       DOUBLE PRECISION, PARAMETER :: ALPHA  = 0.5D0
@@ -1033,12 +1033,12 @@ C
 
 
 C---------------------------------------------------------------------------------------      
-      !||====================================================================
-      !||    qsort                     ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- called by ------------------------------------------------------
-      !||    lm_least_square_prony_2   ../starter/source/materials/visc/hm_read_visc_prony.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    qsort                     ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- called by ------------------------------------------------------
+!||    lm_least_square_prony_2   ../starter/source/materials/visc/hm_read_visc_prony.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       RECURSIVE SUBROUTINE QSORT(A, IDX, FIRST, LAST)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1055,7 +1055,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       DOUBLE PRECISION ::
      .           X, T
-      INTEGER :: I, J, I1, I2
+      INTEGER :: I, J, I1
 C-----------------------------------------------
 C   P r e - C o n d i t i o n
 C-----------------------------------------------

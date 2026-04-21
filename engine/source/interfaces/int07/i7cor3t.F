@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7cor3t   ../engine/source/interfaces/int07/i7cor3t.F
-      !||--- called by ------------------------------------------------------
-      !||    i10sto    ../engine/source/interfaces/intsort/i10sto.F
-      !||    i7sto     ../engine/source/interfaces/intsort/i7sto.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box   ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i7cor3t   ../engine/source/interfaces/int07/i7cor3t.F
+!||--- called by ------------------------------------------------------
+!||    i10sto    ../engine/source/interfaces/intsort/i10sto.F
+!||    i7sto     ../engine/source/interfaces/intsort/i7sto.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box   ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I7COR3T(JLT     ,X     ,IRECT ,NSV   ,CAND_E ,
      1                   CAND_N  ,IGAP  ,GAP   ,X1    ,X2     ,
      2                   X3      ,X4    ,Y1    ,Y2    ,Y3     ,
@@ -38,10 +38,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      7                   ITYP    ,NIN   ,GAP_S_L,GAP_M_L,INTTH,
      8                   DRAD    ,DGAPLOAD)
 C============================================================================
-C  cette routine est appelee par : I10STO(/int10/i10sto.F)
+C  this routine is called by: I10STO(/int10/i10sto.F)
 C                                  I7STO(/int7/i7sto.F)
 C----------------------------------------------------------------------------
-C  cette routine appelle : -
+C  this routine calls: -
 C============================================================================
 C-----------------------------------------------
 C   M o d u l e s
@@ -58,14 +58,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*),
-     .    JLT,IDT, NOINT, NSN, IGAP ,ITYP, NIN, INTTH
+     .    JLT, NSN, IGAP ,ITYP, NIN, INTTH
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ)
-C     REAL
       my_real
      .   X(3,*), GAPV(*), GAP_S(*), GAP_M(*),CURV_MAX(*),
      .   GAP, GAPMAX, GAPMIN
@@ -79,61 +77,9 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,IL, L, NN, IG,JFT,IADD
+      INTEGER I ,J  , L, IG,IADD
 C-----------------------------------------------
 C
-      IF(IMACH/=3) THEN
-       IF(IGAP==3) THEN
-        IADD = 9
-       ENDIF
-       IF(IGAP==0)THEN
-         DO I=1,JLT
-           GAPV(I)=MAX(GAP+DGAPLOAD,DRAD)
-         END DO
-       ELSEIF(IGAP == 3)THEN
-         DO I=1,JLT
-           GAPV(I)=MIN(GAP_S_L(CAND_N(I))+GAP_M_L(CAND_E(I)),GAPV(I))
-           GAPV(I)=MIN(GAPV(I),GAPMAX)
-           GAPV(I)=MAX(GAPMIN,GAPV(I))
-           GAPV(I)=MAX(DRAD,GAPV(I)+DGAPLOAD)
-         END DO
-       ELSE
-         DO I=1,JLT
-           GAPV(I)=GAP_S(CAND_N(I))+GAP_M(CAND_E(I))
-           GAPV(I)=MIN(GAPV(I),GAPMAX)
-           GAPV(I)=MAX(GAPMIN,GAPV(I))
-           GAPV(I)=MAX(DRAD,GAPV(I)+DGAPLOAD)
-         END DO
-       END IF
-       DO 100 I=1,JLT
-       IG = NSV(CAND_N(I))
-       XI(I) = X(1,IG)
-       YI(I) = X(2,IG)
-       ZI(I) = X(3,IG)
-       L  = CAND_E(I)
-C
-       IX1(I)=IRECT(1,L)
-       X1(I)=X(1,IX1(I))
-       Y1(I)=X(2,IX1(I))
-       Z1(I)=X(3,IX1(I))
-C
-       IX2(I)=IRECT(2,L)
-       X2(I)=X(1,IX2(I))
-       Y2(I)=X(2,IX2(I))
-       Z2(I)=X(3,IX2(I))
-C
-       IX3(I)=IRECT(3,L)
-       X3(I)=X(1,IX3(I))
-       Y3(I)=X(2,IX3(I))
-       Z3(I)=X(3,IX3(I))
-C
-       IX4(I)=IRECT(4,L)
-       X4(I)=X(1,IX4(I))
-       Y4(I)=X(2,IX4(I))
-       Z4(I)=X(3,IX4(I))
-C
- 100   CONTINUE
-      ELSE
        IF(IGAP==0)THEN
          DO I=1,JLT
            GAPV(I)=MAX(GAP+DGAPLOAD,DRAD)
@@ -204,7 +150,7 @@ C
          Y4(I)=X(2,IX4(I))
          Z4(I)=X(3,IX4(I))
        ENDDO
-      ENDIF
+
       IF(ITYP == 7)THEN
         DO I=1,JLT
           GAPV(I) = GAPV(I) + CURV_MAX(CAND_E(I))

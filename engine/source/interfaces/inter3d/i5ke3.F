@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i5ke3           ../engine/source/interfaces/inter3d/i5ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_int_k       ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_int       ../engine/source/implicit/assem_int.F
-      !||    i3cst3          ../engine/source/interfaces/inter3d/i3cst3.F
-      !||    i3dis3          ../engine/source/interfaces/inter3d/i3dis3.F
-      !||    i3gap3          ../engine/source/interfaces/inter3d/i3gap3.F
-      !||    i5cork3         ../engine/source/interfaces/inter3d/i5cork3.F
-      !||    i5frik3         ../engine/source/interfaces/inter3d/i5keg3.F
-      !||    i5keg3          ../engine/source/interfaces/inter3d/i5keg3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i5ke3           ../engine/source/interfaces/inter3d/i5ke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_int_k       ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_int       ../engine/source/implicit/assem_int.F
+!||    i3cst3          ../engine/source/interfaces/inter3d/i3cst3.F
+!||    i3dis3          ../engine/source/interfaces/inter3d/i3dis3.F
+!||    i3gap3          ../engine/source/interfaces/inter3d/i3gap3.F
+!||    i5cork3         ../engine/source/interfaces/inter3d/i5cork3.F
+!||    i5frik3         ../engine/source/interfaces/inter3d/i5keg3.F
+!||    i5keg3          ../engine/source/interfaces/inter3d/i5keg3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I5KE3(  A     ,V      ,MS   ,
      1                   IPARI ,INTBUF_TAB,X    ,
      2                   NUM_IMP,CAND_N,CAND_E     ,
@@ -70,14 +71,13 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IGAP, INACTI, IFQ, MFROT, IGSTI
+      INTEGER   IFQ, MFROT
       INTEGER JX1(MVSIZ), JX2(MVSIZ), JX3(MVSIZ), JX4(MVSIZ),
-     .        NSVG(MVSIZ), I3N ,IGIMP
+     .        NSVG(MVSIZ) ,IGIMP
       INTEGER, DIMENSION(MVSIZ) :: IX1,IX2,IX3,IX4
 C     REAL
       my_real
-     .   STARTT, FRIC, GAP, STOPT,STIGLO,GAPMIN,
-     .   KMIN, KMAX, GAPMAX,GAP_IMP
+     .   STARTT, FRIC, GAP, STOPT
 C-----------------------------------------------
 C     REAL
       my_real

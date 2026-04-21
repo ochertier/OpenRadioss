@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24stsecnd      ../starter/source/interfaces/inter3d1/i24stslav.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr1         ../starter/source/interfaces/interf1/inintr1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24fics_ini     ../starter/source/interfaces/inter3d1/i24surfi.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i24stsecnd      ../starter/source/interfaces/inter3d1/i24stslav.F
+!||--- called by ------------------------------------------------------
+!||    inintr1         ../starter/source/interfaces/interf1/inintr1.F
+!||--- calls      -----------------------------------------------------
+!||    i24fics_ini     ../starter/source/interfaces/inter3d1/i24surfi.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I24STSECND(IPARI,STIFINT,INTBUF_TAB,SFAC )
 C-----------------------------------------------
 C   M o d u l e s
@@ -48,12 +48,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NRTS, NRTM, NSN, NMN,
+      INTEGER  NSN,
      .        I, J,NSN0,ITY,NSNE
       my_real
      .   S
 C---------------------------------------------
-C     MISE A JOUR DES RIGIDITES NODALES EQUIVALENTES (COTE SECOND)
+C     SET A JOUR DES RIGIDITES NODALES EQUIVALENTES (COTE SECOND)
 C---------------------------------------------
       NSN   =IPARI(5)
       ITY   = IPARI(7) 

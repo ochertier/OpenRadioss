@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11corp3    ../engine/source/interfaces/int11/i11corp3.F
-      !||--- called by ------------------------------------------------------
-      !||    i11forcf3   ../engine/source/interfaces/int11/i11ke3.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm    ../engine/share/modules/imp_intm.F
-      !||    tri7box     ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i11corp3    ../engine/source/interfaces/int11/i11corp3.F
+!||--- called by ------------------------------------------------------
+!||    i11forcf3   ../engine/source/interfaces/int11/i11ke3.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm    ../engine/share/modules/imp_intm.F
+!||    tri7box     ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I11CORP3(JLT   ,X     ,IRECTS,IRECTM  ,CAND_E  ,
      1                   CAND_N,STIF  ,HS1   ,HS2     ,HM1     ,
      2                   HM2   ,NX    ,NY    ,NZ      ,N1      ,
@@ -72,7 +72,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,NI, L, NN, NS ,NE,NN1,NN2
+      INTEGER I   ,NI, L, NN, NS ,NE,NN1,NN2
 C-----------------------------------------------
 C
 C
@@ -135,13 +135,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i11corkp3   ../engine/source/interfaces/int11/i11corp3.F
-      !||--- called by ------------------------------------------------------
-      !||    i11fku3     ../engine/source/interfaces/int11/i11ke3.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm    ../engine/share/modules/imp_intm.F
-      !||====================================================================
+!||====================================================================
+!||    i11corkp3   ../engine/source/interfaces/int11/i11corp3.F
+!||--- called by ------------------------------------------------------
+!||    i11fku3     ../engine/source/interfaces/int11/i11ke3.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm    ../engine/share/modules/imp_intm.F
+!||====================================================================
       SUBROUTINE I11CORKP3(JLT   ,
      1                    XXS1   ,XXS2    ,XYS1    ,XYS2   ,XZS1   ,
      2                    XZS2   ,DXS1    ,DYS1    ,DZS1   ,DXS2   ,  
@@ -173,7 +173,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,NI, L, NN, NS ,NE,NN1,NN2
+      INTEGER I   ,NI, NN, NS ,NN1,NN2
 C-----------------------------------------------
 C
         DO I=1,JLT

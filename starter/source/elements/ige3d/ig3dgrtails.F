@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ig3dgrtails    ../starter/source/elements/ige3d/ig3dgrtails.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    zeroin         ../starter/source/system/zeroin.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ig3dgrtails        ../starter/source/elements/ige3d/ig3dgrtails.F
+!||--- called by ------------------------------------------------------
+!||    lectur             ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    zeroin             ../starter/source/system/zeroin.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod        ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE IG3DGRTAILS(
      1    KXIG3D    ,IPARG  ,GEO     ,EADD,
      2    ND     ,DD_IAD ,IDX     ,LB_MAX, INUM,
      3    INDEX  ,CEP    ,IPARTIG3D  ,ITR1,   IGRSURF,
      4    IXIG3D ,
-     5    IGEO ,PM   ,NIGE,   KNOTLOCEL)
+     5    IGEO ,PM   ,NIGE,   KNOTLOCEL, MATPARAM_TAB)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
+      USE MATPARAM_DEF_MOD
+      USE ALE_MOD , ONLY : ALE
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -74,23 +76,26 @@ C-----------------------------------------------
      .        IPARTIG3D(*), ITR1(*),NIGE(*)
       my_real GEO(NPROPG,NUMGEO),PM(NPROPM,NUMMAT),KNOTLOCEL(*)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
+      TYPE(MATPARAM_STRUCT_) , TARGET, DIMENSION(NUMMAT),INTENT(IN) :: MATPARAM_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NGR1, NG, ISSN, MTNN, I, NE1, N, NFIX,
+      INTEGER NGR1, NG, MTNN, I, NE1, N,
      .        PID, NEL_PREC, LB_L, P, NEL,NB,
-     .        MODE, WORK(70000),NN,IAD1,NGROU, J,MID,IETYP,
-     .        MT,IXIG3D(*),NUVAR,NUVARN,NXVIE,NXVIN,INND,II,inno,
+     .        MODE, WORK(70000),NN, J,MID,IETYP,
+     .        IXIG3D(*),NUVAR,NUVARN,NXVIE,NXVIN,INND,II,
      .        NGP(NSPMD+1),JALE_FROM_MAT,JALE_FROM_PROP
       my_real KNOTLOCELINDX(SKNOTLOCEL)
+      TYPE(MATPARAM_STRUCT_) , POINTER :: MATPARAM
 C
       DATA NXVIE/3/, NXVIN/0/
 C----------------------------------------------------------
       NPT = 1
 C----------------------------------------------------------
       NGR1 = NGROUP + 1
+      nullify(MATPARAM)
 C
-C phase 1 : decompostition canonique
+C Phase 1: Canonical decomposition
 C
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
@@ -161,8 +166,8 @@ C
         ENDDO
         NFT = NFT + NEL
       ENDDO  
-C phase 2 : bornage en groupe de mvsiz
-C ngroup est global, iparg est global mais organise en fonction de dd
+C Phase 2: MVSIZ Group Bounds
+C ngroup is global, iparg is global but organized according to dd
 C
       DO 300 N=1,ND
        NFT = 0
@@ -184,6 +189,7 @@ C xgroup global
           MTNN= NINT(PM(19,ABS(KXIG3D(1,II))))
           IETYP = 101
           GEO(8,PID)=IETYP + EM01
+          MATPARAM => MATPARAM_TAB(MID)
           
           JALE_FROM_MAT = NINT(PM(72,MID))
           JALE_FROM_PROP = IGEO(62,PID)
@@ -199,6 +205,21 @@ C foam + air
           ELSEIF(JALE == 3 .AND. MTNN == 77) THEN
             JLAG=1          
           ENDIF
+
+          !ALE REZONING/REMAPING : number of MAT/EOS variables to treat (used by staggered scheme only : arezon.F)
+          !  With ALE framework, since the Mesh is arbitrary, the variable must be updated to map thei expected location and not follow the arbitrary mesh displacement
+          !  this numbering here will be used in arezon.F to loop over variables to rezon/remap
+          IF(JALE == 1)THEN
+            ALE%REZON%NUM_NUVAR_MAT = MAX(ALE%REZON%NUM_NUVAR_MAT, MATPARAM%REZON%NUM_NUVAR_MAT)
+            ALE%REZON%NUM_NUVAR_EOS = MAX(ALE%REZON%NUM_NUVAR_EOS, MATPARAM%REZON%NUM_NUVAR_EOS)
+          ENDIF
+
+          !ALE UVAR REZONING  (81:MAT,  82:EOS)
+          IF(JALE == 1)THEN
+            IPARG(81,NGROUP) = MATPARAM%REZON%NUM_NUVAR_MAT
+            IPARG(82,NGROUP) = MATPARAM%REZON%NUM_NUVAR_EOS
+          ENDIF
+
           IF(MTNN/=50)JTUR=NINT(PM(70,MID)) 
           JTHE = NINT(PM(71,MID))
 C
@@ -229,7 +250,7 @@ C
 C
 c          LBUFEL= IPARG(4,NGROUP)+NE1*
 c     .            (NXVIE+NUVAR+INND*(NXVIN+NUVARN))-1
-C reperage groupe/processeur
+C Group/Processor Splition
           IPARG(32,NGROUP)= P-1
           NFT = NFT + NE1
   220    CONTINUE
@@ -238,7 +259,7 @@ C reperage groupe/processeur
        ENDDO
        LB_L = LBUFEL - LB_L
        LB_MAX = MAX(LB_MAX,LB_L)
-C DD_IAD => nb groupes par sous domaine
+C Dd_iad => nb groups by sub -domain
        NGP(NSPMD+1)=0
        DO P = 1, NSPMD
          NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)
@@ -250,9 +271,9 @@ C
 C
       NSPGROUP = NSPGROUP + ND
 C
-C RENUMEROTATION POUR SURFACES
+C renumbering for surfaces
 C
-      DO I=1,NSURF ! mettre un if pour ne pas changer les faces EF classiques
+      DO I=1,NSURF ! add an if to not change the classic ef faces
         NN=IGRSURF(I)%NSEG_IGE
         DO J=1,NN
           IF(IGRSURF(I)%ELTYP_IGE(J) == 101)
@@ -268,14 +289,12 @@ C
       WRITE(IOUT,1001)(N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
      +                IPARG(4,N),IPARG(5,N),
      +              N=NGR1,NGROUP)
-c      WRITE(IOUT,1002) LBUFEL
 C
  1000 FORMAT(10X,' 3D - ISO-GEOMETRIC ELEMENT GROUPS '/
      +       10X,' ----------------------------------'/
      +' GROUP   ELEMENT    ELEMENT   FIRST    BUFFER   ELEMENT  '/
      +'         MATERIAL   NUMBER    ELEMENT  ADDRESS  TYPE     '/)
  1001 FORMAT(6(1X,I7,1X))
- 1002 FORMAT(' BUFFER LENGTH : ',I10 )
 C
 
       RETURN

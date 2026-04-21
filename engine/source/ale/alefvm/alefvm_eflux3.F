@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alefvm_eflux3          ../engine/source/ale/alefvm/alefvm_eflux3.F
-      !||--- called by ------------------------------------------------------
-      !||    aflux0                 ../engine/source/ale/aflux0.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
-      !||    i22tri_mod             ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||====================================================================
-      SUBROUTINE ALEFVM_EFLUX3(PM   ,IXS   ,V       ,FLUX  ,FLU1,
-     2                         VEUL ,ALE_CONNECT ,TAG22 ,IPM ,
-     3                         NV46 ,MOM   ,ITASK   ,X     ,NEL )
+!||====================================================================
+!||    alefvm_eflux3          ../engine/source/ale/alefvm/alefvm_eflux3.F
+!||--- called by ------------------------------------------------------
+!||    aflux0                 ../engine/source/ale/aflux0.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    i22tri_mod             ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||====================================================================
+      SUBROUTINE ALEFVM_EFLUX3(PM   ,IXS   ,FLUX  ,FLU1,
+     2                         VEUL ,ALE_CONNECT  ,IPM ,
+     3                         NV46 ,X     ,NEL   ,s_flux)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -48,6 +49,7 @@ C-----------------------------------------------
       USE ALEFVM_MOD
       USE ALE_CONNECTIVITY_MOD
       USE ALEFVM_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,31 +69,23 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      integer, intent(in) :: s_flux !< length of first dimension of FLUX
       INTEGER :: IXS(NIXS,NUMELS), NV46, IPM(NPROPMI,*),NEL
-      my_real :: PM(NPROPM,NUMMAT), V(3,NUMNOD), FLUX(6,*), FLU1(*), VEUL(LVEUL,*), TAG22(*),MOM(NEL,3),X(3,NUMNOD)
+      my_real :: PM(NPROPM,NUMMAT), FLUX(s_flux,6), FLU1(*), VEUL(LVEUL,*),X(3,NUMNOD)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER MAT(MVSIZ), NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ), NC5(MVSIZ), NC6(MVSIZ),
-     .   NC7(MVSIZ), NC8(MVSIZ), I, II,J,IMAT,IALEFVM_FLG,IDV, ITASK,ICF(4,6),
-     .   IX1,IX2,IX3,IX4
-      my_real
-     .   X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ), X5(MVSIZ), X6(MVSIZ), X7(MVSIZ), X8(MVSIZ),
-     .   Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ), Y5(MVSIZ), Y6(MVSIZ), Y7(MVSIZ), Y8(MVSIZ), Z1(MVSIZ),
-     .   Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ), Z5(MVSIZ), Z6(MVSIZ), Z7(MVSIZ), Z8(MVSIZ), N1X(MVSIZ),
-     .   N2X(MVSIZ), N3X(MVSIZ), N4X(MVSIZ), N5X(MVSIZ), N6X(MVSIZ), N1Y(MVSIZ), N2Y(MVSIZ), N3Y(MVSIZ),
-     .   N4Y(MVSIZ), N5Y(MVSIZ), N6Y(MVSIZ), N1Z(MVSIZ), N2Z(MVSIZ), N3Z(MVSIZ), N4Z(MVSIZ), N5Z(MVSIZ),
-     .   N6Z(MVSIZ), FLUX1(MVSIZ), FLUX2(MVSIZ), FLUX3(MVSIZ), FLUX4(MVSIZ), FLUX5(MVSIZ),
-     .   FLUX6(MVSIZ), VX1(MVSIZ), VX2(MVSIZ), VX3(MVSIZ), VX4(MVSIZ), VX5(MVSIZ), VX6(MVSIZ),
-     .   VY1(MVSIZ), VY2(MVSIZ), VY3(MVSIZ), VY4(MVSIZ), VY5(MVSIZ), VY6(MVSIZ), VZ1(MVSIZ), VZ2(MVSIZ),
-     .   VZ3(MVSIZ), VZ4(MVSIZ), VZ5(MVSIZ), VZ6(MVSIZ), VDX1(MVSIZ), VDX2(MVSIZ), VDX3(MVSIZ),
-     .   VDX4(MVSIZ), VDX5(MVSIZ), VDX6(MVSIZ), VDX7(MVSIZ), VDX8(MVSIZ), VDY1(MVSIZ), VDY2(MVSIZ),
-     .   VDY3(MVSIZ), VDY4(MVSIZ), VDY5(MVSIZ), VDY6(MVSIZ), VDY7(MVSIZ), VDY8(MVSIZ), VDZ1(MVSIZ),
-     .   VDZ2(MVSIZ), VDZ3(MVSIZ), VDZ4(MVSIZ), VDZ5(MVSIZ), VDZ6(MVSIZ), VDZ7(MVSIZ), VDZ8(MVSIZ),
-     .   REDUC,UPWL(6,MVSIZ),VALVOIS(6,NV46,MVSIZ), VALEL(6,MVSIZ), VEC(3,6),Cf(3,MVSIZ),
-     .   Z(3),Zadj(3),ZCf(3),ZZadj(3),Zcf_,ZZadj_,cos, PS, denom, denom1,denom2,lambda,Xsi,SR1,SR2, SRF,
-     .   SURF(6),TERM2
+      INTEGER MAT(MVSIZ), I, II,J,IMAT,IALEFVM_FLG,IDV,ICF(4,6),IX1,IX2,IX3,IX4
+      my_real N1X(MVSIZ),
+     .        N2X(MVSIZ), N3X(MVSIZ), N4X(MVSIZ), N5X(MVSIZ), N6X(MVSIZ), N1Y(MVSIZ), N2Y(MVSIZ), N3Y(MVSIZ),
+     .        N4Y(MVSIZ), N5Y(MVSIZ), N6Y(MVSIZ), N1Z(MVSIZ), N2Z(MVSIZ), N3Z(MVSIZ), N4Z(MVSIZ), N5Z(MVSIZ),
+     .        N6Z(MVSIZ), FLUX1(MVSIZ), FLUX2(MVSIZ), FLUX3(MVSIZ), FLUX4(MVSIZ), FLUX5(MVSIZ),
+     .        FLUX6(MVSIZ), VX1(MVSIZ), VX2(MVSIZ), VX3(MVSIZ), VX4(MVSIZ), VX5(MVSIZ), VX6(MVSIZ),
+     .        VY1(MVSIZ), VY2(MVSIZ), VY3(MVSIZ), VY4(MVSIZ), VY5(MVSIZ), VY6(MVSIZ), VZ1(MVSIZ), VZ2(MVSIZ),
+     .        VZ3(MVSIZ), VZ4(MVSIZ), VZ5(MVSIZ), VZ6(MVSIZ),
+     .        REDUC,UPWL(MVSIZ,6),VALVOIS(6,NV46,MVSIZ), VALEL(6,MVSIZ), VEC(3,6),Cf(3,MVSIZ),
+     .        Z(3),Zadj(3),ZCf(3),ZZadj(3),ZZadj_,PS,lambda,SR1,SR2, SRF, SURF(6),TERM2
       LOGICAL debug_outp
       INTEGER :: idbf,idbl,NC(8,MVSIZ),IAD2,LGTH
 C-----------------------------------------------
@@ -117,7 +111,7 @@ C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------      
       IF(ALEFVM_Param%IEnabled == 0)    RETURN
-      IMAT        = IXS(1,1+NFT)
+      IMAT = IXS(1,1+NFT)
       IALEFVM_FLG = IPM(251,IMAT)
       IF(IALEFVM_FLG <= 1)RETURN
 C-----------------------------------------------
@@ -619,12 +613,12 @@ C             endif
       !======================================================!
       IF(NINT(PM(19,MAT(1)))==51)THEN
         DO I=1,NEL
-          FLUX(1,I)=FLUX1(I)
-          FLUX(2,I)=FLUX2(I)
-          FLUX(3,I)=FLUX3(I)
-          FLUX(4,I)=FLUX4(I)
-          FLUX(5,I)=FLUX5(I)
-          FLUX(6,I)=FLUX6(I)
+          FLUX(I+NFT,1)=FLUX1(I)
+          FLUX(I+NFT,2)=FLUX2(I)
+          FLUX(I+NFT,3)=FLUX3(I)
+          FLUX(I+NFT,4)=FLUX4(I)
+          FLUX(I+NFT,5)=FLUX5(I)
+          FLUX(I+NFT,6)=FLUX6(I)
         ENDDO !next I
         RETURN
       ENDIF
@@ -635,7 +629,7 @@ C             endif
       !======================================================!
       DO J=1,6
         DO I=1,NEL
-          UPWL(J,I)=PM(16,MAT(I))
+          UPWL(I,J)=PM(16,MAT(I))
         ENDDO !next I
       ENDDO !next J
 
@@ -675,19 +669,19 @@ C             endif
       ENDDO !next I
 
       DO I=1,NEL
-        FLUX(1,I)=FLUX1(I)-UPWL(1,I)*ABS(FLUX1(I))
-        FLUX(2,I)=FLUX2(I)-UPWL(2,I)*ABS(FLUX2(I))
-        FLUX(3,I)=FLUX3(I)-UPWL(3,I)*ABS(FLUX3(I))
-        FLUX(4,I)=FLUX4(I)-UPWL(4,I)*ABS(FLUX4(I))
-        FLUX(5,I)=FLUX5(I)-UPWL(5,I)*ABS(FLUX5(I))
-        FLUX(6,I)=FLUX6(I)-UPWL(6,I)*ABS(FLUX6(I))
+        FLUX(I+NFT,1)=FLUX1(I)-UPWL(I,1)*ABS(FLUX1(I))
+        FLUX(I+NFT,2)=FLUX2(I)-UPWL(I,2)*ABS(FLUX2(I))
+        FLUX(I+NFT,3)=FLUX3(I)-UPWL(I,3)*ABS(FLUX3(I))
+        FLUX(I+NFT,4)=FLUX4(I)-UPWL(I,4)*ABS(FLUX4(I))
+        FLUX(I+NFT,5)=FLUX5(I)-UPWL(I,5)*ABS(FLUX5(I))
+        FLUX(I+NFT,6)=FLUX6(I)-UPWL(I,6)*ABS(FLUX6(I))
 
-        FLU1(I)  =FLUX1(I)+UPWL(1,I)*ABS(FLUX1(I))
-     .           +FLUX2(I)+UPWL(2,I)*ABS(FLUX2(I))
-     .           +FLUX3(I)+UPWL(3,I)*ABS(FLUX3(I))
-     .           +FLUX4(I)+UPWL(4,I)*ABS(FLUX4(I))
-     .           +FLUX5(I)+UPWL(5,I)*ABS(FLUX5(I))
-     .           +FLUX6(I)+UPWL(6,I)*ABS(FLUX6(I))
+        FLU1(I)  =FLUX1(I)+UPWL(I,1)*ABS(FLUX1(I))
+     .           +FLUX2(I)+UPWL(I,2)*ABS(FLUX2(I))
+     .           +FLUX3(I)+UPWL(I,3)*ABS(FLUX3(I))
+     .           +FLUX4(I)+UPWL(I,4)*ABS(FLUX4(I))
+     .           +FLUX5(I)+UPWL(I,5)*ABS(FLUX5(I))
+     .           +FLUX6(I)+UPWL(I,6)*ABS(FLUX6(I))
       ENDDO !next I
 
 

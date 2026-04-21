@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  
-      !||====================================================================
-      !||    law111_upd             ../starter/source/materials/mat/mat111/law111_upd.F
-      !||--- called by ------------------------------------------------------
-      !||    updmat                 ../starter/source/materials/updmat.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    arret                  ../starter/source/system/arret.F
-      !||    func_slope             ../starter/source/tools/curve/func_slope.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    law111_upd             ../starter/source/materials/mat/mat111/law111_upd.F
+!||--- called by ------------------------------------------------------
+!||    updmat                 ../starter/source/materials/updmat.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||    func_slope             ../starter/source/tools/curve/func_slope.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE LAW111_UPD(IOUT,TITR    ,MAT_ID,UPARAM,NFUNC,
      .                      IFUNC, FUNC_ID,NPC   ,PLD   ,PM,IPM)
 C-----------------------------------------------
@@ -60,9 +60,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,K,ITEST,II,JJ,NSTART,IC1,IC2,NOGD,NDATA,NMULA,IFC,ICRYPT,
+      INTEGER JJ,NSTART,IC1,IC2,NOGD,NDATA,IFC,ICRYPT,
      .        ICHECK,NCOMP
-      my_real E,NU,GS,RBULK,D,YOUNG,ERRTOL,AVE_SLOPE,MU,MU_MAX,MU_MIN,DX,
+      my_real NU,GS,RBULK,YOUNG,ERRTOL,AVE_SLOPE,MU,
      .   SCALEFAC,STIFFMIN,STIFFMAX,STIFFINI,STFAVG
       my_real , DIMENSION(:), ALLOCATABLE :: STRESS,STRETCH
 C==================================================================== 

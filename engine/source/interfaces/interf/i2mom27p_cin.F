@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2mom27p_cin   ../engine/source/interfaces/interf/i2mom27p_cin.F
-      !||--- called by ------------------------------------------------------
-      !||    i2for27p       ../engine/source/interfaces/interf/i2for27p.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod        ../engine/share/modules/h3d_mod.F
-      !||    outmax_mod     ../common_source/modules/outmax_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i2mom27p_cin   ../engine/source/interfaces/interf/i2mom27p_cin.F
+!||--- called by ------------------------------------------------------
+!||    i2for27p       ../engine/source/interfaces/interf/i2for27p.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod        ../engine/share/modules/h3d_mod.F
+!||    outmax_mod     ../common_source/modules/outmax_mod.F
+!||====================================================================
       SUBROUTINE I2MOM27P_CIN(NSN  ,NMN  ,AR    ,IRECT,CRST  ,
      2                    MSR  ,NSV  ,IRTL  ,IN   ,MS    ,
      3                    A    ,X    ,WEIGHT,STIFR,FSKYI2,
@@ -66,13 +66,13 @@ C-----------------------------------------------
       INTEGER I, J, K, II, L, NN, I0BASE, JJ
 C     REAL
       my_real
-     .   SS, ST, XMSI, FXI, FYI, FZI, MXI, MYI, MZI,INS,
+     .   SS, ST, FXI, FYI, FZI, MXI, MYI, MZI,INS,
      .   X0,X1,X2,X3,X4,Y0,Y1,Y2,Y3,Y4,Z0,Z1,Z2,Z3,Z4,AA,
      .   XC0,YC0,ZC0,SP,SM,TP,TM,XC,YC,ZC,
-     .   STF,AI,INMX,H(4),H2(4)
+     .   STF,AI,H(4),H2(4)
 C=======================================================================
       I0BASE = I0
-C     MINER(II) initialise a MS(J) dans resol_init
+C     MINER(II) initialise a MS(J) in resol_init
       IF(ANIM_N(12)+OUTP_N(3)+H3D_DATA%N_SCAL_DINER >0) THEN
         DO II=1,NMN
           J=MSR(II)
@@ -216,7 +216,7 @@ C
         A(2,I)=ZERO
         A(3,I)=ZERO
 c
-C       stokage ZERO pour noeuds delete par idel2
+C       zero storage for nodes deleted by idel2
         ELSEIF(WEIGHT(-I)==1) THEN
           I0 = I0BASE + IADX(K)
           NN = IADI2(1,I0)

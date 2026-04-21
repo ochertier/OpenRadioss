@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    in_out_side       ../starter/source/initial_conditions/inivol/in_out_side.F
-      !||--- called by ------------------------------------------------------
-      !||    phase_detection   ../starter/source/initial_conditions/inivol/phase_detection.F
-      !||    ratio_fill        ../starter/source/initial_conditions/inivol/ratio_fill.F
-      !||--- calls      -----------------------------------------------------
-      !||    nfacette          ../starter/source/initial_conditions/inivol/nfacette.F
-      !||====================================================================
+!||====================================================================
+!||    in_out_side       ../starter/source/initial_conditions/inivol/in_out_side.F
+!||--- called by ------------------------------------------------------
+!||    phase_detection   ../starter/source/initial_conditions/inivol/phase_detection.F
+!||    ratio_fill        ../starter/source/initial_conditions/inivol/ratio_fill.F
+!||--- calls      -----------------------------------------------------
+!||    nfacette          ../starter/source/initial_conditions/inivol/nfacette.F
+!||====================================================================
       SUBROUTINE IN_OUT_SIDE(
      .       INOD      ,INOD2SURF ,KNOD2SURF ,NNOD2SURF ,X         ,
      .       XN        ,DIST      ,NSEG      ,SURF_ELTYP,NOD_NORMAL,
@@ -52,12 +52,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,K,OK,FAC,FAC1,FAC2,NULL_DIST,
+      INTEGER K,OK,FAC1,FAC2,NULL_DIST,
      . IPL,IXPL(4),
-     . p,r,p1,p2,dd1(4),dd2(4),ddd1(3),ddd2(3),ITYP,SH_ELEM,ISURF
+     . p,r,p1,p2,dd1(4),dd2(4),ddd1(3),ddd2(3),ITYP,ISURF
       my_real
      . DIST_PL(3),VX_NOD_INOD,VY_NOD_INOD,VZ_NOD_INOD,XSIGN(3),
-     . V1X,V1Y,V1Z,V2X,V2Y,V2Z,V3X,V3Y,V3Z,V12X,V12Y,V12Z,DOT,
+     . V1X,V1Y,V1Z,V2X,V2Y,V2Z,V12X,V12Y,V12Z,DOT,
      . NX,NY,NZ
       DATA dd1/4,1,2,3/,dd2/2,3,4,1/,ddd1/3,1,2/,ddd2/2,3,1/
 C-----------------------------------------------

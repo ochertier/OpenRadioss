@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat74            ../starter/source/materials/mat/mat074/hm_read_mat74.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat74            ../starter/source/materials/mat/mat074/hm_read_mat74.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT74(UPARAM  ,MAXUPARAM,NUPARAM  ,ISRATE   , IMATVIS  ,
      .                         NUVAR   ,IFUNC    ,MAXFUNC  ,NFUNC    , PARMAT   , 
      .                         UNITAB  ,MAT_ID   ,TITR     ,MTAG     , LSUBMODEL,
@@ -91,14 +91,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NRATE,NPS,IR0,ILAW
+      INTEGER ILAW
        my_real 
      .         E,NU,G,C1,EPSMAX,EPSR1,EPSR2,X2FAC,YFAC,
      .         S11Y,S22Y,S33Y,S12Y,S23Y,S31Y,
-     .         FISOKIN,M,FAC_L,FAC_T,FAC_M,FAC_C,
+     .         FISOKIN,
      .         T0, RHOCP, FF, GG, HH, LL, MM, NN, FCUT,
      .         EINF,CE,FAC_PRES,FAC_STRAIN_RATE
-      INTEGER IFUNCE, OPTE, NUM_FUNC
+      INTEGER IFUNCE, OPTE
       my_real :: RHO0, RHOR
       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED
 C-----------------------------------------------
@@ -111,6 +111,8 @@ C-----------------------------------------------
       MTAG%G_SEQ  = 1
       MTAG%L_EPSD = 1
       MTAG%L_PLA  = 1
+      MTAG%L_TEMP = 1
+!
       ISRATE=0
       IMATVIS=0
       ILAW=74
@@ -276,6 +278,9 @@ CC     Formulation for solid elements time step computation.
       PARMAT(16) = 2
       PARMAT(17) =  (ONE - TWO*NU)/(ONE - NU) ! == TWO*G/(C1+FOUR_OVER_3*G)
 C
+      ! activate heat source calculation in material
+      MATPARAM%HEAT_FLAG = 1
+!
       ! MATPARAM keywords
       CALL INIT_MAT_KEYWORD(MATPARAM,"ORTHOTROPIC")
 C

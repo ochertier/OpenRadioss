@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    dt16law   ../starter/source/materials/time_step/dt16law.F
-      !||--- called by ------------------------------------------------------
-      !||    dtmain    ../starter/source/materials/time_step/dtmain.F
-      !||--- calls      -----------------------------------------------------
-      !||    dtel      ../starter/source/materials/time_step/dtel.F
-      !||====================================================================
+!||====================================================================
+!||    dt16law   ../starter/source/materials/time_step/dt16law.F
+!||--- called by ------------------------------------------------------
+!||    dtmain    ../starter/source/materials/time_step/dtmain.F
+!||--- calls      -----------------------------------------------------
+!||    dtel      ../starter/source/materials/time_step/dtel.F
+!||====================================================================
       SUBROUTINE DT16LAW(PM,GEO,PID,MAT, DELTAX, AIRE, VOL, DTX)
 C
-C     CALCUL DES DT ELEM. LOI NO 16 TYPE JOHNSON - COOK - GRAY
+C     CALCULATION OF ELEMENT DT FOR LAW NO 16 TYPE JOHNSON - COOK - GRAY
 C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -68,13 +68,13 @@ C=======================================================================
          VIS(I) = ZERO
       END DO
 C------------------------------------
-C     VITESSE DU SON
+C     SOUND VELOCITY
 C------------------------------------
       DO I=LFT,LLT
          SSP(I)=SQRT(C(I)**2 + ONEP333*G(I)/RHO0(I))
       END DO
 C------------------------------------
-C     CALCUL DES DT ELEM
+C     CALCULATION OF DT ELEM
 C------------------------------------
       CALL DTEL(SSP,PM,GEO,PID,MAT, RHO0, VIS, DELTAX, AIRE, VOL, DTX)
 C-----------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cepsini        ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    cinit3         ../starter/source/elements/shell/coque/cinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    cdefoi         ../starter/source/elements/shell/coque/cepsini.F
-      !||    ceveci         ../starter/source/elements/shell/coque/ceveci.F
-      !||    cmlawi         ../starter/source/elements/shell/coque/cepsini.F
-      !||    corth3         ../starter/source/elements/shell/coque/corth3.F
-      !||    cpxpyi         ../starter/source/elements/shell/coque/cepsini.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    cepsini        ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    cinit3         ../starter/source/elements/shell/coque/cinit3.F
+!||--- calls      -----------------------------------------------------
+!||    cdefoi         ../starter/source/elements/shell/coque/cepsini.F
+!||    ceveci         ../starter/source/elements/shell/coque/ceveci.F
+!||    cmlawi         ../starter/source/elements/shell/coque/cepsini.F
+!||    corth3         ../starter/source/elements/shell/coque/corth3.F
+!||    cpxpyi         ../starter/source/elements/shell/coque/cepsini.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE CEPSINI(ELBUF_STR,MAT_PARAM,
      1           JFT    ,JLT   ,ISMSTR,ILAW    ,ITHK    ,
      2           PM     ,GEO   ,IXC   ,X      ,XREFC   ,
@@ -45,6 +45,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MAT_ELEM_MOD            
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,7 +76,6 @@ C------------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, NT, I1, I2, I3, I4,IDRAPE,IGTYP
-      INTEGER PID(MVSIZ)
       my_real
      .   FAC
       my_real
@@ -87,14 +87,7 @@ C-----------------------------------------------
      .   E1X(MVSIZ), E1Y(MVSIZ), E1Z(MVSIZ),
      .   E2X(MVSIZ), E2Y(MVSIZ), E2Z(MVSIZ),
      .   E3X(MVSIZ), E3Y(MVSIZ), E3Z(MVSIZ),
-     .   X2I(MVSIZ), Y2I(MVSIZ), Z2I(MVSIZ),
-     .   X3I(MVSIZ), Y3I(MVSIZ), Z3I(MVSIZ),
      .   X4I(MVSIZ), Y4I(MVSIZ), Z4I(MVSIZ),
-     .   X2H(MVSIZ), Y2H(MVSIZ), X3H(MVSIZ), Y3H(MVSIZ),
-     .   X2R(MVSIZ), Y2R(MVSIZ), Z2R(MVSIZ),
-     .   X3R(MVSIZ), Y3R(MVSIZ), Z3R(MVSIZ),
-     .   X4R(MVSIZ), Y4R(MVSIZ), Z4R(MVSIZ),
-     .   X4H(MVSIZ), Y4H(MVSIZ),
      .   EXX(MVSIZ),EYY(MVSIZ),EXY(MVSIZ),EYZ(MVSIZ),EZX(MVSIZ)
       my_real, 
      .   DIMENSION(:) , POINTER :: DIR1, DIR2
@@ -265,19 +258,19 @@ c-----------
       RETURN
       END
 C
-      !||====================================================================
-      !||    cmlawi         ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3epsini       ../starter/source/elements/sh3n/coque3n/c3epsini.F
-      !||    cdkepsini      ../starter/source/elements/sh3n/coquedk/cdkepsini.F
-      !||    cepsini        ../starter/source/elements/shell/coque/cepsini.F
-      !||    cnepsini       ../starter/source/elements/shell/coqueba/cnepsini.F
-      !||--- calls      -----------------------------------------------------
-      !||    cm19ini        ../starter/source/elements/shell/coque/cepsini.F
-      !||    cm1ini         ../starter/source/elements/shell/coque/cepsini.F
-      !||    cm58_refsta    ../starter/source/materials/mat/mat058/cm58_refsta.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    cmlawi         ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    c3epsini       ../starter/source/elements/sh3n/coque3n/c3epsini.F
+!||    cdkepsini      ../starter/source/elements/sh3n/coquedk/cdkepsini.F
+!||    cepsini        ../starter/source/elements/shell/coque/cepsini.F
+!||    cnepsini       ../starter/source/elements/shell/coqueba/cnepsini.F
+!||--- calls      -----------------------------------------------------
+!||    cm19ini        ../starter/source/elements/shell/coque/cepsini.F
+!||    cm1ini         ../starter/source/elements/shell/coque/cepsini.F
+!||    cm58_refsta    ../starter/source/materials/mat/mat058/cm58_refsta.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE CMLAWI(MAT_PARAM,
      1                  JFT,JLT,ILAW,ITHK,PM,
      2                  FOR,THK,EINT,GSTR,DIR1,
@@ -341,13 +334,13 @@ C-------------------------------------
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    cpxpyi     ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    cepsini    ../starter/source/elements/shell/coque/cepsini.F
-      !||    cnepsini   ../starter/source/elements/shell/coqueba/cnepsini.F
-      !||    fsigcini   ../starter/source/constraints/fxbody/fsigcini.F
-      !||====================================================================
+!||====================================================================
+!||    cpxpyi     ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    cepsini    ../starter/source/elements/shell/coque/cepsini.F
+!||    cnepsini   ../starter/source/elements/shell/coqueba/cnepsini.F
+!||    fsigcini   ../starter/source/constraints/fxbody/fsigcini.F
+!||====================================================================
       SUBROUTINE CPXPYI(JFT  ,JLT  ,ISMSTR,AREA  ,
      .                  PX1G ,PX2G ,PY1G ,PY2G ,
      .                  PX1  ,PX2  ,PY1  ,PY2  ,
@@ -428,12 +421,12 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    cdefoi     ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    cepsini    ../starter/source/elements/shell/coque/cepsini.F
-      !||    cnepsini   ../starter/source/elements/shell/coqueba/cnepsini.F
-      !||====================================================================
+!||====================================================================
+!||    cdefoi     ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    cepsini    ../starter/source/elements/shell/coque/cepsini.F
+!||    cnepsini   ../starter/source/elements/shell/coqueba/cnepsini.F
+!||====================================================================
       SUBROUTINE CDEFOI(JFT  ,JLT ,VL  ,GSTR,
      .                  PX1  ,PX2 ,PY1 ,PY2 ,NEL ,
      .                  AREA ,EXX ,EYY ,EXY ,EYZ ,EZX ,
@@ -530,11 +523,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    cm1ini   ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    cmlawi   ../starter/source/elements/shell/coque/cepsini.F
-      !||====================================================================
+!||====================================================================
+!||    cm1ini   ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    cmlawi   ../starter/source/elements/shell/coque/cepsini.F
+!||====================================================================
       SUBROUTINE CM1INI(JFT,JLT,ITHK,PM,FOR,
      .                  THK,EINT,NEL,IMAT,AREA,
      .                  EXX,EYY ,EXY )
@@ -593,14 +586,14 @@ c-----------
       RETURN
       END
 C
-      !||====================================================================
-      !||    cm19ini   ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    cmlawi    ../starter/source/elements/shell/coque/cepsini.F
-      !||--- calls      -----------------------------------------------------
-      !||    roto      ../starter/source/elements/shell/coque/cepsini.F
-      !||    uroto     ../starter/source/elements/shell/coque/cepsini.F
-      !||====================================================================
+!||====================================================================
+!||    cm19ini   ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    cmlawi    ../starter/source/elements/shell/coque/cepsini.F
+!||--- calls      -----------------------------------------------------
+!||    roto      ../starter/source/elements/shell/coque/cepsini.F
+!||    uroto     ../starter/source/elements/shell/coque/cepsini.F
+!||====================================================================
       SUBROUTINE CM19INI(JFT,JLT,ITHK,PM,FOR,
      .                   THK,EINT,GSTR,DIR,SIGI,
      .                   NEL,IMAT,AREA,EXX,EYY,EXY)
@@ -657,7 +650,7 @@ C
         EPST(5,I)= GSTR(I,5)*HALF
       ENDDO
 C-------------------------------------------------
-C     ROTATIONS DANS LE REPERE D ORTHOTROPIE EPST
+C     rotations in the orthotropy frame epst
 C-------------------------------------------------
       CALL ROTO(JFT,JLT,EPST,5,DIR,NEL)
 C-------------------------------------------------
@@ -673,7 +666,7 @@ C-----------------------------
        FOR(I,2)=A12(I)*EPST(1,I)+A22(I)*EPST(2,I)
        FOR(I,3)=G12(I)*EPST(3,I)*TWO
 C-----------------------------
-C     CONTRAINTES reduites en compression
+C     Reduced compression constraints
 C-----------------------------
        S  = HALF*(FOR(I,1)+FOR(I,2))
        D  = HALF*(FOR(I,1)-FOR(I,2))
@@ -706,7 +699,7 @@ C-----------------------------------------------------------
         ENDIF
       ENDDO
 C--------------------------------
-C     RETOUR DANS LE REPERE COQUE
+C     return to shell reference frame
 C--------------------------------
       CALL UROTO(JFT,JLT,FOR,5,DIR,NEL)
 C
@@ -723,11 +716,11 @@ C        ENDDO
 C      ENDIF
       RETURN
       END
-      !||====================================================================
-      !||    roto      ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    cm19ini   ../starter/source/elements/shell/coque/cepsini.F
-      !||====================================================================
+!||====================================================================
+!||    roto      ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    cm19ini   ../starter/source/elements/shell/coque/cepsini.F
+!||====================================================================
       SUBROUTINE ROTO(JFT,JLT,TAB,LTAB,DIR,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -773,11 +766,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    uroto     ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    cm19ini   ../starter/source/elements/shell/coque/cepsini.F
-      !||====================================================================
+!||====================================================================
+!||    uroto     ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    cm19ini   ../starter/source/elements/shell/coque/cepsini.F
+!||====================================================================
       SUBROUTINE UROTO(JFT,JLT,TAB,LTAB,DIR,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -822,18 +815,19 @@ C-------------------------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    cepschk       ../starter/source/elements/shell/coque/cepsini.F
-      !||--- called by ------------------------------------------------------
-      !||    cbainit3      ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cinit3        ../starter/source/elements/shell/coque/cinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cepschk       ../starter/source/elements/shell/coque/cepsini.F
+!||--- called by ------------------------------------------------------
+!||    cbainit3      ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cinit3        ../starter/source/elements/shell/coque/cinit3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CEPSCHK(JFT,JLT,NFT,PM,GEO,IXC,GSTR,THK,NEL,CPT_ELTENS)
       USE MESSAGE_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

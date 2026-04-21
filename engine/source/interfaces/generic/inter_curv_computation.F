@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inter_curv_computation   ../engine/source/interfaces/generic/inter_curv_computation.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_count_node_curv    ../engine/source/interfaces/generic/inter_count_node_curv.F
-      !||====================================================================
+!||====================================================================
+!||    inter_curv_computation   ../engine/source/interfaces/generic/inter_curv_computation.F
+!||--- called by ------------------------------------------------------
+!||    inter_count_node_curv    ../engine/source/interfaces/generic/inter_count_node_curv.F
+!||====================================================================
       SUBROUTINE INTER_CURV_COMPUTATION(ICURV,NRTM_T,IRECT,C_MAX_LOCAL,CURV_MAX,X)
 !$COMMENT
 !       INTER_CURV_COMPUTATION description :

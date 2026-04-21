@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_fail_biquad      ../starter/source/materials/fail/biquad/hm_read_fail_biquad.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_fail             ../starter/source/materials/fail/hm_read_fail.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    biquad_coefficients      ../starter/source/materials/fail/biquad/biquad_coefficients.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_fail_biquad      ../starter/source/materials/fail/biquad/hm_read_fail_biquad.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_fail             ../starter/source/materials/fail/hm_read_fail.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    biquad_coefficients      ../starter/source/materials/fail/biquad/biquad_coefficients.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_FAIL_BIQUAD(
      .            FAIL     ,MAT_ID   ,FAIL_ID  ,IRUPT    ,
      .            TITR     ,LSUBMODEL,UNITAB   )
@@ -78,7 +78,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER   :: MFLAG,SFLAG,REG_FUNC,ICOUP,NFUNC,NUVAR,NUPARAM
+      INTEGER   :: MFLAG,SFLAG,REG_FUNC,ICOUP,IREG,NFUNC,NUVAR,NUPARAM,FAILIP 
       my_real   :: C1,C2,C3,C4,C5,E1,E2,E3,E4,PTHK,INST,REF_LEN,REF_SIZ_UNIT
       my_real   :: X_1(2)
       my_real   :: X_2(3)
@@ -103,10 +103,13 @@ card1
 c
 card2 damage accumulation parametars
 c
+      CALL HM_GET_INTV   ('FAILIP'   ,FAILIP   ,IS_AVAILABLE,LSUBMODEL)
+      IF (FAILIP == 0)  FAILIP  = 1
       CALL HM_GET_FLOATV ('P_thickfail' ,PTHK        ,IS_AVAILABLE,LSUBMODEL,UNITAB)  
       CALL HM_GET_INTV   ('M_Flag'      ,MFLAG       ,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV   ('S_Flag'      ,SFLAG       ,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_FLOATV ('Inst_start'  ,INST        ,IS_AVAILABLE,LSUBMODEL,UNITAB)  
+      CALL HM_GET_INTV   ('Ireg'        ,IREG        ,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV   ('fct_IDel'    ,REG_FUNC    ,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_FLOATV ('EI_ref'      ,REF_LEN     ,IS_AVAILABLE,LSUBMODEL,UNITAB)
       IF (REG_FUNC > 0 .AND. REF_LEN == ZERO) THEN 
@@ -138,6 +141,13 @@ c
       ! Check SFLAG formulation parameter
       IF (SFLAG == 0)   SFLAG = 2
 c
+      IF (REG_FUNC == 0) THEN
+        IREG = 0
+      ELSE IF (IREG == 0) THEN
+        IREG = 1
+      END IF
+      ! IREG = 2 => automatic correction of element size scaling factor depending on triaxiality
+      ! IREG = 3 => IREG = 2 with debug output of generated tabulated swift function
 c---------------------------------------------------
 c     pre definition for user-input data when only 
 c     tension test data are provided
@@ -195,6 +205,7 @@ c
       ENDIF
 c
       ! Check if minimum of first parabola is negative 
+      IF(X_1(2) .ne. Zero) then
       XMIN = -X_1(1)/(TWO*X_1(2))
       YMIN = X_1(2)*(XMIN**2) + X_1(1)*XMIN + C2
       IF (YMIN < ZERO) THEN 
@@ -202,8 +213,9 @@ c
      .              I1=MAT_ID,
      .              C1=TITR)          
       ENDIF
+      ENDIF
       ! Check if minimum of second parabola is negative 
-      IF (SFLAG == 1) THEN 
+      IF (SFLAG == 1 .and. X_2(3) .ne. 0) THEN 
         XMIN = -X_2(2)/(TWO*X_2(3))
         YMIN = X_2(3)*(XMIN**2) + X_2(2)*XMIN + X_2(1)
         IF (YMIN < ZERO) THEN 
@@ -214,7 +226,7 @@ c
       ENDIF
 c
 c---------------------------------------------------
-      NUPARAM = 16
+      NUPARAM = 17
       IF (REG_FUNC == 0) THEN
         NFUNC = 0
         NUVAR = 2
@@ -229,7 +241,7 @@ c-------------------------
       FAIL%IRUPT   = IRUPT 
       FAIL%FAIL_ID = FAIL_ID 
       FAIL%NUPARAM = NUPARAM
-      FAIL%NIPARAM = 0
+      FAIL%NIPARAM = 4
       FAIL%NUVAR   = NUVAR
       FAIL%NFUNC   = NFUNC
       FAIL%NTABLE  = 0
@@ -242,6 +254,11 @@ c
       ALLOCATE (FAIL%IFUNC (FAIL%NFUNC))
       ALLOCATE (FAIL%TABLE (FAIL%NTABLE))
       
+      FAIL%IPARAM(1)  = IREG
+      FAIL%IPARAM(2)  = MFLAG
+      FAIL%IPARAM(3)  = SFLAG
+      FAIL%IPARAM(4)  = ICOUP
+
       IF (NFUNC == 1) FAIL%IFUNC(1) = REG_FUNC
 
       FAIL%UPARAM(1)  = C2
@@ -253,13 +270,14 @@ c
       FAIL%UPARAM(7)  = PTHK
       FAIL%UPARAM(8)  = 0
       FAIL%UPARAM(9)  = C3
-      FAIL%UPARAM(10) = MFLAG
-      FAIL%UPARAM(11) = SFLAG
+      FAIL%UPARAM(10) = MFLAG ! del
+      FAIL%UPARAM(11) = SFLAG ! del
       FAIL%UPARAM(12) = INST
       FAIL%UPARAM(13) = REF_LEN  
-      FAIL%UPARAM(14) = ICOUP
+      FAIL%UPARAM(14) = ICOUP ! del
       FAIL%UPARAM(15) = DCRIT 
       FAIL%UPARAM(16) = EXP  
+      FAIL%UPARAM(17) = FAILIP
 c---------------------------------------------------
       IF (IS_ENCRYPTED)THEN
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
@@ -271,11 +289,11 @@ c---------------------------------------------------
         WRITE(IOUT,1400) X_2(3),X_2(2),X_2(1)
         WRITE(IOUT,1500) SFLAG
         IF (SFLAG == 3) WRITE(IOUT,1600) INST
-        IF (REG_FUNC > 0) WRITE(IOUT, 1700) REG_FUNC,REF_LEN
+        IF (REG_FUNC > 0) WRITE(IOUT, 1700) IREG,REG_FUNC,REF_LEN
         IF (ICOUP > 0) THEN 
           WRITE(IOUT,1800) ICOUP,DCRIT,EXP
         ENDIF
-        WRITE(IOUT, 1900) PTHK
+        WRITE(IOUT, 1900) PTHK,FAILIP
         WRITE(IOUT, 2000) 
       ENDIF      
 c-----------------------------------------------------------------------
@@ -325,8 +343,9 @@ c-----------------------------------------------------------------------
  1700 FORMAT(
      & 5X,'ELEMENT LENGTH REGULARIZATION:                 ',/,
      & 5X,'------------------------------                 ',/,
+     & 5X,'REGULARIZATION FUNCTION FLAG . . . . . . . . .=',I10,/
      & 5X,'REGULARIZATION FUNCTION ID . . . . . . . . . .=',I10,/
-     & 5X,'REFERENZE ELEMENT LENGTH . . . . . . . . . . .=',1PG20.13,/)
+     & 5X,'REFERENCE ELEMENT LENGTH . . . . . . . . . . .=',1PG20.13,/)
  1800 FORMAT(
      & 5X,'STRESS SOFTENING:                              ',/,
      & 5X,'-----------------                              ',/,
@@ -340,7 +359,8 @@ c-----------------------------------------------------------------------
      & 5X,'-----------------                              ',/,
      & 5X,'SHELL ELEMENT DELETION PARAMETER PTHICKFAIL. .=',1PG20.13,/
      & 5X,'   > 0.0: FRACTION OF FAILED THICKNESS         ',/,
-     & 5X,'   < 0.0: FRACTION OF FAILED INTG. POINTS      ',/)
+     & 5X,'   < 0.0: FRACTION OF FAILED INTG. POINTS      ',/,
+     & 5X,'NUMBER OF FAILED INTG. POINTS PRIOR TO ELEM DELETION  .=',I10/)
  2000 FORMAT(
      & 5X,'-----------------------------------------------',/)
 c-----------------------------------------------------------------------

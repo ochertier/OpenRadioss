@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop18             ../starter/source/properties/beam/hm_read_prop18.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties         ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    defbeam_sect               ../starter/source/properties/beam/hm_read_prop18.F
-      !||    defbeam_sect_new           ../starter/source/properties/beam/defbeam_sect_new.F90
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    defbeam_sect_new_mod       ../starter/source/properties/beam/defbeam_sect_new.F90
-      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
-      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop18             ../starter/source/properties/beam/hm_read_prop18.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties         ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    defbeam_sect               ../starter/source/properties/beam/hm_read_prop18.F
+!||    defbeam_sect_new           ../starter/source/properties/beam/defbeam_sect_new.F90
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    defbeam_sect_new_mod       ../starter/source/properties/beam/defbeam_sect_new.F90
+!||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+!||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP18(GEO       ,IGEO     ,PROP_TAG ,IGTYP    ,IG        ,
      .                          IDTITL    ,UNITAB   ,LSUBMODEL)
 C============================================================================
@@ -131,7 +131,7 @@ C--------------------------------------------------
 C
         GEO(3)=ISMSTR
         IF (ISMSTR==3) GEO(5)=EP06
-C  double stockage temporaire - supprimer GEO(12)=IGTYP apres tests
+C  Temporary double storage - Delete GEO (12) = Igtyp after tests
         IGEO( 1)=IG
         IGEO(10)=ISECT
         IGEO(11)=IGTYP
@@ -265,7 +265,7 @@ c
      .              I2=NIP)
         ENDIF
         
-C---  coord isoparametriques et surfaces relatives des pts d'integration
+C---  isoparametric coordinates and relative surfaces of integration points
         IF (ISECT == 0.AND.IREF == 0) THEN
           Y0 = ZERO      
           Z0 = ZERO      
@@ -398,15 +398,15 @@ C
 C
       END SUBROUTINE
 
-      !||====================================================================
-      !||    defbeam_sect           ../starter/source/properties/beam/hm_read_prop18.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_prop18         ../starter/source/properties/beam/hm_read_prop18.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    defbeam_sect           ../starter/source/properties/beam/hm_read_prop18.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_prop18         ../starter/source/properties/beam/hm_read_prop18.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE DEFBEAM_SECT(GEO,ISECT,INTR,NIP,
      .                        AREA,L,IG,IDTITL)
 C-----------------------------------------------
@@ -593,7 +593,7 @@ c           write error message
             GEO(IPY+1) = ZERO                                                 
             GEO(IPZ+1) = ZERO                                                 
             GEO(IPA+1) = AREA                                                 
-          ELSEIF (INTR == 2) THEN ! cercle divise en 4                                              
+          ELSEIF (INTR == 2) THEN ! Circle divides into 4                                              
             NIP = INTR*INTR                                                   
             AI  = AREA/NIP                                                    
             R1 = L(1)/SQR3                                                      
@@ -693,6 +693,7 @@ c---------------
           ENDIF   
 c---------------
         CASE (4)    ! circular section    Lobatto 5 OR 7 in radius 8 in circonference
+          AREA = PI*L(1)*L(1)                                                     
           !POINTS RADIALS ALIGNES
           IF (INTR == 17) THEN
              NIP = 17
@@ -805,10 +806,10 @@ c---------------
             ENDDO  
           ELSEIF (INTR == 17) THEN   ! POINTS RADIALS NON ALIGNES  
              NIP = INTR
-             R1 = 0.4472136*L(1) ! rayon petit cercle
-             R2 = 0.774597 *L(1) !rayon cercle moyen
-             R3 = L(1)   ! rayon de la section
-             D2 = HALF*L(1) !distance au point d'integ
+             R1 = 0.4472136*L(1) ! Small circle department
+             R2 = 0.774597 *L(1) !Middle circle department
+             R3 = L(1)   ! radius of the section
+             D2 = HALF*L(1) !Distance to Integ point
              AI = PI * (R3*R3 - R2*R2)/EIGHT
              PHI = ZERO
              DPHI= PI * FOURTH

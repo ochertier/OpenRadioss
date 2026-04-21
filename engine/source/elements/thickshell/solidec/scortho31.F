@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    scortho31   ../engine/source/elements/thickshell/solidec/scortho31.F
-      !||--- called by ------------------------------------------------------
-      !||    srota6      ../engine/source/output/anim/generate/srota6.F
-      !||    srotorth    ../engine/source/elements/solid/srotorth.F
-      !||    thsol       ../engine/source/output/th/thsol.F
-      !||====================================================================
+!||====================================================================
+!||    scortho31   ../engine/source/elements/thickshell/solidec/scortho31.F
+!||--- called by ------------------------------------------------------
+!||    srota6      ../engine/source/output/anim/generate/srota6.F
+!||    srotorth    ../engine/source/elements/solid/srotorth.F
+!||    thsol       ../engine/source/output/th/thsol.F
+!||====================================================================
       SUBROUTINE SCORTHO31(
      .   X1, X2, X3, X4, X5, X6, X7, X8,
      .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
@@ -50,7 +50,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I
+ 
 C     REAL
 C                                                                     12
       my_real
@@ -62,9 +62,7 @@ C                                                                     12
      .   C17 , C28 ,
      .   RX , RY , RZ ,
      .   TX , TY , TZ ,
-     .   DET,C1,C2, sign,
-     .   SX , SY , SZ ,
-     .   RSX , RSY , RSZ
+     .   DET,C1,C2
 C-----------------------------------------------
       X17=X7-X1
       X28=X8-X2

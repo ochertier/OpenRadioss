@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,41 +21,42 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  |---- version non //------------
-      !||====================================================================
-      !||    lin_solv             ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_chkm             ../engine/source/implicit/imp_solv.F
-      !||    imp_solv             ../engine/source/implicit/imp_solv.F
-      !||    nl_solv              ../engine/source/implicit/nl_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    bfgs_h1              ../engine/source/implicit/imp_bfgs.F
-      !||    bfgs_h1p             ../engine/source/implicit/imp_bfgs.F
-      !||    bfgs_h2              ../engine/source/implicit/imp_bfgs.F
-      !||    bfgs_h2p             ../engine/source/implicit/imp_bfgs.F
-      !||    diag_kif             ../engine/source/implicit/imp_solv.F
-      !||    imp_smpini           ../engine/source/implicit/imp_solv.F
-      !||    ini_kisc             ../engine/source/implicit/lin_solv.F
-      !||    lin_solv2            ../engine/source/implicit/lin_solv.F
-      !||    lin_solvh0           ../engine/source/implicit/lin_solv.F
-      !||    lin_solvh1           ../engine/source/implicit/lin_solv.F
-      !||    lin_solvhm           ../engine/source/implicit/lin_solv.F
-      !||    lin_solvih2          ../engine/source/implicit/lin_solv.F
-      !||    lin_solvp2           ../engine/source/implicit/lin_solv.F
-      !||    mav_lth0             ../engine/source/implicit/produt_v.F
-      !||    my_barrier           ../engine/source/system/machine.F
-      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
-      !||    produt_hp            ../engine/source/implicit/produt_v.F
-      !||    qstat_end            ../engine/source/implicit/imp_dyna.F
-      !||    qstat_it             ../engine/source/implicit/imp_dyna.F
-      !||    recu_kdis            ../engine/source/airbag/monv_imp0.F
-      !||    recu_kdis0           ../engine/source/implicit/lin_solv.F
-      !||    recudis              ../engine/source/implicit/recudis.F
-      !||    set_ksym             ../engine/source/implicit/imp_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
-      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lin_solv             ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    imp_chkm             ../engine/source/implicit/imp_solv.F
+!||    imp_solv             ../engine/source/implicit/imp_solv.F
+!||    nl_solv              ../engine/source/implicit/nl_solv.F
+!||--- calls      -----------------------------------------------------
+!||    bfgs_h1              ../engine/source/implicit/imp_bfgs.F
+!||    bfgs_h1p             ../engine/source/implicit/imp_bfgs.F
+!||    bfgs_h2              ../engine/source/implicit/imp_bfgs.F
+!||    bfgs_h2p             ../engine/source/implicit/imp_bfgs.F
+!||    diag_kif             ../engine/source/implicit/imp_solv.F
+!||    imp_smpini           ../engine/source/implicit/imp_solv.F
+!||    ini_kisc             ../engine/source/implicit/lin_solv.F
+!||    lin_solv2            ../engine/source/implicit/lin_solv.F
+!||    lin_solvh0           ../engine/source/implicit/lin_solv.F
+!||    lin_solvh1           ../engine/source/implicit/lin_solv.F
+!||    lin_solvhm           ../engine/source/implicit/lin_solv.F
+!||    lin_solvih2          ../engine/source/implicit/lin_solv.F
+!||    lin_solvp2           ../engine/source/implicit/lin_solv.F
+!||    mav_lth0             ../engine/source/implicit/produt_v.F
+!||    my_barrier           ../engine/source/system/machine.F
+!||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+!||    produt_hp            ../engine/source/implicit/produt_v.F
+!||    qstat_end            ../engine/source/implicit/imp_dyna.F
+!||    qstat_it             ../engine/source/implicit/imp_dyna.F
+!||    recu_kdis            ../engine/source/airbag/monv_imp0.F
+!||    recu_kdis0           ../engine/source/implicit/lin_solv.F
+!||    recudis              ../engine/source/implicit/recudis.F
+!||    set_ksym             ../engine/source/implicit/imp_solv.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+!||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+!||    imp_workh            ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod        ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE LIN_SOLV(NDDL  ,IDDL  ,NDOF  ,IKC   ,D     ,
      1                    DR    ,TOL   ,NNZ   ,IADK  ,JDIK  ,
      2                    DIAG_K,LT_K  ,NDDLI ,IADI  ,JDII  ,   
@@ -136,18 +137,18 @@ C-----------------------------------------------
 C------------------------------------------
 c     isolv=1 => P.G.C.  
 C------------------------------------------
-C-------------avec LIN_SOLV0-----------------------------
-c     iprec=1 => [I] (sans precon)
-C-------------avec LIN_SOLV1 (2-10)-----------------------------
+C-------------with LIN_SOLV0-----------------------------
+c     iprec = 1 => [i] (without precon)
+C-------------with LIN_SOLV1 (2-10)-----------------------------
 c     iprec=2 => jacobien 
 c     iprec=3 => I.C.(0)       supprimed
 c     iprec=4 => I.C.(0)_Stab  supprimed
 c     iprec=5 => fsai .r
-C---------avec LIN_SOLV2 NPAT>1: 
-c-----(iprec>10)variable dimension(D_TOL) pour LT_M : supprimed------
+C---------with LIN_SOLV2 NPAT>1:
+c----- (IPREC> 10) Dimension variable (d_tol) for LT_M: delete ---------
 C------------------------------------------
 C------------------------------------------
-C     [K]:matrice de rigidite [M]:matrice de preconditionnement
+C     [K]:stiffness matrix [M]:preconditioning matrix
 C------------------------------------------
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -158,7 +159,7 @@ C---------------------)--------------------------
 C        U->L_U,DIAG_T->DIAG_T,F0->L_F0
 C---------------------
 c        F_DDL=1+ITASK*NDDL/NTHREAD
-c        L_DDL=(ITASK+1)*NDDL/NTHREAD
+c        L_ddl = (itask+1)*nddl/nthread
 c        F_DDLI=1+ITASK*NDDLI/NTHREAD
 c        L_DDLI=(ITASK+1)*NDDLI/NTHREAD
 C
@@ -395,7 +396,7 @@ citask0        IF (ITASK == 0) THEN
 citask0        END IF !(ITASK == 0) THEN
        ENDIF
       ENDIF
-C--------POUR F*X--------
+C--------FOR F*X--------
        CALL PRODUT_HP(NDDL,L_U,L_F0,W_DDL,F_U)
 citask0      IF (ITASK == 0) THEN
 C---------
@@ -428,20 +429,20 @@ C---------------------
 #endif
       END
 
-C  |---- solveurs directs smp------------
-      !||====================================================================
-      !||    lin_solv2        ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv         ../engine/source/implicit/lin_solv.F
-      !||    lin_solvhm       ../engine/source/implicit/lin_solv.F
-      !||    prec_solv        ../engine/source/implicit/prec_solv.F
-      !||    prec_solvh       ../engine/source/implicit/prec_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_dsolv        ../engine/source/implicit/imp_dsolv.F
-      !||    imp_dsolv_iter   ../engine/source/implicit/imp_dsolv.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod      ../engine/share/modules/dsgraph_mod.F
-      !||====================================================================
+C  | ---- SMP direct solvents ------------
+!||====================================================================
+!||    lin_solv2        ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv         ../engine/source/implicit/lin_solv.F
+!||    lin_solvhm       ../engine/source/implicit/lin_solv.F
+!||    prec_solv        ../engine/source/implicit/prec_solv.F
+!||    prec_solvh       ../engine/source/implicit/prec_solv.F
+!||--- calls      -----------------------------------------------------
+!||    imp_dsolv        ../engine/source/implicit/imp_dsolv.F
+!||    imp_dsolv_iter   ../engine/source/implicit/imp_dsolv.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod      ../engine/share/modules/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE LIN_SOLV2(
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,NDDLI ,ITOK  ,IADI  ,JDII   ,
@@ -476,7 +477,7 @@ C-----------------------------------------------
       my_real
      .        RBID
 C------------------------------------------
-C     [K]:matrice de rigidite [KI]:matrice de contact
+C     [K]:stiffness matrix [KI]:contact matrix
 C------------------------------------------
 C       IF (IMON>0) CALL STARTIME(33,ITASK+1)
 C      IF (ISOLV==3) THEN
@@ -504,22 +505,22 @@ C      IF (IMON>0) CALL STOPTIME(33,ITASK+1)
 #endif
       END
 
-      !||====================================================================
-      !||    lin_solvp2       ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv         ../engine/source/implicit/lin_solv.F
-      !||    lin_solvhm       ../engine/source/implicit/lin_solv.F
-      !||    prec_solvh       ../engine/source/implicit/prec_solv.F
-      !||    prec_solvp       ../engine/source/implicit/prec_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_dsfext       ../engine/source/implicit/imp_dsfext.F
-      !||    imp_dsolv        ../engine/source/implicit/imp_dsolv.F
-      !||    imp_dsolv_iter   ../engine/source/implicit/imp_dsolv.F
-      !||    imp_mumps2       ../engine/source/implicit/imp_mumps.F
-      !||    mumpslb          ../engine/source/implicit/lin_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod      ../engine/share/modules/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lin_solvp2       ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv         ../engine/source/implicit/lin_solv.F
+!||    lin_solvhm       ../engine/source/implicit/lin_solv.F
+!||    prec_solvh       ../engine/source/implicit/prec_solv.F
+!||    prec_solvp       ../engine/source/implicit/prec_solv.F
+!||--- calls      -----------------------------------------------------
+!||    imp_dsfext       ../engine/source/implicit/imp_dsfext.F
+!||    imp_dsolv        ../engine/source/implicit/imp_dsolv.F
+!||    imp_dsolv_iter   ../engine/source/implicit/imp_dsolv.F
+!||    imp_mumps2       ../engine/source/implicit/imp_mumps.F
+!||    mumpslb          ../engine/source/implicit/lin_solv.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod      ../engine/share/modules/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE LIN_SOLVP2(GRAPHE, F     , NDDL , IAD_ELEM , FR_ELEM,
      1                      DIAG_K, LT_K  , IADK , JDIK     , X      ,
      2                      ITAB  , IPRINT, NDDLI, IADI     , JDII   ,
@@ -578,8 +579,8 @@ C
 C
       ELSEIF (ISOLV==4) THEN
          NF=1
-C Division des forces exterieures sur les ddls de la frontiere par le nombre 
-C de processeurs auxquels ils appartiennent (elles sont reassemblees dans DSRESOL)
+C Division of external forces on the boundary degrees of freedom by the number
+C of processors to which they belong (they are reassembled in DSRESOL)
          CALL IMP_DSFEXT(GRAPHE , NF, F, NDDL, IAD_ELEM,
      .                   FR_ELEM)
 C
@@ -602,16 +603,16 @@ C
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    err_mem       ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_fac_icj   ../engine/source/implicit/imp_fac_ic.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    err_mem       ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    imp_fac_icj   ../engine/source/implicit/imp_fac_ic.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ERR_MEM(MEM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -636,13 +637,13 @@ C-----------------------------------------------
       CALL ARRET(2)
       RETURN
       END
-      !||====================================================================
-      !||    recu_kdis0   ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv     ../engine/source/implicit/lin_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_knon     ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    recu_kdis0   ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv     ../engine/source/implicit/lin_solv.F
+!||--- uses       -----------------------------------------------------
+!||    imp_knon     ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE RECU_KDIS0(NDOF   ,D     )
 C-----------------------------------------------
 C   M o d u l e s
@@ -677,21 +678,22 @@ C
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    lin_solvh0           ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv             ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
-      !||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
-      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
-      !||    set_ksym             ../engine/source/implicit/imp_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
-      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lin_solvh0           ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv             ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
+!||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
+!||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
+!||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+!||    set_ksym             ../engine/source/implicit/imp_solv.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+!||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+!||    imp_workh            ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod        ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE LIN_SOLVH0(TOL  ,
      1                    NDDL  ,NNZ     ,IADK   ,JDIK  ,DIAG_K ,
      2                    LT_K  ,NDDLI   ,ITOK   ,IADI  ,JDII   ,
@@ -835,29 +837,30 @@ C       IF (IMON>0) CALL STOPTIME(TIMERS,33)
 #endif
       END
 C  |---- version Hybrid------------
-      !||====================================================================
-      !||    lin_solvh1           ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv             ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    fr_dlft              ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_diags            ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_diagsn           ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_fsa_invhp        ../engine/source/implicit/imp_fsa_inv.F
-      !||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
-      !||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
-      !||    monv_diag            ../engine/source/airbag/monv_imp0.F
-      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
-      !||    set_ksym             ../engine/source/implicit/imp_solv.F
-      !||    spmd_max_i           ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sumf_k          ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sumf_v          ../engine/source/mpi/implicit/imp_spmd.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
-      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lin_solvh1           ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv             ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    fr_dlft              ../engine/source/mpi/implicit/imp_fri.F
+!||    imp_diags            ../engine/source/mpi/implicit/imp_fri.F
+!||    imp_diagsn           ../engine/source/mpi/implicit/imp_fri.F
+!||    imp_fsa_invhp        ../engine/source/implicit/imp_fsa_inv.F
+!||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
+!||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
+!||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
+!||    monv_diag            ../engine/source/airbag/monv_imp0.F
+!||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+!||    set_ksym             ../engine/source/implicit/imp_solv.F
+!||    spmd_max_i           ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_sumf_k          ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_sumf_v          ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+!||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+!||    imp_workh            ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod        ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE LIN_SOLVH1(TOL  ,MAX_L  ,
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,NDDLI ,ITOK  ,IADI  ,JDII   ,
@@ -935,7 +938,7 @@ C------------------------------------------
 c     iprec=2 => jacobien 
 c     iprec=5 => fsai static same pattern of [K}
 C------------------------------------------
-C     [K]:matrice de rigidite [M]:matrice de preconditionnement
+C     [K]:stiffness matrix [M]:preconditioning matrix
        NNE = 0
        NNZM = NNZ
        ISTOP = INEGA
@@ -965,7 +968,7 @@ C-------------to add //
        ELSEIF (IPREC==3) THEN
        ELSEIF (IPREC==5) THEN
 C     ----- approx. (by each colonne of L_T) inverse ---------
-C     ----- utilise d'abord la place de [M] pour la matrice assemblee ---------
+C     ----- first uses the space of [M] for the assembled matrix ---------
          IF (NSPMD==1) THEN
              IDLFT0=0
              IDLFT1=0
@@ -1130,30 +1133,31 @@ C--------------------------------------------
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    lin_solvih2          ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv             ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    fr_dlft              ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_diags            ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_diagsn           ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_fsa_inv2hp       ../engine/source/implicit/imp_fsa_inv.F
-      !||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
-      !||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
-      !||    ind_span             ../engine/source/implicit/ind_glob_k.F
-      !||    monv_diag            ../engine/source/airbag/monv_imp0.F
-      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
-      !||    set_ksym             ../engine/source/implicit/imp_solv.F
-      !||    spmd_max_i           ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sum_s           ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sumf_k          ../engine/source/mpi/implicit/imp_spmd.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
-      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lin_solvih2          ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv             ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    fr_dlft              ../engine/source/mpi/implicit/imp_fri.F
+!||    imp_diags            ../engine/source/mpi/implicit/imp_fri.F
+!||    imp_diagsn           ../engine/source/mpi/implicit/imp_fri.F
+!||    imp_fsa_inv2hp       ../engine/source/implicit/imp_fsa_inv.F
+!||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
+!||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
+!||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
+!||    ind_span             ../engine/source/implicit/ind_glob_k.F
+!||    monv_diag            ../engine/source/airbag/monv_imp0.F
+!||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+!||    set_ksym             ../engine/source/implicit/imp_solv.F
+!||    spmd_max_i           ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_sum_s           ../engine/source/mpi/implicit/imp_spmd.F
+!||    spmd_sumf_k          ../engine/source/mpi/implicit/imp_spmd.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+!||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+!||    imp_workh            ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod        ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE LIN_SOLVIH2(TOL  ,N_PAT,MAXB1  ,
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,NDDLI ,ITOK  ,IADI  ,JDII   ,
@@ -1235,14 +1239,14 @@ c     iprec=2 => jacobien
 c     iprec=5 => fsai static same pattern of [K}
 C------------------------------------------
 C------------------------------------------
-C     [K]:matrice de rigidite [M]:matrice de preconditionnement
+C     [K]:stiffness matrix [M]:preconditioning matrix
       ISTOP = INEGA
 C
 !     IF (IMON>0.AND.ITASK==0) CALL STARTIME(TIMERS,32)
       IF (ICPREC==1) THEN
        IF (IPREC==5) THEN
 C     ----- approx. (by each colonne of L_T) inverse ---------
-C     ----- utilise d'abord la place de [M] pour la matrice assemblee ---------
+C     ----- first uses the space of [M] for the assembled matrix ---------
         IF (NSPMD==1) THEN
              IDLFT0=0
              IDLFT1=0
@@ -1409,21 +1413,22 @@ C--------------------------------------------
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    lin_solvhm           ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv             ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
-      !||    lin_solv2            ../engine/source/implicit/lin_solv.F
-      !||    lin_solvp2           ../engine/source/implicit/lin_solv.F
-      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
-      !||    set_ksym             ../engine/source/implicit/imp_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
-      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lin_solvhm           ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv             ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
+!||    lin_solv2            ../engine/source/implicit/lin_solv.F
+!||    lin_solvp2           ../engine/source/implicit/lin_solv.F
+!||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+!||    set_ksym             ../engine/source/implicit/imp_solv.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+!||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+!||    imp_workh            ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod        ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE LIN_SOLVHM(TOL  ,
      1                    NDDL  ,NNZ     ,IADK   ,JDIK  ,DIAG_K ,
      2                    LT_K  ,NDDLI   ,ITOK   ,IADI  ,JDII   ,
@@ -1564,7 +1569,7 @@ C---------------------
          END IF 
 !        IF (IMON>0) CALL STOPTIME(TIMERS,32)
 citask0        END IF !(ITASK==0) THEN
-Cas --imcompabilite avec MONVOL-----
+Cas --incompatibility with MONVOL-----
         IF (NMONV>0)THEN
          IF (ILINE==0.OR.(ILINE>0.AND.ILINTF==0) )THEN
 citask0         IF (ITASK==0) THEN
@@ -1621,9 +1626,9 @@ C      IF (IMON>0) CALL STOPTIME(TIMERS,33)
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    set_kisc   ../engine/source/implicit/lin_solv.F
-      !||====================================================================
+!||====================================================================
+!||    set_kisc   ../engine/source/implicit/lin_solv.F
+!||====================================================================
       SUBROUTINE SET_KISC(NDDL ,NDDLI,IADI ,JDII ,ITOK ,LT_I ,
      .                   IADK0,JDIK0,LT_K0)
 C-----------------------------------------------
@@ -1686,17 +1691,17 @@ C
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    ini_kisc      ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solv      ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_workh     ../engine/share/modules/impbufdef_mod.F
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ini_kisc      ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solv      ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    imp_workh     ../engine/share/modules/impbufdef_mod.F
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INI_KISC(NDDL,NDDLI,IADI)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1736,13 +1741,13 @@ C
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    mumpslb_hp    ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    imp_smpini    ../engine/source/implicit/imp_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mumpslb_hp    ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    imp_smpini    ../engine/source/implicit/imp_solv.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE MUMPSLB_HP(F     ,F1    , NDDL , IAD_ELEM , FR_ELEM,
      1                      IDDL  , IKC  , INLOC    ,NDOF    ,ITAG   )
 C-----------------------------------------------
@@ -1810,13 +1815,13 @@ C
       RETURN
 #endif
       END
-      !||====================================================================
-      !||    mumpslb       ../engine/source/implicit/lin_solv.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solvp2    ../engine/source/implicit/lin_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mumpslb       ../engine/source/implicit/lin_solv.F
+!||--- called by ------------------------------------------------------
+!||    lin_solvp2    ../engine/source/implicit/lin_solv.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod   ../engine/share/modules/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE MUMPSLB(F     ,F1    , NDDL , IAD_ELEM , FR_ELEM,
      1                   IDDL  , IKC  , INLOC    ,NDOF    ,ITAG   )
 C-----------------------------------------------

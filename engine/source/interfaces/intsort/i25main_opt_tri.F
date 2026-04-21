@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25main_opt_tri    ../engine/source/interfaces/intsort/i25main_opt_tri.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri             ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i25irtlm           ../engine/source/interfaces/int25/i25irtlm.F
-      !||    i25optcd           ../engine/source/interfaces/intsort/i25optcd.F
-      !||    i25optcd_e2s       ../engine/source/interfaces/intsort/i25optcd_e2s.F
-      !||    i25optcd_edg       ../engine/source/interfaces/intsort/i25optcd_edg.F
-      !||    my_barrier         ../engine/source/system/machine.F
-      !||    upgrade_cand_opt   ../common_source/interf/upgrade_multimp.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box            ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25main_opt_tri    ../engine/source/interfaces/intsort/i25main_opt_tri.F
+!||--- called by ------------------------------------------------------
+!||    inttri             ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    i25irtlm           ../engine/source/interfaces/int25/i25irtlm.F
+!||    i25optcd           ../engine/source/interfaces/intsort/i25optcd.F
+!||    i25optcd_e2s       ../engine/source/interfaces/intsort/i25optcd_e2s.F
+!||    i25optcd_edg       ../engine/source/interfaces/intsort/i25optcd_edg.F
+!||    my_barrier         ../engine/source/system/machine.F
+!||    upgrade_cand_opt   ../common_source/interf/upgrade_multimp.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod      ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    tri7box            ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25MAIN_OPT_TRI(
      1                  NIN   ,IPARI  ,INTBUF_TAB,X       ,V      ,
      2                  ITASK ,ITAB   ,KINET ,COUNT_REMSLV,
@@ -69,7 +70,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSNR, IGAP, I_STOK_GLO, SIZOPT, IEDGE, NEDGE, IGAP0, I_STOK, L_STOK
+      INTEGER NSNR, IGAP, I_STOK_GLO, SIZOPT, IEDGE, NEDGE, IGAP0
       INTEGER N, NSNF, NSNL, NSNRF, NSNRL ,IFQ
       INTEGER :: NRTM, NSN
 C     REAL
@@ -79,10 +80,7 @@ C-----------------------------------------------------------
 C     Prepare IRTLM 
 C         - IRTLM/=0 <=> at the beginning of CAND_OPT
 C-----------------------------------------------------------
-!$OMP SINGLE
-      CALL I25IRTLM(
-     1  IPARI   ,INTBUF_TAB ,ITAB    ,NIN     )
-!$OMP END SINGLE
+      CALL I25IRTLM(IPARI,INTBUF_TAB,ITAB,NIN,itask)     
 C-----------------------------------------------------------
       STARTT=INTBUF_TAB%VARIABLES(3)
       STOPT =INTBUF_TAB%VARIABLES(11)
@@ -97,7 +95,7 @@ C-----------------------------------------------------------
       IF(IPARI(47,NIN) > 0) DRAD =INTBUF_TAB%VARIABLES(32)
       DGAPLOAD  =INTBUF_TAB%VARIABLES(46)
 C-----------------------------------------------------------
-C     Filtrage des candidats a l'impact
+C     Filtrage des CANDIDATES a l'impact
 C     (si candidat retenu, cand_n(i) = - cand_n(i))
 C-----------------------------------------------------------
        I_STOK_GLO = INTBUF_TAB%I_STOK(1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C   ------- only BC dans system global sont traites---------
-      !||====================================================================
-      !||    bc_imp0      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
-      !||    upd_int_k    ../engine/source/implicit/upd_glob_k.F
-      !||====================================================================
+C   Only BC in global system are processed
+!||====================================================================
+!||    bc_imp0      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
+!||    upd_int_k    ../engine/source/implicit/upd_glob_k.F
+!||====================================================================
       SUBROUTINE BC_IMP0(ICODT ,ICODR,ISKEW,IFIX,NDOF,IADN )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -45,7 +45,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, ISK,  ICT,ICR,J,K,NFIX,ND
+      INTEGER I, ISK,  ICT,ICR,K,ND
 C----------------BC-------------------------
 Ccw   FIX X-DOF FOR 2D CASE
       IF (N2D/=0) THEN
@@ -148,14 +148,14 @@ C         ENDIF
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_imp1      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
-      !||    upd_int_k    ../engine/source/implicit/upd_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    bcl_impk     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bc_imp1      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
+!||    upd_int_k    ../engine/source/implicit/upd_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    bcl_impk     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE BC_IMP1(ICODT ,ICODR ,ISKEW ,SKEW  ,IFIX  ,
      1                   NDOF  ,IADN  ,IADK  ,JDIK  ,DIAG_K,
      2                   LT_K  )
@@ -253,15 +253,15 @@ C---------<0 with FV coupling, not to change IFIX
 C
       RETURN
       END
-      !||====================================================================
-      !||    bcl_impk    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_imp1     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_updk     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updk2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir2      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bcl_impk    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_imp1     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_updk     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updk2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir2      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE BCL_IMPK(ICT  ,ISK   ,SKEW  ,IFIX  ,IADN  ,
      1                   IADK  ,JDIK  ,DIAG_K,LT_K  ,
      2                   I     ,ND    ,IR    )
@@ -283,7 +283,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,K,J1,L,KC
+      INTEGER J,KC
       my_real
      .   EJ(3)
 C----------------BC-------------------------
@@ -334,14 +334,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    l_dir0    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    fv_rwl    ../engine/source/constraints/general/rwall/srw_imp.F
-      !||    l_dir     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir02   ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    l_dir2    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    l_dir0    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    fv_rwl    ../engine/source/constraints/general/rwall/srw_imp.F
+!||    l_dir     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir02   ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    l_dir2    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE L_DIR0(EJ ,J)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -356,7 +356,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I
       my_real
      .   EJ1,EJ2,EJ3
 C-----------------------------------------------
@@ -373,34 +372,34 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    l_dir        ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_imp2      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_impa      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_impr1     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    cdi_bcn      ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    cdi_bcn1     ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    diag_int     ../engine/source/mpi/implicit/imp_fri.F
-      !||    fr_u2dd      ../engine/source/mpi/implicit/imp_fri.F
-      !||    fv_rwl0      ../engine/source/constraints/general/rwall/srw_imp.F
-      !||    fv_rwlr0     ../engine/source/constraints/general/rwall/srw_imp.F
-      !||    imp3_a2b     ../engine/source/airbag/monv_imp0.F
-      !||    imp3_u2x     ../engine/source/airbag/monv_imp0.F
-      !||    rbe2_bcl     ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    rbe2d_bcl    ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    rbe2flsn     ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    rbe2flsnfr   ../engine/source/constraints/general/rbe2/rbe2f.F
-      !||    rbe2impbsn   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    rwl_impd     ../engine/source/constraints/general/rwall/srw_imp.F
-      !||    select_dof   ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    upd_fr       ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_kml      ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl      ../engine/source/mpi/implicit/imp_fri.F
-      !||    updk_mv      ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    l_dir0       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    l_dir        ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_imp2      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_impa      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_impr1     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    cdi_bcn      ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    cdi_bcn1     ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    diag_int     ../engine/source/mpi/implicit/imp_fri.F
+!||    fr_u2dd      ../engine/source/mpi/implicit/imp_fri.F
+!||    fv_rwl0      ../engine/source/constraints/general/rwall/srw_imp.F
+!||    fv_rwlr0     ../engine/source/constraints/general/rwall/srw_imp.F
+!||    imp3_a2b     ../engine/source/airbag/monv_imp0.F
+!||    imp3_u2x     ../engine/source/airbag/monv_imp0.F
+!||    rbe2_bcl     ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    rbe2d_bcl    ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    rbe2flsn     ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    rbe2flsnfr   ../engine/source/constraints/general/rbe2/rbe2f.F
+!||    rbe2impbsn   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    rwl_impd     ../engine/source/constraints/general/rwall/srw_imp.F
+!||    select_dof   ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    upd_fr       ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_kml      ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl      ../engine/source/mpi/implicit/imp_fri.F
+!||    updk_mv      ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    l_dir0       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE L_DIR(EJ ,J)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -427,19 +426,19 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    l_dir2      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_updf     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_frk     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impb    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impd    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impk    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impkd   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    getbcl_j    ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    l_dir0      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    l_dir2      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_updf     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_frk     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impb    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impd    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impk    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impkd   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    getbcl_j    ../engine/source/constraints/general/impvel/fv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    l_dir0      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE L_DIR2(EJ ,J   ,J0)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -475,17 +474,17 @@ C------- will be same than L_DIR, just not to change so much lines--
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updk    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_impa    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impk   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fv_updk    ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    rbe2_bcl   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_kii    ../engine/source/implicit/imp_glob_k.F
-      !||    put_kii    ../engine/source/implicit/imp_glob_k.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updk    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_impa    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impk   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fv_updk    ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    rbe2_bcl   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    get_kii    ../engine/source/implicit/imp_glob_k.F
+!||    put_kii    ../engine/source/implicit/imp_glob_k.F
+!||====================================================================
       SUBROUTINE BC_UPDK(N     ,IDDL  ,EJ    ,JJ    ,IR    ,
      1                   IADK  ,JDIK  ,DIAG_K,LT_K  )
 C-----------------------------------------------
@@ -505,8 +504,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ND,K,L,J1,K1,L1,ID,SHF,JFT,KFT,LFT,NL,NJ,
-     .        IT(6),KK
+      INTEGER I,J,ND,K,L,J1,K1,L1,ID,SHF,JFT,KFT,LFT,NL,NJ
       my_real
      .   KDD(6,6),KII(6,6)
 C-----------------------------------------------
@@ -601,18 +599,18 @@ C---------ajoute NDDL_L dans impl1_c.inc
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_imp2    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    recukin    ../engine/source/implicit/recudis.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_upd2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updd    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impd   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    bc_imp2    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    recukin    ../engine/source/implicit/recudis.F
+!||--- calls      -----------------------------------------------------
+!||    bc_upd2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updd    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impd   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE BC_IMP2(ICODT ,ICODR ,ISKEW ,SKEW  ,NDOF   ,
      1                   D     ,DR    )
 C-----------------------------------------------
@@ -705,18 +703,18 @@ C--------AUTOSPC---------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bcl_impd   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_imp2    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fr_u2dd    ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp3_u2x   ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_c2d     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updd    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    dir_rbe2   ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    l_dir2     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bcl_impd   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_imp2    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fr_u2dd    ../engine/source/mpi/implicit/imp_fri.F
+!||    imp3_u2x   ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_c2d     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updd    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    dir_rbe2   ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    l_dir2     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE BCL_IMPD(ICT  ,ISK   ,SKEW  ,I     ,D     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -735,9 +733,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,K,J1,L
+      INTEGER J,K,J1
       my_real
-     .   EJ(3),EJ1(3),MAX_E,EA,EB
+     .   EJ(3),EJ1(3),EA,EB
 C----------------BC-------negative ICT only possible with 2 dirs------------------
          IF (ICT == 4 ) THEN
           EJ(1)=SKEW(1,ISK)
@@ -829,16 +827,16 @@ c          CALL L_DIR2(EJ,J,2)
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updd    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_imp2    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impd   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fr_u2dd    ../engine/source/mpi/implicit/imp_fri.F
-      !||    fv_impd    ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    imp3_u2x   ../engine/source/airbag/monv_imp0.F
-      !||    rwl_impd   ../engine/source/constraints/general/rwall/srw_imp.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updd    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_imp2    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impd   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fr_u2dd    ../engine/source/mpi/implicit/imp_fri.F
+!||    fv_impd    ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    imp3_u2x   ../engine/source/airbag/monv_imp0.F
+!||    rwl_impd   ../engine/source/constraints/general/rwall/srw_imp.F
+!||====================================================================
       SUBROUTINE BC_UPDD(N     ,EJ    ,J     ,D     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -853,7 +851,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ND,K,L
+      INTEGER K,L
 C-----------------------------------------------
       K = J + 1
       L = J + 2
@@ -863,11 +861,11 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updd2   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    fv_impd    ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updd2   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    fv_impd    ../engine/source/constraints/general/impvel/fv_imp0.F
+!||====================================================================
       SUBROUTINE BC_UPDD2(N     ,EJ    ,J    ,EJ1    ,J1    ,D     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -882,7 +880,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,K,L
+      INTEGER K
       my_real
      .   S
 C-----------------------------------------------
@@ -899,17 +897,17 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bcl_impkd    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    diag_int     ../engine/source/mpi/implicit/imp_fri.F
-      !||    rbe2_impkd   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    updk_mv      ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    fv_updkd     ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    fv_updkd2    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir2       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bcl_impkd    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    diag_int     ../engine/source/mpi/implicit/imp_fri.F
+!||    rbe2_impkd   ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    updk_mv      ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    fv_updkd     ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    fv_updkd2    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir2       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE BCL_IMPKD(ICT  ,ISK   ,SKEW  ,KDD   ,DIAG_K  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -928,7 +926,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,K,J1,L
+      INTEGER J
       my_real
      .   EJ(3)
 C----------------BC-------------------------
@@ -960,16 +958,16 @@ C----------------BC-------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updf    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_fi      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_fi2     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir2     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updf    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
+!||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    bc_fi      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_fi2     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir2     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE BC_UPDF(NBC   ,IBC   ,SKEW  ,A     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -988,7 +986,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,N,K,L,J1,K1,L1,K2,K3,II,ISK,ICT
+      INTEGER J,N,II,ISK,ICT
       my_real
      .   EJ(3)
 C-----------------------------------------------
@@ -1025,13 +1023,13 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_fi      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_updf    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
-      !||====================================================================
+!||====================================================================
+!||    bc_fi      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_updf    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
+!||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
+!||====================================================================
       SUBROUTINE BC_FI(N    ,EJ    ,J1    ,A     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1057,14 +1055,14 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updb    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_impr1   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impb   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fv_imprl   ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    fv_rwlr0   ../engine/source/constraints/general/rwall/srw_imp.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updb    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_impr1   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impb   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fv_imprl   ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    fv_rwlr0   ../engine/source/constraints/general/rwall/srw_imp.F
+!||====================================================================
       SUBROUTINE BC_UPDB(ID    ,EJ    ,JJ    ,IR    ,LB    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1079,7 +1077,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ND,K,L,J1,K1,L1
+      INTEGER ND,K,L,J1,K1,L1
 C-----------------------------------------------
       IF (IR==0) THEN
        ND = 3
@@ -1105,20 +1103,20 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_impr1    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    ext_rhs     ../engine/source/implicit/upd_glob_k.F
-      !||    upd_rhs     ../engine/source/implicit/upd_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_updb     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updf2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impb    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc    ../engine/share/modules/impbufdef_mod.F
-      !||    imp_fvbcl   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    bc_impr1    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    ext_rhs     ../engine/source/implicit/upd_glob_k.F
+!||    upd_rhs     ../engine/source/implicit/upd_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    bc_updb     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updf2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impb    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc    ../engine/share/modules/impbufdef_mod.F
+!||    imp_fvbcl   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE BC_IMPR1(ICODT ,ICODR ,ISKEW ,SKEW  ,NDOF  ,
      1                    IADN  ,LB    )
 C-----------------------------------------------
@@ -1252,15 +1250,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    bcl_impb    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_impr1    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_updb     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updf2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir2      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bcl_impb    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_impr1    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_updb     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updf2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir2      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE BCL_IMPB(ICT  ,ISK   ,SKEW  ,ND    ,LB    ,
      1                    IR   )
 C-----------------------------------------------
@@ -1280,7 +1278,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,K,J1,L
+      INTEGER J
       my_real
      .   EJ(3)
 C----------------BC-------------------------
@@ -1315,16 +1313,16 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updfr   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bcl_frk    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fv_updfr   ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||    upd_kml    ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl    ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    put_kmii   ../engine/source/implicit/imp_glob_k.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updfr   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bcl_frk    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fv_updfr   ../engine/source/constraints/general/impvel/fv_imp0.F
+!||    upd_kml    ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl    ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    put_kmii   ../engine/source/implicit/imp_glob_k.F
+!||====================================================================
       SUBROUTINE BC_UPDFR(N     ,IDDL  ,EJ    ,JJ    ,IDDLM  ,
      1                   IKC    ,IADK  ,JDIK  ,DIAG_K,LT_K  ,
      2                   LB     ,A     ,KSS   ,KSM   ,IDLM   ,
@@ -1397,16 +1395,16 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    bcl_frk     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_kml     ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl     ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_updfr    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updfr2   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir2      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bcl_frk     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_kml     ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl     ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    bc_updfr    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updfr2   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir2      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE BCL_FRK(N      ,IDDL  ,IDDLM  ,ICT  ,ISK   ,
      1                   SKEW   ,IKC   ,IADK  ,JDIK  ,DIAG_K,
      2                   LT_K   ,LB    ,A     ,KSS   ,KSM   ,
@@ -1429,7 +1427,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,K,J1,L
+      INTEGER J
       my_real
      .   EJ(3)
 C----------------BC-------------------------
@@ -1480,18 +1478,18 @@ C---------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_impa      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
-      !||    upd_int_k    ../engine/source/implicit/upd_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_updk      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updk2d    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    l_dir        ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc     ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    bc_impa      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_glob_k   ../engine/source/implicit/upd_glob_k.F
+!||    upd_int_k    ../engine/source/implicit/upd_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    bc_updk      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updk2d    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    l_dir        ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc     ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE BC_IMPA(IADK  ,JDIK   ,DIAG_K,LT_K  ,NDOF  ,
      1                   IDDL  ,IKC    )
 C-----------------------------------------------
@@ -1511,7 +1509,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,IER1,IR,IAD,NN,ND,KC
+      INTEGER I,J,N,IR,IAD,NN,ND,KC
 C
       my_real
      .  EJ(3)
@@ -1545,14 +1543,14 @@ C-----------------------------------------------
 C
        RETURN
       END
-      !||====================================================================
-      !||    clceig    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    autspc    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    cp_real   ../engine/source/implicit/produt_v.F
-      !||    zero1     ../engine/source/system/zero.F
-      !||====================================================================
+!||====================================================================
+!||    clceig    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    autspc    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    cp_real   ../engine/source/implicit/produt_v.F
+!||    zero1     ../engine/source/system/zero.F
+!||====================================================================
       SUBROUTINE CLCEIG(AMTX,EIGVAL,EIGVEC,SMALL,NMTX,IERR)
 C     PURPOSE:
 C
@@ -1767,15 +1765,15 @@ C
 C
  999  RETURN
       END
-      !||====================================================================
-      !||    autspc       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_aspc0    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    clceig       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    nrmlzauspc   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    zero1        ../engine/source/system/zero.F
-      !||====================================================================
+!||====================================================================
+!||    autspc       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_aspc0    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    clceig       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    nrmlzauspc   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    zero1        ../engine/source/system/zero.F
+!||====================================================================
       SUBROUTINE AUTSPC(KII,IDEG,RASPCC,SMLEIG,NDDL,
      *                  IKC,NASPCC,LAUSPC,IERR )
 C-----------------------------------------------
@@ -1820,10 +1818,10 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real
      *   AMTX(9), COPY(9)
-      INTEGER IDMTX,JDMTX,KDMTX,NZERO
-      INTEGER I, J, IND, IHIGH, NMTX, IEQ, ID(3)
+      INTEGER IDMTX,JDMTX,NZERO
+      INTEGER I, J, IND, NMTX, IEQ, ID(3)
       my_real
-     *   EIGVEC(9), EIGVAL(3), HIGH,NOM
+     *   EIGVEC(9), EIGVAL(3), HIGH
 C
 C     INITIALIZE GRID MATRIX DATA TO ZERO
 C
@@ -1993,13 +1991,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    nrmlzauspc   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    autspc       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    zero1        ../engine/source/system/zero.F
-      !||====================================================================
+!||====================================================================
+!||    nrmlzauspc   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    autspc       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    zero1        ../engine/source/system/zero.F
+!||====================================================================
       SUBROUTINE NRMLZAUSPC(VECTOR,SMLEIG,LENGTH,NZERO)
 
 C     PURPOSE:
@@ -2051,11 +2049,11 @@ C-----------------------------------------------
       RETURN
       END
 C
-      !||====================================================================
-      !||    spc_dir     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_aspc0   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    spc_dir     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_aspc0   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE SPC_DIR(IKC,J,J1)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2086,20 +2084,20 @@ C---------reset in BC_IMPA ---
       RETURN
       END
 C
-      !||====================================================================
-      !||    upd_aspc0     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_aspc      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    autspc        ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    get_kii       ../engine/source/implicit/imp_glob_k.F
-      !||    spc_dir       ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc      ../engine/share/modules/impbufdef_mod.F
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    upd_aspc0     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_aspc      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||    autspc        ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    get_kii       ../engine/source/implicit/imp_glob_k.F
+!||    spc_dir       ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc      ../engine/share/modules/impbufdef_mod.F
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE UPD_ASPC0(NDDL  ,NDOF  ,IDDL  ,IKC    ,ITAB  ,
      .                    IADK  ,JDIK  ,DIAG_K,LT_K   )
 C-----------------------------------------------
@@ -2117,7 +2115,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "impl1_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
@@ -2130,12 +2127,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSPCLI,NSPCT,NSPCTI,I,J,K,N,
+      INTEGER NSPCT,NSPCTI,I,J,K,
      .        ID(3),IK,IDK,IER1,IER2,IERR,NSPC,IR,NDOFT,J1,NSPCR,
      .        NSPCN,IKC3
 C
       my_real
-     *       KII(3,3),KDD(6,6),SMLEIG,KDIV3,RS
+     *       KII(3,3),KDD(6,6),SMLEIG,KDIV3
       INTEGER, DIMENSION(:),ALLOCATABLE :: ILT,ILR
       my_real, DIMENSION(:,:),ALLOCATABLE ::
      .                                     SKEWT,SKEWR
@@ -2235,7 +2232,7 @@ C-----------------------------------------------
 C
       NSPCNT = NSPCN
       IF (NSPCN>0.AND.ILINE/=0) THEN
-           IF(IMACH/=3.OR.ISPMD==0)THEN
+           IF(ISPMD==0)THEN
              WRITE(ISTDO,'(I10,A)')NSPCN,
      .        ' NODES TREATED BY AUTOSPC FOR :'
              WRITE(ISTDO,'(I10,A)')NSPCT,
@@ -2303,7 +2300,7 @@ C
        IF (IRODDL/=0) DEALLOCATE(ILR,SKEWR)
       ENDIF
       IF (IERR>0) THEN
-           IF(IMACH/=3.OR.ISPMD==0)THEN
+           IF(ISPMD==0)THEN
              CALL ANCMSG(MSGID=102,ANMODE=ANINFO,
      .            I1=ITAB(IERR))
            ENDIF
@@ -2311,15 +2308,15 @@ C
       ENDIF
       RETURN
       END
-      !||====================================================================
-      !||    upd_aspc      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    upd_glob_k    ../engine/source/implicit/upd_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    cp_real       ../engine/source/implicit/produt_v.F
-      !||    spmd_sumf_k   ../engine/source/mpi/implicit/imp_spmd.F
-      !||    upd_aspc0     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    upd_aspc      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    upd_glob_k    ../engine/source/implicit/upd_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    cp_real       ../engine/source/implicit/produt_v.F
+!||    spmd_sumf_k   ../engine/source/mpi/implicit/imp_spmd.F
+!||    upd_aspc0     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||====================================================================
       SUBROUTINE UPD_ASPC(NDDL  ,NDOF  ,IDDL  ,IKC    ,ITAB     ,
      .                    IADK  ,JDIK  ,DIAG_K,LT_K   )
 C-----------------------------------------------
@@ -2330,7 +2327,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2345,7 +2341,7 @@ C-----------------------------------------------
       my_real,
      .         DIMENSION(:),ALLOCATABLE :: DIAG_KP,LT_KP
 C-----------------------------------------------
-       IF (IMACH==3.AND.NSPMD>1) THEN
+       IF (NSPMD>1) THEN
          NZ = IADK(NDDL+1)-IADK(1)
          ALLOCATE(DIAG_KP(NDDL),LT_KP(NZ),STAT=IERR)
          CALL CP_REAL(NDDL,DIAG_K,DIAG_KP)
@@ -2361,16 +2357,16 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updk2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_impa     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impk    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updk2    ../engine/source/constraints/general/rbe2/rbe2_imp0.F
-      !||    dir_rbe2    ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updk2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_impa     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impk    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updk2    ../engine/source/constraints/general/rbe2/rbe2_imp0.F
+!||    dir_rbe2    ../engine/source/constraints/general/rbe2/rbe2v.F
+!||====================================================================
       SUBROUTINE BC_UPDK2D(IADN  ,IFIX  ,SKEW  ,SKEW1 ,I     ,
      1                     IR    ,KC    ,IADK  ,JDIK  ,DIAG_K,
      2                     LT_K  )
@@ -2387,9 +2383,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,K,J1,L,ND
+      INTEGER J,K,J1
       my_real
-     .   EJ(3),EJ1(3),S,EA,EB
+     .   EJ(3),EJ1(3),EA,EB
 C-----------------------------------------------
           EJ(1)=SKEW(1)
           EJ(2)=SKEW(2)
@@ -2412,15 +2408,15 @@ c    EB=-S*(EJ1(J)*EJ(K)-EJ1(K))
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updf2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_impr1    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impb    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    dir_rbe2    ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updf2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_impr1    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impb    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    dir_rbe2    ../engine/source/constraints/general/rbe2/rbe2v.F
+!||====================================================================
       SUBROUTINE BC_UPDF2D(ND    ,SKEW  ,SKEW1 ,IR    ,B     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2435,9 +2431,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,K,J1,L
+      INTEGER J,K,J1
       my_real
-     .   EJ(3),EJ1(3),S,EA,EB
+     .   EJ(3),EJ1(3),EA,EB
 C-----------------------------------------------
           EJ(1)=SKEW(1)
           EJ(2)=SKEW(2)
@@ -2457,16 +2453,16 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_upd2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_imp2    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fr_u2dd    ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp3_u2x   ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_c2d     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    dir_rbe2   ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||====================================================================
+!||====================================================================
+!||    bc_upd2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_imp2    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fr_u2dd    ../engine/source/mpi/implicit/imp_fri.F
+!||    imp3_u2x   ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_c2d     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    dir_rbe2   ../engine/source/constraints/general/rbe2/rbe2v.F
+!||====================================================================
       SUBROUTINE BC_UPD2D(N     ,SKEW    ,SKEW1    ,D     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2481,9 +2477,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,K,L,J,J1
+      INTEGER K,J,J1
       my_real
-     .   EJ(3),EJ1(3),S,EA,EB
+     .   EJ(3),EJ1(3),EA,EB
 C-----------------------------------------------
           EJ(1)=SKEW(1)
           EJ(2)=SKEW(2)
@@ -2503,16 +2499,16 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    fv_updkd2   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bcl_impkd   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    diag_int    ../engine/source/mpi/implicit/imp_fri.F
-      !||    updk_mv     ../engine/source/airbag/monv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    dir_rbe2    ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||====================================================================
+!||====================================================================
+!||    fv_updkd2   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bcl_impkd   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    diag_int    ../engine/source/mpi/implicit/imp_fri.F
+!||    updk_mv     ../engine/source/airbag/monv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    dir_rbe2    ../engine/source/constraints/general/rbe2/rbe2v.F
+!||====================================================================
       SUBROUTINE FV_UPDKD2(SKEW    ,SKEW1   ,KDD   ,DIAG_K)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2526,9 +2522,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ND,K,L,J1,K1,L1,J
+      INTEGER K,J1,J
       my_real
-     .   EJ(3),EJ1(3),S,EA,EB
+     .   EJ(3),EJ1(3),EA,EB
 C-----------------------------------------------
           EJ(1)=SKEW(1)
           EJ(2)=SKEW(2)
@@ -2550,16 +2546,16 @@ c    EB=S*(EJ1(J)*EJ(K)-EJ1(K))
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_fi2     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_updf    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
-      !||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_c2d     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    dir_rbe2   ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||====================================================================
+!||====================================================================
+!||    bc_fi2     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_updf    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    imp3_a2b   ../engine/source/airbag/monv_imp0.F
+!||    upd_fr     ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    bc_c2d     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    dir_rbe2   ../engine/source/constraints/general/rbe2/rbe2v.F
+!||====================================================================
       SUBROUTINE BC_FI2(N    ,SKEW    ,SKEW1   ,A     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2574,9 +2570,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,L,J,J1
+      INTEGER K,J,J1
       my_real
-     .   EJ(3),EJ1(3),S,EA,EB
+     .   EJ(3),EJ1(3),EA,EB
 C-----------------------------------------------
           EJ(1)=SKEW(1)
           EJ(2)=SKEW(2)
@@ -2597,17 +2593,17 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_updfr2   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bcl_frk     ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    upd_kml     ../engine/source/mpi/implicit/imp_fri.F
-      !||    upd_ksl     ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    dir_rbe2    ../engine/source/constraints/general/rbe2/rbe2v.F
-      !||    put_kmii    ../engine/source/implicit/imp_glob_k.F
-      !||====================================================================
+!||====================================================================
+!||    bc_updfr2   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bcl_frk     ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    upd_kml     ../engine/source/mpi/implicit/imp_fri.F
+!||    upd_ksl     ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    dir_rbe2    ../engine/source/constraints/general/rbe2/rbe2v.F
+!||    put_kmii    ../engine/source/implicit/imp_glob_k.F
+!||====================================================================
       SUBROUTINE BC_UPDFR2(N     ,IDDL  ,SKEW  ,SKEW1 ,IDDLM  ,
      1                    IKC    ,IADK  ,JDIK  ,DIAG_K,LT_K   ,
      2                    LB     ,A     ,KSS   ,KSM   ,IDLM   ,
@@ -2627,9 +2623,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ND,K,L,J1,ID,IDM
+      INTEGER I,J,ND,K,J1,ID,IDM
       my_real
-     .   EJ(3),EJ1(3),S,EA,EB,KDD(6,6)
+     .   EJ(3),EJ1(3),EA,EB,KDD(6,6)
 C-----------------------------------------------
           EJ(1)=SKEW(1)
           EJ(2)=SKEW(2)
@@ -2674,13 +2670,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_nspc   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv   ../engine/source/implicit/imp_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_nspc   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv   ../engine/source/implicit/imp_solv.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE GET_NSPC(NSPC  )
 C-----------------------------------------------
 C   M o d u l e s
@@ -2699,13 +2695,13 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    put_nspc   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_solv   ../engine/source/implicit/imp_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_aspc   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    put_nspc   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    imp_solv   ../engine/source/implicit/imp_solv.F
+!||--- uses       -----------------------------------------------------
+!||    imp_aspc   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE PUT_NSPC(NSPC  )
 C-----------------------------------------------
 C   M o d u l e s
@@ -2724,20 +2720,20 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||--- called by ------------------------------------------------------
-      !||    bc_fi2      ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_upd2d    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updf2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updfr2   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bc_updk2d   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    bcl_impd    ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    fv_updkd2   ../engine/source/constraints/general/bcs/bc_imp0.F
-      !||    getbcl_j    ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||--- calls      -----------------------------------------------------
-      !||    gdir2_ind   ../engine/source/constraints/general/impvel/fv_imp0.F
-      !||====================================================================
+!||====================================================================
+!||    bc_c2d      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||--- called by ------------------------------------------------------
+!||    bc_fi2      ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_upd2d    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updf2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updfr2   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bc_updk2d   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    bcl_impd    ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    fv_updkd2   ../engine/source/constraints/general/bcs/bc_imp0.F
+!||    getbcl_j    ../engine/source/constraints/general/impvel/fv_imp0.F
+!||--- calls      -----------------------------------------------------
+!||    gdir2_ind   ../engine/source/constraints/general/impvel/fv_imp0.F
+!||====================================================================
       SUBROUTINE BC_C2D(EJ,EJ1, J, J1  ,EA, EB  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

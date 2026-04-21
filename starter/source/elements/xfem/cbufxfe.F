@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbufxfe        ../starter/source/elements/xfem/cbufxfe.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3        ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cbainit3       ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cinit3         ../starter/source/elements/shell/coque/cinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    layini_xfe     ../starter/source/elements/xfem/cbufxfe.F
-      !||    thick_ilev     ../starter/source/elements/xfem/thick_ilev.F
-      !||--- uses       -----------------------------------------------------
-      !||    stack_mod      ../starter/share/modules1/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cbufxfe        ../starter/source/elements/xfem/cbufxfe.F
+!||--- called by ------------------------------------------------------
+!||    c3init3        ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cbainit3       ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cinit3         ../starter/source/elements/shell/coque/cinit3.F
+!||--- calls      -----------------------------------------------------
+!||    layini_xfe     ../starter/source/elements/xfem/cbufxfe.F
+!||    thick_ilev     ../starter/source/elements/xfem/thick_ilev.F
+!||--- uses       -----------------------------------------------------
+!||    stack_mod      ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE CBUFXFE(ELBUF_STR,XFEM_STR,ISUBSTACK,STACK   ,
      .                   IGEO     ,GEO ,LFT  ,LLT ,MAT,
      .                   PID      ,NPT ,NPTT ,NLAY,IR ,
@@ -69,7 +69,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IGTYP,IREP,IXEL,I,II,IT,ILAY,L_DMG
+      INTEGER IGTYP, IREP, IXEL, I, IT, ILAY, L_DMG
       INTEGER MATLY(MVSIZ*100)
       my_real
      .  THKLY(MVSIZ*100),POSLY(MVSIZ,100)
@@ -122,13 +122,13 @@ c
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    layini_xfe     ../starter/source/elements/xfem/cbufxfe.F
-      !||--- called by ------------------------------------------------------
-      !||    cbufxfe        ../starter/source/elements/xfem/cbufxfe.F
-      !||--- uses       -----------------------------------------------------
-      !||    stack_mod      ../starter/share/modules1/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    layini_xfe     ../starter/source/elements/xfem/cbufxfe.F
+!||--- called by ------------------------------------------------------
+!||    cbufxfe        ../starter/source/elements/xfem/cbufxfe.F
+!||--- uses       -----------------------------------------------------
+!||    stack_mod      ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE LAYINI_XFE(ELBUF_STR     ,ISUBSTACK,STACK   ,
      .                      LFT   ,LLT    ,NPT      ,GEO     ,IGEO    ,
      .                      MAT   ,PID    ,THKLY    ,MATLY   ,POSLY   ,
@@ -163,7 +163,7 @@ C-----------------------------------------------
       PARAMETER (MAX_NPTT = 10)
       my_real
      .   THK_IT(MAX_NPTT),POS_IT(MAX_NPTT),THK_LY,POS_LY,THK_NPTT,
-     .   POS_NPTT,THICKT,POS_0
+     .   POS_NPTT,POS_0
 C-----------------------------------------------
       my_real
      .  A_GAUSS(9,9),W_GAUSS(9,9)
@@ -266,13 +266,13 @@ c-----------
             DO IT=2,NPTT
               POS_IT(IT) = POS_IT(IT-1) + HALF*(THK_IT(IT) + THK_IT(IT-1))
             ENDDO
-          ELSEIF (IINT == 2) THEN  !  Gauss distribution
+          ELSEIF (IINT == 2) THEN  !  Gauss Distribution
             DO IT=1,NPTT
               THK_IT(IT) = HALF*THK_LY*W_GAUSS(IT,NPTT)
               POS_IT(IT) = POS_LY + HALF*THK_LY*A_GAUSS(IT,NPTT)
             ENDDO
           ENDIF
-c         remplissage
+c         filling
           DO IT=1,NPTT
             IPT = IPT_ALL + IT
             THK_NPTT = THK_IT(IT)

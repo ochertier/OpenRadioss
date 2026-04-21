@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    szsigpara       ../engine/source/elements/solid/solidez/szsigpara.F
-      !||--- called by ------------------------------------------------------
-      !||    strs_tenscor3   ../engine/source/output/h3d/h3d_results/strs_tenscor3.F
-      !||    tensgps3        ../engine/source/output/anim/generate/tensor6.F
-      !||    tensgps_skin    ../engine/source/output/anim/generate/tensor6.F
-      !||====================================================================
+!||====================================================================
+!||    szsigpara       ../engine/source/elements/solid/solidez/szsigpara.F
+!||--- called by ------------------------------------------------------
+!||    strs_tenscor3   ../engine/source/output/h3d/h3d_results/strs_tenscor3.F
+!||    tensgps3        ../engine/source/output/anim/generate/tensor6.F
+!||    tensgps_skin    ../engine/source/output/anim/generate/tensor6.F
+!||====================================================================
       SUBROUTINE SZSIGPARA(JR0  ,JS0  ,JT0  ,FHOUR  ,SIG0 ,
      .                     SIG  ,KSI  ,ETA  ,ZETA   ,NU   ,
      .                     NEL  ,I  )
@@ -48,13 +48,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER   J
       my_real
      .   COEF,NU1,NU2,NU3,SXX,SYY,SZZ,SXY,SXZ,SYZ
-C---JR0=-X1+X2+X3-X4-X5+X6+X7-X8 (coordon  s locaux)     
+C---JR0=-X1+X2+X3-X4-X5+X6+X7-X8 (local coordinates)     
 C---JS0=-Y1-Y2+Y3+Y4-Y5-Y6+Y7+Y8     
 C---JT0=-Z1-Z2-Z3-Z4+Z5+Z6+Z7+Z8
-C---NU : Poisson's Coef     
+C---NU : Poisson's coefficient     
 C-----------------------------------------------
         COEF=TWENTY4
 c        DO I=LFT,LLT

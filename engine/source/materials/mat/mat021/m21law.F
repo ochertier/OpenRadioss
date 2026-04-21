@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m21law         ../engine/source/materials/mat/mat021/m21law.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain          ../engine/source/materials/mat_share/mmain.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter         ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod   ../common_source/modules/constant_mod.F
-      !||====================================================================
+!||====================================================================
+!||    m21law         ../engine/source/materials/mat/mat021/m21law.F
+!||--- called by ------------------------------------------------------
+!||    mmain          ../engine/source/materials/mat_share/mmain.F90
+!||--- calls      -----------------------------------------------------
+!||    finter         ../engine/source/tools/curve/finter.F
+!||--- uses       -----------------------------------------------------
+!||    constant_mod   ../common_source/modules/constant_mod.F
+!||====================================================================
       SUBROUTINE M21LAW (
      1           PM      ,OFF     ,SIG     ,EINT   ,RHO     ,
-     2           MU_BAK  ,EPSEQ   ,VOL     ,MAT    ,SSP     ,
+     2           EPSQ    ,EPXE    ,VOL     ,MAT    ,SSP     ,
      3           DVOL    ,VNEW    ,D1      ,D2     ,D3      ,
      4           D4      ,D5      ,D6      ,SOLD1  ,SOLD2   ,
      5           SOLD3   ,SOLD4   ,SOLD5   ,SOLD6  ,TF      ,
      6           NPF     ,SIGY    ,DEFP    ,IPM    ,PNEW    ,
-     7           PSH     ,MU      ,SEQ_OUTPUT,NEL  ,NUMMAT)
+     7           PSH     ,MU      ,SEQ_OUTPUT,NEL  ,NUMMAT  ,
+     8           DPLA    ,MU_BAK )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -68,13 +69,13 @@ C-----------------------------------------------
       my_real,INTENT(INOUT) :: SSP(NEL) !< sound speed
       my_real,INTENT(INOUT) :: PNEW(NEL) !< current pressure
       my_real,INTENT(INOUT) :: SIG(NEL,6) !< stress tensor
-      my_real,INTENT(INOUT) :: EPSEQ(NEL),DEFP(NEL)
+      my_real,INTENT(INOUT) :: EPXE(NEL),DEFP(NEL),EPSQ(NEL),DPLA(NEL)
       my_real,INTENT(INOUT) :: SIGY(NEL) !< yield surface
       INTEGER,INTENT(IN) :: NUMMAT !< number of aterial laws (array size)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, MX, IFUNC, NPOINT
+      INTEGER I, MX, IFUNC
       my_real :: DPDM(NEL),dpdm0 !< total derivative dP/d(mu)
       my_real :: T1(NEL), T2(NEL), T3(NEL), T4(NEL),T5(NEL), T6(NEL) !< deviatoric stress tensor
       my_real :: POLD(NEL), P(NEL), PNE1, PTOT, PMIN !< pressure and derivated values
@@ -249,17 +250,20 @@ C-----------------------------------------------
         SIG(I,4)=RATIO(I)*T4(I)*OFF(I)
         SIG(I,5)=RATIO(I)*T5(I)*OFF(I)
         SIG(I,6)=RATIO(I)*T6(I)*OFF(I)
-        EPSEQ(I)=EPSEQ(I)+(ONE-RATIO(I))*SQRT(AJ2(I))*DT1 / MAX(EM20,THREE*G)
+        DPLA(I)=(ONE-RATIO(I))*SQRT(AJ2(I))*DT1 / MAX(EM20,THREE*G)
       ENDDO
           
       !----------------------------------------------------------------!
       !  OUTPUT / MISC                                                 !
       !----------------------------------------------------------------!      
       DO I=1,NEL
-       SIGY(I)=G0(I)     !YIELD SURFACE
-       DEFP(I)=EPSEQ(I)  !VOLUMETRIC PLASTIC STRAIN
-      ENDDO 
-C
+        SIGY(I) = G0(I)     !YIELD SURFACE
+        DEFP(I) = DEFP(I) + DPLA(I)
+        EPXE(I) = DEFP(I)
+        EPSQ(I) = MU_BAK(I) ! volumetric plastic strain
+      ENDDO
+
+
       RETURN
-C
+
       END

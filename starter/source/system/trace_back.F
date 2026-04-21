@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #define NIVEAU_MAX 50
-      !||====================================================================
-      !||    trace_in1              ../starter/source/system/trace_back.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inivol         ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||    starter0               ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_exit                ../starter/source/output/analyse/analyse.c
-      !||    trace_pile             ../starter/source/system/trace_back.F
-      !||    trace_print            ../starter/source/system/trace_back.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    trace_in1              ../starter/source/system/trace_back.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inivol         ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
+!||    lectur                 ../starter/source/starter/lectur.F
+!||    starter0               ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    my_exit                ../starter/source/output/analyse/analyse.c
+!||    trace_pile             ../starter/source/system/trace_back.F
+!||    trace_print            ../starter/source/system/trace_back.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TRACE_IN1(MY_CHAR,ILEN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -87,13 +87,13 @@ C-----------------------------------------------
 C
       END
 #define NSUB_MAX 127
-      !||====================================================================
-      !||    trace_in               ../starter/source/system/trace_back.F
-      !||--- calls      -----------------------------------------------------
-      !||    trace_pile             ../starter/source/system/trace_back.F
-      !||    trace_print            ../starter/source/system/trace_back.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    trace_in               ../starter/source/system/trace_back.F
+!||--- calls      -----------------------------------------------------
+!||    trace_pile             ../starter/source/system/trace_back.F
+!||    trace_print            ../starter/source/system/trace_back.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TRACE_IN(NSUB,ITAB,ATAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -313,13 +313,13 @@ C-----------------------------------------------
       RETURN
 C
       END
-      !||====================================================================
-      !||    trace_out              ../starter/source/system/trace_back.F
-      !||--- calls      -----------------------------------------------------
-      !||    trace_pile             ../starter/source/system/trace_back.F
-      !||    trace_print            ../starter/source/system/trace_back.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    trace_out              ../starter/source/system/trace_back.F
+!||--- calls      -----------------------------------------------------
+!||    trace_pile             ../starter/source/system/trace_back.F
+!||    trace_print            ../starter/source/system/trace_back.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TRACE_OUT(NSUB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -349,17 +349,17 @@ C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    trace_out1             ../starter/source/system/trace_back.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||    starter0               ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_exit                ../starter/source/output/analyse/analyse.c
-      !||    trace_pile             ../starter/source/system/trace_back.F
-      !||    trace_print            ../starter/source/system/trace_back.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    trace_out1             ../starter/source/system/trace_back.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||    starter0               ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    my_exit                ../starter/source/output/analyse/analyse.c
+!||    trace_pile             ../starter/source/system/trace_back.F
+!||    trace_print            ../starter/source/system/trace_back.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TRACE_OUT1()
 C-----------------------------------------------
 C   M o d u l e s
@@ -400,15 +400,15 @@ C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    trace_pile    ../starter/source/system/trace_back.F
-      !||--- called by ------------------------------------------------------
-      !||    trace_in      ../starter/source/system/trace_back.F
-      !||    trace_in1     ../starter/source/system/trace_back.F
-      !||    trace_out     ../starter/source/system/trace_back.F
-      !||    trace_out1    ../starter/source/system/trace_back.F
-      !||    trace_print   ../starter/source/system/trace_back.F
-      !||====================================================================
+!||====================================================================
+!||    trace_pile    ../starter/source/system/trace_back.F
+!||--- called by ------------------------------------------------------
+!||    trace_in      ../starter/source/system/trace_back.F
+!||    trace_in1     ../starter/source/system/trace_back.F
+!||    trace_out     ../starter/source/system/trace_back.F
+!||    trace_out1    ../starter/source/system/trace_back.F
+!||    trace_print   ../starter/source/system/trace_back.F
+!||====================================================================
       INTEGER FUNCTION TRACE_PILE(VAL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -421,7 +421,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIVEAU_PILE,IT
+      INTEGER NIVEAU_PILE
       DATA NIVEAU_PILE/0/
       SAVE NIVEAU_PILE
 C-----------------------------------------------
@@ -430,12 +430,12 @@ C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    trace_cf               ../starter/source/system/trace_back.F
-      !||--- calls      -----------------------------------------------------
-      !||    trace_print            ../starter/source/system/trace_back.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    trace_cf               ../starter/source/system/trace_back.F
+!||--- calls      -----------------------------------------------------
+!||    trace_print            ../starter/source/system/trace_back.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE TRACE_CF(SIGNAL,IW)
 C-----------------------------------------------
 C   M o d u l e s
@@ -461,21 +461,21 @@ C-----------------------------------------------
       CALL TRACE_PRINT(LINE1,SIGNAL,IW)
       RETURN
       END
-      !||====================================================================
-      !||    trace_print            ../starter/source/system/trace_back.F
-      !||--- called by ------------------------------------------------------
-      !||    trace_cf               ../starter/source/system/trace_back.F
-      !||    trace_in               ../starter/source/system/trace_back.F
-      !||    trace_in1              ../starter/source/system/trace_back.F
-      !||    trace_out              ../starter/source/system/trace_back.F
-      !||    trace_out1             ../starter/source/system/trace_back.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    my_exit                ../starter/source/output/analyse/analyse.c
-      !||    trace_pile             ../starter/source/system/trace_back.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    trace_print            ../starter/source/system/trace_back.F
+!||--- called by ------------------------------------------------------
+!||    trace_cf               ../starter/source/system/trace_back.F
+!||    trace_in               ../starter/source/system/trace_back.F
+!||    trace_in1              ../starter/source/system/trace_back.F
+!||    trace_out              ../starter/source/system/trace_back.F
+!||    trace_out1             ../starter/source/system/trace_back.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    my_exit                ../starter/source/output/analyse/analyse.c
+!||    trace_pile             ../starter/source/system/trace_back.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE TRACE_PRINT(LINE1,NS_SIGNAL,IW)
 C-----------------------------------------------
 C   M o d u l e s
@@ -506,7 +506,7 @@ C-----------------------------------------------
       INTEGER CHECK_PILE(0:NIVEAU_MAX) 
       CHARACTER(LEN=NCHARLINE):: BLANC
       CHARACTER(LEN=NCHARLINE):: TEXT(0:NIVEAU_MAX)
-      INTEGER I,IP,IL,NLIGNES,IT
+      INTEGER I
       DATA CHECK_PILE/0,NIVEAU_MAX*0/
       SAVE TEXT,CHECK_PILE
 C-----------------------------------------------
@@ -517,7 +517,7 @@ C-----------------------------------------------
 C
       IF(IW==0) THEN
 C------------------------------------------------------------------------
-C       Ajout d'une ligne a TEXT (1 ou plusieurs X par descente de pile)
+C       Addition of a text line (1 or more x by battery descent)
 C------------------------------------------------------------------------
         TEXT(NIVEAU_PILE)(1:NIVEAU_PILE)=BLANC(1:NIVEAU_PILE)
         TEXT(NIVEAU_PILE)(NIVEAU_PILE+1:ncharline)=
@@ -525,7 +525,7 @@ C------------------------------------------------------------------------
         CHECK_PILE(NIVEAU_PILE) = NS_SIGNAL
       ELSEIF(IW==-1) THEN
 C------------------------------------------
-C       remonte de pile 
+C       pile
 C------------------------------------------
         IF(NS_SIGNAL==CHECK_PILE(NIVEAU_PILE))THEN
           TEXT(NIVEAU_PILE+1)=BLANC
@@ -537,7 +537,7 @@ C------------------------------------------
 C
       IF(IW>0) THEN
 C------------------------------------------
-C       Ecriture du Trace Back et Arret
+C       Writing the trace back and stop
 C------------------------------------------
         IF(NIVEAU_PILE<=0)CALL MY_EXIT(3)
 C

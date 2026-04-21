@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    elegror_seatbelt   ../starter/source/groups/elegror_seatbelt.F
-      !||--- called by ------------------------------------------------------
-      !||    lecsec42           ../starter/source/tools/sect/hm_read_sect.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    elegror_seatbelt   ../starter/source/groups/elegror_seatbelt.F
+!||--- called by ------------------------------------------------------
+!||    lecsec42           ../starter/source/tools/sect/hm_read_sect.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod        ../starter/share/message_module/message_mod.F
+!||====================================================================
       INTEGER FUNCTION ELEGROR_SEATBELT(IGU,IGRELE,NGRELE,IBUF,NIB,
      .                                  SIBUF,NFRAM,TAGELEMS,ISTYP,SEATBELT_SHELL_TO_SPRING)
 C-----------------------------------------------
@@ -57,7 +57,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,IG,L,IE,IADV
+      INTEGER I, J, IG, L, IE
 C-----------------------------------------------
       ELEGROR_SEATBELT=0
       IF(IGU /= 0)THEN

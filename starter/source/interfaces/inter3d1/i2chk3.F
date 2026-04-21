@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2chk3         ../starter/source/interfaces/inter3d1/i2chk3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3         ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../starter/source/output/message/message.F
-      !||    incoq3         ../starter/source/interfaces/inter3d1/incoq3.F
-      !||    ineltc         ../starter/source/interfaces/inter3d1/inelt.F
-      !||    inelts         ../starter/source/interfaces/inter3d1/inelt.F
-      !||    insol3         ../starter/source/interfaces/inter3d1/insol3.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i2chk3         ../starter/source/interfaces/inter3d1/i2chk3.F
+!||--- called by ------------------------------------------------------
+!||    inint3         ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../starter/source/output/message/message.F
+!||    incoq3         ../starter/source/interfaces/inter3d1/incoq3.F
+!||    ineltc         ../starter/source/interfaces/inter3d1/inelt.F
+!||    inelts         ../starter/source/interfaces/inter3d1/inelt.F
+!||    insol3         ../starter/source/interfaces/inter3d1/insol3.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I2CHK3(X   ,IRECT    ,IXS      ,NRT       ,IXC     ,
      1                  NINT,NSN      ,NSV      ,NOINT     ,
      2                  IXTG,IRTL     ,ST       ,DMIN      ,GEO     ,
@@ -45,9 +45,10 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
+      use element_mod , only :nixs,nixc,nixtg
 C---------------------------------------------------------------------
 C     CHECK ELEMENT FOR TYPE 2 (ISEARCH=2)
-C     LE NOEUD GLOBAL N'EST PAS REMPLACE PAR LE NOEUD LOCAL DANS IRECT
+C     THE GLOBAL NODE IS NOT REPLACED BY THE LOCAL NODE IN IRECT
 C---------------------------------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -74,7 +75,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, INRT, NELS, NELC, NELTG, L, JJ, NN
+      INTEGER I, INRT, NELS, NELC, NELTG
       my_real AREA
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

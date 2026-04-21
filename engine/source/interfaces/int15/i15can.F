@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i15can         ../engine/source/interfaces/int15/i15can.F
-      !||--- called by ------------------------------------------------------
-      !||    i15cmp         ../engine/source/interfaces/int15/i15cmp.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i15can         ../engine/source/interfaces/int15/i15can.F
+!||--- called by ------------------------------------------------------
+!||    i15cmp         ../engine/source/interfaces/int15/i15cmp.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE I15CAN(NSI    ,KSI   ,X    ,KSURF  ,IGRSURF ,
      2                  BUFSF  ,NSC  ,KSC    ,NTC   , KTC  ,
      3                  IACTIV )
@@ -58,7 +58,7 @@ C-----------------------------------------------
       my_real
      .   DGR,
      .   XM, YM, ZM, XG, YG, ZG, A, B, C, ROT(9),
-     .   AN, BN, CN,
+     .     
      .   XLMIN, XLMAX, YLMIN, YLMAX, ZLMIN, ZLMAX,
      .   XGMIN, XGMAX, YGMIN, YGMAX, ZGMIN, ZGMAX,
      .   X1, Y1, Z1, 
@@ -86,7 +86,7 @@ C       CN=1./CN
         ROT(I)=BUFSF(ADRBUF+7+I-1)
        END DO
 C----------------------------------
-C      Boite englobante de l'ellipsoide dans le repere global.
+C      bounding box of the ellipsoid in the global coordinate system
        XLMIN=-A
        XLMAX= A
        YLMIN=-B

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_cluster   ../engine/source/output/cluster/read_cluster.F
-      !||--- called by ------------------------------------------------------
-      !||    rdresb         ../engine/source/output/restart/rdresb.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_db        ../common_source/tools/input_output/read_db.F
-      !||    read_i_c       ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    cluster_mod    ../engine/share/modules/cluster_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_cluster   ../engine/source/output/cluster/read_cluster.F
+!||--- called by ------------------------------------------------------
+!||    rdresb         ../engine/source/output/restart/rdresb.F
+!||--- calls      -----------------------------------------------------
+!||    read_db        ../common_source/tools/input_output/read_db.F
+!||    read_i_c       ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    cluster_mod    ../engine/share/modules/cluster_mod.F
+!||====================================================================
       SUBROUTINE READ_CLUSTER(CLUSTER)
 C-----------------------------------------------
 C   M o d u l e s
@@ -50,7 +50,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IL,RL,ITY,NEL,NNOD,IFAIL
+      INTEGER I,J,IL,RL,NEL,NNOD,IFAIL
       INTEGER ILCLUSTER_MAX, RLCLUSTER_MAX
       my_real, DIMENSION(:), ALLOCATABLE :: RCLTAB
       INTEGER, DIMENSION(:), ALLOCATABLE :: ICLTAB

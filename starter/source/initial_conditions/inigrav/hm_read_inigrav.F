@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inigrav        ../starter/source/initial_conditions/inigrav/hm_read_inigrav.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    inigrav                ../starter/share/modules1/inigrav_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inigrav        ../starter/source/initial_conditions/inigrav/hm_read_inigrav.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    inigrav                ../starter/share/modules1/inigrav_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INIGRAV(IGRV     ,IBUF     ,AGRV     ,ITAB     ,ITABM1   ,
      .                           IGRPART  ,NPC      ,UNITAB   ,ISKN     ,
      .                           ITAGND   ,IGRSURF  ,PLD      ,BUFSF    ,LSUBMODEL)
@@ -76,16 +76,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real
-     .   FCX,FCY,FAC_M,FAC_L,FAC_T,NGX,NGY,NGZ,DOTPROD
-      INTEGER I, NOD, NCUR, NOSKEW,NSKW,NN,IGS,UID,
-     .        IAD,NS,IWA,J,K,ID,K1,K2,NCURS,N1,N2,NC,L,
-     .        ITAG, IFLAGUNIT,FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,IADPL
-      CHARACTER(LEN=NCHARFIELD) :: XYZ
+     .   NGX,NGY,NGZ,DOTPROD
+      INTEGER UID,
+     .        IAD,J,K,ID,IFLAGUNIT,IADPL
       CHARACTER X*1, Y*1, Z*1, XX*2, YY*2, ZZ*2, MESS*40
       CHARACTER(LEN=NCHARTITLE)::TITR
       
-      INTEGER     :: IGU,ISU,IGRAV,IBID, IG, IS, IDIR, PN1, ICURS, IIGRAV,IIG,IIS
-      my_real     :: BX_,BY_,BZ_, GRAV0,NX,NY,NZ,NORM,PSURF,BID
+      INTEGER     :: IGU,ISU,IGRAV, IG, IS, IDIR, PN1, ICURS, IIGRAV,IIG,IIS
+      my_real     :: BX_,BY_,BZ_, GRAV0,NX,NY,NZ,NORM,PSURF
       LOGICAL     :: lFOUND, lPLANAR_SURF, lUSER_SURF, lOUTP, lGRAV, lUNIQUE, IS_AVAILABLE
       CHARACTER*2 :: CDIR
 

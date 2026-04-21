@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11trc        ../engine/source/interfaces/intsort/i11trc.F
-      !||--- called by ------------------------------------------------------
-      !||    i11main_tri   ../engine/source/interfaces/intsort/i11main_tri.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box       ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i11trc        ../engine/source/interfaces/intsort/i11trc.F
+!||--- called by ------------------------------------------------------
+!||    i11main_tri   ../engine/source/interfaces/intsort/i11main_tri.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box       ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I11TRC(
      1      I_STOK  ,CAND_N ,CAND_E,CAND_FX,CAND_FY ,
      2      CAND_FZ ,MFROT  ,ADDCM ,CHAINE ,NSN4    ,
@@ -41,10 +41,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-C   ROLE DE LA ROUTINE:
+C   role of the routine:
 C   ===================
-C   TRI sur N de CAND_N CAND_E CAND_F
-C   et elimination des noeuds en rebond 
+C   sorting on N of CAND_N CAND_E CAND_F
+C   and elimination of bouncing nodes
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -56,7 +56,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,N,K,IADFIN,IAD,IAD0,J,II,SLVE,NN
+      INTEGER I,IADFIN,IAD,IAD0,J,II,SLVE,NN
 C-----------------------------------------------
 C=======================================================================
 C

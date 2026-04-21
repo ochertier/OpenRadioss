@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    copy_elbuf_1   ../engine/source/elements/elbuf/copy_elbuf_1.F
-      !||--- called by ------------------------------------------------------
-      !||    copy_elbuf     ../engine/source/elements/elbuf/copy_elbuf.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar           ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    copy_elbuf_1   ../engine/source/elements/elbuf/copy_elbuf_1.F
+!||--- called by ------------------------------------------------------
+!||    copy_elbuf     ../engine/source/elements/elbuf/copy_elbuf.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE COPY_ELBUF_1(ELBUF_SRC,ELBUF_TGT,IPARG,NGROUP,NG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -56,7 +54,7 @@ C-----------------------------------------------
      .   NPG,NEL,IGTYP,LEN1,LEN2,NPTTOT,I,NONL,INLOC
       INTEGER ! global variables 
      .   G_GAMA,G_SIG,G_OFF,G_NOFF,G_EINT,G_EINS,G_TEMP,
-     .   G_RHO,G_PLA,G_VOL,G_EPSD,G_QVIS,G_DELTAX,G_TB,G_RK,G_RE,
+     .   G_RHO,G_PLA,G_VOL,G_EPSD,G_QVIS,G_DELTAX,G_TB,G_RK,G_RE,G_WPLA, 
      .   G_SMSTR,G_HOURG,G_BFRAC,G_THK,G_FOR,G_MOM,G_TAG22,G_STRA,G_SIGI,
      .   G_DMG,G_FORPG,G_MOMPG,G_STRPG,G_EPSQ,G_UELR,G_UELR1,G_IERR,
      .   G_DAMDL,G_FORTH,G_EINTTH,G_SEQ,G_STRW,G_STRWPG,
@@ -69,12 +67,13 @@ C-----------------------------------------------
      .   G_FORPGPINCH,G_MOMPGPINCH,G_EPGPINCHXZ,G_EPGPINCHYZ,G_EPGPINCHZZ,
      .   G_SKEW_ID,G_MAXFRAC,G_MAXEPS,G_SLIPRING_ID,G_SLIPRING_STRAND,G_RETRACTOR_ID,
      .   G_RINGSLIP,G_ADD_NODE,G_UPDATE,G_INTVAR,G_BETAORTH,G_AMU,G_SLIPRING_FRAM_ID,
-     .   G_FRAM_FACTOR,G_TSAIWU,G_DMGSCL,G_SH_IOFFSET
+     .   G_FRAM_FACTOR,G_TSAIWU,G_DMGSCL,G_FOR_G,G_FORPG_G,G_YIELD_IN_COMP,
+     .   G_XXOLD_IN_COMP
       INTEGER  ! layer variables
      .   LY_DMG,LY_GAMA,LY_DIRA,LY_DIRB,LY_CRKDIR,LY_PLAPT,LY_SIGPT,LY_HOURG,
      .   LY_UELR,LY_UELR1,LY_OFFPG,LY_OFF,LEN_PLAPT,LEN_SIGPT
       INTEGER  ! local variables
-     .   L_OFF,L_EINT,L_EINS,L_RHO,L_DP_DRHO,L_VOL,L_PLA,L_TB,L_TEMP,
+     .   L_OFF,L_EINT,L_EINS,L_RHO,L_DP_DRHO,L_VOL,L_PLA,L_TB,L_TEMP,L_WPLA,
      .   L_RK,L_RE,L_VK,L_ROB,L_SIG,L_SIGV,L_SIGL,L_SIGA,L_SIGD,L_SIGB,
      .   L_SIGC,L_SIGF,L_STRA,L_EPSA,L_EPSD,L_EPSQ,L_EPSF,L_CRAK,
      .   L_ANG,L_SF,L_QVIS,L_DELTAX,L_GAMA,
@@ -143,7 +142,9 @@ c
             ELBUF_TGT(NG)%BUFLY(IL)%IPORO = ELBUF_SRC(NG)%BUFLY(IL)%IPORO                         
             ELBUF_TGT(NG)%BUFLY(IL)%NFAIL = ELBUF_SRC(NG)%BUFLY(IL)%NFAIL                         
             ELBUF_TGT(NG)%BUFLY(IL)%NVAR_MAT = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_MAT                           
+            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_EOS = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_EOS 
             ELBUF_TGT(NG)%BUFLY(IL)%NVARTMP = ELBUF_SRC(NG)%BUFLY(IL)%NVARTMP                           
+            ELBUF_TGT(NG)%BUFLY(IL)%NVARTMP_EOS = ELBUF_SRC(NG)%BUFLY(IL)%NVARTMP_EOS
             ELBUF_TGT(NG)%BUFLY(IL)%NVAR_EOS = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_EOS                           
             ELBUF_TGT(NG)%BUFLY(IL)%NVAR_VISC = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_VISC                        
             ELBUF_TGT(NG)%BUFLY(IL)%NVAR_LOC = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_LOC                        
@@ -184,6 +185,7 @@ c
            L_EPSQ   = BUFLY%L_EPSQ          
            L_EPSF   = BUFLY%L_EPSF          
            L_PLA    = BUFLY%L_PLA           
+           L_WPLA   = BUFLY%L_WPLA              
            L_TEMP   = BUFLY%L_TEMP          
            L_TB     = BUFLY%L_TB            
            L_RK     = BUFLY%L_RK            
@@ -278,6 +280,7 @@ c
                LBUFT%EPSQ(1:NEL*L_EPSQ)      =LBUFS%EPSQ(1:NEL*L_EPSQ)
                LBUFT%EPSF(1:NEL*L_EPSF)      =LBUFS%EPSF(1:NEL*L_EPSF)
                LBUFT%PLA(1:NEL*L_PLA)        =LBUFS%PLA(1:NEL*L_PLA)  
+               LBUFT%WPLA(1:NEL*L_WPLA)      =LBUFS%WPLA(1:NEL*L_WPLA)                
                LBUFT%TEMP(1:NEL*L_TEMP)      =LBUFS%TEMP(1:NEL*L_TEMP)
                LBUFT%TB(1:NEL*L_TB)          =LBUFS%TB(1:NEL*L_TB)    
                LBUFT%RK(1:NEL*L_RK)          =LBUFS%RK(1:NEL*L_RK)    
@@ -566,7 +569,8 @@ c-------------------------------
 c         EoS                            
 c-------------------------------
           DO IL = 1, NLAY  
-            NUVAR = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_EOS                                                
+            NUVAR = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_EOS 
+            NVARTMP = ELBUF_SRC(NG)%BUFLY(IL)%NVARTMP_EOS                                               
             IF (IGTYP == 51 .OR. IGTYP == 52) THEN
               NPTT = ELBUF_SRC(NG)%BUFLY(IL)%NPTT
             ELSE
@@ -578,6 +582,7 @@ c-------------------------------
                   EOSS => ELBUF_SRC(NG)%BUFLY(IL)%EOS(IR,IS,IT)
                   EOST => ELBUF_TGT(NG)%BUFLY(IL)%EOS(IR,IS,IT)
                   EOST%VAR(1:NEL*NUVAR) = EOSS%VAR(1:NEL*NUVAR)
+                  EOST%VARTMP(1:NEL*NVARTMP) = EOSS%VARTMP(1:NEL*NVARTMP)                  
                 ENDDO                                                         
               ENDDO                                                          
             ENDDO                                                         
@@ -606,6 +611,7 @@ c
           G_EPSD  = GBUFS%G_EPSD      
           G_EPSQ  = GBUFS%G_EPSQ
           G_PLA   = GBUFS%G_PLA       
+          G_WPLA  = GBUFS%G_WPLA                
           G_TEMP  = GBUFS%G_TEMP      
           G_TB    = GBUFS%G_TB        
           G_RK    = GBUFS%G_RK        
@@ -652,6 +658,8 @@ C
           G_MAXEPS = GBUFS%G_MAXEPS
           G_BETAORTH  = GBUFS%G_BETAORTH
           G_AMU    = GBUFS%G_AMU
+          G_FOR_G  = GBUFS%G_FOR_G  
+          G_FORPG_G= GBUFS%G_FORPG_G 
 c---
 c 1-D elements (TRUSS, BEAM, SPRING, NSTRAND)
 c---
@@ -689,6 +697,8 @@ c---
           G_INIFRIC     = GBUFS%G_INIFRIC
           G_STRHG       = GBUFS%G_STRHG
           G_SKEW_ID     = GBUFS%G_SKEW_ID
+          G_YIELD_IN_COMP = GBUFS%G_YIELD_IN_COMP
+          G_XXOLD_IN_COMP = GBUFS%G_XXOLD_IN_COMP
 c---
 c seatbelt elements
 c---
@@ -729,6 +739,8 @@ c
           GBUFT%MAXEPS(1:NEL*G_MAXEPS) = GBUFS%MAXEPS(1:NEL*G_MAXEPS)      
           GBUFT%BETAORTH(1:NEL*G_BETAORTH) = GBUFS%BETAORTH(1:NEL*G_BETAORTH)
           GBUFT%AMU(1:NEL*G_AMU)       = GBUFS%AMU(1:NEL*G_AMU)   
+          GBUFT%FOR_G(1:NEL*G_FOR_G)   = GBUFS%FOR_G(1:NEL*G_FOR_G)   
+          GBUFT%WPLA(1:NEL*G_WPLA)     = GBUFS%WPLA(1:NEL*G_WPLA)           
 c
           IF (NPTTOT == 1) THEN  ! global variables are pointing to local ones
             LBUFT => ELBUF_TGT(NG)%BUFLY(1)%LBUF(1,1,1)
@@ -743,6 +755,7 @@ c
             ELBUF_TGT(NG)%GBUF%EPSD   => LBUFT%EPSD
             ELBUF_TGT(NG)%GBUF%EPSQ   => LBUFT%EPSQ      
             ELBUF_TGT(NG)%GBUF%PLA    => LBUFT%PLA
+            ELBUF_TGT(NG)%GBUF%WPLA   => LBUFT%WPLA
             ELBUF_TGT(NG)%GBUF%TEMP   => LBUFT%TEMP
             ELBUF_TGT(NG)%GBUF%TB     => LBUFT%TB
             ELBUF_TGT(NG)%GBUF%RK     => LBUFT%RK
@@ -779,6 +792,9 @@ c
 c---
 c 1-D elements (TRUSS, BEAM, SPRING, NSTRAND)
 c---
+          IF(IGTYP == 3 .and. ITY == 5) THEN 
+            GBUFT%DMGSCL(1:NEL*G_DMGSCL)=  GBUFS%DMGSCL(1:NEL*G_DMGSCL)
+          ENDIF
           GBUFT%AREA(1:NEL*G_AREA)=  GBUFS%AREA(1:NEL*G_AREA)
           GBUFT%SKEW(1:NEL*G_SKEW)=  GBUFS%SKEW(1:NEL*G_SKEW)
           GBUFT%LENGTH(1:NEL*G_LENGTH)=  GBUFS%LENGTH(1:NEL*G_LENGTH)
@@ -813,6 +829,8 @@ c---
           GBUFT%INIFRIC(1:NEL*G_INIFRIC)=  GBUFS%INIFRIC(1:NEL*G_INIFRIC)
           GBUFT%STRHG(1:NEL*G_STRHG) = GBUFS%STRHG(1:NEL*G_STRHG)
           GBUFT%SKEW_ID(1:NEL*G_SKEW_ID)=  GBUFS%SKEW_ID(1:NEL*G_SKEW_ID)
+          GBUFT%YIELD_IN_COMP(1:NEL*G_YIELD_IN_COMP) = GBUFS%YIELD_IN_COMP(1:NEL*G_YIELD_IN_COMP)
+          GBUFT%XXOLD_IN_COMP(1:NEL*G_XXOLD_IN_COMP) = GBUFS%XXOLD_IN_COMP(1:NEL*G_XXOLD_IN_COMP)
 c---
 c seatbelt elements
 c---
@@ -853,6 +871,7 @@ C
             ENDIF
             ELBUF_TGT(NG)%GBUF%STRWPG=> ELBUF_TGT(NG)%GBUF%STRW
             IF (G_STRPG>G_STRA) GBUFT%STRPG(1:NEL*G_STRPG) =  GBUFS%STRPG(1:NEL*G_STRPG)
+            ELBUF_TGT(NG)%GBUF%FORPG_G => ELBUF_TGT(NG)%GBUF%FOR_G
           ELSEIF (NPG > 1) THEN
             GBUFT%FORPG(1:NEL*G_FORPG) =  GBUFS%FORPG(1:NEL*G_FORPG)
             GBUFT%MOMPG(1:NEL*G_MOMPG) =  GBUFS%MOMPG(1:NEL*G_MOMPG)
@@ -865,6 +884,7 @@ C
 C
             GBUFT%STRPG(1:NEL*G_STRPG) =  GBUFS%STRPG(1:NEL*G_STRPG)
             GBUFT%STRWPG(1:NEL*G_STRWPG)= GBUFS%STRWPG(1:NEL*G_STRWPG)
+            GBUFT%FORPG_G(1:NEL*G_FORPG_G)= GBUFS%FORPG_G(1:NEL*G_FORPG_G)
           ENDIF
 c
         ENDIF  ! ITY

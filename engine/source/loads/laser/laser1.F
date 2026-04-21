@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    laser1         ../engine/source/loads/laser/laser1.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx         ../engine/source/ale/grid/alewdx.F
-      !||--- calls      -----------------------------------------------------
-      !||    laser2         ../engine/source/loads/laser/laser2.F
-      !||    laser3         ../engine/source/loads/laser/laser2.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    laser1         ../engine/source/loads/laser/laser1.F
+!||--- called by ------------------------------------------------------
+!||    alewdx         ../engine/source/ale/grid/alewdx.F
+!||--- calls      -----------------------------------------------------
+!||    laser2         ../engine/source/loads/laser/laser2.F
+!||    laser3         ../engine/source/loads/laser/laser2.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE LASER1(LAS ,XLAS ,MS    ,X    ,V     ,
      .                  W   ,WA   ,IPARG ,IXQ  ,PM    , 
      .                  TF  ,NPF , ELBUF_TAB, WFEXT)

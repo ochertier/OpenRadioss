@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_rgwalc_impact   ../engine/source/ams/sms_rgwalc.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rgwal_0         ../engine/source/ams/sms_rgwal0.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rgwalc_impact   ../engine/source/ams/sms_rgwalc.F
+!||--- called by ------------------------------------------------------
+!||    sms_rgwal_0         ../engine/source/ams/sms_rgwal0.F
+!||====================================================================
       SUBROUTINE SMS_RGWALC_IMPACT(X    ,A    ,V      ,RWL  ,NSW   ,
      1                             NSN  ,ITIED,MSR    ,MS   ,WEIGHT,
      2                             NIMPACT,IMPACT ,NSMS ,NRWL_SMS)
@@ -49,11 +49,11 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, N3, N2, N1, K, J, M1, M2, M3
+      INTEGER I, N, N3, N2, N1, J, M1, M2, M3
       my_real
      .   RA2, XWL, YWL, ZWL, VXW, VYW, VZW,
      .   VX, VY, VZ, UX, UY, UZ, XC, YC, ZC, DD1, DD,
-     .   DP, XT, YT, ZT, XX, XN, YN, ZN, DV, DA, DVT,
+     .   DP,
      .   XWL0, YWL0, ZWL0
 C-----------------------------------------------
       RA2=(HALF*RWL(7))**2
@@ -112,11 +112,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    sms_rgwalc_fric   ../engine/source/ams/sms_rgwalc.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rgwal_0       ../engine/source/ams/sms_rgwal0.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rgwalc_fric   ../engine/source/ams/sms_rgwalc.F
+!||--- called by ------------------------------------------------------
+!||    sms_rgwal_0       ../engine/source/ams/sms_rgwal0.F
+!||====================================================================
       SUBROUTINE SMS_RGWALC_FRIC
      1                 (X     ,A     ,V     ,RWL    ,NSW   ,
      2                  NSN   ,ITIED ,MSR    ,MS     ,WEIGHT ,
@@ -143,16 +143,16 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, N3, N2, N1, J, K, M1, M2, M3
+      INTEGER I, N, N3, N2, N1, J, M1, M2, M3
 
 C     REAL
       my_real
      .   XWL, YWL, ZWL, VXW, VYW, VZW,
      .   XWL0, YWL0, ZWL0,
      .   XC, YC, ZC, DD1, DD, DP, XT, YT, ZT, XX, XN, YN, ZN,
-     .   DV, DA, DVT, FN,
+     .     FN,
      .   FNXN, FNYN, FNZN, FNXT, FNYT, FNZT, FNDFN, FTDFT, FRIC, FRIC2,
-     .   FCOE, FAC, ALPHA, ALPHI, FXT, FYT, FZT
+     .   FCOE, FAC, FXT, FYT, FZT
 C-----------------------------------------------
 C
       IF(MSR==0)THEN
@@ -169,7 +169,7 @@ C
         M3=3*MSR
         M2=M3-1
         M1=M2-1
-C   changement formulation : plus d'impasse sur contribution force
+C   Change Formulation: More dead end on Force Contribution
         VXW=V(M1)+A(M1)*DT12
         VYW=V(M2)+A(M2)*DT12
         VZW=V(M3)+A(M3)*DT12
@@ -248,11 +248,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    sms_rgwalc_bcs_0   ../engine/source/ams/sms_rgwalc.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rgwal_0        ../engine/source/ams/sms_rgwal0.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rgwalc_bcs_0   ../engine/source/ams/sms_rgwalc.F
+!||--- called by ------------------------------------------------------
+!||    sms_rgwal_0        ../engine/source/ams/sms_rgwal0.F
+!||====================================================================
       SUBROUTINE SMS_RGWALC_BCS_0
      1                 (X     ,A     ,V     ,RWL    ,NSW   ,
      2                  NSN   ,ITIED ,MSR    ,MS     ,WEIGHT ,
@@ -277,14 +277,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, N3, N2, N1, J, K, M1, M2, M3
+      INTEGER I, N, N3, N2, N1, J, M1, M2, M3
 
 C     REAL
       my_real
      .   XWL, YWL, ZWL, VXW, VYW, VZW,
      .   XWL0, YWL0, ZWL0,
      .   XC, YC, ZC, DD1, DD, DP, XT, YT, ZT, XX, XN, YN, ZN,
-     .   DV, DA, DVT, MS1
+     .   DV, DA
 C-----------------------------------------------
 C
       IF(MSR==0)THEN
@@ -301,7 +301,7 @@ C
         M3=3*MSR
         M2=M3-1
         M1=M2-1
-C   changement formulation : plus d'impasse sur contribution force
+C   Change Formulation: More dead end on Force Contribution
         VXW=V(M1)+A(M1)*DT12
         VYW=V(M2)+A(M2)*DT12
         VZW=V(M3)+A(M3)*DT12
@@ -401,11 +401,11 @@ C glissement
 C
       RETURN
       END
-      !||====================================================================
-      !||    sms_rgwalc_bcs_1   ../engine/source/ams/sms_rgwalc.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rgwal_0        ../engine/source/ams/sms_rgwal0.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rgwalc_bcs_1   ../engine/source/ams/sms_rgwalc.F
+!||--- called by ------------------------------------------------------
+!||    sms_rgwal_0        ../engine/source/ams/sms_rgwal0.F
+!||====================================================================
       SUBROUTINE SMS_RGWALC_BCS_1
      1                 (X     ,A     ,V     ,RWL    ,NSW   ,
      2                  NSN   ,ITIED ,MSR    ,MS     ,WEIGHT ,
@@ -454,7 +454,7 @@ C
         M3=3*MSR
         M2=M3-1
         M1=M2-1
-C   changement formulation : plus d'impasse sur contribution force
+C   Change Formulation: More dead end on Force Contribution
         VXW=V(M1)+A(M1)*DT12
         VYW=V(M2)+A(M2)*DT12
         VZW=V(M3)+A(M3)*DT12
@@ -549,13 +549,13 @@ C glissement
 C
       RETURN
       END
-      !||====================================================================
-      !||    sms_rgwalc_bilan   ../engine/source/ams/sms_rgwalc.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_rgwal_0        ../engine/source/ams/sms_rgwal0.F
-      !||--- calls      -----------------------------------------------------
-      !||    sum_6_float        ../engine/source/system/parit.F
-      !||====================================================================
+!||====================================================================
+!||    sms_rgwalc_bilan   ../engine/source/ams/sms_rgwalc.F
+!||--- called by ------------------------------------------------------
+!||    sms_rgwal_0        ../engine/source/ams/sms_rgwal0.F
+!||--- calls      -----------------------------------------------------
+!||    sum_6_float        ../engine/source/system/parit.F
+!||====================================================================
       SUBROUTINE SMS_RGWALC_BILAN
      1                 (X     ,FREA  ,V     ,RWL    ,NSW   ,
      2                  NSN   ,ITIED ,MSR    ,MS     ,WEIGHT ,
@@ -585,13 +585,13 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, N3, N2, N1, J, K, M1, M2, M3
+      INTEGER I, N, N3, N2, N1, J, M1, M2, M3
 
       my_real
      .   VXW, VYW, VZW, VX, VY, VZ, XWL0, YWL0, ZWL0,
      .   XC, YC, ZC, DD1, DD, DP, XT, YT, ZT, XX, XN, YN, ZN,
      .   WFEXTT,
-     .   FNXN, FNYN, FNZN, FNXT, FNYT, FNZT, FN,
+     .       FN,
      .   FXN, FYN, FZN, FXT, FYT, FZT,
      .   F1(NSN), F2(NSN), F3(NSN), F4(NSN), F5(NSN), F6(NSN), F7(NSN)
 C-----------------------------------------------
@@ -655,7 +655,7 @@ C
           F6(J) = ZERO
           F7(J) = ZERO
 C
-C 1er impact (WFEXT avec decalage 1/2 cycle)
+C 1st impact (wfext with 1/2 cycle decal)
 c        VX=V(N1)+HALF*A(N1)*DT12
 c        VY=V(N2)+HALF*A(N2)*DT12
 c        VZ=V(N3)+HALF*A(N3)*DT12
@@ -699,7 +699,7 @@ C
           VX=V(N1)+HALF*A(N1)*DT12
           VY=V(N2)+HALF*A(N2)*DT12
           VZ=V(N3)+HALF*A(N3)*DT12
-C 1er impact (WFEXT avec decalage 1/2 cycle)
+C 1st impact (wfext with 1/2 cycle decal)
 c       WFEXTT = WFEXTT -DT12*((VX-VXW)*FXN+(VY-VYW)*FYN+(VZ-VZW)*FZN)
 C
           FXT=WEIGHT(N)*FREA(1,N)-FXN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    forcefingeo           ../engine/source/loads/general/forcefingeo.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
-      !||    sysfus2               ../engine/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    forcefingeo                   ../engine/source/loads/general/forcefingeo.F
+!||--- called by ------------------------------------------------------
+!||    resol                         ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    finter                        ../engine/source/tools/curve/finter.F
+!||    finter_smooth                 ../engine/source/tools/curve/finter_smooth.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                       ../engine/share/modules/h3d_mod.F
+!||    nodal_arrays_mod              ../common_source/modules/nodal_arrays.F90
+!||    python_call_funct_cload_mod   ../engine/source/loads/general/python_call_funct_cload.F90
+!||    python_funct_mod              ../common_source/modules/python_mod.F90
+!||    sensor_mod                    ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE FORCEFINGEO(IBFV  ,NPC    ,TF     ,A     ,V    ,X     ,
      2                       VEL   ,SENSOR_TAB,FSKY  ,FEXT ,ITABM1,
-     3                       H3D_DATA,NSENSOR, PYTHON,WFEXT)
+     3                       H3D_DATA,NSENSOR, PYTHON,WFEXT,NODES)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE nodal_arrays_mod
       USE PYTHON_FUNCT_MOD
+      use python_call_funct_cload_mod
       USE H3D_MOD 
       USE SENSOR_MOD
 C-----------------------------------------------
@@ -61,12 +64,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   E x t e r n a l  F u n c t i o n s
 C-----------------------------------------------
-      INTEGER SYSFUS2
       my_real FINTER,FINTER_SMOOTH
       EXTERNAL FINTER,FINTER_SMOOTH
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(NODAL_ARRAYS_) :: NODES
       TYPE(PYTHON_), INTENT(inout) :: PYTHON
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IBFV(NIFV,*), NPC(*)
@@ -91,9 +94,7 @@ C=======================================================================
       TS_OLD = ZERO
       NCUR_OLD = 0
 C----------------------------------
-C     FORCE CONCENTREE
-C     IF(IMACH/=3.OR.IPARIT==0)
-C     Code PARITH/OFF
+C     CONCENTRATED FORCE
 C----------------------------------
       DO N=1,NFXVEL
         IF (IBFV(13,N) /= 2) CYCLE
@@ -132,8 +133,8 @@ C
             F1 = FINTER_SMOOTH(NCUR,(TS-DT1)*FACX,NPC,TF,DYDX)
             F2 = FINTER_SMOOTH(NCUR,TS*FACX,NPC,TF,DYDX)
           ELSE IF(ISMOOTH < 0) THEN
-            CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,TS-DT1, F1)
-            CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,TS, F2)
+            CALL PYTHON_CALL_FUNCT_CLOAD(PYTHON, -ISMOOTH,TS-DT1, F1,N1,NODES)
+            CALL PYTHON_CALL_FUNCT_CLOAD(PYTHON, -ISMOOTH,TS, F2,N2,NODES)
           ENDIF ! IF (ISMOOTH == 0)
           NCUR_OLD = NCUR
           TS_OLD = TS
@@ -174,9 +175,8 @@ C
         WFEXTT = WFEXTT + DT1*HALF*(A0+AA)*VV*AXI
       ENDDO
 C
-#include "atomic.inc"
+!$OMP ATOMIC
       WFEXT = WFEXT + WFEXTT
-#include "atomend.inc"
 C
       RETURN
       END

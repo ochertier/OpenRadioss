@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cfield_1              ../engine/source/loads/general/load_centri/cfield.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    my_barrier            ../engine/source/system/machine.F
-      !||    relfram_m1            ../engine/source/tools/skew/relfram_m1.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    cfield_1              ../engine/source/loads/general/load_centri/cfield.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    finter                ../engine/source/tools/curve/finter.F
+!||    my_barrier            ../engine/source/system/machine.F
+!||    relfram_m1            ../engine/source/tools/skew/relfram_m1.F
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE CFIELD_1(PYTHON, ICFIELD  ,FAC   ,NPC   ,TF    ,A ,
      2                  V     ,X     ,XFRAME  ,MS,SENSOR_TAB,
      3                  WEIGHT,IB,ITASK,IFRAME,NSENSOR,WFEXT)
@@ -67,10 +67,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, IFRA, N2, IFUNC, K1, K2, K3, ISENS,K,NN,IAD, J, PROC, IADF, IADL,IDIR,IFLAG,N1FRAM,IUN,JJ,IMOVFRAM
+      INTEGER NL, N1, IFRA, IFUNC, ISENS,NN,IAD, J, IADF, IADL,IDIR,IFLAG,N1FRAM,IUN,IMOVFRAM
       INTEGER :: IS_TABULATED
-      my_real NX, NY, NZ, AXI, A0, AA, VV, FX, FY, FZ, AX, DYDX, TS,
-     .        GAMA, MA, VROT, X0, Y0, Z0, X1, Y1, Z1, X2, Y2, Z2, DWDT,
+      my_real     DYDX, TS,
+     .          VROT, X0, Y0, Z0, X1, Y1, Z1, X2, Y2, Z2, DWDT,
      .        WFEXTT,VMX,VMY,VMZ,VROT2
       my_real DIST(3),AREL(3),VN1FRAM(3),AN1FRAM(3),DW(3)
       my_real FINTER
@@ -251,9 +251,8 @@ C      /---------------/
 C      /---------------/
       ENDDO
 C
-#include "atomic.inc"
+!$OMP ATOMIC
       WFEXT = WFEXT + WFEXTT
-#include "atomend.inc"
 C
       RETURN
       END

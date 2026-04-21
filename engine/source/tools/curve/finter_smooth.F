@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,32 +21,37 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #include "my_real.inc"
-      !||====================================================================
-      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
-      !||--- called by ------------------------------------------------------
-      !||    daasolv               ../engine/source/fluid/daasolv.F
-      !||    daasolvp              ../engine/source/fluid/daasolvp.F
-      !||    ebcs11                ../engine/source/boundary_conditions/ebcs/ebcs11.F90
-      !||    force                 ../engine/source/loads/general/force.F90
-      !||    forcefingeo           ../engine/source/loads/general/forcefingeo.F
-      !||    forcepinch            ../engine/source/loads/general/forcepinch.F
-      !||    gravit                ../engine/source/loads/general/grav/gravit.F
-      !||    gravit_fvm_fem        ../engine/source/loads/general/grav/gravit_fvm_fem.F
-      !||    gravit_imp            ../engine/source/loads/general/grav/gravit_imp.F
-      !||    h3d_pre_skin_scalar   ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||    h3d_skin_vector       ../engine/source/output/h3d/h3d_results/h3d_skin_vector.F
-      !||    incpflow              ../engine/source/fluid/incpflow.F
-      !||    lag_fxv               ../engine/source/tools/lagmul/lag_fxv.F
-      !||    lag_fxvp              ../engine/source/tools/lagmul/lag_fxv.F
-      !||====================================================================
+!||====================================================================
+!||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
+!||--- called by ------------------------------------------------------
+!||    daasolv               ../engine/source/fluid/daasolv.F
+!||    daasolvp              ../engine/source/fluid/daasolvp.F
+!||    ebcs11_propellant     ../engine/source/boundary_conditions/ebcs/ebcs11_propellant.F90
+!||    finter_mixed_mod      ../engine/source/tools/finter_mixed.F90
+!||    force                 ../engine/source/loads/general/force.F90
+!||    forcefingeo           ../engine/source/loads/general/forcefingeo.F
+!||    forcepinch            ../engine/source/loads/general/forcepinch.F
+!||    gravit                ../engine/source/loads/general/grav/gravit.F
+!||    gravit_fvm_fem        ../engine/source/loads/general/grav/gravit_fvm_fem.F
+!||    gravit_imp            ../engine/source/loads/general/grav/gravit_imp.F
+!||    h3d_pre_skin_scalar   ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||    h3d_skin_vector       ../engine/source/output/h3d/h3d_results/h3d_skin_vector.F
+!||    incpflow              ../engine/source/fluid/incpflow.F
+!||    lag_fxv               ../engine/source/tools/lagmul/lag_fxv.F
+!||    lag_fxvp              ../engine/source/tools/lagmul/lag_fxv.F
+!||====================================================================
       my_real FUNCTION FINTER_SMOOTH(IFUNC,XX,NPF,TF,DERI)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
+C-----------------------------------------------
+C   L o c a l   V a r i a b l e s
+C-----------------------------------------------
       INTEGER IFUNC,NPF(*),I
-      my_real TF(*),DERI,XX,DX,DERI1,DERI2,DERI3,DX1,DX2,DIV0,DIV,
-     . XX_FIRST,XX_LAST
+      my_real TF(*),DERI,XX,DERI1,DERI2,DERI3,DX1,DX2,DIV0,DIV,XX_FIRST,XX_LAST
+C-----------------------------------------------
+C   B o d y
 C-----------------------------------------------
       FINTER_SMOOTH = ZERO
 !
@@ -57,7 +62,7 @@ C-----------------------------------------------
       XX_LAST  = TF(NPF(IFUNC+1)-2)
 !
       IF ((NPF(IFUNC+1)-NPF(IFUNC)) == 2) THEN
-!     constant function
+!     Constant Function
         FINTER_SMOOTH = TF(NPF(IFUNC)+1)
         RETURN
       ELSE
@@ -103,11 +108,11 @@ C-----------------------------------------------
 !---
       RETURN
       END
-      !||====================================================================
-      !||    finter2_smooth   ../engine/source/tools/curve/finter_smooth.F
-      !||--- called by ------------------------------------------------------
-      !||    fixfingeo        ../engine/source/constraints/general/impvel/fixfingeo.F
-      !||====================================================================
+!||====================================================================
+!||    finter2_smooth   ../engine/source/tools/curve/finter_smooth.F
+!||--- called by ------------------------------------------------------
+!||    fixfingeo        ../engine/source/constraints/general/impvel/fixfingeo.F
+!||====================================================================
       my_real FUNCTION FINTER2_SMOOTH(TF,IAD,IPOS,ILEN,XX,DYDX)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

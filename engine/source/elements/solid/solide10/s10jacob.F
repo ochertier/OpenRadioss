@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10jacob    ../engine/source/elements/solid/solide10/s10jacob.F
-      !||--- called by ------------------------------------------------------
-      !||    s10deri3    ../engine/source/elements/solid/solide10/s10deri3.F
-      !||    s10derit3   ../engine/source/elements/solid/solide10/s10derit3.F
-      !||====================================================================
+!||====================================================================
+!||    s10jacob    ../engine/source/elements/solid/solide10/s10jacob.F
+!||--- called by ------------------------------------------------------
+!||    s10deri3    ../engine/source/elements/solid/solide10/s10deri3.F
+!||    s10derit3   ../engine/source/elements/solid/solide10/s10derit3.F
+!||====================================================================
       SUBROUTINE S10JACOB(
      1   ALPH,    BETA,    W,       X1B,
      2   X2B,     X3B,     X4A,     X5B,
@@ -95,7 +95,7 @@ C-----------------------------------------------
 C     REAL
       DOUBLE PRECISION 
 c      my_real
-     .   D,A4MB4,A4,B4,BB,AB,B2,A4_0,B4_0,
+     .   D,A4MB4,A4,B4,A4_0,B4_0,
      .   DXDR,DXDS,DXDT,DYDR,DYDS,DYDT,DZDR,DZDS,DZDT
      
       DOUBLE PRECISION 

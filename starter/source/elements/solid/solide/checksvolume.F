@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,17 +23,20 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 
 
 
-      !||====================================================================
-      !||    checkvolume_8n   ../starter/source/elements/solid/solide/checksvolume.F
-      !||--- called by ------------------------------------------------------
-      !||    s16coor3         ../starter/source/elements/thickshell/solide16/s16coor3.F
-      !||    s20coor3         ../starter/source/elements/solid/solide20/s20coor3.F
-      !||    sccoor3          ../starter/source/elements/thickshell/solidec/sccoor3.F
-      !||    scoor3           ../starter/source/elements/solid/solide/scoor3.F
-      !||    spcoor3          ../starter/source/elements/solid/sconnect/spcoor3.F
-      !||    srcoor3          ../starter/source/elements/solid/solide/srcoor3.F
-      !||====================================================================
+!||====================================================================
+!||    checkvolume_8n   ../starter/source/elements/solid/solide/checksvolume.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_solid    ../starter/source/elements/reader/hm_read_solid.F
+!||    s16coor3         ../starter/source/elements/thickshell/solide16/s16coor3.F
+!||    s20coor3         ../starter/source/elements/solid/solide20/s20coor3.F
+!||    sccoor3          ../starter/source/elements/thickshell/solidec/sccoor3.F
+!||    scoor3           ../starter/source/elements/solid/solide/scoor3.F
+!||    spcoor3          ../starter/source/elements/solid/sconnect/spcoor3.F
+!||    srcoor3          ../starter/source/elements/solid/solide/srcoor3.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       FUNCTION CHECKVOLUME_8N(X,IXS)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -118,12 +121,18 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    checkvolume_6n   ../starter/source/elements/solid/solide/checksvolume.F
-      !||--- called by ------------------------------------------------------
-      !||    s6ccoor3         ../starter/source/elements/thickshell/solide6c/s6ccoor3.F
-      !||====================================================================
+!||====================================================================
+!||    checkvolume_6n   ../starter/source/elements/solid/solide/checksvolume.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_solid    ../starter/source/elements/reader/hm_read_solid.F
+!||    s6ccoor3         ../starter/source/elements/thickshell/solide6c/s6ccoor3.F
+!||    s6zcoor3         ../starter/source/elements/solid/solide6z/s6zcoor3.F90
+!||    s6zrcoor3        ../starter/source/elements/solid/solide6z/s6zrcoor3.F90
+!||    sgsavini         ../starter/source/elements/solid/solide/scoor3.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       FUNCTION CHECKVOLUME_6N(X,IXS)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -196,17 +205,19 @@ C
       CHECKVOLUME_6N=ONE_OVER_8*(JAC1*JAC_59_68+JAC2*JAC_67_49+JAC3*JAC_48_57)
       RETURN
       END
-      !||====================================================================
-      !||    checkvolume_4n   ../starter/source/elements/solid/solide/checksvolume.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_solid    ../starter/source/elements/reader/hm_read_solid.F
-      !||    s10coor3         ../starter/source/elements/solid/solide10/s10coor3.F
-      !||    s10coor3_old     ../starter/source/elements/solid/solide10/s10coor3.F
-      !||    s4coor3          ../starter/source/elements/solid/solide4/s4coor3.F
-      !||    sgsavini         ../starter/source/elements/solid/solide/scoor3.F
-      !||    soltosphx4       ../starter/source/elements/sph/soltosph.F
-      !||====================================================================
+!||====================================================================
+!||    checkvolume_4n   ../starter/source/elements/solid/solide/checksvolume.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_solid    ../starter/source/elements/reader/hm_read_solid.F
+!||    s10coor3         ../starter/source/elements/solid/solide10/s10coor3.F
+!||    s10coor3_old     ../starter/source/elements/solid/solide10/s10coor3.F
+!||    s4coor3          ../starter/source/elements/solid/solide4/s4coor3.F
+!||    sgsavini         ../starter/source/elements/solid/solide/scoor3.F
+!||    soltosphx4       ../starter/source/elements/sph/soltosph.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       FUNCTION CHECKVOLUME_4N(X,IXS)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,22 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #ifdef MPI
-      !||====================================================================
-      !||    inipar                ../engine/source/mpi/init/inipar.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2              ../engine/source/engine/radioss2.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                 ../engine/source/system/arret.F
-      !||    omp_get_max_threads   ../engine/source/engine/openmp_stub.F90
-      !||    omp_set_num_threads   ../engine/source/engine/openmp_stub.F90
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
-      SUBROUTINE INIPAR(ITID,ICAS,NNODES,INPUT,GOT_INPUT,NBTASK)
+!||====================================================================
+!||    inipar                 ../engine/source/mpi/init/inipar.F
+!||--- called by ------------------------------------------------------
+!||    radioss2               ../engine/source/engine/radioss2.F
+!||--- calls      -----------------------------------------------------
+!||    arret                  ../engine/source/system/arret.F
+!||    omp_get_max_threads    ../engine/source/engine/openmp_stub.F90
+!||    omp_set_num_threads    ../engine/source/engine/openmp_stub.F90
+!||--- uses       -----------------------------------------------------
+!||    coupling_adapter_mod   ../engine/source/coupling/coupling_adapter.F90
+!||    spmd_comm_world_mod    ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
+      SUBROUTINE INIPAR(coupling,ITID,ICAS,NNODES,INPUT,GOT_INPUT,NBTASK)
 C-----------------------------------------------------------------
+        USE COUPLING_ADAPTER_MOD
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 #include      "r4r8_p.inc"
@@ -45,6 +49,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITID(*),ICAS, NNODES,GOT_INPUT,NBTASK(*)
       CHARACTER*100 INPUT
+      type(coupling_type), intent(inout) :: coupling
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -59,13 +64,16 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR,ICODE
       INTEGER MYRANK, JRANK, I, J, NTHREAD1, LOCAL, RLEN
-      CHARACTER (LEN=255) :: STR
-      CHARACTER (LEN=MPI_MAX_PROCESSOR_NAME) :: HOSTNAME(NSPMD),
-     *     HSTNAM,HOST
-      INTEGER PERM(NSPMD),HOST_NUMBERS(NSPMD),HOST_NUMBER
-      INTEGER BUFFER(NSPMD*2),NSPMDx2
+      CHARACTER (LEN=255) :: STR      
+      CHARACTER (LEN=MPI_MAX_PROCESSOR_NAME) :: HSTNAM,HOST
+      character(len=MPI_MAX_PROCESSOR_NAME), dimension(:), allocatable :: hostname
+      integer, dimension(:), allocatable :: perm,host_numbers,buffer
+      INTEGER HOST_NUMBER
+      INTEGER NSPMDx2
       INTEGER :: COLOUR
+      INTEGER (kind=MPI_ADDRESS_KIND) :: COLOUR_ADDR
       INTEGER :: VALID
+      CHARACTER FILNAM*100
 #if defined(_OPENMP)
       INTEGER OMP_GET_MAX_THREADS
 #endif
@@ -79,14 +87,27 @@ C--------------------------------------------------
 C
         KEY = 0
         CALL MPI_INITIALIZED(KEY, IERR)
+        VALID = 0
+        COLOUR_ADDR = 0
 
         CALL MPI_INIT(IERROR)
 
         CALL MPI_COMM_GET_ATTR(MPI_COMM_WORLD, MPI_APPNUM,
-     *                            COLOUR, VALID, IERROR)
+     *                            COLOUR_ADDR, VALID, IERROR)
+
+        IF (IERROR == MPI_SUCCESS) THEN
+           COLOUR = INT(COLOUR_ADDR)
+        ELSE
+           COLOUR = 0  ! Default color if attribute not found
+        ENDIF
+        call coupling_configure(coupling, TRIM(coupling%FILNAM))  
+
+#ifndef WITH_CWIPI 
         CALL MPI_COMM_SPLIT(MPI_COMM_WORLD,COLOUR,KEY,
      *                      SPMD_COMM_WORLD,IERROR)
-
+#else
+        SPMD_COMM_WORLD = coupling_get_communicator(coupling%adapter_ptr)
+#endif
         CALL MPI_COMM_SIZE(SPMD_COMM_WORLD, NNODES, IERROR)
         CALL MPI_COMM_RANK(SPMD_COMM_WORLD, MYRANK, IERROR)
 C
@@ -98,13 +119,13 @@ C
 C         I AM THE FIRST ONE
           ISPMD = 0
 C
-C Calcul du nombre de threads
+C Calculation of the number of threads
 C
 #if defined(_OPENMP)
           STR = ' '
           CALL  GETENV('OMP_NUM_THREADS',STR)
           NTHREAD1=0
-C nthread1 : nombre de threads fixe par la variable environnememt
+C nthread1 : fixed number of threads by the environment variable
           READ(STR,'(I10)',ERR=999)NTHREAD1
           GOTO 1000
  999      CONTINUE
@@ -139,7 +160,7 @@ C nthread1 : nombre de threads fixe par la variable environnememt
           CALL MPI_BCAST(
      1      NSPMD,1,MPI_INTEGER,IT_SPMD(1),SPMD_COMM_WORLD,
      2      IERROR )
-C recuperation de NTHREAD depuis process 0
+C recuperation de NTHREAD depuis process 0   { recovery of NTHREAD from process 0 }
           CALL MPI_BCAST(
      1      NTHREAD,1,MPI_INTEGER,IT_SPMD(1),SPMD_COMM_WORLD,
      2      IERROR )
@@ -155,12 +176,12 @@ C
             END IF
           END DO
 cccc
-C code special pour MIC
+C special code for MIC
 #if defined(__MIC__)
           STR = ' '
           CALL  GETENV('OMP_NUM_THREADS',STR)
           NTHREAD1=0
-C nthread1 : nombre de threads fixe par la variable environnement sur le MIC
+C nthread1 : fixed number of threads by the environment variable on the MIC
           READ(STR,'(I10)',ERR=1999)NTHREAD1
           GOTO 2000
  1999     CONTINUE
@@ -173,7 +194,6 @@ C nthread1 : nombre de threads fixe par la variable environnement sur le MIC
      .        NTHREAD,' FOR MPI PROCESS',ISPMD+1 
           ENDIF
 #endif
-cccc               
 C control of nthread per MPI process
           CALL MPI_GATHER(NTHREAD,1,MPI_INTEGER,NBTASK,1,MPI_INTEGER,
      .                    IT_SPMD(1),SPMD_COMM_WORLD,IERROR)            
@@ -182,7 +202,7 @@ C control of nthread per MPI process
       ELSE IF(ICAS==3) THEN
         IF(ISPMD == 0) THEN
 C
-C test cooherence NSPMD et nombre de proccesses MPI demandes (-np)
+C NSPMD COOHENENCE test and number of MPI requests (-NP)
 C
           IF (NSPMD /= NNODES) THEN
             WRITE(IOUT,*)
@@ -212,10 +232,10 @@ C
             CALL ARRET(7)
           END IF
           IF(NSPMD > 1) THEN
-C envoi NSPMD de process0 vers les autres processes
+C sending NSPMD from process0 to other processes
             CALL MPI_BCAST(NSPMD,1,MPI_INTEGER,IT_SPMD(1),
      .                     SPMD_COMM_WORLD,IERROR)
-C envoi de NTHREAD de process0 vers les autres processes
+C sending NTHREAD from process0 to other processes
             CALL MPI_BCAST(NTHREAD,1,MPI_INTEGER,IT_SPMD(1),
      .                     SPMD_COMM_WORLD,IERROR)
 C
@@ -254,12 +274,16 @@ C
 C
 C Init local SPMD numbering on a node (L_SPMD)
 C
+        allocate(hostname(nspmd))
         CALL MPI_GET_PROCESSOR_NAME(HSTNAM,RLEN,IERROR)
         CALL MPI_GATHER(
      .     HSTNAM,MPI_MAX_PROCESSOR_NAME,MPI_CHARACTER,
      .     HOSTNAME   ,MPI_MAX_PROCESSOR_NAME,MPI_CHARACTER,
      .     IT_SPMD(1),SPMD_COMM_WORLD,IERROR)
-
+        
+        allocate(perm(nspmd))
+        allocate(host_numbers(nspmd))
+        allocate(buffer(2*nspmd))     
         IF(ISPMD==0)THEN
 C permutations during sort are saved
           DO I = 1,NSPMD
@@ -296,6 +320,7 @@ C         Local rank in the node
           BUFFER(1:NSPMD) = L_SPMD(1:NSPMD) 
 C         host numbers
           BUFFER(NSPMD+1:2*NSPMD) = HOST_NUMBERS(1:NSPMD)
+          deallocate(perm)
         ENDIF
         NSPMDx2 = NSPMD*2
         CALL MPI_BCAST(BUFFER,NSPMDx2,MPI_INTEGER,IT_SPMD(1),
@@ -312,6 +337,9 @@ C       Count the number of SPMD on the local host
           ENDIF
         END DO  
 
+        deallocate(hostname)
+        deallocate(host_numbers)
+        deallocate(buffer)
 
       ELSE IF(ICAS==2) THEN
 C
@@ -326,20 +354,24 @@ C MPI
 
 #elif 1
 C
-C routines simplifiees non mpi
+C Simplified routines not mpi
 C
-      !||====================================================================
-      !||    inipar                ../engine/source/mpi/init/inipar.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2              ../engine/source/engine/radioss2.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                 ../engine/source/system/arret.F
-      !||    omp_get_max_threads   ../engine/source/engine/openmp_stub.F90
-      !||    omp_set_num_threads   ../engine/source/engine/openmp_stub.F90
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
-      SUBROUTINE INIPAR(ITID,ICAS,NNODES,INPUT,GOT_INPUT,NBTASK)
+!||====================================================================
+!||    inipar                 ../engine/source/mpi/init/inipar.F
+!||--- called by ------------------------------------------------------
+!||    radioss2               ../engine/source/engine/radioss2.F
+!||--- calls      -----------------------------------------------------
+!||    arret                  ../engine/source/system/arret.F
+!||    omp_get_max_threads    ../engine/source/engine/openmp_stub.F90
+!||    omp_set_num_threads    ../engine/source/engine/openmp_stub.F90
+!||--- uses       -----------------------------------------------------
+!||    coupling_adapter_mod   ../engine/source/coupling/coupling_adapter.F90
+!||    spmd_comm_world_mod    ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
+      SUBROUTINE INIPAR(coupling, ITID,ICAS,NNODES,INPUT,GOT_INPUT,NBTASK)
 C-----------------------------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
+        USE COUPLING_ADAPTER_MOD
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 #include      "r4r8_p.inc"
@@ -351,6 +383,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
+#include "spmd.inc"
 #include  "com01_c.inc"
 #include  "task_c.inc"
 #include  "scr05_c.inc"
@@ -359,6 +392,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
+      type(coupling_type), intent(inout) :: coupling
       INTEGER ICODE, I, NTHREAD1
 #if defined(_OPENMP)
       INTEGER OMP_GET_MAX_THREADS
@@ -379,7 +413,7 @@ C
         STR = ' '
         CALL  GETENV('OMP_NUM_THREADS',STR)
         NTHREAD1=0
-C nthread1 : nombre de threads fixe par la variable environnememt
+C nthread1 : fixed number of threads by the environment variable
         READ(STR,'(I10)',ERR=999)NTHREAD1
         GOTO 1000
  999    CONTINUE

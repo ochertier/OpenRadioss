@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fill_gr                ../starter/source/model/sets/fill_gr.F
-      !||--- called by ------------------------------------------------------
-      !||    fill_igr               ../starter/source/model/sets/fill_igr.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fill_gr                ../starter/source/model/sets/fill_gr.F
+!||--- called by ------------------------------------------------------
+!||    fill_igr               ../starter/source/model/sets/fill_igr.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FILL_GR(IGRELE, NGRELEM  ,IELT,
      .                   SET_ID  ,SET_TITLE,GETELEM, NELEM,SET_GREID)
 C-----------------------------------------------
@@ -41,7 +41,7 @@ C
 C     NAME          DESCRIPTION                         
 C
 C     SET           Set Structure - Current SET
-C     IGRxxx        SURFACES & Groups
+C     IGRXX Surfaces & Groups
 C============================================================================
 C-----------------------------------------------
 C   M o d u l e s
@@ -72,7 +72,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IGRE
+      INTEGER IGRE
 C-----------------------------------------------
       !IF (NELEM == 0) RETURN  create even if empty
 !
@@ -107,14 +107,14 @@ C-----------------------------------------------
 C-----
       RETURN
       END
-      !||====================================================================
-      !||    fill_surf      ../starter/source/model/sets/fill_gr.F
-      !||--- called by ------------------------------------------------------
-      !||    fill_igr       ../starter/source/model/sets/fill_igr.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fill_surf      ../starter/source/model/sets/fill_gr.F
+!||--- called by ------------------------------------------------------
+!||    fill_igr       ../starter/source/model/sets/fill_igr.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FILL_SURF(SET,IGRSURF,IGRS)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -232,14 +232,14 @@ C-----------------------------------------------
 C-----
       RETURN
       END
-      !||====================================================================
-      !||    fill_line      ../starter/source/model/sets/fill_gr.F
-      !||--- called by ------------------------------------------------------
-      !||    fill_igr       ../starter/source/model/sets/fill_igr.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fill_line      ../starter/source/model/sets/fill_gr.F
+!||--- called by ------------------------------------------------------
+!||    fill_igr       ../starter/source/model/sets/fill_igr.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FILL_LINE(SET,IGRSLIN  ,IGRL)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :

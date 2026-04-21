@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    count_remote_nb_elem_edge   ../engine/source/interfaces/interf/count_remote_nb_elem_edge.F
-      !||--- called by ------------------------------------------------------
-      !||    init_nodal_state            ../engine/source/interfaces/interf/init_nodal_state.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_local_node_id           ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||--- uses       -----------------------------------------------------
-      !||    nodal_arrays_mod            ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||====================================================================
+!||====================================================================
+!||    count_remote_nb_elem_edge   ../engine/source/interfaces/interf/count_remote_nb_elem_edge.F
+!||--- called by ------------------------------------------------------
+!||    init_nodal_state            ../engine/source/interfaces/interf/init_nodal_state.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod                 ../common_source/modules/elements/element_mod.F90
+!||    nodal_arrays_mod            ../common_source/modules/nodal_arrays.F90
+!||====================================================================
         SUBROUTINE COUNT_REMOTE_NB_ELEM_EDGE( SIZE_BUFFER,BUFFER,GEO,IXS,IXC,
-     .                                 IXT,IXP,IXR,IXTG,ADDCNEL,NODES,CNEL,CHUNK)
+     .                                 IXT,IXP,IXR,IXTG,ADDCNEL,NODES,CNEL,CHUNK,
+     .                                 IXS10)
 !$COMMENT
 !       COUNT_REMOTE_NB_ELEM_EDGE description
 !           check if a list of node is associated 
@@ -44,6 +44,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !             the nodes from your interface!"
 !$ENDCOMMENT
        USE nodal_arrays_mod
+       use element_mod , only : nixs,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,6 +71,7 @@ C-----------------------------------------------
         TYPE(nodal_arrays_), intent(inout) :: NODES
         my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO
         INTEGER, DIMENSION(0:LCNEL), INTENT(in) :: CNEL ! connectivity node-->element
+
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -86,6 +88,7 @@ C-----------------------------------------------
         INTEGER :: NUMBER_ELEMENT, NUMBER_ELEMENT_HERE
         INTEGER, DIMENSION(:), ALLOCATABLE :: LIST_ELEMENT
         LOGICAL, DIMENSION(:), ALLOCATABLE :: ALREADY_HERE
+        INTEGER, DIMENSION(6,NUMELS10), INTENT(in) :: IXS10!< tetra10 data
 
 C-----------------------------------------------
         ! --------------------------
@@ -118,7 +121,7 @@ C-----------------------------------------------
             NUMBER_NODE = 2 ! for type 11, there are 2 nodes per segments
             IF(GLOBAL_NODE(3)/=0) LOCAL_NODE(3) = GET_LOCAL_NODE_ID(NODES, GLOBAL_NODE(3))
             IF(GLOBAL_NODE(4)/=0) LOCAL_NODE(4) = GET_LOCAL_NODE_ID(NODES, GLOBAL_NODE(4)) 
-            IF( (GLOBAL_NODE(3)/=0).AND.(GLOBAL_NODE(4)/=0) ) NUMBER_NODE = 4 ! for type 7, there are 4 nodes per segments
+            IF((GLOBAL_NODE(3)/=0).AND.(GLOBAL_NODE(4)/=0)) NUMBER_NODE = 4 ! for type 7, there are 4 nodes per segments
             BUFFER(J+2:J+3) = 0
             N1 = LOCAL_NODE(1)
             N2 = LOCAL_NODE(2)
@@ -140,6 +143,12 @@ C-----------------------------------------------
                         NODE_ID = IXS(K,ELEM_ID)
                         TAG_NODE(NODE_ID) = 1
                     ENDDO
+                    IF(ELEM_ID>NUMELS8.AND.ELEM_ID<=NUMELS8+NUMELS10) THEN
+                      DO K=1,6
+                        NODE_ID = IXS10(K,ELEM_ID-NUMELS8)
+                        TAG_NODE(NODE_ID) = 1
+                      ENDDO
+                    ENDIF
                 ELSEIF(ELEM_ID>OFFSET_SHELL.AND.ELEM_ID<=OFFSET_TRUSS) THEN
                 ! -----------------
                 ! shell element
@@ -149,7 +158,7 @@ C-----------------------------------------------
                     ENDDO
                 ELSEIF(ELEM_ID>OFFSET_TRUSS.AND.ELEM_ID<=OFFSET_BEAM) THEN
                 ! -----------------
-                ! truss element
+                ! truss
                     DO K=2,3
                         NODE_ID = IXT(K,ELEM_ID-OFFSET_TRUSS)
                         TAG_NODE(NODE_ID) = 1
@@ -181,8 +190,7 @@ C-----------------------------------------------
                         TAG_NODE(NODE_ID) = 1
                     ENDDO
                 ENDIF
-                ! -----------------
-
+                ! ----------------- 
                 ! -----------------
                 ! check if the element has N1 & N2 & N3 & N4 (if N3 and N4 are real nodes)
                 IF( (TAG_NODE(N1)+TAG_NODE(N2)+TAG_NODE(N3)+TAG_NODE(N4)) == NUMBER_NODE) THEN

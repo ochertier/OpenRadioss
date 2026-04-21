@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21norm3        ../starter/source/interfaces/inter3d1/i21norm3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3_thkvar   ../starter/source/interfaces/inter3d1/inint3_thkvar.F
-      !||====================================================================
+!||====================================================================
+!||    i21norm3        ../starter/source/interfaces/inter3d1/i21norm3.F
+!||--- called by ------------------------------------------------------
+!||    inint3_thkvar   ../starter/source/interfaces/inter3d1/inint3_thkvar.F
+!||====================================================================
       SUBROUTINE I21NORM3(
      1 X     ,IRECTM ,NRTM  ,NMN   ,MSR   ,
      2 NINT  ,NTY   ,NOINT  ,NOD_NORMAL, XM0   )
@@ -216,7 +216,7 @@ C
         GO TO 100
       END IF
 C------------------------------------
-C     normales aux noeuds.
+C     normal nodes.
 C------------------------------------
       DO I=1,NMN
 C
@@ -240,11 +240,11 @@ C------------------------------------
       RETURN
  1000 FORMAT(2X,'GAP MIN = ',1PG20.13)
       END
-      !||====================================================================
-      !||    i21rcurv        ../starter/source/interfaces/inter3d1/i21norm3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3_thkvar   ../starter/source/interfaces/inter3d1/inint3_thkvar.F
-      !||====================================================================
+!||====================================================================
+!||    i21rcurv        ../starter/source/interfaces/inter3d1/i21norm3.F
+!||--- called by ------------------------------------------------------
+!||    inint3_thkvar   ../starter/source/interfaces/inter3d1/inint3_thkvar.F
+!||====================================================================
       SUBROUTINE I21RCURV(NRTM,XM0 ,NOD_NORMAL ,IRECT ,RCURV ,
      .                   ANGLM )
 C-----------------------------------------------
@@ -270,7 +270,7 @@ C-----------------------------------------------
      .   NNZ1, NNZ2, NNZ3, NNZ4,
      .   SURFX, SURFY, SURFZ, 
      .   ERX, ERY, ERZ, DNX, DNY, DNZ, DNT, LL, AAA, RR,
-     .   X13, Y13, Z13, X24, Y24, Z24, NX, NY, NZ, CC
+     .   X13, Y13, Z13, X24, Y24, Z24, CC
 C-----------------------------------------------
       RCURV(1:NRTM) = EP30
       ANGLM(1:NRTM) = EP30
@@ -318,7 +318,7 @@ C-------
         ERY = (Y2+Y3)-(Y1+Y4)
         ERZ = (Z2+Z3)-(Z1+Z4)
 
-C       Longueur vraie = LL/2
+C       True length = ll/2
         LL  = SQRT(ERX*ERX+ERY*ERY+ERZ*ERZ)
         AAA = ONE / LL
         ERX = ERX*AAA
@@ -339,7 +339,7 @@ C-------
         ERY = (Y4+Y3)-(Y1+Y2)
         ERZ = (Z4+Z3)-(Z1+Z2)
 
-C       Longueur vraie = LL/2
+C       True length = ll/2
         LL  = SQRT(ERX*ERX+ERY*ERY+ERZ*ERZ)
         AAA = ONE / LL
         ERX = ERX*AAA

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    upwind4    ../engine/source/elements/solid/solide4/upwind4.F
-      !||--- called by ------------------------------------------------------
-      !||    a4momt3    ../engine/source/elements/solid/solide4/a4momt3.F
-      !||    a4momtn3   ../engine/source/elements/solid/solide4/a4momtn3.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod    ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    upwind4    ../engine/source/elements/solid/solide4/upwind4.F
+!||--- called by ------------------------------------------------------
+!||    a4momt3    ../engine/source/elements/solid/solide4/a4momt3.F
+!||    a4momtn3   ../engine/source/elements/solid/solide4/a4momtn3.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod    ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE UPWIND4(
      1   RHO,     VIS,     VDX,     VDY,
      2   VDZ,     R,       S,       T,
@@ -59,8 +59,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real
-     .  FAC,PE,D1,D2,D3,DIST,CH1,CH2,
-     .  DV(MVSIZ),V(MVSIZ)
+     .  FAC,PE,D1,D2,D3,CH1,CH2,
+     .  V(MVSIZ)
       INTEGER I
 C-----------------------------------------------
 C   S o u r c e   C o d e

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,39 +20,39 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    kinset                 ../starter/source/constraints/general/kinset.F
-      !||--- called by ------------------------------------------------------
-      !||    checkrby               ../starter/source/constraints/general/rbody/checkrby.F
-      !||    hm_read_bcs            ../starter/source/constraints/general/bcs/hm_read_bcs.F
-      !||    hm_read_cyljoint       ../starter/source/constraints/general/cyl_joint/hm_read_cyljoint.F
-      !||    hm_read_gjoint         ../starter/source/constraints/general/gjoint/hm_read_gjoint.F
-      !||    hm_read_impacc         ../starter/source/constraints/general/impvel/hm_read_impacc.F
-      !||    hm_read_link           ../starter/source/constraints/rigidlink/hm_read_rlink.F
-      !||    hm_read_mpc            ../starter/source/constraints/general/mpc/hm_read_mpc.F
-      !||    hm_read_nbcs           ../starter/source/constraints/general/bcs/hm_read_nbcs.F
-      !||    hm_read_rbe2           ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
-      !||    hm_read_rbe3           ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||    hm_read_rbody_lagmul   ../starter/source/constraints/general/rbody/hm_read_rbody_lagmul.F
-      !||    hm_read_rwall_cyl      ../starter/source/constraints/general/rwall/hm_read_rwall_cyl.F
-      !||    hm_read_rwall_lagmul   ../starter/source/constraints/general/rwall/hm_read_rwall_lagmul.F
-      !||    hm_read_rwall_paral    ../starter/source/constraints/general/rwall/hm_read_rwall_paral.F
-      !||    hm_read_rwall_plane    ../starter/source/constraints/general/rwall/hm_read_rwall_plane.F
-      !||    hm_read_rwall_spher    ../starter/source/constraints/general/rwall/hm_read_rwall_spher.F
-      !||    hm_read_rwall_therm    ../starter/source/constraints/general/rwall/hm_read_rwall_therm.F
-      !||    i1tid3                 ../starter/source/interfaces/inter3d1/i1tid3.F
-      !||    i2tid3                 ../starter/source/interfaces/inter3d1/i2tid3.F
-      !||    itagsl12               ../starter/source/interfaces/inter3d1/inintr2.F
-      !||    itagsl2                ../starter/source/interfaces/inter3d1/itagsl2.F
-      !||    read_impdisp           ../starter/source/constraints/general/impvel/read_impdisp.F
-      !||    read_impvel            ../starter/source/constraints/general/impvel/read_impvel.F
-      !||    read_impvel_lagmul     ../starter/source/constraints/general/impvel/read_impvel_lagmul.F
-      !||    rivet0                 ../starter/source/elements/reader/rivet0.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    kinset                 ../starter/source/constraints/general/kinset.F
+!||--- called by ------------------------------------------------------
+!||    checkrby               ../starter/source/constraints/general/rbody/checkrby.F
+!||    hm_read_bcs            ../starter/source/constraints/general/bcs/hm_read_bcs.F
+!||    hm_read_cyljoint       ../starter/source/constraints/general/cyl_joint/hm_read_cyljoint.F
+!||    hm_read_gjoint         ../starter/source/constraints/general/gjoint/hm_read_gjoint.F
+!||    hm_read_impacc         ../starter/source/constraints/general/impvel/hm_read_impacc.F
+!||    hm_read_link           ../starter/source/constraints/rigidlink/hm_read_rlink.F
+!||    hm_read_mpc            ../starter/source/constraints/general/mpc/hm_read_mpc.F
+!||    hm_read_nbcs           ../starter/source/constraints/general/bcs/hm_read_nbcs.F
+!||    hm_read_rbe2           ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
+!||    hm_read_rbe3           ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||    hm_read_rbody_lagmul   ../starter/source/constraints/general/rbody/hm_read_rbody_lagmul.F
+!||    hm_read_rwall_cyl      ../starter/source/constraints/general/rwall/hm_read_rwall_cyl.F
+!||    hm_read_rwall_lagmul   ../starter/source/constraints/general/rwall/hm_read_rwall_lagmul.F
+!||    hm_read_rwall_paral    ../starter/source/constraints/general/rwall/hm_read_rwall_paral.F
+!||    hm_read_rwall_plane    ../starter/source/constraints/general/rwall/hm_read_rwall_plane.F
+!||    hm_read_rwall_spher    ../starter/source/constraints/general/rwall/hm_read_rwall_spher.F
+!||    hm_read_rwall_therm    ../starter/source/constraints/general/rwall/hm_read_rwall_therm.F
+!||    i1tid3                 ../starter/source/interfaces/inter3d1/i1tid3.F
+!||    i2tid3                 ../starter/source/interfaces/inter3d1/i2tid3.F
+!||    itagsl12               ../starter/source/interfaces/inter3d1/inintr2.F
+!||    itagsl2                ../starter/source/interfaces/inter3d1/itagsl2.F
+!||    read_impdisp           ../starter/source/constraints/general/impvel/read_impdisp.F
+!||    read_impvel            ../starter/source/constraints/general/impvel/read_impvel.F
+!||    read_impvel_lagmul     ../starter/source/constraints/general/impvel/read_impvel_lagmul.F
+!||    rivet0                 ../starter/source/elements/reader/rivet0.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE KINSET(IK,NODE,IKINE,IDIR,ISK,IKINE1)
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
@@ -77,7 +77,7 @@ C-----------------------------------------------
       CHARACTER*20 DIRECT
       CHARACTER(LEN=NCHARLINE) :: ERR_CATEGORY_TMP
 
-      INTEGER JWARN, ISKWT, ISKWR, ITRAN, IROTA, NK, I,
+      INTEGER JWARN, ISKWT, ISKWR, ITRAN, IROTA, NK,
      .        JDIR(7), KDIR(7,3),LTYPE, LTYPEB, LDIRECT
       INTEGER JWARN1, ISKWT1, ISKWR1, ITRAN1, IROTA1
 C-----
@@ -96,16 +96,16 @@ C       TRANSLATION
         ISKWT = IKINE(1+NUMNOD)/10
         ITRAN = IKINE(1+NUMNOD) - 10*ISKWT
         IF(ITRAN==0)THEN
-C         LIBRE DANS LES 3 DIRECTIONS
+C         FREE IN 3 DIRECTIONS
           IKINE(1+NUMNOD) = JDIR(IDIR)+10*ISK
         ELSEIF(ISKWT==ISK.AND.KDIR(ITRAN,IDIR)==0)THEN
-C         LIBRE SUR LA DIRECTION DANS LE MEME SKEW
+C         FREE IN THE DIRECTION OF THE SAME SKEW
           IKINE(1+NUMNOD) = IKINE(1+NUMNOD)+JDIR(IDIR)
         ELSEIF(KDIR(ITRAN,IDIR)==0)THEN
           JWARN = 1
           IKINE(1+NUMNOD) = IKINE(1+NUMNOD)+JDIR(IDIR)
         ELSEIF(ISKWT==ISK)THEN
-C         FIXE SUR LA DIRECTION DANS LE MEME SKEW (ERROR)
+C         FIXED IN THE DIRECTION OF THE SAME SKEW (ERROR)
           JWARN = 1
         ELSE
           JWARN = 1
@@ -115,16 +115,16 @@ C       ROTATION
         ISKWR = IKINE(1+2*NUMNOD)/10
         IROTA = IKINE(1+2*NUMNOD) - 10*ISKWR
         IF(IROTA==0)THEN
-C         LIBRE DANS LES 3 DIRECTIONS
+C         FREE IN 3 DIRECTIONS
           IKINE(1+2*NUMNOD) = JDIR(IDIR)+10*ISK
         ELSEIF(ISKWR==ISK.AND.KDIR(IROTA,IDIR-3)==0)THEN
-C         LIBRE SUR LA DIRECTION DANS LE MEME SKEW
+C         FREE IN THE DIRECTION OF THE SAME SKEW
           IKINE(1+2*NUMNOD) = IKINE(1+2*NUMNOD)+JDIR(IDIR)
         ELSEIF(KDIR(IROTA,IDIR-3)==0)THEN
           JWARN = 1
           IKINE(1+2*NUMNOD) = IKINE(1+2*NUMNOD)+JDIR(IDIR)
         ELSEIF(ISKWR==ISK)THEN
-C         FIXE SUR LA DIRECTION DANS LE MEME SKEW (ERROR)
+C         FIXED IN THE DIRECTION OF THE SAME SKEW (ERROR)
           JWARN = 1
         ELSE
           JWARN = 1
@@ -145,8 +145,8 @@ c       lagrange multipliers (IDIR = 7)
         ENDIF
       ENDIF
 C---------------------------------------------------------------
-C  CONDITION CINEMATIQUE INCOMPATIBLES ENTRE 2
-C  ENTITES DU MEME TYPE
+C  INCOMPATIBLE KINEMATIC CONDITIONS BETWEEN 2
+C  ENTITIES OF THE SAME TYPE
 C---------------------------------------------------------------    
       JWARN1 = 0
 C
@@ -155,16 +155,16 @@ C         TRANSLATION
           ISKWT1 = IKINE1(1+NUMNOD)/10
           ITRAN1 = IKINE1(1+NUMNOD) - 10*ISKWT1
           IF(ITRAN1==0)THEN
-C           LIBRE DANS LES 3 DIRECTIONS
+C           FREE IN 3 DIRECTIONS
             IKINE1(1+NUMNOD) = JDIR(IDIR)+10*ISK
           ELSEIF(ISKWT1==ISK.AND.KDIR(ITRAN1,IDIR)==0)THEN
-C           LIBRE SUR LA DIRECTION DANS LE MEME SKEW
+C           FREE IN THE DIRECTION OF THE SAME SKEW
             IKINE1(1+NUMNOD) = IKINE1(1+NUMNOD)+JDIR(IDIR)
           ELSEIF(KDIR(ITRAN1,IDIR)==0)THEN
             JWARN1 = 1
             IKINE1(1+NUMNOD) = IKINE1(1+NUMNOD)+JDIR(IDIR)
           ELSEIF(ISKWT1==ISK)THEN
-C           FIXE SUR LA DIRECTION DANS LE MEME SKEW (ERROR)
+C           FIXED IN THE DIRECTION OF THE SAME SKEW (ERROR)
             JWARN1 = 1
           ELSE
             JWARN1 = 1
@@ -174,16 +174,16 @@ C         ROTATION
           ISKWR1 = IKINE1(1+2*NUMNOD)/10
           IROTA1 = IKINE1(1+2*NUMNOD) - 10*ISKWR1
           IF(IROTA1==0)THEN
-C           LIBRE DANS LES 3 DIRECTIONS
+C           FREE IN 3 DIRECTIONS
             IKINE1(1+2*NUMNOD) = JDIR(IDIR)+10*ISK
           ELSEIF(ISKWR1==ISK.AND.KDIR(IROTA1,IDIR-3)==0)THEN
-C           LIBRE SUR LA DIRECTION DANS LE MEME SKEW
+C           free in the direction within the same skew
             IKINE1(1+2*NUMNOD) = IKINE1(1+2*NUMNOD)+JDIR(IDIR)
           ELSEIF(KDIR(IROTA1,IDIR-3)==0)THEN
             JWARN1 = 1
             IKINE1(1+2*NUMNOD) = IKINE1(1+2*NUMNOD)+JDIR(IDIR)
           ELSEIF(ISKWR1==ISK)THEN
-C           FIXE SUR LA DIRECTION DANS LE MEME SKEW (ERROR)
+C           fixed in the direction within the same skew (error)
             JWARN1 = 1
           ELSE
             JWARN1 = 1
@@ -206,11 +206,11 @@ C         lagrange multipliers (IDIR = 7)
         ENDIF
 C
 C---------------------------------------------------------------
-C  CONDITIONS CINEMATIQUES INCOMPATIBLES ENTRE 2
-C  ENTITES DE MEME TYPE
+C  INCOMPATIBLE KINEMATIC CONDITIONS BETWEEN 2
+C  entities of the same type
 C
 C   TYPECOND(IKINE(1+3*NUMNOD)) = 1
-C   SI AU MOINS 2 CONDITIONS DE TYPE TYPCOND SUR CE NOEUD
+C   if at least 2 conditions of type typcond on this node
 C--------------------------------------------------------------- 
         IF (JWARN1 == 1) THEN
           IF(IK==1)THEN
@@ -255,11 +255,11 @@ C---------------------------------------------------------------
           ENDIF
         ENDIF
 C---------------------------------------------------------------
-C  CONDITIONS CINEMATIQUES INCOMPATIBLES ENTRE 2
-C  ENTITES DE TYPES DIFFERENTS
+C  INCOMPATIBLE KINEMATIC CONDITIONS BETWEEN 2
+C  entities of different types
 C
-C SI IKINE(1+4*NUMNOD) = 0 :  PAS DE CONDITIONS INCOMPATIBLES
-C DE DIFFERENTS TYPES SUR CE NOEUD
+C IF IKINE(1+4*NUMNOD) = 0 :  NO INCOMPATIBLE CONDITIONS
+C of different types on this node
 C---------------------------------------------------------------    
         IF(IK==1)THEN
           IF(IBC(IKINE(1))==0 .AND. IBC(IKINE(1+4*NUMNOD))==0

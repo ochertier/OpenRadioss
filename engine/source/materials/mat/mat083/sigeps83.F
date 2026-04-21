@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps83   ../engine/source/materials/mat/mat083/sigeps83.F
-      !||--- called by ------------------------------------------------------
-      !||    suser43    ../engine/source/elements/solid/sconnect/suser43.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter     ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps83   ../engine/source/materials/mat/mat083/sigeps83.F
+!||--- called by ------------------------------------------------------
+!||    suser43    ../engine/source/elements/solid/sconnect/suser43.F
+!||--- calls      -----------------------------------------------------
+!||    finter     ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE SIGEPS83(
      1     NEL     ,TIME    ,TIMESTEP,UPARAM  ,OFF     ,
      2     EPSD    ,STIFM   ,IFUNC   ,MAXFUNC ,NPF     ,TF      ,
@@ -88,15 +88,15 @@ C----------------------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: II,IEL,ITER,NITER,IRATE,NRATE,IDYIELD,IPLAS,IFUNN,IFUNT,
+      INTEGER :: II,IEL,ITER,NITER,IDYIELD,IPLAS,IFUNN,IFUNT,
      .           ICOMP,NTRAC,NCOMP,VP
       INTEGER ,DIMENSION(NEL) :: ELTRAC,ELCOMP
       my_real :: YOUNGT,YOUNGC,SHEAR,DYDX,
-     .   SVMN,SVMT,DTB,ALPHA,BETA,SVM,TS,TN,XSCALE,RNC,RSC,XFAC,YFAC,
+     .   SVMN,SVMT,DTB,ALPHA,BETA,XSCALE,RNC,RSC,XFAC,YFAC,
      .   AA,AN,AS,NORMEF,NZZ,NYZ,NZX,FACN,FACT,SZZ,SYZ,SZX,
-     .   FPX,FPY,FPRIM,SIGN,SIGT,SIG_EFF,PHI,DTINV,DSZZ,DSYZ,DSZX,DYLD,YLD0
-      my_real ,DIMENSION(NEL) :: DSIGX,DSIGY,DSIGZ,DEP,DEPST,STF,EPSP,HT, 
-     .   FYIELD,HYIELD, RN,HN,RS,SIGTRZZ,SIGTRYZ,SIGTRZX,YOUNG
+     .   FPRIM,SIGN,SIG_EFF,PHI,DTINV,DSZZ,DSYZ,DSZX,DYLD,YLD0
+      my_real ,DIMENSION(NEL) :: DSIGX,DSIGY,DSIGZ,DEP,STF,EPSP, 
+     .   FYIELD,HYIELD, RN,RS,SIGTRZZ,SIGTRYZ,SIGTRZX,YOUNG
 C----------------------------------------------------------
 C   E x t e r n a l  F u n c t i o n
 C----------------------------------------------------------
@@ -142,7 +142,7 @@ c----------------------------------
           DO IEL=1,NEL
             IF (SIGOZZ(IEL) > ZERO) THEN   ! element in tension
               YOUNG(IEL)  = YOUNGT
-            ELSE                           ! element in compression
+            ELSE                           ! in compression
               YOUNG(IEL)  = YOUNGC
             ENDIF
           ENDDO
@@ -155,7 +155,7 @@ c----------------------------------
             YOUNG(IEL)  = YOUNGT
             NTRAC = NTRAC + 1
             ELTRAC(NTRAC) = IEL
-          ELSE                          ! element in compression
+          ELSE                          ! in compression
             YOUNG(IEL)  = YOUNGC
             NCOMP = NCOMP + 1
             ELCOMP(NCOMP) = IEL

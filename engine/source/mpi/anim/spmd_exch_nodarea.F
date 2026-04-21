@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,24 +21,28 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spmd_exch_nodarea     ../engine/source/mpi/anim/spmd_exch_nodarea.F
-      !||--- called by ------------------------------------------------------
-      !||    admthke               ../engine/source/model/remesh/admthke.F
-      !||    ani_pcont             ../engine/source/output/anim/generate/ani_pcont.F
-      !||    ani_pcont21           ../engine/source/output/anim/generate/ani_pcont.F
-      !||    err_thk               ../engine/source/elements/shell/err_thk.F
-      !||    genani                ../engine/source/output/anim/generate/genani.F
-      !||    inter_nodal_areas     ../engine/source/output/inter_nodal_areas.F
-      !||    inter_sh_offset_ini   ../engine/source/interfaces/shell_offset/inter_offset_ini.F90
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_nodarea            ../engine/source/mpi/anim/spmd_exch_nodarea.F
+!||--- called by ------------------------------------------------------
+!||    admthke                      ../engine/source/model/remesh/admthke.F
+!||    ani_pcont                    ../engine/source/output/anim/generate/ani_pcont.F
+!||    ani_pcont21                  ../engine/source/output/anim/generate/ani_pcont.F
+!||    err_thk                      ../engine/source/elements/shell/err_thk.F
+!||    genani                       ../engine/source/output/anim/generate/genani.F
+!||    inter_nodal_areas            ../engine/source/output/inter_nodal_areas.F
+!||    inter_sh_offset_ini          ../engine/source/interfaces/shell_offset/inter_offset_ini.F90
+!||    spmd_exch_output_noda_pext   ../engine/source/mpi/output/spmd_exch_output_noda_pext.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod          ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_NODAREA(
      .           NODAREA,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
-C realise la sommation des aires aux noeuds frontieres
+C performs the summation of areas at boundary nodes
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -52,7 +56,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER  IAD_ELEM(2,*),FR_ELEM(*), SIZE, LENR,WEIGHT(*)
+      INTEGER  IAD_ELEM(2,*),FR_ELEM(*), LENR,WEIGHT(*)
       my_real 
      .        NODAREA(*)
 C-----------------------------------------------
@@ -60,7 +64,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,
-     .        SIZ,J,K,L,NB_NOD,
+     .        SIZ,J,L,NB_NOD,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD),MSGOFF
@@ -79,7 +83,7 @@ C-----------------------------------------------
       L = 1
       IAD_RECV(1)=1
 
-C   Mise en place des buffers de reception
+C   setting up reception buffers
       DO I=1,NSPMD
          SIZ = IAD_ELEM(1,I+1)-IAD_ELEM(1,I)
          IF(SIZ/=0) THEN
@@ -92,7 +96,7 @@ C   Mise en place des buffers de reception
          IAD_RECV(I+1) = L
       END DO
 
-C   Remplissage des buffers d'envoi et envoi des donnees
+C   filling send buffers and sending data
 C
       L=1
       IAD_SEND(1)=1
@@ -119,7 +123,7 @@ C
      G      SPMD_COMM_WORLD,REQ_S(I),IERROR)
        ENDIF                
       END DO
-C   Reception et traitement
+C   reception and processing
       DO I = 1, NSPMD
 C
         NB_NOD = IAD_ELEM(1,I+1)-IAD_ELEM(1,I)
@@ -142,7 +146,7 @@ C
         ENDIF
       ENDDO
 C
-C Mise a 0 de adm sur noeud non main
+C resetting adm on non-main node
 C
 C      DO I = 1, NUMNOD
 C        IF(WEIGHT(I)==0) ADM(I) = ZERO

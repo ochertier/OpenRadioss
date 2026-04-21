@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2025 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2026 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -367,7 +367,7 @@ void u_vinter2__(int *jad,int *jpos,int *jlen,int *llt,my_real_c *xx,my_real_c *
 {u_vinter2_(jad,jpos,jlen,llt,xx,dydx,yy);}
 
 
-void u_vinter2dp_(int *jad,int *jpos,int *jlen,int *llt,my_real_c *xx,my_real_c *dydx,my_real_c *yy)
+void u_vinter2dp_(int *jad,int *jpos,int *jlen,int *llt,double *xx,double *dydx,double *yy)
 {
  double *tf;
  tf= (double*)sav_buf[6];
@@ -380,15 +380,15 @@ void u_vinter2dp_(int *jad,int *jpos,int *jlen,int *llt,my_real_c *xx,my_real_c 
 #endif
 }
 
-void u_vinter2dp(int *jad,int *jpos,int *jlen,int *llt,my_real_c *xx,my_real_c *dydx,my_real_c *yy)
+void u_vinter2dp(int *jad,int *jpos,int *jlen,int *llt,double *xx,double *dydx,double *yy)
 {u_vinter2dp_(jad,jpos,jlen,llt,xx,dydx,yy);}
 
 
-void _FCALL U_VINTER2DP(int *jad,int *jpos,int *jlen,int *llt,my_real_c *xx,my_real_c *dydx,my_real_c *yy)
+void _FCALL U_VINTER2DP(int *jad,int *jpos,int *jlen,int *llt,double *xx,double *dydx,double *yy)
 {u_vinter2dp_(jad,jpos,jlen,llt,xx,dydx,yy);}
 
 
-void u_vinter2dp__(int *jad,int *jpos,int *jlen,int *llt,my_real_c *xx,my_real_c *dydx,my_real_c *yy)
+void u_vinter2dp__(int *jad,int *jpos,int *jlen,int *llt,double *xx,double *dydx,double *yy)
 {u_vinter2dp_(jad,jpos,jlen,llt,xx,dydx,yy);}
 
 

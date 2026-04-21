@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    spmd_sync_mmx   ../engine/source/mpi/interfaces/spmd_sync_mmx.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_icomcrit    ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_sync_mmx         ../engine/source/mpi/interfaces/spmd_sync_mmx.F
+!||--- called by ------------------------------------------------------
+!||    imp_icomcrit          ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_SYNC_MMX(
      1    ISENDTO,IRCVFROM,NEWFRONT,XSLV_L,XMSR_L,
      2    VSLV_L ,VMSR_L  ,INTLIST ,NINTC ,TZINF ,
@@ -34,6 +36,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -46,13 +49,13 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-C commun local a spmd_init et spmd_ring_mmx
+C Common local A SPMD_INIT and SPMD_RING_MMX
        COMMON /RING/IRECVF,ISENDT,IRING
        INTEGER IRECVF,ISENDT,IRING
-C irecvf : proc precedent dans l'anneau si <> 0
-C isendt : proc suivant dans l'anneau si <> 0 et <> -1
-C isendt = -1 indique un broadcast a faire (dernier proc de l'anneau)
-C iring : no du proc effectuant le broadcast si besoin sur le proc
+C IRECVF: Proc previous in the ring if <> 0
+C ISENDT: PROC following in the ring if <> 0 and <> -1
+C Isendt = -1 indicates a Broadcast to do (last proc of the ring)
+C iring: proc number performing the broadcast if needed on the proc
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -67,7 +70,7 @@ C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGOFF,MSGTYP,P,SIZ,NIN,I,J,L,LOC_PROC,
      .        IERROR,I_LEN,NBIRECV,KK,
-     .        IADS,INDEXI,MSGTYP2,
+     .        INDEXI,
      .        IRINDEXI(NSPMD),IADR(NSPMD),REQ_R(NSPMD),
      .        STATUS(MPI_STATUS_SIZE)
       PARAMETER (I_LEN = 46)
@@ -86,7 +89,7 @@ C
 C Compactage min/max, newfront, tzinf
 C
       IF(LOC_PROC/=IRING) THEN
-C si proc participe aux interfaces
+C if proc participates in interfaces
         IF(IRCVFROM(NINTER+1,LOC_PROC)>0.OR.
      +     ISENDTO(NINTER+1,LOC_PROC)>0) THEN
           L = 0
@@ -117,7 +120,7 @@ C
               IF(IPARI(7,NIN)/=17)THEN
 C NEWFRONT
                 SBUF(L+1) = NEWFRONT(NIN)
-              ELSE     ! interface 17 avec courbure
+              ELSE     ! interface 17 with curvature
 C SIZE
                 SBUF(L+1) = SIZE_T(NIN)
               END IF
@@ -165,7 +168,7 @@ C T25 main gap changes with thickness change
              L = L + 6
              IF(IPARI(7,NIN)/=17)THEN
                NEWFRONT(NIN) = SBUF(L+1)
-             ELSE     ! interface 17 avec courbure
+             ELSE     ! interface 17 with curvature
                SIZE_T(NIN) = SBUF(L+1)
              END IF
              L = L + 1
@@ -264,7 +267,7 @@ C
               IF(IPARI(7,NIN)/=17)THEN
 C NEWFRONT
                 NEWFRONT(NIN) = NEWFRONT(NIN)+NINT(SBUF(L))
-              ELSE     ! interface 17 avec courbure
+              ELSE     ! interface 17 with curvature
 C SIZE
                 SIZE_T(NIN) = SIZE_T(NIN)+SBUF(L)
               END IF
@@ -309,7 +312,7 @@ C
               L = L + 6
               IF(IPARI(7,NIN)/=17)THEN
                 SBUF(L+1) = NEWFRONT(NIN)
-              ELSE     ! interface 17 avec courbure
+              ELSE     ! interface 17 with curvature
                 SBUF(L+1) = SIZE_T(NIN)
               END IF
               L = L + 1

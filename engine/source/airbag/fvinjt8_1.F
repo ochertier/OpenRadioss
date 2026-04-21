@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvinjt8_1      ../engine/source/airbag/fvinjt8_1.F
-      !||--- called by ------------------------------------------------------
-      !||    fv_up_switch   ../engine/source/airbag/fv_up_switch.F
-      !||    fvbag1         ../engine/source/airbag/fvbag1.F
-      !||====================================================================
+!||====================================================================
+!||    fvinjt8_1      ../engine/source/airbag/fvinjt8_1.F
+!||--- called by ------------------------------------------------------
+!||    fv_up_switch   ../engine/source/airbag/fv_up_switch.F
+!||    fvbag1         ../engine/source/airbag/fvbag1.F
+!||====================================================================
       SUBROUTINE FVINJT8_1(NJET   , IBAGJET , RBAGJET ,
      2                    IGEO,     GEO,     PM, 
      3                    IVOLU,   RVOLU, DMOUT, DHOUT)
@@ -57,7 +57,7 @@ C----------------------------------------------------------------------------
       R_IGC1=PM(27,IVOLU(66))
       RMWI  = RVOLU(10)
 C--------------------------
-C     NOMBRE TOTAL DE MOLES
+C     TOTAL NUMBER OF MOLES
 C--------------------------
       GMI = RVOLU(11)
       RNM = GMI*RMWI
@@ -81,7 +81,7 @@ C--------------------------
       ENDDO
       RVOLU(14)=RNM
 C-------------------------------
-C     MASSE et ENTHALPY par GAZ
+C     MASS and ENTHALPY by GAS
 C-------------------------------
       RNMI=GMI*RMWI
       DGMOUT=DMOUT*RNMI/RNM

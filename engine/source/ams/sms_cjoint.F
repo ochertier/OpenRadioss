@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_cjoint_0       ../engine/source/ams/sms_cjoint.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier         ../engine/source/system/machine.F
-      !||    sms_telesc_0       ../engine/source/ams/sms_cjoint.F
-      !||    spmd_sd_cj_0       ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_0.F
-      !||====================================================================
+!||====================================================================
+!||    sms_cjoint_0       ../engine/source/ams/sms_cjoint.F
+!||--- called by ------------------------------------------------------
+!||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier         ../engine/source/system/machine.F
+!||    sms_telesc_0       ../engine/source/ams/sms_cjoint.F
+!||    spmd_sd_cj_0       ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_0.F
+!||====================================================================
       SUBROUTINE SMS_CJOINT_0(A    ,AR    ,V ,VR,X    ,
      2                      FSAV   ,LJOINT,MS,IN,IADCJ,
      3                      FR_CJ  ,CJWORK,TAG_LNK_SMS,DIAG_SMS,ITASK)
@@ -94,15 +94,15 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    sms_cjoint_1   ../engine/source/ams/sms_cjoint.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_pcg        ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier     ../engine/source/system/machine.F
-      !||    sms_telesc_1   ../engine/source/ams/sms_cjoint.F
-      !||    spmd_sd_cj_1   ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_1.F
-      !||====================================================================
+!||====================================================================
+!||    sms_cjoint_1   ../engine/source/ams/sms_cjoint.F
+!||--- called by ------------------------------------------------------
+!||    sms_pcg        ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier     ../engine/source/system/machine.F
+!||    sms_telesc_1   ../engine/source/ams/sms_cjoint.F
+!||    spmd_sd_cj_1   ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_1.F
+!||====================================================================
       SUBROUTINE SMS_CJOINT_1(A     ,MS         ,LJOINT ,IADCJ ,FR_CJ ,
      .                        CJWORK,IDOWN,TAG_LNK_SMS,ITASK)
 C-----------------------------------------------
@@ -163,15 +163,15 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    sms_cjoint_2       ../engine/source/ams/sms_cjoint.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier         ../engine/source/system/machine.F
-      !||    sms_telesc_2       ../engine/source/ams/sms_cjoint.F
-      !||    spmd_sd_cj_1       ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_1.F
-      !||====================================================================
+!||====================================================================
+!||    sms_cjoint_2       ../engine/source/ams/sms_cjoint.F
+!||--- called by ------------------------------------------------------
+!||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier         ../engine/source/system/machine.F
+!||    sms_telesc_2       ../engine/source/ams/sms_cjoint.F
+!||    spmd_sd_cj_1       ../engine/source/mpi/kinematic_conditions/spmd_sd_cj_1.F
+!||====================================================================
       SUBROUTINE SMS_CJOINT_2(A    ,AR    ,V ,VR,X    ,
      2                      LJOINT,MS,IN,IADCJ,FR_CJ,
      3                      CJWORK,TAG_LNK_SMS,ITASK)
@@ -235,11 +235,11 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    sms_telesc_0   ../engine/source/ams/sms_cjoint.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_cjoint_0   ../engine/source/ams/sms_cjoint.F
-      !||====================================================================
+!||====================================================================
+!||    sms_telesc_0   ../engine/source/ams/sms_cjoint.F
+!||--- called by ------------------------------------------------------
+!||    sms_cjoint_0   ../engine/source/ams/sms_cjoint.F
+!||====================================================================
       SUBROUTINE SMS_TELESC_0(A,AR,V,VR,X,FS,NOD,MS,IN,
      .                        CJWORK,DIAG_SMS)
 C-----------------------------------------------
@@ -249,7 +249,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NOD(0:*), IFLAG
+      INTEGER NOD(0:*)
 C     REAL
       my_real
      .   A(3,*), AR(3,*), V(3,*), VR(3,*), X(3,*), FS(*), MS(*),
@@ -298,7 +298,7 @@ C
       YCDG=ZERO
       ZCDG=ZERO      
 C----------------------------
-C     CALCUL DU CDG + MASSE
+C     calculation of the center of gravity and mass
 C----------------------------
       DO 100 I=1,NSN
       N = NOD(I)
@@ -380,7 +380,7 @@ C
       CJWORK(10)=MASSE
       CJWORK(11)=INER
 C----------------------------
-C     mvt de corps rigide autour de CDG (masse MASSE, inertie INER):
+C     MVT of rigid body around CDG (mass mass, inertia inert):
 C     Extract V(t-1/2) and VR(t-1/2)
 C----------------------------
       VX= ZERO
@@ -458,7 +458,7 @@ C
 C
       CJWORK(18)=DMASSE
 C----------------------------
-C     CALCUL ACCELERATIONS DE ROTATION
+C     calculation of rotational accelerations
 C----------------------------
       VG(1)=VXX+AXX*DT12
       VG(2)=VYY+AYY*DT12
@@ -479,11 +479,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    sms_telesc_1   ../engine/source/ams/sms_cjoint.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_cjoint_1   ../engine/source/ams/sms_cjoint.F
-      !||====================================================================
+!||====================================================================
+!||    sms_telesc_1   ../engine/source/ams/sms_cjoint.F
+!||--- called by ------------------------------------------------------
+!||    sms_cjoint_1   ../engine/source/ams/sms_cjoint.F
+!||====================================================================
       SUBROUTINE SMS_TELESC_1(A,DMS,NOD,CJWORK,IDOWN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -497,7 +497,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSN, NA, NB, I, N
+      INTEGER NSN, I, N
       my_real AX, AY, AZ, A0, N1, N2, N3, DMASSE
 C-----------------------------------------------
       NSN =NOD(0)
@@ -533,7 +533,7 @@ C
       AY=AY-N2*A0
       AZ=AZ-N3*A0
 C
-C transmet force au 1er nd
+C Transmet Force to the 1st ND
       N = NOD(1)
       A0=N1*A(1,N)+N2*A(2,N)+N3*A(3,N)
       A(1,N)=AX+N1*A0
@@ -579,11 +579,11 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    sms_telesc_2   ../engine/source/ams/sms_cjoint.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_cjoint_2   ../engine/source/ams/sms_cjoint.F
-      !||====================================================================
+!||====================================================================
+!||    sms_telesc_2   ../engine/source/ams/sms_cjoint.F
+!||--- called by ------------------------------------------------------
+!||    sms_cjoint_2   ../engine/source/ams/sms_cjoint.F
+!||====================================================================
       SUBROUTINE SMS_TELESC_2(A,AR,V,VR,X,NOD,MS,IN,
      .                        CJWORK)
 C-----------------------------------------------
@@ -602,7 +602,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSN, NA, NB, I, N
+      INTEGER NSN, I, N
       my_real
      .   N1, N2, N3, AX, AY, AZ, AXX, AYY, AZZ, 
      .   XCDG, YCDG, ZCDG, XX, YY, ZZ, RR, A0, 

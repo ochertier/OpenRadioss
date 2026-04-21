@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps104c             ../engine/source/materials/mat/mat104/sigeps104c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc                 ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    mat104c_ldam_newton    ../engine/source/materials/mat/mat104/mat104c_ldam_newton.F
-      !||    mat104c_ldam_nice      ../engine/source/materials/mat/mat104/mat104c_ldam_nice.F
-      !||    mat104c_nldam_newton   ../engine/source/materials/mat/mat104/mat104c_nldam_newton.F
-      !||    mat104c_nldam_nice     ../engine/source/materials/mat/mat104/mat104c_nldam_nice.F
-      !||    mat104c_nodam_newton   ../engine/source/materials/mat/mat104/mat104c_nodam_newton.F
-      !||    mat104c_nodam_nice     ../engine/source/materials/mat/mat104/mat104c_nodam_nice.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sigeps104c             ../engine/source/materials/mat/mat104/sigeps104c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc                 ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    mat104c_ldam_newton    ../engine/source/materials/mat/mat104/mat104c_ldam_newton.F
+!||    mat104c_ldam_nice      ../engine/source/materials/mat/mat104/mat104c_ldam_nice.F
+!||    mat104c_nldam_newton   ../engine/source/materials/mat/mat104/mat104c_nldam_newton.F
+!||    mat104c_nldam_nice     ../engine/source/materials/mat/mat104/mat104c_nldam_nice.F
+!||    mat104c_nodam_newton   ../engine/source/materials/mat/mat104/mat104c_nodam_newton.F
+!||    mat104c_nodam_nice     ../engine/source/materials/mat/mat104/mat104c_nodam_nice.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE SIGEPS104C(
      1     NEL     ,NGL     ,IPG     ,ILAY    ,IPT     ,NUPARAM ,NUVAR   ,
      2     TIMESTEP,TIME    ,UPARAM  ,UVAR    ,JTHE    ,RHO     ,TEMPEL  ,
-     3     PLA     ,DPLA    ,SOUNDSP ,OFFL    ,EPSD    ,EPSPL   ,GS      ,
+     3     PLA     ,DPLA    ,SOUNDSP ,OFFL    ,EPSD    ,GS      ,
      4     DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,THKLY   ,OFF     ,
      5     SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,THK     ,SIGY    ,
@@ -82,7 +82,7 @@ c
       my_real ,DIMENSION(NEL) :: 
      .   SIGY,ET
       my_real ,DIMENSION(NEL), INTENT(INOUT) :: 
-     .   PLA,EPSD,OFFL,THK,OFF,VARNL,TEMP,SEQ,DPLA,EPSPL
+     .   PLA,EPSD,OFFL,THK,OFF,VARNL,TEMP,SEQ,DPLA
       my_real ,DIMENSION(NEL*L_DMG), INTENT(INOUT) :: 
      .   DMG
       my_real ,DIMENSION(NEL,NUVAR), INTENT(INOUT) :: 
@@ -91,7 +91,7 @@ c
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,II,IGURSON,NSP,ITER,NITER,NINDX,NICE,INDEX(NEL),INDX(NEL),
+      INTEGER I,J,IGURSON,NINDX,NICE,INDX(NEL),
      .        IR,IS,IT
 C=======================================================================
        NICE    = NINT(UPARAM(11))! Plastic projection method
@@ -177,9 +177,6 @@ c
      8         TEMP    ,SEQ     ,PLA_NL  ,PLAP_NL )
           ENDIF      
       END SELECT        
-c    
-      ! Save the strain rate value for failure criterion
-      EPSPL(1:NEL) = EPSD(1:NEL)
 c
       ! Ductile failure activation
       IOFF_DUCT(1:NEL) = 1

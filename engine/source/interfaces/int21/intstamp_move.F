@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intstamp_move   ../engine/source/interfaces/int21/intstamp_move.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_mod    ../engine/share/modules/intstamp_mod.F
-      !||====================================================================
+!||====================================================================
+!||    intstamp_move   ../engine/source/interfaces/int21/intstamp_move.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    intstamp_mod    ../engine/share/modules/intstamp_mod.F
+!||====================================================================
       SUBROUTINE INTSTAMP_MOVE(
      1           INTSTAMP ,NPC    ,TF     ,SKEW    ,NODNX_SMS,
      2           V        ,VR     ,MS     ,X       ,D        ,
@@ -61,7 +61,7 @@ C-----------------------------------------------
       INTEGER NN, IRB, MAIN, J, INTDAMP, MSR, MSRR, IROT
 C     REAL
       my_real
-     .   DW, ALPHA, MASS, VIS, STF, STR, INM, VX, VY, VZ,
+     .   DW, ALPHA, MASS, VIS, STF, STR, INM,
      .   FVX, FVY, FVZ
 C-----------------------------------------------
       DO NN=1,NINTSTAMP

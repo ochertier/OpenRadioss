@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rgwall        ../engine/source/constraints/general/rwall/rgwall.F
-      !||--- called by ------------------------------------------------------
-      !||    rgwal0        ../engine/source/constraints/general/rwall/rgwal0.F
-      !||    rgwal0_imp    ../engine/source/constraints/general/rwall/rgwal0.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier    ../engine/source/system/machine.F
-      !||    sum_6_float   ../engine/source/system/parit.F
-      !||====================================================================
+!||====================================================================
+!||    rgwall        ../engine/source/constraints/general/rwall/rgwall.F
+!||--- called by ------------------------------------------------------
+!||    rgwal0        ../engine/source/constraints/general/rwall/rgwal0.F
+!||    rgwal0_imp    ../engine/source/constraints/general/rwall/rgwal0.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier    ../engine/source/system/machine.F
+!||    sum_6_float   ../engine/source/system/parit.F
+!||====================================================================
       SUBROUTINE RGWALL(X     ,A     ,V     ,RWL    ,NSW   ,
      2                  NSN   ,ITIED ,MSR   ,MS     ,WEIGHT,
      3                  ICONT ,RWSAV ,FRWL6 ,IMP_S  ,NT_RW ,
@@ -160,7 +160,7 @@ C---        test for penetrated nodes
             DP=XC*RWL(1)+YC*RWL(2)+ZC*RWL(3)
             IF(DP > ZERO) CYCLE
             ICONT=1
-C---        test pour noeuds penetres
+C---        test for penetrated nodes
             IF((VX-VXW)*RWL(1)+(VY-VYW)*RWL(2)+(VZ-VZW)*RWL(3) > ZERO)THEN
               CYCLE
             ENDIF
@@ -234,7 +234,7 @@ C
               CYCLE
             ENDIF
             ICONT=1
-C---        test pour noeuds penetres
+C---        test for penetrated nodes
             IF((VX-VXW)*RWL(1)+(VY-VYW)*RWL(2)+(VZ-VZW)*RWL(3) > ZERO)THEN
               CYCLE
             ENDIF
@@ -263,7 +263,7 @@ C
             DP=XC*RWL(1)+YC*RWL(2)+ZC*RWL(3)
             IF(DP > ZERO) CYCLE
             ICONT=1
-C---        test pour noeuds penetres
+C---        test for penetrated nodes
             IF((VX-VXW)*RWL(1)+(VY-VYW)*RWL(2)+(VZ-VZW)*RWL(3) > ZERO)THEN
               CYCLE
             ENDIF
@@ -510,7 +510,7 @@ C
       IF(IMCONV == 1)THEN
           TFXT=TFXT+HALF*DT1*TFXTN
           TFXT2=TFXT2+HALF*DT1*TFXTN2
-#include "atomic.inc"
+!$OMP ATOMIC
           WFEXT=WFEXT+TFXT
           WFEXT_MD=WFEXT_MD+TFXT2
 C
@@ -572,14 +572,14 @@ C
            ENDIF 
           ENDDO
         ELSE
-C--------c'est fait avant-------
+C--------it's done before-------
         ENDIF
           DO J=1,NINDEX
            I = INDEX(J)
            N=NSW(I)
            IF (NDOF(N) > 0) THEN
 C to be uncommented the day it is parallel in implicit
-#include "atomic.inc"
+!$OMP ATOMIC
              NT_RW = NT_RW + 1
            END IF
           ENDDO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,32 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecins                 ../starter/source/interfaces/interf1/lecins.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    elty_surf              ../starter/source/interfaces/interf1/lecins.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    i11edge                ../starter/source/interfaces/inter3d1/i11edge.F
-      !||    i20surfi               ../starter/source/interfaces/inter3d1/i20surfi.F
-      !||    i24surfi               ../starter/source/interfaces/inter3d1/i24surfi.F
-      !||    i25surfi               ../starter/source/interfaces/inter3d1/i25surfi.F
-      !||    i2_surfi               ../starter/source/interfaces/inter3d1/i2_surfi.F90
-      !||    ingrbric               ../starter/source/interfaces/interf1/ingrbric.F
-      !||    ingrbric_centroids     ../starter/source/interfaces/interf1/ingrbric_centroids.F
-      !||    ingrbric_nodes         ../starter/source/interfaces/interf1/ingrbric_nodes.F
-      !||    inpoint                ../starter/source/interfaces/interf1/inpoint.F
-      !||    inslin                 ../starter/source/interfaces/interf1/inslin.F
-      !||    insurf                 ../starter/source/interfaces/interf1/insurf.F
-      !||    insurf23               ../starter/source/interfaces/interf1/insurf23.F
-      !||    insurfigeo             ../starter/source/interfaces/interf1/insurfigeo.F
-      !||    nsegmt                 ../starter/source/interfaces/interf1/nsegmt.F
-      !||--- uses       -----------------------------------------------------
-      !||    i2_surfi_mod           ../starter/source/interfaces/inter3d1/i2_surfi.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecins                 ../starter/source/interfaces/interf1/lecins.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    elty_surf              ../starter/source/interfaces/interf1/lecins.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    i11edge                ../starter/source/interfaces/inter3d1/i11edge.F
+!||    i20surfi               ../starter/source/interfaces/inter3d1/i20surfi.F
+!||    i24surfi               ../starter/source/interfaces/inter3d1/i24surfi.F
+!||    i25surfi               ../starter/source/interfaces/inter3d1/i25surfi.F
+!||    i2_surfi               ../starter/source/interfaces/inter3d1/i2_surfi.F90
+!||    ingrbric               ../starter/source/interfaces/interf1/ingrbric.F
+!||    ingrbric_centroids     ../starter/source/interfaces/interf1/ingrbric_centroids.F
+!||    ingrbric_nodes         ../starter/source/interfaces/interf1/ingrbric_nodes.F
+!||    inpoint                ../starter/source/interfaces/interf1/inpoint.F
+!||    inslin                 ../starter/source/interfaces/interf1/inslin.F
+!||    insurf                 ../starter/source/interfaces/interf1/insurf.F
+!||    insurf23               ../starter/source/interfaces/interf1/insurf23.F
+!||    insurfigeo             ../starter/source/interfaces/interf1/insurfigeo.F
+!||    nsegmt                 ../starter/source/interfaces/interf1/nsegmt.F
+!||--- uses       -----------------------------------------------------
+!||    i2_surfi_mod           ../starter/source/interfaces/inter3d1/i2_surfi.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LECINS(IPARI   ,ITAB       ,PM       ,IPM       ,BUFMAT  ,
      .                  IGRNOD  ,IGRSURF    ,IGRSLIN  ,XFILTR    ,STFAC   ,
      .                  FRIC_P  ,FRIGAP     ,I2RUPT   ,AREASL    ,LIXINT  ,
@@ -53,7 +53,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                  IXC     ,IXTG       ,KNOD2ELC ,KNOD2ELTG ,NOD2ELC ,
      .                  NOD2ELTG,INTBUF_TAB ,KNOD2ELS ,NOD2ELS   ,IXS10   ,
      .                  IXS16   ,IXS20      ,NIGE,RIGE,XIGE      ,VIGE    ,
-     .                  IGRBRIC ,MULTI_FVM  ,NALE     ,IGEO      ,INTERFACES)
+     .                  IGRBRIC ,MULTI_FVM  ,NALE     ,IGEO      ,INTERFACES,
+     .                  S_NOD2ELS,S_NOD2ELTG,FLAG_ELEM_INTER25   ,LIST_NIN25)
 C============================================================================
 C-----------------------------------------------
 C   M o d u l e s
@@ -65,6 +66,7 @@ C-----------------------------------------------
       USE INTERFACES_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE I2_SURFI_MOD ,         ONLY : I2_SURFI
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -85,15 +87,19 @@ C-----------------------------------------------
      .        IXC(*),IXTG(*),KNOD2ELC(*),KNOD2ELTG(*),
      .        NOD2ELC(*),NOD2ELTG(*),KNOD2ELS(*),NOD2ELS(*),
      .        IXS10(6,*), IXS16(8,*), IXS20(12,*),NIGE(*)
+      INTEGER ,INTENT(IN) :: S_NOD2ELS,S_NOD2ELTG
       INTEGER LIXINT, NBRIC
       INTEGER,INTENT(IN) :: IPM(NPROPMI,NUMMAT), IGEO(NPROPGI,NUMGEO)
       my_real,INTENT(IN) :: BUFMAT(SBUFMAT)
-      my_real XFILTR(*),STFAC(*),FRIC_P(10,NINTER),FRIGAP(NPARIR,NINTER),I2RUPT (6,NINTER),AREASL(*),RIGE(*),XIGE(*),VIGE(*)
+      my_real :: XFILTR(*),STFAC(*),FRIC_P(10,NINTER),FRIGAP(NPARIR,NINTER)
+      my_real :: I2RUPT(6,NINTER),AREASL(*),RIGE(*),XIGE(*),VIGE(*)
       my_real,INTENT(IN) :: X(3,NUMNOD)
       my_real, INTENT(IN) :: PM(*)
       INTEGER NOM_OPT(LNOPT1,*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
-      INTEGER, INTENT(IN) :: NALE(NUMNOD)      
+      INTEGER, INTENT(IN) :: NALE(NUMNOD)   
+      INTEGER, INTENT(INOUT) :: LIST_NIN25(NINTER)
+      INTEGER, INTENT(INOUT) :: FLAG_ELEM_INTER25(NINTER25,NUMELS)   
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
@@ -110,7 +116,8 @@ C-----------------------------------------------
      .   ISU1,ISU2,NRTM0,NRTM_SH,
      .   NRTS_NEW, NRTM_NEW,IBID,INTTH,
      .   NRTM_IGE,NRTM_FE,NRTS_IGE,NRTS_FE,
-     .   NMN_IGE,NMN_FE,NSN_IGE,NSN_FE,INTNITSCHE,IAD_IGE,GRBRIC_ID
+     .   NMN_IGE,NMN_FE,NSN_IGE,NSN_FE,INTNITSCHE,
+     .   IAD_IGE,GRBRIC_ID,NIN25,NEDGE_L,NMN_1D
 
       INTEGER :: STAT
       INTEGER, DIMENSION(:), ALLOCATABLE, TARGET ::  NTAG_TARGET
@@ -130,6 +137,7 @@ C=======================================================================
         NTAG(K) = 0
        ENDDO
       LIXINT = 0
+      NIN25 = 0
 C---------------------
       DO NI = 1,LINTER
 C
@@ -151,6 +159,8 @@ C
         INTTH  = IPARI(47,NI)
         INTNITSCHE  = IPARI(86,NI)
         GRBRIC_ID   = IPARI(83,NI) !int18
+        NEDGE_L = IPARI(101,NI) 
+        NMN_1D = IPARI(104,NI) 
         IRM    = 0
         IRS    = 0
 C- deactivated interfaces
@@ -186,7 +196,7 @@ C-------------------------------------------
           INTBUF_TAB(NI)%VARIABLES(J) = FRIGAP(J,NI)
         ENDDO
 C-----
-C      LECTURE DES RENSEIGNEMENTS SURFACE SECOND/MAIN
+C      READING SURFACE INFORMATION SECONDARY/MAIN
 C-----
 C      1) SURFACE SECONDARY
 C
@@ -418,7 +428,11 @@ C-------
      2                       NMN     ,INTBUF_TAB(NI)%MSR,INTBUF_TAB(NI)%MSEGTYP,
      3                       FRIGAP(4,NI),X       ,NUMNOD,ITAB ,IPRI ,IOUT  ,
      4                       IXS     ,NUMELS  ,NOINT   ,INTBUF_TAB(NI)%IRTLM    ,
-     5                       INTBUF_TAB(NI)%CSTS,INTBUF_TAB(NI)%DPARA  )
+     5                       INTBUF_TAB(NI)%CSTS,INTBUF_TAB(NI)%DPARA,IXC      ,
+     6                       IXTG    , KNOD2ELC ,KNOD2ELTG,NOD2ELC   ,NOD2ELTG ,
+     7                       KNOD2ELS,NOD2ELS   ,IXS10    ,IXS16     ,IXS20    ,
+     8                       S_NOD2ELS,S_NOD2ELTG,NUMELC  ,NUMELTG   ,NUMELS10 ,
+     9                       NUMELS16,NUMELS20 ,ID,TITR)
           END IF
 C-------
         ELSEIF (NTYP == 3 .OR. NTYP == 4 .OR. NTYP == 9) THEN
@@ -512,7 +526,7 @@ C-------
             INTBUF_TAB(NI)%XFILTR(1) = XFILTR(NI)
           ENDIF
           LIXINT = LIXINT+MULTIMP*NSN
-          IALLO = 2  ! initialisation des tableaux
+          IALLO = 2  ! initialization of arrays
           CALL I20SURFI(
      1      IALLO        ,IPARI(1,NI)  ,IGRNOD     ,IGRSURF  ,
      2      IGRSLIN      ,INTBUF_TAB(NI)%IRECTM,FRIGAP(1,NI) ,
@@ -578,7 +592,7 @@ C-------
           ENDIF
           LIXINT = LIXINT+MULTIMP*NSN
 C-----------inside I24SURFI NRTM=NRTM0          
-          IALLO = 2  ! initialisation des tableaux
+          IALLO = 2  ! initialization of arrays
           CALL I24SURFI(
      1      IALLO                  , IPARI(1,NI)            ,IGRNOD                   ,IGRSURF              ,
      2      INTBUF_TAB(NI)%IRECTM  ,FRIGAP(1,NI)            ,
@@ -605,12 +619,14 @@ C-------
           ENDIF
           LIXINT = LIXINT+MULTIMP*NSN
 C-----------inside I24SURFI NRTM=NRTM0          
-          IALLO = 2  ! initialisation des tableaux
+          IALLO = 2  ! initialization of arrays
           IF(ILEV==2)THEN
-C           necessaire au 2eme passage (cf IDDLEVEL)
+C           necessary in the 2nd passage (see iddlevel)
             INTBUF_TAB(NI)%NBINFLG(1:INTBUF_TAB(NI)%S_NBINFLG)=0
             INTBUF_TAB(NI)%MBINFLG(1:INTBUF_TAB(NI)%S_MBINFLG)=0
           END IF
+          NIN25 = NIN25 + 1
+          LIST_NIN25(NI) = NIN25
           CALL I25SURFI(
      1      IALLO                  ,IPARI(1,NI)            ,IGRNOD                   , IGRSURF               ,
      2      INTBUF_TAB(NI)%IRECTM  , FRIGAP(1,NI)          ,
@@ -620,7 +636,10 @@ C           necessaire au 2eme passage (cf IDDLEVEL)
      6      IXTG                   ,KNOD2ELC               ,KNOD2ELTG                ,NOD2ELC                ,
      7      NOD2ELTG               ,KNOD2ELS               ,NOD2ELS                  ,IXS                    ,
      8      IXS10                  ,IXS16                  ,IXS20                    ,INTBUF_TAB(NI)%IRTSE   ,
-     9      INTBUF_TAB(NI)%IS2SE   ,INTBUF_TAB(NI)%IS2PT   ,INTBUF_TAB(NI)%IS2ID     ,INTERFACES%PARAMETERS  )
+     9      INTBUF_TAB(NI)%IS2SE   ,INTBUF_TAB(NI)%IS2PT   ,INTBUF_TAB(NI)%IS2ID     ,INTERFACES%PARAMETERS  ,
+     A      NIN25                  ,FLAG_ELEM_INTER25      ,IGRSLIN                  ,
+     B      INTBUF_TAB(NI)%LEDGE   ,INTBUF_TAB(NI)%EBINFLG ,IPARI(68,NI)             ,IPARI(104,NI)          ,
+     C      INTBUF_TAB(NI)%MSR_1D  )
 C------initialization of doubler M_seg pour shells ---> move inside I24SURFI
         ENDIF
 C
@@ -635,11 +654,11 @@ C-----
 
       RETURN
       END
-      !||====================================================================
-      !||    elty_surf   ../starter/source/interfaces/interf1/lecins.F
-      !||--- called by ------------------------------------------------------
-      !||    lecins      ../starter/source/interfaces/interf1/lecins.F
-      !||====================================================================
+!||====================================================================
+!||    elty_surf   ../starter/source/interfaces/interf1/lecins.F
+!||--- called by ------------------------------------------------------
+!||    lecins      ../starter/source/interfaces/interf1/lecins.F
+!||====================================================================
       SUBROUTINE ELTY_SURF(NRTM0,NRTM,NSEG,SURF_ELTYP,MSEGTYP,ISU2)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    initwg_x        ../starter/source/spmd/domain_decomposition/initwg_x.F
-      !||--- called by ------------------------------------------------------
-      !||    initwg          ../starter/source/spmd/domain_decomposition/initwg.F
-      !||--- uses       -----------------------------------------------------
-      !||    ddweights_mod   ../starter/share/modules1/ddweights_mod.F
-      !||====================================================================
+!||====================================================================
+!||    initwg_x        ../starter/source/spmd/domain_decomposition/initwg_x.F
+!||--- called by ------------------------------------------------------
+!||    initwg          ../starter/source/spmd/domain_decomposition/initwg.F
+!||--- uses       -----------------------------------------------------
+!||    ddweights_mod   ../starter/share/modules1/ddweights_mod.F
+!||====================================================================
       SUBROUTINE INITWG_X(WD,PM,GEO,KXX,IGEO,
      .            NUMELX,IPM,NUMMAT,NUMGEO,OFF)
 C-----------------------------------------------
@@ -49,7 +49,7 @@ C-----------------------------------------------
       INTEGER  OFF,NUMELX,
      .  NUMMAT,NUMGEO,TAILLE,KXX(NIXX,*),IGEO(NPROPGI,*),
      .  IPM(NPROPMI,*)
-C     REAL OU REAL*8
+C     REAL OR REAL*8
       my_real
      .    PM(NPROPM,*), GEO(NPROPG,*)
       REAL WD(*)

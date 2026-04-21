@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    uaccess_dum   ../engine/source/user_interface/uaccess.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2      ../engine/source/engine/radioss2.F
-      !||====================================================================
+!||====================================================================
+!||    uaccess_dum   ../engine/source/user_interface/uaccess.F
+!||--- called by ------------------------------------------------------
+!||    radioss2      ../engine/source/engine/radioss2.F
+!||====================================================================
       SUBROUTINE UACCESS_DUM(IERR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -33,9 +33,9 @@ C-----------------------------------------------
        INTEGER IERR
        IERR=0
       END
-      !||====================================================================
-      !||    get_u_cycle   ../engine/source/user_interface/uaccess.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_cycle   ../engine/source/user_interface/uaccess.F
+!||====================================================================
       INTEGER FUNCTION GET_U_CYCLE()
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -50,11 +50,11 @@ C-----------------------------------------------
        RETURN
        END
 #include "my_real.inc"
-      !||====================================================================
-      !||    get_u_time   ../engine/source/user_interface/uaccess.F
-      !||--- called by ------------------------------------------------------
-      !||    ruser46      ../engine/source/elements/spring/ruser46.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_time   ../engine/source/user_interface/uaccess.F
+!||--- called by ------------------------------------------------------
+!||    ruser46      ../engine/source/elements/spring/ruser46.F
+!||====================================================================
       my_real FUNCTION GET_U_TIME()
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -68,12 +68,12 @@ C-----------------------------------------------
        GET_U_TIME = TT
        RETURN
        END
-      !||====================================================================
-      !||    get_u_accel         ../engine/source/user_interface/uaccess.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_u_accel         ../engine/source/user_interface/uaccess.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       INTEGER FUNCTION GET_U_ACCEL(NACC, AX,AY,AZ)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -117,11 +117,11 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_u_numacc     ../engine/source/user_interface/uaccess.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_u_numacc     ../engine/source/user_interface/uaccess.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       INTEGER FUNCTION GET_U_NUMACC(IDACC)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -158,14 +158,14 @@ C---
 C---
       RETURN
       END
-      !||====================================================================
-      !||    get_u_numnod     ../engine/source/user_interface/uaccess.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg           ../engine/source/output/message/message.F
-      !||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_numnod     ../engine/source/user_interface/uaccess.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg           ../engine/source/output/message/message.F
+!||    get_var_user_i   ../engine/source/user_interface/eng_callback_c.c
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../engine/share/message_module/message_mod.F
+!||====================================================================
       INTEGER FUNCTION GET_U_NUMNOD(IU)
 C-----------------------------------------------
 C   M o d u l e s
@@ -204,12 +204,12 @@ C-----------------------------------------------
      .                I1=IU,C1=MESS)
         IERR=IERR+1
        END IF
-C   en SPMD la valeur 0 n indique pas une erreur mais l absence du noeud sur le proc
+C   in SPMD the value 0 does not indicate an error but the absence of the node on the proc
        GET_U_NUMNOD=0
        RETURN
       ENDIF
       IF((IU-ITAB1)==0)THEN
-C     >CAS IU=TABM FIN DE LA RECHERCHE
+C     >CAS IU=TABM END OF THE SEARCH
        CALL GET_VAR_USER_I(13,J+NUMNOD,ITAB2)
          GET_U_NUMNOD=ITAB2
          RETURN
@@ -226,18 +226,18 @@ C---
       RETURN
       END
 C
-      !||====================================================================
-      !||    get_u_nod_x         ../engine/source/user_interface/uaccess.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
-      !||    spmd_glob_dsum      ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_nod_x         ../engine/source/user_interface/uaccess.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
+!||    spmd_glob_dsum      ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
+!||====================================================================
       INTEGER FUNCTION GET_U_NOD_X(NOD, X,Y,Z)
-C   En SPMD, tous les procs doivent appeler cette fonction
-C   sinon blocage
+C   In SPMD, all procs must call this function
+C   otherwise deadlock
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -263,7 +263,7 @@ C   S o u r c e   L i n e s
 C-----------------------------------------------
       IF (NOD>0) THEN
        IF(NSPMD>1) THEN
-C   get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
+C   get_proc_user_f returns 1 if weight(nod) = 1, 0 otherwise
 C   weight : pointeur 18 (cf resol.F)
          CALL GET_VAR_USER_I(18,NOD,P)
        ELSE
@@ -285,7 +285,7 @@ C   weight : pointeur 18 (cf resol.F)
         ENDIF
        ENDIF
 C
-C SPMD communication du resultat a ts les procs
+C SPMD communication of the result to all procs
 C
        IF(NSPMD>1.AND.GETUNOD_NOCOM==0) THEN
          IF(P==1) THEN
@@ -316,18 +316,18 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_u_nod_d         ../engine/source/user_interface/uaccess.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
-      !||    spmd_glob_dsum      ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_nod_d         ../engine/source/user_interface/uaccess.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
+!||    spmd_glob_dsum      ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
+!||====================================================================
       INTEGER FUNCTION GET_U_NOD_D(NOD, DX,DY,DZ)
-C   En SPMD, tous les procs doivent appeler cette fonction
-C   sinon blocage
+C   In SPMD, all procs must call this function
+C   otherwise deadlock
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -353,7 +353,7 @@ C   S o u r c e   L i n e s
 C-----------------------------------------------
       IF (NOD>0) THEN
        IF(NSPMD>1) THEN
-C   get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
+C   get_proc_user_f returns 1 if weight(nod) = 1, 0 otherwise
 C   weight : pointeur 18 (cf resol.F)
          CALL GET_VAR_USER_I(18,NOD,P)
        ELSE
@@ -375,7 +375,7 @@ C   weight : pointeur 18 (cf resol.F)
         ENDIF
        ENDIF
 C
-C SPMD communication du resultat a ts les procs
+C SPMD communication of the result to all procs
 C
        IF(NSPMD>1.AND.GETUNOD_NOCOM==0) THEN
          IF(P==1) THEN
@@ -406,18 +406,18 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_u_nod_v         ../engine/source/user_interface/uaccess.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
-      !||    spmd_glob_dsum      ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_nod_v         ../engine/source/user_interface/uaccess.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
+!||    spmd_glob_dsum      ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
+!||====================================================================
       INTEGER FUNCTION GET_U_NOD_V(NOD, VX,VY,VZ)
-C   En SPMD, tous les procs doivent appeler cette fonction
-C   sinon blocage
+C   In SPMD, all procs must call this function
+C   otherwise deadlock
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -445,7 +445,7 @@ C   S o u r c e   L i n e s
 C-----------------------------------------------
       IF (NOD>0) THEN
        IF(NSPMD>1) THEN
-C   get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
+C   get_proc_user_f returns 1 if weight(nod) = 1, 0 otherwise
 C   weight : pointeur 18 (cf resol.F)
          CALL GET_VAR_USER_I(18,NOD,P)
        ELSE
@@ -466,7 +466,7 @@ C   weight : pointeur 18 (cf resol.F)
           CALL GET_VAR_USER_F(16,D3,VZ)
         ENDIF
 C
-C SPMD communication du resultat a ts les procs
+C SPMD communication of the result to all procs
 C
        ENDIF
        IF(NSPMD>1.AND.GETUNOD_NOCOM==0) THEN
@@ -498,18 +498,18 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_u_nod_a         ../engine/source/user_interface/uaccess.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
-      !||    spmd_glob_dsum      ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
-      !||====================================================================
+!||====================================================================
+!||    get_u_nod_a         ../engine/source/user_interface/uaccess.F
+!||--- calls      -----------------------------------------------------
+!||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i      ../engine/source/user_interface/eng_callback_c.c
+!||    spmd_glob_dsum      ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
+!||====================================================================
       INTEGER FUNCTION GET_U_NOD_A(NOD, AX,AY,AZ)
-C   En SPMD, tous les procs doivent appeler cette fonction
-C   sinon blocage
+C   In SPMD, all procs must call this function
+C   otherwise deadlock
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -535,7 +535,7 @@ C   S o u r c e   L i n e s
 C-----------------------------------------------
       IF (NOD>0) THEN
        IF(NSPMD>1) THEN
-C   get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
+C   get_proc_user_f returns 1 if weight(nod) = 1, 0 otherwise
 C   weight : pointeur 18 (cf resol.F)
          CALL GET_VAR_USER_I(18,NOD,P)
        ELSE
@@ -557,9 +557,9 @@ C   weight : pointeur 18 (cf resol.F)
         ENDIF
        ENDIF
 C
-C SPMD communication du resultat a ts les procs
+C SPMD communication of the result to all procs
 C
-       IF(IMACH==3.AND.NSPMD>1.AND.GETUNOD_NOCOM==0) THEN
+       IF(NSPMD>1.AND.GETUNOD_NOCOM==0) THEN
          IF(P==1) THEN
            BUFS(1) = AX
            BUFS(2) = AY
@@ -589,15 +589,15 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    get_u_skew            ../engine/source/user_interface/uaccess.F
-      !||--- called by ------------------------------------------------------
-      !||    rskew33               ../engine/source/elements/joint/rskew33.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_array_user_f      ../engine/source/user_interface/eng_callback_c.c
-      !||    get_array_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
-      !||    get_var_user_i        ../engine/source/user_interface/eng_callback_c.c
-      !||====================================================================
+!||====================================================================
+!||    get_u_skew            ../engine/source/user_interface/uaccess.F
+!||--- called by ------------------------------------------------------
+!||    rskew33               ../engine/source/elements/joint/rskew33.F
+!||--- calls      -----------------------------------------------------
+!||    get_array_user_f      ../engine/source/user_interface/eng_callback_c.c
+!||    get_array_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
+!||    get_var_user_i        ../engine/source/user_interface/eng_callback_c.c
+!||====================================================================
       INTEGER FUNCTION GET_U_SKEW(IDSKW,N1,N2,N3,VECT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -695,12 +695,15 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    set_spring_elnum   ../engine/source/user_interface/uaccess.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3             ../engine/source/elements/spring/rforc3.F
-      !||====================================================================
+!||====================================================================
+!||    set_spring_elnum   ../engine/source/user_interface/uaccess.F
+!||--- called by ------------------------------------------------------
+!||    rforc3             ../engine/source/elements/spring/rforc3.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE SET_SPRING_ELNUM(JFT,JLT,IXR)
+      use element_mod , only : nixr
 C---------+---------+---+---+--------------------------------------------
 C Saves external spring number for local element group
 C---------+---------+---+---+--------------------------------------------
@@ -760,16 +763,18 @@ C-----------------------------------------------
       GET_SPRING_ELNUM = NUM
       RETURN
       END
-      !||====================================================================
-      !||    mat_solid_get_nod_x   ../engine/source/user_interface/uaccess.F
-      !||--- uses       -----------------------------------------------------
-      !||    restmod               ../engine/share/modules/restart_mod.F
-      !||    user_interface_mod    ../engine/source/modules/user_interface_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    mat_solid_get_nod_x   ../engine/source/user_interface/uaccess.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    restmod               ../engine/share/modules/restart_mod.F
+!||    user_interface_mod    ../engine/source/modules/user_interface_mod.F90
+!||====================================================================
       SUBROUTINE MAT_SOLID_GET_NOD_X(USER_X)
 C---------+---------+---+---+--------------------------------------------
       USE RESTMOD 
       USE user_interface_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -885,16 +890,18 @@ C
 
       END
 C-----------------------------------------------
-      !||====================================================================
-      !||    mat_solid_get_nod_v   ../engine/source/user_interface/uaccess.F
-      !||--- uses       -----------------------------------------------------
-      !||    restmod               ../engine/share/modules/restart_mod.F
-      !||    user_interface_mod    ../engine/source/modules/user_interface_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    mat_solid_get_nod_v   ../engine/source/user_interface/uaccess.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    restmod               ../engine/share/modules/restart_mod.F
+!||    user_interface_mod    ../engine/source/modules/user_interface_mod.F90
+!||====================================================================
       SUBROUTINE MAT_SOLID_GET_NOD_V(USER_V)
 C---------+---------+---+---+--------------------------------------------
       USE RESTMOD
       USE user_interface_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

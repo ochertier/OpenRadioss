@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    srcoor12    ../engine/source/elements/solid/solide/srcoor12.F
-      !||--- called by ------------------------------------------------------
-      !||    s8eforc3    ../engine/source/elements/solid/solide8e/s8eforc3.F
-      !||    sforc3      ../engine/source/elements/solid/solide/sforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    sortho12    ../engine/source/elements/solid/solide/sortho12.F
-      !||    srepiso12   ../engine/source/elements/solid/solide/srepiso12.F
-      !||====================================================================
+!||====================================================================
+!||    srcoor12    ../engine/source/elements/solid/solide/srcoor12.F
+!||--- called by ------------------------------------------------------
+!||    s8eforc3    ../engine/source/elements/solid/solide8e/s8eforc3.F
+!||    sforc3      ../engine/source/elements/solid/solide/sforc3.F
+!||--- calls      -----------------------------------------------------
+!||    sortho12    ../engine/source/elements/solid/solide/sortho12.F
+!||    srepiso12   ../engine/source/elements/solid/solide/srepiso12.F
+!||====================================================================
       SUBROUTINE SRCOOR12(
      1   OFF,     X,       XDP,     NC1,
      2   NC2,     NC3,     NC4,     NC5,
@@ -144,7 +144,7 @@ C----------------------------
         ENDDO      
       ENDIF         
 C-----------
-C     REPERE CONVECTE (ITERATIONS).
+C     convected frame (ITERATIONS).
 C-----------
       CALL SREPISO12(
      1   OFF,     XD1,     XD2,     XD3,

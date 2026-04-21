@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stackgroup_drape       ../starter/source/stack/stackgroup_drape.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod              ../starter/share/modules1/drape_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    stack_mod              ../starter/share/modules1/stack_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    stackgroup_drape       ../starter/source/stack/stackgroup_drape.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod              ../starter/share/modules1/drape_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    stack_mod              ../starter/share/modules1/stack_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE STACKGROUP_DRAPE(DRAPE ,DRAPEG , IWORK_T, IWORKSH , 
      .                     IGRSH3N    ,IGRSH4N  ,IXC   ,IXTG ,
      .                     IGEO       ,GEO      ,THK    ,STACK   ,
@@ -45,6 +47,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE DRAPE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -491,53 +494,38 @@ C geometric property
              ENDDO
              
 C                      
-C to be  clarified later IPOS > 0 
             IPOS = IGEO(99,PID) 
             ZSHIFT = GEO(199,PID)
-            IF(IPOS == 1)THEN                                              
-             TMIN = EP20                                                    
-             TMAX = -EP20                                                   
-             DO J=1,NPT                                                     
-              DT = HALF*IWORKS%GEO(IPTHK   + J     ,IS)                    
-              TMIN = MIN(TMIN,IWORKS%GEO(IPPOS   + J     ,IS)-DT)            
-              TMAX = MAX(TMAX,IWORKS%GEO(IPPOS   + J     ,IS)+DT)            
-             ENDDO                                                           
-             THICKT = TMAX - TMIN               
-             DO J=1,NPT  
-              IWORKS%GEO(IPTHK+J,IS)=IWORKS%GEO(IPTHK+J,IS)/MAX(THICKT,EM20) 
-              IWORKS%GEO(IPPOS+J,IS)=IWORKS%GEO(IPPOS+J,IS)/MAX(THICKT,EM20)  
-             ENDDO 
-                                                                        
-          ELSE                                                          
-               THICKT = ZERO                                       
-               DO J=1,NPT                                
+            IF(IPOS == 1) THEN
+                CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,PID),LTITR)
+                CALL ANCMSG(MSGID=3128,
+     .              MSGTYPE=MSGERROR,
+     .              ANMODE=ANSTOP,
+     .              I1=PID,
+     .              C1=TITR,
+     .              I2=IPOS)
+            END IF
+            !                                                      
+            THICKT = ZERO                                       
+            DO J=1,NPT                                
                  THICKT = THICKT + IWORKS%GEO(IPTHK+J,IS)
-               ENDDO           
-               DO J=1,NPT 
+            ENDDO           
+            DO J=1,NPT 
                  IWORKS%GEO(IPTHK+J,IS) =                                   
      .                    IWORKS%GEO(IPTHK+J,IS)/MAX(THICKT,EM20)
-               ENDDO
+            ENDDO
 C                
-               IF(IPOS == 2 ) ZSHIFT =  ZSHIFT /MAX(THICKT,EM20)       
-C---             calcul automatique de position des couches             
-                 IWORKS%GEO(IPPOS+1,IS) = ZSHIFT + HALF*IWORKS%GEO(IPTHK+1,IS)
-                 DO J=2,NPT                                               
+            IF(IPOS == 2 ) ZSHIFT =  ZSHIFT /MAX(THICKT,EM20)       
+C--- Automatic calculation of layer positions
+            IWORKS%GEO(IPPOS+1,IS) = ZSHIFT + HALF*IWORKS%GEO(IPTHK+1,IS)
+            DO J=2,NPT                                               
                    IWORKS%GEO(IPPOS+J,IS) = IWORKS%GEO(IPPOS+J-1,IS)            
      .               + HALF*(IWORKS%GEO(IPTHK+J,IS)+IWORKS%GEO(IPTHK+J-1,IS))   
-                 ENDDO
-C               
-            ENDIF ! IPOS =0,1,2,3,4                                            
+            ENDDO
+C                                                        
 C calcul du thk by shell
             IWORKS%GEO(1,IS) = THICKT
 C============================================================================
-C---
-C  update the shell thickness   NDRAPE =0         
-C---
-              DO I= NFIRST(IS) , NLAST(IS)
-                ID = INDX_TOTAL(I)
-                II = INDX_SH(ID)
-                IF (THK(II) == ZERO) THK(II) = THICKT
-              ENDDO             
 C============================================================================
         ENDDO ! DO IS = 1,NS_TOTAL 
 C           
@@ -844,56 +832,38 @@ C
 C to be  clarified later IPOS > 0 
            IPOS = IGEO(99,PID) 
            ZSHIFT = GEO(199,PID)
-           IF(IPOS == 1)THEN                                             
-            TMIN = EP20                                                     
-            TMAX = -EP20                                                    
-            DO J=1,NPT                                                      
-             DT = HALF*STACK%GEO(IPTHK   + J  ,IIS)                     
-             TMIN = MIN(TMIN,STACK%GEO(IPPOS   + J ,IIS)-DT)             
-             TMAX = MAX(TMAX,STACK%GEO(IPPOS   + J ,IIS)+DT)             
-            ENDDO                                                            
-            THICKT = TMAX - TMIN               
-            DO J=1,NPT  
-               STACK%GEO(IPTHK+J,IIS)=
-     .                 STACK%GEO(IPTHK+J,IIS)/MAX(THICKT,EM20)  
-               STACK%GEO(IPPOS+J,IIS)=
-     .                 STACK%GEO(IPPOS+J,IIS)/MAX(THICKT,EM20)   
-            ENDDO 
-                                                                       
-          ELSE                                                          
-               THICKT = ZERO                                       
-               DO J=1,NPT                                
+           IF(IPOS == 1) THEN
+              CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,PID),LTITR)
+              CALL ANCMSG(MSGID=3128,
+     .              MSGTYPE=MSGERROR,
+     .              ANMODE=ANSTOP,
+     .              I1=PID,
+     .              C1=TITR,
+     .              I2=IPOS)
+           END IF
+          !                                                    
+           THICKT = ZERO                                       
+           DO J=1,NPT                                
                  THICKT = THICKT + STACK%GEO(IPTHK+J,IIS)
-               ENDDO           
-               DO J=1,NPT 
+           ENDDO           
+            DO J=1,NPT 
                  STACK%GEO(IPTHK+J,IIS) =                                   
      .                STACK%GEO(IPTHK+J,IIS)/MAX(THICKT,EM20)
-               ENDDO
+           ENDDO
 C                
-               IF(IPOS == 2 )ZSHIFT =  ZSHIFT /MAX(THICKT,EM20)                 
-C---             calcul automatique de position des couches             
-                 STACK%GEO(IPPOS+1,IIS) = ZSHIFT +
+           IF(IPOS == 2 )ZSHIFT =  ZSHIFT /MAX(THICKT,EM20)                 
+C--- Automatic calculation of layer positions
+           STACK%GEO(IPPOS+1,IIS) = ZSHIFT +
      .                          HALF*STACK%GEO(IPTHK+1,IIS)
-                 DO J=2,NPT                                               
+           DO J=2,NPT                                               
                   STACK%GEO(IPPOS+J,IIS) =   
      .                    STACK%GEO(IPPOS+J-1,IIS)      +
      .                    HALF*(STACK%GEO(IPTHK+J,IIS)+
      .                            STACK%GEO(IPTHK+J-1,IIS))   
-                 ENDDO
-C               
-            ENDIF ! IPOS =0,1,2,3,4                                                 
+          ENDDO                                       
 C calcul du thk by shell
               STACK%GEO(1,IIS) = THICKT
 C============================================================================
-C---
-C  update the shell thickness if /DRAPE defined          
-C---
-!!  (NDRAPE == 0) 
-              DO I= NFIRST(IS) , NLAST(IS)
-                ID = INDX_TOTAL(I)
-                II = INDX_SH(ID)
-                IF (THK(II) == ZERO) THK(II) = THICKT
-              ENDDO
 C---
             IPPID = 2
             DO ILAY=1,NPT

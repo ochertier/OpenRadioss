@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mpi_tools_mod   ../engine/share/modules/mpi_tools_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    mpi_tools_mod   ../engine/share/modules/mpi_tools_mod.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||====================================================================
       MODULE MPI_TOOLS_MOD 
 C-----------------------------------------------
 C   m y _ r e a l
@@ -60,14 +60,15 @@ C  CALL MPI_MIN_REAL_END(VAL2,TAB2,1,MY_STRUCT)
 C  ! VAL2 is the min of VAL over the processors
 C  ! TAB2 is the TAB of the processor that has the minimum value of VAL
 
-      !||====================================================================
-      !||    mpi_min_real_begin   ../engine/share/modules/mpi_tools_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mpi_min_real_begin    ../engine/share/modules/mpi_tools_mod.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE MPI_MIN_REAL_BEGIN(VAL,TAB,STAB,MY_STRUCT) 
 C-----------------------------------------------
 C   M o d u l e s
@@ -76,6 +77,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "r4r8_p.inc"
 C-----------------------------------------------
@@ -86,13 +88,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr02_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "timeri_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -106,7 +102,6 @@ C-----------------------------------------------
       INTEGER P,IERROR
       INTEGER MSGTYP
 #ifdef MPI
-      INTEGER STATUS (MPI_STATUS_SIZE)
 
 !     Loop on send and Recv : NSPMD*NSPMD communications
 !     Since there is not collective asynchronous communication
@@ -158,14 +153,15 @@ C-----------------------------------------------
       RETURN
       END SUBROUTINE MPI_MIN_REAL_BEGIN
 
-      !||====================================================================
-      !||    mpi_min_real_end   ../engine/share/modules/mpi_tools_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mpi_min_real_end      ../engine/share/modules/mpi_tools_mod.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE MPI_MIN_REAL_END(VAL,TAB,STAB,MY_STRUCT) 
 C-----------------------------------------------
 C   M o d u l e s
@@ -174,6 +170,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "r4r8_p.inc"
 C-----------------------------------------------
@@ -184,13 +181,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr02_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "timeri_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -202,7 +193,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER P,PMIN,IERROR
-      INTEGER MSGTYP
 #ifdef MPI
       INTEGER STATUS (MPI_STATUS_SIZE)
 

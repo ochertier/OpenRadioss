@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fxbelnum   ../starter/source/constraints/fxbody/fxbelnum.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur     ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    fxbelnum      ../starter/source/constraints/fxbody/fxbelnum.F
+!||--- called by ------------------------------------------------------
+!||    lectur        ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE FXBELNUM(
      .              FXBNOD , NSN, IPARG, ITAG  , FXBELM,
      .              IXS    , IXC, IXTG , IPARTS, IPARTC,
      .              IPARTTG, IXT, IXP  , IPARTT, IPARTP)
+      use element_mod , only : nixs,nixc,nixtg,nixt,nixp
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,8 +52,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,NG,NEL,NFT,ITY,II,NALL,NEL2,J,IAD,MAT,JHBE,
-     .        IT1,IT2,IT3,IT4,IT5,IT6,IT7,IT8,JSROT
+      INTEGER I,NG,NEL,NFT,ITY,II,NALL,NEL2,J,IAD,MAT,JHBE,IT1,IT2,IT3,IT4,IT5,IT6,IT7,IT8
 C=======================================================================
       DO I=1,NUMNOD
          ITAG(I)=0

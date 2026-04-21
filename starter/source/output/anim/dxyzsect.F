@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dxyzsect    ../starter/source/output/anim/dxyzsect.F
-      !||--- called by ------------------------------------------------------
-      !||    genani1     ../starter/source/output/anim/genani1.F
-      !||--- calls      -----------------------------------------------------
-      !||    dxwalc      ../starter/source/output/anim/dxwalc.F
-      !||    dxwall      ../starter/source/output/anim/dxwall.F
-      !||    dxwalp      ../starter/source/output/anim/dxwalp.F
-      !||    dxwals      ../starter/source/output/anim/dxwals.F
-      !||====================================================================
+!||====================================================================
+!||    dxyzsect    ../starter/source/output/anim/dxyzsect.F
+!||--- called by ------------------------------------------------------
+!||    genani1     ../starter/source/output/anim/genani1.F
+!||--- calls      -----------------------------------------------------
+!||    dxwalc      ../starter/source/output/anim/dxwalc.F
+!||    dxwall      ../starter/source/output/anim/dxwall.F
+!||    dxwalp      ../starter/source/output/anim/dxwalp.F
+!||    dxwals      ../starter/source/output/anim/dxwals.F
+!||====================================================================
       SUBROUTINE DXYZSECT (NSTRF,RWBUF,NPRW  ,X    , XMIN,
      2                     YMIN ,ZMIN ,XMAX ,YMAX  , ZMAX,
      3                     ITAB)
@@ -51,7 +51,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J, I, K, K0, K1, N, NSEG, N1, N2, N3, N4,MSR, ITYP
+      INTEGER I, K, K1, N, N1, N2, N3, N4, MSR, ITYP
       my_real
      .   XX1, YY1, ZZ1, XX2, YY2, ZZ2, XX3, YY3, ZZ3,
      .   XX4, YY4, ZZ4, D13, XXC, YYC, ZZC, AL4,XWL,YWL,ZWL,

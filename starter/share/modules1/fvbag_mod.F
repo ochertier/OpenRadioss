@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,26 +21,26 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
-      !||====================================================================
-      !||    fvbag_mod        ../starter/share/modules1/fvbag_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    applysort2fvm    ../starter/source/airbag/fvmesh0.F
-      !||    c_fvbag          ../starter/source/airbag/c_fvbag.F
-      !||    ddsplit          ../starter/source/restart/ddsplit/ddsplit.F
-      !||    fvbric           ../starter/source/airbag/fvbric.F
-      !||    fvdeal           ../starter/source/airbag/fvmesh.F
-      !||    fvdim            ../starter/source/airbag/fvmesh.F
-      !||    fvelinte         ../starter/source/airbag/fvelinte.F
-      !||    fvmesh0          ../starter/source/airbag/fvmesh0.F
-      !||    fvmesh1          ../starter/source/airbag/fvmesh.F
-      !||    fvnodbr          ../starter/source/airbag/fvmbag1.F
-      !||    fvwrestp         ../starter/source/restart/ddsplit/fvwrestp.F
-      !||    genani1          ../starter/source/output/anim/genani1.F
-      !||    hm_thgrki_vent   ../starter/source/output/th/hm_thgrki_vent.F
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||    name_fvbag       ../starter/source/output/th/hm_thgrki_vent.F
-      !||    w_front          ../starter/source/restart/ddsplit/w_front.F
-      !||====================================================================
+!||====================================================================
+!||    fvbag_mod        ../starter/share/modules1/fvbag_mod.F
+!||--- called by ------------------------------------------------------
+!||    applysort2fvm    ../starter/source/airbag/fvmesh0.F
+!||    c_fvbag          ../starter/source/airbag/c_fvbag.F
+!||    ddsplit          ../starter/source/restart/ddsplit/ddsplit.F
+!||    fvbric           ../starter/source/airbag/fvbric.F
+!||    fvdeal           ../starter/source/airbag/fvmesh.F
+!||    fvdim            ../starter/source/airbag/fvmesh.F
+!||    fvelinte         ../starter/source/airbag/fvelinte.F
+!||    fvmesh0          ../starter/source/airbag/fvmesh0.F
+!||    fvmesh1          ../starter/source/airbag/fvmesh.F
+!||    fvnodbr          ../starter/source/airbag/fvmbag1.F
+!||    fvwrestp         ../starter/source/restart/ddsplit/fvwrestp.F
+!||    genani1          ../starter/source/output/anim/genani1.F
+!||    hm_thgrki_vent   ../starter/source/output/th/hm_thgrki_vent.F
+!||    lectur           ../starter/source/starter/lectur.F
+!||    name_fvbag       ../starter/source/output/th/hm_thgrki_vent.F
+!||    w_front          ../starter/source/restart/ddsplit/w_front.F
+!||====================================================================
       MODULE FVBAG_MOD
 C-----------------------------------------------
 C   m y _ r e a l
@@ -63,7 +63,7 @@ C     Dispersion of pressure around mean pressure
 C------------------------------------------------
           my_real PDISP_OLD, PDISP
 C-------------------------------
-C Donnees briques intersectantes
+C Interesting brick data
 C-------------------------------
           INTEGER, DIMENSION(:,:), POINTER :: BRIC, TBRIC
           my_real,
@@ -75,7 +75,7 @@ C Dimensions
 C-----------
           INTEGER NNS, NNTR, LENP, NPOLY, LENH, NPOLH
 C----------------
-C Anim polyhedres
+C Anim polyhedra
 C----------------
           INTEGER NPOLH_ANIM, NNS_ANIM, ID
           INTEGER, DIMENSION(:), POINTER :: IFVPOLY_ANIM, IFVTADR_ANIM,
@@ -85,7 +85,7 @@ C----------------
           my_real
      .           , DIMENSION(:,:), POINTER :: NOD_ANIM
 C------------------------
-C Polygones et polyhedres
+C Polygons and polyhedra
 C------------------------
           INTEGER, DIMENSION(:), POINTER :: IFVPOLY, IFVTADR,
      .                                      IFVPOLH, IFVPADR, IDPOLH,
@@ -94,7 +94,7 @@ C------------------------
           my_real
      .           , DIMENSION(:,:), POINTER :: RFVNOD
 C------------------------
-C Variables volumes finis
+C Finite volume variables
 C------------------------
           my_real
      .           , DIMENSION(:), POINTER :: MPOLH,   EPOLH,   PPOLH,

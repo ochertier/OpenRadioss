@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lag_rwall     ../engine/source/tools/lagmul/lag_rwall.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult      ../engine/source/tools/lagmul/lag_mult.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lag_rwall     ../engine/source/tools/lagmul/lag_rwall.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult      ../engine/source/tools/lagmul/lag_mult.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LAG_RWALL(RWL     ,NSW     ,NSN     ,ITIED   ,MSR     ,
      2                     INDEX   ,X       ,V       ,A       ,IADLL   ,
      3                     LLL     ,JLL     ,SLL     ,XLL     ,COMNTAG ,
@@ -49,24 +49,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NC, NSN, ITIED, MSR, NDDIM, N_MUL_MX, NKMAX
+      INTEGER NC, NSN, ITIED, MSR, N_MUL_MX, NKMAX
       INTEGER NSW(*),INDEX(*),LLL(*),JLL(*),SLL(*),IADLL(*),COMNTAG(*)
       my_real
      .   X(*), V(*), A(*), RWL(*), XLL(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IK, J, JJ, K, N, N1, N2, N3, M1, M2, M3, NINDEX, 
+      INTEGER I, IK, J, N, N1, N2, N3, M1, M2, M3, NINDEX, 
      .   ICONT
       my_real 
      .   XWL, YWL, ZWL, VXW, VYW, VZW, VNW,
-     .   VX, VY, VZ, UX, UY, UZ, XC, YC, ZC, DP0, DP, DV
+     .   VX, VY, VZ, UX, UY, UZ, XC, YC, ZC, DP0, DP
 C-----------------------------------------------
-C        NC : nombre de condition cinematique 
-C        IC : numero de la condition cinematique (1,NC)
+C        NC: number of cinematic condition 
+C        ic: number of the kinematic condition (1,nc)
 C        IK : 
-C        I  : numero global du noeud (1,NUMNOD)
-C        J  : direction 1,2,3,4,5,6
+C        I  : global node number (1,NUMNOD)
+C        J ': direction 1,2,3,4,5,6
 C------
 C        IADLL(NC)        : IAD = IADLL(IC)
 C        IK = IAD,IAD+1,IAD+2,...
@@ -117,7 +117,7 @@ ctmp        VZ=V(N3)+A(N3)*DT12
         DP=XC*RWL(1)+YC*RWL(2)+ZC*RWL(3)
         IF(DP>ZERO) GOTO 20
         ICONT=1
-C---    test pour noeuds penetres
+C--- test for penetrated nodes
         XC=X(N1)-XWL
         YC=X(N2)-YWL
         ZC=X(N3)-ZWL

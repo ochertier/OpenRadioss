@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r3def3                ../engine/source/elements/spring/r3def3.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3                ../engine/source/elements/spring/rforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    table_interp          ../engine/source/tools/curve/table_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r3def3                ../engine/source/elements/spring/r3def3.F
+!||--- called by ------------------------------------------------------
+!||    rforc3                ../engine/source/elements/spring/rforc3.F
+!||--- calls      -----------------------------------------------------
+!||    redef3                ../engine/source/elements/spring/redef3.F90
+!||    table_interp          ../engine/source/tools/curve/table_tools.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    redef3_mod            ../engine/source/elements/spring/redef3.F90
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE R3DEF3( PYTHON,
      1   GEO,     F,       AL0,     E,
      2   DL,      NPF,     TF,      OFF,
@@ -52,6 +55,7 @@ C-----------------------------------------------
       USE TABLE_MOD
       USE INTERFACE_TABLE_MOD
       USE python_funct_mod
+      use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -107,7 +111,7 @@ C     REAL
      .     XL0(MVSIZ),DMN(MVSIZ),DMX(MVSIZ),
      .     DLOLD(MVSIZ),B(MVSIZ), D(MVSIZ), DV(MVSIZ),
      .     FF(MVSIZ),LSCALE(MVSIZ),EE(MVSIZ),
-     .     GF3(MVSIZ),FRIC(MVSIZ),XSCALF(MVSIZ),GX(MVSIZ),YSCALF(MVSIZ),
+     .     GF3(MVSIZ),FRIC(MVSIZ),XSCALF(MVSIZ),YSCALF(MVSIZ),
      .     F_MIN(MVSIZ),F_MAX(MVSIZ),EPLA(MVSIZ)
       my_real
      .     BETA, MU,FMAX, DDX ,VX21,VY21,VZ21,VL21,
@@ -213,7 +217,7 @@ C
       IF (SCODVER >= 101) THEN
         IF (TT == ZERO) THEN
           DO I=1,NEL
-            AL0_ERR(I)=ALDP(I)-AL0(I)     ! difference entre double et My_real
+            AL0_ERR(I)=ALDP(I)-AL0(I)     ! difference between double and my_real
           ENDDO
         ENDIF
       ENDIF
@@ -230,7 +234,7 @@ C
 !
       IF (SCODVER >= 101) THEN
         DO I=1,NEL
-          AL0DP(I)= AL0DP(I)+AL0_ERR(I)   ! AL_DP doit   tre recalcul   ainsi afin de garantir la coh  rence absolue entre AL0_DP et AL_DP
+          AL0DP(I)= AL0DP(I)+AL0_ERR(I)   ! Al_dp must be recalculated as well in order to guarantee the absolute coh rence between al0_dp and al_dp
         ENDDO
       ENDIF
 C
@@ -341,8 +345,8 @@ C
             FMAX  = MIN(FMAX,ABS(DFS(I)))
             DFS(I)= SIGN(FMAX,DFS(I))
             DF(I) = DFS(I)
-C         df=dfs pour compatibilite des restarts si fric=0 
-C         et dfs=ev(nb9) non existant avant 23f et ancien 23f
+C         df=dfs for restart compatibility if fric=0
+C         and DFS = EV (NB9) not existing before 23F and old 23F
           ELSE
             DF(I)= ZERO
           ENDIF ! IF (ITABF(I) > ZERO)

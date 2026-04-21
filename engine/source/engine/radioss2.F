@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,120 +20,129 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    radioss2                     ../engine/source/engine/radioss2.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss0                     ../engine/source/engine/radioss0.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                       ../engine/source/output/message/message.F
-      !||    arret                        ../engine/source/system/arret.F
-      !||    bcs0                         ../engine/source/constraints/general/bcs/bcs0.F
-      !||    build_msg                    ../common_source/tools/memory/my_alloc.F90
-      !||    cdk6bc3                      ../engine/source/elements/sh3n/coquedk6/cdk6bc3.F
-      !||    check_message_definition     ../common_source/modules/check_mod.F
-      !||    close_c                      ../common_source/tools/input_output/write_routtines.c
-      !||    condrmat                     ../engine/source/materials/mat/mat013/condrmat.F
-      !||    coqini                       ../engine/source/elements/shell/coqini.F
-      !||    cur_fil_c                    ../common_source/tools/input_output/write_routtines.c
-      !||    fvdeal                       ../engine/source/airbag/fvdeal.F
-      !||    get_file_name_info           ../engine/source/system/get_file_name_info.F
-      !||    hist1                        ../engine/source/output/th/hist1.F
-      !||    hist13                       ../engine/source/output/th/hist13.F
-      !||    ini_msg                      ../engine/source/output/message/ini_msg.F
-      !||    inicod                       ../engine/source/tools/univ/inicod.F
-      !||    iniconstant                  ../engine/source/system/iniconstant.F
-      !||    inipar                       ../engine/source/mpi/init/inipar.F
-      !||    iniresa                      ../engine/source/output/restart/rdresa.F
-      !||    init_dyn_lib_struc           ../engine/share/modules/dynlib_mod.F
-      !||    init_th0                     ../engine/source/output/th/init_th0.F
-      !||    initime                      ../engine/source/system/timer_mod.F90
-      !||    lecinp                       ../engine/source/input/lecinp.F
-      !||    lectur                       ../engine/source/input/lectur.F
-      !||    lf_convert_c_flat            ../engine/source/engine/lf_convert_c.c
-      !||    my_getpid                    ../engine/source/system/pid.c
-      !||    names_and_title_init         ../common_source/modules/names_and_titles_mod.F
-      !||    omp_get_thread_num           ../engine/source/engine/openmp_stub.F90
-      !||    open_c                       ../common_source/tools/input_output/write_routtines.c
-      !||    open_f_scratch_file          ../engine/source/system/open_tempfile.F
-      !||    printcenter                  ../engine/source/engine/radioss_title.F
-      !||    printcpu                     ../engine/source/system/timer.F
-      !||    qaopen                       ../common_source/qa/qa_out_mod.F
-      !||    r2r_input_init               ../engine/source/coupling/rad2rad/r2r_input_init.F
-      !||    radioss_title                ../engine/source/engine/radioss_title.F
-      !||    rdresa                       ../engine/source/output/restart/rdresa.F
-      !||    rdresb                       ../engine/source/output/restart/rdresb.F
-      !||    read_c_c                     ../common_source/tools/input_output/write_routtines.c
-      !||    resol_head                   ../engine/source/engine/resol_head.F
-      !||    restalloc                    ../engine/source/output/restart/arralloc.F
-      !||    setignorecore                ../engine/source/system/traceback_handler.c
-      !||    solver_stacksize             ../common_source/comm/stacksize.cpp
-      !||    spmd_allreduce_db            ../engine/source/mpi/generic/spmd_allreduce_db.F
-      !||    spmd_allreduce_int           ../engine/source/mpi/generic/spmd_allreduce_db.F
-      !||    spmd_reduce_db               ../engine/source/mpi/generic/spmd_reduce_db.F
-      !||    spmd_rst_check               ../engine/source/mpi/init/spmd_rst_check.F
-      !||    stack_ply_alloc              ../engine/share/modules/stack_mod.F
-      !||    switch_to_dtnoda             ../engine/source/time_step/switch_to_dtnoda.F
-      !||    table_zero                   ../engine/source/tools/curve/table_tools.F
-      !||    th_clean                     ../common_source/modules/output/time_history_mod.F
-      !||    trace_in                     ../engine/source/system/trace_back.F
-      !||    trace_out                    ../engine/source/system/trace_back.F
-      !||    uaccess_dum                  ../engine/source/user_interface/uaccess.F
-      !||    ufunc_dum                    ../engine/source/user_interface/ufunc.F
-      !||    upidmid_dum                  ../engine/source/user_interface/upidmid.F
-      !||    usensor_dum                  ../engine/source/user_interface/usensor.F
-      !||    user_windows_clean           ../common_source/modules/user_windows_mod.F
-      !||    usrplas_dum                  ../engine/source/user_interface/usrplas.F
-      !||    utable_dum                   ../engine/source/user_interface/utable.F
-      !||    write_tpl_file               ../engine/source/implicit/imp_solv.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    ale_mod                      ../common_source/modules/ale/ale_mod.F
-      !||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
-      !||    alemuscl_mod                 ../common_source/modules/ale/alemuscl_mod.F
-      !||    check_mod                    ../common_source/modules/check_mod.F
-      !||    connectivity_mod             ../common_source/modules/connectivity.F90
-      !||    diffusion_mod                ../engine/share/modules/diffusion_mod.F
-      !||    drape_mod                    ../engine/share/modules/drape_mod.F
-      !||    dsgraph_mod                  ../engine/share/modules/dsgraph_mod.F
-      !||    dt_mod                       ../engine/source/modules/dt_mod.F
-      !||    dynlib_mod                   ../engine/share/modules/dynlib_mod.F
-      !||    ebcs_mod                     ../common_source/modules/boundary_conditions/ebcs_mod.F90
-      !||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    group_mod                    ../engine/share/modules/group_mod.F
-      !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
-      !||    inoutfile_mod                ../common_source/modules/inoutfile_mod.F
-      !||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
-      !||    linear_solver_mod            ../engine/share/modules/linear_solver_mod.F
-      !||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mds_restart_mod              ../common_source/modules/mds_rest.mod.F
-      !||    message_mod                  ../engine/share/message_module/message_mod.F
-      !||    monvol_struct_mod            ../engine/share/modules/monvol_struct_mod.F
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
-      !||    nodal_arrays_mod             ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||    output_mod                   ../common_source/modules/output/output_mod.F90
-      !||    pinchtype_mod                ../common_source/modules/pinchtype_mod.F
-      !||    python_funct_mod             ../common_source/modules/python_mod.F90
-      !||    qa_out_mod                   ../common_source/qa/qa_out_mod.F
-      !||    rad2r_mod                    ../engine/share/modules/rad2r.F
-      !||    rbe3_mod                     ../common_source/modules/constraints/rbe3_mod.F90
-      !||    rbody_mod                    ../engine/share/modules/rbody_mod.F
-      !||    restmod                      ../engine/share/modules/restart_mod.F
-      !||    scratchfile_mod              ../engine/share/modules/scratchfiles_mod.F
-      !||    segvar_mod                   ../engine/share/modules/segvar_mod.F
-      !||    sensor_mod                   ../common_source/modules/sensor_mod.F90
-      !||    skew_mod                     ../common_source/modules/skew_mod.F90
-      !||    soltosph_mod                 ../engine/share/modules/soltosph_mod.F
-      !||    stack_mod                    ../engine/share/modules/stack_mod.F
-      !||    state_mod                    ../common_source/modules/state_mod.F
-      !||    table_glob_mod               ../engine/share/modules/table_glob_mod.F
-      !||    time_history_mod             ../common_source/modules/output/time_history_mod.F
-      !||    time_mod                     ../engine/share/modules/time_mod.F
-      !||    timer_mod                    ../engine/source/system/timer_mod.F90
-      !||    unitab_mod                   ../common_source/modules/unitab_mod.F
-      !||    user_interface_mod           ../engine/source/modules/user_interface_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    radioss2                     ../engine/source/engine/radioss2.F
+!||--- called by ------------------------------------------------------
+!||    radioss0                     ../engine/source/engine/radioss0.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                       ../engine/source/output/message/message.F
+!||    arret                        ../engine/source/system/arret.F
+!||    bcs0                         ../engine/source/constraints/general/bcs/bcs0.F
+!||    build_msg                    ../common_source/tools/memory/my_alloc.F90
+!||    cdk6bc3                      ../engine/source/elements/sh3n/coquedk6/cdk6bc3.F
+!||    check_message_definition     ../common_source/modules/check_mod.F
+!||    close_c                      ../common_source/tools/input_output/write_routines.c
+!||    condrmat                     ../engine/source/materials/mat/mat013/condrmat.F
+!||    coqini                       ../engine/source/elements/shell/coqini.F
+!||    cur_fil_c                    ../common_source/tools/input_output/write_routines.c
+!||    fvdeal                       ../engine/source/airbag/fvdeal.F
+!||    get_file_name_info           ../engine/source/system/get_file_name_info.F
+!||    hist1                        ../engine/source/output/th/hist1.F
+!||    hist13                       ../engine/source/output/th/hist13.F
+!||    ini_msg                      ../engine/source/output/message/ini_msg.F
+!||    inicod                       ../engine/source/tools/univ/inicod.F
+!||    iniconstant                  ../engine/source/system/iniconstant.F
+!||    inipar                       ../engine/source/mpi/init/inipar.F
+!||    iniresa                      ../engine/source/output/restart/rdresa.F
+!||    init_dyn_lib_struc           ../engine/share/modules/dynlib_mod.F
+!||    init_h3d_engine              ../engine/source/output/h3d/h3d_build_fortran/init_h3d_engine.F90
+!||    init_th0                     ../engine/source/output/th/init_th0.F
+!||    initime                      ../engine/source/system/timer_mod.F90
+!||    lecinp                       ../engine/source/input/lecinp.F
+!||    lectur                       ../engine/source/input/lectur.F
+!||    lf_convert_c_flat            ../engine/source/engine/lf_convert_c.c
+!||    my_getpid                    ../engine/source/system/pid.c
+!||    names_and_title_init         ../common_source/modules/names_and_titles_mod.F
+!||    omp_get_thread_num           ../engine/source/engine/openmp_stub.F90
+!||    open_c                       ../common_source/tools/input_output/write_routines.c
+!||    open_f_scratch_file          ../engine/source/system/open_tempfile.F
+!||    printcenter                  ../engine/source/engine/radioss_title.F
+!||    printcpu                     ../engine/source/system/timer.F
+!||    qaopen                       ../common_source/qa/qa_out_mod.F
+!||    r2r_input_init               ../engine/source/coupling/rad2rad/r2r_input_init.F
+!||    radioss_title                ../engine/source/engine/radioss_title.F
+!||    rdresa                       ../engine/source/output/restart/rdresa.F
+!||    rdresb                       ../engine/source/output/restart/rdresb.F
+!||    read_c_c                     ../common_source/tools/input_output/write_routines.c
+!||    resol_head                   ../engine/source/engine/resol_head.F
+!||    restalloc                    ../engine/source/output/restart/arralloc.F
+!||    setignorecore                ../engine/source/system/traceback_handler.c
+!||    solver_stacksize             ../common_source/comm/stacksize.cpp
+!||    spmd_reduce_db               ../engine/source/mpi/generic/spmd_reduce_db.F
+!||    spmd_rst_check               ../engine/source/mpi/init/spmd_rst_check.F
+!||    stack_ply_alloc              ../engine/share/modules/stack_mod.F
+!||    switch_to_dtnoda             ../engine/source/time_step/switch_to_dtnoda.F
+!||    table_zero                   ../engine/source/tools/curve/table_tools.F
+!||    th_clean                     ../common_source/modules/output/time_history_mod.F
+!||    trace_in                     ../engine/source/system/trace_back.F
+!||    trace_out                    ../engine/source/system/trace_back.F
+!||    uaccess_dum                  ../engine/source/user_interface/uaccess.F
+!||    ufunc_dum                    ../engine/source/user_interface/ufunc.F
+!||    upidmid_dum                  ../engine/source/user_interface/upidmid.F
+!||    usensor_dum                  ../engine/source/user_interface/usensor.F
+!||    user_windows_clean           ../common_source/modules/user_windows_mod.F
+!||    usrplas_dum                  ../engine/source/user_interface/usrplas.F
+!||    utable_dum                   ../engine/source/user_interface/utable.F
+!||    write_tpl_file               ../engine/source/implicit/imp_solv.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
+!||    ale_mod                      ../common_source/modules/ale/ale_mod.F
+!||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
+!||    alemuscl_mod                 ../common_source/modules/ale/alemuscl_mod.F
+!||    anim_mod                     ../common_source/modules/output/anim_mod.F90
+!||    check_mod                    ../common_source/modules/check_mod.F
+!||    checksum_output_option_mod   ../common_source/modules/output/checksum_mod.F90
+!||    connectivity_mod             ../common_source/modules/connectivity.F90
+!||    coupling_adapter_mod         ../engine/source/coupling/coupling_adapter.F90
+!||    diffusion_mod                ../engine/share/modules/diffusion_mod.F
+!||    drape_mod                    ../engine/share/modules/drape_mod.F
+!||    dsgraph_mod                  ../engine/share/modules/dsgraph_mod.F
+!||    dt_mod                       ../engine/source/modules/dt_mod.F
+!||    dynlib_mod                   ../engine/share/modules/dynlib_mod.F
+!||    ebcs_mod                     ../common_source/modules/boundary_conditions/ebcs_mod.F90
+!||    file_descriptor_mod          ../engine/source/modules/file_descriptor_mod.F90
+!||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    group_mod                    ../engine/share/modules/group_mod.F
+!||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
+!||    h3d_mod                      ../engine/share/modules/h3d_mod.F
+!||    init_h3d_engine_mod          ../engine/source/output/h3d/h3d_build_fortran/init_h3d_engine.F90
+!||    inoutfile_mod                ../common_source/modules/inoutfile_mod.F
+!||    interfaces_mod               ../common_source/modules/interfaces/interfaces_mod.F90
+!||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
+!||    linear_solver_mod            ../engine/share/modules/linear_solver_mod.F
+!||    loads_mod                    ../common_source/modules/loads/loads_mod.F90
+!||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    mds_restart_mod              ../common_source/modules/mds_rest.mod.F
+!||    message_mod                  ../engine/share/message_module/message_mod.F
+!||    monvol_struct_mod            ../engine/share/modules/monvol_struct_mod.F
+!||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+!||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
+!||    nodal_arrays_mod             ../common_source/modules/nodal_arrays.F90
+!||    output_mod                   ../common_source/modules/output/output_mod.F90
+!||    pblast_mod                   ../common_source/modules/loads/pblast_mod.F90
+!||    pinchtype_mod                ../common_source/modules/pinchtype_mod.F
+!||    python_funct_mod             ../common_source/modules/python_mod.F90
+!||    qa_out_mod                   ../common_source/qa/qa_out_mod.F
+!||    rad2r_mod                    ../engine/share/modules/rad2r.F
+!||    rbe3_mod                     ../common_source/modules/constraints/rbe3_mod.F90
+!||    restmod                      ../engine/share/modules/restart_mod.F
+!||    rwall_mod                    ../common_source/modules/constraints/rwall_mod.F90
+!||    scratchfile_mod              ../engine/share/modules/scratchfiles_mod.F
+!||    segvar_mod                   ../engine/share/modules/segvar_mod.F
+!||    sensor_mod                   ../common_source/modules/sensor_mod.F90
+!||    sfem_mod                     ../common_source/modules/elements/sfem_mod.F90
+!||    skew_mod                     ../common_source/modules/skew_mod.F90
+!||    soltosph_mod                 ../engine/share/modules/soltosph_mod.F
+!||    spmd_mod                     ../engine/source/mpi/spmd_mod.F90
+!||    stack_mod                    ../engine/share/modules/stack_mod.F
+!||    state_mod                    ../common_source/modules/state_mod.F
+!||    table_glob_mod               ../engine/share/modules/table_glob_mod.F
+!||    time_history_mod             ../common_source/modules/output/time_history_mod.F
+!||    time_mod                     ../engine/share/modules/time_mod.F
+!||    timer_mod                    ../engine/source/system/timer_mod.F90
+!||    unitab_mod                   ../common_source/modules/unitab_mod.F
+!||    user_interface_mod           ../engine/source/modules/user_interface_mod.F90
+!||====================================================================
       SUBROUTINE RADIOSS2(IDATA,MIDATA,RDATA,MRDATA) 
 C-----------------------------------------------
 C   M o d u l e s
@@ -162,19 +171,18 @@ C-----------------------------------------------
       USE DYNLIB_MOD
       USE MONVOL_STRUCT_MOD
       USE DRAPE_MOD
-      USE RBODY_MOD
       USE SENSOR_MOD
       USE EBCS_MOD
       USE DIFFUSION_MOD
       USE LINEAR_SOLVER_MOD
-      USE MDS_RESTART_MOD
+      USE MDS_RESTART_MOD , ONLY : MDS_LABEL,MDS_MATID,MDS_FILES,MDS_NDEPSVAR,MDS_NMAT
       USE SEGVAR_MOD
       USE SCRATCHFILE_MOD
       USE STATE_MOD
       USE ALEMUSCL_MOD , only:ALEMUSCL_Param
       USE USER_INTERFACE_MOD
       USE ALE_MOD
-      USE OUTPUT_MOD , ONLY : OUTPUT_, WFEXT, WFEXT_MD
+      USE OUTPUT_MOD , ONLY : OUTPUT_, OUTPUT_PTR
       USE INTERFACES_MOD
       USE DT_MOD
       USE LOADS_MOD
@@ -188,6 +196,14 @@ C-----------------------------------------------
       use nodal_arrays_mod
       use rbe3_mod
       USE TIME_HISTORY_MOD , only : TH_CLEAN
+      USE SPMD_MOD
+      use checksum_output_option_mod
+      use file_descriptor_mod,only : fd_bin_th,fd_bin_rd_rst,fd_bin_wr_rst           ! Contains the file descriptors for all files / same as unit_c.inc
+      use coupling_adapter_mod
+      USE ANIM_MOD
+      use rwall_mod
+      use sfem_mod
+      use init_h3d_engine_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -224,6 +240,7 @@ C-----------------------------------------------
 #include      "scr_fac_c.inc"
 #include      "chara_c.inc"
 #include      "task_c.inc"
+#include      "spmd_c.inc"
 #include      "warn_c.inc"
 #include      "parit_c.inc"
 #include      "titr_c.inc"
@@ -249,15 +266,15 @@ C-----------------------------------------------
       INTEGER ITASK, ITID(PARASIZ), NBTASK(PARASIZ+1),
      .        IFILNAM(2148), IFILNAM_TMP(2148)
       INTEGER ITSTV1, IEXPM, IRUNN, IRFL, IRFE, IRR, IT, JT, I,
-     .        NPRELD, NPTS,NNODES,N,LEN, IOS,
+     .        NNODES,N,LEN, IOS,
      .        I13A,I13B,I13C,I13D,I13E,I13F,I13G,I13H,I76A,I88A,I89A,
      .        I40A,I40B,I40G,I78N,IO_ERR,LEN_G,LEN_M, IAD1, IAD2, IAD3,
      .        IUN,IFUN, ITH, I76ATH(9), IFIL, IO_ERRL,
      .        RADIOSSV,RADFLEXV,RDFLEXCOMP,ABFV,ABFCOMP,IFILABF,
      .        NB_OF_FILES,N_FAIL,IP,IRUNN_BIS,IFILTITL
       INTEGER OMP_GET_THREAD_NUM,LONG,LONG_TMP,
-     .        LENV,FVERS,LFNAME,NB_INDEX_ABF
-      CHARACTER FILNAM*100, VERSDP*36,CHRUNM1*2, INPUTNAM*100,
+     .        LENV,FVERS,LFNAME,NB_INDEX_ABF,NINTERSKID
+      CHARACTER FILNAM*100, CHRUNM1*2, INPUTNAM*100,
      .          CHR_OLD*2,FNAME*2048,IOFF1*3,IOFF2*3,IOFF3*3
       CHARACTER*2048 INAME
       CHARACTER*4 PROCNAM,CHRU_M1
@@ -278,21 +295,19 @@ C-----------------------------------------------
       INTEGER ICH,MSGID
 C Madymo Stuff
       INTEGER IERROR,MADSTRLEN
-      CHARACTER MAD_OPTION_STRING*256,RMAD_OPTION_STRING*256
+      CHARACTER MAD_OPTION_STRING*256
       INTEGER KMADPRT,KMADSH4,KMADSH3,KMADSOL,KMADNOD,KMADFAIL,K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,K11
-      INTEGER BUFTEST(100),NB_MAN,NB_MAN_TOT,TOPINT,FLAG_MAIN,J, ILAW51,ILAW37,ILAW20
+      INTEGER BUFTEST(100),NB_MAN,FLAG_MAIN,J, ILAW51,ILAW37,ILAW20
 
-      my_real, DIMENSION(:), ALLOCATABLE :: MCP,TEMP
       my_real, DIMENSION(:),ALLOCATABLE :: FORNEQS
       TYPE(PRGRAPH), DIMENSION(:), ALLOCATABLE :: GRAPHE
       INTEGER, DIMENSION(:), ALLOCATABLE :: IFLOW
-      CHARACTER*128 MESS1,MESS2,MESS3
       my_real, DIMENSION(:), ALLOCATABLE :: RFLOW
       my_real RNB_INDEX_ABF,RMAXINT
       SAVE ITASK, IRFE, ITID
       SAVE IXDP
       INTEGER MLN,IMID,MMALE,IFAILURE_NXT,FLAG_CST_AMS
-      INTEGER  IPPID ,IPMAT,NPT, IPMAT_IPLY ,IPANG,IPTHK  ,IPPOS,IS,IPT
+      INTEGER  IPPID ,IPMAT, IPMAT_IPLY ,IPANG,IPTHK  ,IPPOS,IS,IPT
 
       TYPE (STACK_PLY) :: STACK
       TYPE (MULTI_FVM_STRUCT) :: MULTI_FVM
@@ -339,11 +354,14 @@ C MDS Table
       TYPE(t_segvar) :: SEGVAR
 C----------------------------------------------------------------------------------
       TYPE(NAMES_AND_TITLES_) :: NAMES_AND_TITLES  !< NAMES_AND_TITLES host the input deck names and titles for outputs
-      TYPE(UNIT_TYPE_) :: UNITAB !< units conversion
+      TYPE(UNIT_TYPE_) :: UNITAB !<Units Conversion
       TYPE(connectivity_) :: element 
       TYPE(nodal_arrays_), target :: nodes 
       TYPE(timer_) :: TIMERS
       TYPE(rbe3_) :: rbe3
+      TYPE(coupling_type) :: coupling
+      TYPE(rwall_) :: rwall
+      TYPE(sfem_)  :: sfem
 C------------------------------------------------------------------
 C to build a IBM PARALLEL version
 C In starter : define install parameter nspmd 
@@ -357,6 +375,7 @@ C------------------------------------------------
 C     Init Timer (from beginning of radioss2 (reading timer)
 C------------------------------------------------    
       ISTDO=6
+      coupling%active = .false.
       CALL INI_MSG()
       CALL BUILD_MSG()
     
@@ -391,10 +410,11 @@ C                                   IF RELEASE WAS BUILT FROM SOURCE
       ABOUT = 0
 
       !External Foce Work
-      OUTPUT%WFEXT = 0.0D0
-      OUTPUT%WFEXT_MD = 0.0D0
-      WFEXT => OUTPUT%WFEXT
-      WFEXT_MD => OUTPUT%WFEXT_MD
+      OUTPUT%TH%WFEXT = 0.0D0
+      OUTPUT%TH%WFEXT_MD = 0.0D0
+
+      OUTPUT%CHECKSUM%CHECKSUM_COUNT = 0
+      output_ptr => OUTPUT
 
 #include      "machine2.inc"
       
@@ -583,7 +603,7 @@ c
         IF(OUTFILE_BOOL) BOOL_C = 1
 
         CALL LF_CONVERT_C_FLAT(GOT_INPUT,ROOTN,LENROOTN,FNAME,LFNAME,
-     .                         INAME, IERR,1024,LEN_TMP_NAME,TMP_NAME,
+     .                         INAME, IERR,65536,LEN_TMP_NAME,TMP_NAME,
      .                         LEN_TMP_NAME2,TMP_NAME2)
 
         IF (IERR == 0) THEN
@@ -608,10 +628,13 @@ C--------------------------------------------------
 C Get Hardware characteristics before init // (system incompatible with infiniband)
       CALL PRINTCPU(1)
 C Init NTHREAD(=NPROC) tasks
-      CALL INIPAR(ITID,1,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
+      coupling%FILNAM=ROOTN(1:LENROOTN)//'.cpl'
+      CALL INIPAR(coupling,ITID,1,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
 C KMP_STACKSIZE/OMP_STACKSIZE Environment variable check
       CALL SOLVER_STACKSIZE()
 C--------------------------------------------------
+C some initializations to be done after INIPAR
+
       HELAS=HALF
       HVISC=HALF
       HVLIN=ZERO
@@ -643,7 +666,9 @@ C     Standard input reading
 C------------------------------------------------
       CALL LECINP(IRUNN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
      .            SENSORS,DT,OUTPUT,GLOB_THERM)
-      NFSKYI=5
+
+       NFSKYI=5
+
       IF(KDTINT==0 )NFSKYI=4
       
       IF (GOT_INPUT==0)THEN
@@ -754,7 +779,7 @@ C       Create info, hist, monitor, progress and tpl files for writing implicit 
             TMP_NAME=OUTFILE_NAME(1:OUTFILE_NAME_LEN)//FILNAM(1:ROOTLEN+9)
             INPUTNAM='CHECK_DATA'
             OPEN(UNIT=IOUT,FILE=TMP_NAME(1:LEN_TMP_NAME),ACCESS='SEQUENTIAL',FORM='FORMATTED',STATUS='UNKNOWN')
-
+            OUTPUT%OUT_FILENAME(1:LEN_TMP_NAME)=TMP_NAME(1:LEN_TMP_NAME)
              IO_ERRL=0
             DO WHILE (IO_ERRL>=0)
               READ(IOUT,'(A)',END = 1000,IOSTAT=IO_ERRL)LINE
@@ -786,6 +811,7 @@ C       Create info, hist, monitor, progress and tpl files for writing implicit 
      .       ACCESS='SEQUENTIAL',
      .       FORM='FORMATTED',STATUS='UNKNOWN')
 C
+           OUTPUT%OUT_FILENAME(1:LEN_TMP_NAME)=TMP_NAME(1:LEN_TMP_NAME)
            WRITE(IOUT,'(1X,A)')FILNAM(1:ROOTLEN+9)
          ENDIF
          WRITE(CHRU_M1,'(I4.4)')IRUNN-1
@@ -817,7 +843,8 @@ C
       DO I=1,LEN_TMP_NAME
         IFILNAM(I)=ICHAR(TMP_NAME(I:I))
       END DO
-      CALL CUR_FIL_C(0)
+      IFIL = fd_bin_rd_rst                 ! Parameter for binary file reading
+      CALL CUR_FIL_C(IFIL)
       CALL OPEN_C(IFILNAM,LEN_TMP_NAME,1)
       CALL READ_C_C(IFILNAM,LEN)
       DO I=1,LEN
@@ -840,11 +867,11 @@ C------------------------------------------------------------------
 C------------------------------------------------
 C     .rst file reading 1
 C------------------------------------------------
-      CALL RDRESA(ITSTV1 ,LHEADER ,LVARINT ,LVARREA ,PRADIOS ,
+      CALL RDRESA(output,ITSTV1 ,LHEADER ,LVARINT ,LVARREA ,PRADIOS ,
      .            PRESFIL, MULTI_FVM, H3D_DATA,
      .            PINCH_DATA,DYNAIN_DATA,INTERFACES,SENSORS,LOADS,
      .            MAT_ELEM,NAMES_AND_TITLES,SKEWS ,GLOB_THERM,PBLAST,
-     .            RBE3)
+     .            RBE3,RWALL,SFEM)
 
 C------------------------------------------------
 C     Test of .rst file compatibility
@@ -871,10 +898,11 @@ C      IF(ISPMD==0) CALL XTIME0(NNODES)
 C      CALL TRACE_OUT(19)
 
 
-      CALL INIPAR(ITID,3,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
+      CALL INIPAR(coupling,ITID,3,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
 
       IF(NSPMD > 1 ) THEN
-        CALL SPMD_ALLREDUCE_INT(GLOB_THERM%NFXFLUX,NFXFLUX_GLOB,1,"SUM ")
+        !CALL SPMD_ALLREDUCE_INT(GLOB_THERM%NFXFLUX,NFXFLUX_GLOB,1,"SUM ")
+        CALL SPMD_ALLREDUCE(GLOB_THERM%NFXFLUX,NFXFLUX_GLOB,1,SPMD_SUM)
       ELSE
         NFXFLUX_GLOB = GLOB_THERM%NFXFLUX
       ENDIF
@@ -888,7 +916,7 @@ C      CALL TRACE_OUT(19)
 
       CALL TRACE_IN(17,1,ZERO)
 C end init rdresa after call xtime0
-      CALL INIRESA(H3D_DATA,PINCH_DATA,GLOB_THERM)
+      CALL INIRESA(OUTPUT,H3D_DATA,PINCH_DATA,GLOB_THERM)
       CALL TRACE_OUT(17)
 
 
@@ -945,14 +973,14 @@ C
       CALL ALE_CONNECTIVITY%ALE_CONNECTIVITY_INIT()
 
       ! Most of arrays from Restart
-      CALL RESTALLOC(ELEMENT,NODES,MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS,
-     *               GLOB_THERM,RBE3)
+      CALL RESTALLOC(OUTPUT,ELEMENT,NODES,MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS,
+     *               GLOB_THERM,RBE3,RWALL,SFEM)
 
       ! Initialization
       IGEO = 0
       IPM = 0
 
-      ! IAF,AF : Fluid, noise
+      ! IAF, AF: Fluid, Noise
       IF(IFIF>0)ALLOCATE (IAF(IFIF),STAT=IADIF)
       IF(MFIF>0)ALLOCATE (AF(MFIF),STAT=IADRF)
       IF(IADRF/=0.OR.IADIF/=0)THEN
@@ -976,7 +1004,7 @@ C
         ALLOCATE(TABLE(0))
       END IF
 
-      IF (IMACH==3) NSPROC=1
+      NSPROC=1
       ALLOCATE(GRAPHE(0))
 
       !NFLOW
@@ -987,11 +1015,11 @@ C
       ENDIF
 
       ! Heat Transfer
-      IF (GLOB_THERM%ITHERM_FE > 0   ) THEN
-        ALLOCATE(MCP(NUMNOD),TEMP(NUMNOD))
-      ELSE
-         ALLOCATE(MCP(0),TEMP(0))
-      ENDIF
+!     IF (GLOB_THERM%ITHERM_FE > 0   ) THEN
+!       ALLOCATE(NODES%MCP(NUMNOD),NODES%TEMP(NUMNOD))
+!     ELSE
+!        ALLOCATE(NODES%MCP(0),NODES%TEMP(0))
+!     ENDIF
 
       ! Nitsche Method : Equivalent Nodal Force allocation
       IF(NITSCHE > 0   ) THEN
@@ -1031,15 +1059,17 @@ C
      .            SENSORS        ,EBCS_TAB   ,DYNAIN_DATA   ,USER_WINDOWS     ,OUTPUT    ,
      .            INTERFACES     ,LOADS      ,MAT_ELEM      ,PYTHON           ,IFLOW     ,
      .            SKEWS          ,RFLOW      ,LIFLOW        ,LRFLOW           ,IMPL_S0   ,
-     .            MCP            ,TEMP       ,FORNEQS       ,UNITAB,
+     .            FORNEQS       ,UNITAB,
      .            STACK          ,DRAPE_SH4N ,DRAPE_SH3N    ,DRAPEG           ,NDRAPE ,
-     .            GLOB_THERM     ,PBLAST     ,ELEMENT       ,NODES            ,RBE3)
+     .            GLOB_THERM     ,PBLAST     ,ELEMENT       ,NODES            ,RBE3     ,
+     .            RWALL          ,SFEM      )
       ! Close restart file
        CALL CLOSE_C
+ 
        ! --------------------------------------------------------------------------------------------
       IF (NSPMD > 1)  CALL SPMD_RST_CHECK()
 c----------
-      IF (IMACH==3) NSPROC=1
+      NSPROC=1
 C----------
       ALLOCATE(DMSPH(SDMSPH),STAT=IERR)
       IF (IERR/=0)THEN
@@ -1080,11 +1110,11 @@ C--------------------------------------------
          IF (MLN==20) ILAW20=1 
       ENDDO
       !----------------------------------!
-      !  Updating contour output request !
+      !  Updating output output Request!
       !  according multimaterial law type!
       !  and usage                       !
       !----------------------------------!      
-      !COMMUN LAW51/LAW37
+      !Common Law 51/Law 37
       !Removing /ANIM/ELEM/VFRAC if no multimaterial law
       IF(MMALE==0)THEN  
         DO I=283,286
@@ -1144,9 +1174,11 @@ C--------------------------------------------
         !/ANIM/VECT/ZFINT  not relevant in this case 
         NV_ANI     = NV_ANI - ANIM_V(25)
         ANIM_V(25) = 0                                    
-      ENDIF     
+      ENDIF  
+      
+      NN_ANI = NN_ANI + OUTPUT%CHECKSUM%CHECKSUM_COUNT   
 
-      !COMMUN LAW51/LAW37
+      !Common Law 51/Law 37
       !if multimaterial law then removing useless phases output (phases 3 or/and 4)
       IF(MMALE==1)THEN     
           IF(N2D==0)THEN 
@@ -1289,10 +1321,10 @@ C--------------------------------------------
 C--------------------------------------------
       IF (NSPMD > 1)  THEN
         PREVIOUS_RUN = GLOBAL_COMP_TIME%RUN_NBR-1
-        CALL SPMD_ALLREDUCE_DB(GLOBAL_COMP_TIME%STARTER_TIME,LOCAL_STARTER_TIME,1,"MAX ")
+        CALL SPMD_ALLREDUCE(GLOBAL_COMP_TIME%STARTER_TIME,LOCAL_STARTER_TIME,1,SPMD_MAX)
         GLOBAL_COMP_TIME%STARTER_TIME = LOCAL_STARTER_TIME
         IF(PREVIOUS_RUN>0) THEN
-            CALL SPMD_ALLREDUCE_DB(GLOBAL_COMP_TIME%ENGINE_TIME(PREVIOUS_RUN),LOCAL_ENGINE_TIME,1,"MAX ")
+            CALL SPMD_ALLREDUCE(GLOBAL_COMP_TIME%ENGINE_TIME(PREVIOUS_RUN),LOCAL_ENGINE_TIME,1,SPMD_MAX)
             GLOBAL_COMP_TIME%ENGINE_TIME(PREVIOUS_RUN) = LOCAL_ENGINE_TIME
         ENDIF
       ENDIF
@@ -1412,15 +1444,7 @@ C-----------------------------------------------------
      .                    NODES%MS       ,NODES%IN       ,NODES%ITAB     ,IGEO     ,IPM    ,
      .                    BUFMAT   ,IPART    ,IGRNOD   ,IGRPART)
       END IF
-C------------------------------------------------
-C     initializations MDS
-C------------------------------------------------
-      IF(.NOT.ALLOCATED(MDS_LABEL)) THEN
-        ALLOCATE( MDS_LABEL(1024,MDS_NMAT) )
-      ENDIF
-      IF(.NOT.ALLOCATED(MDS_NDEPSVAR)) THEN
-        ALLOCATE( MDS_NDEPSVAR(MDS_NMAT) )
-      ENDIF
+C-----------------------------------------------------
       MAX_DEPVAR = 0
 #ifdef DNC
       IF(MDS_AVAIL==1) THEN
@@ -1433,11 +1457,14 @@ C------------------------------------------------
            MAX_DEPVAR=MAX(MAX_DEPVAR,MDS_NDEPSVAR(I) )
         ENDDO
         ALLOCATE (MDS_OUTPUT_TABLE(MDS_NMAT*MAX_DEPVAR) ) 
-
-        CALL MDS_ENGINE_USER_INITIALIZE(NSPMD_USER,NTASK_USER,ISPMD_USER,TSTOP,
-     *                                  MDS_NMAT,MDS_MATID,MDS_FILES,MDS_LABEL,MDS_NDEPSVAR,MAX_DEPVAR,MDS_OUTPUT_TABLE)
       ENDIF
 #endif
+      IF(.NOT.ALLOCATED(MDS_LABEL)) THEN
+        ALLOCATE( MDS_LABEL(1024,MDS_NMAT) )
+      ENDIF
+      IF(.NOT.ALLOCATED(MDS_NDEPSVAR)) THEN
+        ALLOCATE( MDS_NDEPSVAR(MDS_NMAT) )
+      ENDIF
       IF(.NOT.ALLOCATED(MDS_OUTPUT_TABLE) ) THEN
         ALLOCATE (MDS_OUTPUT_TABLE(MDS_NMAT*MAX_DEPVAR) ) 
       ENDIF
@@ -1445,25 +1472,25 @@ C------------------------------------------------
 C     engine file reading
 C------------------------------------------------
       CALL TRACE_IN(16,2,ZERO)
-      CALL LECTUR(  NODES%ICODE ,  NODES%ISKEW ,  ISKWN ,  IXTG  ,   IXS ,
-     2              IXQ ,    ELEMENT%SHELL%IXC ,    IXT ,    IXP ,     IXR ,
+      CALL LECTUR(  NODES%ICODE ,  NODES%ISKEW ,  ISKWN ,  IXTG  ,   IXS  ,
+     2              IXQ ,    ELEMENT%SHELL%IXC ,    IXT ,    IXP ,   IXR  ,
      3              NODES%ITAB ,   NODES%ITABM1  ,NPC,     IPARG,    IGRV ,
      4              LGRAV   ,IPARI,
      5              NPBY ,   LPBY    ,ILINK,   LLINK  ,LINALE ,
      6              NEFLSW , NNFLSW , ICUT ,   IAF(IF01),
      7              NODES%X  ,NODES%V,  NODES%VR, NODES%MS   ,NODES%IN  ,
      8              SKEWS%SKEW  ,TF       ,RBY  ,
-     9              WA  ,CRFLSW  ,XCUT  ,ANIN  ,DAMPR  ,
+     9              WA  ,CRFLSW  ,XCUT  ,DAMPR  ,
      A              IGRNOD ,KXSP,NODES%WEIGHT ,FR_RBY2 ,FR_RL,
      B              PARTSAV,IPART,PM,
      C              MONVOL ,VOLMON, IPART_STATE,GEO,TABLE,
      D              IFRAME,XFRAME,MAT_ELEM%ELBUF,IGEO,INTERFACES%INTBUF_TAB,
      E              IPM   ,H3D_DATA, MULTI_FVM,
-     F              IGRPART,TAG_SKINS6,ICFIELD,LCFIELD,TAGSLV_RBY,
-     G              MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,
-     H              MDS_NDEPSVAR,STACK,IBCL,ILOADP,LLOADP,SENSORS,
-     I              DYNAIN_DATA,DT ,LOADS ,OUTPUT,NAMES_AND_TITLES,
-     J              MAT_ELEM%MAT_PARAM,GLOB_THERM,PBLAST)
+     F              IGRPART,ICFIELD,LCFIELD,NODES%TAG_S_RBY,
+     G              MDS_NMAT,
+     H              SENSORS,MAT_ELEM,
+     I              DYNAIN_DATA,DT ,OUTPUT,NAMES_AND_TITLES,
+     J              GLOB_THERM)
 C------------------------------------------------
 C Close & Delete scratch file
       CLOSE (UNIT=IIN)
@@ -1471,6 +1498,30 @@ C Close & Delete scratch file
       CALL DELETE_USER_FILE(IINFNA,LEN_IINFNA)
 C------------------------------------------------
       CALL TRACE_OUT(16)
+C------------------------------------------------
+C     initializations MDS
+C------------------------------------------------
+
+#ifdef DNC
+      IF (MDS_AVAIL==1) THEN
+        CALL MDS_ENGINE_USER_INITIALIZE(NSPMD_USER,NTASK_USER,ISPMD_USER,TSTOP,
+     *       MDS_NMAT,MDS_MATID,MDS_FILES,MDS_LABEL,MDS_NDEPSVAR,MAX_DEPVAR,MDS_OUTPUT_TABLE)
+      ENDIF
+#endif
+C------------------------------------------------
+C     H3D initialization
+C------------------------------------------------
+      CALL INIT_H3D_ENGINE(OUTPUT,GEO,IGEO,IPM,IPART,H3D_DATA,MULTI_FVM,IPARI,IPARG,TAG_SKINS6,
+     .                     MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,MDS_NDEPSVAR,
+     .                     MAT_ELEM%ELBUF,STACK,IBCL,ILOADP,LLOADP,LOADS,MAT_ELEM%MAT_PARAM,PBLAST,
+     .                     IGRPART,NPC,TF,SNPC,STF,SENSORS,SENSORS%SENSOR_TAB,PSKIDS,
+     .                     NINTSKIDOLD,NINTERSKID,NINTSTAMP,NUMNOD,NUMNODG,NINTER,NUMSPHG,
+     .                     NPROPG,NPROPGI,NPROPMI,LIPART1,NPARI,NPARG,
+     .                     NGROUP,NUMELS,SIBCL,NLOADP,SIZLOADP,SLLOADP,NGRPART,SENSORS%NSENSOR,
+     .                     ISPMD,IOUT,MCHECK,
+     .                     NUMELCG,NUMELTGG,NUMELSG,NUMELTRG,NUMELPG,NUMELRG,
+     .                     NUMELQG,NUMSKING,NUMGEO,NUMMAT,NUMPLY)
+
 C------------------------------------------------
       CALL TRACE_IN(19,0,ZERO)
       CALL TRACE_OUT(19)
@@ -1529,14 +1580,14 @@ C
         IABFPIPE=1
         ABFCOMP=180182702
         
-        IF((IMACH/=3).OR.(IMACH==3.AND.ISPMD==0)) THEN
+        IF(ISPMD==0) THEN
         
           CALL OPEN_ABFPIPE(ABINP,ABOUT,IABFPIPE,1,ABFV,NB_OF_FILES)
           
           IF (IABFPIPE < 0) THEN
             SELECT CASE (IABFPIPE)
                CASE (-1)
-C---        Error: abf pas trouve
+C--- error: abf not find
                   CALL ANCMSG(MSGID=150,ANMODE=ANINFO)
                CASE (-2)
                   CALL ANCMSG(MSGID=151,ANMODE=ANINFO,I1=ABFCOMP)
@@ -1573,7 +1624,8 @@ C------------------------------------------------
           LONG = 9
          ENDIF
           IUNIT=IUHIS
-          IFIL = 1
+          IFIL = fd_bin_th
+          OUTPUT%TH%TH_WRITE_TYPE = ITFORM
           IFILTITL = IUTITLHIS
           ITHFLAG = 10
           CALL HIST1( FILNAMTH ,IFIL              ,NTHGRP            ,LONG,
@@ -1583,6 +1635,9 @@ C------------------------------------------------
      5                 12      ,ITFORM  ,ITHFLAG ,ITHVAR,
      6                 IFILTITL,OUTPUT%TH%SITHBUF ,NAMES_AND_TITLES)
           WA(1:SWA) = ZERO
+          ! Store filename for eventuel checksum computation
+          OUTPUT%TH%TH_FILENAME(1:LEN_TRIM(FILNAMTH))=FILNAMTH(1:LEN_TRIM(FILNAMTH))
+
 C   Multiple th files
             IF(NTHGRP01(1)/=0)THEN
               WRITE(CHR_OLD,'(I2.2)')IRUNN
@@ -2159,7 +2214,7 @@ C---------------------------------------------------------------------
          IRUNN_BIS = IRUNN
 
          CALL RESOL_HEAD(ELEMENT, NODES, ITASK        ,AF              ,IAF             ,IDATA      ,RDATA,
-     .                   GRAPHE       ,IFLOW           ,RFLOW           ,MCP        ,TEMP      ,
+     .                   GRAPHE       ,IFLOW           ,RFLOW           ,
      .                   STACK        ,IRUNN_BIS       , TIMERS,
      .                   MULTI_FVM    ,H3D_DATA        ,SUBSETS    ,IGRNOD    ,
      .                   IGRBRIC      ,IGRQUAD         ,IGRSH4N         ,IGRSH3N    ,IGRTRUSS  ,
@@ -2169,10 +2224,12 @@ C---------------------------------------------------------------------
      .                   DIFFUSION    ,SEGVAR          ,DYNAIN_DATA     ,DRAPEG     ,USER_WINDOWS    ,
      .                   OUTPUT       ,INTERFACES      ,DT              ,LOADS      ,MAT_ELEM  , PYTHON,
      .                   NAMES_AND_TITLES, UNITAB ,SKEWS,LIFLOW         ,LRFLOW     ,glob_therm,PBLAST,
-     .                   RBE3)
+     .                   RBE3, coupling,RWALL     ,SFEM)
 C---------------------------------------------------------------------
       CURRENT_RUN = GLOBAL_COMP_TIME%RUN_NBR
       CALL SPMD_REDUCE_DB(GLOBAL_COMP_TIME%ENGINE_TIME(CURRENT_RUN),RESULT,1,0,"MAX ")
+
+
 #ifdef DNC
 C New MADYMO coupling
       IF (IMADCPL==1)THEN
@@ -2181,7 +2238,7 @@ C New MADYMO coupling
 #endif
 C----------------------------------------------------------------------X
 C End tasks
-      CALL INIPAR(ITID,2,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
+      CALL INIPAR(coupling,ITID,2,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
 C---------------------------------------------------------------------
       IF(MSTOP==1) THEN
         N = 3
@@ -2194,6 +2251,7 @@ C---------------------------------------------------------------------
       DEALLOCATE(GRAPHE)
       DEALLOCATE(IFLOW, RFLOW)
       CALL FVDEAL()
+
       CALL ARRET(N)
 C---------------------------------------------------------------------
 

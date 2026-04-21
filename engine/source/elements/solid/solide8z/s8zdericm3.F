@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8zdericm3    ../engine/source/elements/solid/solide8z/s8zdericm3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8zforc3      ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s8zdericm3    ../engine/source/elements/solid/solide8z/s8zdericm3.F
+!||--- called by ------------------------------------------------------
+!||    s8zforc3      ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S8ZDERICM3(
      1   DET,     NGL,     X1,      X2,
      2   X3,      X4,      X5,      X6,
@@ -93,7 +93,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NGL(*), I, J ,ICOR
+      INTEGER NGL(*), I, J 
 C     REAL
 C                                                                     12
       my_real
@@ -306,6 +306,4 @@ C
        ENDDO
       RETURN
 C
- 3000 FORMAT(/' ZERO OR NEGATIVE SUB-VOLUME : 3D-ELEMENT NB:',I10/,
-     +        ' ELEMENT IS SWITCHED TO SMALL STRAIN OPTION'/) 
       END

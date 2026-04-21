@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_arrays_mod              ../common_source/modules/interfaces/spmd_arrays_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    get_neighbour_surface        ../engine/source/interfaces/interf/get_neighbour_surface.F90
-      !||    spmd_update_frontier_int25   ../engine/source/mpi/interfaces/spmd_update_frontier_int25.F90
-      !||====================================================================
-        MODULE SPMD_ARRAYS_MOD
+!||====================================================================
+!||    spmd_arrays_mod              ../common_source/modules/interfaces/spmd_arrays_mod.F
+!||--- called by ------------------------------------------------------
+!||    get_neighbour_surface        ../engine/source/interfaces/interf/get_neighbour_surface.F90
+!||    interfaces_mod               ../common_source/modules/interfaces/interfaces_mod.F90
+!||    spmd_update_frontier_int25   ../engine/source/mpi/interfaces/spmd_update_frontier_int25.F90
+!||====================================================================
+      MODULE SPMD_ARRAYS_MOD
 C-----------------------------------------------
 C   m y _ r e a l
 C-----------------------------------------------
 #include      "my_real.inc"
-       implicit none
+        implicit none
 !   -----------------------------------------------
 !   D e r i v e d   T y p e   D e f i n i t i o n s
 !   -----------------------------------------------
@@ -42,10 +43,10 @@ C----------------------------------------------
 C   Global SPMD_ARRAYS activated by Contact
 C---------------------------------------------
 
-          TYPE SPMD_ARRAYS_
-             INTEGER , DIMENSION(:), ALLOCATABLE :: FR_EDG      ! List of frontier edges of main segments of int25 contacts
-             INTEGER , DIMENSION(:), ALLOCATABLE :: IAD_FREDG   ! Adress of frontier edges of main segments of int25 contacts per proc spmd
-          END TYPE SPMD_ARRAYS_
+        TYPE SPMD_ARRAYS_
+          INTEGER , DIMENSION(:), ALLOCATABLE :: FR_EDG      ! List of frontier edges of main segments of int25 contacts
+          INTEGER , DIMENSION(:), ALLOCATABLE :: IAD_FREDG   ! Address of frontier edges of main segments of int25 contacts per proc spmd
+        END TYPE SPMD_ARRAYS_
 
 C
-        END MODULE SPMD_ARRAYS_MOD
+      END MODULE SPMD_ARRAYS_MOD

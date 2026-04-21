@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_cell_size_exchange   ../engine/source/mpi/interfaces/spmd_cell_size_exchange.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_cell_list_exchange   ../engine/source/mpi/interfaces/spmd_cell_list_exchange.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                    ../engine/source/output/message/message.F
-      !||    arret                     ../engine/source/system/arret.F
-      !||    my_orders                 ../common_source/tools/sort/my_orders.c
-      !||    myqsort_int               ../common_source/tools/sort/myqsort_int.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_sorting_mod         ../engine/share/modules/inter_sorting_mod.F
-      !||    message_mod               ../engine/share/message_module/message_mod.F
-      !||    tri7box                   ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_cell_size_exchange   ../engine/source/mpi/interfaces/spmd_cell_size_exchange.F
+!||--- called by ------------------------------------------------------
+!||    spmd_cell_list_exchange   ../engine/source/mpi/interfaces/spmd_cell_list_exchange.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                    ../engine/source/output/message/message.F
+!||    arret                     ../engine/source/system/arret.F
+!||    my_orders                 ../common_source/tools/sort/my_orders.c
+!||    myqsort_int               ../common_source/tools/sort/myqsort_int.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod             ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    inter_sorting_mod         ../engine/share/modules/inter_sorting_mod.F
+!||    message_mod               ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod       ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box                   ../engine/share/modules/tri7box.F
+!||====================================================================
         SUBROUTINE SPMD_CELL_SIZE_EXCHANGE(IRCVFROM,ISENDTO,WEIGHT,
      .                    IAD_ELEM,FR_ELEM,X,V,MS,TEMP,KINET,NODNX_SMS,ITAB,INTBUF_TAB,IPARI,NIN,REMOTE_PROC_ID,
      .                    ALREADY_SEND,INDEX_ALREADY_SEND,SORT_COMM,NODNX_SMS_SIZ,TEMP_SIZE)
@@ -61,6 +63,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -101,29 +104,28 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
 #ifdef MPI        
-        INTEGER :: I,J,NOD,L,L2,KK,IJK,KJI
-        INTEGER :: P,P_LOC
-        INTEGER :: ADRESS,SHIFT_
-        INTEGER :: ISIZ,RSIZ,IDEB,JDEB
+        INTEGER :: I,J,NOD,L,L2,IJK,KJI
+        INTEGER :: P
+        INTEGER :: SHIFT_
+        INTEGER :: ISIZ,RSIZ
         INTEGER :: NSN,NMN,IGAP,INTTH,INTFRIC,ITYP,ITIED
         INTEGER :: IFQ,INACTI
 
-        INTEGER IERROR1,STATUS(MPI_STATUS_SIZE),IERROR
+        INTEGER IERROR
 
         INTEGER :: LOC_PROC
-        INTEGER :: IX,IY,IZ,NB
-        INTEGER, DIMENSION(NUMNOD) :: INDEX
+        INTEGER :: NB
+        INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX
         INTEGER :: ISHIFT,RSHIFT
 
         INTEGER :: MSGOFF, MSGOFF2, MSGOFF3, MSGOFF4, MSGOFF5
-        INTEGER :: MSGTYP,INFO
+        INTEGER :: MSGTYP
 
         INTEGER :: ERROR_SORT
         INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX_2,ITRI
         INTEGER, DIMENSION(:), ALLOCATABLE ::  WORK
         INTEGER :: CELL_X_ID,CELL_Y_ID,CELL_Z_ID
         INTEGER :: DISPL
-        LOGICAL :: NEED_TO_RCV
 
         INTEGER :: NB_INDEX_ALREADY_SEND,VALUE,NB_SAVE
 !   --------------------------------------------------------------------  
@@ -164,6 +166,7 @@ C-----------------------------------------------
 
                 SORT_COMM(NIN)%NB(P) = 0
                 NB = 0
+                ALLOCATE(INDEX(2*NUMNOD))
                 !   --------------------------
                 IF(ITIED/=0.AND.ITYP==7) THEN
                     !   itied/=0 --> need to send all nodes 
@@ -414,6 +417,7 @@ C -- IDTMINS_INT /= 0
                         L2 = L2 + ISIZ
                     END DO  
                 ENDIF   !   if nb/=0
+                DEALLOCATE(INDEX)
                 !   ------------------------------
             ENDIF      
         ENDIF ! nsn>0 or nmn > 0

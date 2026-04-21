@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s6clke3   ../engine/source/elements/thickshell/solide6c/s6clke3.F
-      !||--- called by ------------------------------------------------------
-      !||    s6cke3    ../engine/source/elements/thickshell/solide6c/s6cke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    s6ckeg3   ../engine/source/elements/thickshell/solide6c/s6ckeg3.F
-      !||    s8zkeb3   ../engine/source/elements/solid/solide8z/s8zkeb3.F
-      !||====================================================================
+!||====================================================================
+!||    s6clke3   ../engine/source/elements/thickshell/solide6c/s6clke3.F
+!||--- called by ------------------------------------------------------
+!||    s6cke3    ../engine/source/elements/thickshell/solide6c/s6cke3.F
+!||--- calls      -----------------------------------------------------
+!||    s6ckeg3   ../engine/source/elements/thickshell/solide6c/s6ckeg3.F
+!||    s8zkeb3   ../engine/source/elements/solid/solide8z/s8zkeb3.F
+!||====================================================================
       SUBROUTINE S6CLKE3(
      1   PXC1,    PXC2,    PXC3,    PXC4,
      2   PYC1,    PYC2,    PYC3,    PYC4,
@@ -82,7 +82,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,IS
+      INTEGER I,IS
 C     REAL
       my_real
      .  PX1(MVSIZ),PX2(MVSIZ),PX3(MVSIZ),
@@ -188,7 +188,7 @@ C
        BYZ6(I) = -ZNU1*PY3H(I)-ZNU*PYC3(I)
        BZY6(I) = -ZNU1*PZ3H(I)
       ENDDO
-C ----------shear,PX,PY->DXY;PXY,PXZ...pour DYZ,DXZ-------------
+C ----------shear,PX,PY->DXY;PXY,PXZ...for DYZ,DXZ-------------
 C | PY  PX   0 |
 C | PXY PYZ PZY|
 C | PXZ PYX PZX|

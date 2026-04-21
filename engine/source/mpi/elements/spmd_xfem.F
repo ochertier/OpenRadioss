@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 c
-      !||====================================================================
-      !||    spmd_exch_crkvel   ../engine/source/mpi/elements/spmd_xfem.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod      ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_crkvel      ../engine/source/mpi/elements/spmd_xfem.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_CRKVEL(IAD_ELEM  ,FR_ELEM  ,INOD_CRK ,ITAB   ,
      .                            X         ,V        ,VR       )
 C-----------------------------------------------
@@ -38,6 +39,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -58,8 +60,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,I,J,L1,L2,ILEV,ILAY,IXEL,IAD,KK,IL,IENR,EN0,ENR,
-     .  NENR,SIZ,LEN1,LEN2,LENR,NNODX,NN,NSX,NCT,NC,COUNT,
+      INTEGER I,J,L1,L2,ILEV,ILAY,IAD,KK,IL,IENR,EN0,ENR,
+     .  NENR,SIZ,LEN1,LEN2,LENR,NNODX,NN,NSX,COUNT,
      .  LOC_PROC,IERROR,MSGTYP1,MSGTYP2,MSGOFF1,MSGOFF2
       INTEGER STATUS(MPI_STATUS_SIZE),NODXSAV(NSPMD),
      .  REQ_R1(NSPMD),REQ_R2(NSPMD),REQ_S1(NSPMD),REQ_S2(NSPMD),
@@ -174,7 +176,7 @@ c                    endif
                 END DO
               END DO
             ELSE
-C               on envoie des zeros (initialise plus haut)
+C               We send zeros (initialized above)
                 L1 = L1+NENR*NXLAYMAX
                 L2 = L2+NENR*NXLAYMAX
             ENDIF
@@ -258,7 +260,7 @@ c     .                RBUFR(5,L2), RBUFR(6,L2)  , RBUFR(7,L2)
 c---
                 ENDDO  ! IENR=1,NENR                                           
               ENDDO    ! ILAY=1,NXLAYMAX                                          
-C si noeud n'est pas XFEM skipper la comm
+C if node is not XFEM skip the comm
             ELSE
                 L1 = L1+NENR*NXLAYMAX
                 L2 = L2+NENR*NXLAYMAX
@@ -289,12 +291,13 @@ c-----------
       END SUBROUTINE SPMD_EXCH_CRKVEL
 c-----------
 
-      !||====================================================================
-      !||    spmd_exch_tagxp   ../engine/source/mpi/elements/spmd_xfem.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod     ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_tagxp       ../engine/source/mpi/elements/spmd_xfem.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_TAGXP(IAD_ELEM ,FR_ELEM ,INOD_CRK ,ITAB    )
 C-----------------------------------------------
 C   M o d u l e s
@@ -303,6 +306,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -322,10 +326,10 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I,J,L,ILAY,IAD,ILEV,KK,IL,EN1,IENR,ENR,SIZ,
-     .  LEN,LENR,NNODX,NN,NSX,NCT,NC,
+      INTEGER I,J,L,ILAY,IAD,ILEV,IL,IENR,ENR,SIZ,
+     .  LEN,LENR,NNODX,NN,NSX,
      .  LOC_PROC,IERROR,MSGTYP,MSGOFF,
-     .  ENRL,ENRR,FLAGS,FLAGR,NENR
+     .  ENRL,NENR
       INTEGER STATUS(MPI_STATUS_SIZE),NODXSAV(NSPMD),
      .  REQ_R(NSPMD),REQ_S(NSPMD),IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1)
       INTEGER, DIMENSION(:,:), ALLOCATABLE ::  RBUF,SBUF
@@ -464,15 +468,16 @@ c-----------
       RETURN
       END
 c
-      !||====================================================================
-      !||    spmd_exch_nodenr   ../engine/source/mpi/elements/spmd_xfem.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_crk_adv       ../engine/source/elements/xfem/xfemfsky.F
-      !||    upxfem2            ../engine/source/elements/xfem/upxfem2.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod      ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_nodenr      ../engine/source/mpi/elements/spmd_xfem.F
+!||--- called by ------------------------------------------------------
+!||    spmd_crk_adv          ../engine/source/elements/xfem/xfemfsky.F
+!||    upxfem2               ../engine/source/elements/xfem/upxfem2.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_NODENR(IAD_ELEM,FR_ELEM,SIZE,LENR,INOD_CRK,
      .                            ENRTAG,FLAG)
 C-----------------------------------------------
@@ -482,6 +487,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -503,7 +509,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,MSGOFF,
-     .        SIZ,J,L,NB_NOD,NNOD,IENR,ENR,SIZN,
+     .        SIZ,J,L,NB_NOD,IENR,ENR,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD)
@@ -597,16 +603,17 @@ c-----------
       END SUBROUTINE SPMD_EXCH_NODENR
 c-----------
 C
-      !||====================================================================
-      !||    spmd_exch_iedge   ../engine/source/mpi/elements/spmd_xfem.F
-      !||--- called by ------------------------------------------------------
-      !||    inixfem           ../engine/source/elements/xfem/inixfem.F
-      !||    upxfem2           ../engine/source/elements/xfem/upxfem2.F
-      !||    xfeoff            ../engine/source/elements/xfem/xfeoff.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod     ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_iedge       ../engine/source/mpi/elements/spmd_xfem.F
+!||--- called by ------------------------------------------------------
+!||    inixfem               ../engine/source/elements/xfem/inixfem.F
+!||    upxfem2               ../engine/source/elements/xfem/upxfem2.F
+!||    xfeoff                ../engine/source/elements/xfem/xfeoff.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_IEDGE(IAD_EDGE,FR_EDGE,SIZE  ,LSDRC,FR_NBEDGE,
      .                           FLAG    ,CRKEDGE)
 C-----------------------------------------------
@@ -614,6 +621,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -635,7 +643,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I,II,J,JJ,L0,L,CC,MSGTYP,LOC_PROC,IERROR,
+      INTEGER I,II,J,L0,L,MSGTYP,LOC_PROC,IERROR,
      .        INDEX,SIZ,NBIRECV,IAD_RECV(NSPMD+1),
      .        STATUS(MPI_STATUS_SIZE),REQ_R(NSPMD),
      .        REQ_S(NSPMD),IRINDEX(NSPMD),IED,ICUT,
@@ -851,20 +859,22 @@ c-----------
       END SUBROUTINE SPMD_EXCH_IEDGE
 c-----------
 c
-      !||====================================================================
-      !||    spmd_exch_redge   ../engine/source/mpi/elements/spmd_xfem.F
-      !||--- called by ------------------------------------------------------
-      !||    upxfem2           ../engine/source/elements/xfem/upxfem2.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod     ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_redge       ../engine/source/mpi/elements/spmd_xfem.F
+!||--- called by ------------------------------------------------------
+!||    upxfem2               ../engine/source/elements/xfem/upxfem2.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_REDGE(IAD_EDGE,FR_EDGE,SIZE ,LSDRC,FR_NBEDGE,CRKEDGE)
 C-----------------------------------------------
       USE CRACKXFEM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -880,13 +890,13 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IAD_EDGE(*),FR_EDGE(*),
-     .        SIZE,LSDRC,FR_NBEDGE(*),FLAG
+     .        SIZE,LSDRC,FR_NBEDGE(*)
       TYPE (XFEM_EDGE_)   , DIMENSION(*) :: CRKEDGE
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I,II,J,JJ,L0,L,CC,MSGTYP,LOC_PROC,IERROR,
+      INTEGER I,II,J,L0,L,MSGTYP,LOC_PROC,IERROR,
      .        INDEX,SIZ,NBIRECV,IAD_RECV(NSPMD+1),
      .        STATUS(MPI_STATUS_SIZE),REQ_R(NSPMD),
      .        REQ_S(NSPMD),IRINDEX(NSPMD),NXLAY,ILAY,IED,MSGOFF
@@ -971,12 +981,13 @@ c-----------
       END SUBROUTINE SPMD_EXCH_REDGE
 c-----------
 
-      !||====================================================================
-      !||    spmd_exch_crkavx   ../engine/source/mpi/elements/spmd_xfem.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod      ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_crkavx      ../engine/source/mpi/elements/spmd_xfem.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod         ../engine/share/modules/crackxfem_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_CRKAVX(
      .   IAD_ELEM,FR_ELEM,FR_NBCC1,LENS1 ,LENR1  ,
      .   IADSDP_CRK,IADRCP_CRK,ISENDP_CRK,IRECVP_CRK)
@@ -985,6 +996,7 @@ C--------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1005,7 +1017,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I,J,II,L,L0,CC,IPT,SIZ,INDEX,LOC_PROC,IERROR,
+      INTEGER I,J,L,L0,CC,IPT,SIZ,LOC_PROC,IERROR,
      .        NB_NOD,NBIRECV,MSGTYP,MSGOFF,
      .        IAD_RECV(NSPMD+1),STATUS(MPI_STATUS_SIZE),
      .        REQ_R(NSPMD),REQ_S(NSPMD)
@@ -1102,20 +1114,23 @@ c-----------
       RETURN
       END
 c
-      !||====================================================================
-      !||    spmd_max_xfe_i   ../engine/source/mpi/elements/spmd_xfem.F
-      !||--- called by ------------------------------------------------------
-      !||    delnumbc_crk     ../engine/source/output/anim/generate/delnumbc_crk.F
-      !||    genani           ../engine/source/output/anim/generate/genani.F
-      !||    resol            ../engine/source/engine/resol.F
-      !||    upxfem2          ../engine/source/elements/xfem/upxfem2.F
-      !||    xfeoff           ../engine/source/elements/xfem/xfeoff.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_max_xfe_i        ../engine/source/mpi/elements/spmd_xfem.F
+!||--- called by ------------------------------------------------------
+!||    delnumbc_crk          ../engine/source/output/anim/generate/delnumbc_crk.F
+!||    genani                ../engine/source/output/anim/generate/genani.F
+!||    resol                 ../engine/source/engine/resol.F
+!||    upxfem2               ../engine/source/elements/xfem/upxfem2.F
+!||    xfeoff                ../engine/source/elements/xfem/xfeoff.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_MAX_XFE_I(INT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g

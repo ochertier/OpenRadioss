@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s20ke3         ../engine/source/elements/solid/solide20/s20ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
-      !||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_s20      ../engine/source/implicit/assem_s20.F
-      !||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
-      !||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
-      !||    s20coork       ../engine/source/elements/solid/solide20/s20coork.F
-      !||    s20cumg3       ../engine/source/elements/solid/solide20/s20cumg3.F
-      !||    s20deri3       ../engine/source/elements/solid/solide20/s20deri3.F
-      !||    s20eoff        ../engine/source/elements/solid/solide20/s20eoff.F
-      !||    s20kgeo3       ../engine/source/elements/solid/solide20/s20kgeo3.F
-      !||    s20rst         ../engine/source/elements/solid/solide20/s20rst.F
-      !||    sorthdir3      ../engine/source/elements/solid/solide/sorthdir3.F
-      !||    sreploc3       ../engine/source/elements/solid/solide/sreploc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s20ke3         ../engine/source/elements/solid/solide20/s20ke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
+!||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_s20      ../engine/source/implicit/assem_s20.F
+!||    mmats          ../engine/source/elements/solid/solide8z/mmats.F
+!||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
+!||    s20coork       ../engine/source/elements/solid/solide20/s20coork.F
+!||    s20cumg3       ../engine/source/elements/solid/solide20/s20cumg3.F
+!||    s20deri3       ../engine/source/elements/solid/solide20/s20deri3.F
+!||    s20eoff        ../engine/source/elements/solid/solide20/s20eoff.F
+!||    s20kgeo3       ../engine/source/elements/solid/solide20/s20kgeo3.F
+!||    s20rst         ../engine/source/elements/solid/solide20/s20rst.F
+!||    sorthdir3      ../engine/source/elements/solid/solide/sorthdir3.F
+!||    sreploc3       ../engine/source/elements/solid/solide/sreploc3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE S20KE3(
      1   PM,       GEO,      IXS,      IXS20,
      2   X,        ELBUF_STR,ETAG,     IDDL,
@@ -51,7 +52,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C----------------------------------------------- 
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD     
+      use element_mod , only : nixs       
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -175,7 +177,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NIPMAX,NPE, NF1, NF2, IADBUF,IBID,
-     . J,I,N,K
+     . I,N
       PARAMETER (NIPMAX=81)
       PARAMETER (NPE=20)
       
@@ -192,7 +194,7 @@ C-----------------------------------------------
      .  E1Y (MVSIZ,NIPMAX) ,E2Y (MVSIZ,NIPMAX) ,E3Y (MVSIZ,NIPMAX) ,
      .  E1Z (MVSIZ,NIPMAX) ,E2Z (MVSIZ,NIPMAX) ,E3Z (MVSIZ,NIPMAX) , 
      .  PX(MVSIZ,NPE,NIPMAX),PY(MVSIZ,NPE,NIPMAX),PZ(MVSIZ,NPE,NIPMAX),
-     .  OFF(MVSIZ), WI, VOLNP(MVSIZ,NIPMAX),STIN(MVSIZ,NPE),
+     .   WI, VOLNP(MVSIZ,NIPMAX),STIN(MVSIZ,NPE),
      .  NI(NPE,NIPMAX), VOLG(MVSIZ),UL(MVSIZ,NPE),GAMA(MVSIZ,6),
      .  DM(9,MVSIZ), DGM(9,MVSIZ),GM(9,MVSIZ), DELTAX(MVSIZ),BID(1),
      .  DD(9,MVSIZ),GG(MVSIZ),DG(9,MVSIZ),G33(9,MVSIZ),OFFG(MVSIZ)          

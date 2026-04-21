@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,25 +21,26 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #ifndef DNC
-      !||====================================================================
-      !||    eig                    ../engine/stub/eig.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                  ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    cluster_mod            ../engine/share/modules/cluster_mod.F
-      !||    crackxfem_mod          ../engine/share/modules/crackxfem_mod.F
-      !||    drape_mod              ../engine/share/modules/drape_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    inoutfile_mod          ../common_source/modules/inoutfile_mod.F
-      !||    matparam_def_mod       ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    stack_mod              ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    eig                    ../engine/stub/eig.F
+!||--- calls      -----------------------------------------------------
+!||    arret                  ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    cluster_mod            ../engine/share/modules/cluster_mod.F
+!||    crackxfem_mod          ../engine/share/modules/crackxfem_mod.F
+!||    drape_mod              ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    groupdef_mod           ../common_source/modules/groupdef_mod.F
+!||    h3d_mod                ../engine/share/modules/h3d_mod.F
+!||    inoutfile_mod          ../common_source/modules/inoutfile_mod.F
+!||    intbufdef_mod          ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    matparam_def_mod       ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    stack_mod              ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE EIG(K_DIAG    , K_LT     , IADK        , JDIK        , MS        ,
      2               IN        , NDDL     , NDOF        , NNZL        , X         ,
      3               D         , V        , A           , BUFEL       , IXS       ,
@@ -191,7 +192,7 @@ C-----------------------------------------------
      .        SCALE(EIGIPM(5)+NMS+6), CMAX, DMAX, KSI, ORIG(3),
      .        RX, RY, RZ, VV(6), FACIT2(4,EIGIPM(10)), CUTFREQ, RBID,
      .        RRBID(1)
-C ON PASSE LES GROS TABLEAUX EN ALLOCATABLE (A CAUSE DES RISQUES DE LIMITE
+C WE PASS LARGE ARRAYS AS ALLOCATABLE (BECAUSE OF STACK LIMIT RISKS)
 C DE STACK)
       INTEGER, DIMENSION(:), ALLOCATABLE :: ROWIND, JDIK2, JDIK_IB
       my_real, DIMENSION(:), ALLOCATABLE ::

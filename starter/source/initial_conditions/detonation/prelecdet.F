@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    prelecdet              ../starter/source/initial_conditions/detonation/prelecdet.F
-      !||--- called by ------------------------------------------------------
-      !||    read_detonators        ../starter/source/initial_conditions/detonation/read_detonators.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    ngr2usrn               ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    prelecdet              ../starter/source/initial_conditions/detonation/prelecdet.F
+!||--- called by ------------------------------------------------------
+!||    read_detonators        ../starter/source/initial_conditions/detonation/read_detonators.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    ngr2usrn               ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE PRELECDET(IGRNOD, LSUBMODEL, DETONATORS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -62,8 +62,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER SIZ_ECRAN, SIZ_DETCORD
-      INTEGER I,J,K,ID,USER_ID,INTERNAL_ID,NN,STAT
+      INTEGER K, ID, USER_ID, INTERNAL_ID
       INTEGER NNOD_DETCORD, NNOD_WAV_SHA,NUM
       CHARACTER(LEN=NCHARKEY) :: KEY,KEY2,KEY3
       CHARACTER(LEN=NCHARTITLE) :: TITR

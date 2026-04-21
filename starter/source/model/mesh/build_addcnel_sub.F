@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    build_addcnel_sub   ../starter/source/model/mesh/build_addcnel_sub.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur              ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    build_addcnel_sub   ../starter/source/model/mesh/build_addcnel_sub.F
+!||--- called by ------------------------------------------------------
+!||    lectur              ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE BUILD_ADDCNEL_SUB(ADDCNEL  ,CNEL     ,ADDCNEL_SUB,
      .                             INDX     ,SUBSIZE)
 C-----------------------------------------------
@@ -62,7 +62,7 @@ C Building the ADDCNEL table for a subset of nodes
 C    
       ! The first node is in first position in FSKY
       ADDCNEL_SUB(2) = 1     
-      ! Boucle ici pour indexer les elements non-locaux
+      ! loop here to index non-local elements
       ! Loop over the nodes of the subset
       DO NS=1,SUBSIZE
         ! Number of the corresponding global node

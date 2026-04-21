@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_sol_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_skin_scalar        ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||--- calls      -----------------------------------------------------
-      !||    gpsstrain_skin         ../engine/source/output/anim/generate/tensgpstrain.F
-      !||    h3d_sol_skin_scalar1   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar1.F
-      !||    spmd_exch_nodarea2     ../engine/source/mpi/anim/spmd_exch_nodarea2.F
-      !||    spmd_exch_nodareai     ../engine/source/mpi/anim/spmd_exch_nodareai.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_sol_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||--- called by ------------------------------------------------------
+!||    h3d_skin_scalar        ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||--- calls      -----------------------------------------------------
+!||    gpsstrain_skin         ../engine/source/output/anim/generate/tensgpstrain.F
+!||    h3d_sol_skin_scalar1   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar1.F
+!||    spmd_exch_nodarea2     ../engine/source/mpi/anim/spmd_exch_nodarea2.F
+!||    spmd_exch_nodareai     ../engine/source/mpi/anim/spmd_exch_nodareai.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod            ../engine/share/resol/initbuf.F
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE H3D_SOL_SKIN_SCALAR(
      .                   ELBUF_TAB,SKIN_SCALAR, IPARG   ,IXS     ,X     ,PM  ,
      4                   IPARTS  ,IGEO    ,IXS10 ,IXS16 , IXS20  ,
@@ -48,6 +49,7 @@ C-----------------------------------------------
       USE MAT_ELEM_MOD
       USE ELBUFDEF_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,9 +77,9 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
-      INTEGER I,I1,II,J,LENR,NEL,NFT,N
+      INTEGER I,J,LENR,N
 
-      INTEGER JJ,N1,N2
+      INTEGER JJ
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGPS,TAG_SKIN_ND    
       my_real
      .       , DIMENSION(:,:), ALLOCATABLE :: AFLU, VFLU,T6GPS
@@ -139,14 +141,14 @@ C
 C-----------
       RETURN
       END 
-      !||====================================================================
-      !||    idx_fld_sol            ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_sol_skin_scalar1   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar1.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                 ../engine/source/tools/curve/finter.F
-      !||    finterfld              ../engine/source/materials/fail/fld/fail_fld_c.F
-      !||====================================================================
+!||====================================================================
+!||    idx_fld_sol            ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||--- called by ------------------------------------------------------
+!||    h3d_sol_skin_scalar1   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar1.F
+!||--- calls      -----------------------------------------------------
+!||    finter                 ../engine/source/tools/curve/finter.F
+!||    finterfld              ../engine/source/materials/fail/fld/fail_fld_c.F
+!||====================================================================
       SUBROUTINE IDX_FLD_SOL(
      1     NEL      ,NUPARAM  ,NFUNC    ,IFUNC    ,
      2     NPF      ,TF       ,UPARAM   ,EPS3     ,FLD_IDX  ,
@@ -199,7 +201,7 @@ C        NPF,TF  : FUNCTION PARAMETER
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,II,J,IENG,LENF,NINDX,IMARGIN
+      INTEGER :: I,II,IENG,LENF,IMARGIN
       my_real :: RANI,R1,R2,S1,S2,SS,Q,DYDX,E12,FACT_MARGIN,FACT_LOOSEMETAL
       my_real ,ALLOCATABLE, DIMENSION(:) :: XF  
       my_real ,DIMENSION(NEL) :: EMAJ,EMIN,EM,BETA
@@ -340,14 +342,14 @@ c
 C------------------------
       RETURN
       END
-      !||====================================================================
-      !||    dam_fld_sol            ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_sol_skin_scalar1   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar1.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                 ../engine/source/tools/curve/finter.F
-      !||    finterfld              ../engine/source/materials/fail/fld/fail_fld_c.F
-      !||====================================================================
+!||====================================================================
+!||    dam_fld_sol            ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||--- called by ------------------------------------------------------
+!||    h3d_sol_skin_scalar1   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar1.F
+!||--- calls      -----------------------------------------------------
+!||    finter                 ../engine/source/tools/curve/finter.F
+!||    finterfld              ../engine/source/materials/fail/fld/fail_fld_c.F
+!||====================================================================
       SUBROUTINE DAM_FLD_SOL(
      1     NEL      ,NUPARAM  ,NFUNC    ,IFUNC    ,
      2     NPF      ,TF       ,UPARAM   ,EPS3     ,DAM,
@@ -403,8 +405,8 @@ C        NPF,TF  : FUNCTION PARAMETER
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,II,J,IENG,LENF,NINDX,IMARGIN
-      my_real :: RANI,R1,R2,S1,S2,SS,Q,DYDX,E12,FACT_MARGIN,FACT_LOOSEMETAL
+      INTEGER :: I,II,IENG,LENF,IMARGIN
+      my_real :: RANI,S1,S2,SS,Q,DYDX,E12,FACT_MARGIN,FACT_LOOSEMETAL
       my_real ,ALLOCATABLE, DIMENSION(:) :: XF  
       my_real ,DIMENSION(NEL) :: EMAJ,EMIN,EM,BETA
 C=======================================================================

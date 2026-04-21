@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_cload          ../starter/source/loads/general/cload/hm_read_cload.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    nodgr_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    nodgrnr5               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_cload          ../starter/source/loads/general/cload/hm_read_cload.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    nodgr_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    nodgrnr5               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_CLOAD(IBCL   ,FORC    ,NUM    ,ITAB   ,ITABM1   ,
      .                         IGRNOD ,NWORK   ,UNITAB ,ISKN   ,LSUBMODEL,
      .                         LOADS  )
@@ -229,14 +229,14 @@ C
      .                   C2=XYZ,I1=ID,C1=TITR)
            END IF
         END IF
-C !!  IBCL ET NWORK ONT LA MEME ADRESSE
+C !!  ibcl and nwork have the same address
         NUM0=NUM
 C-----------
         IF (IDDOM==0) THEN
         NN = NODGRNR5(IGU    ,IGS    ,NWORK(1+NIBCLD*NUM0),IGRNOD ,
      .                ITABM1 ,MESS   )
         ELSE
-C-----------Multidomaines : on enleve les noeuds communs qui sont deja trait   s dans le fomain full-------------
+Cmultidomains: shared nodes already processed in the full domain are removed
         NN = NODGR_R2R(IGU    ,IGS    ,NWORK(1+NIBCLD*NUM0),IGRNOD   ,
      .                ITABM1 ,MESS      )
         ENDIF
@@ -250,7 +250,7 @@ C-----------
         ENDIF
         NUM=NUM+NN
         DO J=NN,1,-1
-C       !!  IBCL ET NWORK ONT LA MEME ADRESSE
+C       !!  ibcl and nwork have the same address
 C          IBCL(1,I+J)=NWORK(J+6*NUM0)
             NWORK(1+NIBCLD*(J+I-1))=NWORK(J+NIBCLD*NUM0)
         ENDDO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2curvv      ../engine/source/interfaces/interf/i2curvv.F
-      !||--- called by ------------------------------------------------------
-      !||    intti2v      ../engine/source/interfaces/interf/intti2v.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2_fform     ../engine/source/interfaces/interf/i2_fform.F
-      !||    i2curv_rep   ../engine/source/interfaces/interf/i2curv_rep.F
-      !||    inv3         ../engine/source/elements/joint/rskew33.F
-      !||====================================================================
+!||====================================================================
+!||    i2curvv      ../engine/source/interfaces/interf/i2curvv.F
+!||--- called by ------------------------------------------------------
+!||    intti2v      ../engine/source/interfaces/interf/intti2v.F
+!||--- calls      -----------------------------------------------------
+!||    i2_fform     ../engine/source/interfaces/interf/i2_fform.F
+!||    i2curv_rep   ../engine/source/interfaces/interf/i2curv_rep.F
+!||    inv3         ../engine/source/elements/joint/rskew33.F
+!||====================================================================
       SUBROUTINE I2CURVV(
      .           NSN     ,NMN     ,MS      ,V       ,A       ,
      .           AR      ,VR      ,X       ,IRECT   ,NSV     ,
@@ -48,7 +48,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIR,I,J,L,II,JJ,IS
+      INTEGER NIR,J,L,II,JJ,IS
       INTEGER INOD(4)
 C     REAL
       my_real

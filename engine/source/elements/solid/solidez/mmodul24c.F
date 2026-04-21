@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mmodul24c   ../engine/source/elements/solid/solidez/mmodul24c.F
-      !||--- called by ------------------------------------------------------
-      !||    mdama24     ../engine/source/elements/solid/solidez/mdama24.F
-      !||====================================================================
+!||====================================================================
+!||    mmodul24c   ../engine/source/elements/solid/solidez/mmodul24c.F
+!||--- called by ------------------------------------------------------
+!||    mdama24     ../engine/source/elements/solid/solidez/mdama24.F
+!||====================================================================
       SUBROUTINE MMODUL24C(NEL    ,PM     ,DAM    ,CRAK   ,
      .                     CDAM   ,G3     ,ANG    ,DAMANG ,NBDAMA)
 C-----------------------------------------------
@@ -54,7 +54,7 @@ C-----------------------------------------------
       my_real  YOUNG,NU,G,A11,A12,DE1,DE2,DE3,DE4,DE5,DE6,DEN,
      .         SCAL1,SCAL2,SCAL3,D_MAX
 C=======================================================================
-c     DEi = (1 - DAMi)       coefficients d endommagement de la matrice Hook
+c     Dei = (1 - Dami) Damage coefficients of the Hook matrix
 c-----------------------------------------------------------------------
       YOUNG = PM(20)
       NU    = PM(21)

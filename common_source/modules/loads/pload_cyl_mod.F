@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,38 +22,39 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #include "my_real.inc"
 c-----------------------------------------------------------------------
-      !||====================================================================
-      !||    pload_cyl_mod   ../common_source/modules/loads/pload_cyl_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    press_seg3      ../engine/source/loads/general/load_pcyl/press_seg3.F
-      !||    rdcomi          ../engine/source/output/restart/rdcomm.F
-      !||    rdresb          ../engine/source/output/restart/rdresb.F
-      !||    wrcomip         ../starter/source/restart/ddsplit/wrcommp.F
-      !||    write_pcyl      ../engine/source/output/restart/write_pcyl.F
-      !||====================================================================
+!||====================================================================
+!||    pload_cyl_mod   ../common_source/modules/loads/pload_cyl_mod.F
+!||--- called by ------------------------------------------------------
+!||    loads_mod       ../common_source/modules/loads/loads_mod.F90
+!||    press_seg3      ../engine/source/loads/general/load_pcyl/press_seg3.F
+!||    rdcomi          ../engine/source/output/restart/rdcomm.F
+!||    rdresb          ../engine/source/output/restart/rdresb.F
+!||    wrcomip         ../starter/source/restart/ddsplit/wrcommp.F
+!||    write_pcyl      ../engine/source/output/restart/write_pcyl.F
+!||====================================================================
       MODULE PLOAD_CYL_MOD
 c-----------------------------------------------------------------------
-      TYPE PRESS_CYL_
-        INTEGER   :: ID                !  option ID
-        INTEGER   :: IFRAME            !  moving frame 
-        INTEGER   :: ISENS             !  sensor number
-        INTEGER   :: ITABLE            !  table number
-        INTEGER   :: NSEG              !  number of surface segments
-        INTEGER ,DIMENSION(:,:) ,ALLOCATABLE :: SEGNOD ! segment nodes(NSEG,4)
-        my_real   :: XSCALE_R
-        my_real   :: XSCALE_T
-        my_real   :: YSCALE
-        ! ---------
-        ! starter only
-        INTEGER ,DIMENSION(:) ,ALLOCATABLE :: NUMBER_SEG_PER_PROC ! number of segment defined on a proc
-        INTEGER ,DIMENSION(:) ,ALLOCATABLE :: PROC_ID ! processor id where the segment is defined 
-        ! ---------
+        TYPE PRESS_CYL_
+          INTEGER   :: ID                !  option ID
+          INTEGER   :: IFRAME            !  moving frame
+          INTEGER   :: ISENS             !  sensor number
+          INTEGER   :: ITABLE            !  table number
+          INTEGER   :: NSEG              !  number of surface segments
+          INTEGER ,DIMENSION(:,:) ,ALLOCATABLE :: SEGNOD ! segment nodes(NSEG,4)
+          my_real   :: XSCALE_R
+          my_real   :: XSCALE_T
+          my_real   :: YSCALE
+          ! ---------
+          ! starter only
+          INTEGER ,DIMENSION(:) ,ALLOCATABLE :: NUMBER_SEG_PER_PROC ! number of segment defined on a proc
+          INTEGER ,DIMENSION(:) ,ALLOCATABLE :: PROC_ID ! processor id where the segment is defined
+          ! ---------
 
-        ! ---------
-        ! parith/on option : starter and engine
-        INTEGER :: S_SEGMENT_ADRESS ! second dimension of SEGMENT_ADRESS
-        INTEGER, DIMENSION(:,:), ALLOCATABLE :: SEGMENT_ADRESS ! adress to point to the adsky array, dim =(4,S_SEGMENT_ADRESS) (parith/on option)
-        ! ---------
-      END TYPE PRESS_CYL_
+          ! ---------
+          ! parith/on option : starter and engine
+          INTEGER :: S_SEGMENT_ADRESS ! second dimension of SEGMENT_ADRESS
+          INTEGER, DIMENSION(:,:), ALLOCATABLE :: SEGMENT_ADRESS ! address to point to the adsky array, dim =(4,S_SEGMENT_ADRESS) (parith/on option)
+          ! ---------
+        END TYPE PRESS_CYL_
 c-----------------------------------------------------------------------
       END MODULE PLOAD_CYL_MOD

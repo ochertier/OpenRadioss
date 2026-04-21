@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cfint_reg_ini     ../starter/source/elements/shell/coque/cfint_reg_ini.F
-      !||--- called by ------------------------------------------------------
-      !||    nlocal_init_sta   ../starter/source/materials/fail/nlocal_init_sta.F
-      !||--- calls      -----------------------------------------------------
-      !||    ceveci            ../starter/source/elements/shell/coque/ceveci.F
-      !||    cnloc_matini      ../starter/source/materials/mat_share/cnloc_matini.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cfint_reg_ini     ../starter/source/elements/shell/coque/cfint_reg_ini.F
+!||--- called by ------------------------------------------------------
+!||    nlocal_init_sta   ../starter/source/materials/fail/nlocal_init_sta.F
+!||--- calls      -----------------------------------------------------
+!||    ceveci            ../starter/source/elements/shell/coque/ceveci.F
+!||    cnloc_matini      ../starter/source/materials/mat_share/cnloc_matini.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod       ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CFINT_REG_INI(ELBUF_TAB,NLOC_DMG ,AREA     ,IXC      ,
      .                         DT_NL    ,X        ,XREFC    ,NFT      ,
      .                         NEL      ,NG       ,IPM      ,BUFMAT   ,
@@ -40,6 +40,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE MESSAGE_MOD
       USE NLOCAL_REG_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

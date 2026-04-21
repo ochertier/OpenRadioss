@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dama24   ../engine/source/materials/mat/mat024/dama24.F
-      !||--- called by ------------------------------------------------------
-      !||    conc24   ../engine/source/materials/mat/mat024/conc24.F
-      !||--- calls      -----------------------------------------------------
-      !||    pri224   ../engine/source/materials/mat/mat024/pri224.F
-      !||    pri324   ../engine/source/materials/mat/mat024/pri324.F
-      !||====================================================================
+!||====================================================================
+!||    dama24   ../engine/source/materials/mat/mat024/dama24.F
+!||--- called by ------------------------------------------------------
+!||    conc24   ../engine/source/materials/mat/mat024/conc24.F
+!||--- calls      -----------------------------------------------------
+!||    pri224   ../engine/source/materials/mat/mat024/pri224.F
+!||    pri324   ../engine/source/materials/mat/mat024/pri324.F
+!||====================================================================
       SUBROUTINE DAMA24(NEL    ,NINDX  ,INDX   ,NGL    ,PM     ,SCLE2  ,
      .                  SIG    ,DAM    ,ANG    ,EPS_F  ,CRAK   ,CDAM   ,
      .                  S01    ,S02    ,S03    ,S04    ,S05    ,S06    ,
@@ -118,7 +118,7 @@ c---------------------
           CALL PRI324(SIGO,EPSTOT,EPS,DIR)
         ENDIF
 c
-c       SAUVE LA DEFORMATION A RUPTURE
+c       SAVE THE STRAIN AT RUPTURE
 c
         SFTRY = MIN(EPSTOT(IDIR),EPSTOT(IDIR)-SCLE2(I)*EPS(IDIR),EPST)
         SFTRY = MAX(SFTRY,FOURTH*EPST)
@@ -142,7 +142,7 @@ c
            CYCLE
         ENDIF
 c
-c       SAUVE LES DIRECTIONS DE DOMMAGE
+c       saves the damage directions
 c
         IF (IDIR == 1) THEN
           ANG(I,1:6) = DIR(1:6)
@@ -150,7 +150,7 @@ c
           ANG(I,4:6) = DIR(4:6)
         ENDIF
 c
-c       CALCULE LE DOMMAGE
+c       computes the damage
 c
         DO K=1,3
           CRAK(I,K) = EPSTOT(K)
@@ -188,7 +188,7 @@ c            SCAL(K)= ZERO
           ENDIF
         ENDDO   ! next K
 c
-c       CALCULE LA MATRICE DE HOOKE ET LES CONTRAINTES (rotation repere !)
+c       computes the hooke matrix and the stresses (rotation of the frame!)
 c
         DEN = ONE - NU**2
      .      * (SCAL(1)*SCAL(2) + SCAL(2)*SCAL(3) + SCAL(3)*SCAL(1)

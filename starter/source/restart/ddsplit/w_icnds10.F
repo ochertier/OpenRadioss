@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    w_icnds10   ../starter/source/restart/ddsplit/w_icnds10.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal      ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    w_icnds10   ../starter/source/restart/ddsplit/w_icnds10.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal      ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE W_ICNDS10(ICNDS10,ITAGND,PROC,NODLOCAL,NS10E_L,
      .                     ITABCNDM,NBDDCNDM,NUMNOD_L,LEN_IA,itab)
 C-----------------------------------------------
@@ -51,7 +51,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, NN, K, J, L,P, N_L,N1,N2, ILP,PROCI,NG
+      INTEGER N, NN, L, P, N_L, N1, N2, ILP, PROCI
       INTEGER ICNDS10_L(3,NS10E_L),IFRONT(NUMNOD_L),NF
 C
       PROCI = PROC + 1

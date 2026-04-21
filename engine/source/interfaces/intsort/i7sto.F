@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7sto      ../engine/source/interfaces/intsort/i7sto.F
-      !||--- called by ------------------------------------------------------
-      !||    i7tri      ../engine/source/interfaces/intsort/i7tri.F
-      !||    i7trivox   ../engine/source/interfaces/intsort/i7trivox.F
-      !||--- calls      -----------------------------------------------------
-      !||    i7cor3t    ../engine/source/interfaces/int07/i7cor3t.F
-      !||    i7pen3     ../engine/source/interfaces/intsort/i7pen3.F
-      !||====================================================================
+!||====================================================================
+!||    i7sto      ../engine/source/interfaces/intsort/i7sto.F
+!||--- called by ------------------------------------------------------
+!||    i7tri      ../engine/source/interfaces/intsort/i7tri.F
+!||    i7trivox   ../engine/source/interfaces/intsort/i7trivox.F
+!||--- calls      -----------------------------------------------------
+!||    i7cor3t    ../engine/source/interfaces/int07/i7cor3t.F
+!||    i7pen3     ../engine/source/interfaces/intsort/i7pen3.F
+!||====================================================================
       SUBROUTINE I7STO(
      1      J_STOK,IRECT  ,X     ,NSV   ,II_STOK,
      2      CAND_N,CAND_E ,MULNSN,NOINT ,MARGE  ,
@@ -91,7 +91,7 @@ C-----------------------------------------------
      .               YI    ,ZI    ,PENE  ,IX1    ,IX2  ,
      .               IX3   ,IX4   ,IGAP  ,GAP    ,GAPV )
 C-----------------------------------------------
-C SUPPRESSION DES ANCIENS CANDIDATS DEJE STOCKES (PENE INITIALE)
+C SUPPRESSION DES ANCIENS CANDIDATES DEJE STOCKES (PENE INITIALE)
 C-----------------------------------------------
        IF(INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.IFQ>0.OR.
      .    ITIED/=0)THEN
@@ -100,7 +100,7 @@ C-----------------------------------------------
                 N  = PROV_N(I)
                 NE = PROV_E(I)+ESHIFT
                 IF(N>NSN) THEN
-C numerotation tris precedent pour les noeuds non locaux (SPMD)
+C numbering from previous sorting for non-local nodes (SPMD)
                   N = OLDNUM(N-NSN)+NSN
                   IF(N==NSN) N = NSN+NSNROLD+1
                 END IF

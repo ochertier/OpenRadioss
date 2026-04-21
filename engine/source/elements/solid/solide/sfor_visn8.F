@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sfor_visn8     ../engine/source/elements/solid/solide/sfor_visn8.F
-      !||--- called by ------------------------------------------------------
-      !||    s8for_distor   ../engine/source/elements/solid/solide/s8for_distor.F
-      !||====================================================================
+!||====================================================================
+!||    sfor_visn8     ../engine/source/elements/solid/solide/sfor_visn8.F
+!||--- called by ------------------------------------------------------
+!||    s8for_distor   ../engine/source/elements/solid/solide/s8for_distor.F
+!||====================================================================
       SUBROUTINE SFOR_VISN8(VC ,    FLD,   TOL_V,    IFC1,
      4                      VX1,    VX2,     VX3,     VX4,
      5                      VX5,    VX6,     VX7,     VX8,
@@ -70,14 +70,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
+      INTEGER I,IFCONT
 C                                                                     12
       my_real
-     .   VRE(6),VXC,VYC,VZC,FX,FY,FZ,FAC,VNJ(8),VL,TOL_V2,
-     .   VXMAX,VYMAX,VZMAX,V2MAX,VC2,LAM_MIN,LAM_MIN2,LAM_MAX
+     .   FAC,VNJ(8),VL,TOL_V2,
+     .   V2MAX,VC2
 C----------------------------
         TOL_V2 = TOL_V*TOL_V
         IFCTL = 0
+        IFCONT = 1 ! no more for contact condition due to P/on issue
          DO I=1,NEL
            VC2 = VC(I,1)*VC(I,1)+VC(I,2)*VC(I,2)+VC(I,3)*VC(I,3)
            IF (VC2 <EM20.OR.STIF(I)==ZERO) CYCLE
@@ -92,10 +93,9 @@ C----------------------------
            VNJ(8) = VX8(I)*VX8(I) + VY8(I)*VY8(I) + VZ8(I)*VZ8(I)
            V2MAX = MAX(VNJ(1),VNJ(2),VNJ(3),VNJ(4))
            V2MAX = MAX(V2MAX,VNJ(5),VNJ(6),VNJ(7),VNJ(8))
-           IF (V2MAX > VL) THEN
-              IFC1(I) = 1
-              IFCTL=1
-           END IF
+           IF (V2MAX > VL) IFC1(I) = 1
+           IF (IFC1(I) > 0)   IFCTL=1
+!           IF (V2MAX > FOUR*VC2) IFCONT=1
          END DO
 C
        IF (IFCTL==1) THEN
@@ -153,6 +153,8 @@ C
      .                                   FOR_T8(I,3)*(VZ8(I)-VC(I,3)))
          ENDDO
        END IF 
+!
+        IFCTL = IFCONT  ! used for self-contact compute less strict : 2 times
 C
       RETURN
       END

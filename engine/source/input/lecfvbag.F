@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecfvbag        ../engine/source/input/lecfvbag.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur          ../engine/source/input/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret           ../engine/source/system/arret.F
-      !||    spmd_fvb_gath   ../engine/source/mpi/airbags/spmd_fvb_gath.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod       ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecfvbag        ../engine/source/input/lecfvbag.F
+!||--- called by ------------------------------------------------------
+!||    lectur          ../engine/source/input/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    arret           ../engine/source/system/arret.F
+!||    spmd_fvb_gath   ../engine/source/mpi/airbags/spmd_fvb_gath.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod       ../engine/share/modules/fvbag_mod.F
+!||====================================================================
       SUBROUTINE LECFVBAG(NFVMESH, MONVOL, VOLMON, X)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -46,7 +46,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -58,7 +57,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, ID, NBX, NBY, K1, K2, KIBJET, KIBHOL, KIBALE, KK1, N,
-     .        ITYP, NN, KI1, J, JJ, NSTEP, IV(10), IFVI, NBZ, IFV
+     .        ITYP, NN, KI1, J, NSTEP, IFVI, NBZ, IFV
       my_real
      .        VX3, VY3, VZ3, VX1, VY1, VZ1, DX0, DY0, DZ0, LX, LY, NORM,
      .        VVX3, VVY3, VVZ3, NORM2, SS, VVX1, VVY1, VVZ1, VVX2,
@@ -148,12 +147,15 @@ C
                   NN=MONVOL(K1-1+32)
                   KI1=KIBALE+MONVOL(K1-1+31)
 C
-                  IF (IMACH/=3) THEN
+                  IFV=MONVOL(K1-1+45)
+                  ALLOCATE(XXX(3,NN))
+                  CALL SPMD_FVB_GATH(IFV, X, XXX, RBID, RBID,
+     .                               1  )
+                  IF (ISPMD==FVSPMD(IFV)%PMAIN-1) THEN
                      DO J=1,NN
-                        JJ=MONVOL(KI1-1+J)
-                        XX=X(1,JJ)
-                        YY=X(2,JJ)
-                        ZZ=X(3,JJ)
+                        XX=XXX(1,J)
+                        YY=XXX(2,J)
+                        ZZ=XXX(3,J)
                         XL=(XX-X0)*VVX1+(YY-Y0)*VVY1+(ZZ-Z0)*VVZ1
                         YL=(XX-X0)*VVX2+(YY-Y0)*VVY2+(ZZ-Z0)*VVZ2
                         ZL=(XX-X0)*VVX3+(YY-Y0)*VVY3+(ZZ-Z0)*VVZ3
@@ -161,27 +163,8 @@ C
                         LYMAX=MAX(LYMAX,ABS(YL))
                         LZMAX=MAX(LZMAX,ABS(ZL))
                      ENDDO
-C
-                  ELSE
-                     IFV=MONVOL(K1-1+45)
-                     ALLOCATE(XXX(3,NN))
-                     CALL SPMD_FVB_GATH(IFV, X, XXX, RBID, RBID,
-     .                                  1  )
-                     IF (ISPMD==FVSPMD(IFV)%PMAIN-1) THEN
-                        DO J=1,NN
-                           XX=XXX(1,J)
-                           YY=XXX(2,J)
-                           ZZ=XXX(3,J)
-                           XL=(XX-X0)*VVX1+(YY-Y0)*VVY1+(ZZ-Z0)*VVZ1
-                           YL=(XX-X0)*VVX2+(YY-Y0)*VVY2+(ZZ-Z0)*VVZ2
-                           ZL=(XX-X0)*VVX3+(YY-Y0)*VVY3+(ZZ-Z0)*VVZ3
-                           LXMAX=MAX(LXMAX,ABS(XL))
-                           LYMAX=MAX(LYMAX,ABS(YL))
-                           LZMAX=MAX(LZMAX,ABS(ZL))
-                        ENDDO
-                     ENDIF
-                     DEALLOCATE(XXX)
                   ENDIF
+                  DEALLOCATE(XXX)
 C
                   IF (LXMAX>LX) THEN
                      WRITE(IOUT,'(A14,I8,A9)') 
@@ -203,7 +186,7 @@ C
                      LY=LYMAX*ONEP01
                      WRITE(IOUT,'(A20,G11.4)') '    IT IS RESET TO ',LY
                   ENDIF
-C On autorise le decoupage horizontal d'une bande du maillage uniquement
+C only horizontal splitting of a mesh band is allowed
 C                  IF (LZMAX>LZ) THEN
 C                     WRITE(IOUT,'(A14,I8,A9)') 
 C     .                        ' ** MONVOL ID ',ID,' (ALEBAG)'
@@ -211,7 +194,7 @@ C                     WRITE(IOUT,'(A)') '    IN LOCAL FRAME DIRECTION 3'
 C                     WRITE(IOUT,'(A18,G11.4,A33,G11.4,G11.4)') 
 C     .    '    GIVEN LENGTH ',LZ,
 C     .    ' IS SMALLER THAN BOUNDING LENGTH ',LZMAX
-C                     LZ=LZMAX*ONEP01
+C                     Lz = Lzmax*ONEP01
 C                     WRITE(IOUT,'(A20,G11.4)') '    IT IS RESET TO ',LZ
 C                  ENDIF
 C

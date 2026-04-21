@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,69 +20,69 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    freform                  ../engine/source/input/freform.F
-      !||--- called by ------------------------------------------------------
-      !||    lecinp                   ../engine/source/input/lecinp.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../engine/source/output/message/message.F
-      !||    arret                    ../engine/source/system/arret.F
-      !||    connection_sock_init_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||    errmsg                   ../engine/source/input/errmsg.F
-      !||    fraleonoff               ../engine/source/input/fraleonoff.F
-      !||    fralnk                   ../engine/source/input/fralnk.F
-      !||    fralnk2                  ../engine/source/input/fralnk.F
-      !||    freabf                   ../engine/source/input/freabf.F
-      !||    freanim                  ../engine/source/output/anim/reader/freanim.F
-      !||    frebcs                   ../engine/source/input/frebcs.F
-      !||    frecpl                   ../engine/source/input/frecpl.F
-      !||    fredamp                  ../engine/source/input/fredamp.F
-      !||    fredebug                 ../engine/source/input/fredebug.F
-      !||    fredli                   ../engine/source/input/fredli.F
-      !||    fredli7                  ../engine/source/input/fredli7.F
-      !||    fredynain                ../engine/source/input/fredynain.F
-      !||    freeig                   ../engine/source/input/freeig.F
-      !||    freflw                   ../engine/source/input/freflw.F
-      !||    frefunc                  ../engine/source/input/frefunc.F
-      !||    frefvbag                 ../engine/source/input/frefvbag.F
-      !||    frefxinp                 ../engine/source/input/frefxinp.F
-      !||    freimpl                  ../engine/source/input/freimpl.F
-      !||    freiniv                  ../engine/source/input/freiniv.F
-      !||    freint                   ../engine/source/input/freint.F
-      !||    frelnk                   ../engine/source/input/frelnk.F
-      !||    frenois                  ../engine/source/input/frenois.F
-      !||    freoutp                  ../engine/source/input/freoutp.F
-      !||    frerbo                   ../engine/source/input/frerbo.F
-      !||    frestat                  ../engine/source/input/frestat.F
-      !||    frethermal               ../engine/source/constraints/thermic/frethermal.F
-      !||    freupwind                ../engine/source/input/freupwind.F
-      !||    freupwm                  ../engine/source/input/freupwm.F
-      !||    h3d_ini                  ../engine/source/output/h3d/h3d_build_fortran/h3d_ini.F
-      !||    h3d_read                 ../engine/source/output/h3d/h3d_build_fortran/h3d_read.F
-      !||    init_idel_brick          ../engine/source/modules/dt_mod.F
-      !||    nvar                     ../engine/source/input/nvar.F
-      !||    open_f_scratch_file      ../engine/source/system/open_tempfile.F
-      !||    rdele                    ../engine/source/input/rdele.F
-      !||    redkey0                  ../engine/source/input/redkey0.F
-      !||    redkey1                  ../engine/source/input/redkey1.F
-      !||    redkey1_h3d              ../engine/source/input/redkey1_h3d.F
-      !||    wriusc2                  ../engine/source/input/wriusc2.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod                  ../common_source/modules/ale/ale_mod.F
-      !||    alemuscl_mod             ../common_source/modules/ale/alemuscl_mod.F
-      !||    check_mod                ../common_source/modules/check_mod.F
-      !||    dt_mod                   ../engine/source/modules/dt_mod.F
-      !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
-      !||    glob_therm_mod           ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
-      !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||    metric_mod               ../common_source/modules/interfaces/metric_mod.F
-      !||    names_and_titles_mod     ../common_source/modules/names_and_titles_mod.F
-      !||    output_mod               ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod               ../common_source/modules/sensor_mod.F90
-      !||    state_mod                ../common_source/modules/state_mod.F
-      !||    th_mod                   ../engine/share/modules/th_mod.F
-      !||====================================================================
+!||====================================================================
+!||    freform                  ../engine/source/input/freform.F
+!||--- called by ------------------------------------------------------
+!||    lecinp                   ../engine/source/input/lecinp.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../engine/source/output/message/message.F
+!||    arret                    ../engine/source/system/arret.F
+!||    connection_sock_init_c   ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||    errmsg                   ../engine/source/input/errmsg.F
+!||    fraleonoff               ../engine/source/input/fraleonoff.F
+!||    fralnk                   ../engine/source/input/fralnk.F
+!||    fralnk2                  ../engine/source/input/fralnk.F
+!||    freabf                   ../engine/source/input/freabf.F
+!||    freanim                  ../engine/source/output/anim/reader/freanim.F
+!||    frebcs                   ../engine/source/input/frebcs.F
+!||    frecpl                   ../engine/source/input/frecpl.F
+!||    fredamp                  ../engine/source/input/fredamp.F
+!||    fredebug                 ../engine/source/input/fredebug.F
+!||    fredli                   ../engine/source/input/fredli.F
+!||    fredli7                  ../engine/source/input/fredli7.F
+!||    fredynain                ../engine/source/input/fredynain.F
+!||    freeig                   ../engine/source/input/freeig.F
+!||    freflw                   ../engine/source/input/freflw.F
+!||    frefunc                  ../engine/source/input/frefunc.F
+!||    frefvbag                 ../engine/source/input/frefvbag.F
+!||    frefxinp                 ../engine/source/input/frefxinp.F
+!||    freimpl                  ../engine/source/input/freimpl.F
+!||    freiniv                  ../engine/source/input/freiniv.F
+!||    freint                   ../engine/source/input/freint.F
+!||    frelnk                   ../engine/source/input/frelnk.F
+!||    frenois                  ../engine/source/input/frenois.F
+!||    freoutp                  ../engine/source/input/freoutp.F
+!||    frerbo                   ../engine/source/input/frerbo.F
+!||    frestat                  ../engine/source/input/frestat.F
+!||    frethermal               ../engine/source/constraints/thermic/frethermal.F
+!||    freupwind                ../engine/source/input/freupwind.F
+!||    freupwm                  ../engine/source/input/freupwm.F
+!||    h3d_ini                  ../engine/source/output/h3d/h3d_build_fortran/h3d_ini.F
+!||    h3d_read                 ../engine/source/output/h3d/h3d_build_fortran/h3d_read.F
+!||    init_idel_brick          ../engine/source/modules/dt_mod.F
+!||    open_f_scratch_file      ../engine/source/system/open_tempfile.F
+!||    rdele                    ../engine/source/input/rdele.F
+!||    redkey0                  ../engine/source/input/redkey0.F
+!||    redkey1                  ../engine/source/input/redkey1.F
+!||    redkey1_h3d              ../engine/source/input/redkey1_h3d.F
+!||    wriusc2                  ../engine/source/input/wriusc2.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod                  ../common_source/modules/ale/ale_mod.F
+!||    alemuscl_mod             ../common_source/modules/ale/alemuscl_mod.F
+!||    check_mod                ../common_source/modules/check_mod.F
+!||    dt_mod                   ../engine/source/modules/dt_mod.F
+!||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
+!||    glob_therm_mod           ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    h3d_mod                  ../engine/share/modules/h3d_mod.F
+!||    message_mod              ../engine/share/message_module/message_mod.F
+!||    metric_mod               ../common_source/modules/interfaces/metric_mod.F
+!||    names_and_titles_mod     ../common_source/modules/names_and_titles_mod.F
+!||    output_mod               ../common_source/modules/output/output_mod.F90
+!||    sensor_mod               ../common_source/modules/sensor_mod.F90
+!||    state_mod                ../common_source/modules/state_mod.F
+!||    th_mod                   ../engine/share/modules/th_mod.F
+!||    viper_mod                ../engine/source/coupling/viper/viper_interface_mod.F90
+!||====================================================================
       SUBROUTINE FREFORM(IRUNN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
      .                   SENSORS,DT,OUTPUT,GLOB_THERM)
 C-----------------------------------------------
@@ -107,6 +107,7 @@ C-----------------------------------------------
       USE OUTPUT_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY
       use glob_therm_mod
+      USE VIPER_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -155,8 +156,8 @@ C-----------------------------------------------
 C   L o c a l   P a r a m e t e r s
 C-----------------------------------------------
       INTEGER NKEY, NUM_ALE_KEY2
-      PARAMETER (NKEY = 92)
-      PARAMETER (NUM_ALE_KEY2 = 22)
+      PARAMETER (NKEY = 93)
+      PARAMETER (NUM_ALE_KEY2 = 25)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -172,7 +173,7 @@ C-----------------------------------------------
      .   NFVMESH,KSTATF,KSHVER,KABF,KDTSDE,
      .   KAABF,KBABF,KCABF,KDABF,KEABF,KFABF,KGABF,KHABF,KIABF,NFVMODI,
      .   KUPWIND,KTHERMAL,KH3D,KREPORT,KNEGVOL,KADYREL,KDT1TET10,KPERF,
-     .   KDYNAIN,KDTTSH,KMASS,KSENSOR
+     .   KDYNAIN,KDTTSH,KMASS,KSENSOR,KVIPER
       INTEGER
      .   IKEY,I,II,I1,J,J1,J2,K,KK,M,N, NCT, IKOLD, NBC, K3, K4,
      .   NUBCS1,NUBCS2, IR,IDT,NELTGOF,IREC,
@@ -184,7 +185,7 @@ C-----------------------------------------------
      .   GR_ID, NLINKOFF,IS_PREVKEYA_NCHARKEY,IS_KEYA_NCHARKEY, IFLAG,
      .   DT_CTRL_COMPATIBILITY(3), LOWMACH_OPT,IO_ERR, NITERP, IOK_READ,
      .   ID_BAG, IERR1, ID_DT_OPTION, FVMBAG_L_TYPE, INUM,INTDT,NBSENS,
-     .   NUM_ALE_GRID
+     .   NUM_ALE_GRID,NPARTOF
       INTEGER :: BCS_SK_FR(10000),VEL_SK_FR(10000),NSLASH(NKEY)
       INTEGER :: NBALEOFF, NBALEON, NBPARTALEON, NBPARTALEOFF     
       my_real
@@ -196,7 +197,7 @@ C-----------------------------------------------
       CHARACTER(LEN=NCHARLINE100) :: CARTE,KEYW,MOT1,LINE
       CHARACTER(LEN=NCHARKEY), DIMENSION(9) :: KEY_H3D
       CHARACTER(LEN=5), DIMENSION(NKEY) :: KEY0
-      CHARACTER(LEN=5), DIMENSION(24)  ::  KEYALE
+      CHARACTER(LEN=5), DIMENSION(NUM_ALE_KEY2)  ::  KEYALE
       CHARACTER(len=NCHARLINE100) :: STRING_RESTART
       LOGICAL :: lFOUND
       REAL(KIND=8) :: DTHIS0
@@ -228,7 +229,7 @@ C-----------------------------------------------
      .     'EABF '   ,'FABF'    ,'GABF'    ,'HABF'    ,'IABF'    ,
      .     'UPWIN'   ,'THERM'   ,'H3D'     ,'REPOR'   ,'NEGVO'  ,
      .     'ADYRE'   ,'DT1TE'   ,'PERF'    ,'DYNAI'   ,'DTTSH'   ,
-     .     'MASS '   ,'SENS ' /
+     .     'MASS '   ,'SENS '   ,'VIPER' /
 
       DATA KRUN/1/    ,KTITLE/2/    ,KDT/3/       ,KTFILE/4/   ,KPRINT/5/  ,
      .     KRFILE/6/  ,KVERS/7/     ,                           KALE/10/   ,
@@ -248,14 +249,14 @@ C-----------------------------------------------
      .     KEABF/76/  ,KFABF/77/    ,KGABF/78/    ,KHABF/79/   ,KIABF/80/  ,
      .     KUPWIND/81/,KTHERMAL/82/ ,KH3D/83/     ,KREPORT/84/ ,KNEGVOL/85/,
      .     KADYREL/86/,KDT1TET10/87/,KPERF/88/    ,KDYNAIN/89/ ,KDTTSH/90/ ,
-     .     KMASS/91/  ,KSENSOR/92/
+     .     KMASS/91/  ,KSENSOR/92/  ,KVIPER/93/
 
       DATA KEYALE/
      .     'BCS  '   ,'CLOSE'   ,'GRID '   ,'LINK '   ,'MAT  '   ,
      .     'ON   '   ,'OFF  '   ,'MUSCL'   ,'SOLVE'   ,'ZERO '   ,
      .     'DONEA'   ,'STAND'   ,'SPRIN'   ,'DISP '   ,'SUPG '   ,
      .     '0    '   ,'1    '   ,'2    '   ,'3    '   ,'4    '   ,
-     .     'LOWMA'   ,'LAPLA'   ,'     '   ,'     '   /
+     .     'LOWMA'   ,'LAPLA'   ,'VOLUM'   ,'FLOW-'   ,'LAGRA'/
       
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -426,7 +427,8 @@ C---------------------------------------------------
         IF(KEYA(1:1)=='$')CYCLE
         IF(KEYA==' ')     CYCLE
         !---
-        IF(KEYA(1:4)=='/H3D' .OR. KEYA(1:6)=='/STATE'.OR. KEYA(1:7)=='/DYNAIN'.OR.KEYA(1:5)=='/ANIM')THEN
+        IF(KEYA(1:4)=='/H3D' .OR. KEYA(1:6)=='/STATE'.OR. KEYA(1:7)=='/DYNAIN'.OR.KEYA(1:5)=='/ANIM'.OR.
+     .        KEYA(1:5)=='/DAMP')THEN
           IS_KEYA_NCHARKEY = 1
         ELSE
           IS_KEYA_NCHARKEY = 0
@@ -575,9 +577,20 @@ C--------------------
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
        CALL WRIUSC2(IKAD(IKEY)+1,1,KEY0(IKEY))
        READ(IUSC2,*,ERR=9990,END=9990)DTIN,DTMX
+       IF(DTMX < ZERO)THEN
+         CALL ANCMSG(MSGID=316,ANMODE=ANINFO,C1='/DTIX : PARAMETER DT_MAX MUST BE STRICTLY POSITIVE')
+         IERR=IERR+1
+       ENDIF
+       IF(DTMX == ZERO)DTMX=EP20
+       IF(DTMX /= EP20 )THEN
+         IF(DTIN > DTMX)THEN
+           CALL ANCMSG(MSGID=316,ANMODE=ANINFO,C1='/DTIX : PARAMETER DT_INI MUST BE LOWER THAN DT_MAX')
+           IERR=IERR+1
+         ENDIF
+       ENDIF
       ELSE
        DTIN=ZERO
-       DTMX=EP30
+       DTMX=EP20
       ENDIF
 C--------------------
 C     /FLSEC
@@ -665,24 +678,27 @@ C-----------------------
        TST_START = ZERO
        TST_STOP = ZERO
        READ(IUSC1,REC=IKAD(IKEY),FMT='(7X,A)',ERR=9990)KEY2
-       READ(IUSC1,REC=IKAD(IKEY)+1,FMT='(A)',ERR=520)KEY3
-       CALL WRIUSC2(IKAD(IKEY)+1,1,KEY0(IKEY))
-       IF (KEY2=='FREQ_') THEN
-         READ(IUSC2,*)FREQ_C
-         READ(IUSC1,REC=IKAD(IKEY)+2,FMT='(A)',ERR=520)KEY2
-         CALL WRIUSC2(IKAD(IKEY)+2,1,KEY0(IKEY))
-       ELSE
-        READ(IUSC1,REC=IKAD(IKEY),FMT='(7X,I5)',ERR=9990)K4
-        IF(K4==1)THEN
-         READ(IUSC2,*)ISTATG
-         READ(IUSC1,REC=IKAD(IKEY)+2,FMT='(A)',ERR=520)KEY2
-         CALL WRIUSC2(IKAD(IKEY)+2,1,KEY0(IKEY))
-        ENDIF
-       END IF
-       READ(IUSC2,*,ERR=510,END=520)TST_START ,TST_STOP
-        GOTO 520
- 510    READ(IUSC2,*,ERR=520,END=520)TST_START
- 520    CONTINUE
+       READ(IUSC1,REC=IKAD(IKEY),FMT='(49X,I10)',ERR=9990) NBC
+       IF (NBC > 0) THEN
+         READ(IUSC1,REC=IKAD(IKEY)+1,FMT='(A)',ERR=520)KEY3
+         CALL WRIUSC2(IKAD(IKEY)+1,1,KEY0(IKEY))
+         IF (KEY2=='FREQ_') THEN
+           READ(IUSC2,*)FREQ_C
+           READ(IUSC1,REC=IKAD(IKEY)+2,FMT='(A)',ERR=520)KEY2
+           CALL WRIUSC2(IKAD(IKEY)+2,1,KEY0(IKEY))
+         ELSE
+          READ(IUSC1,REC=IKAD(IKEY),FMT='(7X,I5)',ERR=9990)K4
+          IF(K4==1)THEN
+           READ(IUSC2,*)ISTATG
+           READ(IUSC1,REC=IKAD(IKEY)+2,FMT='(A)',ERR=520)KEY2
+           CALL WRIUSC2(IKAD(IKEY)+2,1,KEY0(IKEY))
+          ENDIF
+         END IF
+         READ(IUSC2,*,ERR=510,END=520)TST_START ,TST_STOP
+          GOTO 520
+ 510      READ(IUSC2,*,ERR=520,END=520)TST_START
+ 520      CONTINUE
+       ENDIF   ! NBC
        BETA=ONE
        PERIOD = ZERO
        BETATE = ZERO
@@ -840,13 +856,17 @@ C--------------------------
       WRITE(CHRUN,'(I4.4)')IRUNN
       
 C-----------------------
-C   /NEGVOL  (SMSTR: INEG_V=1;STOP: INEG_V=0)
+C   /NEGVOL  (SMSTR: INEG_V=1;STOP: INEG_V=0, DEL: INEG_V=2)
 C--------------------------------------------------------
       IKEY   = KNEGVOL
       INEG_V = 1
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
         READ(IUSC1,REC=IKAD(IKEY),FMT='(7X,A)',ERR=9990)KEY2
-        IF(KEY2(1:4)=='STOP') INEG_V = 0
+        IF(KEY2(1:4)=='STOP') THEN
+          INEG_V = 0
+        ELSEIF(KEY2(1:3)=='DEL') THEN 
+          INEG_V = 2
+        END IF
       END IF
 
 C-----------------------
@@ -1197,7 +1217,7 @@ C           if /DT/AMS is read later, then following definition can be erased
            IDTMIN(52) = ID_DT_OPTION   
          ELSEIF(KEY3(1:1)=='2')THEN
            ID_DT_OPTION = 2
-           !option requires an airbag_id.
+           !Option REQUIRS AIRBAG_ID.
          ELSE
            ID_DT_OPTION = 1
            DTFAC1(52) = DTFACA
@@ -1631,7 +1651,7 @@ C--------------------
          ! case "/ALE  /....." (obsolete)
          StringALE(1:5)=KEY2(1:5)
        ENDIF
-       CALL WRIUSC2(IKAD(IKEY)+1,1,KEY0(IKEY)) 
+       CALL WRIUSC2(IKAD(IKEY)+1,1,KEY0(IKEY))
        !---------------------------------------!
        !    '/ALE/GRID/DONEA'                  !
        !---------------------------------------!
@@ -1677,7 +1697,7 @@ C--------------------
        ELSEIF(StringALE(1:5)=='LAPLA')THEN
         NUM_ALE_GRID = NUM_ALE_GRID + 1
         IALE_GRID_FORM=5
-        READ(IUSC2,*,ERR=9990,END=9990)ALP,A1,A2
+        READ(IUSC2,*,ERR=9990,END=9990)ALP,A1
         IF(ALP==ZERO)ALP=ONE
         IF(NINT(A1)<=ZERO)A1=ONE
         IF(A2/=ONE .AND. A2/=TWO)A2=ONE
@@ -1690,12 +1710,24 @@ C--------------------
        !---------------------------------------!
        !    '/ALE/GRID/MASS-WEIGHTED-VEL'      !
        !---------------------------------------!
-       ELSEIF(StringALE(1:5)=='MASS-')THEN
+       ELSEIF(StringALE(1:5)=='FLOW-')THEN
         NUM_ALE_GRID = NUM_ALE_GRID + 1
         IALE_GRID_FORM=7
-        READ(IUSC2,*,ERR=9990,END=9990)ALP,GAM
+        READ(IUSC2,*,ERR=9990,END=9990)A1,ALP
+        CALL WRIUSC2(IKAD(IKEY)+2,1,KEY0(IKEY))
+        READ(IUSC2,*,ERR=9990,END=9990)A2,GAM
         IF(ALP == ZERO)ALP = ONE
         IF(GAM == ZERO)GAM = ONE
+        IF(INT(A1) == 0)A1 = 1
+        IF(INT(A1) /= 1 .AND. INT(A1) /= -1)A1 = 1 !value different than expected values leads to default value
+        IF(INT(A2) == 0)A2 = 1
+        IF(INT(A2) /= 1 .AND. INT(A2) /= -1)A2 = 1 !value different than expected values leads to default value
+       !---------------------------------------!
+       !    '/ALE/GRID/LAGRANGE'               !
+       !---------------------------------------!
+       ELSEIF(StringALE(1:5)=='LAGRA')THEN
+        NUM_ALE_GRID = NUM_ALE_GRID + 1
+        IALE_GRID_FORM=8
        ELSE
         !not a keyword related to grid formulation
        ENDIF
@@ -1736,7 +1768,7 @@ C--------------------
        ENDIF
        K = K + 1 + NBC
       ENDDO
-      WRITE(IIN,'(I8)') LOWMACH_OPT
+      ALE%GLOBAL%HLLC_LOWMACH = LOWMACH_OPT
 
 C--------------------------
 C     /DEL
@@ -1757,6 +1789,7 @@ C--------------------------
       NALEOF=0
       NEULEROF=0
       NTHERMOF=0
+      NPARTOF=0
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
        K=0
  200   READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(7X,A,1X,A,31X,I10)',ERR=9990)KEY2,KEY3,NBC
@@ -1799,6 +1832,8 @@ C--------------------------
          NEULEROF=1
        ELSEIF(KEY2=='THERM')THEN
          NTHERMOF=1
+       ELSEIF(KEY2=='PART ')THEN
+         NPARTOF = NPARTOF+NOF
        ELSE
         CALL ERRMSG(KEY2)
        ENDIF
@@ -1806,7 +1841,7 @@ C--------------------------
       ENDIF
       WRITE(IIN,'(10I8)')NINTOF,NELSOF,NELQOF,NELCOF,NELTOF,NELPOF,NELROF,NELTGOF,NINTNOF,NINTSOF
       WRITE(IIN,'(I8)')NSPHOF
-      WRITE(IIN,'(3I8)')NALEOF,NEULEROF,NTHERMOF
+      WRITE(IIN,'(4I8)')NALEOF,NEULEROF,NTHERMOF,NPARTOF
 
 C--------------------------
 C     /VEL
@@ -2184,7 +2219,7 @@ C--------------------
           CALL ERRMSG(KEY2)
         ELSEIF(KEY2=='ON')THEN
           IRAD2R = 1
-          !initial connexion with rad2rad
+          !initial connection with rad2rad
           IF (ISPMD==0) CALL CONNECTION_SOCK_INIT_C(SOCK0)
         ENDIF
         K=K+1
@@ -2193,6 +2228,25 @@ C--------------------
           K=K+1
         ENDDO
         IF(IKAD(IKEY)+K/=IKAD(IKEY+1)) GO TO 670
+      ENDIF
+      
+C--------------------
+C     /VIPER
+C--------------------
+      IKEY=KVIPER
+      ViperCoupling = .false.
+      IF (IKAD(IKEY)/=IKAD(IKEY+1)) THEN
+        K=0
+ 680    READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(7X,A,37X,I10)',ERR=9990) KEY2,NBC
+        IF(KEY2=='ON')THEN
+          ViperCoupling = .true.
+        ENDIF
+        K=K+1
+        DO I=1,NBC
+          READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(A)',ERR=9990) CARTE
+          K=K+1
+        ENDDO
+        IF(IKAD(IKEY)+K/=IKAD(IKEY+1)) GO TO 680
       ENDIF
       
 C--------------------------------------------------
@@ -2252,7 +2306,7 @@ C--------------------
       IKEY=KDAMP
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
         K=0
- 770    READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(49X,I10)',ERR=9990) NBC
+ 770    READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(101X,I10)',ERR=9990) NBC
         IF (NBC == 2) IDAMP0=1
         K=K+NBC+1
         N_DAMP=N_DAMP+1
@@ -2400,6 +2454,7 @@ C--------------------
       CALL RDELE(NDEL,'SH3N ',IKAD(KDEL),KEY0(IKEY))
       CALL RDELE(NDEL,'SPCEL',IKAD(KDEL),KEY0(IKEY))
       CALL RDELE(NDEL,'SPHCE',IKAD(KDEL),KEY0(IKEY))
+      CALL RDELE(NDEL,'PART ',IKAD(KDEL),KEY0(IKEY))
       
 C--------------------
 C     /ALE/LINK (and obsolete option /VEL/ALE)
@@ -2439,7 +2494,7 @@ C--------------------
       NTFLSW=0
       IF(NSFLSW/=0)CALL FREFLW(IKAD(0),KEY0,KFLSEC,NSFLSW,NTFLSW)
       !not compatible SPMD
-      IF (NSFLSW>0.AND.IMACH==3) THEN
+      IF (NSFLSW>0) THEN
        CALL ANCMSG(MSGID=201,ANMODE=ANINFO)
        IERR=IERR+1
       ENDIF
@@ -2457,7 +2512,7 @@ C--------------------
 C-----------------------
 C     /ANIM (ANIMATION FILES)
 C-----------------------
-      CALL FREANIM(IKAD(0),KEY0,KANIM,SENSORS)
+      CALL FREANIM(output,IKAD(0),KEY0,KANIM,SENSORS)
 C-----------------------
 C     /OUTP (OUTPUT FILES)
 C-----------------------
@@ -2676,18 +2731,18 @@ C-----------------------------------------------
       
       END
 
-      !||====================================================================
-      !||    ngr2usr            ../engine/source/input/freform.F
-      !||--- called by ------------------------------------------------------
-      !||    lecdamp            ../engine/source/input/lecdamp.F
-      !||    lecinv             ../engine/source/input/lecinv.F
-      !||    lectur             ../engine/source/input/lectur.F
-      !||    s10cnistat         ../engine/source/elements/solid/solide10/s10cndf.F
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||    static             ../engine/source/general_controls/damping/static.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod       ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ngr2usr            ../engine/source/input/freform.F
+!||--- called by ------------------------------------------------------
+!||    lecdamp            ../engine/source/input/lecdamp.F
+!||    lecinv             ../engine/source/input/lecinv.F
+!||    lectur             ../engine/source/input/lectur.F
+!||    s10cnistat         ../engine/source/elements/solid/solide10/s10cndf.F
+!||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
+!||    static             ../engine/source/general_controls/damping/static.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod       ../common_source/modules/groupdef_mod.F
+!||====================================================================
       INTEGER FUNCTION NGR2USR(IU,IGRNOD,NGRNOD)
 C-----------------------------------------------
 C   M o d u l e s
@@ -2736,16 +2791,16 @@ C-----------------------------------------------
       RETURN
       END
 C
-      !||====================================================================
-      !||    fretitl         ../engine/source/input/freform.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d          ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||    w_gr_entity     ../engine/source/output/restart/w_gr_entity.F
-      !||    w_line_str      ../engine/source/output/restart/w_line_str.F
-      !||    w_subset_str    ../engine/source/output/restart/w_subset_str.F
-      !||    w_surf_str      ../engine/source/output/restart/w_surf_str.F
-      !||    write_sensors   ../engine/source/output/restart/write_sensors.F
-      !||====================================================================
+!||====================================================================
+!||    fretitl         ../engine/source/input/freform.F
+!||--- called by ------------------------------------------------------
+!||    genh3d          ../engine/source/output/h3d/h3d_results/genh3d.F
+!||    w_gr_entity     ../engine/source/output/restart/w_gr_entity.F
+!||    w_line_str      ../engine/source/output/restart/w_line_str.F
+!||    w_subset_str    ../engine/source/output/restart/w_subset_str.F
+!||    w_surf_str      ../engine/source/output/restart/w_surf_str.F
+!||    write_sensors   ../engine/source/output/restart/write_sensors.F
+!||====================================================================
       SUBROUTINE FRETITL(TITR,IASC,L)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2780,19 +2835,19 @@ C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    fretitl2           ../engine/source/input/freform.F
-      !||--- called by ------------------------------------------------------
-      !||    alloc_group_str    ../engine/source/groups/alloc_group_str.F
-      !||    alloc_line_str     ../engine/source/groups/alloc_line_str.F
-      !||    alloc_subset_str   ../engine/source/groups/alloc_subset_str.F
-      !||    alloc_surf_str     ../engine/source/groups/alloc_surf_str.F
-      !||    genani             ../engine/source/output/anim/generate/genani.F
-      !||    hist1              ../engine/source/output/th/hist1.F
-      !||    outp_mt            ../engine/source/output/sty/outp_mt.F
-      !||    read_sensors       ../engine/source/output/restart/read_sensors.F
-      !||    thmonv             ../engine/source/output/th/thmonv.F
-      !||====================================================================
+!||====================================================================
+!||    fretitl2           ../engine/source/input/freform.F
+!||--- called by ------------------------------------------------------
+!||    alloc_group_str    ../engine/source/groups/alloc_group_str.F
+!||    alloc_line_str     ../engine/source/groups/alloc_line_str.F
+!||    alloc_subset_str   ../engine/source/groups/alloc_subset_str.F
+!||    alloc_surf_str     ../engine/source/groups/alloc_surf_str.F
+!||    genani             ../engine/source/output/anim/generate/genani.F
+!||    hist1              ../engine/source/output/th/hist1.F
+!||    outp_mt            ../engine/source/output/sty/outp_mt.F
+!||    read_sensors       ../engine/source/output/restart/read_sensors.F
+!||    thmonv             ../engine/source/output/th/thmonv.F
+!||====================================================================
       SUBROUTINE FRETITL2(TITR,IASC,L)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2827,9 +2882,9 @@ C-----------------------------------------------
 C----------------------------------------------- 
       RETURN
       END
-      !||====================================================================
-      !||    fretitlr   ../engine/source/input/freform.F
-      !||====================================================================
+!||====================================================================
+!||    fretitlr   ../engine/source/input/freform.F
+!||====================================================================
       SUBROUTINE FRETITLR(TITR,ASC,L)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2864,9 +2919,9 @@ C-----------------------------------------------
 C----------------------------------------------- 
       RETURN
       END
-      !||====================================================================
-      !||    fretitl2r   ../engine/source/input/freform.F
-      !||====================================================================
+!||====================================================================
+!||    fretitl2r   ../engine/source/input/freform.F
+!||====================================================================
       SUBROUTINE FRETITL2R(TITR,ASC,L)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    biquad_coefficients   ../starter/source/materials/fail/biquad/biquad_coefficients.F
-      !||--- called by ------------------------------------------------------
-      !||    cfailini              ../starter/source/elements/shell/coque/cfailini.F
-      !||    cfailini4             ../starter/source/elements/shell/coque/cfailini.F
-      !||    failini               ../starter/source/elements/solid/solide/failini.F
-      !||    hm_read_fail_biquad   ../starter/source/materials/fail/biquad/hm_read_fail_biquad.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    biquad_coefficients   ../starter/source/materials/fail/biquad/biquad_coefficients.F
+!||--- called by ------------------------------------------------------
+!||    cfailini              ../starter/source/elements/shell/coque/cfailini.F
+!||    cfailini4             ../starter/source/elements/shell/coque/cfailini.F
+!||    failini               ../starter/source/elements/solid/solide/failini.F
+!||    hm_read_fail_biquad   ../starter/source/materials/fail/biquad/hm_read_fail_biquad.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE BIQUAD_COEFFICIENTS(
      .           C1    ,C2    ,C3    ,C4    ,C5    ,L     ,
      .           X_1   ,X_2   ,E1    ,E2    ,E3    ,E4    )
@@ -47,7 +47,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I, J, K, IPIV2(2), IPIV3(3), INFO
+      INTEGER  IPIV2(2), IPIV3(3), INFO
       my_real TRIAX_1_LIN, TRIAX_2_LIN, TRIAX_3_LIN,
      .        TRIAX_4_LIN, TRIAX_5_LIN
       my_real TRIAX_1_QUAD, TRIAX_2_QUAD, 

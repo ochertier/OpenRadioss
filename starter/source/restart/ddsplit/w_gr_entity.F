@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    w_gr_entity_e          ../starter/source/restart/ddsplit/w_gr_entity.F
-      !||--- called by ------------------------------------------------------
-      !||    w_group_str            ../starter/source/restart/ddsplit/w_group_str.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    w_gr_entity_e          ../starter/source/restart/ddsplit/w_gr_entity.F
+!||--- called by ------------------------------------------------------
+!||    w_group_str            ../starter/source/restart/ddsplit/w_group_str.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl                ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE W_GR_ENTITY_E(IGR  ,NGR  ,LEN_IA ,LENIGR ,CEP,
      .                       CEL    ,PROC ,ESHIFT )
 C-----------------------------------------------
@@ -52,7 +52,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,IGU,NENTITY,GRTYPE,TRI,GRPGRP,LEVEL,R2R_ALL,
+      INTEGER J,ID,IGU,NENTITY,GRTYPE,TRI,GRPGRP,LEVEL,R2R_ALL,
      .        R2R_SHARE,L_GROUP,ERR,ITITLE1(LTITR),ENTITY,
      .       NENTITY_L(NGR)
       CHARACTER(LEN=NCHARTITLE) :: TITR
@@ -134,14 +134,14 @@ C-----------------------------------------------
 !---------
       RETURN
       END
-      !||====================================================================
-      !||    w_gr_entity_p   ../starter/source/restart/ddsplit/w_gr_entity.F
-      !||--- called by ------------------------------------------------------
-      !||    w_group_str     ../starter/source/restart/ddsplit/w_group_str.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl         ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    w_gr_entity_p   ../starter/source/restart/ddsplit/w_gr_entity.F
+!||--- called by ------------------------------------------------------
+!||    w_group_str     ../starter/source/restart/ddsplit/w_group_str.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl         ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE W_GR_ENTITY_P(IGR  ,NGR  ,LEN_IA ,LENIGR ,CEP,
      .                         CEL  ,PROC )
 C-----------------------------------------------
@@ -165,8 +165,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,IGU,NENTITY,GRTYPE,TRI,GRPGRP,LEVEL,R2R_ALL,
-     .        R2R_SHARE,L_GROUP,ERR,ITITLE2(LTITR),ENTITY,NENTITY_L
+      INTEGER J,ID,IGU,NENTITY,GRTYPE,TRI,GRPGRP,LEVEL,R2R_ALL,
+     .        R2R_SHARE,L_GROUP,ERR,ITITLE2(LTITR),ENTITY
       CHARACTER(LEN=nchartitle) :: TITR
 !      CHARACTER(LEN=NCHARTITLE)::TITR
       INTEGER, ALLOCATABLE, DIMENSION (:)  ::  IGROUP_L
@@ -236,14 +236,14 @@ C-----------------------------------------------
 !---------
       RETURN
       END
-      !||====================================================================
-      !||    w_gr_entity_n          ../starter/source/restart/ddsplit/w_gr_entity.F
-      !||--- called by ------------------------------------------------------
-      !||    w_group_str            ../starter/source/restart/ddsplit/w_group_str.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    w_gr_entity_n          ../starter/source/restart/ddsplit/w_gr_entity.F
+!||--- called by ------------------------------------------------------
+!||    w_group_str            ../starter/source/restart/ddsplit/w_group_str.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl                ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE W_GR_ENTITY_N(IGR  ,NGR       ,LEN_IA ,LENIGR ,NODLOCAL,
      .                         PROC ,FRONTB_R2R,NUMNOD_L)
 C-----------------------------------------------
@@ -284,7 +284,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,ID,IGU,NOD,NNOD,GRTYPE,TRI,GRPGRP,LEVEL,R2R_ALL,
+      INTEGER J,ID,IGU,NOD,NNOD,GRTYPE,TRI,GRPGRP,LEVEL,R2R_ALL,
      .        R2R_SHARE,L_GROUP,ERR,ITITLE3(LTITR),NNOD_LOC(NGR),
      .        IGU1,IGU2
       my_real CODE

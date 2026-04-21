@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fcumu3   ../engine/source/elements/solid/solide/fcumu3.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3   ../engine/source/elements/solid/solide/sforc3.F
-      !||====================================================================
+!||====================================================================
+!||    fcumu3   ../engine/source/elements/solid/solide/fcumu3.F
+!||--- called by ------------------------------------------------------
+!||    sforc3   ../engine/source/elements/solid/solide/sforc3.F
+!||====================================================================
       SUBROUTINE FCUMU3(
      1   OFFG,    F,       NC1,     NC2,
      2   NC3,     NC4,     NC5,     NC6,
@@ -59,7 +59,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I, J
+      INTEGER  I
       my_real
      .   OFF_L
       INTEGER NVC1,NVC2,NVC3,NVC4,NVC5,NVC6,NVC7,NVC8

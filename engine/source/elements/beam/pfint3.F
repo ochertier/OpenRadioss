@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    pfint3   ../engine/source/elements/beam/pfint3.F
-      !||--- called by ------------------------------------------------------
-      !||    pforc3   ../engine/source/elements/beam/pforc3.F
-      !||====================================================================
+!||====================================================================
+!||    pfint3   ../engine/source/elements/beam/pfint3.F
+!||--- called by ------------------------------------------------------
+!||    pforc3   ../engine/source/elements/beam/pforc3.F
+!||====================================================================
       SUBROUTINE PFINT3(FOR    ,MOM    ,GEO    ,OFFG   ,OFF,
      .                  AL     ,F1     ,F2     ,F3     ,M1 ,
      .                  M2     ,M3     ,STI    ,STIR   ,NEL,
@@ -59,7 +59,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, IG, IR1Y, IR1Z, IR2Y, IR2Z
+      INTEGER I, IG, IR1Y, IR1Z, IR2Y, IR2Z
 C     REAL
       my_real
      .   OFF_L
@@ -86,7 +86,7 @@ C
         M32(I)=M3(I)-HALF*AL(I)*F2(I)
       ENDDO
 C---------------------------------------------------
-C     LIBERATION DES ROTATIONS
+C     RELEASE OF ROTATIONS
 C---------------------------------------------------
       DO I=1,NEL
         IG=PID(I)
@@ -94,7 +94,6 @@ C---------------------------------------------------
         IR1Z=NINT(GEO(9 ,IG))
         IR2Y=NINT(GEO(10,IG))
         IR2Z=NINT(GEO(11,IG))
-C ... this looks suspicious - DWS
         M21(I)=IR1Y*M21(I)+(1-IR2Y)*M22(I)
         M22(I)=IR2Y*M22(I)+(1-IR1Y)*M21(I)
         M31(I)=IR1Z*M31(I)+(1-IR2Z)*M32(I)

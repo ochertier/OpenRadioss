@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    w_th              ../starter/source/restart/ddsplit/w_th.F
-      !||--- called by ------------------------------------------------------
-      !||    write_th_buffer   ../starter/source/restart/ddsplit/write_th_buffer.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal            ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    w_th              ../starter/source/restart/ddsplit/w_th.F
+!||--- called by ------------------------------------------------------
+!||    write_th_buffer   ../starter/source/restart/ddsplit/write_th_buffer.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal            ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE W_TH(ITHGRP ,ITHBUF ,LENTHG,NODLOCAL,CEL   ,
      2                NTHGRP0,NTHGRP2,PROC    ,
      3                CELSPH, NUMLOCCLUSTER ,NBR_TH_MONVOL)
@@ -67,7 +67,7 @@ C Header recopie
 C
       CALL WRITE_I_C(ITHGRP,NITHGR*(NTHGRP0+NBR_TH_MONVOL))
 C
-C buffer renumerote localement
+C buffer renumbered locally
 C
       DO NT = 1, LENTHG
         ITHBUF_L(NT) = ITHBUF(NT)
@@ -109,14 +109,14 @@ C   elements
             ENDIF
           ENDDO
         ELSEIF (ITYP==0) THEN
-C   noeuds
+C   nodes
           DO IH = 1, NNE
             K = ITHBUF_L(IAD-1+IH)
             IF(NLOCAL(K,PROC)==1) THEN
-C   noeud present => nodlocal
+C   node present => nodlocal
               ITHBUF_L(IAD-1+IH) = NODLOCAL(K)
             ELSE
-C   noeud abscent => 0
+C   node absent => 0
               ITHBUF_L(IAD-1+IH) = 0
             ENDIF
           ENDDO

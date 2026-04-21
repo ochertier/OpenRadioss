@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,30 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    prelecsec              ../starter/source/tools/sect/prelecsec.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||    r2r_prelec             ../starter/source/coupling/rad2rad/r2r_prelec.F
-      !||    r2r_split              ../starter/source/coupling/rad2rad/r2r_split.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    grsize_ele             ../starter/source/system/nintrr.F
-      !||    grsize_ele_trans       ../starter/source/system/nintrr.F
-      !||    grsize_r2r             ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    grsizen                ../starter/source/system/nintrr.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_sz_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    prelecsec              ../starter/source/tools/sect/prelecsec.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||    r2r_prelec             ../starter/source/coupling/rad2rad/r2r_prelec.F
+!||    r2r_split              ../starter/source/coupling/rad2rad/r2r_split.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl                ../starter/source/starter/freform.F
+!||    grsize_ele             ../starter/source/system/nintrr.F
+!||    grsize_ele_trans       ../starter/source/system/nintrr.F
+!||    grsize_r2r             ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    grsizen                ../starter/source/system/nintrr.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_sz_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE PRELECSEC(
      1     SNSTRF  ,SSECBUF   ,ITABM1  ,FLAG_R2R ,NOM_OPT ,
      2     IGRBRIC ,IGRQUAD   ,IGRSH4N ,IGRSH3N  ,IGRTRUSS,
@@ -80,11 +80,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,KK,IBID,ISAV,IGU,IGUS,IGUQ,IGUC,IGUT,IGUP,IGUR,IGUTG,
-     .   NNOD,NBINTER,NSEGQ,NSEGS,NSEGC,NSEGT,NSEGP,NSEGR,NSEGTG,NFRAM,
-     .   ID,UID,L,ISTYP,
-     .   FLAG_R2R,N1,N2,N3,POS_SEC_R2R,NSEG0,NSEG,
-     .   COMPT,NG
+      INTEGER :: I,ISAV,IGU,IGUS,IGUQ,IGUC,IGUT,IGUP,IGUR,IGUTG,
+     .           NNOD,NBINTER,NSEGQ,NSEGS,NSEGC,NSEGT,NSEGP,NSEGR,NSEGTG,NFRAM,
+     .           ID,UID,L,ISTYP,
+     .           FLAG_R2R,N1,N2,N3,NSEG0,NSEG,
+     .           COMPT,NG
       CHARACTER(LEN=NCHARTITLE)::TITR
       CHARACTER(LEN=NCHARKEY) :: KEY2
       CHARACTER MESS*40
@@ -122,7 +122,7 @@ C=======================================================================
       DO I=1,NSECT
 
         NG=NG+1
-C----------Multidomain --> non taged sections ignored----
+C----------Multidomain --> non tagged sections ignored----
         IF (FLAG_R2R == 0) THEN
             IF( NSUBDOM > 0 ) THEN
                 IF( TAGSEC(NG) == 0 ) CALL HM_SZ_R2R(TAGSEC,NG,LSUBMODEL)
@@ -166,7 +166,7 @@ C----------tag section s skew nodes---------------
             IF(TAGNO(N3+NPART) < 2) TAGNO(N3+NPART) = 2
         ELSEIF (FLAG_R2R == 2) THEN     
 C----------set section position  wrt multidomain interface
-C----------element groups
+C--------- Group element
            NSEG  = GRSIZE_ELE(IGUS,IGRBRIC,NGRBRIC)
            NSEGC = GRSIZE_R2R(IGUS,IGRBRIC,NGRBRIC,9)
            NSEG0 = GRSIZE_R2R(IGUS,IGRBRIC,NGRBRIC,8)
@@ -232,7 +232,7 @@ C---
      .    NSEGR = NSEGR + GRSIZE_ELE_TRANS(IGUC,IGRSH4N,NGRSHEL,SEATBELT_SHELL_TO_SPRING)
         NSEGTG = GRSIZE_ELE(IGUTG,IGRSH3N,NGRSH3N)      
 C---    
-        SNSTRF = SNSTRF +30 + NBINTER + NNOD + 2*(NSEGS+NSEGQ+NSEGC+NSEGT+NSEGP+NSEGR+NSEGTG)
+        SNSTRF = SNSTRF +30 + NBINTER!+ NNOD + 2*(NSEGS+NSEGQ+NSEGC+NSEGT+NSEGP+NSEGR+NSEGTG)
         SSECBUF=SSECBUF+10
         IF(ISAV >= 100) SSECBUF=SSECBUF+12*NNOD
         IF(ISAV >= 101) SSECBUF=SSECBUF+12*NNOD

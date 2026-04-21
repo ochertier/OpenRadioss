@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,34 +20,35 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    upd_tmax          ../engine/source/output/upd_outmax.F
-      !||--- called by ------------------------------------------------------
-      !||    ini_tmax          ../engine/source/output/ini_outmax.F
-      !||    resol             ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    gps_solid         ../engine/source/output/outmaxsubr.F
-      !||    gpstra_solid      ../engine/source/output/outmaxsubr.F
-      !||    my_barrier        ../engine/source/system/machine.F
-      !||    sig3dpin2h        ../engine/source/output/outmaxsubr.F
-      !||    tm_dmg_shells     ../engine/source/output/outmaxsubr.F
-      !||    tm_dmg_solid      ../engine/source/output/outmaxsubr.F
-      !||    tm_dmgl25_shell   ../engine/source/output/outmaxsubr.F
-      !||    tm_seq_shell      ../engine/source/output/outmaxsubr.F
-      !||    tm_seq_solid      ../engine/source/output/outmaxsubr.F
-      !||    tm_sig_shell      ../engine/source/output/outmaxsubr.F
-      !||    tm_sig_solid      ../engine/source/output/outmaxsubr.F
-      !||    tm_stra_shell     ../engine/source/output/outmaxsubr.F
-      !||    tm_stra_solid     ../engine/source/output/outmaxsubr.F
-      !||    tm_vonm_shell     ../engine/source/output/outmaxsubr.F
-      !||    tm_vonm_solid     ../engine/source/output/outmaxsubr.F
-      !||    upd_tmnorm2       ../engine/source/output/outmaxsubr.F
-      !||    upd_tmtens        ../engine/source/output/outmaxsubr.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    outmax_mod        ../common_source/modules/outmax_mod.F
-      !||    stack_mod         ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    upd_tmax          ../engine/source/output/upd_outmax.F
+!||--- called by ------------------------------------------------------
+!||    ini_tmax          ../engine/source/output/ini_outmax.F
+!||    resol             ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    gps_solid         ../engine/source/output/outmaxsubr.F
+!||    gpstra_solid      ../engine/source/output/outmaxsubr.F
+!||    my_barrier        ../engine/source/system/machine.F
+!||    sig3dpin2h        ../engine/source/output/outmaxsubr.F
+!||    tm_dmg_shells     ../engine/source/output/outmaxsubr.F
+!||    tm_dmg_solid      ../engine/source/output/outmaxsubr.F
+!||    tm_dmgl25_shell   ../engine/source/output/outmaxsubr.F
+!||    tm_seq_shell      ../engine/source/output/outmaxsubr.F
+!||    tm_seq_solid      ../engine/source/output/outmaxsubr.F
+!||    tm_sig_shell      ../engine/source/output/outmaxsubr.F
+!||    tm_sig_solid      ../engine/source/output/outmaxsubr.F
+!||    tm_stra_shell     ../engine/source/output/outmaxsubr.F
+!||    tm_stra_solid     ../engine/source/output/outmaxsubr.F
+!||    tm_vonm_shell     ../engine/source/output/outmaxsubr.F
+!||    tm_vonm_solid     ../engine/source/output/outmaxsubr.F
+!||    upd_tmnorm2       ../engine/source/output/outmaxsubr.F
+!||    upd_tmtens        ../engine/source/output/outmaxsubr.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod       ../common_source/modules/elements/element_mod.F90
+!||    outmax_mod        ../common_source/modules/outmax_mod.F
+!||    stack_mod         ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE UPD_TMAX(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
      .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
      .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
@@ -59,6 +60,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE OUTMAX_MOD
       USE STACK_MOD
+      use element_mod , only : nixs,nixq,nixc,nixp,nixr,nixt,nixtg
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -100,17 +102,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  N, I, J,NG,ITY,NEL,IVISC,NFT,IFLU,MX,TSHELL,
+      INTEGER N, I, NG, ITY, NEL, IVISC, NFT, IFLU, MX, TSHELL, 
      .         IGTYP,ISOLNOD,ISROT,NPTR,NPTS,NPTT,NLAY,NPT,
      .         JHBE,IMAT,IPID,MATLY(MVSIZ*100),IPMAT,IADR,
      .         ISUBSTACK,MTN
       INTEGER  NODFTSK,NODLTSK,NGFTSK,NGLTSK
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF  
-      TYPE(BUF_LAY_)  ,POINTER :: BUFLY     
+ 
       my_real
-     .  NORM,S(3),VALUE(MVSIZ),RHO,TEN1(MVSIZ,6),TEN3(MVSIZ,6),
-     .  TP2(MVSIZ,2),T2D1(MVSIZ,3),T2D3(MVSIZ,3),MASS(MVSIZ)
+     . VALUE(MVSIZ),RHO,
+     . MASS(MVSIZ)
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------     

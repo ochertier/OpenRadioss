@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,34 +20,35 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecint                       ../starter/source/interfaces/interf1/lecint.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                       ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                       ../starter/source/output/message/message.F
-      !||    fretitl2                     ../starter/source/starter/freform.F
-      !||    i20surfi                     ../starter/source/interfaces/inter3d1/i20surfi.F
-      !||    i24surfi                     ../starter/source/interfaces/inter3d1/i24surfi.F
-      !||    i25surfi                     ../starter/source/interfaces/inter3d1/i25surfi.F
-      !||    i2_surfi_dim                 ../starter/source/interfaces/inter3d1/i2_surfi_dim.F90
-      !||    ingrbric                     ../starter/source/interfaces/interf1/ingrbric.F
-      !||    ingrbric_dx                  ../starter/source/interfaces/interf1/ingrbric_dx.F
-      !||    ingrbric_nodes               ../starter/source/interfaces/interf1/ingrbric_nodes.F
-      !||    inpoint                      ../starter/source/interfaces/interf1/inpoint.F
-      !||    inslin                       ../starter/source/interfaces/interf1/inslin.F
-      !||    insurf                       ../starter/source/interfaces/interf1/insurf.F
-      !||    insurf23                     ../starter/source/interfaces/interf1/insurf23.F
-      !||    insurf_dx                    ../starter/source/interfaces/interf1/insurf_dx.F
-      !||    insurfigeo                   ../starter/source/interfaces/interf1/insurfigeo.F
-      !||    inter1_check_ale_lag_sides   ../starter/source/interfaces/int01/inter1_check_ale_lag_sides.F90
-      !||    nintri                       ../starter/source/system/nintrr.F
-      !||    presegmt                     ../starter/source/interfaces/interf1/presegmt.F
-      !||--- uses       -----------------------------------------------------
-      !||    i2_surfi_dim_mod             ../starter/source/interfaces/inter3d1/i2_surfi_dim.F90
-      !||    message_mod                  ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                      ../starter/share/modules1/r2r_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecint                           ../starter/source/interfaces/interf1/lecint.F
+!||--- called by ------------------------------------------------------
+!||    lectur                           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                           ../starter/source/output/message/message.F
+!||    fretitl2                         ../starter/source/starter/freform.F
+!||    i20surfi                         ../starter/source/interfaces/inter3d1/i20surfi.F
+!||    i24surfi                         ../starter/source/interfaces/inter3d1/i24surfi.F
+!||    i25surfi                         ../starter/source/interfaces/inter3d1/i25surfi.F
+!||    i2_surfi_dim                     ../starter/source/interfaces/inter3d1/i2_surfi_dim.F90
+!||    ingrbric                         ../starter/source/interfaces/interf1/ingrbric.F
+!||    ingrbric_dx                      ../starter/source/interfaces/interf1/ingrbric_dx.F
+!||    ingrbric_nodes                   ../starter/source/interfaces/interf1/ingrbric_nodes.F
+!||    inpoint                          ../starter/source/interfaces/interf1/inpoint.F
+!||    inslin                           ../starter/source/interfaces/interf1/inslin.F
+!||    insurf                           ../starter/source/interfaces/interf1/insurf.F
+!||    insurf23                         ../starter/source/interfaces/interf1/insurf23.F
+!||    insurf_dx                        ../starter/source/interfaces/interf1/insurf_dx.F
+!||    insurfigeo                       ../starter/source/interfaces/interf1/insurfigeo.F
+!||    inter1_check_ale_lag_sides       ../starter/source/interfaces/int01/inter1_check_ale_lag_sides.F90
+!||    nintri                           ../starter/source/system/nintrr.F
+!||    presegmt                         ../starter/source/interfaces/interf1/presegmt.F
+!||--- uses       -----------------------------------------------------
+!||    i2_surfi_dim_mod                 ../starter/source/interfaces/inter3d1/i2_surfi_dim.F90
+!||    inter1_check_ale_lag_sides_mod   ../starter/source/interfaces/int01/inter1_check_ale_lag_sides.F90
+!||    message_mod                      ../starter/share/message_module/message_mod.F
+!||    r2r_mod                          ../starter/share/modules1/r2r_mod.F
+!||====================================================================
       SUBROUTINE LECINT(IPARI   ,LINTER  ,IPM     ,BUFMAT  ,
      .                  NMNT    ,ITAB    ,ITABM1  ,GEO     ,
      .                  PM      ,X       ,IGRNOD  ,IGRSURF ,IGRSLIN ,
@@ -61,7 +62,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                  IXS16   ,IXS20   ,DEF_INTER,MAXNSNE,
      .                  NPC1    ,MULTI_FVM,NOM_OPTFRIC,INTBUF_FRIC_TAB,
      .                  IGRBRIC,IGRSH3N ,IGRTRUSS ,MAXRTM_T2,NSN_MULTI_CONNEC,T2_NB_CONNEC,
-     .                  IDDLEVEL,NALE   ,INTERFACES,SNPC1)
+     .                  IDDLEVEL,NALE   ,INTERFACES,SNPC1  ,FLAG_ELEM_INTER25,LIST_NIN25)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -75,6 +76,8 @@ C-----------------------------------------------
       USE INTERFACES_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE I2_SURFI_DIM_MOD ,     ONLY : I2_SURFI_DIM
+      use inter1_check_ale_lag_sides_mod , only : inter1_check_ale_lag_sides
+      use element_mod , only : nixs
 C-----------------------------------------------      
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -106,6 +109,8 @@ C-----------------------------------------------
      .        NPC1(SNPC1),NOM_OPTFRIC(LNOPT1,*),MAXRTM_T2,
      .        T2_NB_CONNEC(*),NSN_MULTI_CONNEC
       INTEGER, INTENT(IN) :: NALE(NUMNOD)
+      INTEGER, INTENT(INOUT) :: LIST_NIN25(NINTER)
+      INTEGER, INTENT(INOUT) :: FLAG_ELEM_INTER25(NINTER25,NUMELS)
       my_real
      .   GEO(NPROPG,NUMGEO), PM(*), XFILTR(*),STFAC(*),
      .   FRIC_P(10,NINTER),I2RUPT(6,NINTER),FRIGAP(NPARIR,NINTER),AREASL(*)
@@ -136,7 +141,8 @@ C-----------------------------------------------
      .        NRTM_IGE,NRTMM_IGE,
      .        NRTS_IGE,NRTMS_IGE,NRTS_FE,
      .        NMN_IGE,NMN_FE,NSN_IGE,NSN_FE,IAD_IGE,
-     .        IEDGE,NCONTE,MULTIMPE,MULTIMPS,ISTIFF
+     .        IEDGE,NCONTE,MULTIMPE,MULTIMPS,ISTIFF,NIN25,
+     .        NEDGE_FE,NEDGE_L,ISU3,ISU4,NMN_1D
       INTEGER KD(50),JD(50),IBID,NRTM_SH,ETYP,INTPLY
       INTEGER, DIMENSION(:), ALLOCATABLE :: IRECTS,IRECTM,NSV,MSR
       INTEGER ID,ISL, GRBRIC_ID
@@ -270,6 +276,7 @@ C-----------------------------------------------
       NRTMM_IGE = 0
       NRTMS_IGE = 0
       STIFF_STAT = ZERO
+      NIN25 = 0
       
       DO NI=1,LINTER
 C
@@ -287,6 +294,8 @@ C
         ISU2    = IPARI(46,NI)  
         ISTIFF  = IPARI(29,NI)       
         ILAGM   = IPARI(33,NI)
+        ISU3    = IPARI(102,NI) 
+        ISU4    = IPARI(103,NI)  
         TYPE18=.FALSE.
         IF(NTYP==7 .AND. INACTI==7 )TYPE18=.TRUE.
         GRBRIC_ID = ISU1
@@ -304,6 +313,9 @@ C-----  --
         NRTM=0
         NRTM_IGE=0
         NRTM_FE =0
+        NEDGE_FE =0
+        NEDGE_L =0 
+        NMN_1D =0
         IF(IS1 == 1)THEN
             NRTS_IGE=IGRSURF(ISU1)%NSEG_IGE
             NRTS_FE =IGRSURF(ISU1)%NSEG
@@ -318,7 +330,13 @@ C-----  --
             NSN=0
         ELSEIF(IS1 == 5) THEN
             NSN_FE=IGRBRIC(ISU1)%NENTITY
-            NSN = NSN_FE            
+            NSN = NSN_FE     
+        ELSEIF(IS1 == 6)THEN
+            NRTS_FE =IGRSURF(ISU1)%NSEG
+            NRTS = NRTS_FE 
+            NEDGE_FE=IGRSLIN(ISU3)%NSEG
+            NEDGE_L= NEDGE_FE  
+            NMN_1D = 2*NEDGE_L
         ENDIF
         IF(IS2 == 1)THEN
             NRTM_IGE=IGRSURF(ISU2)%NSEG_IGE
@@ -336,6 +354,12 @@ C              ISURF(4,NS) == 100 Hyper-Ellipsoid MaDyMo coupled with.
 C              ISURF(4,NS) == 101 Hyper-Ellipsoid Radioss defined.
 C     IS2=4 is available for Interface TYPE 14 only :
 C     should be checked for all others interfaces in LECIN4 ...
+        ELSEIF(IS2 == 6)THEN
+            NRTM_FE =IGRSURF(ISU2)%NSEG
+            NRTM = NRTM_FE
+            NEDGE_FE=IGRSLIN(ISU4)%NSEG
+            NEDGE_L= NEDGE_L + NEDGE_FE 
+            NMN_1D= NEDGE_L + 2*NEDGE_L
         ENDIF
 C
         IPARI(3,NI)  = NRTS
@@ -350,6 +374,8 @@ C
         IPARI(78,NI) = NSN_FE
         IPARI(79,NI) = NMN_IGE
         IPARI(80,NI) = NMN_FE
+        IPARI(101,NI) = NEDGE_L
+        IPARI(104,NI) = NMN_1D
 C
         IF (NTYP == 2 .AND. IS1==-1.AND. IS2==-1) THEN
             CALL I2_SURFI_DIM( NPARI   ,IPARI(1,NI),NSURF   ,IGRSURF ,           
@@ -439,6 +465,8 @@ C
         ELSEIF(NTYP == 25)THEN
           IALLO = 1  ! memory evaluation
           INTPLY = 0
+          NIN25 = NIN25 + 1
+          LIST_NIN25(NI) = NIN25
           CALL I25SURFI(
      1      IALLO        ,IPARI(1,NI)  ,IGRNOD     ,IGRSURF      ,
      2      IBID         ,FRIGAP(1,NI) ,
@@ -448,7 +476,10 @@ C
      6      IXTG         ,KNOD2ELC     ,KNOD2ELTG   ,NOD2ELC      ,
      7      NOD2ELTG     ,KNOD2ELS     ,NOD2ELS     ,IXS          ,
      8      IXS10        ,IXS16        ,IXS20       ,IBID         ,
-     9      IBID         ,IBID         ,IBID        ,INTERFACES%PARAMETERS)
+     9      IBID         ,IBID         ,IBID        ,INTERFACES%PARAMETERS,
+     A      NIN25        ,FLAG_ELEM_INTER25,IGRSLIN     ,
+     B      IBID         ,IBID         ,IBID        ,IBID         ,
+     C      IBID         )
             IPARI(66,NI) = INTPLY
             IF(INTPLY > 0) INTPLYXFEM = 1          
 C----------NRTS,NRTM is calculated in I25SURFI     
@@ -460,6 +491,8 @@ C!!!!!re-calculate NRTM_SH taking into account to ISU1  :inside I25SURFI
           NSN  = IPARI(5,NI)
           NLN  = IPARI(35,NI)
           NRTM_SH=IPARI(42,NI)
+          NEDGE_L = IPARI(101,NI)
+          NMN_1D = IPARI(104,NI)
         ENDIF
 C--------------------------------------------     
 C     Sizing due to sub-interfaces
@@ -517,10 +550,60 @@ C Subinter :  Case Inter 0
             END IF
           END DO
           IPARI(36,NI)=NISUB
+        ELSEIF(NTYP==24)THEN
+C--------------------------------------------
+          DO JSUB=1,NINTSUB
 
-C
+C Subinter : Case Inter corresponding to id inter
+
+            IF(NOM_OPT(2,NINTER+JSUB) == NOINT .AND. NOM_OPT(5,NINTER+JSUB) == 1)THEN
+              NISUB=NISUB+1
+              IGR  =NOM_OPT(4,NINTER+JSUB)
+              ISU1 =NOM_OPT(3,NINTER+JSUB)
+              ISU2 =NOM_OPT(6,NINTER+JSUB)
+              IF(IGR/=0)IPARI(37,NI)=IPARI(37,NI)+IGRNOD(IGR)%NENTITY
+              IF(ISU2/=0)THEN
+                IPARI(38,NI)=IPARI(38,NI)+IGRSURF(ISU2)%NSEG
+                IPARI(37,NI)=IPARI(37,NI)+4*IGRSURF(ISU2)%NSEG
+                IF(IPARI(55,NI)/=0)THEN
+                  IPARI(37,NI)=IPARI(37,NI)+4*3*IGRSURF(ISU2)%NSEG
+                END IF
+              END IF
+              IF(ISU1/=0)THEN
+                IPARI(38,NI)=IPARI(38,NI)+IGRSURF(ISU1)%NSEG
+                IPARI(37,NI)=IPARI(37,NI)+4*IGRSURF(ISU1)%NSEG
+                IF(IPARI(55,NI)/=0)THEN
+                  IPARI(37,NI)=IPARI(37,NI)+4*3*IGRSURF(ISU1)%NSEG
+                END IF
+              END IF
+            END IF
+
+C Subinter :  Case Inter 0
+
+            IF(NOM_OPT(2,NINTER+JSUB) == 0 .AND. NOM_OPT(5,NINTER+JSUB) == 1) THEN
+              NISUB=NISUB+1
+              ISU1 =NOM_OPT(3,NINTER+JSUB)
+              ISU2 =NOM_OPT(6,NINTER+JSUB)
+              IF(ISU2 /= 0 ) THEN 
+                 IPARI(37,NI) = IPARI(37,NI) + 4* IGRSURF(ISU2)%NSEG
+                 IPARI(38,NI)=IPARI(38,NI)+IGRSURF(ISU2)%NSEG
+                IF(IPARI(55,NI)/=0)THEN
+                   IPARI(37,NI)=IPARI(37,NI)+4*3*IGRSURF(ISU2)%NSEG
+                 END IF          
+              ENDIF
+              IF(ISU1 /=0 ) THEN
+                 IPARI(37,NI) = IPARI(37,NI) + 4* IGRSURF(ISU1)%NSEG
+                 IPARI(38,NI)=IPARI(38,NI)+IGRSURF(ISU1)%NSEG
+                IF(IPARI(55,NI)/=0)THEN
+                   IPARI(37,NI)=IPARI(37,NI)+4*3*IGRSURF(ISU1)%NSEG
+                 END IF 
+              ENDIF
+            END IF
+          END DO
+          IPARI(36,NI)=NISUB
+CSubiSubiSubi
         ELSEIF(NTYP==7.OR.NTYP==10.OR.NTYP==20
-     . .OR.NTYP==22.OR.NTYP==24)THEN
+     . .OR.NTYP==22)THEN
 C--------------------------------------------
 
 C Subinter : Case Inter corresponding to id inter
@@ -735,16 +818,12 @@ C--------------------------------------------
               CALL INSURF(NRTS_FE,NSN_FE,IRS,IRECTS,
      .                    SURF_NODES,ITAB,NSV,ID,TITR,
      .                    NTAG,S_NSV,S_IRECTS,TYPE18)
-              IF (NTYP == 1)THEN
-                CALL INTER1_CHECK_ALE_LAG_SIDES(N2D, IGRSURF(ISU1)%ID, ID, TITR,
-     .                                          NUMNOD, ITAB, NRTS_FE, IRECTS, NALE, 'ALE', IDDLEVEL)
-              ENDIF
               IF (IGRSURF(ISU1)%NSEG_IGE >= 1) THEN
                 SURF_NODES_IGE => IGRSURF(ISU1)%NODES_IGE(1:NRTS_IGE,1:4)
                 IAD_IGE = IGRSURF(ISU1)%IAD_IGE               
                 CALL INSURFIGEO(NRTS_IGE,NRTS_FE,NSN_IGE,0,IAD_IGE,IRM,IRECTS,NOINT,
      .                     SURF_NODES_IGE,ITAB,NSV,ID,TITR,
-     .                     RBID,IBID,RBID,RBID,RBID,RBID,RBID,RBID)
+     .                     IBID,RBID,RBID,RBID,IBID,RBID,RBID,RBID)
               ENDIF
             ELSEIF(IS1 == 2)THEN
               CALL INPOINT(NSN_FE,NOINT,IGRNOD(ISU1)%ENTITY,ITAB,NSV)
@@ -758,6 +837,15 @@ C--------------------------------------------
                NBRIC = IGRBRIC(ISU1)%NENTITY
                CALL INGRBRIC(NSN, IGRBRIC(ISU1)%ENTITY, NSV,
      .                       IXS, NBRIC, PM,S_NSV, IGEO)
+            ELSEIF(IS1==6) THEN
+              SURF_NODES => IGRSURF(ISU1)%NODES(1:NRTS_FE,1:4)
+              CALL INSURF(NRTS_FE,NSN_FE,IRS,IRECTS,
+     .                    SURF_NODES,ITAB,NSV,ID,TITR,
+     .                    NTAG,S_NSV,S_IRECTS,TYPE18)
+              LINE_NODES => IGRSLIN(ISU1)%NODES(1:NRTS,1:2)
+              CALL INSLIN(NRTS,NSN_FE,IRECTS,NOINT,
+     .                    LINE_NODES,ITAB,NSV,
+     .                    NTAG)
             ENDIF
           ENDIF
           NSN = NSN_FE+NSN_IGE
@@ -834,8 +922,8 @@ C--------------------------------------------
               CALL INSURF(NRTM,NMN,IRM,IRECTM,
      .                    SURF_NODES,ITAB,MSR,ID,TITR,
      .                    NTAG,S_MSR,S_IRECTM,TYPE18)
-              IPARI(6,NI)  = NMN           !nombre de main node.
-              IPARI(33,NI) = IGRSURF(ISU2)%NSEG ! nombre de facette main
+              IPARI(6,NI)  = NMN           !number of main node.
+              IPARI(33,NI) = IGRSURF(ISU2)%NSEG ! number of main facet
               IPARI(4,NI)  = IGRSURF(ISU2)%NSEG
 C--------------------------------------------
         ELSEIF( NTYP == 23) THEN
@@ -874,15 +962,19 @@ C--------------------------------------------
      .                    SURF_NODES,ITAB,MSR,ID,TITR,
      .                    NTAG,S_MSR,S_IRECTM,TYPE18)
               IF (NTYP == 1)THEN
-                CALL INTER1_CHECK_ALE_LAG_SIDES(N2D, IGRSURF(ISU2)%ID, ID, TITR,
-     .                                          NUMNOD, ITAB, NRTM_FE, IRECTM, NALE, 'LAG', IDDLEVEL)
+                CALL INTER1_CHECK_ALE_LAG_SIDES(N2D, IGRSURF(ISU1)%ID, IGRSURF(ISU2)%ID,  ID, TITR,
+     .                                          NUMNOD, ITAB, NRTS_FE, NRTM_FE, IRECTS, IRECTM,NALE, IDDLEVEL)
+                IGRSURF(ISU1)%NSEG = NRTS_FE
+                IGRSURF(ISU2)%NSEG = NRTM_FE
+                IPARI(74,NI) = NRTM_FE
+                IPARI(76,NI) = NRTS_FE
               ENDIF
               IF (IGRSURF(ISU2)%NSEG_IGE >= 1) THEN
               SURF_NODES_IGE => IGRSURF(ISU2)%NODES_IGE(1:NRTM_IGE,1:4)
               IAD_IGE = IGRSURF(ISU2)%IAD_IGE              
                 CALL INSURFIGEO(NRTM_IGE,NRTM_FE,NMN_IGE,NSN_IGE,IAD_IGE,IRM,IRECTM,NOINT,
      .                     SURF_NODES_IGE,ITAB,MSR,ID,TITR,
-     .                     RBID,RBID,RBID,RBID,RBID,RBID,RBID,RBID)
+     .                     IBID,RBID,RBID,RBID,IBID,RBID,RBID,RBID)
               ENDIF
             ELSEIF(IS2 == 3)THEN
               LINE_NODES => IGRSLIN(ISU2)%NODES(1:NRTM,1:2)
@@ -899,7 +991,7 @@ C--------------------------------------------
               IAD_IGE = IGRSURF(ISU2)%IAD_IGE              
                 CALL INSURFIGEO(NRTM_IGE,NRTM_FE,NMN_IGE,0,IAD_IGE,IRM,IRECTM,NOINT,
      .                     SURF_NODES_IGE,ITAB,MSR,ID,TITR,
-     .                     RBID,RBID,RBID,RBID,RBID,RBID,RBID,RBID)
+     .                     IBID,RBID,RBID,RBID,IBID,RBID,RBID,RBID)
               ENDIF
             ENDIF
             NMN = NMN_FE+NMN_IGE
@@ -997,12 +1089,14 @@ C-------
           IPARI(24,NI) = NSN_FE+NSN_IGE
           IPARI(25,NI) = NSN_FE+NSN_IGE+NMN_FE+NMN_IGE
           IMAXIMP = IMAXIMP + MULTIMP*(NSN_FE+NSN_IGE)
-          NMNT =MAX0(NMNT,NSN_FE+NSN_IGE + 3) 
+          NMNT =MAX0(NMNT,NSN_IGE + 3) 
+
           IF (ILAGM > 0) THEN
             LAG_NC16 = NUMNOD
             LAG_NK16 = NUMNOD*15
             NMNT = MAX(NMNT, 4*(NMN+100)+ 2*(NSN_FE+NSN_IGE) + LAG_NC16 + 4*LAG_NK16)                       
           ENDIF
+
           MAXRTM=MAX(MAXRTM,NRTM)
 C-------
         ELSEIF (NTYP == 8) THEN
@@ -1059,7 +1153,7 @@ C-------
           IPARI(24,NI) = NSN
           IPARI(25,NI) = NSN+NMN
           IMAXIMP = IMAXIMP + MULTIMP*NSN
-          NMNT =MAX0(NMNT,NSN + 3) 
+          !NMNT =MAX0(NMNT,NSN + 3) 
           MAXRTM=MAX(MAXRTM,NRTM)
 C-------
         ELSEIF (NTYP == 20) THEN
@@ -1141,17 +1235,18 @@ C
 C         NADMSR, NEDGE are over estimated for ALLOCATE
 C         NADMSR, NEDGE will be over written before writing
           IPARI(67,NI)=4*NRTM
-          IPARI(68,NI)=4*NRTM
+          NEDGE_L = IPARI(101,NI)
+          IPARI(68,NI)=4*NRTM + NEDGE_L
 C
           IF(IEDGE /= 0) THEN
-            NCONTE=4*NRTM       ! cf NCONTE=NEDGE
+            NCONTE=4*NRTM + NEDGE_L    ! cf NCONTE=NEDGE
             IPARI(88,NI)=NCONTE
           ELSE
             NCONTE=0
           END IF
 C
           IMAXIMP = IMAXIMP + MULTIMP*NSN + MULTIMPE*NCONTE + MULTIMPS*NCONTE
-          NMNT =MAX0(NMNT,NSN + 3) 
+          !NMNT =MAX0(NMNT,NSN + 3) 
           IF (ILAGM > 0) THEN
             LAG_NC16 = NUMNOD
             LAG_NK16 = NUMNOD*15

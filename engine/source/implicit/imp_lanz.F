@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    imp_lanzp       ../engine/source/implicit/imp_lanz.F
-      !||--- called by ------------------------------------------------------
-      !||    lin_solvh0      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvh1      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvih2     ../engine/source/implicit/lin_solv.F
-      !||--- calls      -----------------------------------------------------
-      !||    mav_ltp         ../engine/source/implicit/produt_v.F
-      !||    prec_solvp      ../engine/source/implicit/prec_solv.F
-      !||    produt_w        ../engine/source/implicit/produt_v.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod     ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_lanzp       ../engine/source/implicit/imp_lanz.F
+!||--- called by ------------------------------------------------------
+!||    lin_solvh0      ../engine/source/implicit/lin_solv.F
+!||    lin_solvh1      ../engine/source/implicit/lin_solv.F
+!||    lin_solvih2     ../engine/source/implicit/lin_solv.F
+!||--- calls      -----------------------------------------------------
+!||    mav_ltp         ../engine/source/implicit/produt_v.F
+!||    prec_solvp      ../engine/source/implicit/prec_solv.F
+!||    produt_w        ../engine/source/implicit/produt_v.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod     ../engine/share/modules/dsgraph_mod.F
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE IMP_LANZP(IPREC ,
      1                    N     ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
      2                    LT_K  ,NI    ,ITOK  ,IADI  ,JDII   ,
@@ -130,7 +131,7 @@ C*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C*     based on File symmlq.f
 C*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-C machine  precision minimum dependant du type REAL ou DOUBLE
+C machine minimum precision depending on REAL or DOUBLE type
 c      write(*,*)'flm=',flm
 C-------add if (RTOL<FLM) RTOL=FLM
       IUPD = 0
@@ -569,7 +570,7 @@ C    --R=B-A.X--- ---
        IF(IPRINT<0) WRITE(ISTDO,1002)ITN,RNORM
       ENDIF
       IF (ISTOP>0.AND.ISTOP<4) ISTOP=0
-C--------POUR F*X--------
+C--------FOR F*X--------
       RETURN
 
 C*     ------------------------------------------------------------------

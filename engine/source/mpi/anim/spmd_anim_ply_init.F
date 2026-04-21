@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_anim_ply_init   ../engine/source/mpi/anim/spmd_anim_ply_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol_init           ../engine/source/engine/resol_init.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    plyxfem_mod          ../engine/share/modules/plyxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_anim_ply_init   ../engine/source/mpi/anim/spmd_anim_ply_init.F
+!||--- called by ------------------------------------------------------
+!||    resol_init           ../engine/source/engine/resol_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    plyxfem_mod          ../engine/share/modules/plyxfem_mod.F
+!||    spmd_mod             ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SPMD_ANIM_PLY_INIT()
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE PLYXFEM_MOD
+      USE SPMD_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,10 +53,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER, DIMENSION(:),ALLOCATABLE :: PLYNODTAG,SENDBUF,RECBUF
-      INTEGER MAXSENDSZ,RECSZ,PLYSZ
-      INTEGER I,J,P,ND, ITAG, IDCMAXP(NSPMD-1), REQ(NSPMD-1),NODCOUNT
-      INTEGER MSGOFF,MSGOFF2,STAT(MPI_STATUS_SIZE,NSPMD-1), IERR
+ 
+      INTEGER RECSZ
+      INTEGER I, P, ITAG
+      INTEGER MSGOFF, STAT(MPI_STATUS_SIZE, NSPMD-1), IERR
 C-----------------------------------------------
       DATA MSGOFF/7054/
 C-----------------------------------------------

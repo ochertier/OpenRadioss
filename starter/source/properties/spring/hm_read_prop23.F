@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop23           ../starter/source/properties/spring/hm_read_prop23.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop23           ../starter/source/properties/spring/hm_read_prop23.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP23(GEO,IGEO,IG,IGTYP,UNITAB,
-     .                          ISKN,TITR,LSUBMODEL,PROP_TAG)
+     .                          ISKN,TITR,LSUBMODEL,PROP_TAG,SUB_INDEX)
 C-----------------------------------------------
       USE UNITAB_MOD
       USE MESSAGE_MOD
@@ -59,6 +59,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER IGEO(NPROPGI),ISKN(LISKN,*),IG,IGTYP
+      INTEGER, INTENT(IN) :: SUB_INDEX
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
 C     REAL
       my_real
@@ -95,17 +96,21 @@ C EXTRACT DATAS (INTEGER VALUES)
 C--------------------------------------------------
       CALL HM_GET_INTV('Imass',ITYPE,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('SKEW_CSID',ID_SKEW,IS_AVAILABLE,LSUBMODEL)
+      IF(ID_SKEW == 0 .AND. SUB_INDEX /= 0 ) ID_SKEW = LSUBMODEL(SUB_INDEX)%SKEW
       CALL HM_GET_INTV('ISENSOR',ID_SENS,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('ISFLAG',ISFLAG,IS_AVAILABLE,LSUBMODEL)
 C--------------------------------------------------
 C EXTRACT DATAS (REAL VALUES)
 C--------------------------------------------------
+C     Default value of Imass is 2
+      IF (ITYPE==0) ITYPE = 2
+C      
       CALL HM_GET_FLOATV('INERTIA',INERTIA,IS_AVAILABLE,LSUBMODEL,UNITAB)
       IF (ITYPE == 1) THEN
         CALL HM_GET_FLOATV('AREA',VOL_AIR,IS_AVAILABLE,LSUBMODEL,UNITAB)
       ELSE
         CALL HM_GET_FLOATV('Volume',VOL_AIR,IS_AVAILABLE,LSUBMODEL,UNITAB)
-      ENDIF
+      ENDIF  
 C
 !----------------
 !  verification
@@ -156,9 +161,9 @@ C----
      &    5X,'CONFIDENTIAL DATA'//)
       ELSE
         IF(ITYPE == 1) THEN
-          WRITE(IOUT,1700)IG,VOL_AIR,INERTIA,ISKN(4,ID_SKEW),ID_SENS,ISFLAG
+          WRITE(IOUT,1700)IG,VOL_AIR,INERTIA,ISKN(4,ID_SKEW),ABS(ID_SENS),ISFLAG
         ELSE
-          WRITE(IOUT,1800)IG,VOL_AIR,INERTIA,ISKN(4,ID_SKEW),ID_SENS,ISFLAG
+          WRITE(IOUT,1800)IG,VOL_AIR,INERTIA,ISKN(4,ID_SKEW),ABS(ID_SENS),ISFLAG
         ENDIF  
       ENDIF
 C------------------------

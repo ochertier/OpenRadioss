@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_exch_a_rb6    ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
-      !||--- called by ------------------------------------------------------
-      !||    rbyfor             ../engine/source/constraints/general/rbody/rbyfor.F
-      !||    sms_encin_2        ../engine/source/ams/sms_encin_2.F
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||    sms_pcg            ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_a_rb6       ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
+!||--- called by ------------------------------------------------------
+!||    rbyfor                ../engine/source/constraints/general/rbody/rbyfor.F
+!||    sms_encin_2           ../engine/source/ams/sms_encin_2.F
+!||    sms_mass_scale_2      ../engine/source/ams/sms_mass_scale_2.F
+!||    sms_pcg               ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_A_RB6(NRBDIM,IAD_RBY,FR_RBY6,ICSIZE,RBF6)
 C     make summation of acc and stiffness for main nodes of rigid bodies
 C     and make summation of other quantities for AMS
@@ -42,6 +43,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -63,7 +65,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,LOC_PROC,A_AR,NOD,L,I,J,K,IAD,IRB,
+      INTEGER MSGTYP,LOC_PROC,A_AR,L,I,J,K,IAD,IRB,
      .        MSGOFF,SIZ,IDEB, LEN,INDEX,NBINDEX,
      .        INDEXI(NSPMD),REQ_R(NSPMD),REQ_S(NSPMD)
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR
@@ -154,14 +156,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_exch_a_rb6_vrel   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
-      !||--- called by ------------------------------------------------------
-      !||    rbyfor                 ../engine/source/constraints/general/rbody/rbyfor.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_a_rb6_vrel   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
+!||--- called by ------------------------------------------------------
+!||    rbyfor                 ../engine/source/constraints/general/rbody/rbyfor.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod    ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_A_RB6_VREL(NRBDIM,IAD_RBY,FR_RBY6,ICSIZE,RBY6,
      .                                RBY6_C,SIZE_RBY6_C)
 C     make summation of acc, stiffness for main nodes of rigid bodies
@@ -173,6 +176,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -194,7 +198,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,LOC_PROC,A_AR,NOD,L,I,J,K,IAD,IRB,
+      INTEGER MSGTYP,LOC_PROC,A_AR,L,I,J,K,IAD,IRB,
      .        MSGOFF,SIZ,IDEB, LEN,INDEX,NBINDEX,
      .        INDEXI(NSPMD),REQ_R(NSPMD),REQ_S(NSPMD)
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    velvecz22        ../engine/source/output/anim/generate/velvecz22.F
-      !||--- called by ------------------------------------------------------
-      !||    genani           ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_r_c        ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    groupdef_mod     ../common_source/modules/groupdef_mod.F
-      !||    i22bufbric_mod   ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22edge_mod      ../common_source/modules/interfaces/cut-cell-buffer_mod.F
-      !||    i22tri_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    initbuf_mod      ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    velvecz22        ../engine/source/output/anim/generate/velvecz22.F
+!||--- called by ------------------------------------------------------
+!||    genani           ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    write_r_c        ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod     ../common_source/modules/groupdef_mod.F
+!||    i22bufbric_mod   ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22edge_mod      ../common_source/modules/interfaces/cut-cell-buffer_mod.F
+!||    i22tri_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    initbuf_mod      ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE VELVECZ22(ELBUF_TAB,IPARG ,IPARI ,IGRNOD ,   X,
      .                     IXS      ,IXQ   ,ITAB  ,IFLG   )
 C-----------------------------------------------
@@ -51,6 +52,7 @@ C-----------------------------------------------
       USE I22EDGE_MOD    
       USE I22TRI_MOD
       USE GROUPDEF_MOD
+      use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,9 +76,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   A r g u m e n t s
 C----------------------------------------------- 
-      INTEGER :: ICELLM,NCELL,NBF,NBL,ICELL,NIN,NODE_ID,IB,NG,I
-      INTEGER :: IAD0, NNODES, II, NFACE, J, K, IE,IGR
-      my_real :: rho_cell, RHO(4)
+      INTEGER :: NCELL, NBF, NBL, ICELL, NIN, NODE_ID, IB, I
+      INTEGER :: NNODES, II, J, IE, IGR
+ 
       REAL,DIMENSION(:,:),ALLOCATABLE :: BUFFER
       LOGICAL :: lStillNode
 C-----------------------------------------------

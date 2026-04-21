@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_auto_dt      ../starter/source/ams/sms_auto_dt.F
-      !||--- called by ------------------------------------------------------
-      !||    initia           ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    nod_sms_dt       ../starter/source/ams/sms_auto_dt.F
-      !||    nod_sms_dt_sol   ../starter/source/ams/sms_auto_dt.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    sms_auto_dt      ../starter/source/ams/sms_auto_dt.F
+!||--- called by ------------------------------------------------------
+!||    initia           ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    nod_sms_dt       ../starter/source/ams/sms_auto_dt.F
+!||    nod_sms_dt_sol   ../starter/source/ams/sms_auto_dt.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SMS_AUTO_DT(DTELEM,NATIV_SMS,
      1  IXS     ,IXQ      ,IXC     ,IXT     ,IXP       ,
      2  IXR     ,IXTG     ,IXS10   ,IXS16   ,IXS20     ,
@@ -39,6 +39,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
       USE ELBUFDEF_MOD  
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,7 +73,6 @@ C-----------------------------------------------
       INTEGER I,NEL,IAD,NFT,ITY,ISOL,NG,NUMEL,
      .   COMPT_PART(NPART),COMPT_TOT_PART(NPART),COMPT(7),COMPT_TOT,
      .   NUME(7),DT_INDEX(7)
-      CHARACTER FILNAM*109, KEYA*80, KEYA2*80
       CHARACTER*12 :: TYPE_ELEM(7)
       my_real
      .   RATIO
@@ -89,7 +89,7 @@ C
 C-----------------------------------------------
 C
 C-----------------------------------------------
-C     Remplissage de ISMS pour les elements selectionnes par PART
+C     ISMS filling for selected elements by share
 C-----------------------------------------------
 C
       IF(ISMS_SELEC==1 .OR. ISMS_SELEC==2 .OR. ISMS_SELEC==4)THEN
@@ -135,7 +135,7 @@ C
       END IF
 C
 C-----------------------------------------------
-C     Calcul des index dans dtelem pour chaque type d'element
+C     Calculation of indexes in Dtelem for each type of element
 C-----------------------------------------------
 C
       NUMEL= NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELTG
@@ -165,7 +165,7 @@ C
       TYPE_ELEM(7)='SHELL-3NODES'
 C
 C--------------------------------------------------
-C     Identification des elements a switcher en AMS
+C     Identification of switcher elements in AMS
 C--------------------------------------------------
 C
       DO NG=1,NGROUP
@@ -280,11 +280,11 @@ C
 
       END
 
-      !||====================================================================
-      !||    nod_sms_dt    ../starter/source/ams/sms_auto_dt.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_auto_dt   ../starter/source/ams/sms_auto_dt.F
-      !||====================================================================
+!||====================================================================
+!||    nod_sms_dt    ../starter/source/ams/sms_auto_dt.F
+!||--- called by ------------------------------------------------------
+!||    sms_auto_dt   ../starter/source/ams/sms_auto_dt.F
+!||====================================================================
       SUBROUTINE NOD_SMS_DT(
      1 NUMNOD  ,TAGEL_SMS,NEL,NFT,NIX ,MIX ,LIX_INPUT,
      2 IX      ,TAGN_SMS,DTELEM,ITY,DT_INDEX,
@@ -352,13 +352,13 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    nod_sms_dt_sol   ../starter/source/ams/sms_auto_dt.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_auto_dt      ../starter/source/ams/sms_auto_dt.F
-      !||--- uses       -----------------------------------------------------
-      !||    sms_mod          ../starter/share/modules1/sms_mod.F
-      !||====================================================================
+!||====================================================================
+!||    nod_sms_dt_sol   ../starter/source/ams/sms_auto_dt.F
+!||--- called by ------------------------------------------------------
+!||    sms_auto_dt      ../starter/source/ams/sms_auto_dt.F
+!||--- uses       -----------------------------------------------------
+!||    sms_mod          ../starter/share/modules1/sms_mod.F
+!||====================================================================
       SUBROUTINE NOD_SMS_DT_SOL(
      1 NUMNOD  ,TAGEL_SMS ,NEL  ,NFT     ,NIX ,OFFSET,
      2 IXS  ,TAGN_SMS)

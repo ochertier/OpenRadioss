@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_bcs            ../engine/source/ams/sms_bcs.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_encin_2        ../engine/source/ams/sms_encin_2.F
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||    sms_pcg            ../engine/source/ams/sms_pcg.F
-      !||--- calls      -----------------------------------------------------
-      !||    sms_bcs1v          ../engine/source/ams/sms_bcs.F
-      !||====================================================================
+!||====================================================================
+!||    sms_bcs            ../engine/source/ams/sms_bcs.F
+!||--- called by ------------------------------------------------------
+!||    sms_encin_2        ../engine/source/ams/sms_encin_2.F
+!||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
+!||    sms_pcg            ../engine/source/ams/sms_pcg.F
+!||--- calls      -----------------------------------------------------
+!||    sms_bcs1v          ../engine/source/ams/sms_bcs.F
+!||====================================================================
       SUBROUTINE SMS_BCS(NODFT  ,NODLT  ,INDX1   ,ICODT   ,ISKEW   ,
      2                   SKEW    ,A      ,NODLAST )
 C-----------------------------------------------
@@ -50,7 +50,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, N, NINDX,
-     .        INDX(1024),L,J
+     .        INDX(1024),J
 C-----------------------------------------------
 C     DO 420 I = NODFT,NODLT,1024
       DO 420 I = NODFT,NODLAST,1024
@@ -69,11 +69,11 @@ C       DO 400 N=I,MIN(NODLT,I+1023)
 C
       RETURN
       END
-      !||====================================================================
-      !||    sms_bcs1v   ../engine/source/ams/sms_bcs.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_bcs     ../engine/source/ams/sms_bcs.F
-      !||====================================================================
+!||====================================================================
+!||    sms_bcs1v   ../engine/source/ams/sms_bcs.F
+!||--- called by ------------------------------------------------------
+!||    sms_bcs     ../engine/source/ams/sms_bcs.F
+!||====================================================================
       SUBROUTINE SMS_BCS1V(NINDX,INDX,ISKEW,ICODT,
      .                 A    ,SKEW   )
 C-----------------------------------------------
@@ -94,7 +94,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, K, L, ISK, LCOD
+      INTEGER  K, L, ISK, LCOD
 C     REAL
       my_real
      .   AA
@@ -106,7 +106,7 @@ C-----------------------------------------------
         LCOD=ICODT(L)
         IF(ISK==1) THEN
 C------------------
-C     REPERE GLOBAL
+C     GLOBAL REFERENCE FRAME
 C------------------
       IF(LCOD==1)THEN
       A(3,L)=ZERO

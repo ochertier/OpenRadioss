@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_sph_scalar         ../engine/source/output/h3d/h3d_results/h3d_sph_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                 ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_write_scalar       ../engine/source/output/h3d/h3d_results/h3d_write_scalar.F
-      !||    initbuf                ../engine/share/resol/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||    multimat_param_mod     ../common_source/modules/multimat_param_mod.F90
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    schlieren_mod          ../engine/share/modules/schlieren_mod.F
-      !||    stack_mod              ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_sph_scalar         ../engine/source/output/h3d/h3d_results/h3d_sph_scalar.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                 ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_write_scalar       ../engine/source/output/h3d/h3d_results/h3d_write_scalar.F
+!||    initbuf                ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    initbuf_mod            ../engine/share/resol/initbuf.F
+!||    multimat_param_mod     ../common_source/modules/multimat_param_mod.F90
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||    schlieren_mod          ../engine/share/modules/schlieren_mod.F
+!||    stack_mod              ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE H3D_SPH_SCALAR(
      .                  ELBUF_TAB ,SPH_SCALAR      ,IFUNC     ,IPARG       ,
      .                  KXSP      ,PM        ,IPART       ,
@@ -329,8 +329,9 @@ C--------------------------------------------------
 C             VISCOSITE TURBULENTE
                 DO I=1,NEL
                   IF((MLW == 6 .OR. MLW == 17).AND.JTURB/=0)THEN
+                    N = I+NFT
                     IPRT=IPARTSP(N)
-              MT  =IPART(1,IPRT)
+                    MT  =IPART(1,IPRT)
                     VALUE(I)=PM(81,MT)*GBUF%RK(I)**2/
      .                     MAX(EM15,GBUF%RE(I))
                     IS_WRITTEN_VALUE(I) = 1  
@@ -437,9 +438,9 @@ C--------------------------------------------------
               ELSEIF(KEYWORD == 'BFRAC')THEN
 C--------------------------------------------------
                 DO I=1,NEL
-                  VALUE = ZERO
+                  VALUE(I) = ZERO
                   IF (MLW == 5)THEN
-                    VALUE(I) = GBUF%BFRAC(I) 
+                    VALUE(I) = GBUF%BFRAC(I)
                     IS_WRITTEN_VALUE(I) = 1  
                   ENDIF
                 ENDDO 
@@ -570,18 +571,18 @@ C--------------------------------------------------
 C-------------------------------------------------- 
               ELSEIF(KEYWORD == 'TILLOTSON') THEN  
 C-------------------------------------------------- 
-                 N = I + NFT
-                 IPRT=IPARTSP(N)                                           
-                 MT  =IPART(1,IPRT) 
-                 IEOS = IPM(4,MT)                             
-                 IF(IEOS == 3)THEN                            
-                   EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1,1,1)   
+                   EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1,1,1)
                    NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS  
-                   DO  I=1,NEL                                
-                     VALUE(I) = EBUF%VAR(I)                   
-                     IS_WRITTEN_VALUE(I) = 1                  
-                   ENDDO                                      
-                 ENDIF
+                   DO I=1,NEL
+                     N = I + NFT
+                     IPRT = IPARTSP(N)
+                     MT = IPART(1,IPRT)
+                     IEOS = IPM(4,MT)
+                     IF(IEOS == 3)THEN
+                       VALUE(I) = EBUF%VAR(I)
+                       IS_WRITTEN_VALUE(I) = 1
+                     ENDIF
+                   ENDDO
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'NEIGHBOURS')THEN
 C--------------------------------------------------
@@ -593,6 +594,7 @@ C--------------------------------------------------
               ELSEIF(KEYWORD == 'VSTRAIN') then
 !--------------------------------------------------
                 DO I=1,NEL
+                  N = I + NFT
                   IPRT = IPARTSP(N)
                   MT = IPART(1,IPRT)
                   IF(PM(89,MT) > ZERO)THEN
@@ -600,6 +602,15 @@ C--------------------------------------------------
                     IS_WRITTEN_VALUE(I) = 1
                   END IF
                 ENDDO
+C--------------------------------------------------
+              ELSEIF(KEYWORD == 'DT')THEN  
+C--------------------------------------------------           
+                IF (GBUF%G_DT > 0) THEN          
+                  DO I=1,NEL
+                    VALUE(I) = GBUF%DT(I)
+                    IS_WRITTEN_VALUE(I) = 1
+                  END DO
+                ENDIF
 C-------------------------------------------------- 
               ENDIF   ! IFUNC
 C-------------------------------------------------- 

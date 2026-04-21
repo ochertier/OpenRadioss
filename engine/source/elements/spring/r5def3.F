@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r5def3   ../engine/source/elements/spring/r5def3.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3   ../engine/source/elements/spring/rforc3.F
-      !||====================================================================
+!||====================================================================
+!||    r5def3   ../engine/source/elements/spring/r5def3.F
+!||--- called by ------------------------------------------------------
+!||    rforc3   ../engine/source/elements/spring/rforc3.F
+!||====================================================================
       SUBROUTINE R5DEF3(
      1   XL,      VX2L,    RY1L,    RZ1L,
      2   RX2L,    RY2L,    RZ2L,    FR_WAVE,
@@ -72,10 +72,10 @@ C-----------------------------------------------
       INTEGER I,MX
 C     REAL
       my_real
-     .     VX1L, VY1L, VY2L, VZ1L, VZ2L,THETA , XLDEMI,XSIGN
+     .       VY2L, VZ2L,THETA , XLDEMI,XSIGN
 C-----------------------------------------------
 C--------------------------------------------
-C     VITESSES REPERE CONVECTEE
+C     VELOCITIES convected frameE
 C--------------------------------------------
       DO I=1,NEL
         RX2L(I) = EXX(I)*(RX2(I)-RX1(I))

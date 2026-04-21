@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,34 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i20ini3                     ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                      ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    i11buc1                     ../starter/source/interfaces/inter3d1/i11buc1.F
-      !||    i20dst3                     ../starter/source/interfaces/inter3d1/i20dst3.F
-      !||    i20dst3e                    ../starter/source/interfaces/inter3d1/i20dst3.F
-      !||    i20gap1                     ../starter/source/interfaces/inter3d1/i20dst3.F
-      !||    i20nlg                      ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||    i20norm                     ../starter/source/interfaces/inter3d1/i20dst3.F
-      !||    i20pwr3                     ../starter/source/interfaces/inter3d1/i20pwr3.F
-      !||    i20pwr3a                    ../starter/source/interfaces/inter3d1/i20pwr3.F
-      !||    i20pwr3ae                   ../starter/source/interfaces/inter3d1/i20pwr3.F
-      !||    i20pwr3e                    ../starter/source/interfaces/inter3d1/i20pwr3.F
-      !||    i20sti3                     ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||    i20sti3e                    ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||    i20wcontdd                  ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    i7buc1                      ../starter/source/interfaces/inter3d1/i7buc1.F
-      !||    i7cor3                      ../starter/source/interfaces/inter3d1/i7cor3.F
-      !||    i7err3                      ../starter/source/interfaces/inter3d1/i7err3.F
-      !||    i7pen3                      ../starter/source/interfaces/inter3d1/i7pen3.F
-      !||    update_weight_inter_type7   ../starter/source/spmd/domain_decomposition/update_weight_inter_type7.F
-      !||    upgrade_ixint               ../starter/source/interfaces/interf1/upgrade_ixint.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_cand_mod              ../starter/share/modules1/inter_cand_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i20ini3                     ../starter/source/interfaces/inter3d1/i20ini3.F
+!||--- called by ------------------------------------------------------
+!||    inint3                      ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    i11buc1                     ../starter/source/interfaces/inter3d1/i11buc1.F
+!||    i20dst3                     ../starter/source/interfaces/inter3d1/i20dst3.F
+!||    i20dst3e                    ../starter/source/interfaces/inter3d1/i20dst3.F
+!||    i20gap1                     ../starter/source/interfaces/inter3d1/i20dst3.F
+!||    i20nlg                      ../starter/source/interfaces/inter3d1/i20sti3.F
+!||    i20norm                     ../starter/source/interfaces/inter3d1/i20dst3.F
+!||    i20pwr3                     ../starter/source/interfaces/inter3d1/i20pwr3.F
+!||    i20pwr3a                    ../starter/source/interfaces/inter3d1/i20pwr3.F
+!||    i20pwr3ae                   ../starter/source/interfaces/inter3d1/i20pwr3.F
+!||    i20pwr3e                    ../starter/source/interfaces/inter3d1/i20pwr3.F
+!||    i20sti3                     ../starter/source/interfaces/inter3d1/i20sti3.F
+!||    i20sti3e                    ../starter/source/interfaces/inter3d1/i20sti3.F
+!||    i20wcontdd                  ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    i7buc1                      ../starter/source/interfaces/inter3d1/i7buc1.F
+!||    i7cor3                      ../starter/source/interfaces/inter3d1/i7cor3.F
+!||    i7err3                      ../starter/source/interfaces/inter3d1/i7err3.F
+!||    i7pen3                      ../starter/source/interfaces/inter3d1/i7pen3.F
+!||    update_weight_inter_type7   ../starter/source/spmd/domain_decomposition/update_weight_inter_type7.F
+!||    upgrade_ixint               ../starter/source/interfaces/interf1/upgrade_ixint.F
+!||--- uses       -----------------------------------------------------
+!||    inter_cand_mod              ../starter/share/modules1/inter_cand_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I20INI3(X       ,IXS    ,IXC     ,
      2                  PM      ,GEO     ,IPARI   ,INTERFACE_ID ,ITAB    ,
      3                  MS      ,MWA     ,RWA     ,IXTG   ,IWRN    ,
@@ -69,6 +69,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE INTER_CAND_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only :nixs,nixc,nixtg,nixt,nixp,nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,7 +84,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr12_c.inc"
 #include      "units_c.inc"
 #include      "vect07_c.inc"
@@ -201,7 +201,7 @@ C
      7         XN2      ,YN2    ,ZN2    ,XN3    ,YN3    ,
      8         ZN3    ,XN4      ,YN4    ,ZN4      )
 C
-C     CALCUL DES RIGIDITES ELEMENTTAIRES ET NODALES 
+C     CALCULATION OF ELEMENTARY AND NODAL STIFFNESSES
 C
       IF(ISU2 /= 0 .and. ISYM == 1)THEN
         IFS2 = 1
@@ -229,7 +229,7 @@ C
      F IXS20          ,ID,TITR,IGEO, PM_STACK , IWORKSH )
       IPARI(21) = IGAP
 C
-C     IL FAUT ENCORE FAIRE ONE BUCKET SORT DANS LE STARTER
+C     STILL NEED TO DO A BUCKET SORT IN THE STARTER
 C
       MAXBOX  = INTBUF_TAB%VARIABLES(9)
       MINBOX  = INTBUF_TAB%VARIABLES(12)
@@ -257,12 +257,10 @@ C
 
       INTBUF_TAB%VARIABLES(9) = MAXBOX
       INTBUF_TAB%VARIABLES(12) = MINBOX
-      IF (IMACH==3) THEN
-       ! -----------------
-       ! update the weight of candidate's pair for the domain decomposition
-       IF (IDDLEVEL==0.AND.NSPMD>1)THEN
-         IF ( ((NELEMINT+I_STOK)) > INTER_CAND%S_IXINT_2) CALL UPGRADE_IXINT(INTER_CAND,NELEMINT,I_STOK)
-
+      ! -----------------
+      ! update the weight of candidate's pair for the domain decomposition
+      IF (IDDLEVEL==0.AND.NSPMD>1)THEN
+        IF ( ((NELEMINT+I_STOK)) > INTER_CAND%S_IXINT_2) CALL UPGRADE_IXINT(INTER_CAND,NELEMINT,I_STOK)
         GAP = INTBUF_TAB%VARIABLES(2)
         GAPMIN = INTBUF_TAB%VARIABLES(13)
         GAPMAX = INTBUF_TAB%VARIABLES(16)
@@ -272,26 +270,17 @@ C
      .                                 IGAP,GAP,GAPMAX,GAPMIN,DGAPLOAD,
      .                                 DRAD,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_SL,INTBUF_TAB%GAP_M,INTBUF_TAB%GAP_ML,
      .                                 NUMNOD,X,INTER_CAND)
-       ENDIF
+      ENDIF
        ! -----------------
 
-        IF((IDDLEVEL==0).AND.
-     .     (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appe routine poids noeuds interfaces
-          CALL I20WCONTDD(INTBUF_TAB%NSV,INTBUF_TAB%MSR,NSN,NMN,IWCONT,
-     .                  NSNT,NMNT)
+        IF((IDDLEVEL==0).AND. (DECTYP>=3.AND.DECTYP<=6))THEN
+C Appe routine weights nodes interfaces
+          CALL I20WCONTDD(INTBUF_TAB%NSV,INTBUF_TAB%MSR,NSN,NMN,IWCONT,NSNT,NMNT)
         END IF
-      ELSE
-        IF(DECTYP>=3.AND.DECTYP<=6)THEN
-C Appe routine poids noeuds interfaces
-          CALL I20WCONTDD(INTBUF_TAB%NSV,INTBUF_TAB%MSR,NSN,NMN,IWCONT,
-     .                  NSNT,NMNT)
-        END IF
-      END IF
 
 c----------------------------------------------------
-c   Calcul des normales nodales
-c   Igap/=0 pour solides (GAP=0)
+c   Calculation of nodal normals
+c   IGAP/= 0 for solids (gap = 0)
 c----------------------------------------------------
 c      IF(ICURV==3.or.IGAP/=0)THEN
       IF(IGAP/=0)THEN
@@ -309,7 +298,7 @@ C-----EDGES -------
       NMNE   =IPARI(56)
       
       IF(NLINS + NLINM /= 0)THEN  
-C       CALCUL DES RIGIDITES ELEMENTTAIRES 
+C       CALCULATION OF ELEMENTARY STIFFNESSES
 C
         GAP0 = GAPINPUT
         GAPE = GAPINPUT
@@ -342,12 +331,12 @@ C
         GAPINF=MIN(GAPINF,INTBUF_TAB%VARIABLES(6))
         INTBUF_TAB%VARIABLES(6)=MAX(GAPINF,INTBUF_TAB%VARIABLES(13))
 C
-C       IL FAUT ENCORE FAIRE ONE BUCKET SORT DANS LE STARTER
+C       STILL NEED TO DO A BUCKET SORT IN THE STARTER
 C
         MAXBOX  = INTBUF_TAB%VARIABLES(9)
         MINBOX  = INTBUF_TAB%VARIABLES(12)
         GAP_TRI = INTBUF_TAB%VARIABLES(2)
-c       majoration temporaire du gap pour tri (gap shift)
+c       temporary increase of the gap for sorting (gap shift)
         IF(IGAP/=0)GAP_TRI=TWO*GAP_TRI
         CALL I11BUC1(
      1X         ,INTBUF_TAB%IXLINM,INTBUF_TAB%IXLINS,INTBUF_TAB%VARIABLES(4),NLINSA,
@@ -361,8 +350,8 @@ c       majoration temporaire du gap pour tri (gap shift)
         INTBUF_TAB%VARIABLES(9)  = MAXBOX
         INTBUF_TAB%VARIABLES(12) = MINBOX
 C------------------------------------------------------
-C     CALCUL LES PENETRATIONS INITIALES 
-C     CORRECTION DE LA POSITION DES POINTS D'ANCRAGE 
+C     CALCULATE THE INITIAL PENETRATIONS
+C     CORRECTION OF THE POSITION OF ANCHOR POINTS
 C     1-EDGES
 C------------------------------------------------------
  
@@ -392,15 +381,14 @@ C
      5 IGAP      ,X         ,FPENMAX )
          IF(IWPENEDGE/=0.AND.INACTI==3.OR.INACTI==4) IWRN = 1
         ENDDO
-        IF(((IMACH==3.AND.IDDLEVEL==0)).AND.
-     +  (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+        IF(((IDDLEVEL==0)).AND.(DECTYP>=3.AND.DECTYP<=6))THEN
+C Call routine for interface node weights
           CALL I20WCONTDD(INTBUF_TAB%NSVL,INTBUF_TAB%MSRL,NSNE,NMNE,IWCONT,
      .                NSNET,NMNET)
         END IF
       END IF
 C------------------------------------------------------
-C     2-NOEUDS FACETTES
+C     2-NODES FACETTES
 C------------------------------------------------------
       IF(IGAP /= 0)CALL I20GAP1(
      1 NRTM         ,NSN          ,NLN,  INTBUF_TAB%GAP_M,INTBUF_TAB%GAP_SH,
@@ -458,9 +446,9 @@ C
       ENDDO
 
 C------------------------------------------------------
-C     RE-CALCUL LES PENETRATIONS INITIALES 
-C     APRES CORRECTION DE LA POSITION DES POINTS D'ANCRAGE 
-C     1-NOEUDS FACETTES
+C     RE-CALCULATION LES PENETRATIONS INITIALES 
+C     AFTER CORRECTING THE POSITION OF ANCHOR POINTS
+C     1-NODES FACETTES
 C------------------------------------------------------
  
       NGROUS=1+(I_STOK-1)/NVSIZ
@@ -543,9 +531,8 @@ C
      5 INTBUF_TAB%PENISE,INTBUF_TAB%PENIME,IGAP   )
          IF(IWPENEDGE/=0.AND.INACTI==3.OR.INACTI==4) IWRN = 1
         ENDDO
-        IF(((IMACH==3.AND.IDDLEVEL==0)).AND.
-     +  (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+        IF(((IDDLEVEL==0)).AND.(DECTYP>=3.AND.DECTYP<=6))THEN
+C Call routine for interface node weights
           CALL I20WCONTDD(INTBUF_TAB%NSVL,INTBUF_TAB%MSRL,NSNE,NMNE,IWCONT,
      .                NSNET,NMNET)
         END IF

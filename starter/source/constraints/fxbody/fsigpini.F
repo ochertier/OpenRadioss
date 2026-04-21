@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbsini    ../starter/source/constraints/fxbody/fxbsini.F
-      !||--- calls      -----------------------------------------------------
-      !||    pcurvi     ../starter/source/constraints/fxbody/fsigpini.F
-      !||    pdefoi     ../starter/source/constraints/fxbody/fsigpini.F
-      !||    pevecii    ../starter/source/constraints/fxbody/fsigpini.F
-      !||    pm1inif    ../starter/source/constraints/fxbody/fsigpini.F
-      !||====================================================================
+!||====================================================================
+!||    fsigpini      ../starter/source/constraints/fxbody/fsigpini.F
+!||--- called by ------------------------------------------------------
+!||    fxbsini       ../starter/source/constraints/fxbody/fxbsini.F
+!||--- calls      -----------------------------------------------------
+!||    pcurvi        ../starter/source/constraints/fxbody/fsigpini.F
+!||    pdefoi        ../starter/source/constraints/fxbody/fsigpini.F
+!||    pevecii       ../starter/source/constraints/fxbody/fsigpini.F
+!||    pm1inif       ../starter/source/constraints/fxbody/fsigpini.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE FSIGPINI(FXBELM, IPARG , X     , PM, IXP ,
-     .                    GEO   , FXBMOD, FXBSIG, R , NELP)
+     .                    GEO   , FXBMOD, FXBSIG, R , NELP,
+     .                    IBEAM_VECTOR,RBEAM_VECTOR)
+      use element_mod , only : nixp
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,9 +51,11 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER FXBELM(*), IPARG(NPARG,*), IXP(NIXP,*), NELP
+      INTEGER, INTENT (IN   ) :: IBEAM_VECTOR(NELP)
       my_real
      .        X(3,*), PM(NPROPM,*), GEO(NPROPG,*), FXBMOD(*),
      .        FXBSIG(*), R(3,*)
+      my_real , INTENT (IN   )  :: RBEAM_VECTOR(3,NELP)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -88,18 +93,24 @@ C
             IEL=IPARG(3,NG)+FXBELM(NFT+9*(I-1)+2)
             MAT(I)=IXP(1,IEL)
             PROP(I)=IXP(5,IEL)
-            X1(I)=X(1,IXP(3,I))
-            Y1(I)=X(2,IXP(3,I))
-            Z1(I)=X(3,IXP(3,I))
-            X2(I)=X(1,IXP(4,I))
-            Y2(I)=X(2,IXP(4,I))
-            Z2(I)=X(3,IXP(4,I))
-            X3(I)=X(1,IXP(5,I))
-            Y3(I)=X(2,IXP(5,I))
-            Z3(I)=X(3,IXP(5,I))
-            E2X=X3(I)-X1(I)
-            E2Y=Y3(I)-Y1(I)
-            E2Z=Z3(I)-Z1(I)
+            X1(I)=X(1,IXP(2,IEL))
+            Y1(I)=X(2,IXP(2,IEL))
+            Z1(I)=X(3,IXP(2,IEL))
+            X2(I)=X(1,IXP(3,IEL))
+            Y2(I)=X(2,IXP(3,IEL))
+            Z2(I)=X(3,IXP(3,IEL))
+            X3(I)=X(1,IXP(4,IEL))
+            Y3(I)=X(2,IXP(4,IEL))
+            Z3(I)=X(3,IXP(4,IEL))
+            IF (IBEAM_VECTOR(IEL) > 1) THEN
+              E2X=RBEAM_VECTOR(1,IEL)
+              E2Y=RBEAM_VECTOR(2,IEL)
+              E2Z=RBEAM_VECTOR(3,IEL)
+            ELSE      
+              E2X=X3(I)-X1(I)
+              E2Y=Y3(I)-Y1(I)
+              E2Z=Z3(I)-Z1(I)
+            ENDIF  
             EE2=SQRT(E2X**2+E2Y**2+E2Z**2)
             RLOC(1,I)=E2X/EE2
             RLOC(2,I)=E2Y/EE2
@@ -172,11 +183,11 @@ C
 C
       RETURN
       END SUBROUTINE FSIGPINI
-      !||====================================================================
-      !||    pevecii    ../starter/source/constraints/fxbody/fsigpini.F
-      !||--- called by ------------------------------------------------------
-      !||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
-      !||====================================================================
+!||====================================================================
+!||    pevecii    ../starter/source/constraints/fxbody/fsigpini.F
+!||--- called by ------------------------------------------------------
+!||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
+!||====================================================================
       SUBROUTINE PEVECII(X1 , Y1, Z1  , X2, Y2 ,
      .     Z2 , R , RLOC, AL, NEL, 
      .     E1X, E1Y, E1Z, 
@@ -299,11 +310,11 @@ C
 C
       RETURN
       END SUBROUTINE PEVECII
-      !||====================================================================
-      !||    pdefoi     ../starter/source/constraints/fxbody/fsigpini.F
-      !||--- called by ------------------------------------------------------
-      !||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
-      !||====================================================================
+!||====================================================================
+!||    pdefoi     ../starter/source/constraints/fxbody/fsigpini.F
+!||--- called by ------------------------------------------------------
+!||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
+!||====================================================================
       SUBROUTINE PDEFOI(V  , EXX, EXY, EXZ, AL, NEL, 
      .     E1X, E1Y, E1Z, 
      .     E2X, E2Y, E2Z, 
@@ -361,11 +372,11 @@ C
 C
       RETURN
       END SUBROUTINE PDEFOI
-      !||====================================================================
-      !||    pcurvi     ../starter/source/constraints/fxbody/fsigpini.F
-      !||--- called by ------------------------------------------------------
-      !||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
-      !||====================================================================
+!||====================================================================
+!||    pcurvi     ../starter/source/constraints/fxbody/fsigpini.F
+!||--- called by ------------------------------------------------------
+!||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
+!||====================================================================
       SUBROUTINE PCURVI(V  , GEO, KXX, KYY, KZZ,
      .     EXY, EXZ, AL , NEL, MGM, 
      .     E1X, E1Y, E1Z, 
@@ -470,11 +481,11 @@ C
 C
       RETURN
       END SUBROUTINE PCURVI
-      !||====================================================================
-      !||    pm1inif    ../starter/source/constraints/fxbody/fsigpini.F
-      !||--- called by ------------------------------------------------------
-      !||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
-      !||====================================================================
+!||====================================================================
+!||    pm1inif    ../starter/source/constraints/fxbody/fsigpini.F
+!||--- called by ------------------------------------------------------
+!||    fsigpini   ../starter/source/constraints/fxbody/fsigpini.F
+!||====================================================================
       SUBROUTINE PM1INIF(PM , FOR, MOM, EINT, GEO,
      .                   EXX, EXY, EXZ, KXX , KYY,
      .                   KZZ, AL , NEL, MAT , MGM)     

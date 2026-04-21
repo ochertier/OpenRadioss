@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
-      !||====================================================================
-      !||    sensor_time   ../engine/source/tools/sensor/sensor_time.F
-      !||--- called by ------------------------------------------------------
-      !||    sensor_base   ../engine/source/tools/sensor/sensor_base.F
-      !||    sensor_init   ../engine/source/tools/sensor/sensor_init.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod    ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sensor_time   ../engine/source/tools/sensor/sensor_time.F
+!||--- called by ------------------------------------------------------
+!||    sensor_base   ../engine/source/tools/sensor/sensor_base.F
+!||    sensor_init   ../engine/source/tools/sensor/sensor_init.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod    ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SENSOR_TIME(SENSOR ,TIME   ,TIMESTEP)
 C-----------------------------------------------
 C   M o d u l e s
@@ -53,9 +53,8 @@ C----------------------------------------------------------
 C   Local Variables
 C----------------------------------------------------------
       INTEGER :: NSENS
-      my_real :: TDELAY,TSTOP,INFINITY
+      my_real :: TDELAY,TSTOP
       DOUBLE PRECISION :: TDELAY_DP,TSTOP_DP,NEXT_CYCLE
-      PARAMETER (INFINITY = 1.0E20)
 C=======================================================================
       NSENS  = SENSOR%SENS_ID
       TDELAY = SENSOR%TDELAY

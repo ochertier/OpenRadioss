@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    bamom2   ../engine/source/ale/bimat/bamom2.F
-      !||--- called by ------------------------------------------------------
-      !||    bforc2   ../engine/source/ale/bimat/bforc2.F
-      !||====================================================================
+!||====================================================================
+!||    bamom2   ../engine/source/ale/bimat/bamom2.F
+!||--- called by ------------------------------------------------------
+!||    bforc2   ../engine/source/ale/bimat/bforc2.F
+!||====================================================================
       SUBROUTINE BAMOM2(
      1   PM,      V,       W,       RHO,
      2   ALPH,    ALPHC,   FILL,    B11,
@@ -101,7 +101,7 @@ C
         DZY(I)=PY1(I)*VZ13(I)+PY2(I)*VZ24(I)
       ENDDO
 C-----------------------------------------------
-C     CALCUL PAR NOEUD DE V MATIERE - V MAILLAGE
+C     CALCULATION PER NODE OF V MATERIAL - V MESH
 C-----------------------------------------------
       DO I=1,NEL
         VDY1(I)=V(2,NC1(I)) - W(2,NC1(I))

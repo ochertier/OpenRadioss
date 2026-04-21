@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,68 +20,60 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-!chd|====================================================================
-!chd|  mat25_crasurv_c                 source/materials/mat/mat025/mat25_crasurv_c.F90
-!chd|-- called by -----------
-!chd|-- calls ---------------
-!chd|====================================================================
 
-      !||====================================================================
-      !||    mat25_crasurv_c_mod   ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
-      !||--- called by ------------------------------------------------------
-      !||    sigeps25c             ../engine/source/materials/mat/mat025/sigeps25c.F
-      !||====================================================================
+!||====================================================================
+!||    mat25_crasurv_c_mod   ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
+!||--- called by ------------------------------------------------------
+!||    sigeps25c             ../engine/source/materials/mat/mat025/sigeps25c.F
+!||====================================================================
       module mat25_crasurv_c_mod
+      implicit none
       contains
 
-! ==========================================================================================
+! ======================================================================================================================
 ! \brief nonlinear orthotropic material law25 with Crasurv formulation
 ! \details calculates stress-strain relationship using modified Tsai-Wu plasticity criterion
 
-! ==========================================================================================
-      !||====================================================================
-      !||    mat25_crasurv_c    ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
-      !||--- called by ------------------------------------------------------
-      !||    sigeps25c          ../engine/source/materials/mat/mat025/sigeps25c.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../engine/source/output/message/message.F
-      !||    rotov              ../engine/source/airbag/roto.F
-      !||    urotov             ../engine/source/airbag/uroto.F
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod       ../common_source/modules/constant_mod.F
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||====================================================================
-        subroutine mat25_crasurv_c(mat_param   ,                                &
+! ======================================================================================================================
+!||====================================================================
+!||    mat25_crasurv_c    ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
+!||--- called by ------------------------------------------------------
+!||    sigeps25c          ../engine/source/materials/mat/mat025/sigeps25c.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg             ../engine/source/output/message/message.F
+!||    rotov              ../engine/source/airbag/roto.F
+!||    urotov             ../engine/source/airbag/uroto.F
+!||--- uses       -----------------------------------------------------
+!||    constant_mod       ../common_source/modules/constant_mod.F
+!||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    message_mod        ../engine/share/message_module/message_mod.F
+!||    precision_mod      ../common_source/modules/precision_mod.F90
+!||====================================================================
+        subroutine mat25_crasurv_c(mat_param   ,                       &
           nel     ,off     ,sig     ,                                  &
           wpla    ,dir     ,crak    ,                                  &
           nfis1   ,nfis2   ,nfis3   ,ilayer  ,shf   ,                  &
           ngl     ,eps     ,wplar   ,strn1 ,                           &
           strn2   ,strn3   ,strp1   ,strp2   ,sige  ,                  &
-          epsp    ,israte  ,offply  ,sigy    ,etse  ,                  &
-          outv    ,ishplyxfem,ly_exx,ly_eyy,                           &
+          epsd_pg ,epsd    ,israte  ,asrate  ,offply,                  &
+          sigy    ,etse    ,outv    ,ishplyxfem,ly_exx,ly_eyy,         &
           ly_exy  ,sigply  ,sigpe   ,ply_id  ,                         &
           signxx  ,signyy  ,signxy  ,signyz  ,signzx,                  &
           ipg     ,tsaiwu  ,iplyxfem,time    ,timestep,                &
           imconv  ,mvsiz   ,iout    ,dmg     ,l_dmg   )
-!-----------------------------------------------
-!   M o d u l e s
-!-----------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                        Modules
+! ----------------------------------------------------------------------------------------------------------------------
           use matparam_def_mod
           use message_mod
           use constant_mod ,only : zero,half,one,two,four,four_over_5,three
           use constant_mod ,only : em10,em15,em20,ep20
-! ------------------------------------------------------------------------------------------
+          use precision_mod , only : WP
+! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ------------------------------------------------------------------------------------------
-!     included files
-! ------------------------------------------------------------------------------------------
-
-#include "my_real.inc"
-
-!-----------------------------------------------
-!   D u m m y   A r g u m e n t s
-!-----------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   arguments
+! ----------------------------------------------------------------------------------------------------------------------
           integer ,intent(in) :: nel                       !< element group size
           integer ,intent(in) :: mvsiz                     !< max element group size
           integer ,intent(in) :: ilayer                    !< layer number
@@ -93,86 +85,89 @@
           integer ,intent(in) :: ishplyxfem                !< ply Xfem flag
           integer ,intent(in) :: iplyxfem                  !< ply Xfem flag
           integer ,intent(in) :: ngl(mvsiz)                !< element ID table
-          my_real ,intent(in) :: time                      !< current time
-          my_real ,intent(in) :: timestep                  !< current time step
+          real(kind=WP) ,intent(in) :: time                !< current time
+          real(kind=WP) ,intent(in) :: timestep            !< current time step
+          real(kind=WP) ,intent(in) :: asrate              !< strain rate filtering coefficient
           integer ,intent(in) :: l_dmg                     !< second dimension of damage table
           integer ,dimension(nel) ,intent(inout) :: outv   !< failure flag
           integer ,dimension(nel) ,intent(inout) :: nfis1  !< failure counter in 1st direction
           integer ,dimension(nel) ,intent(inout) :: nfis2  !< failure counter in 2nd direction
           integer ,dimension(nel) ,intent(inout) :: nfis3  !< failure counter in 3rd direction
-          my_real :: off(nel)                              !< element activation coefficient
-          my_real :: sig(nel,5)                            !< output stress tensor
-          my_real :: wpla(nel)                             !< plastic work
-          my_real :: dir(nel,2)                            !< orthotropy directions
-          my_real :: crak(nel,2)                           !< ply Xfem failure criterion
-          my_real :: shf(nel)                              !< transverse shear factor
-          my_real :: epsp(nel)                             !< equivalent strain rate
-          my_real :: eps(mvsiz,5)                          !< total strain tensor
-          my_real :: wplar(mvsiz)                          !< reference plastic work
-          my_real :: strp1(mvsiz)                          !< strain in 1st orthotropic direction
-          my_real :: strp2(mvsiz)                          !< strain in 2nd orthotropic direction
-          my_real :: strn1(mvsiz)                          !< strain in 1st direction
-          my_real :: strn2(mvsiz)                          !< strain in 2nd direction
-          my_real :: strn3(mvsiz)                          !< strain in 3rd direction
-          my_real :: sige(mvsiz,5)                         !< stress in local element coord system
-          my_real :: offply(nel)                           !< ply activation coefficient
-          my_real :: sigy(nel)                             !< yield stress
-          my_real :: etse(nel)                             !< tangent stiffness
-          my_real :: ly_exx(nel)                           !< layer sliding deformation xx
-          my_real :: ly_eyy(nel)                           !< layer sliding deformation yy
-          my_real :: ly_exy(nel)                           !< layer sliding deformation xy
-          my_real :: sigply(nel,3)                         !< layer stress
-          my_real :: sigpe(mvsiz,5)                        !< layer stress
-          my_real :: signxx(mvsiz)                         !< stress component
-          my_real :: signyy(mvsiz)                         !< stress component
-          my_real :: signxy(mvsiz)                         !< stress component
-          my_real :: signyz(mvsiz)                         !< stress component
-          my_real :: signzx(mvsiz)                         !< stress component)
-          my_real :: tsaiwu(mvsiz)                         !< Tsai-Wu criterion
-          my_real, intent(inout) :: dmg(nel,l_dmg)         !< damage related variables
+          real(kind=WP) :: off(nel)                              !< element activation coefficient
+          real(kind=WP) :: sig(nel,5)                            !< output stress tensor
+          real(kind=WP) :: wpla(nel)                             !< plastic work
+          real(kind=WP) :: dir(nel,2)                            !< orthotropy directions
+          real(kind=WP) :: crak(nel,2)                           !< ply Xfem failure criterion
+          real(kind=WP) :: shf(nel)                              !< transverse shear factor
+          real(kind=WP) :: epsd_pg(nel)                          !< global strain rate in Gauss point
+          real(kind=WP) :: epsd(nel)                             !< local strain rate (lbuf%epsd)
+          real(kind=WP) :: eps(mvsiz,5)                          !< total strain tensor
+          real(kind=WP) :: wplar(mvsiz)                          !< reference plastic work
+          real(kind=WP) :: strp1(mvsiz)                          !< strain in 1st orthotropic direction
+          real(kind=WP) :: strp2(mvsiz)                          !< strain in 2nd orthotropic direction
+          real(kind=WP) :: strn1(mvsiz)                          !< strain in 1st direction
+          real(kind=WP) :: strn2(mvsiz)                          !< strain in 2nd direction
+          real(kind=WP) :: strn3(mvsiz)                          !< strain in 3rd direction
+          real(kind=WP) :: sige(mvsiz,5)                         !< stress in local element coord system
+          real(kind=WP) :: offply(nel)                           !< ply activation coefficient
+          real(kind=WP) :: sigy(nel)                             !< yield stress
+          real(kind=WP) :: etse(nel)                             !< tangent stiffness
+          real(kind=WP) :: ly_exx(nel)                           !< layer sliding deformation xx
+          real(kind=WP) :: ly_eyy(nel)                           !< layer sliding deformation yy
+          real(kind=WP) :: ly_exy(nel)                           !< layer sliding deformation xy
+          real(kind=WP) :: sigply(nel,3)                         !< layer stress
+          real(kind=WP) :: sigpe(mvsiz,5)                        !< layer stress
+          real(kind=WP) :: signxx(mvsiz)                         !< stress component
+          real(kind=WP) :: signyy(mvsiz)                         !< stress component
+          real(kind=WP) :: signxy(mvsiz)                         !< stress component
+          real(kind=WP) :: signyz(mvsiz)                         !< stress component
+          real(kind=WP) :: signzx(mvsiz)                         !< stress component)
+          real(kind=WP) :: tsaiwu(mvsiz)                         !< Tsai-Wu criterion
+          real(kind=WP), intent(inout) :: dmg(nel,l_dmg)         !< damage related variables
           type (matparam_struct_) ,intent(in) :: mat_param !< material parameter structure
-!-----------------------------------------------
-!   l o c a l   v a r i a b l e s
-!-----------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   local variables
+! ----------------------------------------------------------------------------------------------------------------------
           integer :: i,j,fail,ioff,icc,imodwp,nindx,id,ifail0
           integer ,dimension(nel) :: index,icas,isoft
           integer ,dimension(nel) :: fail_old
-          my_real :: scale,scale1,scale2,dam1,dam2,alpha
-          my_real :: strp12,coefa,coefb,delta,dwpla
-          my_real :: wpla1,wpla2,wpla3,norm1,norm2,norm3,ht
-          my_real :: e11,e22,g12,g23,g31,nu12,nu21
-          my_real :: epst1,epst2,eps1t12,eps2t12,epsm1,epsm2
-          my_real :: eps1t1,eps1t2,eps1c1,eps1c2,epsf1
-          my_real :: eps2t1,eps2t2,eps2c1,eps2c2,epsf2
-          my_real :: sigrst1,sigrst2,sigrsc1,sigrsc2,sigrst12
-          my_real :: sigmxt1,sigmxt2,sigmxc1,sigmxc2,sigmxt12
-          my_real :: sigyt1,sigyt2,sigyc1,sigyc2,sigyt12
-          my_real :: sigy0_t1,sigy0_t2,sigy0_c1,sigy0_c2,sigy0_t12
-          my_real :: wplaref,cc,epdr,dmax
-          my_real :: cn_t1,cn_t2,cn_c1,cn_c2,cn_t12,cb_t1,cb_t2,cb_c1,cb_c2,cb_t12
-          my_real :: cc_t1,cc_t2,cc_c1,cc_c2,cc_t12
-          my_real :: log_wpla,b1,b2
-          my_real ,dimension(3)   :: soft
-          my_real ,dimension(nel) :: dp1,dp2,dp3,de1,de2,ds1,ds2,ds3
-          my_real ,dimension(nel) :: wvec,t1,t2, t3,lamda,coef,a11,a12,a22
-          my_real ,dimension(nel) :: beta
-          my_real ,dimension(nel) :: f1,f2,f12,f11,f22,f33
-          my_real ,dimension(nel) :: so1,so2,so3,s1,s2,s3,s4,s5
-          my_real ,dimension(nel) :: wplamx,wplamxt1,wplamxt2
-          my_real ,dimension(nel) :: wplamxc1,wplamxc2,wplamxt12
-          my_real ,dimension(mvsiz,5) :: epsply
-          my_real ,dimension(mvsiz,3) :: eply
-!=======================================================================
+          real(kind=WP) :: scale,scale1,scale2,dam1,dam2,alpha
+          real(kind=WP) :: strp12,coefa,coefb,delta,dwpla
+          real(kind=WP) :: wpla1,wpla2,wpla3,norm1,norm2,norm3,ht
+          real(kind=WP) :: e11,e22,g12,g23,g31,nu12,nu21
+          real(kind=WP) :: epst1,epst2,eps1t12,eps2t12,epsm1,epsm2
+          real(kind=WP) :: eps1t1,eps1t2,eps1c1,eps1c2,epsf1
+          real(kind=WP) :: eps2t1,eps2t2,eps2c1,eps2c2,epsf2
+          real(kind=WP) :: sigrst1,sigrst2,sigrsc1,sigrsc2,sigrst12
+          real(kind=WP) :: sigmxt1,sigmxt2,sigmxc1,sigmxc2,sigmxt12
+          real(kind=WP) :: sigyt1,sigyt2,sigyc1,sigyc2,sigyt12
+          real(kind=WP) :: sigy0_t1,sigy0_t2,sigy0_c1,sigy0_c2,sigy0_t12
+          real(kind=WP) :: wplaref,cc,epdr,dmax
+          real(kind=WP) :: cn_t1,cn_t2,cn_c1,cn_c2,cn_t12,cb_t1,cb_t2,cb_c1,cb_c2,cb_t12
+          real(kind=WP) :: cc_t1,cc_t2,cc_c1,cc_c2,cc_t12
+          real(kind=WP) :: log_wpla,b1,b2
+          real(kind=WP) ,dimension(3)   :: soft
+          real(kind=WP) ,dimension(nel) :: dp1,dp2,dp3,de1,de2,ds1,ds2,ds3
+          real(kind=WP) ,dimension(nel) :: wvec,t1,t2, t3,lamda,coef,a11,a12,a22
+          real(kind=WP) ,dimension(nel) :: beta
+          real(kind=WP) ,dimension(nel) :: f1,f2,f12,f11,f22,f33
+          real(kind=WP) ,dimension(nel) :: so1,so2,so3,s1,s2,s3,s4,s5
+          real(kind=WP) ,dimension(nel) :: wplamx,wplamxt1,wplamxt2
+          real(kind=WP) ,dimension(nel) :: wplamxc1,wplamxc2,wplamxt12
+          real(kind=WP) ,dimension(nel) :: epspfac
+          real(kind=WP) ,dimension(mvsiz,5) :: epsply
+          real(kind=WP) ,dimension(mvsiz,3) :: eply
+! ======================================================================================================================
           if (time == zero) then
             offply(1:nel) = one
-          endif
+          end if
 !
           ioff   = mat_param%iparam(2)
           icc    = mat_param%iparam(3)
           imodwp = mat_param%iparam(4)
-!-----------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
 !     constant input parameters
-!-----------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           e11      = mat_param%uparam(1)            !  pm(33)
           e22      = mat_param%uparam(2)            !  pm(34)
           nu12     = mat_param%uparam(4)            !  pm(35)
@@ -253,16 +248,16 @@
           wplamxc1(1:nel) = mat_param%uparam(69)    !   pm(177)
           wplamxc2(1:nel) = mat_param%uparam(70)    !   pm(181)
           wplamxt12(1:nel)= mat_param%uparam(71)    !   pm(185)
-!-----------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
 !     element variable initialization
-!-----------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
 
           etse(1:nel)  = one
           isoft(1:nel) = 0
 !
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
 !     old failure
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             fail_old(i)=0
             if (dmg(i,2)>=dmax)fail_old(i) = fail_old(i) + 1
@@ -279,7 +274,7 @@
               fail_old(i) = fail_old(i) + 16
             end if
 !       if (wpla(i) >= wplamx(i)) fail_old(i) = fail_old(i) + 4
-          enddo
+          end do
 !
           nindx = 0
           do i=1,nel
@@ -287,10 +282,10 @@
               nindx=nindx+1
               index(nindx)=i
             end if
-          enddo
-!-------------------------------------------------------------------
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
 !     stress reduction using wpla_old >= wplamx
-!-----------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             if (fail_old(i) >= 4 .and. ioff >= 0 .or. fail_old(i) >= 8) then
               sig(i,1) = four_over_5*sig(i,1)
@@ -310,11 +305,11 @@
               eps(i,4) = zero
               eps(i,5) = zero
 !
-            endif
-          enddo
-!-------------------------------------------------------------------
+            end if
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
 !     Ply Xfem
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           if (ishplyxfem /= 0 .and. iplyxfem==2) then
             do i=1,nel
               epsply(i,1)=ly_exx(i)
@@ -322,13 +317,13 @@
               epsply(i,3)=half*ly_exy(i)
               epsply(i,4)=zero
               epsply(i,5)=zero
-            enddo
+            end do
             call rotov(1,nel,epsply,dir,nel)
             do i=1,nel
               epsply(i,3)=two*epsply(i,3)
 !         epsply(i,4)=two*epsply(i,4)
 !         epsply(i,5)=two*epsply(i,5)
-            enddo
+            end do
             do i=1,nel
               if ((fail_old(i)>=4.and.ioff>=0).or. fail_old(i)>=8) then
                 sigply(i,1)=four_over_5*sigply(i,1)
@@ -341,16 +336,16 @@
                 epsply(i,2)=zero
                 epsply(i,3)=zero
               end if
-            enddo
+            end do
           end if
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
 !     rotation into orthotropic directions
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             eps(i,3) = half*eps(i,3)
             eps(i,4) = half*eps(i,4)
             eps(i,5) = half*eps(i,5)
-          enddo
+          end do
 !
           call rotov(1,nel,eps,dir,nel)
 !
@@ -358,7 +353,7 @@
             eps(i,3) = two*eps(i,3)
             eps(i,4) = two*eps(i,4)
             eps(i,5) = two*eps(i,5)
-          enddo
+          end do
 !     Total strains in orthotropic directions
           do i=1,nel
             strp1(i) = dir(i,1)*dir(i,1)*strn1(i)         &
@@ -367,10 +362,10 @@
             strp2(i) = dir(i,2)*dir(i,2)*strn1(i)         &
               + dir(i,1)*dir(i,1)*strn2(i)         &
               - two*dir(i,2)*dir(i,1)*strn3(i)
-          enddo
-!-------------------------------------------------------------------
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
 !     Elastic deformations
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           if (ishplyxfem /= 0 .and. iplyxfem==2) then
             do i=1,nel
               de1(i) =one-max(zero ,sign(dmg(i,2),sig(i,1)) )
@@ -389,7 +384,7 @@
               eply(i,1) = eply(i,1)/e11
               eply(i,2) = eply(i,2)/e22
               eply(i,3) = sigply(i,3)/de1(i)/de2(i)/g12
-            enddo
+            end do
 !
             do i=1,nel
               s1(i)=s1(i)+eps(i,1)
@@ -401,7 +396,7 @@
               eply(i,1) = eply(i,1)+epsply(i,1)
               eply(i,2) = eply(i,2)+epsply(i,2)
               eply(i,3) = eply(i,3)+epsply(i,3)
-            enddo
+            end do
 !
           else   ! without ply xfem
 !
@@ -416,7 +411,7 @@
               s3(i) = sig(i,3)/de1(i)/de2(i)/g12
               s4(i) = sig(i,4)/max(de2(i)*g23*shf(i),em20)
               s5(i) = sig(i,5)/max(de1(i)*g31*shf(i),em20)
-            enddo
+            end do
 !
             do i=1,nel
               s1(i) = s1(i) + eps(i,1)
@@ -424,9 +419,9 @@
               s3(i) = s3(i) + eps(i,3)
               s4(i) = s4(i) + eps(i,4)
               s5(i) = s5(i) + eps(i,5)
-            enddo
+            end do
 !
-          endif ! iplxfem
+          end if ! iplxfem
 !
           if (ishplyxfem /= 0 .and. iplyxfem==2) then
 #include "vectorize.inc"
@@ -438,8 +433,8 @@
                 dam2 = dam1*epsm1/(crak(i,1)+epst1)
                 dmg(i,2)= max(dmg(i,2),dam2)
                 dmg(i,2)= min(dmg(i,2),dmax)
-              endif
-            enddo
+              end if
+            end do
 !
 #include "vectorize.inc"
             do j=1,nindx
@@ -450,8 +445,8 @@
                 dam2 = dam1*epsm2/(crak(i,2)+epst2)
                 dmg(i,3)= max(dmg(i,3),dam2)
                 dmg(i,3)= min(dmg(i,3),dmax)
-              endif
-            enddo
+              end if
+            end do
 !
           else   ! without ply xfem
 !
@@ -464,8 +459,8 @@
                 dam2 = dam1*epsm1/(crak(i,1)+epst1)
                 dmg(i,2) = max(dmg(i,2),dam2)
                 dmg(i,2) = min(dmg(i,2),dmax)
-              endif
-            enddo
+              end if
+            end do
 !
             do j=1,nindx
               i=index(j)
@@ -475,11 +470,11 @@
                 dam2 = dam1*epsm2/(crak(i,2)+epst2)
                 dmg(i,3) = max(dmg(i,3),dam2)
                 dmg(i,3) = min(dmg(i,3),dmax)
-              endif
-            enddo
-          endif  ! ply xfem
+              end if
+            end do
+          end if  ! ply xfem
 !
-!-----------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             de1(i) = one - max(zero ,sign(dmg(i,2),sig(i,1)) )
             de2(i) = one - max(zero ,sign(dmg(i,3),sig(i,2)) )
@@ -488,17 +483,17 @@
             a11(i) = e11*de1(i)/scale2
             a22(i) = e22*de2(i)/scale2
             a12(i) = nu21*a11(i)*scale1
-          enddo
-!-----------------------------
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
 !     elastic stress
-!-----------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             t1(i)    = a11(i)*s1(i)+a12(i)*s2(i)
             t2(i)    = a12(i)*s1(i)+a22(i)*s2(i)
             t3(i)    = de1(i)*de2(i)*g12*s3(i)
             sig(i,4) = de2(i)*g23*shf(i)*s4(i)
             sig(i,5) = de1(i)*g31*shf(i)*s5(i)
-          enddo
+          end do
 !
           if (ishplyxfem /= 0 .and. iplyxfem==2) then
             do i=1,nel
@@ -515,27 +510,31 @@
             else
               if (t2(i) > 0) icas(i) = 2
               if (t2(i) < 0) icas(i) = 3
-            endif
-          enddo
-!-------------------------------------------------------------------
+            end if
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
 !     strain rate
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           if (israte == 0) then
             do i=1,nel
-              epsp(i) = max(                                       &
+              epsd(i) = max(                                       &
                 abs(eps(i,1)),abs(eps(i,2)),abs(eps(i,3)),           &
                 abs(eps(i,4)),abs(eps(i,5))) / max(timestep,em20)
-            enddo
-          endif
+            end do
+          else
+            do i=1,nel
+              epsd(i) = asrate*epsd_pg(i) + (one-asrate)*epsd(i)
+            end do
+          end if
           do i=1,nel
-            if (epsp(i) > epdr) then
-              epsp(i) = log(epsp(i)/epdr)
+            if (epsd(i) > epdr) then
+              epspfac(i) = log(epsd(i)/epdr)
             else
-              epsp(i) = zero
-            endif
+              epspfac(i) = zero
+            end if
             coef(i)   = zero
-          enddo
-!-------------------------------------------------------------------
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             if (wpla(i) > zero) then
               log_wpla = log(wpla(i))
@@ -550,33 +549,33 @@
               sigyc1 = sigy0_c1
               sigyc2 = sigy0_c2
               sigyt12= sigy0_t12
-            endif
+            end if
             if (icc==1 .or. icc==3) then
               sigyt1 = min(sigyt1 ,sigmxt1)
               sigyt2 = min(sigyt2 ,sigmxt2)
               sigyc1 = min(sigyc1 ,sigmxc1)
               sigyc2 = min(sigyc2 ,sigmxc2)
               sigyt12= min(sigyt12,sigmxt12)
-              sigyt1 = sigyt1*(one  + cc_t1 *epsp(i))
-              sigyt2 = sigyt2*(one  + cc_t2 *epsp(i))
-              sigyc1 = sigyc1*(one  + cc_c1 *epsp(i))
-              sigyc2 = sigyc2*(one  + cc_c2 *epsp(i))
-              sigyt12= sigyt12*(one + cc_t12*epsp(i))
+              sigyt1 = sigyt1*(one  + cc_t1 *epspfac(i))
+              sigyt2 = sigyt2*(one  + cc_t2 *epspfac(i))
+              sigyc1 = sigyc1*(one  + cc_c1 *epspfac(i))
+              sigyc2 = sigyc2*(one  + cc_c2 *epspfac(i))
+              sigyt12= sigyt12*(one + cc_t12*epspfac(i))
             else
-              sigyt1 = sigyt1*(one  + cc_t1 *epsp(i))
-              sigyt2 = sigyt2*(one  + cc_t2 *epsp(i))
-              sigyc1 = sigyc1*(one  + cc_c1 *epsp(i))
-              sigyc2 = sigyc2*(one  + cc_c2 *epsp(i))
-              sigyt12= sigyt12*(one + cc_t12*epsp(i))
+              sigyt1 = sigyt1*(one  + cc_t1 *epspfac(i))
+              sigyt2 = sigyt2*(one  + cc_t2 *epspfac(i))
+              sigyc1 = sigyc1*(one  + cc_c1 *epspfac(i))
+              sigyc2 = sigyc2*(one  + cc_c2 *epspfac(i))
+              sigyt12= sigyt12*(one + cc_t12*epspfac(i))
               sigyt1 = min(sigyt1 ,sigmxt1 )
               sigyt2 = min(sigyt2 ,sigmxt2 )
               sigyc1 = min(sigyc1 ,sigmxc1 )
               sigyc2 = min(sigyc2 ,sigmxc2 )
               sigyt12= min(sigyt12,sigmxt12)
-            endif
-!-----------------------------------------------------------------
+            end if
+! ----------------------------------------------------------------------------------------------------------------------
 !      softening
-!-----------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
             soft(1)  = zero
             soft(2)  = zero
             soft(3)  = zero
@@ -585,16 +584,16 @@
             ! -> failure index in compression
             if ((strp1(i) < zero).and.(strp1(i) > -eps1c1)) then
               dmg(i,5) = max(-abs(strp1(i))/abs(eps1c1),-one)
-            elseif (strp1(i) <= -eps1c1) then
+            else if (strp1(i) <= -eps1c1) then
               soft(1)  = min(one,(strp1(i)+eps1c1)/(eps1c1-eps2c1))
               dmg(i,5) = max(-one-soft(1),-1.95d0)
               ! -> failure index in tension
-            elseif (strp1(i) >= zero .and. strp1(i) < eps1t1) then
+            else if (strp1(i) >= zero .and. strp1(i) < eps1t1) then
               dmg(i,5) = min(strp1(i)/eps1t1,one)
             else if (strp1(i) >= eps1t1) then
               soft(1)  = min(one,(strp1(i)-eps1t1)/(eps2t1-eps1t1))
               dmg(i,5) = min(one + soft(1),1.95d0)
-            endif
+            end if
             sigyt1 = min(sigyt1,(one -soft(1))*sigyt1+soft(1)*sigrst1)
             sigyc1 = min(sigyc1,(one -soft(1))*sigyc1+soft(1)*sigrsc1)
             ! direction 2
@@ -605,12 +604,12 @@
               soft(2)  = min(one,(strp2(i)+eps1c2)/(eps1c2-eps2c2))
               dmg(i,6) = max(- one - soft(2),-1.95d0)
               ! -> failure index in tension
-            elseif (strp2(i) >= zero .and. strp2(i) < eps1t2) then
+            else if (strp2(i) >= zero .and. strp2(i) < eps1t2) then
               dmg(i,6) = min(strp2(i)/eps1t2,one)
             else if (strp2(i) >= eps1t2) then
               soft(2)  = min(one,(strp2(i)-eps1t2)/(eps2t2-eps1t2))
               dmg(i,6) = min(one + soft(2),1.95d0)
-            endif
+            end if
             sigyt2 = min(sigyt2,(one -soft(2))*sigyt2+soft(2)*sigrst2)
             sigyc2 = min(sigyc2,(one -soft(2))*sigyc2+soft(2)*sigrsc2)
             ! direction 12
@@ -626,7 +625,7 @@
               dmg(i,7) = min(one + soft(3),1.95d0)
             else
               dmg(i,7) = min(abs(strp12)/eps1t12,one)
-            endif
+            end if
             sigyt12 = min(sigyt12,(one - soft(3))*sigyt12 + soft(3)*sigrst12)
             if (soft(1) + soft(2) + soft(3) > zero) isoft(i) = 1
 !
@@ -638,30 +637,30 @@
             f12(i) = -alpha/(two*sqrt(sigyt1*sigyc1*sigyt2*sigyc2))
             sigy(i)= min(sigyt1,sigyc1,sigyt2,sigyc2,sigyt12)
 !
-            epsp(i) = one + cc * epsp(i)
+            epspfac(i) = one + cc * epspfac(i)
             if (icc==3 .or. icc==4) then
-              wplamx(i)    = wplamx(i)   * epsp(i)
-              wplamxt1(i)  = wplamxt1(i) * epsp(i)
-              wplamxt2(i)  = wplamxt2(i) * epsp(i)
-              wplamxc1(i)  = wplamxc1(i) * epsp(i)
-              wplamxc2(i)  = wplamxc2(i) * epsp(i)
-              wplamxt12(i) = wplamxt12(i)* epsp(i)
-            endif
-          enddo
-!-------------------------------------------------------------------
+              wplamx(i)    = wplamx(i)   * epspfac(i)
+              wplamxt1(i)  = wplamxt1(i) * epspfac(i)
+              wplamxt2(i)  = wplamxt2(i) * epspfac(i)
+              wplamxc1(i)  = wplamxc1(i) * epspfac(i)
+              wplamxc2(i)  = wplamxc2(i) * epspfac(i)
+              wplamxt12(i) = wplamxt12(i)* epspfac(i)
+            end if
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
 !     plasticity
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             wvec(i) = f1(i) *t1(i)       + f2(i) *t2(i)             &
               + f11(i)*t1(i)*t1(i) + f22(i)*t2(i)*t2(i)       &
               + f33(i)*t3(i)*t3(i) + two*f12(i)*t1(i)*t2(i)
             tsaiwu(i) = max(min(wvec(i),one),tsaiwu(i))
-          enddo
+          end do
 !
           do i=1,nel
             if (wvec(i) > one .and. off(i)==one) coef(i)=one
             wvec(i)=zero
-          enddo
+          end do
 !
           do i=1,nel
             beta(i) = one
@@ -676,14 +675,14 @@
                 if (abs(coefa) > em15 .or. abs(coefa) <= em15 .and. abs(coefb) > em15) then
                   if (abs(coefa) <= em15 .and. abs(coefb) > em15) then
                     beta(i) = one/coefb
-                  endif
+                  end if
                   b1 = half * (coefb - delta) / coefa
                   b2 = half * (coefb + delta) / coefa
                   if (abs(one + b1) <= abs(one + b2)) then
                     beta(i) = -b1
                   else
                     beta(i) = -b2
-                  endif
+                  end if
                   delta = (f1(i) * sig(i,1) + f2(i) * sig(i,2)            &
                     + f11(i) * beta(i)*sig(i,1)*sig(i,1)              &
                     + f22(i) * beta(i)*sig(i,2)*sig(i,2)              &
@@ -695,34 +694,34 @@
                   call ancmsg(msgid=244,anmode=aninfo, i1=ngl(i),i2=ilayer)
                   outv(i) = 1
 !$OMP END CRITICAL
-                endif
+                end if
 
               else if (imconv == 1 .and. outv(i) == 0) then   ! delta < 0
 !$OMP CRITICAL
                 call ancmsg(msgid=244,anmode=aninfo, i1=ngl(i),i2=ilayer)
                 outv(i) = 1
 !$OMP END CRITICAL
-              endif   ! delta > 0
+              end if   ! delta > 0
             end if    ! coef == 1
-          enddo
-!-----------------------------------------------------------------------
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             so1(i) = beta(i)*sig(i,1)
             so2(i) = beta(i)*sig(i,2)
             so3(i) = beta(i)*sig(i,3)
-          enddo
+          end do
 !
           do i=1,nel
             dp1(i) = f1(i)+two*f11(i)*so1(i)+two*f12(i)*so2(i)
             dp2(i) = f2(i)+two*f22(i)*so2(i)+two*f12(i)*so1(i)
             dp3(i) = two*f33(i)*so3(i)
-          enddo
-!-----------------------------------------------------------------------
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             ds1(i) = t1(i) - so1(i)
             ds2(i) = t2(i) - so2(i)
             ds3(i) = t3(i) - so3(i)
-          enddo
+          end do
 !
           do i=1,nel
             lamda(i)=(dp1(i)*ds1(i)+dp2(i)*ds2(i)+dp3(i)*ds3(i))*coef(i)
@@ -732,19 +731,19 @@
                 + dp2(i)*(a12(i)*dp1(i)+a22(i)*dp2(i))          &
                 + two*dp3(i)*g12*de1(i)*de2(i)*dp3(i) )
             end if
-          enddo
+          end do
 !
           do i=1,nel
             dp1(i) = lamda(i)*dp1(i)
             dp2(i) = lamda(i)*dp2(i)
             dp3(i) = lamda(i)*dp3(i)
-          enddo
+          end do
 !
           do i=1,nel
             t1(i) = t1(i) - a11(i)*dp1(i) - a12(i)*dp2(i)
             t2(i) = t2(i) - a12(i)*dp1(i) - a22(i)*dp2(i)
             t3(i) = t3(i) - g12*de1(i)*de2(i)*dp3(i)*two
-          enddo
+          end do
 !
           do i=1,nel
             dwpla = (dp1(i)*(t1(i)+so1(i)) + dp2(i)*(t2(i)+so2(i))   &
@@ -752,7 +751,7 @@
             dwpla   = max(dwpla ,zero) / wplaref
             wpla(i) = wpla(i) + dwpla
             icas(i) = 0   ! flag for output
-          enddo
+          end do
 !
           do i=1,nel
             sigyt1 = sigy0_t1
@@ -774,24 +773,24 @@
               else if (t1(i) <= -sigyc1) then
                 wpla1 = wplamxc1(i)
                 id =-1
-              else 
+              else
                 wpla1 = ep20
                 id = 0
-              endif
+              end if
 !
               if (wpla1 < wplamx(i)) then
                 wplamx(i) = wpla1
                 icas(i) = id
-              endif
+              end if
 !
               ! failure index in direction 1 update
               if (wpla(i)/wplamx(i) >= 0.95d0) then
                 dmg(i,5) = sign(two,dmg(i,5))
-              elseif (dmg(i,5) > one) then
+              else if (dmg(i,5) > one) then
                 dmg(i,5) = max(dmg(i,5),one + wpla(i)/wplamx(i))
-              elseif (dmg(i,5) < -one) then
+              else if (dmg(i,5) < -one) then
                 dmg(i,5) = min(dmg(i,5),-one-wpla(i)/wplamx(i))
-              endif
+              end if
 !
               ! direction 2
               wpla2 = ep20
@@ -801,38 +800,38 @@
               else if (t2(i) <= -sigyc2) then
                 wpla2 = wplamxc2(i)
                 id = -2
-              endif
+              end if
               if (wpla2 < wplamx(i) ) then
                 wplamx(i) = wpla2
                 icas(i) = id
-              endif
+              end if
 !
               ! failure index in direction 2 update
               if (wpla(i)/wplamx(i) >= 0.95d0) then
                 dmg(i,6) = sign(two,dmg(i,6))
-              elseif (dmg(i,6) > one) then
+              else if (dmg(i,6) > one) then
                 dmg(i,6) = max(dmg(i,6),one + wpla(i)/wplamx(i))
-              elseif (dmg(i,6) < -one) then
+              else if (dmg(i,6) < -one) then
                 dmg(i,6) = min(dmg(i,6),-one-wpla(i)/wplamx(i))
-              endif
+              end if
 !
               ! shear
               wpla3 = ep20
               if (abs(t3(i)) >= sigyt12) then
                 wpla3 = wplamxt12(i)
                 id = 3
-              endif
+              end if
               if (wpla3 < wplamx(i)) then
                 wplamx(i) = wpla3
                 icas(i) = id
-              endif
+              end if
 !
               ! failure index in shear plane 12 update
               if (wpla(i)/wplamx(i) >= 0.95d0) then
                 dmg(i,7) = two
-              elseif (dmg(i,7) > one) then
+              else if (dmg(i,7) > one) then
                 dmg(i,7) = max(dmg(i,7),one + wpla(i)/wplamx(i))
-              endif
+              end if
             else if (imodwp > 0) then
               id = 1
               icas(i) = nint(sign(one,t1(i)))
@@ -840,22 +839,22 @@
                 norm1 = ((t1(i))/sigyt1)
               else
                 norm1 = ((abs(t1(i))/sigyc1))
-              endif
+              end if
               icas(i) = nint(sign(one,t2(i)))
               if (icas(i) > 0 ) then
                 norm2 = ((t2(i))/sigyt2)
               else
                 norm2 = ((abs(t2(i))/sigyc2))
-              endif
+              end if
               if (norm2 > norm1) then
                 id = 2
-              endif
+              end if
               norm3 = ((abs(t3(i))/sigyt12))
               if (norm3 >= norm2) then
                 id = 3
               else if (norm3 >= norm1) then
                 id = 3
-              endif
+              end if
               select case(id)
                case(1)
                 icas(i) = nint(sign(one,t1(i)) )
@@ -864,18 +863,18 @@
                   ! update failure index in direction 1 (tension)
                   if (wpla(i)/wplamx(i) >= 0.95d0) then
                     dmg(i,5) = two
-                  elseif (dmg(i,5) > one) then
+                  else if (dmg(i,5) > one) then
                     dmg(i,5) = max(dmg(i,5),one + wpla(i)/wplamx(i))
-                  endif
+                  end if
                 else
                   wplamx(i) = min(wplamx(i),wplamxc1(i))
                   ! update failure index in direction 1 (compression)
                   if (wpla(i)/wplamx(i) >= 0.95d0) then
                     dmg(i,5) = -two
-                  elseif (dmg(i,5) < -one) then
+                  else if (dmg(i,5) < -one) then
                     dmg(i,5) = min(dmg(i,5),-one-wpla(i)/wplamx(i))
-                  endif
-                endif
+                  end if
+                end if
                case(2)
                 icas(i) = nint(sign(two,t2(i)) )
                 if (icas(i) > 0 ) then
@@ -883,30 +882,30 @@
                   ! update failure index in direction 2 (tension)
                   if (wpla(i)/wplamx(i) >= 0.95d0) then
                     dmg(i,6) = two
-                  elseif (dmg(i,6) > one) then
+                  else if (dmg(i,6) > one) then
                     dmg(i,6) = max(dmg(i,6),one + wpla(i)/wplamx(i))
-                  endif
+                  end if
                 else
                   wplamx(i) = min(wplamx(i),wplamxc2(i))
                   ! update failure index in direction 2 (compression)
                   if (wpla(i)/wplamx(i) >= 0.95d0) then
                     dmg(i,6) = -two
-                  elseif (dmg(i,6) < -one) then
+                  else if (dmg(i,6) < -one) then
                     dmg(i,6) = min(dmg(i,6),-one-wpla(i)/wplamx(i))
-                  endif
-                endif
+                  end if
+                end if
                case(3)
                 icas(i) = 3
                 wplamx(i) = min(wplamx(i),wplamxt12(i))
                 ! update failure index in plane 12 (shear)
                 if (wpla(i)/wplamx(i) >= 0.95d0) then
                   dmg(i,7) = two
-                elseif (dmg(i,7) > one) then
+                else if (dmg(i,7) > one) then
                   dmg(i,7) = max(dmg(i,7),one + wpla(i)/wplamx(i))
-                endif
+                end if
               end select
-            endif
-          enddo
+            end if
+          end do
 !
           do i=1,nel
             ifail0 = mod(fail_old(i),8)
@@ -918,11 +917,11 @@
             if (wpla(i)>=wplamx(i) .or. ifail0 >= 4 .or. dmg(i,2)>=dmax .or.    &
               crak(i,1)>=epsf1-epst1 .or. dmg(i,3)>=dmax .or.                 &
               crak(i,2)>=epsf2-epst2) nfis3(i) = nfis3(i)+1
-          enddo
+          end do
 !
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
 !     failure
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             fail = 0
             if (dmg(i,2) >= dmax)         fail = fail + 1
@@ -953,7 +952,7 @@
                     else if (icas(i) == 3) then
                       write(iout, 2005) ngl(i),wplamx(i),ilayer,ipg,ply_id,time
                     end if    ! icas
-                  endif
+                  end if
                   if (fail >= 16) then
                     write(iout,1003) ngl(i),ilayer,ipg,ply_id,time
                   else if (fail >= 8) then
@@ -977,29 +976,29 @@
                       write(iout,4004) ngl(i),wplamx(i),ilayer,ipg,time
                     else if (icas(i) == 3) then
                       write(iout,4005) ngl(i),wplamx(i),ilayer,ipg,time
-                    endif
-                  endif
+                    end if
+                  end if
                   if (fail >= 16) then
                     write(iout,3003) ngl(i),ilayer,ipg,time
                   else if (fail >= 8) then
                     write(iout,3004) ngl(i),ilayer,ipg,time
                   end if
-                endif   ! igtyp
+                end if   ! igtyp
 !$OMP END CRITICAL
-              endif     ! imconv == 1
-            endif       ! new failure
+              end if     ! imconv == 1
+            end if       ! new failure
 !
 !       Wpla negative for stresses reduction at next cycle in case of failure-p :
             if (wpla(i)>=wplamx(i).or.mod(fail_old(i),8)>=4) wpla(i)=-wpla(i)
-          enddo
-!-------------------------------------------------------------------
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
 !     end of failure
-!-------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             sig(i,1)=t1(i)
             sig(i,2)=t2(i)
             sig(i,3)=t3(i)
-          enddo
+          end do
           ! for qeph
           do i=1,nel
             if (abs(beta(i)) < one) then
@@ -1007,32 +1006,32 @@
               etse(i) = ht/(ht+e11)
             end if
           end do
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
 !     end of plasticity calculation
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             signxx(i) = sig(i,1)
             signyy(i) = sig(i,2)
             signxy(i) = sig(i,3)
             signyz(i) = sig(i,4)
             signzx(i) = sig(i,5)
-          enddo
-!-------------------------------------------------------------------
+          end do
+! ----------------------------------------------------------------------------------------------------------------------
 !     stress rotation - back to local element coordinate system
-!-----------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           do i=1,nel
             sige(i,1) = sig(i,1)
             sige(i,2) = sig(i,2)
             sige(i,3) = sig(i,3)
             sige(i,4) = sig(i,4)
             sige(i,5) = sig(i,5)
-          enddo
+          end do
 !
           call urotov(1,nel,sige,dir,nel)
 !
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
 !     Ply Xfem
-!-------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
           if (ishplyxfem /= 0 .and. iplyxfem == 2) then
             do  i=1,nel
               t1(i) = sigply(i,1)
@@ -1041,13 +1040,13 @@
               wvec(i)= f1(i) *t1(i) + f2(i) * t2(i)                    &
                 + f11(i)*t1(i)*t1(i) + f22(i)*t2(i)*t2(i)         &
                 + f33(i)*t3(i)*t3(i) + two*f12(i)*t1(i)*t2(i)
-            enddo
+            end do
 !
             do i=1,nel
               coef(i) = zero
               if (wvec(i) > one .and. off(i)==one) coef(i)=one
               wvec(i)=zero
-            enddo
+            end do
 !
             do i=1,nel
               beta(i)= one
@@ -1062,11 +1061,11 @@
                   call ancmsg(msgid=244,anmode=aninfo, i1=ngl(i),i2=ilayer)
                   outv(i) = 1
 !$OMP END CRITICAL
-                endif
+                end if
                 cycle
               else
                 delta=sqrt(delta)
-              endif
+              end if
               if (abs(coefa) <= em15) then
                 if (abs(coefb) <= em15) then
                   if (imconv==1 .and. outv(i) == 0) then
@@ -1074,36 +1073,36 @@
                     call ancmsg(msgid=244,anmode=aninfo, i1=ngl(i),i2=ilayer)
                     outv(i) = 1
 !$OMP END CRITICAL
-                  endif
+                  end if
                   cycle
                 else
                   beta(i) = one/coefb
-                endif
-              endif
+                end if
+              end if
               if (abs(one+(coefb-delta)*half/coefa)<= abs(one+(coefb+delta)*half/coefa)) then
                 beta(i)=(-coefb+delta)*half/coefa
               else
                 beta(i)=(-coefb-delta)*half/coefa
-              endif
+              end if
 
-            enddo
+            end do
             !------------------------
             do i=1,nel
               so1(i) = beta(i)*t1(i)
               so2(i) = beta(i)*t2(i)
               so3(i) = beta(i)*t3(i)
-            enddo
+            end do
 
             do  i=1,nel
               dp1(i)=f1(i)+two*f11(i)*so1(i)+two*f12(i)*so2(i)
               dp2(i)=f2(i)+two*f22(i)*so2(i)+two*f12(i)*so1(i)
               dp3(i)=two*f33(i)*so3(i)
-            enddo
+            end do
             do  i=1,nel
               ds1(i)=t1(i)-so1(i)
               ds2(i)=t2(i)-so2(i)
               ds3(i)=t3(i)-so3(i)
-            enddo
+            end do
 !
             do  i=1,nel
               lamda(i)=(dp1(i)*ds1(i)+dp2(i)*ds2(i)+dp3(i)*ds3(i))*coef(i)
@@ -1112,20 +1111,20 @@
                   (dp1(i)*(a11(i)*dp1(i)+a12(i)*dp2(i))+                 &
                   dp2(i)*(a12(i)*dp1(i)+a22(i)*dp2(i))+                 &
                   two*dp3(i)*g12*de1(i)*de2(i)*dp3(i))
-              endif
-            enddo
+              end if
+            end do
 !
             do  i=1,nel
               dp1(i)=lamda(i)*dp1(i)
               dp2(i)=lamda(i)*dp2(i)
               dp3(i)=lamda(i)*dp3(i)
-            enddo
+            end do
 !
             do  i=1,nel
               sigply(i,1)=t1(i)-a11(i)*dp1(i)-a12(i)*dp2(i)
               sigply(i,2)=t2(i)-a12(i)*dp1(i)-a22(i)*dp2(i)
               sigply(i,3)=t3(i)-g12*de1(i)*de2(i)*dp3(i)*two
-            enddo
+            end do
 !
             do i=1,nel
               sigpe(i,1) = sigply(i,1)
@@ -1135,54 +1134,54 @@
               sigpe(i,5) = zero
               strp1(i) = strp1(i) + eply(i,1)
               strp2(i) = strp2(i) + eply(i,2)
-            enddo
+            end do
 !
             call urotov(1,nel,sigpe,dir,nel)
 !
           end if    ! Ply Xfem
-!-----------
+! ----------------------------------------------------------------------------------------------------------------------
           return
-!-----------------------------------------------------------------------
-1001      format(' FAILURE-1 ELEMENT #',i10,', LAYER #',i3,                       &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-1002      format(' FAILURE-2 ELEMENT #',i10,', LAYER #',i3,                       &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-1003      format(' TOTAL FAILURE-2 ELEMENT #',i10,', LAYER #',i3,                 &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-1004      format(' TOTAL FAILURE-1 ELEMENT #',i10,', LAYER #',i3,                 &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-2000      format(' FAILURE-P-MAX ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,    &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-2001      format(' FAILURE-P-T1 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,     &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-2002      format(' FAILURE-P-C1 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,     &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-2003      format(' FAILURE-P-T2 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,     &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-2004      format(' FAILURE-P-C2 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,     &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-2005      format(' FAILURE-P-T12 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,    &
-            ', INTEGRATION POINT #',i3,', (PLY #',i10,'), TIME=',1pe11.4)
-3001      format(' FAILURE-1 ELEMENT #',i10,', LAYER #',i3,                       &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-3002      format(' FAILURE-1 ELEMENT #',i10,', LAYER #',i3,                       &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-3003      format(' TOTAL FAILURE-2 ELEMENT #',i10,', LAYER #',i3,                 &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-3004      format(' TOTAL FAILURE-1 ELEMENT #',i10,', LAYER #',i3,                 &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-4000      format(' FAILURE-P-MAX ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,    &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-4001      format(' FAILURE-P-T1 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,     &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-4002      format(' FAILURE-P-C1 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,     &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-4003      format(' FAILURE-P-T2 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,     &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-4004      format(' FAILURE-P-C2 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,     &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-4005      format(' FAILURE-P-T12 ELEMENT #',i10,', WPLA ',f8.2,', LAYER #',i3,    &
-            ', INTEGRATION POINT #',i3,', TIME=',1pe11.4)
-!-----------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
+1001      format(" FAILURE-1 ELEMENT #",i10,", LAYER #",i3,                       &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+1002      format(" FAILURE-2 ELEMENT #",i10,", LAYER #",i3,                       &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+1003      format(" TOTAL FAILURE-2 ELEMENT #",i10,", LAYER #",i3,                 &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+1004      format(" TOTAL FAILURE-1 ELEMENT #",i10,", LAYER #",i3,                 &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+2000      format(" FAILURE-P-MAX ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,    &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+2001      format(" FAILURE-P-T1 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,     &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+2002      format(" FAILURE-P-C1 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,     &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+2003      format(" FAILURE-P-T2 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,     &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+2004      format(" FAILURE-P-C2 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,     &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+2005      format(" FAILURE-P-T12 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,    &
+            ", INTEGRATION POINT #",i3,", (PLY #",i10,"), TIME=",1pe11.4)
+3001      format(" FAILURE-1 ELEMENT #",i10,", LAYER #",i3,                       &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+3002      format(" FAILURE-1 ELEMENT #",i10,", LAYER #",i3,                       &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+3003      format(" TOTAL FAILURE-2 ELEMENT #",i10,", LAYER #",i3,                 &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+3004      format(" TOTAL FAILURE-1 ELEMENT #",i10,", LAYER #",i3,                 &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+4000      format(" FAILURE-P-MAX ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,    &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+4001      format(" FAILURE-P-T1 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,     &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+4002      format(" FAILURE-P-C1 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,     &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+4003      format(" FAILURE-P-T2 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,     &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+4004      format(" FAILURE-P-C2 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,     &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+4005      format(" FAILURE-P-T12 ELEMENT #",i10,", WPLA ",f8.2,", LAYER #",i3,    &
+            ", INTEGRATION POINT #",i3,", TIME=",1pe11.4)
+! ----------------------------------------------------------------------------------------------------------------------
         end subroutine mat25_crasurv_c
       end module mat25_crasurv_c_mod

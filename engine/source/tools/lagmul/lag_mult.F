@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,40 +20,45 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lag_mult           ../engine/source/tools/lagmul/lag_mult.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    i16main            ../engine/source/interfaces/int16/i16main.F
-      !||    i17main            ../engine/source/interfaces/int17/i17main.F
-      !||    i7main_lmult       ../engine/source/interfaces/int07/i7main_lmult.F
-      !||    init_int           ../engine/source/tools/lagmul/lag_ntag.F
-      !||    init_intv          ../engine/source/tools/lagmul/lag_ntag.F
-      !||    lag_anith          ../engine/source/tools/lagmul/lag_anith.F
-      !||    lag_bcs            ../engine/source/tools/lagmul/lag_bcs.F
-      !||    lag_fxv            ../engine/source/tools/lagmul/lag_fxv.F
-      !||    lag_gjnt           ../engine/source/tools/lagmul/lag_gjnt.F
-      !||    lag_i2main         ../engine/source/tools/lagmul/lag_i2main.F
-      !||    lag_mpc            ../engine/source/tools/lagmul/lag_mpc.F
-      !||    lag_mult_solv      ../engine/source/tools/lagmul/lag_mult_solv.F
-      !||    lag_rby            ../engine/source/tools/lagmul/lag_rby.F
-      !||    lag_rwall          ../engine/source/tools/lagmul/lag_rwall.F
-      !||    ltag_bcs           ../engine/source/tools/lagmul/lag_ntag.F
-      !||    ltag_fxv           ../engine/source/tools/lagmul/lag_ntag.F
-      !||    ltag_gjnt          ../engine/source/tools/lagmul/lag_ntag.F
-      !||    ltag_i2main        ../engine/source/tools/lagmul/lag_ntag.F
-      !||    ltag_mpc           ../engine/source/tools/lagmul/lag_ntag.F
-      !||    ltag_rby           ../engine/source/tools/lagmul/lag_ntag.F
-      !||    my_barrier         ../engine/source/system/machine.F
-      !||    rby_decond         ../engine/source/tools/lagmul/lag_rby_cond.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod       ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||    python_funct_mod   ../common_source/modules/python_mod.F90
-      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
-      !||====================================================================
-      SUBROUTINE LAG_MULT(
+!||====================================================================
+!||    lag_mult           ../engine/source/tools/lagmul/lag_mult.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    i16main            ../engine/source/interfaces/int16/i16main.F
+!||    i17main            ../engine/source/interfaces/int17/i17main.F
+!||    i7main_lmult       ../engine/source/interfaces/int07/i7main_lmult.F
+!||    init_int           ../engine/source/tools/lagmul/lag_ntag.F
+!||    init_intv          ../engine/source/tools/lagmul/lag_ntag.F
+!||    lag_anith          ../engine/source/tools/lagmul/lag_anith.F
+!||    lag_bcs            ../engine/source/tools/lagmul/lag_bcs.F
+!||    lag_fxv            ../engine/source/tools/lagmul/lag_fxv.F
+!||    lag_gjnt           ../engine/source/tools/lagmul/lag_gjnt.F
+!||    lag_i2main         ../engine/source/tools/lagmul/lag_i2main.F
+!||    lag_mpc            ../engine/source/tools/lagmul/lag_mpc.F
+!||    lag_mult_solv      ../engine/source/tools/lagmul/lag_mult_solv.F
+!||    lag_rby            ../engine/source/tools/lagmul/lag_rby.F
+!||    lag_rwall          ../engine/source/tools/lagmul/lag_rwall.F
+!||    ltag_bcs           ../engine/source/tools/lagmul/lag_ntag.F
+!||    ltag_fxv           ../engine/source/tools/lagmul/lag_ntag.F
+!||    ltag_gjnt          ../engine/source/tools/lagmul/lag_ntag.F
+!||    ltag_i2main        ../engine/source/tools/lagmul/lag_ntag.F
+!||    ltag_mpc           ../engine/source/tools/lagmul/lag_ntag.F
+!||    ltag_rby           ../engine/source/tools/lagmul/lag_ntag.F
+!||    my_barrier         ../engine/source/system/machine.F
+!||    rby_decond         ../engine/source/tools/lagmul/lag_rby_cond.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    extend_array_mod   ../common_source/tools/memory/extend_array.F90
+!||    groupdef_mod       ../common_source/modules/groupdef_mod.F
+!||    h3d_mod            ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod      ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    nodal_arrays_mod   ../common_source/modules/nodal_arrays.F90
+!||    output_mod         ../common_source/modules/output/output_mod.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||====================================================================
+      SUBROUTINE LAG_MULT(output,
      1       IPARI  ,X        ,A        ,
      2       WAT    ,V       ,MS      ,IN       ,VR       ,
      3       ITASK  ,WAG     ,ITAB    ,IXS      ,IXS20    ,
@@ -64,7 +69,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      8       TF     ,NEWFRONT,ICONTACT,RWBUF    ,LPRW     ,
      9       NPRW   ,RBYL    ,D       ,DR       ,KINET    ,
      A       NSENSOR,SENSOR_TAB,INTBUF_TAB ,H3D_DATA ,IGRBRIC,
-     B       PYTHON)
+     B       PYTHON, nodes)
 C======================================================================|
 C-----------------------------------------------
 C   M o d u l e s
@@ -74,6 +79,10 @@ C-----------------------------------------------
       USE H3D_MOD
       USE GROUPDEF_MOD
       USE SENSOR_MOD
+      USE nodal_arrays_mod
+      USE extend_array_mod
+      USE OUTPUT_MOD
+      use element_mod , only : nixs
 C----------------------------------------------- 
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -89,6 +98,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(output_), intent(inout) :: output
       INTEGER ,INTENT(IN) :: NSENSOR,ITASK
       INTEGER IPARI(NPARI,*),IXS(NIXS,*),IXS16(8,*),
      .        IXS10(6,*),IXS20(12,*),ITAB(*),
@@ -106,17 +116,18 @@ C     REAL
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
+      TYPE(nodal_arrays_), intent(in) :: nodes 
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,I,N_MULT,N_MUL_MX,NKMAX,LENH,NH,NTY,NCR,
+      INTEGER N,N_MULT,N_MUL_MX,NKMAX,NH,NTY,NCR,
      .        IP0,IP1,IP2,IP3,IP4,IP5,IP6,IP7,IP8,IP8A,IP8B,IP9,IP10,
      .        IP11,IP12,IP13,IP14,IP15,IP16,IP17,IP18,IP19,IP20,
-     .        J1,J2,J3,J4,J5,K,N1,N2,N3,N4,N5,N6,LWAT,ISKIP,NCF_S,NCF_E,
-     .        INUM,IDDL,ISKW,ITYP,NB_JLT,NB_JLT_NEW,NB_STOK_N,
+     .        J1,J2,J3,J4,J5,K,N2,N3,N4,N5,N6,LWAT,ISKIP,NCF_S,NCF_E,
+     .        INUM,IDDL,ISKW,NB_JLT,NB_JLT_NEW,NB_STOK_N,
      .        NUM_ISTOCK,KINDEX2,
      .        ILAGM, ISENS
       my_real TS
@@ -323,7 +334,7 @@ C ---------------------
      2   WAG(IP0)  ,WAG(IP1)  ,WAG(IP2)  ,WAG(IP3)  ,WAG(IP4)  ,
      3   WAG(IP5)  ,WAG(IP6)  ,LAGBUF(J3),LAGBUF(J4),MS        ,
      4   IN        ,V         ,VR        ,A         ,AR        ,
-     5   ISKIP     ,NCF_S     ,N_MULT    ,PYTHON)
+     5   ISKIP     ,NCF_S     ,N_MULT    ,PYTHON, nodes)
 C ---------------------
       NCF_E = N_MULT
 C ---------------------
@@ -390,7 +401,7 @@ C-------------------
       CALL MY_BARRIER
 C-------------------
       IF(ITASK==0)
-     .  CALL LAG_ANITH(WAG(IP1),WAG(IP2),WAG(IP3),WAG(IP4),WAG(IP5),
+     .  CALL LAG_ANITH(output,WAG(IP1),WAG(IP2),WAG(IP3),WAG(IP4),WAG(IP5),
      .                 FANI    ,FSAV    ,N_MULT  ,H3D_DATA )
 c      IF(ITASK==0 .AND. NRBYLAG>0)
 c     .  CALL LAGTH_RBY(LPBYL ,NPBYL ,FANI  ,FSAV  ,A     ,AR    ,X     )
@@ -398,31 +409,36 @@ C---
       RETURN
       END
 C
-      !||====================================================================
-      !||    lag_multp          ../engine/source/tools/lagmul/lag_mult.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../engine/source/output/message/message.F
-      !||    arret              ../engine/source/system/arret.F
-      !||    init_int           ../engine/source/tools/lagmul/lag_ntag.F
-      !||    init_intv          ../engine/source/tools/lagmul/lag_ntag.F
-      !||    lag_anithp         ../engine/source/tools/lagmul/lag_anith.F
-      !||    lag_fxvp           ../engine/source/tools/lagmul/lag_fxv.F
-      !||    lag_i2main         ../engine/source/tools/lagmul/lag_i2main.F
-      !||    lag_mpcp           ../engine/source/tools/lagmul/lag_mpc.F
-      !||    lag_mult_solvp     ../engine/source/tools/lagmul/lag_mult_solv.F
-      !||    rby_decond         ../engine/source/tools/lagmul/lag_rby_cond.F
-      !||    spmd_exch_mult     ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||    spmd_get_mult      ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||    spmd_gg_mult       ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||    spmd_sg_mult       ../engine/source/mpi/lag_multipliers/spmd_lag.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||    python_funct_mod   ../common_source/modules/python_mod.F90
-      !||====================================================================
-      SUBROUTINE LAG_MULTP(
+!||====================================================================
+!||    lag_multp          ../engine/source/tools/lagmul/lag_mult.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg             ../engine/source/output/message/message.F
+!||    arret              ../engine/source/system/arret.F
+!||    init_int           ../engine/source/tools/lagmul/lag_ntag.F
+!||    init_intv          ../engine/source/tools/lagmul/lag_ntag.F
+!||    lag_anithp         ../engine/source/tools/lagmul/lag_anith.F
+!||    lag_fxvp           ../engine/source/tools/lagmul/lag_fxv.F
+!||    lag_i2main         ../engine/source/tools/lagmul/lag_i2main.F
+!||    lag_mpcp           ../engine/source/tools/lagmul/lag_mpc.F
+!||    lag_mult_solvp     ../engine/source/tools/lagmul/lag_mult_solv.F
+!||    rby_decond         ../engine/source/tools/lagmul/lag_rby_cond.F
+!||    spmd_exch_mult     ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||    spmd_get_mult      ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||    spmd_gg_mult       ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||    spmd_sg_mult       ../engine/source/mpi/lag_multipliers/spmd_lag.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    extend_array_mod   ../common_source/tools/memory/extend_array.F90
+!||    h3d_mod            ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod      ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod        ../engine/share/message_module/message_mod.F
+!||    nodal_arrays_mod   ../common_source/modules/nodal_arrays.F90
+!||    output_mod         ../common_source/modules/output/output_mod.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||====================================================================
+      SUBROUTINE LAG_MULTP(output,
      1       IPARI  ,X        ,A        ,
      2       WAT    ,V       ,MS      ,IN       ,VR       ,
      3               WAG     ,ITAB    ,IXS      ,IXS20    ,
@@ -434,14 +450,18 @@ C
      9       NPRW   ,RBYL    ,D       ,DR       ,KINET    ,
      A       NODGLOB,WEIGHT  ,NBNCL   ,NBIKL    ,NBNODL   ,
      B       NBNODLR,FR_LAGF ,LLAGF   ,IAD_ELEM ,FR_ELEM  ,
-     C       INTBUF_TAB ,H3D_DATA, PYTHON)
+     C       INTBUF_TAB ,H3D_DATA, PYTHON, nodes)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE PYTHON_FUNCT_MOD
+      USE nodal_arrays_mod
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
+      USE extend_array_mod
+      use output_mod
+      use element_mod , only : nixs
 C======================================================================|
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -460,6 +480,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(output_), intent(inout) :: output
       INTEGER NBNCL, NBIKL, NBNODL, NBNODLR
       INTEGER IPARI(NPARI,*),IXS(NIXS,*),IXS16(8,*),
      .        IXS10(6,*),IXS20(12,*),ITAB(*),
@@ -478,22 +499,23 @@ C     REAL
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
+      TYPE(nodal_arrays_), intent(in) :: nodes 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,I,N_MULT,N_MUL_MX,NKMAX,LENH,NH,NTY,NCR,
+      INTEGER N,N_MULT,N_MUL_MX,NKMAX,NH,NTY,NCR,
      .        IP0,IP1,IP2,IP3,IP4,IP5,IP6,IP7,IP8,IP8A,IP8B,IP9,IP10,
      .        IP11,IP12,IP13,IP14,IP15,IP16,IP17,IP18,IP19,IP20,
-     .        J1,J2,J3,J4,J5,K,N1,N2,N3,N4,N5,N6,LWAT,ISKIP,
+     .        J1,J2,J3,J4,J5,K,N2,N3,N4,N5,N6,LWAT,ISKIP,
      .        NCF_S,NCF_E,
-     .        INUM,IDDL,ISKW,ITYP,NB_JLT,NB_JLT_NEW,NB_STOK_N,
+     .        INUM,IDDL,ISKW,NB_JLT,NB_JLT_NEW,NB_STOK_N,
      .        NUM_ISTOCK,KINDEX2,
-     .        ILAGM,IK0,N_IK, NNODMAX, ISIZ, LRBUF, NLAGF,
+     .        ILAGM,IK0,N_IK, ISIZ, LRBUF, NLAGF,
      .        INDEXLAG(NUMNODG)
       my_real
      .        LAGCOM(2*NBNCL+4*NBIKL),
      .        AG(3,NBNODL),VG(3,NBNODL),MSG(NBNODL),
-     .        ARG(3,NBNODLR),VRG(3,NBNODLR),ING(NBNODLR)   ! NBNODLR = NBNODL ou 0 suivant iroddl
+     .        ARG(3,NBNODLR),VRG(3,NBNODLR),ING(NBNODLR)   ! Nbnodlr = nbnodl or 0 following Iroddl
 C======================================================================|
 C
       NLAGF = FR_LAGF(3,ISPMD+1)
@@ -677,7 +699,7 @@ C ---------------------
       IF(NFVLAG>0) CALL LAG_FXVP(
      1   IBFV      ,VEL        ,SKEW     ,NPF       ,TF        ,
      2   LAGCOM    ,LAGCOM(IK0),N_MULT   ,NODGLOB   ,WEIGHT    ,
-     3   N_IK      ,PYTHON)
+     3   N_IK      ,PYTHON, nodes)
 C ---------------------
       NCF_E = N_MULT
 C ---------------------
@@ -777,7 +799,7 @@ C
      1  A      ,AR     ,AG    ,ARG     ,FR_LAGF,
      2  ISIZ   ,NBNODL ,LLAGF ,NLAGF   )
 C
-C Echange aux noeuds frontieres Pi <=> Pj A, AR, V, VR, MS, IN
+C Exchange to the nodes Frontieres Pi <=> pj a, ar, v, vr, ms, in
 C
       IF(IRODDL==0)THEN
         ISIZ = 4
@@ -794,7 +816,7 @@ C
      3               MS      ,IN      ,RBYL    ,NPBYL   ,LPBYL  ,
      4               N_MULT  ,NCR     )
 C AG => FANIG
-      CALL LAG_ANITHP(WAG(IP1),WAG(IP2),WAG(IP3),WAG(IP4),WAG(IP5),
+      CALL LAG_ANITHP(output, WAG(IP1),WAG(IP2),WAG(IP3),WAG(IP4),WAG(IP5),
      2                FANI    ,FSAV    ,N_MULT  ,INDEXLAG,AG      ,
      3                FR_LAGF ,NBNODL  ,LLAGF   ,NLAGF   ,H3D_DATA)
 C---

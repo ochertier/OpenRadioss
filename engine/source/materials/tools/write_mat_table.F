@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    write_mat_table   ../engine/source/materials/tools/write_mat_table.F
-      !||--- called by ------------------------------------------------------
-      !||    write_eosparam    ../engine/source/output/restart/write_eosparam.F90
-      !||    write_matparam    ../engine/source/output/restart/write_matparam.F
-      !||    write_viscparam   ../engine/source/output/restart/write_viscparam.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_db          ../common_source/tools/input_output/write_db.F
-      !||    write_i_c         ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    table4d_mod       ../common_source/modules/table4d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    write_mat_table   ../engine/source/materials/tools/write_mat_table.F
+!||--- called by ------------------------------------------------------
+!||    write_eosparam    ../engine/source/output/restart/write_eosparam.F90
+!||    write_failparam   ../engine/source/output/restart/write_failparam.F
+!||    write_matparam    ../engine/source/output/restart/write_matparam.F
+!||    write_viscparam   ../engine/source/output/restart/write_viscparam.F
+!||--- calls      -----------------------------------------------------
+!||    write_db          ../common_source/tools/input_output/write_db.F
+!||    write_i_c         ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    table4d_mod       ../common_source/modules/table4d_mod.F
+!||====================================================================
       SUBROUTINE WRITE_MAT_TABLE(TABLE, NUMTABL)
 C-----------------------------------------------
       USE TABLE4D_MOD
@@ -54,6 +55,7 @@ c===============================================
       DO N=1,NUMTABL
         LEN  = 1
         CALL WRITE_I_C(TABLE(N)%NOTABLE,LEN)
+        IF (TABLE(N)%NOTABLE <= 0) CYCLE
         NDIM = TABLE(N)%NDIM
         CALL WRITE_I_C(NDIM,LEN)
         DO I=1,NDIM

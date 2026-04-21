@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    smass3             ../starter/source/elements/solid/solide/smass3.F
-      !||--- called by ------------------------------------------------------
-      !||    inirig_mat         ../starter/source/elements/initia/inirig_mat.F
-      !||    inivoid            ../starter/source/elements/initia/inivoid.F
-      !||    multifluid_init3   ../starter/source/multifluid/multifluid_init3.F
-      !||    s8cinit3           ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||    s8zinit3           ../starter/source/elements/solid/solide8z/s8zinit3.F
-      !||    scinit3            ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sinit3             ../starter/source/elements/solid/solide/sinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_exit            ../starter/source/output/analyse/analyse.c
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    smass3             ../starter/source/elements/solid/solide/smass3.F
+!||--- called by ------------------------------------------------------
+!||    inirig_mat         ../starter/source/elements/initia/inirig_mat.F
+!||    inivoid            ../starter/source/elements/initia/inivoid.F
+!||    multifluid_init3   ../starter/source/multifluid/multifluid_init3.F
+!||    s8cinit3           ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||    s8zinit3           ../starter/source/elements/solid/solide8z/s8zinit3.F
+!||    scinit3            ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sinit3             ../starter/source/elements/solid/solide/sinit3.F
+!||--- calls      -----------------------------------------------------
+!||    my_exit            ../starter/source/output/analyse/analyse.c
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SMASS3(
      1     RHO    ,MS   ,PARTSAV,X    ,V ,
      2     IPART  ,MSS  ,VOLU   ,
@@ -56,7 +56,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IPART(*),NDDIM
+      INTEGER IPART(*)
       my_real
      .   RHO(*),MS(*),X(3,*),V(3,*),PARTSAV(20,*),VOLU(*),
      .   MSS(8,*), MSSF(8,*), MSNF(*),IN(*),VR(3,*),INS(8,*),WMA(*),
@@ -70,8 +70,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, IP,I1,I2,I3,I4,I5,I6,I7,I8
-      my_real XX,YY,ZZ,XY,YZ,ZX, MASSP,INER,RCP
+      INTEGER I, IP, I1, I2, I3, I4, I5, I6, I7, I8
+      my_real XX, YY, ZZ, XY, YZ, ZX, INER, RCP
       my_real MASS(MVSIZ),MASSF(MVSIZ)
 C-------------------------------
 C=======================================================================

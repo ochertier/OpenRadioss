@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,20 +21,24 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    alew7                               ../engine/source/ale/grid/alew7.F
-      !||--- called by ------------------------------------------------------
-      !||    alewdx                              ../engine/source/ale/grid/alewdx.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier                          ../engine/source/system/machine.F
-      !||    spmd_exch_flow_tracking_data        ../engine/source/ale/grid/spmd_exch_flow_tracking_data.F90
-      !||    spmd_exch_flow_tracking_data2       ../engine/source/ale/grid/spmd_exch_flow_tracking_data2.F90
-      !||    spmd_exch_flow_tracking_data3       ../engine/source/ale/grid/spmd_exch_flow_tracking_data3.F90
-      !||    spmd_exch_flow_tracking_data4       ../engine/source/ale/grid/spmd_exch_flow_tracking_data4.F90
-      !||    valpvec                             ../engine/source/materials/mat/mat033/sigeps33.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod                             ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alew7                               ../engine/source/ale/grid/alew7.F
+!||--- called by ------------------------------------------------------
+!||    alewdx                              ../engine/source/ale/grid/alewdx.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier                          ../engine/source/system/machine.F
+!||    spmd_exch_flow_tracking_data        ../engine/source/ale/grid/spmd_exch_flow_tracking_data.F90
+!||    spmd_exch_flow_tracking_data2       ../engine/source/ale/grid/spmd_exch_flow_tracking_data2.F90
+!||    spmd_exch_flow_tracking_data3       ../engine/source/ale/grid/spmd_exch_flow_tracking_data3.F90
+!||    spmd_exch_flow_tracking_data4       ../engine/source/ale/grid/spmd_exch_flow_tracking_data4.F90
+!||    valpvec                             ../engine/source/materials/mat/mat033/sigeps33.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod                             ../common_source/modules/ale/ale_mod.F
+!||    spmd_exch_flow_tracking_data2_mod   ../engine/source/ale/grid/spmd_exch_flow_tracking_data2.F90
+!||    spmd_exch_flow_tracking_data3_mod   ../engine/source/ale/grid/spmd_exch_flow_tracking_data3.F90
+!||    spmd_exch_flow_tracking_data4_mod   ../engine/source/ale/grid/spmd_exch_flow_tracking_data4.F90
+!||    spmd_exch_flow_tracking_data_mod    ../engine/source/ale/grid/spmd_exch_flow_tracking_data.F90
+!||====================================================================
       SUBROUTINE ALEW7(
      1   X       ,V       ,W       ,MS      , NALE,
      2   NODFT   ,NODLT   ,WEIGHT  ,NUMNOD  , DT1 ,
@@ -110,11 +114,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,II,JJ
-      INTEGER :: IDEFORMATION,IROTATION
+      INTEGER :: I,JJ
       my_real :: SUM_MS,MS_NODE, ksi
       my_real :: SUM_MOM(3),SUM_COG(3) !1:m*vx, 2:m*vy, 3:m*vz
-      my_real :: SUM_M, SUM_VOL
+      my_real :: SUM_M
       my_real :: SUM_ITM(6)
       my_real :: VMEAN(3),LD(6),LW(3),COG(3),ITM(6),LD_B(3,3),LD_Bp(3,3),LD_Bp_B(3,3),LD_TOT_B(3,3)
       my_real :: P_B_Bp(3,3)
@@ -125,7 +128,7 @@ C-----------------------------------------------
       my_real :: XX,YY,ZZ
       my_real :: LD_NORM
       my_real :: SCALE_DEF,SCALE_ROT
-      my_real :: RATIO(3), LAMBDA(6), DW(3)
+      my_real :: RATIO(3), DW(3)
       my_real :: BETA(6),BETA0(6)
       my_real :: FAC(3)
       my_real :: MS_ELEM_MEAN
@@ -143,14 +146,14 @@ C-----------------------------------------------
       SCALE_DEF = ALE%GRID%ALPHA !user parameter
       SCALE_ROT = ALE%GRID%GAMMA !user parameter
       IF(INT(ALE%GRID%VGX) == 1)lDEF=.TRUE. !enable mesh deformation
-      IF(INT(ALE%GRID%VGY) == 1)lROT=.TRUE. !enalbe mesh rotation
+      IF(INT(ALE%GRID%VGY) == 1)lROT=.TRUE. !enable mesh rotation
       IF(lDEF .OR. lROT)lTENSOR=.TRUE.!request for mean tensor calculation
 
       !2.---AVERAGED DEFORMATION TENSOR
       !-----------------------------------
       !mean value is computed here
       !  cumulative mass value done in sfor3.F for 3d solid and qforc2.F for quads
-      !  ALE%GRID%flow_tracking_data%.. is a shared data strucutre for SMP  (omp single or lock on/off)
+      !  ALE%GRID%flow_tracking_data%.. is a shared data structure for SMP  (omp single or lock on/off)
 !$OMP SINGLE
       IF(lTENSOR)THEN
          IF(NSPMD > 1)THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,33 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dfunc0                       ../engine/source/output/anim/generate/dfunc0.F
-      !||--- called by ------------------------------------------------------
-      !||    genani                       ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    output_schlieren             ../engine/source/output/anim/generate/output_schlieren.F
-      !||    schlieren_buffer_gathering   ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
-      !||    spmd_r4get_partn             ../engine/source/mpi/anim/spmd_r4get_partn.F
-      !||    write_r_c                    ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
-      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod                  ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    my_alloc_mod                 ../common_source/tools/memory/my_alloc.F90
-      !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dfunc0                       ../engine/source/output/anim/generate/dfunc0.F
+!||--- called by ------------------------------------------------------
+!||    genani                       ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    schlieren_buffer_gathering   ../engine/source/output/anim/generate/schlieren_buffer_gathering.F
+!||    spmd_r4get_partn             ../engine/source/mpi/anim/spmd_r4get_partn.F
+!||    write_r_c                    ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
+!||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
+!||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    initbuf_mod                  ../engine/share/resol/initbuf.F
+!||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+!||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
+!||    my_alloc_mod                 ../common_source/tools/memory/my_alloc.F90
+!||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
+!||====================================================================
       SUBROUTINE DFUNC0(ELBUF_TAB, FUNC             ,IFUNC     ,IPARG   ,
      2                  MASS     , PM               ,EL2FA     ,NBF     ,
      3                  NBPART   , IADG             ,SPBUF     ,IPART   ,
-     4                  IPARTSP  , ALE_CONNECTIVITY ,IXQ       ,IPM     ,
+     4                  IPARTSP  , ALE_CONNECTIVITY ,IPM       ,
      5                  X        , V                ,W         ,ITHERM  ,
      6                  NERCVOIS , NESDVOIS         ,LERCVOIS  ,LESDVOIS, 
-     7                  BUFMAT   , MULTI_FVM        ,KXSP      ,DEFAULT_OUTPUT)
+     7                  BUFMAT   , MULTI_FVM        ,KXSP      ,DEFAULT_OUTPUT,
+     8                  MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -55,6 +57,8 @@ C-----------------------------------------------
       USE SCHLIEREN_MOD    
       USE ALE_CONNECTIVITY_MOD
       USE my_alloc_mod
+      USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
+      USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,21 +72,24 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "sphcom.inc"
 #include      "scr17_c.inc"
+#include      "scr25_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real FUNC(*), MASS(*) ,PM(NPROPM,NUMMAT),SPBUF(NSPBUF,*),BUFMAT(*),X(3,NUMNOD),V(3,NUMNOD), W(*)
+      my_real FUNC(*), MASS(*) ,PM(NPROPM,NUMMAT),SPBUF(NSPBUF,*),X(3,NUMNOD),V(3,NUMNOD), W(*)
+      my_real, TARGET :: BUFMAT(*)
       INTEGER IPARG(NPARG,NGROUP),EL2FA(*),IFUNC,NBF,
      .        NBPART,IADG(NSPMD,*),IPART(LIPART1,*),IPARTSP(*),
-     .        NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),IXQ(NIXQ,NUMELQ),IPM(NPROPMI,NUMMAT)
+     .        NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),IPM(NPROPMI,NUMMAT)
       INTEGER, INTENT(IN) :: ITHERM
       INTEGER, INTENT(IN) :: KXSP(NISP,NUMSPH),DEFAULT_OUTPUT
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -95,6 +102,15 @@ C-----------------------------------------------
       TYPE(BUF_MAT_) ,POINTER :: MBUF
       TYPE(BUF_EOS_)  ,POINTER :: EBUF
       my_real, DIMENSION(:),POINTER  ::  DFMAX
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -109,7 +125,7 @@ C-----------------------------------------------
       ENDIF!(IFUNC==4892)
 
 C-----------------------------------------------
-      DO 900 NG=1,NGROUP
+      DO NG=1,NGROUP
         MLW = IPARG(1,NG)     
         NEL = IPARG(2,NG)                                          
         NFT = IPARG(3,NG)
@@ -295,19 +311,7 @@ c-----------
            N = I + NFT          
            FUNC(EL2FA(NN1+N)) = DFMAX(I)    
              ENDDO
-           ENDDO  
-c-----------
-            ELSEIF(IFUNC == 4892) THEN  
-             IALEL=IPARG(7,NG)+IPARG(11,NG)
-             IF(IALEL == 0)THEN
-               EVAR(LFT:LLT) = ZERO
-             ELSE
-               CALL OUTPUT_SCHLIEREN(
-     1                        EVAR    ,IXQ    ,X           ,
-     2                        IPARG   ,WA_L   ,ELBUF_TAB   ,ALE_CONNECTIVITY   ,GBUF%VOL,
-     3                        NG      ,NIXQ   ,ITY)
-             ENDIF  
-             FUNC(EL2FA(NN1+NFT+1:NN1+NFT+LLT)) = EVAR(1:LLT)      
+           ENDDO
 c-----------      
            ELSEIF (IFUNC == 4893) THEN                     
              DO I=LFT,LLT                                               
@@ -345,12 +349,15 @@ C  equivalent stress -  (NON VON MISES / VON MISES)
              ENDIF
 c-----------     
            ELSEIF(IFUNC == 4930 )THEN   !/ANIM/ELEM/TDET
-            DO I=LFT,LLT
-             N = I + NFT
-             IF(EL2FA(NN1+N)/=0)THEN
-                FUNC(EL2FA(NN1+N)) = -GBUF%TB(I)
-             ENDIF
-            ENDDO    
+            IF(GBUF%G_TB > 0)THEN
+              DO I=LFT,LLT
+                N = I + NFT
+                IF(EL2FA(NN1+N)/=0)THEN
+                   FUNC(EL2FA(NN1+N)) = -GBUF%TB(I)
+                ENDIF
+              ENDDO
+            ENDIF
+c-----------
            ELSEIF(IFUNC == 4937 )THEN   !/ANIM/ELEM/DT
             IF(GBUF%G_DT>0)THEN
               DO I=LFT,LLT
@@ -373,7 +380,6 @@ c-----------
                ELSEIF(IFUNC==4941)THEN
                  DO I=LFT,LLT
                   N     = I + NFT
-!                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
      +                                         +GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I) )  
@@ -382,7 +388,6 @@ c-----------
                ELSEIF(IFUNC==4942)THEN
                  DO I=LFT,LLT
                   N     = I + NFT
-!                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I)
      +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  
@@ -391,7 +396,6 @@ c-----------
                ELSEIF(IFUNC==4943)THEN
                  DO I=LFT,LLT
                   N     = I + NFT
-!                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
      +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  
@@ -400,7 +404,6 @@ c-----------
                ELSEIF(IFUNC==4944)THEN
                  DO I=LFT,LLT
                   N     = I + NFT
-!                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
      +                                         +GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I)
@@ -422,7 +425,6 @@ c-----------
                ELSEIF(IFUNC==4948)THEN
                  DO I=LFT,LLT
                   N     = I + NFT
-!                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
      +                                         +GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I) )  / GBUF%RHO(I)      
@@ -431,7 +433,6 @@ c-----------
                ELSEIF(IFUNC==4949)THEN
                  DO I=LFT,LLT
                   N     = I + NFT
-!                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I) 
      +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  / GBUF%RHO(I)      
@@ -440,7 +441,6 @@ c-----------
                ELSEIF(IFUNC==4950)THEN
                  DO I=LFT,LLT
                   N     = I + NFT
-!                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
      +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  / GBUF%RHO(I)      
@@ -449,7 +449,6 @@ c-----------
                ELSEIF(IFUNC==4951)THEN
                  DO I=LFT,LLT
                   N     = I + NFT
-!                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
      +                                         +GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I)
@@ -576,9 +575,9 @@ c-----------
         ELSE
         ENDIF
 C-----------------------------------------------
-C       FIN DE BOUCLE SUR LES GROUPES
+C       end of loop over groups
 C-----------------------------------------------
- 900  CONTINUE
+      ENDDO ! next NG
 C-----------------------------------------------
 
       IF (NSPMD == 1) THEN

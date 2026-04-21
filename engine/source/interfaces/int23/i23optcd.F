@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i23optcd          ../engine/source/interfaces/int23/i23optcd.F
-      !||--- called by ------------------------------------------------------
-      !||    i23main_opt_tri   ../engine/source/interfaces/intsort/i23main_opt_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    sync_data         ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box           ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i23optcd          ../engine/source/interfaces/int23/i23optcd.F
+!||--- called by ------------------------------------------------------
+!||    i23main_opt_tri   ../engine/source/interfaces/intsort/i23main_opt_tri.F
+!||--- calls      -----------------------------------------------------
+!||    sync_data         ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box           ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I23OPTCD(CAND_E ,CAND_N ,X      ,I_STOK  ,IRECT ,
      2                   GAP    ,GAP_S  ,IGAP    ,NSN    ,STFN   ,
      3                   ITASK  ,STF    ,INACTI  ,FTXSAV ,
@@ -68,12 +68,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,L,IS,JS,LS,NLS,NLT,NSEG,SG,FIRST,LAST,MSEG,NLF,II,J,NLS2
+      INTEGER I,L,IS,JS,LS,NLS,NLT,NSEG,SG,FIRST,LAST,MSEG,NLF,II,NLS2
       INTEGER LIST(MVSIZ),IG(MVSIZ),IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),
      .        IX4(MVSIZ), LISTI(MVSIZ),COUNT_CAND,CT
       my_real
      .        XI,X1,X2,X3,X4,YI,Y1,Y2,Y3,Y4,ZI,Z1,Z2,Z3,Z4,
-     .        XMIN,XMAX,YMIN,YMAX,ZMIN,ZMAX,V12,V22,V32,V42
+     .        XMIN,XMAX,YMIN,YMAX,ZMIN,ZMAX
       my_real
      .        GAPV(MVSIZ)
       my_real
@@ -147,7 +147,7 @@ C
        NLF = 1
        NLT = NLS
 C
-C necessaire pour gap TYPE5
+C necessary for gap TYPE5
        DO LS=NLF,NLT
          IS = LISTI(LS)
          GAPV(IS)=SQRT(THREE)*GAPV(IS)
@@ -201,9 +201,8 @@ C necessaire pour gap TYPE5
           ENDIF
         ENDDO
        ELSE
-#include      "vectorize.inc"
         DO LS = NLF, NLT
-C   conserver LISTI et LIST pour optimiser le code genere (IA64)
+C   keep LISTI and LIST to optimize the generated code (IA64)
           IS = LISTI(LS)
           I=JS+IS
           L  = CAND_E(I)
@@ -229,7 +228,6 @@ C   conserver LISTI et LIST pour optimiser le code genere (IA64)
 C
         NLT=NLS
         NLS=0
-#include      "vectorize.inc"
         DO LS=NLF,NLT
           IS=LIST(LS)
           YI=X(2,IG(IS))
@@ -279,7 +277,7 @@ C
             ENDDO
           ENDIF
 C
-C necessaire pour gap TYPE5
+C necessary for gap TYPE5
           DO LS = NLF, NLT
             IS = LISTI(LS)
             GAPV(IS)=SQRT(THREE)*GAPV(IS)
@@ -335,7 +333,6 @@ C
            END DO
           ELSE
            NLS=0
-#include      "vectorize.inc"
            DO LS = NLF, NLT
             IS = LISTI(LS)
             I=JS+IS
@@ -363,7 +360,6 @@ C
            NLF=1
            NLT=NLS
            NLS=0
-#include      "vectorize.inc"
            DO LS=NLF,NLT
             IS=LIST(LS)
             I=JS+IS

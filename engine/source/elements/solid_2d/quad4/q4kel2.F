@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    q4kel2      ../engine/source/elements/solid_2d/quad4/q4kel2.F
-      !||--- called by ------------------------------------------------------
-      !||    q4ke2       ../engine/source/elements/solid_2d/quad4/q4ke2.F
-      !||--- calls      -----------------------------------------------------
-      !||    q4kelij2    ../engine/source/elements/solid_2d/quad4/q4kelij2.F
-      !||    q4kelijs2   ../engine/source/elements/solid_2d/quad4/q4kelijs2.F
-      !||====================================================================
+!||====================================================================
+!||    q4kel2      ../engine/source/elements/solid_2d/quad4/q4kel2.F
+!||--- called by ------------------------------------------------------
+!||    q4ke2       ../engine/source/elements/solid_2d/quad4/q4ke2.F
+!||--- calls      -----------------------------------------------------
+!||    q4kelij2    ../engine/source/elements/solid_2d/quad4/q4kelij2.F
+!||    q4kelijs2   ../engine/source/elements/solid_2d/quad4/q4kelijs2.F
+!||====================================================================
       SUBROUTINE Q4KEL2(
      1   PY1,     PY2,     PY3,     PY4,
      2   PZ1,     PZ2,     PZ3,     PZ4,
@@ -74,7 +74,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, IS
+      INTEGER I, IS
       my_real
      .    PYC3(MVSIZ), PYC4(MVSIZ), PZC3(MVSIZ), PZC4(MVSIZ)
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    radiatoff        ../engine/source/constraints/thermic/radiatoff.F
-      !||--- called by ------------------------------------------------------
-      !||    desacti          ../engine/source/elements/desacti.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    radiatoff        ../engine/source/constraints/thermic/radiatoff.F
+!||--- called by ------------------------------------------------------
+!||    desacti          ../engine/source/elements/desacti.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||====================================================================
       SUBROUTINE RADIATOFF(IBCR, FRADIA, IPARG, IGROUPS, IXS, ELBUF_TAB,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD            
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,10 +58,10 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, JJ, NG, NEL, MLW
+      INTEGER N, JJ, NG, MLW
       my_real, DIMENSION(:), POINTER :: OFFG
 C======================================================================|
-C   ACTIVATION/DESACTIVATION DE LA RADIATION
+C   activation/deactivation of radiation
 C------------------------------------------------
       DO N=1,GLOB_THERM%NUMRADIA
          IF(IBCR(7,N) == 1) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_solid_tensor_1        ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_solid_tensor          ../engine/source/output/h3d/h3d_results/h3d_solid_tensor.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_write_tensor          ../engine/source/output/h3d/h3d_results/h3d_write_tensor.F
-      !||    h3d_write_tensor_corner   ../engine/source/output/h3d/h3d_results/h3d_write_tensor_corner.F
-      !||    initbuf                   ../engine/share/resol/initbuf.F
-      !||    s6_tstrain                ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||    s8_tstrain                ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||    srota6                    ../engine/source/output/anim/generate/srota6.F
-      !||    strn_tenscor3             ../engine/source/output/h3d/h3d_results/h3d_strn_tenscor3.F
-      !||    strs_tenscor3             ../engine/source/output/h3d/h3d_results/strs_tenscor3.F
-      !||    t4_tstrain                ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod              ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod               ../engine/share/resol/initbuf.F
-      !||    names_and_titles_mod      ../common_source/modules/names_and_titles_mod.F
-      !||    schlieren_mod             ../engine/share/modules/schlieren_mod.F
-      !||    stack_mod                 ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_solid_tensor_1        ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- called by ------------------------------------------------------
+!||    h3d_solid_tensor          ../engine/source/output/h3d/h3d_results/h3d_solid_tensor.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_write_tensor          ../engine/source/output/h3d/h3d_results/h3d_write_tensor.F
+!||    h3d_write_tensor_corner   ../engine/source/output/h3d/h3d_results/h3d_write_tensor_corner.F
+!||    initbuf                   ../engine/share/resol/initbuf.F
+!||    s6_tstrain                ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||    s8_tstrain                ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||    srota6                    ../engine/source/output/anim/generate/srota6.F
+!||    strn_tenscor3             ../engine/source/output/h3d/h3d_results/h3d_strn_tenscor3.F
+!||    strs_tenscor3             ../engine/source/output/h3d/h3d_results/strs_tenscor3.F
+!||    t4_tstrain                ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod              ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod               ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod               ../engine/share/resol/initbuf.F
+!||    names_and_titles_mod      ../common_source/modules/names_and_titles_mod.F
+!||    schlieren_mod             ../engine/share/modules/schlieren_mod.F
+!||    stack_mod                 ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE H3D_SOLID_TENSOR_1(
      .                  ELBUF_TAB,SOLID_TENSOR, IPARG   ,ITENS   ,IXS     ,PM       ,
      2                   EL2FA    ,NBF     ,TENS    ,EPSDOT  ,
@@ -56,6 +57,7 @@ C-----------------------------------------------
       USE SCHLIEREN_MOD 
       USE STACK_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -88,37 +90,22 @@ C-----------------------------------------------
       my_real
      .   EVAR(6,MVSIZ),EVAR_CORNER(6,20,MVSIZ)
       my_real
-     .   OFF, P,VONM2,S1,S2,S12,S3,VALUE,DMGMX,FAC,
-     .   DIR1_1,DIR1_2,DIR2_1,DIR2_2,AA,BB,V1,V2,V3,X21,X32,X34,
-     .   X41,Y21,Y32,Y34,Y41,Z21,Z32,Z34,Z41,SUMA,VR,VS,X31,Y31,
-     .   Z31,E11,E12,E13,E21,E22,E23,SUM,AREA,X2L,VAR,
-     .   E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z,RX,RY,RZ,SX,SY,SZ,
-     .   VG(5),VLY(5),VE(5),S11,S22,S33,S4,S5,S6,VONM, GAMA(6),EVAR_TMP(6),
-     .   A1
+     .   GAMA(6),EVAR_TMP(6)
       my_real 
      .   XN(8*MVSIZ) , YN(8*MVSIZ) , ZN(8*MVSIZ), 
-     .   DXN(8*MVSIZ) ,DYN(8*MVSIZ) , DZN(8*MVSIZ),STRAIN(6,MVSIZ) 
-      INTEGER I,I1,II,J,NEL,NPTR,NPTS,NPTT,NLAY,L,IFAIL,ILAY,
-     .        IR,IS,IT,IL,MLW, NUVAR,IUS,LENF,PTF,PTM,PTS,NFAIL,
-     .        N,NN,K,K1,K2,JTURB,MT,IMID,IALEL,IPID,ISH3N,NNI,
-     .        NN1,NN2,NN3,NN4,NN5,NN6,NN9,NF,BUF,NVARF,
-     .        IHBE,NPTM,NPG, MPT,IPT,IADD,IADR,IPMAT,IFAILT,
-     .        IIGEO,IADI,ISUBSTACK,ITHK,
-     .        ID_PLY,NB_PLYOFF
-      INTEGER PID(MVSIZ),MAT(MVSIZ),MATLY(MVSIZ*100),FAILG(100,MVSIZ),
-     .        PTE(4),PTP(4),PTMAT(4),PTVAR(4),NPT_ALL,IPLY,
-     .        ID_ELEM_TMP(MVSIZ),NIX,ISOLNOD,IVISC,NPTG,TSHELL,TSH_ORT,
-     .        ISTRAIN,KCVT,IOR_TSH,MT1,ICSIG,PTI,IOK,IPRT,IOK_PART(MVSIZ),
+     .   DXN(8*MVSIZ) ,DYN(8*MVSIZ) , DZN(8*MVSIZ) 
+      INTEGER I, II, J, NEL, NPTR, NPTS, NPTT, NLAY, ILAY, 
+     .        IR,IS,IT,IL,MLW, NUVAR,IPID,NNI
+      INTEGER PID(MVSIZ), 
+     .        ISOLNOD,IVISC,NPTG,TSHELL,IPT,N,
+     .        ISTRAIN,KCVT,IOR_TSH,MT1,ICSIG,IOK,IOK_PART(MVSIZ),
      .        JJ(6),IS_WRITTEN_TENSOR(MVSIZ),KK(8)
 
-      REAL R4
+ 
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF     
-      TYPE(BUF_LAY_)  ,POINTER :: BUFLY     
-      TYPE(BUF_FAIL_) ,POINTER :: FBUF 
-      my_real,
-     .  DIMENSION(:), POINTER  :: UVAR
-      TYPE(L_BUFEL_) ,POINTER  :: LBUF1,LBUF2,LBUF3,LBUF4
+ 
+ 
         GBUF => ELBUF_TAB(NG)%GBUF
         ISTRAIN = IPARG(44,NG)
         ISOLNOD = IPARG(28,NG)
@@ -141,6 +128,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C       SOLID 8N
 C-----------------------------------------------
+
         IF (ITY == 1) THEN
 
 
@@ -203,9 +191,9 @@ C-------- LAYER_INPUT not available yet fix in function of JHBE+IJK
              IS = 1
            END IF
           END IF
-! tet10 to hav 4 ipt		   
+! tet10 to have 4 ipt
           IF(ISOLNOD == 10.OR.(ISOLNOD == 4 .AND. ISROT == 1))THEN
-            NPTS = 2                 
+            NPTS = 2
             NPTT = 2
           END IF
 C-----------------------------------------------
@@ -256,7 +244,7 @@ c
 C             STRESS TENSOR IN GLOBAL SYSTEM
               DO I=1,NEL
                N = I + NFT
-C            pour JHBE=14, valeurs moyennes est dans rep. corota.
+C            for jhbe=14, average values are in the corota frame.
           IF(KCVT==2.AND.JHBE/=14)THEN
             II = 6*(I-1)
             GAMA(1)=GBUF%GAMA(JJ(1) + I)
@@ -802,7 +790,7 @@ c-----------
             ELSEIF ( ILAY >= 0 .AND. ILAY <= NLAY .AND. IR >= 0 .AND. IR <= NPTR .AND. 
      .                   IS >= 0 .AND.  IS <= NPTS) THEN
 c-----------
-              IF((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15)THEN
+              IF(((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24))THEN
 c-----------
                 IPT = IS
                 IF ( ILAY <= NPT) THEN
@@ -1025,7 +1013,7 @@ c-----------
 c ILAY= IS= IT=
               EVAR(1:6,1:NEL) = ZERO
 c-----------
-              IF((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15)THEN
+              IF(((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24))THEN
 c-----------
                 IPT = IS
                 IF ( ILAY <= NPT) THEN
@@ -1635,7 +1623,7 @@ C                 STRAIN TENSOR IN GLOBAL SYSTEM
                   ENDDO             
                 ENDIF
 c-----------
-              ELSEIF((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15)THEN
+              ELSEIF(((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24))THEN
 c-----------
                 IF (MLW>=28.AND.MLW /= 49.AND.ISTRAIN > 0) THEN
                   DO I=1,NEL               
@@ -2071,11 +2059,11 @@ C              STRAIN TENSOR IN GLOBAL SYSTEM
 c-----------
             ELSEIF (ISOLNOD==10 .OR. (ISOLNOD==4 .AND. ISROT==1)) THEN
 c-----------
-              IPT = IR
-c              IF (IR == 1 .AND. IS == 1 .AND. IT == 1) IPT = 1 
-c              IF (IR == 2 .AND. IS == 1 .AND. IT == 1) IPT = 2 
-c              IF (IR == 1 .AND. IS == 2 .AND. IT == 1) IPT = 3 
-c              IF (IR == 1 .AND. IS == 1 .AND. IT == 2) IPT = 4 
+              IPT = 0
+              IF (IR == 1 .AND. IS == 1 .AND. IT == 1) IPT = 1 
+              IF (IR == 2 .AND. IS == 1 .AND. IT == 1) IPT = 2 
+              IF (IR == 1 .AND. IS == 2 .AND. IT == 1) IPT = 3 
+              IF (IR == 1 .AND. IS == 1 .AND. IT == 2) IPT = 4 
               IF ( IPT > 0) THEN
                 LBUF =>  ELBUF_TAB(NG)%BUFLY(1)%LBUF(IPT,1,1)          
                 IF (MLW>=28.AND.MLW /= 49 .OR. MLW == 24) THEN 
@@ -2140,7 +2128,7 @@ c-----------
      .                   IS >= 0 .AND.  IS <= NPTS) THEN 
 
               EVAR(1:6,1:NEL) = ZERO
-              IF ((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) THEN
+              IF (((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24)) THEN
 c-----------
                 IF ( ILAY <= NPT ) THEN
                   LBUF =>  ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1) 
@@ -2385,7 +2373,7 @@ C                STRAIN TENSOR IN GLOBAL SYSTEM
             ELSEIF ( ILAY >= 0 .AND. ILAY <= NLAY) THEN 
 c ILAY= IS= IT=
               EVAR(1:6,1:NEL) = ZERO
-              IF ((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) THEN
+              IF (((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24)) THEN
 c-----------
                 IF ( ILAY <= NPT ) THEN
                   LBUF =>  ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)  
@@ -2897,7 +2885,7 @@ C               PLASTIC STRAIN TENSOR IN GLOBAL SYSTEM
                   ENDDO             
                 ENDIF
 c-----------
-              ELSEIF((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15)THEN
+              ELSEIF(((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24))THEN
 c-----------
                 IF (MLW == 24 .and. ISTRAIN > 0) THEN
                   DO I=1,NEL               
@@ -3210,7 +3198,7 @@ c-----------
             ELSEIF ( ILAY >= 0 .AND. ILAY <= NLAY  .AND. IR >= 0 .AND. IR <= NPTR .AND. 
      .                   IS >= 0 .AND.  IS <= NPTS) THEN 
               EVAR(1:6,1:NEL)=ZERO
-              IF ((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) THEN
+              IF (((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24)) THEN
 c-----------
                 IF ( ILAY <= NPT ) THEN
                   LBUF =>  ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)  
@@ -3408,7 +3396,7 @@ C               PLASTIC STRAIN TENSOR IN GLOBAL SYSTEM
             ELSEIF ( ILAY >= 0 .AND. ILAY <= NLAY) THEN 
 c ILAY= IS= IT=
               EVAR(1:6,1:NEL)=ZERO
-              IF ((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) THEN
+              IF (((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24)) THEN
 c-----------
                 IF ( ILAY <= NPT ) THEN
                   LBUF =>  ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)  
@@ -3482,7 +3470,7 @@ c
 C            STRESS TENSOR IN GLOBAL SYSTEM
              DO I=1,NEL
               N = I + NFT
-C              pour JHBE=14, valeurs moyennes est dans rep. corota.
+C              for jhbe=14, average values are in the corota frame.
                IF(KCVT==2.AND.JHBE/=14)THEN
                  II = 6*(I-1)
                  GAMA(1)=GBUF%GAMA(JJ(1) + I)
@@ -4052,7 +4040,7 @@ C                 STRAIN TENSOR IN GLOBAL SYSTEM
                   ENDDO             
                 ENDIF
 c-----------
-              ELSEIF((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15)THEN
+              ELSEIF(((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24))THEN
 c-----------
                 IF (MLW>=28.AND.MLW /= 49.AND.ISTRAIN > 0) THEN
                   DO I=1,NEL               
@@ -4451,7 +4439,7 @@ c-----------
             ELSEIF ( ILAY >= 0 .AND. ILAY <= NLAY) THEN 
 c-----------
               EVAR(1:6,1:NEL) = ZERO
-              IF((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15)THEN
+              IF(((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15) .OR. ((ISOLNOD == 6).AND.JHBE == 24))THEN
                 IPT = IS                                           
                 IF ( ILAY <= NPT) THEN                             
                   LBUF =>  ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)   
@@ -4567,7 +4555,7 @@ C-----------------------------------------------
      .                 SOLID_TENSOR_CORNER,NEL,0,NFT,EVAR_CORNER,MAXNNOD,IS_WRITTEN_TENSOR)
 C
 c-----------
-         ISORTHG = ISORTH   ! pour precaution
+         ISORTHG = ISORTH   ! as a precaution
 C-----------------------------------------------
         ELSE
 c
@@ -4577,14 +4565,14 @@ C
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    t4_tstrain           ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_solid_tensor_1   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- calls      -----------------------------------------------------
-      !||    t4deri3              ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||    u_from_f3            ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||====================================================================
+!||====================================================================
+!||    t4_tstrain           ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- called by ------------------------------------------------------
+!||    h3d_solid_tensor_1   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- calls      -----------------------------------------------------
+!||    t4deri3              ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||    u_from_f3            ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||====================================================================
         SUBROUTINE T4_TSTRAIN(XN,YN,ZN,DX,DY,DZ,STRAIN,NEL)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -4610,7 +4598,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I,J,NNOD
+      INTEGER I, NNOD
       PARAMETER (NNOD = 4)
       my_real 
      .   X0N(NEL,NNOD) , Y0N(NEL,NNOD) , Z0N(NEL,NNOD), 
@@ -4654,14 +4642,14 @@ C---------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    s8_tstrain           ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_solid_tensor_1   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- calls      -----------------------------------------------------
-      !||    t8deri3              ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||    u_from_f3            ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||====================================================================
+!||====================================================================
+!||    s8_tstrain           ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- called by ------------------------------------------------------
+!||    h3d_solid_tensor_1   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- calls      -----------------------------------------------------
+!||    t8deri3              ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||    u_from_f3            ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||====================================================================
         SUBROUTINE S8_TSTRAIN(XN,YN,ZN,DX,DY,DZ,STRAIN,NEL)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -4687,7 +4675,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I,J,NNOD
+      INTEGER I, NNOD
       PARAMETER (NNOD = 8)
       my_real 
      .   X0N(NEL,NNOD) , Y0N(NEL,NNOD) , Z0N(NEL,NNOD), 
@@ -4752,14 +4740,14 @@ C---------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    s6_tstrain           ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_solid_tensor_1   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- calls      -----------------------------------------------------
-      !||    t6deri3              ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||    u_from_f3            ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||====================================================================
+!||====================================================================
+!||    s6_tstrain           ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- called by ------------------------------------------------------
+!||    h3d_solid_tensor_1   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- calls      -----------------------------------------------------
+!||    t6deri3              ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||    u_from_f3            ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||====================================================================
         SUBROUTINE S6_TSTRAIN(XN,YN,ZN,DX,DY,DZ,STRAIN,NEL)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
@@ -4785,7 +4773,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I,J,NNOD
+      INTEGER I, NNOD
       PARAMETER (NNOD = 6)
       my_real 
      .   X0N(NEL,NNOD) , Y0N(NEL,NNOD) , Z0N(NEL,NNOD), 
@@ -4847,11 +4835,11 @@ C---------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    t4deri3      ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- called by ------------------------------------------------------
-      !||    t4_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||====================================================================
+!||====================================================================
+!||    t4deri3      ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- called by ------------------------------------------------------
+!||    t4_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||====================================================================
       SUBROUTINE T4DERI3(
      .   X1,  X2,  X3,  X4,  Y1,  Y2,  Y3,  Y4, 
      .   Z1,  Z2,  Z3,  Z4,  PX1, PX2, PX3, PX4,
@@ -4881,7 +4869,7 @@ C     REAL
       INTEGER I
       my_real
      .   X41, Y41, Z41, X42, Y42, Z42, X43, Y43, Z43,
-     .   A1, A2, A3, A4, D, AREAMX2, 
+     .   D, 
      .   B1(NEL), B2(NEL), B3(NEL), B4(NEL), 
      .   C1(NEL), C2(NEL), C3(NEL), C4(NEL),
      .   D1(NEL), D2(NEL), D3(NEL), D4(NEL)
@@ -4935,11 +4923,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    t8deri3      ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- called by ------------------------------------------------------
-      !||    s8_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||====================================================================
+!||====================================================================
+!||    t8deri3      ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- called by ------------------------------------------------------
+!||    s8_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||====================================================================
       SUBROUTINE T8DERI3(
      .   X1, X2, X3, X4, X5, X6, X7, X8,
      .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
@@ -4968,7 +4956,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
 C     REAL
       my_real
      .   AJ1(NEL),AJ2(NEL),AJ3(NEL),
@@ -5028,7 +5016,7 @@ C
         DET(I)=AJ1(I)*JAC_59_68+AJ2(I)*JAC_67_49+AJ3(I)*JAC_48_57
 C        DET(I)=ONE_OVER_64*(AJ1(I)*JAC_59_68+AJ2(I)*JAC_67_49+AJ3(I)*JAC_48_57)
         DETT=1.0/DET(I)
-C       INVERSE DE LA MATRICE JACOBIENNE
+C       inverse of the jacobian matrix
         AJI1=DETT*JAC_59_68
         AJI4=DETT*JAC_67_49
         AJI7=DETT*JAC_48_57
@@ -5063,11 +5051,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    t6deri3      ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- called by ------------------------------------------------------
-      !||    s6_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||====================================================================
+!||====================================================================
+!||    t6deri3      ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- called by ------------------------------------------------------
+!||    s6_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||====================================================================
       SUBROUTINE T6DERI3(
      .   X1, X2, X3, X4, X5, X6, 
      .   Y1, Y2, Y3, Y4, Y5, Y6, 
@@ -5096,7 +5084,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
 C     REAL
       my_real
      .   DETT ,  AJ1(NEL), AJ2(NEL) ,AJ3(NEL), 
@@ -5106,8 +5094,7 @@ C     REAL
      .   AJI4, AJI5, AJI6,
      .   AJI7, AJI8, AJI9,
      .   JAC_59_68, JAC_67_49, JAC_48_57,
-     .   AJ12, AJ45, AJ78,
-     .   FAC
+     .   AJ12, AJ45, AJ78
 C-----------------------------------------------
 C
       DO I=1,NEL
@@ -5132,7 +5119,7 @@ C
       DO I=1,NEL
         DETT=1.0/DET(I)
 C
-C     INVERSE DE LA MATRICE JACOBIENNE
+C     inverse of the jacobian matrix
 C
         AJI1=DETT*JAC_59_68
         AJI4=DETT*JAC_67_49
@@ -5165,15 +5152,15 @@ C ----------symtrie(a b c a b c)->P1-P3,anti-symtrie(-1 -1 -1 1 1 1)->P4
 C
       RETURN
       END
-      !||====================================================================
-      !||    u_from_f3    ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- called by ------------------------------------------------------
-      !||    s6_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||    s8_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||    t4_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-      !||--- calls      -----------------------------------------------------
-      !||    princ_u1     ../engine/source/materials/mat/mat001/princ_u1.F
-      !||====================================================================
+!||====================================================================
+!||    u_from_f3    ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- called by ------------------------------------------------------
+!||    s6_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||    s8_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||    t4_tstrain   ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+!||--- calls      -----------------------------------------------------
+!||    princ_u1     ../engine/source/materials/mat/mat001/princ_u1.F
+!||====================================================================
       SUBROUTINE U_FROM_F3(F,STRAIN,NEL )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -5192,11 +5179,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
+      INTEGER I
       my_real
      .   ES1(MVSIZ), ES2(MVSIZ), ES3(MVSIZ), 
      .   ES4(MVSIZ), ES5(MVSIZ), ES6(MVSIZ),
-     .   SV(3),EV(MVSIZ,3),DIRPRV(MVSIZ,3,3)
+     .   EV(MVSIZ,3),DIRPRV(MVSIZ,3,3)
 C-----------------------------------------------
       DO I=1,NEL
         ES1(I)=F(1,1,I)*(TWO+F(1,1,I))+F(1,2,I)*F(1,2,I)+F(1,3,I)*F(1,3,I)

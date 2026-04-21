@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    kirkaldykinetics   ../engine/source/materials/mat/mat080/kirkaldykinetics.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps80           ../engine/source/materials/mat/mat080/sigeps80.F
-      !||    sigeps80c          ../engine/source/materials/mat/mat080/sigeps80c.F
-      !||====================================================================
+!||====================================================================
+!||    kirkaldykinetics   ../engine/source/materials/mat/mat080/kirkaldykinetics.F
+!||--- called by ------------------------------------------------------
+!||    sigeps80           ../engine/source/materials/mat/mat080/sigeps80.F
+!||    sigeps80c          ../engine/source/materials/mat/mat080/sigeps80c.F
+!||====================================================================
       SUBROUTINE KIRKALDYKINETICS(NEL0,TIME,TEMPEL,TEMPMIN,AE1,AE3,BS,MS,FCFER,
      .  FCPER,FCBAI,FGRAIN,FRAC1,FRAC2,FRAC3,FRAC4,FRAC5,X2,X3,X4,X5,
      .  QR2,QR3,QR4,KPER,KBAIN,ALPHA,XEQ2,XEQ4,XGAMA,TOTFRAC,TIMESTEP,NICOOL,
@@ -41,7 +41,7 @@ C-----------------------------------------------
         my_real
      .        TEMPEL(NEL0),TEMPMIN(NEL0),TIMESTEP
         my_real
-     .        TIME,ALPHA,TREF,AE1,AE3,BS,MS,GSIZE,NU,FCFER,FCPER,FCBAI,
+     .        TIME,ALPHA,AE1,AE3,BS,MS,FCFER,FCPER,FCBAI,
      .        FGRAIN,QR2,QR3,QR4,KPER,KBAIN,XEQ2,XEQ4,YX
 C-----------------------------------------------
         my_real
@@ -105,7 +105,7 @@ c---------------------------------
            ! BAINITE  FORMATION 
             X4OLD(I) =  X4(I) !FRAC4(I) = X4(I)
             IF(X4(I) == ZERO) X4(I) = X3(I)  !FRAC3(I)/(ONE-XEQ2) 
-            ! INITIALISE AU TAUX DE PERLITE
+            ! INITIALIZE TO PEARLITE RATE
             FTEMP=EXP(-QR4/TEMPEL(I)) *(TEMPEL(I)-BS)**2
             CONST=FTEMP*FGRAIN*FCBAI
             DO K=1,4

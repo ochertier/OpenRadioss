@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_r2r_rget3   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    init_link_spmd   ../engine/source/coupling/rad2rad/r2r_init.F
-      !||    send_data_spmd   ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_rget3        ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    init_link_spmd        ../engine/source/coupling/rad2rad/r2r_init.F
+!||    send_data_spmd        ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_RGET3(
      1    X      ,NNG   ,GRNOD, DD_R2R, WEIGHT, BUFR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -90,17 +93,20 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_rget3_dp   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    send_data_spmd      ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_rget3_dp     ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    send_data_spmd        ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_RGET3_DP(
      1    X      ,NNG   ,GRNOD, DD_R2R, WEIGHT, BUFR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -159,19 +165,22 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_rget        ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    send_data_spmd       ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||    send_mass_rby_spmd   ../engine/source/coupling/rad2rad/r2r_init.F
-      !||    send_mass_spmd       ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_rget         ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    send_data_spmd        ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||    send_mass_rby_spmd    ../engine/source/coupling/rad2rad/r2r_init.F
+!||    send_mass_spmd        ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_RGET(
      1    M   ,NNG   ,GRNOD, DD_R2R, WEIGHT, BUFR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -228,14 +237,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_rby     ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    send_data_spmd   ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod        ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_rby          ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    send_data_spmd        ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod             ../engine/share/modules/rad2r.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_RBY(
      1    RBY   ,NNG   ,GRNOD, DD_R2R, WEIGHT, IEX, BUFR)
 C----6----------------------------------------------------------------
@@ -245,6 +255,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -305,14 +316,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_idef    ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    init_link_spmd   ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod        ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_idef         ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    init_link_spmd        ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod             ../engine/share/modules/rad2r.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_IDEF(NNG,GRNOD,WEIGHT,IEX,TLEL,TLELN,TCNEL,TCNELDB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -321,6 +333,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -340,12 +353,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, P, N, L(6), IERROR, MSGOFF,LOC_PROC, MSGTYP, BUFSIZ,
+      INTEGER I, P, N, L(6), IERROR, MSGOFF, LOC_PROC, MSGTYP, 
      .        STATUS(MPI_STATUS_SIZE),NB(6),OFFSET1
       DATA  MSGOFF/5004/
 C-----------------------------------------------
 C
-C --- Recolte des infos sur les procs : nb d'elements a envoyer, noeuds doubles, etc ...
+C --- gathering information on the processors: number of elements to send, double nodes, etc ...
 C
       LOC_PROC = ISPMD+1
       L(1) = 0
@@ -409,19 +422,22 @@ C
 #endif
       RETURN
       END      
-      !||====================================================================
-      !||    spmd_r2r_iget        ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    get_mass_rby_spmd    ../engine/source/coupling/rad2rad/r2r_init.F
-      !||    init_link_spmd       ../engine/source/coupling/rad2rad/r2r_init.F
-      !||    send_mass_rby_spmd   ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_iget         ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    get_mass_rby_spmd     ../engine/source/coupling/rad2rad/r2r_init.F
+!||    init_link_spmd        ../engine/source/coupling/rad2rad/r2r_init.F
+!||    send_mass_rby_spmd    ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_IGET(
      1    ITAB   ,NNG   ,GRNOD, DD_R2R, WEIGHT, IBUF,FLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -482,14 +498,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_iget2   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    init_link_spmd   ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod        ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_iget2        ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    init_link_spmd        ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod             ../engine/share/modules/rad2r.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_IGET2(
      1    ITAB   ,NNG   ,IEX, IBUF, FLAG)
 C-----------------------------------------------
@@ -499,6 +516,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -517,7 +535,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, P, N, L, IERROR, MSGOFF,LOC_PROC, MSGTYP, BUFSIZ,
+      INTEGER I, P, L, IERROR, MSGOFF, LOC_PROC, MSGTYP, BUFSIZ, 
      .        STATUS(MPI_STATUS_SIZE)
       DATA  MSGOFF/5006/
 C-----------------------------------------------
@@ -550,7 +568,7 @@ C
      S        IBUF(L+1),BUFSIZ,MPI_INTEGER,IT_SPMD(P),MSGTYP,
      G        SPMD_COMM_WORLD,STATUS,IERROR)
   
-C--------------OFFSET de la numerotation des elements----     
+C--------------offset of the element numbering----
             IF ((FLAG==1).OR.(FLAG>2)) THEN
                 DO I=1,BUFSIZ
                   IBUF(L+I)=IBUF(L+I)+OFFSET(P)
@@ -582,14 +600,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_iget4   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    init_link_spmd   ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod        ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_iget4        ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    init_link_spmd        ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod             ../engine/share/modules/rad2r.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_IGET4(
      1    ITAB,NNG,GRNOD,DD_R2R,WEIGHT,IBUF,IEX,DBNBUF,
      2    DDBUF,FLAG)
@@ -600,6 +619,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -667,17 +687,20 @@ C
       RETURN
       END
       
-      !||====================================================================
-      !||    spmd_r2r_sync   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_init        ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_name_c      ../engine/source/coupling/rad2rad/rad2rad_c.c
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_sync         ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    r2r_init              ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||    get_name_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_SYNC(ADDR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -696,8 +719,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, P, N, IERROR, MSGOFF,LOC_PROC, MSGTYP,
-     .        STATUS(MPI_STATUS_SIZE),BUFSIZ,BUFA,TOTO
+      INTEGER P, IERROR, MSGOFF, LOC_PROC, MSGTYP, 
+     . STATUS(MPI_STATUS_SIZE),BUFSIZ,TOTO
       DATA  MSGOFF/5008/
 C-----------------------------------------------
 C
@@ -727,14 +750,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_rset    ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    get_stiff_spmd   ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod        ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_rset         ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    get_stiff_spmd        ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod             ../engine/share/modules/rad2r.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_RSET(
      1    M      ,NNG     ,GRNOD, DD_R2R, WEIGHT,
      2    BUFR   ,IAD_ELEM,FR_ELEM, LRBUF,IEX )
@@ -745,6 +769,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -767,12 +792,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, J, P, N, L, IERROR, MSGOFF, ISHIFT,
-     .        LOC_PROC, MSGTYP, BUFSIZ, SIZ, INB, NB_NOD, NOD, LSEND,
-     .        REQ_R(NSPMD), REQ_S(NSPMD),IAD_SEND(NSPMD+1),DBL,
-     .        IAD_RECV(NSPMD+1), STATUS(MPI_STATUS_SIZE), ITAG(NUMNOD)
-      my_real
-     .        RBUF(LRBUF)
+      INTEGER I, P, N, L, IERROR, MSGOFF, 
+     . LOC_PROC, MSGTYP, BUFSIZ,
+     . DBL,
+     . STATUS(MPI_STATUS_SIZE), ITAG(NUMNOD)
       DATA  MSGOFF/5009/
 C-----------------------------------------------
 C
@@ -817,18 +840,21 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_rset4   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    get_mass_spmd    ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_rset4        ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    get_mass_spmd         ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_RSET4(
      1    M      ,NNG     ,GRNOD, DD_R2R, WEIGHT,
      2    BUFR   ,IAD_ELEM,FR_ELEM, LRBUF )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -851,12 +877,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, J, P, N, L, IERROR, MSGOFF, ISHIFT,
-     .        LOC_PROC, MSGTYP, BUFSIZ, SIZ, INB, NB_NOD, NOD, LSEND,
-     .        REQ_R(NSPMD), REQ_S(NSPMD),IAD_SEND(NSPMD+1),
-     .        IAD_RECV(NSPMD+1), STATUS(MPI_STATUS_SIZE), ITAG(NUMNOD)
-      my_real
-     .        RBUF(LRBUF)
+      INTEGER I, P, N, L, IERROR, MSGOFF, 
+     . LOC_PROC, MSGTYP, BUFSIZ,
+     .
+     . STATUS(MPI_STATUS_SIZE), ITAG(NUMNOD)
       DATA  MSGOFF/5010/
 C-----------------------------------------------
 C
@@ -898,15 +922,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_rset3   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    get_displ_spmd   ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||    get_force_spmd   ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod        ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_rset3        ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    get_displ_spmd        ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||    get_force_spmd        ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod             ../engine/share/modules/rad2r.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_RSET3(
      1    A      ,NNG     ,GRNOD, DD_R2R, WEIGHT,
      2    BUFR   ,IAD_ELEM,FR_ELEM, LRBUF,IEX )
@@ -917,6 +942,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -939,12 +965,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, J, P, N, L, IERROR, MSGOFF, ISHIFT,DBL,
-     .        LOC_PROC, MSGTYP, BUFSIZ, SIZ, INB, NB_NOD, NOD, LSEND,
-     .        REQ_R(NSPMD), REQ_S(NSPMD),IAD_SEND(NSPMD+1),
-     .        IAD_RECV(NSPMD+1), STATUS(MPI_STATUS_SIZE), ITAG(NUMNOD)
-      my_real
-     .        RBUF(LRBUF)
+      INTEGER I, P, N, L, IERROR, MSGOFF, DBL, 
+     . LOC_PROC, MSGTYP, BUFSIZ,
+     .
+     . STATUS(MPI_STATUS_SIZE), ITAG(NUMNOD)
       DATA  MSGOFF/5011/
 C-----------------------------------------------
 C
@@ -994,14 +1018,15 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_r2r_rset3b   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    get_force_spmd    ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod         ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_rset3b       ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    get_force_spmd        ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod             ../engine/share/modules/rad2r.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_RSET3B(
      1    A      ,NNG     ,GRNOD, DD_R2R,WEIGHT,
      2    BUFR   ,IAD_ELEM,FR_ELEM, LRBUF ,MS    ,
@@ -1013,6 +1038,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1035,12 +1061,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, J, P, N, L, IERROR, MSGOFF, MSGOFF2, ISHIFT,DBL,
-     .        LOC_PROC, MSGTYP, BUFSIZ, SIZ, INB, NB_NOD, NOD, LSEND,
-     .        REQ_R(NSPMD), REQ_S(NSPMD),IAD_SEND(NSPMD+1),
-     .        IAD_RECV(NSPMD+1), STATUS(MPI_STATUS_SIZE), ITAG(NUMNOD)    
+      INTEGER I, P, N, L, IERROR, MSGOFF, MSGOFF2, DBL, 
+     . LOC_PROC, MSGTYP, BUFSIZ,
+     .
+     . STATUS(MPI_STATUS_SIZE)
       my_real
-     .        DF1, DF2, DF3, RBUF(LRBUF), WFB
+     . DF1, DF2, DF3, WFB
       DATA  MSGOFF/5012/
       DATA  MSGOFF2/5013/
 C-----------------------------------------------
@@ -1082,7 +1108,7 @@ C
           A(1,N) = MS(N)*BUFR(1,L)
           A(2,N) = MS(N)*BUFR(2,L)
           A(3,N) = MS(N)*BUFR(3,L)
-C calcul du travail localement
+C local computation of work
           WF = WF + (DF1*V(1,N)+DF2*V(2,N)+DF3*V(3,N))/TWO
           WF2= WF2+ (DF1*A(1,N)+DF2*A(2,N)+DF3*A(3,N))/(TWO*MS(N))        
           ELSE
@@ -1096,7 +1122,7 @@ C calcul du travail localement
         ENDIF    
       END DO
       
-C Sommation sur les procs de WF
+C summation over the processors of wf
       IF(LOC_PROC==1) THEN
         DO P = 2, NSPMD
             MSGTYP = MSGOFF 
@@ -1112,7 +1138,7 @@ C Sommation sur les procs de WF
      G     SPMD_COMM_WORLD,IERROR)     
       END IF
       
-C Sommation sur les procs de WF2
+C summation over the processors of wf2
 
       IF(LOC_PROC==1) THEN
         DO P = 2, NSPMD
@@ -1132,13 +1158,15 @@ C Sommation sur les procs de WF2
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_exch_r2r   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_exchange    ../engine/source/coupling/rad2rad/r2r_exchange.F
-      !||    r2r_init        ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_r2r         ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    r2r_exchange          ../engine/source/coupling/rad2rad/r2r_exchange.F
+!||    r2r_init              ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_R2R(
      1   A        ,AR     ,STIFN,STIFR ,MS  ,
      2   IAD_ELEM ,FR_ELEM, SIZE,
@@ -1147,6 +1175,7 @@ C--------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1170,7 +1199,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,
-     .        SIZ,J,K,L,NB_NOD,
+     . SIZ,J,L,NB_NOD,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD),OFFSET,MSGOFF
@@ -1241,7 +1270,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
        IF(DD_R2R(I+1,1)-DD_R2R(I,1)>0)THEN
           MSGTYP = MSGOFF
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -1257,7 +1286,7 @@ C decompactage
 C
       OFFSET = DD_R2R(NSPMD+1,1)-1
       DO I = 1, NSPMD
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
         NB_NOD = DD_R2R(I+1,2)-DD_R2R(I,2)
         IF(NB_NOD>0)THEN
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -1311,12 +1340,14 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_exch_r2r_2   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_getdata       ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_r2r_2       ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    r2r_getdata           ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_R2R_2(
      1   A ,AR, V, VR     ,MS  , IN,
      2   IAD_ELEM ,FR_ELEM, SIZE, WF, WF2,
@@ -1325,6 +1356,7 @@ C--------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1350,7 +1382,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,
-     .        SIZ,J,K,L,NB_NOD,
+     . SIZ,J,L,NB_NOD,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD),OFFSET,MSGOFF
@@ -1419,7 +1451,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
        IF(DD_R2R(I+1,1)-DD_R2R(I,1)>0)THEN
           MSGTYP = MSGOFF
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -1435,7 +1467,7 @@ C decompactage
 C
       OFFSET = DD_R2R(NSPMD+1,1)-1
       DO I = 1, NSPMD
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
         NB_NOD = DD_R2R(I+1,2)-DD_R2R(I,2)
         IF(NB_NOD>0)THEN
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -1464,7 +1496,7 @@ C   test si msg necessaire a envoyer a completer par test interface
                   IN(NOD)= RBUF(L+7)            
                 ENDIF                                 
                 L = L + SIZE
-C calcul du travail localement                
+C local computation of work
                 IF(WEIGHT(NOD)==1)THEN
                   WF = WF + (DF1*V(1,NOD)+DF2*V(2,NOD)+
      .                 DF3*V(3,NOD))/TWO
@@ -1492,7 +1524,7 @@ C calcul du travail localement
                    MS(NOD)= RBUF(L+3)           
                  ENDIF                 
                  L = L + SIZE
-C calcul du travail localement                
+C local computation of work
                  IF(WEIGHT(NOD)==1)THEN
                    WF = WF + (DF1*V(1,NOD)+DF2*V(2,NOD)+
      .                 DF3*V(3,NOD))/TWO
@@ -1518,12 +1550,14 @@ C
 #endif
       RETURN
       END    
-      !||====================================================================
-      !||    spmd_exch_r2r_rby   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_init            ../engine/source/coupling/rad2rad/r2r_init.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_r2r_rby     ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    r2r_init              ../engine/source/coupling/rad2rad/r2r_init.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_R2R_RBY(
      1   NPBY , RBY  ,IAD_ELEM    ,FR_ELEM, SIZE,
      2   LENR ,DD_R2R,DD_R2R_ELEM ,X)
@@ -1531,6 +1565,7 @@ C--------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "param_c.inc"
 C-----------------------------------------------------------------
@@ -1619,7 +1654,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
        IF(DD_R2R(I+1,1)-DD_R2R(I,1)>0)THEN
           MSGTYP = MSGOFF
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -1635,7 +1670,7 @@ C decompactage
 C
       OFFSET = DD_R2R(NSPMD+1,1)-1
       DO I = 1, NSPMD
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
         NB_NOD = DD_R2R(I+1,2)-DD_R2R(I,2)
         IF(NB_NOD>0)THEN
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -1675,14 +1710,15 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_exch_work   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_getdata      ../engine/source/coupling/rad2rad/r2r_getdata.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    rad2r_mod        ../engine/share/modules/rad2r.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_work        ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    r2r_getdata           ../engine/source/coupling/rad2rad/r2r_getdata.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    rad2r_mod             ../engine/share/modules/rad2r.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_WORK(WF, WF2)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1691,6 +1727,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1719,7 +1756,7 @@ C-----------------------------------------------
 C
       LOC_PROC = ISPMD+1
       
-C Sommation sur les procs de WF
+C summation over the processors of wf
       IF(LOC_PROC==1) THEN
         DO P = 2, NSPMD
             MSGTYP = MSGOFF 
@@ -1735,7 +1772,7 @@ C Sommation sur les procs de WF
      G     SPMD_COMM_WORLD,IERROR)     
       END IF
       
-C Sommation sur les procs de WF2
+C summation over the processors of wf2
 
       IF(LOC_PROC==1) THEN
         DO P = 2, NSPMD
@@ -1756,16 +1793,19 @@ C Sommation sur les procs de WF2
       RETURN
       END
 C      
-      !||====================================================================
-      !||    spmd_r2r_tagel   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    tagoff3n         ../engine/source/interfaces/interf/chkstfn3.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_r2r_tagel        ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    tagoff3n              ../engine/source/interfaces/interf/chkstfn3.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_R2R_TAGEL(TAGELG,TAGEL,LEN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1784,7 +1824,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER I, P, N, L, IERROR, MSGOFF,LOC_PROC, MSGTYP, BUFSIZ,
+      INTEGER I, P, L, IERROR, MSGOFF, LOC_PROC, MSGTYP, 
      .        STATUS(MPI_STATUS_SIZE)
       DATA  MSGOFF/5018/
 C-----------------------------------------------
@@ -1817,18 +1857,21 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_exch_r2r_itag   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    tagoff3n             ../engine/source/interfaces/interf/chkstfn3.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_r2r_itag    ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    tagoff3n              ../engine/source/interfaces/interf/chkstfn3.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_R2R_ITAG(
      1   ITAG,IAD_ELEM ,FR_ELEM,DD_R2R,DD_R2R_ELEM,LENR)
 C--------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1845,14 +1888,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IAD_ELEM(2,*),FR_ELEM(*),
-     .        DD_R2R(NSPMD+1,SDD_R2R),DD_R2R_ELEM(*),FLAG,
+     . DD_R2R(NSPMD+1,SDD_R2R),DD_R2R_ELEM(*),
      .        ITAG(*),LENR 
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,
-     .        SIZ,J,K,L,NB_NOD,
+     . SIZ,J,L,NB_NOD,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD),OFFSET,
@@ -1896,7 +1939,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
        IF(DD_R2R(I+1,1)-DD_R2R(I,1)>0)THEN
           MSGTYP = MSGOFF
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -1912,7 +1955,7 @@ C decompactage
 C
       OFFSET = DD_R2R(NSPMD+1,1)-1
       DO I = 1, NSPMD
-C   test si msg necessaire a envoyer a completer par test interface
+C   test if msg requires to send to complete by test interface
         NB_NOD = DD_R2R(I+1,2)-DD_R2R(I,2)
         IF(NB_NOD>0)THEN
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -1942,16 +1985,19 @@ C
       RETURN
       END      
 C
-      !||====================================================================
-      !||    spmd_exch_r2r_sph   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    resol               ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_r2r_sph     ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_R2R_SPH(A,IAD_ELEM,FR_ELEM,DD_R2R,DD_R2R_ELEM,LENR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1975,7 +2021,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,
-     .        SIZ,J,K,L,NB_NOD,
+     . SIZ,J,L,NB_NOD,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD),OFFSET  
@@ -2066,17 +2112,20 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_exch_r2r_sphoff   ../engine/source/mpi/r2r/spmd_r2r.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                  ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_r2r_sphoff   ../engine/source/mpi/r2r/spmd_r2r.F
+!||--- called by ------------------------------------------------------
+!||    resol                  ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod    ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_R2R_SPHOFF(OFF_SPH_R2R,IAD_ELEM,
      1   FR_ELEM,DD_R2R,DD_R2R_ELEM,LENR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -2098,7 +2147,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,
-     .        SIZ,J,K,L,NB_NOD,
+     . SIZ,J,L,NB_NOD,
      .        STATUS(MPI_STATUS_SIZE),
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD),REQ_S(NSPMD),OFFSET,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21main_gap     ../engine/source/interfaces/int21/i21main_gap.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri          ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i21gap3         ../engine/source/interfaces/int21/i21gap3.F
-      !||--- uses       -----------------------------------------------------
-      !||    intstamp_mod    ../engine/share/modules/intstamp_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i21main_gap     ../engine/source/interfaces/int21/i21main_gap.F
+!||--- called by ------------------------------------------------------
+!||    inttri          ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    i21gap3         ../engine/source/interfaces/int21/i21gap3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    intstamp_mod    ../engine/share/modules/intstamp_mod.F
+!||====================================================================
       SUBROUTINE I21MAIN_GAP(
      1  IPARI  ,INTBUF_TAB  ,NIN    ,ITASK  ,
      2  THKNOD)
@@ -60,7 +61,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER KD(50), JD(50), JFI, KFI, IGAP, IDEL
+      INTEGER   IGAP, IDEL
 C     REAL
       my_real
      .   STARTT, STOPT

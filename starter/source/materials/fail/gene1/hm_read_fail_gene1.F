@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_fail_gene1       ../starter/source/materials/fail/gene1/hm_read_fail_gene1.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_fail             ../starter/source/materials/fail/hm_read_fail.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_fail_gene1       ../starter/source/materials/fail/gene1/hm_read_fail_gene1.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_fail             ../starter/source/materials/fail/hm_read_fail.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_FAIL_GENE1(
      .           FAIL    ,MAT_ID   ,FAIL_ID  ,IRUPT    ,
-     .           TITR    ,LSUBMODEL,UNITAB   ,FAIL_TAG )
+     .           TITLE   ,LSUBMODEL,UNITAB   ,FAIL_TAG ,
+     .           NTABLE  ,TABLE    )
 C-----------------------------------------------
 c    ROUTINE DESCRIPTION :
 c    Read generic tabulated failure model parameters
@@ -51,6 +52,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE ELBUFTAG_MOD            
+      use table_mod
+      use func_table_copy_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,19 +68,25 @@ C-----------------------------------------------
       INTEGER             ,INTENT(IN) :: FAIL_ID        !< failure model ID
       INTEGER             ,INTENT(IN) :: MAT_ID         !< material law ID
       INTEGER             ,INTENT(IN) :: IRUPT          !< failure model number
-      CHARACTER           ,INTENT(IN) :: TITR*500       !< material model title
+      CHARACTER           ,INTENT(IN) :: TITLE*500       !< material model title
       TYPE (UNIT_TYPE_)   ,INTENT(IN) :: UNITAB         !< table of input units
       TYPE (SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*)   !< submodel table 
       TYPE (FAIL_PARAM_)  ,INTENT(INOUT) :: FAIL        !< failure model data structure
       TYPE (FAIL_TAG_)    ,INTENT(INOUT) :: FAIL_TAG    !< failure model tag for buffer allocation
+      integer             ,intent(in)    :: ntable      !< number of function tables in Radioss input
+      type(ttable) ,dimension(ntable) ,intent(in) :: table  !< input table array
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,NSTEP,NCS,fct_IDsm,fct_IDps,fct_IDg12,fct_IDg13,
-     .        fct_IDe1c,fct_IDel,Itab,tab_IDfld,Istrain,CRIT,
-     .        Ismooth,NCRIT_MAX,NFUNC,NTABLE,NUPARAM,NUVAR,NMODE
-      INTEGER ,PARAMETER :: NSIZE = 6
-      INTEGER ,DIMENSION(NSIZE) :: IFUNC
+     .        fct_IDe1c,fct_IDel,Itab,tab_IDfld,Istrain,CRIT,IERROR,
+     .        Ismooth,NCRIT_MAX,NTABF,NIPARAM,NUPARAM,NUVAR,NVARTMP,NMODE,FAILIP 
+      INTEGER ,PARAMETER :: NFUNC = 6
+      INTEGER ,DIMENSION(NFUNC) :: IFUNC
+      INTEGER :: NF
+      my_real :: x2scale,x3scale,x4scale
+      my_real ,DIMENSION(NFUNC) :: x1scale,YSCALE
+      my_real, dimension(1) :: x2vect
       my_real 
      .        MINPRES,MAXPRES,SIGP1,TMAX,DTMIN,EPSDOT_SM,SIGVM,SIGTH,KF,
      .        EPSDOT_PS,MAXEPS,EFFEPS,VOLEPS,MINEPS,EPSSH,EPSDOT_FLD,
@@ -252,6 +261,8 @@ C===============================================================================
 !---------------
 ! -> Card6
 !---------------
+      CALL HM_GET_INTV   ('FAILIP'       ,FAILIP    ,IS_AVAILABLE,LSUBMODEL)
+      IF (FAILIP == 0)  FAILIP  = 1
       CALL HM_GET_FLOATV ('MAT_VOLFRAC'  ,VOLFRAC   ,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV ('Pthk'         ,PTHK      ,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_INTV   ('MAT_NCS'      ,NCS       ,IS_AVAILABLE,LSUBMODEL)
@@ -334,12 +345,12 @@ C===============================================================================
         IF (NCRIT_MAX > 0) THEN 
           CALL ANCMSG(MSGID=2043,MSGTYPE=MSGWARNING,
      .                ANMODE=ANINFO_BLIND_1,I1=MAT_ID,
-     .                C1=TITR,I2=NCS,I3=NCRIT_MAX,I4=NCRIT_MAX)   
+     .                C1=title,I2=NCS,I3=NCRIT_MAX,I4=NCRIT_MAX)   
           NCS = NCRIT_MAX
         ELSE 
           CALL ANCMSG(MSGID=3040,MSGTYPE=MSGWARNING,
      .                ANMODE=ANINFO_BLIND_1,I1=MAT_ID,
-     .                C1=TITR)             
+     .                C1=title)             
         ENDIF
       ENDIF 
       NCS = MAX(1,NCS)
@@ -355,19 +366,22 @@ C===============================================================================
 c     Filling buffer tables
 c-----------------------------------------------------    
       NUVAR   = 8 
+      NVARTMP = 8
+      NIPARAM = 7
       NUPARAM = 22
-      NFUNC   = 6
-      NTABLE  = 0
-      IF (tab_IDfld > 0) NTABLE = 1
+      NTABF   = 0
+      IF (tab_IDfld > 0) NTABF = 1
 c
       FAIL%KEYWORD = 'GENE1' 
       FAIL%IRUPT   = IRUPT 
       FAIL%FAIL_ID = FAIL_ID 
       FAIL%NUPARAM = NUPARAM
-      FAIL%NIPARAM = 6
+      FAIL%NIPARAM = NIPARAM
       FAIL%NUVAR   = NUVAR
-      FAIL%NFUNC   = NFUNC
-      FAIL%NTABLE  = NTABLE
+      FAIL%NVARTMP = NVARTMP
+      FAIL%NFUNC   = 0
+      FAIL%NTABLE  = NTABF
+      FAIL%NTABLE4D= NFUNC
       FAIL%NMOD    = NMODE
       FAIL%PTHK    = PTHK
 c            
@@ -375,6 +389,7 @@ c
       ALLOCATE (FAIL%IPARAM(FAIL%NIPARAM))
       ALLOCATE (FAIL%IFUNC (FAIL%NFUNC))
       ALLOCATE (FAIL%TABLE (FAIL%NTABLE))
+      ALLOCATE (FAIL%TABLE4D(FAIL%NTABLE4D))
 c
       ! Modes of failure
       FAIL_TAG%LF_DAMMX = FAIL_TAG%LF_DAMMX + FAIL%NMOD
@@ -382,14 +397,31 @@ c
       DO I = 1,FAIL%NMOD
         FAIL%MODE(I) = MODNAME(I)
       ENDDO 
-c
-      FAIL%IFUNC(1) = fct_IDsm
-      FAIL%IFUNC(2) = fct_IDps
-      FAIL%IFUNC(3) = fct_IDg12
-      FAIL%IFUNC(4) = fct_IDg13
-      FAIL%IFUNC(5) = fct_IDe1c
-      FAIL%IFUNC(6) = fct_IDel
-      IF (NTABLE == 1) FAIL%TABLE(1) = tab_IDfld
+      IF (tab_IDfld > 0) FAIL%TABLE(1) = tab_IDfld
+!---------------------------------------------------------------------
+      IFUNC(1) = fct_IDsm
+      IFUNC(2) = fct_IDps
+      IFUNC(3) = fct_IDg12
+      IFUNC(4) = fct_IDg13
+      IFUNC(5) = fct_IDe1c
+      IFUNC(6) = fct_IDel
+!           
+      nf = 1
+      x1scale(1)   = epsdot_sm
+      x1scale(2)   = epsdot_ps
+      x1scale(3:6) = one
+      x2scale      = one
+      x2vect(:)    = zero
+      yscale(1)    = sigvm
+      yscale(2)    = maxeps
+      yscale(3:5)  = one
+      yscale(6)    = fscale_el
+      do i = 1,nfunc
+        call func_table_copy(fail%table4d(i),title  ,mat_id   ,      
+     .           nf      ,ifunc(i),x2vect  ,x1scale(i) ,x2scale  ,yscale(i)  ,      
+     .           ntable  ,table   ,ierror  )
+      end do
+!---------------------------------------------------------------------
 c
       FAIL%IPARAM(1)  = CRIT
       FAIL%IPARAM(2)  = Itab
@@ -397,6 +429,7 @@ c
       FAIL%IPARAM(4)  = NCS
       FAIL%IPARAM(5)  = Ismooth
       FAIL%IPARAM(6)  = Istrain
+      FAIL%IPARAM(7)  = failip
 c
       FAIL%UPARAM(1)  = MINPRES
       FAIL%UPARAM(2)  = MAXPRES
@@ -478,9 +511,9 @@ c--------------------------
         IF (fct_IDel > 0) WRITE(IOUT,7000) fct_IDel,Fscale_el
         IF (((fct_IDel > 0).OR.(fct_IDg12 > 0).OR.(fct_IDg13 > 0).OR.(fct_IDe1c > 0)
      .    .OR.(tab_IDfld > 0.AND.Itab == 2))) WRITE(IOUT,7100) El_ref
-        ! Element deletion properties
+        ! element deletion properties
         WRITE(IOUT,7101)
-        WRITE(IOUT,6000) VOLFRAC,PTHK
+        WRITE(IOUT,6000) VOLFRAC,PTHK,FAILIP
         WRITE(IOUT,5001) NSTEP
         WRITE(IOUT,8000)
       ENDIF
@@ -555,7 +588,8 @@ c-----------------------------------------------------
      & 5X,'VOLUME FRACTION FOR SOLID ELEMENT DELETION . . . . .=',1PG20.13,/,
      & 5X,'SHELL ELEMENT DELETION PARAMETER PTHICKFAIL. . . . .=',1PG20.13,/,
      & 5X,'  > 0.0 : FRACTION OF FAILED THICKNESS               ',/,
-     & 5X,'  < 0.0 : FRACTION OF FAILED INTG. POINTS OR LAYERS  ',/)
+     & 5X,'  < 0.0 : FRACTION OF FAILED INTG. POINTS OR LAYERS  ',/,
+     & 5X,'NUMBER OF FAILED INTG. POINTS PRIOR TO ELEM DELETION  .=',I10/)
  6001 FORMAT(
      & 5X,'MAXIMUM TEMPERATURE  . . . . . . . . . . . . . . . .=',1PG20.13,/)
  7000 FORMAT(

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    check_nan_acc      ../engine/source/output/outfile/check_nan_acc.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_isnan           ../engine/source/system/my_isnan.F
-      !||    spmd_barrier       ../engine/source/mpi/generic/spmd_barrier.F
-      !||--- uses       -----------------------------------------------------
-      !||    nodal_arrays_mod   ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||====================================================================
+!||====================================================================
+!||    check_nan_acc      ../engine/source/output/outfile/check_nan_acc.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    my_isnan           ../engine/source/system/my_isnan.F
+!||    spmd_barrier       ../engine/source/mpi/spmd_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    nodal_arrays_mod   ../common_source/modules/nodal_arrays.F90
+!||    spmd_mod           ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE CHECK_NAN_ACC(NCYCLE,NODES)
+      USE SPMD_MOD, ONLY : SPMD_BARRIER
       USE nodal_arrays_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -47,7 +49,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------
-!       REAL ou REAL*8
+! REAL or REAL*8
         INTEGER, INTENT(IN) :: NCYCLE
         TYPE(nodal_arrays_), INTENT(IN) :: NODES
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*

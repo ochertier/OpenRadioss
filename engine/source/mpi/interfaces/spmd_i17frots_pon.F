@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,19 +21,20 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_i17frots_pon   ../engine/source/mpi/interfaces/spmd_i17frots_pon.F
-      !||--- called by ------------------------------------------------------
-      !||    i17for3             ../engine/source/interfaces/int17/i17for3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg              ../engine/source/output/message/message.F
-      !||    arret               ../engine/source/system/arret.F
-      !||    intcontp            ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    sorti20             ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||    tri7box             ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i17frots_pon     ../engine/source/mpi/interfaces/spmd_i17frots_pon.F
+!||--- called by ------------------------------------------------------
+!||    i17for3               ../engine/source/interfaces/int17/i17for3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||    intcontp              ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||    sorti20               ../engine/source/mpi/interfaces/spmd_i7tool.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    tri7box               ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_I17FROTS_PON(
      1      NSKYI17 ,ISKYI17,FSKYI17,NRSKYI17,IRSKYI17,
      2      FRSKYI17,NIN    ,LSKYI17,NOINT   )
@@ -45,6 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -68,7 +70,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER P, L, ADD, LL, NB, LEN, SIZ, LOC_PROC,
-     .        IDEB, N, MSGTYP, IERROR, IDEBI, NI, NOD,
+     .        IDEB, N, MSGTYP, IERROR, IDEBI,
      .        IALLOCS, IALLOCR, IES, I, NN, MSGOFF, MSGOFF2,
      .        STATUS(MPI_STATUS_SIZE),
      .        REQ_SI(NSPMD),REQ_S(NSPMD),REQ_R(NSPMD),
@@ -85,7 +87,7 @@ C-----------------------------------------------
 C
       LEN = 5
 C
-C Init + ireceive sur taille communication
+C INIT + IREceive on Communication Size
 C
         DO P = 1, NSPMD
           ISIZRCV(1,P)=0
@@ -113,7 +115,7 @@ C
         IF(NRSKYI17>0) THEN
           CALL SORTI20(NRSKYI17,IRSKYI17,FRSKYI17,4)
         END IF
-C precomptage du nombre de contacts par processeur+calcul nsnfi total
+C precomputation of the number of contacts per processor + total nsnfi calculation
         CALL INTCONTP(
      +    NRSKYI17,IRSKYI17,NSNFI(NIN)%P(1),ISIZENV,NSNFITOT,LEN)
 C
@@ -149,7 +151,7 @@ C
               L = L + 1
               DO N = 1, NB
                 IF(NSVFI(NIN)%P(IDEB+N)<0)THEN
-C facette element generant une force
+C Facet element generating a force
                   IES = -NSVFI(NIN)%P(IDEB+N)
                   IF(IDEBI<=NRSKYI17) THEN
                     ITEST = IRSKYI17(IDEBI)==IDEB+N
@@ -185,13 +187,13 @@ C facette element generant une force
           END IF
         END DO
 C
-C Receive 1er message : taille communication
+C Receive 1st message: Communication size
 C
         IALLOCR = 0
         DO P = 1, NSPMD
           IF(NSNSITOT(P)>0)THEN
             CALL MPI_WAIT(REQ_R(P),STATUS,IERROR)
-            IALLOCR = MAX(IALLOCR,ISIZRCV(1,P))   ! pour comm bloquantes
+            IALLOCR = MAX(IALLOCR,ISIZRCV(1,P))   ! for blocking comm
           END IF
         END DO
 C
@@ -203,7 +205,7 @@ C
           CALL ARRET(2)
         ENDIF
 C
-C Reception buffer et decompactage
+C Reception buffer and decompression
 C
         DO P = 1, NSPMD
           IF(ISIZRCV(1,P)>0) THEN

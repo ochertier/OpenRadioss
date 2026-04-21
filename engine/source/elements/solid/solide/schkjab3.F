@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    schkjab3      ../engine/source/elements/solid/solide/schkjab3.F
-      !||--- called by ------------------------------------------------------
-      !||    fderi3        ../engine/source/elements/solid/solide/fderi3.F
-      !||    s4derit3      ../engine/source/elements/solid/solide4/s4derit3.F
-      !||    s8ederict3    ../engine/source/elements/solid/solide8e/s8ederict3.F
-      !||    s8zderict3    ../engine/source/elements/solid/solide8z/s8zderict3.F
-      !||    sderit3       ../engine/source/elements/solid/solide/sderit3.F
-      !||    szderit3      ../engine/source/elements/solid/solidez/szderi3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    schkjab3      ../engine/source/elements/solid/solide/schkjab3.F
+!||--- called by ------------------------------------------------------
+!||    fderi3        ../engine/source/elements/solid/solide/fderi3.F
+!||    s4derit3      ../engine/source/elements/solid/solide4/s4derit3.F
+!||    s6zderit3     ../engine/source/elements/solid/solide6z/s6zderit3.F90
+!||    s8ederict3    ../engine/source/elements/solid/solide8e/s8ederict3.F
+!||    s8zderict3    ../engine/source/elements/solid/solide8z/s8zderict3.F
+!||    sderit3       ../engine/source/elements/solid/solide/sderit3.F
+!||    szderit3      ../engine/source/elements/solid/solidez/szderi3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SCHKJAB3(
      1   OFF,     DET,     NGL,     NEL)
 C-----------------------------------------------
@@ -63,7 +64,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,J,ICOR
+      INTEGER :: I,ICOR
 C-----------------------------------------------
       IF(IDTMIN(1)==1)THEN
         ICOR = 0
@@ -139,6 +140,5 @@ C-----------------------------------------------
       ENDIF
       RETURN
 C
- 1000 FORMAT(/' ZERO OR NEGATIVE VOLUME : 3D-ELEMENT NB',I10/)
  2000 FORMAT(/' ZERO OR NEGATIVE VOLUME : DELETE 3D-ELEMENT NB',I10/)
       END

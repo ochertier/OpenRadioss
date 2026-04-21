@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_x_section   ../engine/source/mpi/sections/spmd_section.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_x_section        ../engine/source/mpi/sections/spmd_section.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_X_SECTION(NSTRF,X,MS,WEIGHT,WA)
 C maj X (MS) N1, N2, N3 (+ NNODS) sur procs distants
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -51,8 +54,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGOFF,INFO,I,J,K,L,NELSEG,NNOD,NELC,NELTG,
-     .        NN,P,ATID,ATAG,ALEN,IDEB,SIZ,K0,K1,K2,A_AR,IFRAM,
+      INTEGER MSGOFF,I,J,L,NELSEG,NNOD,NELC,NELTG,
+     .        NN,IDEB,SIZ,K0,K1,K2,A_AR,IFRAM,
      .        REM_PROC,MSGTYP,REM_PROC2,MSGTYP2,N1,N2,N3,NOD,        
      .        SENDTO(PARASIZ),RECVFR(PARASIZ),LOC_PROC,NB_NOD,
      .        REQ_R(PARASIZ),BUFSIZ,IALL
@@ -398,12 +401,14 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    spmd_exch_sec   ../engine/source/mpi/sections/spmd_section.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_sec         ../engine/source/mpi/sections/spmd_section.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_SEC(NSTRF ,X      ,MS    ,WEIGHT,XSEC  ,
      2                         FR_SEC,IAD_SEC,LSEND1,LRECV1,LSEND2,
      3                         LRECV2, WEIGHT_MD)
@@ -411,6 +416,7 @@ C maj X (MS) N1, N2, N3 (+ NNODS) sur procs distants
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -433,10 +439,10 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER LOC_PROC,A_AR,N,L,I,J,II,K,M,JJ, LEN,A_AR2,
+      INTEGER LOC_PROC,A_AR,N,L,I,J,II,K,A_AR2,
      .        MSGTYP,MSGOFF,MSGOFF2,SIZ,IDEBR,IDEBS,ICC,IFRAM,
-     .        IERROR, NBIRECV, NBISEND, INDEX, NBRBY, NBNOD,
-     .        PMAIN, IDEB, LENS, LENR, K0, K2, N1, N2, N3, NNOD,
+     .        IERROR, NBIRECV, NBISEND, INDEX, NBNOD,
+     .        PMAIN, IDEB, K0, K2, N1, N2, N3, NNOD,
      .        NELSEG,NN,NB,
      .        IAD_SEND(NSPMD+1),IAD_RECV(NSPMD+1),
      .        REQ_R(NSPMD), REQ_S(NSPMD),
@@ -697,7 +703,7 @@ C
         CALL MPI_WAIT(REQ_S(I),STATUS,IERROR)
       END DO
 C
-C Calcul des valeurs nodales sur proc main si besoin (test global ?)
+C Calculation of nodal values on Proc Main if necessary (global test?)
 C     
       K0=NSTRF(25)
       DO N = 1, NSECT
@@ -730,7 +736,7 @@ C
           IDEBR = IDEBR + SIZ
         ENDIF
       ENDDO
-C reste a coder l'envoi des noeuds vers les procs concernes
+C It remains to cod the sending of the nodes to the procs concerned
       NBISEND = 0
       IF(IAD_SEC(3,NSPMD+1)>0) THEN
         L = 0
@@ -822,18 +828,21 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_wrt_cutd   ../engine/source/mpi/sections/spmd_section.F
-      !||--- called by ------------------------------------------------------
-      !||    section_io      ../engine/source/tools/sect/section_io.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_r_c       ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    spmd_wrt_cutd         ../engine/source/mpi/sections/spmd_section.F
+!||--- called by ------------------------------------------------------
+!||    section_io            ../engine/source/tools/sect/section_io.F
+!||--- calls      -----------------------------------------------------
+!||    write_r_c             ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_WRT_CUTD(NNOD   ,NSTRF ,D    ,DR    ,RG_CUT,
      2                         IAD_CUT,NSIZE ,NNODG,WEIGHT,IFLG  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1007,18 +1016,21 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_wrt_cutf   ../engine/source/mpi/sections/spmd_section.F
-      !||--- called by ------------------------------------------------------
-      !||    section_io      ../engine/source/tools/sect/section_io.F
-      !||--- calls      -----------------------------------------------------
-      !||    write_r_c       ../common_source/tools/input_output/write_routtines.c
-      !||====================================================================
+!||====================================================================
+!||    spmd_wrt_cutf         ../engine/source/mpi/sections/spmd_section.F
+!||--- called by ------------------------------------------------------
+!||    section_io            ../engine/source/tools/sect/section_io.F
+!||--- calls      -----------------------------------------------------
+!||    write_r_c             ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_WRT_CUTF(NNOD  ,NSTRF,SECFCUM,RG_CUT,IAD_CUT,
      2                         NSIZE ,NNODG,WEIGHT ,IFLG )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1203,18 +1215,21 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_exch_cut   ../engine/source/mpi/sections/spmd_section.F
-      !||--- called by ------------------------------------------------------
-      !||    section_io      ../engine/source/tools/sect/section_io.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_cut         ../engine/source/mpi/sections/spmd_section.F
+!||--- called by ------------------------------------------------------
+!||    section_io            ../engine/source/tools/sect/section_io.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_CUT(NSTRF,SECFCUM,IAD_ELEM,FR_ELEM,SIZE,
      2                         LENR ,NNOD,WEIGHT)
-C cumul de secfcum au noeuds frontieres puis mise a 0 sur procs additionnels
+C Cumulation of SECFCUM at the boundary nodes then put on 0 on additional procs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1334,7 +1349,7 @@ C
         END IF
       END DO
 C
-C Remise a 0 de SECFCUM si P non main
+C Specific back to 0 if p not main
 C
       IF(SIZE==6) THEN
 #include "vectorize.inc"
@@ -1367,17 +1382,20 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    spmd_sd_cut     ../engine/source/mpi/sections/spmd_section.F
-      !||--- called by ------------------------------------------------------
-      !||    section_readp   ../engine/source/tools/sect/section_readp.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_sd_cut           ../engine/source/mpi/sections/spmd_section.F
+!||--- called by ------------------------------------------------------
+!||    section_readp         ../engine/source/tools/sect/section_readp.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_SD_CUT(SECBUFG,NNODG  ,SECBUF1,SECBUF2,NNOD,
      2                       FR_CUT ,IAD_CUT,IFLG   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -1399,10 +1417,10 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER LOC_PROC,N,L,I,K,LEN,P,NN,N0,OFFG,
-     .        MSGTYP,MSGOFF,SIZ,IDEBR,
-     .        IERROR, NBIRECV,IDEB, 
-     .        IAD_RECV(NSPMD+1),
+      INTEGER LOC_PROC,N,L,I,K,P,NN,N0,OFFG,
+     .        MSGTYP,MSGOFF,SIZ,
+     .        IERROR, 
+     .        
      .        STATUS(MPI_STATUS_SIZE)
       DATA MSGOFF/4006/
       my_real
@@ -1415,7 +1433,7 @@ C
       IF(LOC_PROC==1) THEN
         N0 = 0
         OFFG = 6*NNODG
-C Traitement P0
+C P0 Treatment
         IF(IAD_CUT(1)/=0) THEN
           NN = IAD_CUT(1)
           IF(IFLG==2) THEN
@@ -1447,7 +1465,7 @@ C Traitement P0
           END IF
           N0 = N0 + NN
         END IF
-C Traitement autres procs
+C Treatment Other procs
         DO P = 2, NSPMD
           IF(IAD_CUT(P)/=0) THEN
             L = 0

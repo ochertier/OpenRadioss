@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    nodalvfrac           ../engine/source/output/anim/generate/nodalvfrac.F
-      !||--- called by ------------------------------------------------------
-      !||    genani               ../engine/source/output/anim/generate/genani.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    i22bufbric_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22edge_mod          ../common_source/modules/interfaces/cut-cell-buffer_mod.F
-      !||    i22tri_mod           ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    initbuf_mod          ../engine/share/resol/initbuf.F
-      !||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    nodalvfrac           ../engine/source/output/anim/generate/nodalvfrac.F
+!||--- called by ------------------------------------------------------
+!||    genani               ../engine/source/output/anim/generate/genani.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    i22bufbric_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22edge_mod          ../common_source/modules/interfaces/cut-cell-buffer_mod.F
+!||    i22tri_mod           ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    initbuf_mod          ../engine/share/resol/initbuf.F
+!||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
+!||====================================================================
       SUBROUTINE NODALVFRAC(IFUNC    , WA4, IFLOW, RFLOW, IPARG, 
      .                      ELBUF_TAB, IX , NIX  , ITAB , NV46 )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
-C     This suroutine computes nodal volumetric fraction for
+C     This subroutine computes nodal volumetric fraction for
 C     ALE elements. In case of CEL coupling (inter22)
 C     result is also calculated from cut cells.
 C     Aim is to expand centroid values to nodal positions
@@ -79,15 +79,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER                            :: IADI, IADR, I, ITYP, NINOUT, NNO, NEL, II1, II2,K1,K,
+      INTEGER                            :: I, ITYP, NEL, K1, K, 
      .                                      IR1, IR2, J, JJ, NNO_L, NNI_L, II3, II4, JJJ, NNI,
      .                                      IALEL,NNOD,IPOS,IV,NGv,J1,J2,IBV, MLW,NumNodCell,
      .                                      NG, KCVT, II, NBF, NBL, IB, ICELL, NIN, MCELL,
      .                                      IPHASE
-      TYPE(G_BUFEL_)  ,POINTER           :: GBUF,GBUFv     
+      TYPE(G_BUFEL_)  ,POINTER           :: GBUF
       my_real, ALLOCATABLE, DIMENSION(:) :: COUNT_VOL    
-      my_real                            :: P,VF,D,V
-      INTEGER,DIMENSION(:,:), POINTER    :: pAdjBRICK      
+      my_real                            :: VF, V
+ 
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------

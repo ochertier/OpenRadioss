@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_ladeveze   ../engine/source/materials/fail/ladeveze/fail_ladeveze.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain           ../engine/source/materials/mat_share/mmain.F90
-      !||====================================================================
+!||====================================================================
+!||    fail_ladeveze   ../engine/source/materials/fail/ladeveze/fail_ladeveze.F
+!||--- called by ------------------------------------------------------
+!||    mmain           ../engine/source/materials/mat_share/mmain.F90
+!||====================================================================
       SUBROUTINE FAIL_LADEVEZE(
      1     NEL     ,NUVAR   ,ILAY    ,NPT0    ,
      2     TIME    ,TIMESTEP,UPARAM  ,
@@ -98,8 +98,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER INDX0(MVSIZ),IFLAG,INDX(MVSIZ)
-      INTEGER I,J,JJ,IADBUF,NINDX,NINDX0,
-     .        IFAIL,IMATLY
+      INTEGER I,J,NINDX,NINDX0
       my_real 
      .   K1,K2,K3,K,
      .   A,GAMA1,GAMA2,
@@ -212,10 +211,10 @@ C
              ENDIF
 C             
             ELSEIF(IFLAG == 2) THEN    ! iflag = 2 
-C-------------------------------     
+C-------------------------------
 C     OFF = 0. all layer fiber or matrix criteria is reached
-C      is not actived this flag
-C-------------------------------              
+C      is not activated this flag
+C-------------------------------
                IF(UVAR(I,12) == ZERO )THEN
                 SIGNXX(I) = ZERO
                 SIGNYY(I) = ZERO

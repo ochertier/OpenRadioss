@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lossfun_98             ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- calls      -----------------------------------------------------
-      !||    calc_uniax             ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||    calc_uniax_2           ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||    fct_fiber              ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||    fct_fiber_2            ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||    finter                 ../starter/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lossfun_98             ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- calls      -----------------------------------------------------
+!||    calc_uniax             ../starter/source/materials/mat/mat098/lossfun_98.F
+!||    calc_uniax_2           ../starter/source/materials/mat/mat098/lossfun_98.F
+!||    fct_fiber              ../starter/source/materials/mat/mat098/lossfun_98.F
+!||    fct_fiber_2            ../starter/source/materials/mat/mat098/lossfun_98.F
+!||    finter                 ../starter/source/tools/curve/finter.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE LOSSFUN_98(NVAR,NDC,X,FUN,DFUN,CONS,DCONS,IGOTO,
      .                    NPC,PLD ,IFUNC,NFUNC,UPARAM,LENC,LENT,
      .                    XBIA,NPTBI,ISYM )
@@ -135,7 +135,7 @@ C---------------------------------------------------------------------
         CALL  CALC_UNIAX_2(EC(I),XCFIB,YCFIB,LENC,DC0,HC0,
      .                   YFAC(1),FLEX1,FLEX2,EMBC ,SIGC(I))   !SIGC = SIGMA CALCULATED
         A1 = (FCU(I) - SIGC(I))/MAX(EM20,FCU(I))
-        FMINC = FMINC + A1**2   !somme de la difference des carres
+        FMINC = FMINC + A1**2   !sum of the difference of squares
       ENDDO
       !DIRECTION TRAME = FMINT
       PN1  = NPC(IFUNC(2))
@@ -148,14 +148,14 @@ C---------------------------------------------------------------------
         CALL  CALC_UNIAX_2(ET(I),XTFIB,YTFIB,LENT,DT0,HT0,
      .                   YFAC(2),FLEX1,FLEX2,EMBT,SIGT(I))   !SIGT = SIGMA CALCULATED
         A2 = (FTU(I) - SIGT(I))/MAX(EM20,FTU(I))
-        FMINT = FMINT + A2**2   !somme de la difference des carres
+        FMINT = FMINT + A2**2   !sum of the difference of squares
       ENDDO
 C----------------------------------------------------------- 
       IF (IGOTO == 5 .or. IGOTO == 8) FUN =  (FMINC + FMINT )/TWO                                   
 C----------------------------------------------------------
 c     DERIVATIVES - CHAINE
 C----------------------------------------------------------
-      !Deriv over stretch ( a voir si besoin de recalculer fonctions fibres)
+      !Deriv Over Stretch (to see if necessary to recalculate fiber functions)
       IF (IGOTO == 3 .or. IGOTO == 8) THEN
       !PERTURBATION STRETCH DIRECTION CHAINE  = FMINS
          EMBCP  = X(1) + DEMBC 
@@ -170,7 +170,7 @@ C----------------------------------------------------------
      .                     YFAC(1),FLEX1,FLEX2,EMBCP,SIGC(I))
 c
            A1 = (FCU(I) - SIGC(I))/MAX(EM20,FCU(I))
-           FMINS = FMINS + A1**2 !somme de la difference des carres
+           FMINS = FMINS + A1**2 !sum of the squared differences
          ENDDO  !LENC    
 c        FMINS   = SQRT(FMINS)                                        
          DFUN(1) = (FMINS - FMINC) / DEMBC 
@@ -193,7 +193,7 @@ C----------------------------------------------------------
 c
            A1 = (FCU(I) - SIGC(I))/MAX(EM20,FCU(I))
            !A1 = FCU(I) - SIGC(I)
-           FMINF1 = FMINF1 + A1**2 !somme de la difference des carres
+           FMINF1 = FMINF1 + A1**2 !sum of the squared differences
          ENDDO !LENC  
 
          DT0 = ONE + EMBT
@@ -206,7 +206,7 @@ c
      .                     YFAC(2),FLEXP,FLEX2,EMBT,SIGT(I))
 c
            A1 = (FTU(I) - SIGT(I))/MAX(EM20,FTU(I))
-           FMINF2 = FMINF2 + A1**2 !somme de la difference des carres
+           FMINF2 = FMINF2 + A1**2 !sum of the squared differences
          ENDDO !LENT   
 c        FMINF   = SQRT(FMINF)                                        
          DFUN(2) = (FMINF1 + FMINF2 - FMINC - FMINT) / DFLEX                                     
@@ -230,7 +230,7 @@ C----------------------------------------------------------
      .                     YFAC(2),FLEX1,FLEX2,EMBTP,SIGT(I))
 c
            A1 = (FTU(I) - SIGT(I))/MAX(EM20,FTU(I))
-           FMINS2 = FMINS2 + A1**2 !somme de la difference des carres
+           FMINS2 = FMINS2 + A1**2 !sum of the squared differences
          ENDDO  !LENT    
 c        FMINS   = SQRT(FMINS)                                        
          DFUN(3) = (FMINS2 - FMINT) / DEMBT      
@@ -253,7 +253,7 @@ C----------------------------------------------------------
 c
            A1 = (FCU(I) - SIGC(I))/MAX(EM20,FCU(I))
            !A1 = FCU(I) - SIGC(I)
-           FMINF1 = FMINF1 + A1**2 !somme de la difference des carres
+           FMINF1 = FMINF1 + A1**2 !sum of the squared differences
          ENDDO !LENC  
          DT0 = ONE + EMBT
          HT0 = SQRT(DT0*DT0 - ONE)
@@ -266,7 +266,7 @@ c
 c
            A1 = (FTU(I) - SIGT(I))/MAX(EM20,FTU(I))
            !A1 = FCU(I) - SIGC(I)
-           FMINF2 = FMINF2 + A1**2 !somme de la difference des carres
+           FMINF2 = FMINF2 + A1**2 !sum of the squared differences
          ENDDO !LENT   
          DFUN(4) = (FMINF1 + FMINF2 - FMINC - FMINT) / DFLEX                                     
       ENDIF !IGOTO
@@ -293,7 +293,7 @@ C----------------------------------------------------------
 
       DT0 = ONE+EMBT 
       HT0 = SQRT(DT0*DT0 - ONE)
-      ! IL FAUT PRENDRE LA LONGUEUR DE LA FONCTION CR  EE
+      ! THE LENGTH OF THE CREATED FUNCTION MUST BE TAKEN
       PN1 = NPC(IFUNC(7))
       PN2 = NPC(IFUNC(7)+1)
       SIZEPN = HALF*(PN2 - PN1) ! 
@@ -313,14 +313,14 @@ C----------------------------------------------------------
         CALL  CALC_UNIAX(EC(I),XFIB,YFIB,SIZEPN,DC0,HC0,
      .                  YFAC(1),FLEX1,EMBC,SIGC(I)) !SIGC = SIGMA CALCULATED
         A1 = (FCU(I) - SIGC(I))/MAX(EM20,FCU(I))
-        FMINC = FMINC + A1**2   !somme de la difference des carres
+        FMINC = FMINC + A1**2   !sum of the squared differences
       ENDDO
       !STOP
       IF (IGOTO == 5 .or. IGOTO == 8) FUN =  FMINC                                      
 C----------------------------------------------------------
 c     DERIVATIVES
 C----------------------------------------------------------
-      !Deriv over stretch ( a voir si besoin de recalculer fonctions fibres)
+      !Deriv Over Stretch (to see if necessary to recalculate fiber functions)
       IF (IGOTO == 3 .or. IGOTO == 8) THEN
          EMBCP  = X(1) + DEMBC 
          FLEX1  = X(2)
@@ -335,7 +335,7 @@ C----------------------------------------------------------
            CALL  CALC_UNIAX(EC(I),XFIB,YFIB,SIZEPN,DC0,HC0,
      .                     YFAC(1),FLEX1,EMBCP,SIGC(I))
            A1 = (FCU(I) - SIGC(I))/MAX(EM20,FCU(I))
-           FMINS = FMINS + A1**2 !somme de la difference des carres
+           FMINS = FMINS + A1**2 !sum of the squared differences
          ENDDO  !SIZEPN    
 c        FMINS   = SQRT(FMINS)                                        
          DFUN(1) = (FMINS - FMINC) / DEMBC      
@@ -356,7 +356,7 @@ C----------------------------------------------------------
 c
            A1 = (FCU(I) - SIGC(I))/MAX(EM20,FCU(I))
            !A1 = FCU(I) - SIGC(I)
-           FMINF = FMINF + A1**2 !somme de la difference des carres
+           FMINF = FMINF + A1**2 !sum of the squared differences
          ENDDO !SIZEPN                                                 
 c        FMINF   = SQRT(FMINF)                                        
          DFUN(2) = (FMINF - FMINC) / DFLEX                                     
@@ -370,14 +370,14 @@ c-----------
       END
 
 
-      !||====================================================================
-      !||    calc_uniax    ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- called by ------------------------------------------------------
-      !||    lossfun_98    ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||    table_mod     ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    calc_uniax    ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- called by ------------------------------------------------------
+!||    lossfun_98    ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||    table_mod     ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE CALC_UNIAX(EC,XFIB,YFIB,SIZEPN,DC0,HC0,
      .           YFAC,FLEX,STRETCH,SIGC)
 !           CALL  CALC_UNIAX(EC,XFIB,YFIB,NPT,DC0,HC0,
@@ -477,16 +477,16 @@ C
       RETURN
       END      
 
-      !||====================================================================
-      !||    fct_fiber_2   ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- called by ------------------------------------------------------
-      !||    lossfun_98    ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter        ../starter/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||    table_mod     ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fct_fiber_2   ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- called by ------------------------------------------------------
+!||    lossfun_98    ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- calls      -----------------------------------------------------
+!||    finter        ../starter/source/tools/curve/finter.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||    table_mod     ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE FCT_FIBER_2(NPC,PLD ,IDN1,IDN2,YFAC1,YFAC2,
      .           XBIA,NPTBI,KFC,KFT,DC0,HC0,DT0,HT0,XCFIB,YCFIB,XTFIB,YTFIB )
 C-----------------------------------------------
@@ -571,14 +571,14 @@ c-----------
       RETURN
       END 
 
-      !||====================================================================
-      !||    fct_fiber     ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- called by ------------------------------------------------------
-      !||    lossfun_98    ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||    table_mod     ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fct_fiber     ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- called by ------------------------------------------------------
+!||    lossfun_98    ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||    table_mod     ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE FCT_FIBER(NPC,PLD ,IDN,SIZEPN,DC0,HC0,XFIB,YFIB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -618,14 +618,14 @@ c-----------
       RETURN
       END 
 
-      !||====================================================================
-      !||    calc_uniax_2   ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- called by ------------------------------------------------------
-      !||    lossfun_98     ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||    table_mod      ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    calc_uniax_2   ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- called by ------------------------------------------------------
+!||    lossfun_98     ../starter/source/materials/mat/mat098/lossfun_98.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||    table_mod      ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE CALC_UNIAX_2(EC,XFIB,YFIB,SIZEPN,DC0,HC0,
      .           YFAC,FLEX1,FLEX2,EMBC ,SIGC)
 !        CALL  CALC_UNIAX_2(EC(I),XCFIB,YCFIB,LENC,DC0,HC0,

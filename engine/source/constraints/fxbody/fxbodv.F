@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fxlink     ../engine/source/constraints/fxbody/fxbodv.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbodvp1   ../engine/source/constraints/fxbody/fxbodvp.F
-      !||====================================================================
+!||====================================================================
+!||    fxlink     ../engine/source/constraints/fxbody/fxbodv.F
+!||--- called by ------------------------------------------------------
+!||    fxbodvp1   ../engine/source/constraints/fxbody/fxbodvp.F
+!||====================================================================
       SUBROUTINE FXLINK(CR    , SR,  DT1, DT2, FXBRPM,
      .                  FXBVIT, NME)
 C-----------------------------------------------
@@ -166,11 +166,11 @@ C-----------------------------------------------
 C      
       RETURN
       END   
-      !||====================================================================
-      !||    splink     ../engine/source/constraints/fxbody/fxbodv.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbodvp1   ../engine/source/constraints/fxbody/fxbodvp.F
-      !||====================================================================
+!||====================================================================
+!||    splink     ../engine/source/constraints/fxbody/fxbodv.F
+!||--- called by ------------------------------------------------------
+!||    fxbodvp1   ../engine/source/constraints/fxbody/fxbodvp.F
+!||====================================================================
       SUBROUTINE SPLINK(MT, ST, DT1, FXBRPM, FXBVIT,
      .                  DMT)
 C-----------------------------------------------
@@ -285,11 +285,11 @@ C
 C 
       RETURN
       END   
-      !||====================================================================
-      !||    fxspin     ../engine/source/constraints/fxbody/fxbodv.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbodvp2   ../engine/source/constraints/fxbody/fxbodvp.F
-      !||====================================================================
+!||====================================================================
+!||    fxspin     ../engine/source/constraints/fxbody/fxbodv.F
+!||--- called by ------------------------------------------------------
+!||    fxbodvp2   ../engine/source/constraints/fxbody/fxbodvp.F
+!||====================================================================
       SUBROUTINE FXSPIN(FXBRPM, FXBVIT, S, R12, DT2)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -298,43 +298,37 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .   FXBRPM(*), FXBVIT(*), S(*), R12(*), DT2
+      my_real :: FXBRPM(*), FXBVIT(*), S(*), R12(*), DT2
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real
-     .   SL(3),DDEP(12),DT05
-      my_real
-     .   RT(3,3),RP(3,3),OM(3,3)
-      INTEGER I,J,K
-C
+      my_real SL(3),DDEP(12),DT05
+      INTEGER I,J
       DT05=HALF*DT2
       DO I=1,12
          DDEP(I)=DT05*FXBVIT(I)
       ENDDO
       DO I=1,3
          DO J=1,3
-            R12(3*(I-1)+J)=FXBRPM(1+3*(I-1)+J)
-     .                     +DDEP(3*(J-1)+I)-DDEP(9+I)
+            R12(3*(I-1)+J)=FXBRPM(1+3*(I-1)+J)+DDEP(3*(J-1)+I)-DDEP(9+I)
          ENDDO
       ENDDO
-C
+
       SL(1)=-R12(2)*(FXBVIT(7)-FXBVIT(10))
      .      -R12(5)*(FXBVIT(8)-FXBVIT(11))
      .      -R12(8)*(FXBVIT(9)-FXBVIT(12))
-C
+
       SL(2)=R12(1)*(FXBVIT(7)-FXBVIT(10))
      .     +R12(4)*(FXBVIT(8)-FXBVIT(11))
      .     +R12(7)*(FXBVIT(9)-FXBVIT(12))
-C
+
       SL(3)=-R12(1)*(FXBVIT(4)-FXBVIT(10))
      .      -R12(4)*(FXBVIT(5)-FXBVIT(11))
      .      -R12(7)*(FXBVIT(6)-FXBVIT(12))
-C
+
       S(1)=R12(1)*SL(1)+R12(2)*SL(2)+R12(3)*SL(3)
       S(2)=R12(4)*SL(1)+R12(5)*SL(2)+R12(6)*SL(3)
       S(3)=R12(7)*SL(1)+R12(8)*SL(2)+R12(9)*SL(3)
-C      
+
       RETURN
       END

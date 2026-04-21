@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_type20   ../starter/source/interfaces/int20/hm_read_inter_type20.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_type20   ../starter/source/interfaces/int20/hm_read_inter_type20.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE20(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,
      2        IGRNOD     ,IGRSURF    ,IGRSLIN    ,XFILTR    ,FRIC_P   ,  
@@ -78,22 +78,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=NCHARTITLE) :: TITR1
-      INTEGER I,J,L,IBC1, IBC2, IBC3, NOINT, NTYP, IBID,
+
+      INTEGER I,IBC1, IBC2, IBC3, NOINT, NTYP,
      .    INACTI, IBC1M, IBC2M, IBC3M, IGSTI,IS1,IS2,
-     .    IGAP,MULTIMP,MFROT,IFQ,IBAG,MODFR,IERR1,IVIS2, 
-     .    ISYM,NOD1,IDUM,IGNORE,KK,II,IGAP0,IDELKEEP,
-     .    IRSTH,ICURV,NA1,NA2,IFORM,IADM,IEDGE,NRADM,ISU10,ISU20,
-     .    NOD10,NOD20,LINE10,LINE20,IBID1,IBID2,IDEL7N,LINE1,
+     .    IGAP,MULTIMP,MFROT,IFQ,IBAG,MODFR,IVIS2, 
+     .    ISYM,NOD1,IDELKEEP,
+     .    IFORM,IADM,IEDGE,NRADM,ISU10,ISU20,
+     .    NOD10,LINE10,LINE20,IDEL7N,LINE1,
      .    LINE2
       my_real
      .   FRIC,GAP,STARTT,BUMULT,STOPT,C1,C2,C3,C4,C5,C6,ALPHA,
-     .   VISC,VISCF,EGDE_ANGL,FPENMAX,EDG_ANGL,GAPSOL,STMIN,STMAX,
+     .   VISC,VISCF,FPENMAX,EDG_ANGL,GAPSOL,STMIN,STMAX,
      .   PADM,ANGLADM,CADM,GAPMAX,GAPSCALE
-      CHARACTER(LEN=40)::MESS
-      CHARACTER(LEN=NCHARTITLE)::MSGTITL
-      CHARACTER(LEN=NCHARKEY)::OPT,KEY,KEY1
-      CHARACTER(LEN=NCHARFIELD)::BCFLAG,BCFLAGM
+
 !
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
 C-----------------------------------------------
@@ -256,7 +253,7 @@ C
       IF (ISU1 == 0 .AND. ISU2 == 0) IEDGE = -1
       IPARI(58)=IEDGE
 
-      IF(IEDGE==3 .and. EDG_ANGL==ZERO) EDG_ANGL=NINTY+ONE
+      IF(IEDGE==3 .and. EDG_ANGL==ZERO) EDG_ANGL=NINETY+ONE
       FRIGAP(26)  = COS((HUNDRED80-EDG_ANGL)*PI/HUNDRED80)
 
       INGR2USR => IGRNOD(1:NGRNOD)%ID
@@ -504,9 +501,6 @@ C--------------------------------------------------------------
       ENDIF
 C
 C--------------------------------------------------------------
- 1000 FORMAT(/1X,'  INTERFACE NUMBER :',I10,1X,A)
- 1300 FORMAT(    /1X,'   INTERFACES               ' /
-     .            1X,' --------------             '// )
 C------------
       RETURN
  3507 FORMAT(//

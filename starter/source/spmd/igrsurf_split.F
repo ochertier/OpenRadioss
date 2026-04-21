@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    igrsurf_split         ../starter/source/spmd/igrsurf_split.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus            ../starter/source/spmd/node/frontplus.F
-      !||    plist_ifront          ../starter/source/spmd/node/ddtools.F
-      !||--- uses       -----------------------------------------------------
-      !||    monvol_struct_mod     ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    igrsurf_split         ../starter/source/spmd/igrsurf_split.F
+!||--- called by ------------------------------------------------------
+!||    lectur                ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus            ../starter/source/spmd/node/frontplus.F
+!||    plist_ifront          ../starter/source/spmd/node/ddtools.F
+!||--- uses       -----------------------------------------------------
+!||    monvol_struct_mod     ../starter/share/modules1/monvol_struct_mod.F
+!||====================================================================
         SUBROUTINE IGRSURF_SPLIT(SCEP,CEP,T_MONVOL,IGRSURF,IGRSURF_PROC)
 !$COMMENT
 ! IGSURF_SPLIT description
 ! IGSURF_SPLIT splits the global IGSURF array into local 
 !              IGSURF_PROC arrays in order to save 
-!              CPU time in ddsplit routine (avoid NSPMD 
+!              CPU TIME IN DDSPLIT Routine (Avoid NSPMD 
 !              treatments)
 ! 
 ! IGSURF_SPLIT organization :

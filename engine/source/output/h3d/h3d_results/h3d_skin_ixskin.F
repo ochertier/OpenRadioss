@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_skin_ixskin       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d                ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_pre_skin_ixskin   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||    h3d_sol_skin_ixskin   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_ixskin.F
-      !||    initbuf               ../engine/share/resol/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_inc_mod           ../engine/share/modules/h3d_inc_mod.F
-      !||    initbuf_mod           ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_skin_ixskin       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- called by ------------------------------------------------------
+!||    genh3d                ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_pre_skin_ixskin   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||    h3d_sol_skin_ixskin   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_ixskin.F
+!||    initbuf               ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    h3d_inc_mod           ../engine/share/modules/h3d_inc_mod.F
+!||    initbuf_mod           ../engine/share/resol/initbuf.F
+!||    loads_mod             ../common_source/modules/loads/loads_mod.F90
+!||    pblast_mod            ../common_source/modules/loads/pblast_mod.F90
+!||====================================================================
       SUBROUTINE H3D_SKIN_IXSKIN(ELBUF_TAB,IPARG,IPARTS,IXS,IXS10,
      .                           ITAB ,IXSKIN  ,TAG_SKINS6,IBCL  ,
      .                           ILOADP,LLOADP ,NODAL_IPART,IMAPSKP,
@@ -45,6 +48,7 @@ C-----------------------------------------------
       USE H3D_INC_MOD
       USE LOADS_MOD
       USE PBLAST_MOD
+      use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,15 +73,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
-      INTEGER I,NSKIN,ISOLNOD,ICS,NG,N,J
+      INTEGER I, NSKIN, ISOLNOD, ICS, NG, N
       INTEGER 
      .        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      .        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      .        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
      .        NVAUX   ,JPOR    ,KCVT    ,JCLOSE  ,JPLASOL ,    
      .        IREP    ,IINT    ,IGTYP   ,ISRAT   ,ISROT   ,    
-     .        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS    , 
-     .        NN,NN1,N1,IDB
+     .        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS
 C-----------------------------------------------
        NSKIN =0
       IF (NUMSKIN> NUMSKINP) THEN      
@@ -255,17 +258,19 @@ C------to show pressure
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    h3d_skin_dim         ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- called by ------------------------------------------------------
-      !||    lech3d               ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_skin_pre_dim     ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||    h3d_skin_sol_dim     ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||    h3d_skin_tsh_dim     ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    h3d_skin_dim         ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- called by ------------------------------------------------------
+!||    lech3d               ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_skin_pre_dim     ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||    h3d_skin_sol_dim     ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||    h3d_skin_tsh_dim     ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||    spmd_allglob_isum9   ../engine/source/mpi/generic/spmd_allglob_isum9.F
+!||--- uses       -----------------------------------------------------
+!||    loads_mod            ../common_source/modules/loads/loads_mod.F90
+!||    pblast_mod           ../common_source/modules/loads/pblast_mod.F90
+!||====================================================================
       SUBROUTINE H3D_SKIN_DIM(IPARG ,NUMSKIN, NUMSKING,TAG_SKINS6,IBCL,
      .                       ILOADP,LLOADP ,LOADS,NUMSKINP0,NUMSKINP,IFLAG,PBLAST )
 C-----------------------------------------------
@@ -292,7 +297,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
-      INTEGER I, LEN ,N0  ,NUMSKIN0
+      INTEGER LEN, N0, NUMSKIN0
 
 C-----------------------------------------------
        NUMSKIN = 0
@@ -319,15 +324,15 @@ C
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    h3d_skin_tsh_dim   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_skin_dim       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf            ../engine/share/resol/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||    initbuf_mod        ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_skin_tsh_dim   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- called by ------------------------------------------------------
+!||    h3d_skin_dim       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf            ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    initbuf_mod        ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE H3D_SKIN_TSH_DIM(IPARG    ,TAG_SKINS6, NUMSKIN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -350,14 +355,13 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
-      INTEGER I,NG,
+      INTEGER NG, 
      .        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      .        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      .        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
      .        NVAUX   ,JPOR    ,KCVT    ,JCLOSE  ,JPLASOL ,    
      .        IREP    ,IINT    ,IGTYP   ,ISRAT   ,ISROT   ,    
-     .        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS   ,
-     .        NN,ICS,ISOLNOD
+     .        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS
 C-----------------------------------------------
        DO NG=1,NGROUP
         CALL INITBUF(IPARG    ,NG      ,                      
@@ -377,15 +381,15 @@ C------ possible to remove(w/ TAG_SKINS6) case of several layers in mesh (even n
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    h3d_skin_sol_dim   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_skin_dim       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf            ../engine/share/resol/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||    initbuf_mod        ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_skin_sol_dim   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- called by ------------------------------------------------------
+!||    h3d_skin_dim       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf            ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    initbuf_mod        ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE H3D_SKIN_SOL_DIM(IPARG   ,TAG_SKINS6, NUMSKIN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -408,15 +412,15 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
-      INTEGER I,NG,N,J,N1,N2,
+      INTEGER I, NG, N, 
      .        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      .        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      .        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
      .        NVAUX   ,JPOR    ,KCVT    ,JCLOSE  ,JPLASOL ,    
      .        IREP    ,IINT    ,IGTYP   ,ISRAT   ,ISROT   ,    
      .        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS   ,
-     .        NN,ICS,ISOLNOD,NN1,JJ,II,K1,K2,NF(3),NSKIN2,IDB
-      INTEGER FACES(4,6),NS(4),PWR(7),LL
+     .        ICS,ISOLNOD,JJ
+      INTEGER FACES(4, 6), PWR(7), LL
       DATA PWR/1,2,4,8,16,32,64/
       DATA FACES/4,3,2,1,
      .           5,6,7,8,
@@ -483,13 +487,15 @@ C------
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    h3d_skin_pre_dim   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_skin_dim       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- uses       -----------------------------------------------------
-      !||    pinchtype_mod      ../common_source/modules/pinchtype_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_skin_pre_dim   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- called by ------------------------------------------------------
+!||    h3d_skin_dim       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- uses       -----------------------------------------------------
+!||    loads_mod          ../common_source/modules/loads/loads_mod.F90
+!||    pblast_mod         ../common_source/modules/loads/pblast_mod.F90
+!||    pinchtype_mod      ../common_source/modules/pinchtype_mod.F
+!||====================================================================
       SUBROUTINE H3D_SKIN_PRE_DIM(IB ,ILOADP  ,LLOADP ,LOADS, NSKIN0,NSKIN,PBLAST)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -520,8 +526,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5, J,
-     .        IAD ,NP ,IFUNC ,NPRES ,N,NSKIN_I,NSKINP0,IERR,IXST,SHIFT
+      INTEGER NL, N1, N2, N3, N4, J, 
+     .        IAD ,NP ,N,NSKIN_I,NSKINP0,IERR,IXST,SHIFT
       INTEGER, DIMENSION(:), ALLOCATABLE  :: ITAGN
       INTEGER, DIMENSION(:,:), ALLOCATABLE  :: IRECT
 C=======================================================================
@@ -730,14 +736,17 @@ C-----some segs are used > 1 times
 C
       RETURN
       END
-      !||====================================================================
-      !||    h3d_pre_skin_ixskin   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_skin_ixskin       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_inc_mod           ../engine/share/modules/h3d_inc_mod.F
-      !||    pinchtype_mod         ../common_source/modules/pinchtype_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_pre_skin_ixskin   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- called by ------------------------------------------------------
+!||    h3d_skin_ixskin       ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    h3d_inc_mod           ../engine/share/modules/h3d_inc_mod.F
+!||    loads_mod             ../common_source/modules/loads/loads_mod.F90
+!||    pblast_mod            ../common_source/modules/loads/pblast_mod.F90
+!||    pinchtype_mod         ../common_source/modules/pinchtype_mod.F
+!||====================================================================
       SUBROUTINE H3D_PRE_SKIN_IXSKIN(NODAL_IPART,IB ,ILOADP,LLOADP,
      .                               IXSKIN  ,NSKIN ,IMAPSKP,LOADS,PBLAST )
 C-----------------------------------------------
@@ -747,6 +756,7 @@ C-----------------------------------------------
       USE H3D_INC_MOD
       USE LOADS_MOD
       USE PBLAST_MOD
+      use element_mod , only : nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -771,8 +781,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5, 
-     .        IAD ,NP ,IFUNC ,NPRES,NSKIN0,NSKIN1,N,I,PID0,SHIFT
+      INTEGER NL, N1, N2, N3, N4, 
+     .        IAD ,NP ,NSKIN0,NSKIN1,N,I,PID0,SHIFT
 C=======================================================================
 C-----IXSKIN(1,*):ipart;IXSKIN(2:5,*):N1-4,IXSKIN(6,*):pid;IXSKIN(7,*):usr_id
        PID0 =0
@@ -905,16 +915,17 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    get_nodal_ipart   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
-      !||--- called by ------------------------------------------------------
-      !||    genh3d            ../engine/source/output/h3d/h3d_results/genh3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf           ../engine/share/resol/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod       ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    get_nodal_ipart   ../engine/source/output/h3d/h3d_results/h3d_skin_ixskin.F
+!||--- called by ------------------------------------------------------
+!||    genh3d            ../engine/source/output/h3d/h3d_results/genh3d.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf           ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod       ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod       ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE GET_NODAL_IPART(ELBUF_TAB,IPARG,IPARTC,IPARTTG,IPARTS,
      .                           IXC, IXTG, IXS,IXS10,IXS16,IXS20,
      .                           NODAL_IPART)
@@ -923,6 +934,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD    
+      use element_mod , only : nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -944,7 +956,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
-      INTEGER I,NSKIN,ISOLNOD,ICS,NG,N,J,NJ
+      INTEGER I, ISOLNOD, NG, N, J, NJ
       INTEGER 
      .        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      .        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
@@ -952,7 +964,7 @@ C-----------------------------------------------
      .        NVAUX   ,JPOR    ,KCVT    ,JCLOSE  ,JPLASOL ,    
      .        IREP    ,IINT    ,IGTYP   ,ISRAT   ,ISROT   ,    
      .        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS    , 
-     .        NN,NN1,N1,IDB
+     .        NN1
 C-----------------------------------------------
        DO NG=1,NGROUP
         ISOLNOD = IPARG(28,NG)

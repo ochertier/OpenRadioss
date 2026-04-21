@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbapinchproj    ../engine/source/elements/shell/coqueba/cbapinchproj.F
-      !||--- called by ------------------------------------------------------
-      !||    cbaforc3        ../engine/source/elements/shell/coqueba/cbaforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    pinchtype_mod   ../common_source/modules/pinchtype_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cbapinchproj    ../engine/source/elements/shell/coqueba/cbapinchproj.F
+!||--- called by ------------------------------------------------------
+!||    cbaforc3        ../engine/source/elements/shell/coqueba/cbaforc3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    pinchtype_mod   ../common_source/modules/pinchtype_mod.F
+!||====================================================================
       SUBROUTINE CBAPINCHPROJ(
      1            JFT    ,JLT    ,VQN    ,VQ     ,VFPINCH,
      2            NPLAT  ,IPLAT  ,FP     ,COREL  ,DI     ,THK0,
@@ -51,7 +51,7 @@ C-------------------------------------------------------------------------------
 C-------------------------------------------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-------------------------------------------------------------------------------
-      INTEGER I, J, K,EP
+      INTEGER K,EP
       my_real 
      .     FPP(3,4), ELTHKINV
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8

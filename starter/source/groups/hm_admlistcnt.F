@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_admlcnt             ../starter/source/groups/hm_admlistcnt.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_lecgre              ../starter/source/groups/hm_lecgre.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_admlcnt             ../starter/source/groups/hm_admlistcnt.F
+!||--- called by ------------------------------------------------------
+!||    hm_lecgre              ../starter/source/groups/hm_lecgre.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_ADMLCNT(NIX     ,IX      ,NUMEL   ,IPARTEL ,IPART   ,
      .                   KELTREE ,ELTREE  ,KSONTREE,NSONTREE,KLEVTREE,
      .                   NLIST   ,MESS    ,IX1     ,IX2     ,INDEX   ,
@@ -78,7 +78,7 @@ C-----------------------------------------------
        END SUBROUTINE  
       END INTERFACE     
 C-----------------------------------------------
-C CONSTITUTION DE LIST
+C CONSTITUTION OF LIST
 C-----------------------------------------------
       IL   = 0
       CALL GROUPS_GET_ELEM_LIST(LIST_ENTITY, NENTITY, LSUBMODEL)
@@ -93,7 +93,7 @@ C-----------------------------------------------
                       
 C-----------------------
 C TRI DE LIST EN ORDRE CROISSANT
-C AVEC SUPPRESSION DES No DOUBLES
+C WITH REMOVAL OF DOUBLE Nos
 C-----------------------
       CALL MY_ORDERS(0,IWORK,LIST,INDEX,NLIST,1)
       DO I=1,NLIST
@@ -108,7 +108,7 @@ C-----------------------
       ENDDO
       NEL=K
 C-----------------------
-C TRI DE IX EN ORDRE CROISSANT si LL = 0
+C SORT IX IN ASCENDING ORDER if LL = 0
 C-----------------------
       IF(LL==0)THEN
         DO I=1,NUMEL
@@ -123,7 +123,7 @@ C-----------------------
         ENDDO
       ENDIF
 C-----------------------
-C RECHERCHE DES ELEMENTS DE LIST() DANS IX()
+C SEARCH FOR ELEMENTS OF LIST() IN IX()
 C  ALGO < NLIST+NUMEL
 C-----------------------
       I=1

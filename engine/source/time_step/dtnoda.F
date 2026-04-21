@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dtnoda         ../engine/source/time_step/dtnoda.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod        ../common_source/modules/ale/ale_mod.F
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod        ../engine/share/modules/h3d_mod.F
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dtnoda         ../engine/source/time_step/dtnoda.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../engine/source/output/message/message.F
+!||    arret          ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod        ../common_source/modules/ale/ale_mod.F
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||    h3d_mod        ../engine/share/modules/h3d_mod.F
+!||    message_mod    ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE DTNODA(NODFT ,NODLT ,NELTST,ITYPTST,ITAB   ,
      2                  MS    ,IN    ,STIFN ,STIFR  ,DT2T   ,
      3                  DMAST ,DINERT,ADT   ,ADM    ,IMSCH  ,
@@ -83,10 +83,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, NN, K, KMAX, ISTOP,I,J,
-     .   INDTN(1024), TAG(NUMNOD),IOK, NOD_LAG_COUNT
-      my_real DTN(1024),
-     .   DTNOD, DT2P, MAS, INER, MAS0, DMM, MASS, STI, DT2S
+      INTEGER N, NN, K, KMAX, ISTOP,I,INDTN(1024), TAG(NUMNOD),IOK
+      my_real DTN(1024),DTNOD, DT2P, MAS, INER, MASS, STI, DT2S
 C----------------------------------------------------------
 C     TAG NODAL GROUP 
 C----------------------------------------------------------
@@ -229,6 +227,8 @@ C----------------------------------------------------------
 C true dependency
          IF(IALE+IEULER == 0 .OR.  ALE%GLOBAL%I_DT_NODA_ALE_ON==1)THEN
            DO N=I,MIN(NODLT,I+1023)
+c            write(6,*) "STIFN(",N,")=",STIFN(N)
+c            call flush(6)
              IF(STIFN(N)<=ZERO)THEN                             
                 ISTOP = -ITAB(N)                                  
              ELSEIF(MS(N)>ZERO)THEN                            
@@ -359,7 +359,7 @@ C true dependency
            MASS = RBYM(1,I)
            STI  = RBYM(27,I)
            IF(STI<=ZERO)THEN
-c le rigi materiau
+c the rigid material
               ISTOP = -(I+ NUMNOD)
            ELSEIF(MASS> ZERO)THEN
               K = K + 1

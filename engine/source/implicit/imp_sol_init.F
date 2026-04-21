@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,33 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    imp_sol_init    ../engine/source/implicit/imp_sol_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||    buf_dim1        ../engine/source/implicit/produt_v.F
-      !||    cp_dm           ../engine/source/implicit/produt_v.F
-      !||    cp_real         ../engine/source/implicit/produt_v.F
-      !||    dim_glob_k      ../engine/source/implicit/ind_glob_k.F
-      !||    dim_int7        ../engine/source/implicit/ind_glob_k.F
-      !||    dim_span        ../engine/source/implicit/ind_glob_k.F
-      !||    fil_span0       ../engine/source/implicit/ind_glob_k.F
-      !||    imp_frii        ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_trans0      ../engine/source/output/restart/wrrest.F
-      !||    ind_glob_k      ../engine/source/implicit/ind_glob_k.F
-      !||    spmd_mstop      ../engine/source/mpi/init/spmd_mstop.F
-      !||    zero1           ../engine/source/system/zero.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    impbufdef_mod   ../engine/share/modules/impbufdef_mod.F
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_sol_init    ../engine/source/implicit/imp_sol_init.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../engine/source/output/message/message.F
+!||    arret           ../engine/source/system/arret.F
+!||    buf_dim1        ../engine/source/implicit/produt_v.F
+!||    cp_dm           ../engine/source/implicit/produt_v.F
+!||    cp_real         ../engine/source/implicit/produt_v.F
+!||    dim_glob_k      ../engine/source/implicit/ind_glob_k.F
+!||    dim_int7        ../engine/source/implicit/ind_glob_k.F
+!||    dim_span        ../engine/source/implicit/ind_glob_k.F
+!||    fil_span0       ../engine/source/implicit/ind_glob_k.F
+!||    imp_frii        ../engine/source/mpi/implicit/imp_fri.F
+!||    imp_trans0      ../engine/source/output/restart/wrrest.F
+!||    ind_glob_k      ../engine/source/implicit/ind_glob_k.F
+!||    spmd_mstop      ../engine/source/mpi/init/spmd_mstop.F
+!||    zero1           ../engine/source/system/zero.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod     ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    impbufdef_mod   ../engine/share/modules/impbufdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE IMP_SOL_INIT(
      1    GEO       ,NPBY      ,LPBY      ,ITAB      ,
      2    IPARI     ,IXS       ,IXQ       ,IXC       ,IXT       ,
@@ -66,6 +68,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
       USE IMPBUFDEF_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -323,7 +326,7 @@ C     ----- ---------
          IF (NINTER/=0.AND.NEIG==0) THEN
           CALL DIM_INT7(NINTER,IPARI ,INTBUF_TAB ,NINT7)
           IF (NINT7>0) THEN
-           IF (ISOLV==4.AND.IMACH==3) THEN
+           IF (ISOLV==4) THEN
               CALL ANCMSG(MSGID=214,ANMODE=ANINFO)
               CALL ARRET(2)
            ENDIF
@@ -331,8 +334,6 @@ C     ----- ---------
            S_CAND_E = S_CAND_N      !NE_IMP
            S_INDSUBT= S_CAND_N      !IND_IMP  
                  S_IDDLI=NUMNOD
-          ELSE
-           IF (ILINTF>0.AND.IMACH/=3) ILINTF=0
           ENDIF
          ENDIF
          ALLOCATE(IMPBUF_TAB%CAND_N(S_CAND_N))
@@ -435,7 +436,7 @@ C
             ALLOCATE(IMPBUF_TAB%X_C(S_X_C))
             ALLOCATE(IMPBUF_TAB%DD(S_DD))
             ALLOCATE(IMPBUF_TAB%DDR(S_DDR))
-            ALLOCATE(IMPBUF_TAB%X_A(S_X_A))   
+            ALLOCATE(IMPBUF_TAB%X_A(3,S_X_A/3))   
             ALLOCATE(IMPBUF_TAB%FEXT(S_FEXT))  
             ALLOCATE(IMPBUF_TAB%DG(S_DG))    
             ALLOCATE(IMPBUF_TAB%DGR(S_DGR))   
@@ -493,17 +494,17 @@ c      IBUCK= IBUCKL
 C    
       RETURN
       END SUBROUTINE IMP_SOL_INIT
-      !||====================================================================
-      !||    imp_restarcp    ../engine/source/implicit/imp_sol_init.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    cp_dm           ../engine/source/implicit/produt_v.F
-      !||    cp_real         ../engine/source/implicit/produt_v.F
-      !||    zeror           ../engine/source/system/zero.F
-      !||--- uses       -----------------------------------------------------
-      !||    impbufdef_mod   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    imp_restarcp    ../engine/source/implicit/imp_sol_init.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    cp_dm           ../engine/source/implicit/produt_v.F
+!||    cp_real         ../engine/source/implicit/produt_v.F
+!||    zeror           ../engine/source/system/zero.F
+!||--- uses       -----------------------------------------------------
+!||    impbufdef_mod   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE IMP_RESTARCP(X,V,VR,GEO,IGEO,DMCP,IMPBUF_TAB)
 C-----------------------------------------------
 C   M o d u l e s

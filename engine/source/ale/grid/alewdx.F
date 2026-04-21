@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,41 +20,45 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alewdx                 ../engine/source/ale/grid/alewdx.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                  ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    alelin                 ../engine/source/ale/grid/alelin.F
-      !||    alew                   ../engine/source/ale/grid/alew.F
-      !||    alew1                  ../engine/source/ale/grid/alew1.F
-      !||    alew2                  ../engine/source/ale/grid/alew2.F
-      !||    alew4                  ../engine/source/ale/grid/alew4.F
-      !||    alew5                  ../engine/source/ale/grid/alew5.F
-      !||    alew6                  ../engine/source/ale/grid/alew6.F
-      !||    alew7                  ../engine/source/ale/grid/alew7.F
-      !||    bcs2v                  ../engine/source/constraints/general/bcs/bcs2.F
-      !||    bcs3v                  ../engine/source/ale/inter/bcs3v.F
-      !||    intal3                 ../engine/source/ale/inter/intal3.F
-      !||    laser1                 ../engine/source/loads/laser/laser1.F
-      !||    my_barrier             ../engine/source/system/machine.F
-      !||    rgwal1                 ../engine/source/ale/grid/rgwal1.F
-      !||    startime               ../engine/source/system/timer_mod.F90
-      !||    stoptime               ../engine/source/system/timer_mod.F90
-      !||    wlag                   ../engine/source/ale/grid/wlag.F
-      !||    wpor                   ../engine/source/ale/grid/wpor.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    python_funct_mod       ../common_source/modules/python_mod.F90
-      !||    timer_mod              ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    alewdx                 ../engine/source/ale/grid/alewdx.F
+!||--- called by ------------------------------------------------------
+!||    resol                  ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    alelin                 ../engine/source/ale/grid/alelin.F
+!||    alew                   ../engine/source/ale/grid/alew.F
+!||    alew1                  ../engine/source/ale/grid/alew1.F
+!||    alew2                  ../engine/source/ale/grid/alew2.F
+!||    alew4                  ../engine/source/ale/grid/alew4.F
+!||    alew5                  ../engine/source/ale/grid/alew5.F
+!||    alew6                  ../engine/source/ale/grid/alew6.F
+!||    alew7                  ../engine/source/ale/grid/alew7.F
+!||    alew8                  ../engine/source/ale/grid/alew8.F90
+!||    bcs2v                  ../engine/source/constraints/general/bcs/bcs2.F
+!||    bcs3v                  ../engine/source/ale/inter/bcs3v.F
+!||    intal3                 ../engine/source/ale/inter/intal3.F
+!||    laser1                 ../engine/source/loads/laser/laser1.F
+!||    my_barrier             ../engine/source/system/machine.F
+!||    rgwal1                 ../engine/source/ale/grid/rgwal1.F
+!||    startime               ../engine/source/system/timer_mod.F90
+!||    stoptime               ../engine/source/system/timer_mod.F90
+!||    wlag                   ../engine/source/ale/grid/wlag.F
+!||    wpor                   ../engine/source/ale/grid/wpor.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    ale_mod                ../common_source/modules/ale/ale_mod.F
+!||    alew8_mod              ../engine/source/ale/grid/alew8.F90
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    groupdef_mod           ../common_source/modules/groupdef_mod.F
+!||    intbufdef_mod          ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    python_funct_mod       ../common_source/modules/python_mod.F90
+!||    timer_mod              ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE ALEWDX(TIMERS,
      1     GEO             ,X             ,D          ,V          ,VR         ,
-     2     W               ,WA            ,WB         ,RBY        ,SKEW       ,
+     2     W               ,WA            ,WB         ,SKEW       ,
      3     PM              ,XLAS          ,MS         ,FSAV       ,
      4     A               ,TF            ,RWBUF      ,
      5     DT2SAVE         ,PYTHON, 
@@ -66,7 +70,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      B     LNSDVOIS        ,WEIGHT        ,ADSKY      ,FSKY       ,IADS       ,
      C     FR_WALL         ,NPORGEO       ,PROCNE     ,
      D     FR_NBCC         ,IADQ          ,XDP        ,IGRNOD     ,
-     E     DR              ,INTBUF_TAB    ,ITAB       ,MULTI_FVM  ,
+     E     DR              ,INTBUF_TAB    ,MULTI_FVM  ,
      F     ALE_CONNECTIVITY,DDP           ,NE_NERCVOIS,NE_NESDVOIS,
      G     NE_LERCVOIS     ,NE_LESDVOIS   ,XCELL      ,XFACE      ,WFEXT)
 C-----------------------------------------------
@@ -101,6 +105,8 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE MULTI_FVM_MOD
       USE ALE_MOD
+      USE ALEW8_MOD , ONLY : ALEW8
+      use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -132,12 +138,12 @@ C-----------------------------------------------
      .     WEIGHT(*), FR_ELEM(*), IAD_ELEM(*), ADSKY(*), NPORGEO(*),
      .     IADS(*) ,FR_WALL(*),
      .     IADQ(*), NIADX
-      INTEGER, INTENT(IN) :: ITAB(NUMNOD)
       DOUBLE PRECISION    :: XDP(3,*),DDP(3,*)
       my_real X(3,SX/3) ,D(3,SD/3), V(3,SV/3) ,VR(3,SVR/3) ,A(3,SA/3) , FSKY(*),
      .        MS(*)   ,PM(NPROPM,NUMMAT),SKEW(LSKEW,*),GEO(NPROPG,NUMGEO),
      .        W(3,SW/3), WB(*), TF(*), FSAV(NTHVKI,*) ,XLAS(*),
-     .        RWBUF(NRWLP,*),RBY(NRBY,*),WA(3,*),DR(3,SDR/3),XCELL(3,SXCELL), XFACE(3,6,*)
+     .        WA(3,*),DR(3,SDR/3),XCELL(3,SXCELL), XFACE(3,6,*)
+      my_real :: RWBUF(NRWLP,*)
       my_real DT2SAVE
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
@@ -178,8 +184,8 @@ C----------------------------------------
             CALL MY_BARRIER
             CALL ALEW(
      1           X         ,D      ,V       ,W       ,WA      ,
-     2           ALE_CONNECTIVITY%NN_CONNECT     ,ALE_CONNECTIVITY%NALE   ,NODFT   ,NODLT   ,ITASK   ,
-     3           NBRCVOIS,NBSDVOIS,LNRCVOIS ,LNSDVOIS,ITAB         )
+     2           ALE_CONNECTIVITY%NN_CONNECT     ,ALE_CONNECTIVITY%NALE   ,NODFT   ,NODLT ,
+     3           NBRCVOIS,NBSDVOIS,LNRCVOIS ,LNSDVOIS  )
             CALL MY_BARRIER
 
           !-------------------------!
@@ -187,9 +193,9 @@ C----------------------------------------
           !-------------------------!
           CASE(1)
             CALL ALEW1(
-     1           X         ,D       ,V       ,W       ,
-     2           ALE_CONNECTIVITY%NN_CONNECT     ,ALE_CONNECTIVITY%NALE    ,NODFT   ,NODLT   ,ITASK   ,
-     3           NBRCVOIS  ,NBSDVOIS,LNRCVOIS,LNSDVOIS,ITAB         )
+     1           D       ,V       ,W       ,
+     2           ALE_CONNECTIVITY%NN_CONNECT     ,ALE_CONNECTIVITY%NALE    ,NODFT   ,NODLT   ,
+     3           NBRCVOIS  ,NBSDVOIS,LNRCVOIS,LNSDVOIS         )
             CALL MY_BARRIER
 
           !-------------------------!
@@ -201,7 +207,7 @@ C----------------------------------------
      1            X       ,D      ,V       ,W    ,WA   ,
      2            ALE_CONNECTIVITY%NALE    ,IPARG  ,IXS     ,WB   ,
      3            IAD_ELEM,FR_ELEM,FR_NBCC ,SIZEN,ADSKY,
-     4            PROCNE  ,FSKY   ,FSKY    ,IADS ,ITAB      )
+     4            PROCNE  ,FSKY   ,FSKY    ,IADS )
             ENDIF
 
           !-------------------------!
@@ -224,15 +230,15 @@ C----------------------------------------
      2               ALE_CONNECTIVITY%NALE    ,IPARG  ,IXS     ,WB   ,
      3               IAD_ELEM,FR_ELEM,FR_NBCC ,SIZEN,ADSKY         ,
      4               PROCNE  ,FSKY   ,FSKY    ,IADS ,WB(1+3*NUMNOD),
-     5               NIXS    ,NIADX  ,ITAB )
+     5               NIXS    ,NIADX  )
               ELSE
                 NIADX=4
                 CALL ALEW4(
-     1               X       ,D      ,V       ,W    ,WA            ,
-     2               ALE_CONNECTIVITY%NALE    ,IPARG  ,IXQ     ,WB   ,
-     3               IAD_ELEM,FR_ELEM,FR_NBCC ,SIZEN,ADSKY         ,
-     4               PROCNE  ,FSKY   ,FSKY    ,IADQ ,WB(1+3*NUMNOD),
-     5               NIXQ    ,NIADX  ,ITAB  )
+     1               X                      ,D       ,V       ,W     ,WA            ,
+     2               ALE_CONNECTIVITY%NALE  ,IPARG   ,IXQ     ,WB    ,
+     3               IAD_ELEM               ,FR_ELEM ,FR_NBCC ,SIZEN ,ADSKY         ,
+     4               PROCNE                 ,FSKY    ,FSKY    ,IADQ  ,WB(1+3*NUMNOD),
+     5               NIXQ                   ,NIADX  )
               ENDIF
             ENDIF
 
@@ -242,10 +248,10 @@ C----------------------------------------
           CASE(5)
             CALL MY_BARRIER
             CALL ALEW5(
-     1           X         ,D       ,V       ,W       ,WA       ,
-     2           ALE_CONNECTIVITY%NN_CONNECT     ,ALE_CONNECTIVITY%NALE    ,NODFT   ,NODLT   ,ITASK   ,
-     3           NBRCVOIS  ,NBSDVOIS,LNRCVOIS,LNSDVOIS,ITAB       ,
-     4           SKEW, ISKEW,ICODT)
+     1           X                           ,V                     ,W       , WA     ,
+     2           ALE_CONNECTIVITY%NN_CONNECT ,ALE_CONNECTIVITY%NALE ,NODFT   , NODLT  ,
+     3           NBRCVOIS                    ,NBSDVOIS              ,LNRCVOIS, LNSDVOIS,
+     4           SKEW                        ,ISKEW                 ,ICODT)
             CALL MY_BARRIER
 
           !-------------------------!
@@ -254,11 +260,11 @@ C----------------------------------------
           CASE(6)
             CALL MY_BARRIER
             CALL ALEW6(
-     1           X         ,D       ,V       ,W       ,WA       ,
-     .           XCELL, XFACE,
-     2           ALE_CONNECTIVITY%NN_CONNECT     ,ALE_CONNECTIVITY%NE_CONNECT,ALE_CONNECTIVITY%NALE    ,NODFT   ,NODLT   ,ITASK   ,
-     3           NBRCVOIS  ,NBSDVOIS,LNRCVOIS,LNSDVOIS,ITAB,NE_NERCVOIS, NE_NESDVOIS, NE_LERCVOIS, NE_LESDVOIS,
-     4           ELBUF_TAB, IPARG, IXS, IXQ)
+     1           X                          , V                        ,W          , WA          ,
+     .           XCELL                      , XFACE                    ,
+     2           ALE_CONNECTIVITY%NE_CONNECT, ALE_CONNECTIVITY%NALE    ,NODFT      , NODLT       ,ITASK   ,
+     3           NE_NERCVOIS                , NE_NESDVOIS              ,NE_LERCVOIS, NE_LESDVOIS,
+     4           ELBUF_TAB                  , IPARG                    ,IXS        , IXQ)
             CALL MY_BARRIER
 
           !-------------------------------!
@@ -272,6 +278,13 @@ C----------------------------------------
      3           SX      ,SV      ,SW     ,NSPMD   )
             CALL MY_BARRIER
 
+          !-------------------------------!
+          !---/ALE/GRID/LAGRANGE (8)
+          !-------------------------------!
+          CASE(8)
+            CALL MY_BARRIER
+            CALL ALEW8(SV, SW, V ,W, NODFT, NODLT, NUMNOD, ALE_CONNECTIVITY%NALE)
+            CALL MY_BARRIER
 
         END SELECT !CASE (ALE%GRID%NWALE)
 
@@ -288,8 +301,8 @@ C
       IF (ITASK == 0) THEN
 C----------------------------------------
          IF(NUMPOR > 0)
-     1        CALL WPOR(GEO,NODPOR,X                    ,V       ,VR  ,
-     2                  W  ,RBY   ,ALE_CONNECTIVITY%NALE,NPORGEO       )
+     1        CALL WPOR(GEO,NODPOR               ,X       ,V       ,VR  ,
+     2                  W  ,ALE_CONNECTIVITY%NALE,NPORGEO       )
 C----------------------------------------
 C     BOUNDARY CONDITIONS AT NODES
 C----------------------------------------
@@ -349,7 +362,7 @@ C     /ALE/LINK/VEL
 C--------------------------------------
          IF(NALELK /= 0) THEN
             IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,4)
-            CALL ALELIN(NALELK,LINALE,W,WEIGHT,IGRNOD,ITAB)
+            CALL ALELIN(NALELK,LINALE,W,WEIGHT,IGRNOD)
             IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,4)
          ENDIF
 C-----------------------------------
@@ -370,12 +383,12 @@ C-----------------------
          IF(NRWALL > 0) THEN
             IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,4)
             CALL RGWAL1(
-     1           X                   ,A                      ,V          ,W       ,RWBUF           ,
-     2           NPRW(1+NNPRW*NRWALL),NPRW                   , PYTHON, 
-     3           ICODT               ,ISKEW                  ,SKEW       ,MS      ,FSAV(1,NINTER+1),
-     4           IXS                 ,IXQ                    ,ELBUF_TAB  ,IPARG   ,
-     5           PM                  ,ALE_CONNECTIVITY%NALE  ,TF         ,NPF     ,WEIGHT          ,
-     6           IAD_ELEM            ,FR_ELEM                ,FR_WALL    ,WFEXT    )
+     1           X                   ,A                   ,V          ,W       ,
+     2           RWBUF               ,NPRW(1+NNPRW*NRWALL),NPRW                ,PYTHON ,
+     3           MS                  ,FSAV(1,NINTER+1),
+     4           IXS                 ,IXQ                 ,ELBUF_TAB  ,IPARG   ,
+     5           PM                  ,TF                  ,NPF        ,WEIGHT          ,
+     6           IAD_ELEM            ,FR_ELEM             ,FR_WALL        )
             IF(IMON > 0.AND. ITASK == 0) CALL STOPTIME(TIMERS,4)
          ENDIF
 C-----------------------

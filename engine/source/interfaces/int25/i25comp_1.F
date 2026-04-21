@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25comp_1        ../engine/source/interfaces/int25/i25comp_1.F
-      !||--- called by ------------------------------------------------------
-      !||    i25main_slid     ../engine/source/interfaces/int25/i25main_slid.F
-      !||--- calls      -----------------------------------------------------
-      !||    i25cor3_1        ../engine/source/interfaces/int25/i25cor3.F
-      !||    i25dst3_1        ../engine/source/interfaces/int25/i25dst3_1.F
-      !||    i25glob_1        ../engine/source/interfaces/int25/i25dst3_1.F
-      !||    i25prep_slid_1   ../engine/source/interfaces/int25/i25slid.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||    tri7box          ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25comp_1        ../engine/source/interfaces/int25/i25comp_1.F
+!||--- called by ------------------------------------------------------
+!||    i25main_slid     ../engine/source/interfaces/int25/i25main_slid.F
+!||--- calls      -----------------------------------------------------
+!||    i25cor3_1        ../engine/source/interfaces/int25/i25cor3.F
+!||    i25dst3_1        ../engine/source/interfaces/int25/i25dst3_1.F
+!||    i25glob_1        ../engine/source/interfaces/int25/i25dst3_1.F
+!||    i25prep_slid_1   ../engine/source/interfaces/int25/i25slid.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod    ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||    tri7box          ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25COMP_1(
      1                   IPARI   ,INTBUF_TAB ,X      ,ITAB   ,NIN        ,
      2                   KINET      ,JTASK  ,NB_DST1,V       ,NSENSOR    ,
@@ -74,10 +75,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
-     .        I, J, L, H, I_STOK_RTLM, I_STOK, JLT , NFT,
+     .        I_STOK_RTLM, I_STOK, JLT , NFT,
      .        INACTI, NADMSR, NB_LOC, DEBUT, IGAP,
-     .        MG, N, NSN, NSNR, IVIS2, ISENS
-      INTEGER  LENT, MAXCC
+     .        NSN, NSNR, IVIS2, ISENS
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ), FAR(MVSIZ,4), SUBTRIA(MVSIZ), 
      .        MVOISN(MVSIZ,4), IBOUND(4,MVSIZ)
@@ -105,7 +105,7 @@ C-----------------------------------------------
 C
         STARTT=INTBUF_TAB%VARIABLES(3)
         STOPT =INTBUF_TAB%VARIABLES(11)
-        IF(STARTT>TT) RETURN ! dont look for sliding
+        IF(STARTT>TT) RETURN ! don't look for sliding
         IF(TT>STOPT)  RETURN
 C
 C       Look if interface is activated 

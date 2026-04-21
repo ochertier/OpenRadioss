@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r23l114def3          ../engine/source/elements/spring/r23l114def3.F
-      !||--- called by ------------------------------------------------------
-      !||    r23law114            ../engine/source/elements/spring/r23law114.F
-      !||--- calls      -----------------------------------------------------
-      !||    material_flow        ../engine/source/tools/seatbelts/material_flow.F
-      !||    repla3               ../engine/source/elements/spring/repla3.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod     ../common_source/modules/python_mod.F90
-      !||    seatbelt_mod         ../common_source/modules/seatbelt_mod.F
-      !||    sensor_mod           ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    r23l114def3          ../engine/source/elements/spring/r23l114def3.F
+!||--- called by ------------------------------------------------------
+!||    r23law114            ../engine/source/elements/spring/r23law114.F
+!||--- calls      -----------------------------------------------------
+!||    material_flow        ../engine/source/tools/seatbelts/material_flow.F
+!||    redef3               ../engine/source/elements/spring/redef3.F90
+!||    redef_seatbelt       ../engine/source/tools/seatbelts/redef_seatbelt.F90
+!||    repla3               ../engine/source/elements/spring/repla3.F
+!||--- uses       -----------------------------------------------------
+!||    python_funct_mod     ../common_source/modules/python_mod.F90
+!||    redef3_mod           ../engine/source/elements/spring/redef3.F90
+!||    redef_seatbelt_mod   ../engine/source/tools/seatbelts/redef_seatbelt.F90
+!||    seatbelt_mod         ../common_source/modules/seatbelt_mod.F
+!||    sensor_mod           ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE R23L114DEF3( PYTHON,
      1   SKEW,                 IPM,                  IGEO,                 MID,
      2   PID,                  GEO,                  UPARAM,               FX,
@@ -148,8 +152,8 @@ C-----------------------------------------------
      .        IECROU(MVSIZ), IFUNC(MVSIZ), IFV(MVSIZ), IFUNC2(MVSIZ),
      .        I,K,ILENG, J, KK, IFAIL(MVSIZ),IFAIL2(MVSIZ),ADHER(MVSIZ),
      .        NINDX,ISRATE, IFUNC3(MVSIZ),I1,I2,I3,I4,I5,I6,I7,I8,
-     .        I9,I10,I11,I12,I13,I14,IF1,IF2,IF3,IF4,IADBUF,NUPAR,NN1,NN2,RET,
-     .        FLAG_RETRACTOR_UPDATE_OLD,FLAG,INDEX1(MVSIZ),INDEX2(MVSIZ),COMPT,
+     .        I9,I10,I11,I12,I13,I14,IF1,IF2,IF3,IF4,IADBUF,NUPAR,
+     .        FLAG,INDEX1(MVSIZ),INDEX2(MVSIZ),COMPT,
      .        DIR,STRD,II,INDEX_SLIP(MVSIZ),COMPT2
 C     REAL
       my_real
@@ -159,18 +163,18 @@ C     REAL
      .     B(MVSIZ), D(MVSIZ), EPLA(MVSIZ),
      .     DV(MVSIZ),VRT(MVSIZ),VRR(MVSIZ),
      .     DMN(MVSIZ),DMX(MVSIZ),XL0(MVSIZ),CRIT(MVSIZ),
-     .     XN(MVSIZ),FF(MVSIZ),LSCALE(MVSIZ),EE(MVSIZ),GF3(MVSIZ),
+     .     FF(MVSIZ),LSCALE(MVSIZ),EE(MVSIZ),GF3(MVSIZ),
      .     HX(MVSIZ), HY(MVSIZ), HZ(MVSIZ),FX_MAX(MVSIZ),E_OFFSET(MVSIZ),
      .     XK_COMP(MVSIZ),MX_MAX(MVSIZ),DFS_OLD(MVSIZ),NOT_USED,XL02(MVSIZ),
      .     XKP(MVSIZ),DFX(MVSIZ)
       my_real
      .     AT,DT05,XKA,YKA,ZKA,CC,CN,XA,XB,DLIM,VFAIL,
      .     X21, Y21, Z21, EPXY, EPXZ,
-     .     VX21, VY21, VZ21, RYAVP, RZAVP,EYZP,EXZP,
-     .     RYAV, RZAV,DEN, C, CP, EXYP,
-     .     X21PHI, Y21PHI, Z21PHI, VX21PHI, VY21PHI, VZ21PHI,
-     .     RYAV1, RZAV1, RYAV1P, RZAV1P,ASRATE,NORM,GAP,LMIN_B2(MVSIZ),
-     .     EB(MVSIZ),DXOLDB(MVSIZ),XKP_B2(MVSIZ),DX_B2(MVSIZ),A1
+     .     VX21, VY21, VZ21,
+     .     RYAV, RZAV,
+     .       
+     .     RYAV1, RZAV1,ASRATE,NORM,
+     .     EB(MVSIZ),DXOLDB(MVSIZ),XKP_B2(MVSIZ),DX_B2(MVSIZ)
       DOUBLE PRECISION X0DP(MVSIZ),X0DP_B2(MVSIZ),EX2DP(MVSIZ),EY2DP(MVSIZ),EZ2DP(MVSIZ),
      .                 ALDP_B2(MVSIZ)
       my_real ,DIMENSION(:), POINTER :: COORD_OLD

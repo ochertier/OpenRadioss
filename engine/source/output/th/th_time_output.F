@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    th_time_output   ../engine/source/output/th/th_time_output.F
-      !||--- called by ------------------------------------------------------
-      !||    resol            ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    output_mod       ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    th_time_output   ../engine/source/output/th/th_time_output.F
+!||--- called by ------------------------------------------------------
+!||    resol            ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    output_mod       ../common_source/modules/output/output_mod.F90
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE TH_TIME_OUTPUT(ITHOUT,SENSORS,OUTPUT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -53,7 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I, J, ISENS, SENS_ID 
+      INTEGER :: I, J, ISENS
       my_real :: THIS_L, TS, TABFIS_L(10)
 C---------------------------------------------------------------------------
 C   ITHOUT : flag to check if TH file will be written for CAREA output
@@ -69,7 +69,7 @@ C ******  IF /STOP/LSENSOR *****
              TS = EP20
              IF (SENSORS%SENSOR_TAB(ISENS)%STATUS == 1) TS = TT
              IF (TT >= TS) THEN
-                IF(SENSORS%STOP_NSTH/=0)THEN  !IF THIST FILE
+                IF(SENSORS%STOP_NSTH/=0)THEN  !IF THIS FILE
                    THIS_L= TT
                 ENDIF
                 IF(SENSORS%STOP_NSABF/=0)THEN  !IF ABF FILE

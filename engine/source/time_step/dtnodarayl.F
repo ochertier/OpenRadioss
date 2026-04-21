@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dtnodarayl     ../engine/source/time_step/dtnodarayl.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dtnodarayl                       ../engine/source/time_step/dtnodarayl.F
+!||--- called by ------------------------------------------------------
+!||    resol                            ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    damping_vref_compute_dampa       ../engine/source/assembly/damping_vref_compute_dampa.F90
+!||--- uses       -----------------------------------------------------
+!||    damping_vref_compute_dampa_mod   ../engine/source/assembly/damping_vref_compute_dampa.F90
+!||    groupdef_mod                     ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE DTNODARAYL(MS       ,IN    ,STIFN ,STIFR ,DT2T     ,
      1                      IGRNOD   ,DAMPR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
+      use damping_vref_compute_dampa_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,16 +61,16 @@ C     REAL
       my_real , DIMENSION(NUMNOD*IRODDL), INTENT(IN) ::IN 
       my_real , DIMENSION(NUMNOD), INTENT(INOUT) ::STIFN 
       my_real , DIMENSION(NUMNOD*IRODDL), INTENT(INOUT) ::STIFR 
-      my_real , DIMENSION(NRDAMP,NDAMP), INTENT(IN) ::DAMPR
+      my_real , DIMENSION(NRDAMP,NDAMP), INTENT(INOUT) ::DAMPR
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD), INTENT(IN) :: IGRNOD
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,I,J,ISK,IGR,ND,K,L,LL
-      my_real FACTB,DAMPBR,DAMPAR,D_TSTART,D_TSTOP,DAMPT,
+      INTEGER I,J,IGR,ND,ITYPE,FL_VREL,FL_FREQ_RANGE
+      my_real FACTB,D_TSTART,D_TSTOP,DAMPT,
      .   DT2N(NUMNOD),BB,COEFF,DTN,DTN2,DAMPAI,DAMPBI,DT0,DAMPA3,
-     .   ALPHA05,BETA1,DTMAX,FAC,DTMI1,DTMI2,BBI,FACI,FL_VREL,ID_RBY   
+     .   ALPHA05,BETA1,DTMAX,FAC,DTMI1,DTMI2,BBI,FACI,DAMP_A(3)     
 C----------------------------------------------------------
         DTMI1 = DTMIN1(11)
         DTMAX = EP04
@@ -82,7 +86,17 @@ C----------------------------------------------------------
 c--    
         DO I=1,NDAMP
 C--       
-          IF (DAMPR(19,I)/=0) CYCLE                                               
+          FL_VREL = 0
+          FL_FREQ_RANGE = 0
+          ITYPE = NINT(DAMPR(21,I))
+          SELECT CASE (ITYPE)
+             CASE(2) 
+               FL_VREL = 1
+             CASE(3) 
+               FL_FREQ_RANGE = 1
+          END SELECT
+!          FL_FREQ_RANGE = NINT(DAMPR(31,I))
+          IF ((DAMPR(19,I)/=0).OR.(FL_FREQ_RANGE > 0)) CYCLE                                               
           D_TSTART = DAMPR(17,I)
           D_TSTOP  = DAMPR(18,I)         
           IF ((TT<D_TSTART).OR.(TT>D_TSTOP)) CYCLE
@@ -97,17 +111,19 @@ C--
               DTN = MIN(DT2N(ND),DTN)
             END IF                               
           END DO      
+          FACTB = ONE
           DAMPAI = MAX(DAMPR(3,I),DAMPR(5,I),DAMPR(7,I))
           DAMPAI = MAX(DAMPAI,DAMPR(9,I),DAMPR(11,I),DAMPR(13,I))
           DAMPBI = MAX(DAMPR(4,I),DAMPR(6,I),DAMPR(8,I))
           DAMPBI = MAX(DAMPBI,DAMPR(10,I),DAMPR(12,I),DAMPR(14,I))
-          DAMPT = DT0*DAMPR(16,I)
+          DAMPT = DT0*FACTB
           DAMPBI = MIN(DAMPBI,DAMPT)
 C--          
-C--       /DAMP/VREL with RBDOY - max damping coefficient computed in rbyfor.F or damping.F
-          FL_VREL = NINT(DAMPR(21,I))
+C--       /DAMP/VREL - recompute damping parameters at current time
+!          FL_VREL = NINT(DAMPR(21,I))
           IF (FL_VREL==1) THEN
-            DAMPAI = DAMPR(30,I)
+            call damping_vref_compute_dampa(i,ndamp,nrdamp,dampr,dt1,tt,damp_a)
+            DAMPAI = MAX(DAMP_A(1),DAMP_A(2),DAMP_A(3))
             DAMPBI = ZERO
           ENDIF  
 C--

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spsymp        ../engine/source/elements/sph/spsym.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep       ../engine/source/elements/sph/sphprep.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier    ../engine/source/system/machine.F
-      !||    myqsort       ../common_source/tools/sort/myqsort.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    sphbox        ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    spsymp        ../engine/source/elements/sph/spsym.F
+!||--- called by ------------------------------------------------------
+!||    sphprep       ../engine/source/elements/sph/sphprep.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier    ../engine/source/system/machine.F
+!||    myqsort       ../common_source/tools/sort/myqsort.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||    sphbox        ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPSYMP(
      1    X       ,V        ,MS      ,SPBUF   ,ITAB    ,
      2    KXSP    ,IXSP     ,NOD2SP  ,ISPCOND ,ISPSYM  ,
@@ -69,19 +69,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,N,INOD,JNOD,J,NVOIS,M,SM,JS,I,NN,IG,
+      INTEGER K,N,INOD,JNOD,J,NVOIS,M,JS,I,NN,IG,
      .        NVOIS1,NVOIS2,NVOISS,NVOISS1,NVOISS2,
-     .        IS,IC,NC,L,ISLIDE, IAUX, NSPHSYM_L,
-     .        JK,JL,IERROR,NS,NB,JJ1,JJ2, JJ, JJJ,
+     .        IS,IC,NC,ISLIDE, NSPHSYM_L,
+     .        JK,IERROR,NS,
      .        JVOIS(NSPHSYM+KVOISPH+1), JSTOR(NSPHSYM+KVOISPH+1),
-     .        JPERM(NSPHSYM+KVOISPH+1), JCOND(KVOISPH)
+     .        JPERM(NSPHSYM+KVOISPH+1)
       my_real
-     .       XI,YI,ZI,DI,RHOI,XJ,YJ,ZJ,DJ,RHOJ,DIJ,
-     .       VXI,VYI,VZI,VXJ,VYJ,VZJ,
+     .       XI,YI,ZI,DI,XJ,YJ,ZJ,DJ,DIJ,
+     .       VXI,VYI,VZI,
      .       OX,OY,OZ,NX,NY,NZ,
-     .       XS,YS,ZS,VXS,VYS,VZS,VN,DD,DM,DK,DL,
-     .       XISORT,YISORT,ZISORT,DISORT,
-     .       XJSORT,YJSORT,ZJSORT,DJSORT,
+     .       XS,YS,ZS,VXS,VYS,VZS,VN,DD,DK,
+     .       
+     .       
      .       SPALINR, DVOIS(NSPHSYM+KVOISPH+1)
 C-----------------------------------------------
 C     new construction of ghost particles is necessary.
@@ -494,7 +494,7 @@ C             -NC-NN*(NSPCOND+1) : remote if negative sign
          IF(NVOIS2+NVOISS<=KVOISPH)THEN
 C--------------------------------------------------
 C         ghost particles are added to real ones.
-C         (ordonne les particules fantomes).
+C         (orders the ghost particles).
           NVOISS1=0
           NVOISS2=NVOISS
           DO K=NVOIS2+1,NVOIS2+NVOISS

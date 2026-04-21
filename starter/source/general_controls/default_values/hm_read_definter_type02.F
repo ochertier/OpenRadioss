@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_definter_type02   ../starter/source/general_controls/default_values/hm_read_definter_type02.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_definter          ../starter/source/general_controls/default_values/hm_read_definter.F
-      !||--- calls      -----------------------------------------------------
-      !||    definter                  ../starter/source/interfaces/interf1/definter.F
-      !||    hm_get_intv               ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod        ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod               ../starter/share/message_module/message_mod.F
-      !||    submodel_mod              ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_definter_type02   ../starter/source/general_controls/default_values/hm_read_definter_type02.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_definter          ../starter/source/general_controls/default_values/hm_read_definter.F
+!||--- calls      -----------------------------------------------------
+!||    definter                  ../starter/source/interfaces/interf1/definter.F
+!||    hm_get_intv               ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod        ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod               ../starter/share/message_module/message_mod.F
+!||    submodel_mod              ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_DEFINTER_TYPE02(NTYP , DEF_INTER, LSUBMODEL)
 C============================================================================
 C-----------------------------------------------
@@ -62,7 +62,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  IGNORE,ILEV,IBUC,IDEL2,IGSTI,IPRINT,IASSIGN
-      CHARACTER(LEN=NCHARKEY) :: OPT,KEY,KEY1
+      CHARACTER(LEN=NCHARKEY) :: KEY1
       LOGICAL IS_AVAILABLE
 C============================================================================
 C       READING DEFAULT VALUES INTERFACE TYPE02 (/DEFAULT/INTER/TYPE02)

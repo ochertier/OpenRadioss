@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    smom43    ../engine/source/elements/solid/sconnect/smom43.F
-      !||--- called by ------------------------------------------------------
-      !||    suser43   ../engine/source/elements/solid/sconnect/suser43.F
-      !||====================================================================
+!||====================================================================
+!||    smom43    ../engine/source/elements/solid/sconnect/smom43.F
+!||--- called by ------------------------------------------------------
+!||    suser43   ../engine/source/elements/solid/sconnect/suser43.F
+!||====================================================================
       SUBROUTINE SMOM43(NEL   ,
      .     F1X   ,F2X   ,F3X   ,F4X   ,F5X   ,F6X   ,F7X   ,F8X   ,
      .     F1Y   ,F2Y   ,F3Y   ,F4Y   ,F5Y   ,F6Y   ,F7Y   ,F8Y   ,
@@ -62,7 +62,7 @@ C     REAL
       my_real
      .  MXX(NEL),MYY(NEL),MZZ(NEL)
       my_real
-     .  MYZ,MZY,MZX,MXZ,MXY,MYX,FXX,FYY,FZZ,FA,FB,RAX,RBX,RAY,RBY,
+     .  MYZ,MZY,MZX,MXZ,MXY,MYX,FXX,FYY,FA,FB,RAX,RBX,RAY,RBY,
      .  D1,D2,DD
 C=======================================================================
       DO I=1,NEL

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C Computes AINV(NEL,3,3) which is the inverse of MAT(NEL,3,3)
-      !||====================================================================
-      !||    kmatinv3    ../engine/source/materials/tools/kmatinv.F
-      !||--- called by ------------------------------------------------------
-      !||    calcmatb    ../engine/source/materials/mat/mat100/calcmatb.F
-      !||    sigeps100   ../engine/source/materials/mat/mat100/sigeps100.F90
-      !||    sigeps95    ../engine/source/materials/mat/mat095/sigeps95.F
-      !||====================================================================
+!||====================================================================
+!||    kmatinv3    ../engine/source/materials/tools/kmatinv.F
+!||--- called by ------------------------------------------------------
+!||    calcmatb    ../engine/source/materials/mat/mat100/calcmatb.F
+!||    sigeps100   ../engine/source/materials/mat/mat100/sigeps100.F90
+!||    sigeps95    ../engine/source/materials/mat/mat095/sigeps95.F
+!||====================================================================
        SUBROUTINE KMATINV3(MAT, AINV  ,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -35,7 +35,7 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
 
-      INTEGER I,NEL,N
+      INTEGER I,NEL
 C-----------------------------------------------
 
       my_real  FAC,DETA, MAT(NEL,3,3),AINV(NEL,3,3)
@@ -47,7 +47,7 @@ C
      .         MAT(I,2,1)*MAT(I,3,2)*MAT(I,1,3) -MAT(I,2,2)*MAT(I,3,1)*MAT(I,1,3)
           IF(DETA == ZERO)DETA = EM20
           FAC=ONE/ DETA
-          !transpose(comatrice)/det
+          !transpose(comatrix)/det
           AINV(I,1,1)=FAC*(MAT(I,2,2)*MAT(I,3,3)-MAT(I,2,3)*MAT(I,3,2))
           AINV(I,2,2)=FAC*(MAT(I,1,1)*MAT(I,3,3)-MAT(I,3,1)*MAT(I,1,3))
           AINV(I,3,3)=FAC*(MAT(I,1,1)*MAT(I,2,2)-MAT(I,1,2)*MAT(I,2,1))

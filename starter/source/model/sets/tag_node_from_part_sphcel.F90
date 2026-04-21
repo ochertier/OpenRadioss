@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tag_node_from_part_sphcel_mod   ../starter/source/model/sets/tag_node_from_part_sphcel.F90
-      !||--- called by ------------------------------------------------------
-      !||    create_node_from_element        ../starter/source/model/sets/create_node_from_element.F
-      !||====================================================================
+!||====================================================================
+!||    tag_node_from_part_sphcel_mod   ../starter/source/model/sets/tag_node_from_part_sphcel.F90
+!||--- called by ------------------------------------------------------
+!||    create_node_from_element        ../starter/source/model/sets/create_node_from_element.F
+!||====================================================================
       module tag_node_from_part_sphcel_mod
+        implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
@@ -34,14 +35,14 @@
 !=======================================================================================================================
 !\brief This subroutine creates a clause of nodes from sphcels
 !=======================================================================================================================
-      !||====================================================================
-      !||    tag_node_from_part_sphcel   ../starter/source/model/sets/tag_node_from_part_sphcel.F90
-      !||--- called by ------------------------------------------------------
-      !||    create_node_from_element    ../starter/source/model/sets/create_node_from_element.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||====================================================================
-      subroutine tag_node_from_part_sphcel(nb_sphcel  ,sphcel  ,tagnod,clause_node,ind,numnod)
+!||====================================================================
+!||    tag_node_from_part_sphcel   ../starter/source/model/sets/tag_node_from_part_sphcel.F90
+!||--- called by ------------------------------------------------------
+!||    create_node_from_element    ../starter/source/model/sets/create_node_from_element.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||====================================================================
+        subroutine tag_node_from_part_sphcel(nb_sphcel  ,sphcel  ,tagnod,clause_node,ind,numnod)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -51,10 +52,6 @@
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -80,9 +77,9 @@
                 tagnod(nod) = 1
                 ind = ind+1
                 clause_node(ind) = nod
-              endif
-            enddo
-          endif
+              end if
+            end do
+          end if
 !
 ! ----------------------------------------------------------------------------------------------------------------------
         end subroutine tag_node_from_part_sphcel

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21rot          ../starter/source/interfaces/inter3d1/i21rot.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3_thkvar   ../starter/source/interfaces/inter3d1/inint3_thkvar.F
-      !||====================================================================
+!||====================================================================
+!||    i21rot          ../starter/source/interfaces/inter3d1/i21rot.F
+!||--- called by ------------------------------------------------------
+!||    inint3_thkvar   ../starter/source/interfaces/inter3d1/inint3_thkvar.F
+!||====================================================================
       SUBROUTINE I21ROT(IROT   ,XG, ROT, NMN, NOD_NORMAL,
      .                  XM0    ,BRACKET,NRTM,IRECTM,LXM ,
      .                  LYM    ,LZM    ,NSN ,XSAV  )
@@ -49,7 +49,7 @@ C     REAL
      .     XI(3), NXI(3), LMAX, DD, 
      .     X0, Y0, Z0, X1, Y1, Z1, XXX, YYY, ZZZ
 C------------------------------------
-C     Coordonnees initiales cote main : passage en coord locales.
+C     Initial contact details on the main side: Passage in local coordinates.
 C------------------------------------
       IF(IROT==0)THEN
 C--------------------------------------

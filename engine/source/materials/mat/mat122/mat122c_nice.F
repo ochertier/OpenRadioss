@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mat122c_nice   ../engine/source/materials/mat/mat122/mat122c_nice.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps122c     ../engine/source/materials/mat/mat122/sigeps122c.F
-      !||--- calls      -----------------------------------------------------
-      !||    vinter         ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    mat122c_nice   ../engine/source/materials/mat/mat122/mat122c_nice.F
+!||--- called by ------------------------------------------------------
+!||    sigeps122c     ../engine/source/materials/mat/mat122/sigeps122c.F
+!||--- calls      -----------------------------------------------------
+!||    vinter         ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE MAT122C_NICE(
      1     NEL     ,NUPARAM ,NUVAR   ,UPARAM  ,UVAR    ,
      2     EPSXX   ,EPSYY   ,RHO     ,PLA     ,DPLA    ,
@@ -72,7 +72,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
-     .   I,II,J,NITER,ITER,NINDX,INDEX(NEL),
+     .   I,II,NINDX,INDEX(NEL),
      .   ISH,ITR,IRES,IBUCK,ICOMP,LTYPE11,LTYPE12,
      .   LTYPER0,IPOS(NEL),ILEN(NEL),IAD(NEL)
       my_real

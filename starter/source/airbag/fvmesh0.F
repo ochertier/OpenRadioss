@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,36 +20,38 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C ATTENTION : toute modification dans ces routines doit etre reportee
-C             dans les routines identiques dans l'engine
-      !||====================================================================
-      !||    fvmesh0                  ../starter/source/airbag/fvmesh0.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    fvbric                   ../starter/source/airbag/fvbric.F
-      !||    fvelarea                 ../starter/source/airbag/fvelarea.F
-      !||    fvelinte                 ../starter/source/airbag/fvelinte.F
-      !||    fvelprint                ../starter/source/airbag/fvelprint.F
-      !||    fvelsurf                 ../starter/source/airbag/fvelsurf.F
-      !||    fvinjectint              ../starter/source/airbag/fvinjectint.F
-      !||    fvinjnormal              ../starter/source/airbag/fvinjnormal.F
-      !||    fvlength                 ../starter/source/airbag/fvlength.F
-      !||    fvmesh1                  ../starter/source/airbag/fvmesh.F
-      !||    fvnodbr                  ../starter/source/airbag/fvmbag1.F
-      !||    fvthsurf                 ../starter/source/airbag/fvthsurf.F
-      !||    fvventholeint            ../starter/source/airbag/fvventholeint.F
-      !||    fvverif                  ../starter/source/airbag/fvmbag1.F
-      !||    fvvolu                   ../starter/source/airbag/fvvolu.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
-      !||    reorder_mod              ../starter/share/modules1/reorder_mod.F
-      !||====================================================================
-      SUBROUTINE FVMESH0(T_MONVOL, XYZINI, IXS, IXC, IXTG, PM,
-     1                   IPM,  ITAB, IGRSURF, XYZREF,
-     2                   NOM_OPT, NB_NODE)
+C Please note: any modification in these routines must be postponed
+C             in identical routines in the machine
+!||====================================================================
+!||    fvmesh0                  ../starter/source/airbag/fvmesh0.F
+!||--- called by ------------------------------------------------------
+!||    lectur                   ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    fvbric                   ../starter/source/airbag/fvbric.F
+!||    fvelarea                 ../starter/source/airbag/fvelarea.F
+!||    fvelinte                 ../starter/source/airbag/fvelinte.F
+!||    fvelprint                ../starter/source/airbag/fvelprint.F
+!||    fvelsurf                 ../starter/source/airbag/fvelsurf.F
+!||    fvinjectint              ../starter/source/airbag/fvinjectint.F
+!||    fvinjnormal              ../starter/source/airbag/fvinjnormal.F
+!||    fvlength                 ../starter/source/airbag/fvlength.F
+!||    fvmesh1                  ../starter/source/airbag/fvmesh.F
+!||    fvnodbr                  ../starter/source/airbag/fvmbag1.F
+!||    fvthsurf                 ../starter/source/airbag/fvthsurf.F
+!||    fvventholeint            ../starter/source/airbag/fvventholeint.F
+!||    fvverif                  ../starter/source/airbag/fvmbag1.F
+!||    fvvolu                   ../starter/source/airbag/fvvolu.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
+!||    fvelinte_mod             ../starter/source/airbag/fvelinte.F
+!||    fvinjnormal_mod          ../starter/source/airbag/fvinjnormal.F
+!||    fvlength_mod             ../starter/source/airbag/fvlength.F
+!||    fvvolu_mod               ../starter/source/airbag/fvvolu.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
+!||    reorder_mod              ../starter/share/modules1/reorder_mod.F
+!||====================================================================
+      SUBROUTINE FVMESH0(T_MONVOL, XYZINI, IXS, IXC, IXTG, PM,IPM, IGRSURF, XYZREF,NB_NODE)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -61,6 +63,11 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MONVOL_STRUCT_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FVELINTE_MOD , ONLY : FVELINTE
+      USE FVVOLU_MOD , ONLY : FVVOLU
+      USE FVINJNORMAL_MOD , ONLY : FVINJNORMAL
+      USE FVLENGTH_MOD , ONLY : FVLENGTH
+      use element_mod , only : nixs,nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,22 +85,21 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(INOUT) :: T_MONVOL
       INTEGER IXS(NIXS,*), IXC(NIXC,*), IXTG(NIXTG,*)
-      INTEGER IPM(NPROPMI,*), ITAB(*)
-      INTEGER NOM_OPT(LNOPT1,*), NB_NODE
+      INTEGER IPM(NPROPMI,*)
+      INTEGER NB_NODE
       my_real XYZINI(3,NB_NODE), PM(NPROPM,*), XYZREF(3,NB_NODE)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IFV,
-     .        N, ITYP, NNS, NTG, NBRIC, NBX, NBY, NNB, IMESH,
+     .        N, ITYP, NNS, NTG, NBRIC, NBX, NBY, NNB,
      .        NBA, NTGA, NNA, 
      .        PFLAG, NNI, NTGI, ILVOUT, NNFV, NNT, NSURFI, 
      .        NSEG, IREF, NTRFV,  NPOLH, ID,
      .        NTGT, INODE
       INTEGER I
-      INTEGER J, IEL, IBID
-      INTEGER, DIMENSION(:), ALLOCATABLE :: TAGVENT,TMP
+      INTEGER IBID
       CHARACTER(len=nchartitle) :: TITR
       INTEGER, DIMENSION(:), ALLOCATABLE :: MINUS_SIGN_REVERSE
       my_real, DIMENSION(:,:), ALLOCATABLE :: X
@@ -132,7 +138,7 @@ C
 
             T_MONVOL(N)%KR5 = 1+NRVOLU*NVOLU+LRCBAG+LRBAGJET+LRBAGHOL+T_MONVOL(N)%IVOLU(34) + NNT*6
 C----------------------------------------------
-C Parametres de decoupage automatique du volume
+C Automatic volume cutting parameters
 C----------------------------------------------
             DIRX = T_MONVOL(N)%RVOLU(35)
             DIRY = T_MONVOL(N)%RVOLU(36)
@@ -185,7 +191,7 @@ C
             CALL FVMESH1(
      .           T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM, X, T_MONVOL(N)%IVOLU, FVDATA(IFV)%BRIC,
      .           FVDATA(IFV)%XB, T_MONVOL(N)%RVOLU, NTG, NTGI, NBRIC, FVDATA(IFV)%TBRIC,
-     .           FVDATA(IFV)%SFAC, FVDATA(IFV)%DLH, NBA, NTGA, NNA,
+     .           FVDATA(IFV)%SFAC, FVDATA(IFV)%DLH, NBA, NTGA,
      .           T_MONVOL(N)%TBRIC, T_MONVOL(N)%TFAC, T_MONVOL(N)%TAGELS, T_MONVOL(N)%IBUFA,
      .           T_MONVOL(N)%ELEMA, T_MONVOL(N)%TAGELA, IXS, ID ,TITR, NB_NODE, ITYP)
 
@@ -206,15 +212,15 @@ C
               NSURFI=T_MONVOL(N)%INT_SURFID
               NSEG=IGRSURF(NSURFI)%NSEG
 C-----------------------------
-C  Elements de surface interne
+C  Internal surface elements
 C-----------------------------
               T_MONVOL(N)%POROSITY(1:NTGI) = ZERO
               CALL FVELINTE(T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM(1, NTG + 1), IXC, IXTG,
      .                     PM, IPM, ILVOUT, IFV, NNT, NTG, T_MONVOL(N)%POROSITY,
-     .                     ITAB, NSEG,IGRSURF(NSURFI)%ELTYP, NTGI, T_MONVOL(N)%ELTG,
+     .                     NSEG,IGRSURF(NSURFI)%ELTYP, NTGI, T_MONVOL(N)%ELTG,
      .                     NB_NODE,IGRSURF(NSURFI)%ELEM)
 C--------------------------------
-C  Injecteurs sur surface interne
+C  Injectors on internal surface
 C--------------------------------
               ALLOCATE(MINUS_SIGN_REVERSE(NTGI))
               MINUS_SIGN_REVERSE(:) = 0
@@ -224,7 +230,7 @@ C--------------------------------
      .               T_MONVOL(N)%ITAGEL(NTG + 1), NNS+NNI          , NTGI,NB_NODE,
      .               MINUS_SIGN_REVERSE)
 C--------------------------------
-C  Porous surface sur surface interne
+C  Porous surface on internal surface
 C--------------------------------
               CALL FVVENTHOLEINT(
      .               T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM(1, NTG + 1), T_MONVOL(N)%IBAGHOL,
@@ -239,14 +245,14 @@ C        REDEFINE INTERNAL TRIANGLE FOR NORMAL CONSISTENCY FOR INJECTORS
 C-----------------------------------------------------------------------
               CALL FVINJNORMAL(
      .             T_MONVOL(N)%NODES, T_MONVOL(N)%ELEM(1, NTG + 1), IXC, IXTG, 
-     .             T_MONVOL(N)%ITAGEL(NTG + 1), T_MONVOL(N)%ELTG(NTG + 1), NTGI, ILVOUT, 
+     .             T_MONVOL(N)%ELTG(NTG + 1), NTGI, ILVOUT,
      .             MINUS_SIGN_REVERSE)
               DEALLOCATE(MINUS_SIGN_REVERSE)
               CALL FVELPRINT(
      .               IXC, IXTG, NTGI, T_MONVOL(N)%ITAGEL(NTG + 1), T_MONVOL(N)%ELTG(NTG + 1),
      .               T_MONVOL(N)%IBAGHOL,  ILVOUT , 1 )
 C------------------------------------------------------
-C  Tag element interne pour l'option /TH/SURF mass flow
+C  Tag internal element for /TH/SURF mass flow option
 C------------------------------------------------------
               DO I=1,NSURF
                 NSEG=IGRSURF(I)%NSEG
@@ -255,7 +261,7 @@ C------------------------------------------------------
               ENDDO
             ENDIF
 C---------------------------------
-C  Noeuds de briques additionnelles
+C  Additional brick nodes
 C---------------------------------  
             IF (NNA > 0) THEN
                NNFV = T_MONVOL(N)%IVOLU(46)
@@ -269,12 +275,12 @@ C------------------------------------
 C    REFERENCE METRICS : VOLUME CHECK
 C------------------------------------
             IF (IREF /= 0) THEN
-               CALL FVVOLU(IFV,     ITYP, NNFV,  NTRFV, NPOLH,
+               CALL FVVOLU( ITYP, NNFV,  NTRFV, NPOLH,
      1              T_MONVOL(N)%NODES, T_MONVOL(N)%IBUFA, T_MONVOL(N)%ELEMA, T_MONVOL(N)%TAGELA,
      2              XYZINI,      T_MONVOL(N)%IVOLU,   T_MONVOL(N)%RVOLU,
      3              FVDATA(IFV)%IFVNOD, FVDATA(IFV)%RFVNOD, FVDATA(IFV)%IFVTRI,
      4              FVDATA(IFV)%IFVPOLY,FVDATA(IFV)%IFVTADR,FVDATA(IFV)%IFVPOLH,
-     5              FVDATA(IFV)%IFVPADR,FVDATA(IFV)%IDPOLH, FVDATA(IFV)%MPOLH, 
+     5              FVDATA(IFV)%IFVPADR,FVDATA(IFV)%MPOLH,
      6              FVDATA(IFV)%EPOLH,  FVDATA(IFV)%VPOLH_INI )
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 
@@ -282,9 +288,9 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C----------------------------------------
 C    COMPUTE MINIMUM LENGTH FOR TIME STEP
 C----------------------------------------
-            CALL FVLENGTH(IFV,    NNFV,         NTRFV,        NPOLH,
+            CALL FVLENGTH(NNFV,         NTRFV,        NPOLH,
      1           T_MONVOL(N)%NODES, T_MONVOL(N)%IBUFA, T_MONVOL(N)%ELEMA, T_MONVOL(N)%TAGELA,
-     2           XYZINI,     T_MONVOL(N)%IVOLU,   T_MONVOL(N)%RVOLU,
+     2           XYZINI,     T_MONVOL(N)%IVOLU,
      3           FVDATA(IFV)%IFVNOD, FVDATA(IFV)%RFVNOD, FVDATA(IFV)%IFVTRI,
      4           FVDATA(IFV)%IFVPOLY,FVDATA(IFV)%IFVTADR,FVDATA(IFV)%IFVPOLH,
      5           FVDATA(IFV)%IFVPADR,FVDATA(IFV)%IBPOLH, FVDATA(IFV)%DLH    ) 
@@ -308,17 +314,16 @@ C
 
 
 
-      !||====================================================================
-      !||    applysort2fvm            ../starter/source/airbag/fvmesh0.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
-      !||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
-      !||    reorder_mod              ../starter/share/modules1/reorder_mod.F
-      !||====================================================================
-      SUBROUTINE APPLYSORT2FVM(T_MONVOL, IXS    , IXC,   IXTG,
-     1                         ITAB  , NOM_OPT, NB_NODE)
+!||====================================================================
+!||    applysort2fvm            ../starter/source/airbag/fvmesh0.F
+!||--- called by ------------------------------------------------------
+!||    lectur                   ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
+!||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
+!||    reorder_mod              ../starter/share/modules1/reorder_mod.F
+!||====================================================================
+      SUBROUTINE APPLYSORT2FVM(T_MONVOL)
 C Description: Apply renumbering to FVMBAGS (ELTG et TBA) 
 C after S*HEAD S*TAILS routines 
 C-----------------------------------------------
@@ -340,17 +345,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IXS(NIXS,*), IXC(NIXC,*), IXTG(NIXTG,*)
-      INTEGER ITAB(*)                        
-      INTEGER NOM_OPT(LNOPT1,*), NB_NODE
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(INOUT) :: T_MONVOL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: IFV, N, ITYP, NNS, NTG, NBA, NTGA, NNA, 
-     .     NNI, NTGI,  NNT,  IREF, ID, NTGT
-      INTEGER I, J, IEL, NJET, NODE_ID
-      INTEGER NJ1, NJ2, NJ3, P, NJ
+      INTEGER :: IFV, N, ITYP, NNS, NTG, NBA, NTGA, NNA, NNI, NTGI,  NNT,  IREF, ID, NTGT
+      INTEGER J, IEL
       INTEGER, DIMENSION(:), ALLOCATABLE :: TMP
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       IFV=0
@@ -371,7 +371,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
             NTGT = NTG + NTGI
 
 C----------------------------------------------
-C Parametres de decoupage automatique du volume
+C Parameters for automatic volume splitting
 C----------------------------------------------
 C           PERMUTATION ELTG
             IF (NTG > 0) THEN

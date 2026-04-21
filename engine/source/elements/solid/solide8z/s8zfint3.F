@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8zfint3   ../engine/source/elements/solid/solide8z/s8zfint3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
-      !||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
-      !||====================================================================
+!||====================================================================
+!||    s8zfint3   ../engine/source/elements/solid/solide8z/s8zfint3.F
+!||--- called by ------------------------------------------------------
+!||    s8cforc3   ../engine/source/elements/thickshell/solide8c/s8cforc3.F
+!||    s8zforc3   ../engine/source/elements/solid/solide8z/s8zforc3.F
+!||====================================================================
       SUBROUTINE S8ZFINT3(
      1   SIG,     SIGOR,   PX1,     PX2,
      2   PX3,     PX4,     PY1,     PY2,
@@ -62,7 +62,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      X   F13,     F23,     F33,     F14,
      Y   F24,     F34,     F15,     F25,
      Z   F35,     F16,     F26,     F36,
-     1   F17,     F27,     F37,     F18,
+     1   F17,     F27,     F37,     F18,  
      2   F28,     F38,     VOL,     QVIS,
      3   PP,      EINT,    RHO,     Q,
      4   DEFP,    EPSD,    EPSDM,   SIGM,
@@ -71,7 +71,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      7   OFF,     VOL0,    VOL0G,   G_PLA,
      8   G_EPSD,  JFAC,    EINTTH,  EINTTHM,
      9   IEXPAN,  NEL,     IDEG,    CONDE,
-     A   CONDEN,  MTN,     ISMSTR,  SVIS ,NODADT_THERM)
+     A   CONDEN,  MTN,     ISMSTR,  SVIS ,NODADT_THERM,
+     B   G_WPLA,  L_WPLA,  G_WPLA_FLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -133,11 +134,14 @@ C     REAL
      .   SIGM(NEL,6),EINTM(*),RHOM(*),QM(*),EPSD(*),EPSDM(*),
      .   VOLG(*),STI(*),STIN(*),OFF(*),VOL0(*),VOL0G(*),JFAC(*),
      .   EINTTH(*),EINTTHM(*),CONDE(MVSIZ),CONDEN(MVSIZ)
+      INTEGER, INTENT(IN) :: G_WPLA_FLAG
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
+      my_real,DIMENSION(NEL*G_WPLA_FLAG), INTENT(INOUT) :: G_WPLA
+      my_real,DIMENSION(NEL*G_WPLA_FLAG), INTENT(IN) :: L_WPLA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J
+      INTEGER I
 C     REAL
       my_real
      .   S1(MVSIZ), S2(MVSIZ), S3(MVSIZ),
@@ -240,7 +244,7 @@ C
         ENDDO
        ENDIF
 C----------------------------------------------    /
-C   - post-traitement-valeur moyenne au sens a'=(_/  a dv ) /v
+C   -Average post-processing in the sense A '= (_ / a dv) / V
       DO I=1,NEL
          FAC(I) = OFF(I)*VOL(I)/VOLG(I)
          SIGM(I,1) = SIGM(I,1) + FAC(I) * SIGOR(I,1)
@@ -251,6 +255,7 @@ C   - post-traitement-valeur moyenne au sens a'=(_/  a dv ) /v
          SIGM(I,6) = SIGM(I,6) + FAC(I) * SIGOR(I,6)
          RHOM(I)   = RHOM(I)   + FAC(I) * RHO(I)
          EINTM(I)  = EINTM(I)  + EINT(I)*VOL0(I)/VOL0G(I)
+         IF (G_WPLA_FLAG > 0) G_WPLA(I) = G_WPLA(I) + L_WPLA(I)
          QM(I)     = QM(I)     + FAC(I) * Q(I)
 C
          STIN(I)   = STIN(I)   + STI(I)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8bicp11    ../engine/source/elements/solid/solide8e/s8bicp11.F
-      !||--- called by ------------------------------------------------------
-      !||    s8ederi_2   ../engine/source/elements/solid/solide8e/s8ederi_2.F
-      !||====================================================================
+!||====================================================================
+!||    s8bicp11    ../engine/source/elements/solid/solide8e/s8bicp11.F
+!||--- called by ------------------------------------------------------
+!||    s8ederi_2   ../engine/source/elements/solid/solide8e/s8ederi_2.F
+!||====================================================================
       SUBROUTINE S8BICP11(
      1   PX1,     PX2,     PX3,     PX4,
      2   PX5,     PX6,     PX7,     PX8,
@@ -97,7 +97,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J 
+      INTEGER I 
 C     REAL
 C                                                                     12
       my_real

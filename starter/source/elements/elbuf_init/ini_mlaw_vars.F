@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ini_mlaw_vars          ../starter/source/elements/elbuf_init/ini_mlaw_vars.F
-      !||--- called by ------------------------------------------------------
-      !||    read_material_models   ../starter/source/materials/read_material_models.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ini_mlaw_vars          ../starter/source/elements/elbuf_init/ini_mlaw_vars.F
+!||--- called by ------------------------------------------------------
+!||    read_material_models   ../starter/source/materials/read_material_models.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
+!||====================================================================
       SUBROUTINE INI_MLAW_VARS(MLAW_TAG ,NUMMAT)
 C-----------------------------------------------
 C     M o d u l e s
@@ -49,12 +49,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IMAT,ILAW
+      INTEGER IMAT
       TYPE(MLAW_TAG_)    , POINTER :: MTAG
 C=======================================================================
 C     Set default variables used in all matarial laws
 C=======================================================================
-c      attention, apres la lecture de mats, remtettre     zero tout pour la loi 0 (void)
+c      note, after reading mats, reset everything to zero for law 0 (void)
 
       DO IMAT = 1,NUMMAT
         MTAG => MLAW_TAG(IMAT)
@@ -63,7 +63,7 @@ c       global variables - scalars
         MTAG%G_EINS   = 0 
         MTAG%G_RHO    = 0   ! G_RHO > 0 only for solids   
         MTAG%G_DELTAX = 0 
-        MTAG%G_EPSD   = 0 
+        MTAG%G_EPSD   = 1 
         MTAG%G_EPSQ   = 0
         MTAG%G_PLA    = 0 
         MTAG%G_TEMP   = 0 
@@ -103,6 +103,8 @@ C
         MTAG%G_NUVAR    = 0                                                                      
         MTAG%G_MASS     = 0
         MTAG%G_SKEW_ID  = 0
+        MTAG%G_YIELD_IN_COMP  = 0
+        MTAG%G_XXOLD_IN_COMP  = 0
 c---
 c       for seatbelt elements
 c---

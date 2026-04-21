@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,45 +20,46 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdkforc3            ../engine/source/elements/sh3n/coquedk/cdkforc3.F
-      !||--- called by ------------------------------------------------------
-      !||    forintc             ../engine/source/elements/forintc.F
-      !||--- calls      -----------------------------------------------------
-      !||    c3bilan             ../engine/source/elements/sh3n/coque3n/c3bilan.F
-      !||    c3updt3             ../engine/source/elements/sh3n/coque3n/c3updt3.F
-      !||    c3updt3p            ../engine/source/elements/sh3n/coque3n/c3updt3.F
-      !||    cbavisc             ../engine/source/elements/shell/coqueba/cbavisc.F
-      !||    cdkcoor3            ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
-      !||    cdkcurv3            ../engine/source/elements/sh3n/coquedk/cdkdefo3.F
-      !||    cdkdefo3            ../engine/source/elements/sh3n/coquedk/cdkdefo3.F
-      !||    cdkderi3            ../engine/source/elements/sh3n/coquedk/cdkderi3.F
-      !||    cdkderic3           ../engine/source/elements/sh3n/coquedk/cdkderi3.F
-      !||    cdkfcum3            ../engine/source/elements/sh3n/coquedk/cdkfcum3.F
-      !||    cdkfint3            ../engine/source/elements/sh3n/coquedk/cdkfint3.F
-      !||    cdkfint_reg         ../engine/source/elements/sh3n/coquedk/cdkfint_reg.F
-      !||    cdkstra3            ../engine/source/elements/sh3n/coquedk/cdkstra3.F
-      !||    cmain3              ../engine/source/materials/mat_share/cmain3.F
-      !||    cncoef3             ../engine/source/elements/sh3n/coquedk/cncoef3.F
-      !||    cndt3               ../engine/source/elements/sh3n/coquedk/cndt3.F
-      !||    dtcdk_reg           ../engine/source/elements/sh3n/coquedk/dtcdk_reg.F
-      !||    dttherm             ../engine/source/time_step/dttherm.F90
-      !||    set_failwave_nod3   ../engine/source/materials/fail/failwave/set_failwave_nod3.F
-      !||    set_failwave_sh3n   ../engine/source/materials/fail/failwave/upd_failwave_sh3n.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod           ../engine/share/modules/drape_mod.F
-      !||    dt_mod              ../engine/source/modules/dt_mod.F
-      !||    dttherm_mod         ../engine/source/time_step/dttherm.F90
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    failwave_mod        ../common_source/modules/failwave_mod.F
-      !||    glob_therm_mod      ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    nlocal_reg_mod      ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
-      !||    stack_mod           ../engine/share/modules/stack_mod.F
-      !||    table_mod           ../engine/share/modules/table_mod.F
-      !||    timer_mod           ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    cdkforc3            ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+!||--- called by ------------------------------------------------------
+!||    forintc             ../engine/source/elements/forintc.F
+!||--- calls      -----------------------------------------------------
+!||    c3bilan             ../engine/source/elements/sh3n/coque3n/c3bilan.F
+!||    c3updt3             ../engine/source/elements/sh3n/coque3n/c3updt3.F
+!||    c3updt3p            ../engine/source/elements/sh3n/coque3n/c3updt3.F
+!||    cbavisc             ../engine/source/elements/shell/coqueba/cbavisc.F
+!||    cdkcoor3            ../engine/source/elements/sh3n/coquedk/cdkcoor3.F
+!||    cdkcurv3            ../engine/source/elements/sh3n/coquedk/cdkdefo3.F
+!||    cdkdefo3            ../engine/source/elements/sh3n/coquedk/cdkdefo3.F
+!||    cdkderi3            ../engine/source/elements/sh3n/coquedk/cdkderi3.F
+!||    cdkderic3           ../engine/source/elements/sh3n/coquedk/cdkderi3.F
+!||    cdkfcum3            ../engine/source/elements/sh3n/coquedk/cdkfcum3.F
+!||    cdkfint3            ../engine/source/elements/sh3n/coquedk/cdkfint3.F
+!||    cdkfint_reg         ../engine/source/elements/sh3n/coquedk/cdkfint_reg.F
+!||    cdkstra3            ../engine/source/elements/sh3n/coquedk/cdkstra3.F
+!||    cmain3              ../engine/source/materials/mat_share/cmain3.F
+!||    cncoef3             ../engine/source/elements/sh3n/coquedk/cncoef3.F
+!||    cndt3               ../engine/source/elements/sh3n/coquedk/cndt3.F
+!||    dtcdk_reg           ../engine/source/elements/sh3n/coquedk/dtcdk_reg.F
+!||    dttherm             ../engine/source/time_step/dttherm.F90
+!||    set_failwave_nod3   ../engine/source/materials/fail/failwave/set_failwave_nod3.F
+!||    set_failwave_sh3n   ../engine/source/materials/fail/failwave/upd_failwave_sh3n.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod           ../engine/share/modules/drape_mod.F
+!||    dt_mod              ../engine/source/modules/dt_mod.F
+!||    dttherm_mod         ../engine/source/time_step/dttherm.F90
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    failwave_mod        ../common_source/modules/failwave_mod.F
+!||    glob_therm_mod      ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    nlocal_reg_mod      ../common_source/modules/nlocal_reg_mod.F
+!||    sensor_mod          ../common_source/modules/sensor_mod.F90
+!||    stack_mod           ../engine/share/modules/stack_mod.F
+!||    table_mod           ../engine/share/modules/table_mod.F
+!||    timer_mod           ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE CDKFORC3(TIMERS,
      1   ELBUF_STR,   JFT,         JLT,         PM,
      2   IXTG,        X,           F,           M,
@@ -83,7 +84,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      L   NLOC_DMG,    INDX_DRAPE,  IGRE,        JTUR,
      M   DT,          NCYCLE,      SNPC,        STF,
      M   GLOB_THERM,  NXLAYMAX,    IDEL7NOK,    USERL_AVAIL,
-     N   MAXFUNC,     SBUFMAT)
+     N   MAXFUNC,     SBUFMAT,IPART     ,LIPART1 )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -99,6 +100,7 @@ C-----------------------------------------------
       use glob_therm_mod
       use dttherm_mod
       USE TIMER_MOD
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -156,18 +158,23 @@ C     REAL
       TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
       TYPE (DT_), INTENT(IN) :: DT
       type (glob_therm_) ,intent(inout) :: glob_therm
+      INTEGER, INTENT(IN)  :: LIPART1
+      INTEGER, DIMENSION(LIPART1, NPART ), INTENT(IN)     :: IPART
+   
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-c  indx utilise localement contrairement aux coques 4n 
+c  Indx uses locally unlike 4N shells 
       INTEGER MAT(MVSIZ),PID(MVSIZ),NGL(MVSIZ),INDX(MVSIZ),FWAVE_EL(NEL),
-     .   IFLAG,LENF,LENM,LENS,IR,IS,IT,IPT,NPTT,N1,N2,N3,
-     .   I,II,J,JJ,NG,NPG,NNOD,NPTR,NPTS,NLAY,L_DIRA,L_DIRB,IFAILWAVE,
-     .   PT0,PT1,PT2,PT3,PTF,PTM,PTE,PTEP,PTS,IGTYP,IBID,J1,J2,
+     . LENF,LENM,LENS,IR,IS,IT,NPTT,IMAT,
+     . I,J,NG,NPG,NNOD,NLAY,L_DIRA,L_DIRB,IFAILWAVE,
+     . PT1,PT2,PT3,PTF,PTM,PTS,IGTYP,IBID,J1,J2,
      .   IGMAT,ILAY,NPTTOT,IREP,KK(5),K,IDRAPE,ACTIFXFEM,SEDRAPE,NUMEL_DRAPE
       INTEGER, DIMENSION(NEL) :: OFFLY
       PARAMETER (NPG = 3)
       PARAMETER (NNOD = 3)
+      my_real, dimension(mvsiz) :: epsd_pg,epsd_glob
+      my_real :: dtinv,asrate,eps_m2,eps_k2
       my_real 
      .   STI(MVSIZ),STIR(MVSIZ),RHO(MVSIZ),
      .   SSP(MVSIZ),VISCMX(MVSIZ),AREA(MVSIZ),AREA2(MVSIZ),
@@ -178,7 +185,7 @@ c  indx utilise localement contrairement aux coques 4n
      .   NU(MVSIZ) , SHF(MVSIZ), DT1C(MVSIZ),
      .   G(MVSIZ)   , YM(MVSIZ)  , A11(MVSIZ)   , A12(MVSIZ),
      .   VOL0(MVSIZ),THK02(MVSIZ),ZCFAC(MVSIZ,2), GS(MVSIZ),
-     .   VOL00(MVSIZ),ALPE(MVSIZ),A_HAMMER(3,2),ONE_OVER_3,O2_3TH,
+     . VOL00(MVSIZ),ALPE(MVSIZ),A_HAMMER(3,2),
      .   R11(MVSIZ),R12(MVSIZ),R13(MVSIZ),R21(MVSIZ),R22(MVSIZ),
      .   R23(MVSIZ),R31(MVSIZ),R32(MVSIZ),R33(MVSIZ),ALDT(MVSIZ),
      .   VLX(MVSIZ,2),VLY(MVSIZ,2),VLZ(MVSIZ,2),RLX(MVSIZ,3),RLY(MVSIZ,3),
@@ -186,14 +193,14 @@ c  indx utilise localement contrairement aux coques 4n
      .   BZ1(MVSIZ,2),BZ2(MVSIZ,2),BZ3(MVSIZ,2), BRX1(MVSIZ,3),
      .   BRX2(MVSIZ,3),BRX3(MVSIZ,3),BRY1(MVSIZ,3),BRY2(MVSIZ,3),
      .   BRY3(MVSIZ,3),AMU(MVSIZ),CDET(MVSIZ),VDEF(MVSIZ,8),DIE(MVSIZ), 
-     .   TEMPEL(MVSIZ),KRZ(MVSIZ),DIR1_CRK(NPT,MVSIZ),
-     .   DIR2_CRK(NPT,MVSIZ),CONDE(MVSIZ),A11R(MVSIZ)
+     . TEMPEL(MVSIZ),KRZ(MVSIZ),
+     . CONDE(MVSIZ),A11R(MVSIZ)
       my_real, 
      .   DIMENSION(1),TARGET :: BID
       my_real
-     .   X1G(MVSIZ), X2G(MVSIZ), X3G(MVSIZ),
-     .   Y1G(MVSIZ), Y2G(MVSIZ), Y3G(MVSIZ),
-     .   Z1G(MVSIZ), Z2G(MVSIZ), Z3G(MVSIZ),
+     .
+     .
+     .
      .   X2L(MVSIZ),Y2L(MVSIZ),X3L(MVSIZ),Y3L(MVSIZ)
        my_real , DIMENSION(NEL) ::  ZOFFSET
       my_real, 
@@ -202,8 +209,9 @@ c  indx utilise localement contrairement aux coques 4n
      .  DIMENSION(:) ,POINTER  :: DIR_A,DIR_B,CRKDIR,DADV
 !     variables for heat transfer
       my_real, dimension(mvsiz) :: fheat
+      my_real, dimension(mvsiz) :: ssp_eq
 !
-C--- Variables pour le non-local
+C--- Variables for non-local
       INTEGER :: NDDL, INOD(3),NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), L_NLOC, IPOS(3),INLOC
       my_real, DIMENSION(:,:), ALLOCATABLE :: VAR_REG
       my_real, DIMENSION(:), POINTER :: DNL,UNL
@@ -212,32 +220,14 @@ C--- Variables pour le non-local
       INTEGER SDIR_A    ! Size of DIR_A
       INTEGER SDIR_B    ! Size of DIR_B
 C-----
-      TYPE(BUF_LAY_) ,POINTER :: BUFLY
+ 
       TYPE(G_BUFEL_) ,POINTER :: GBUF
-      TYPE(L_BUFEL_) ,POINTER :: LBUF1,LBUF2,LBUF3 ,LBUF
+ 
       TYPE(L_BUFEL_DIR_) ,POINTER :: LBUF_DIR    
 C-----------------------------------------------
       DATA A_HAMMER / 
      1 0.166666666666667,0.666666666666667,0.166666666666667,             
      2 0.166666666666667,0.166666666666667,0.666666666666667/
-C=======================================================================
-C GENERALIZED STRAINS ARE SAVED AT NB8 (GENERALIZED FOR ALL MATERIALS)
-C
-C     NB1    |5*JLT    | FORCES  
-C     NB2    |3*JLT    | MOMENTS
-C     NB3    |JLT      | THK0
-C     NB4    |5*JLT    | UNUSED : ONLY FOR FINDING OFF
-C     NB5    |2*JLT    | ENERGIES
-C     NB6    |JLT      | OFF
-C     NB8    |8*JLT    | DEFORMATIONS
-C     NB10   |5*NPT*JLT         | Contraintes moyennes->post  
-C     NB11   |max(1,npt)*JLT    | def plastique moyennes->post
-C     NB12   |8*NPG*JLT         | contraintes generalisees 
-C     NB13   |8*NPG*JLT         | def generalise
-C     NB14   |max(1,npt)*NPG*JLT| def plastique
-C     NB15   |5*NPG*NPT*JLT     | contraintes pour laws et npt >0
-C     NB16   |2*NPT*JLT         | axe I  d'orthotropie/anisotropie
-C     NB16A  |2*NPT*JLT         | axe II d'anisotropie
 C=======================================================================
       GBUF   => ELBUF_STR%GBUF
       IDRAPE = ELBUF_STR%IDRAPE
@@ -369,12 +359,13 @@ C
       CALL CDKDEFO3(JFT,JLT,VLX,VLY,PX2,PY2,PX3,PY3,EXX,EYY,EXY,
      1              EXZ, EYZ,DT1,EPSDOT,NFT,ISTRAIN,GBUF%STRA,VDEF,NEL)
 C-----------------------------------------------
-C     BOUCLE SUR POINTS D'INTEGRATION DE GAUSS
+C     LOOP OVER GAUSS INTEGRATION POINTS
 C-----------------------------------------------
       LENF = NEL*GBUF%G_FORPG/NPG
       LENM = NEL*GBUF%G_MOMPG/NPG
       LENS = NEL*GBUF%G_STRPG/NPG
       IT   = 1
+      epsd_glob(1:nel) = zero      
 c
       DO NG =1,NPG
         IR = NG
@@ -420,6 +411,23 @@ c-------------------------------------------
            ENDDO
          ENDDO
        ENDIF
+!-------------------------------------------------------------------------------
+!       global element strain rate (shell energy equivalent) - by Gauss points
+!-----------------------------------------------------------
+!       e = 1/t integ[1/2 e (eps_m + k z)^2 dz ]
+!       e = 1/2 e eps_eq^2
+!       eps_eq = sqrt[ eps_m^2 + 1/12 k^2t^2 ]
+!-------------------------------------------------------------------------------
+      dt1 = dt1c(1)
+      dtinv = dt1 / max(dt1**2,em20)  ! inverse of dt
+#include "vectorize.inc"
+      do i = 1,nel
+        eps_k2 = (kxx(i)**2+kyy(i)**2+kxx(i)*kyy(i)+fourth*kxy(i)**2)
+     .         * one_over_9*gbuf%thk(i)**2
+        eps_m2 = four_over_3*(exx(i)**2+eyy(i)**2+exx(i)*eyy(i) + fourth*exy(i)**2)
+        epsd_pg(i) = sqrt(eps_k2 + eps_m2)*dtinv
+        epsd_glob(i) = epsd_glob(i) + epsd_pg(i) / npg
+      end do
 C----------------------------------------------------------------------------
        CALL CMAIN3(TIMERS,
      1     ELBUF_STR ,JFT       ,JLT       ,NFT       ,IPARG      ,
@@ -432,7 +440,7 @@ C----------------------------------------------------------------------------
      8     GBUF%FORPG(PTF),GBUF%MOMPG(PTM) ,GBUF%STRPG(PTS),FAILWAVE,FWAVE_EL,
      9     GBUF%THK  ,GBUF%EINT ,IOFC      ,
      A     G         ,A11       ,A12       ,VOL0      ,INDX      ,
-     B     NGL       ,ZCFAC     ,SHF       ,GS        ,GBUF%EPSD ,
+     B     NGL       ,ZCFAC     ,SHF       ,GS        ,EPSD_PG   ,
      C     KFTS      ,IHBE      ,ALPE      ,
      D     DIR_A     ,DIR_B     ,IGEO      ,
      E     IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
@@ -442,7 +450,7 @@ C----------------------------------------------------------------------------
      I     BID       ,BID       ,BID       ,R11       ,R12       ,
      J     R13       ,R21       ,R22       ,R23       ,R31       ,
      K     R32       ,R33       ,NG        ,TABLE     ,IBID      ,
-     L     BID       ,SENSORS   ,BID       ,IBID      ,
+     L     BID       ,SENSORS   ,IBID       ,IBID      ,
      M     BID       ,BID       ,ALDT      ,GLOB_THERM%IDT_THERM ,GLOB_THERM%THEACCFACT,
      N     ISMSTR    ,IR        ,IS        ,NLAY      ,NPT       ,
      O     IBID      ,IBID      ,ISUBSTACK ,STACK     ,
@@ -450,7 +458,8 @@ C----------------------------------------------------------------------------
      R    INDX_DRAPE ,THKE      ,SEDRAPE     ,NUMEL_DRAPE ,DT   ,
      Q    NCYCLE     ,SNPC      ,  STF ,
      S    NXLAYMAX   ,IDEL7NOK  ,USERL_AVAIL ,MAXFUNC     ,NPTTOT,
-     T    SBUFMAT    ,SDIR_A    ,SDIR_B)
+     T    SBUFMAT    ,SDIR_A    ,SDIR_B,  GBUF%FORPG_G(PTF),SSP_EQ,
+     X    IPART      ,LIPART1   ,IPARTTG   )
 C----------------------------------------------------------------------------
 C     THICKNESS CORRECTION 
 C----------------------------
@@ -463,7 +472,7 @@ C----------------------------
 C----------------------------------------------------------------------------
 C     FORCES VISCOCITE 
 C----------------------------
-C       uniquement membranaire pour l'instant--------
+C       only membrane for the moment --------
       CALL CBAVISC(JFT     ,JLT            ,VDEF           ,AMU ,OFF ,
      2             SHF     ,NU             ,RHO            ,SSP ,CDET,
      3             THK0    ,GBUF%FORPG(PTF),GBUF%MOMPG(PTM),IUN ,MTN ,
@@ -494,9 +503,14 @@ c-------------------------------
       ENDDO  !  NG = 1,NPG
 C----
 C----------------------------------------------------------------------------
-C     FIN DE BOUCLE DE 3 POINTS DE INTEGRATION------------
+C     END OF LOOP OF 3 INTEGRATION POINTS------------
 C----------------------------------------------------------------------------
-C     POST-TRAITEMENT - valeurs moyennes
+!     global element strain rate filtering for output
+
+      asrate = one   ! to be changed for default value
+      gbuf%epsd(1:nel) = asrate * epsd_glob(1:nel) + (one - asrate) * gbuf%epsd(1:nel)      
+!-------------------------------------------------------------------------------
+C     Post -processing - Average values
 C----------------------------
 C---
 C    = FOR, MOM =
@@ -529,7 +543,7 @@ C-------------------------
      3              M11,M12,M13,M21,M22,M23,M31,M32,M33)
 C 
 C--------------------------
-C     PAS DE TEMPS
+C     TIME STEP
 C--------------------------
       CALL CNDT3(
      1        JFT    ,JLT    ,OFF      ,DT2T    ,AMU     ,
@@ -539,12 +553,13 @@ C--------------------------
      5        IOFC   ,NNOD   ,AREA     ,G       ,SHF   ,
      6        MSTG   ,DMELTG ,JSMS     ,PTG     ,IGTYP ,
      7        IGMAT  ,A11R   ,GBUF%G_DT, GBUF%DT,MTN   ,
-     8        PM     ,MAT(JFT),NEL     ,ZOFFSET  )
+     8        PM     ,MAT(JFT),NEL     ,ZOFFSET ,SSP_EQ )
 C--------------------------
 C     THERMAL TIME STEP
 C--------------------------
+        imat = mat(1)
         IF (JTHE /= 0 .AND. GLOB_THERM%IDT_THERM == 1) THEN
-           call dttherm(nel     ,pm(1,mat(1))  ,npropm  ,glob_therm   ,
+           call dttherm(nel     ,pm(1,imat),npropm,glob_therm,mat_elem%mat_param(imat),
      .                  jtur    ,tempel  ,vol0    ,rho       ,
      .                  aldt    ,off     ,conde   ,gbuf%re   ,gbuf%rk )
          ENDIF
@@ -556,7 +571,7 @@ C     NON-LOCAL TIME STEP
       ENDIF 
 C--------------------------
 C--------------------------
-C     BILANS PAR MATERIAU
+C     BALANCES BY MATERIAL
 C--------------------------
 c      IFLAG=MOD(NCYCLE,NCPRI)
       IF(IPRI>0) 
@@ -568,7 +583,8 @@ c      IFLAG=MOD(NCYCLE,NCPRI)
      5   GRTH,       IGRTH,      OFF,        IBID,
      6   IBID,       IBID,       IBID,       IBID,
      7   IBID,       GBUF%EINTTH,ITASK,      MAT,
-     8   GBUF%VOL,   ACTIFXFEM,  IGRE,SENSORS)
+     8   GBUF%VOL,   ACTIFXFEM,  IGRE,       SENSORS,
+     9   NEL,        GBUF%G_WPLA,GBUF%WPLA)
 c
       IF (IPARIT == 0) THEN
         CALL C3UPDT3(JFT  ,JLT  ,F   ,M   ,NVC  ,

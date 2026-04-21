@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    w_line_str             ../engine/source/output/restart/w_line_str.F
-      !||--- called by ------------------------------------------------------
-      !||    wrrestp                ../engine/source/output/restart/wrrestp.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl                ../engine/source/input/freform.F
-      !||    write_i_c              ../common_source/tools/input_output/write_routtines.c
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    w_line_str             ../engine/source/output/restart/w_line_str.F
+!||--- called by ------------------------------------------------------
+!||    wrrestp                ../engine/source/output/restart/wrrestp.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl                ../engine/source/input/freform.F
+!||    write_i_c              ../common_source/tools/input_output/write_routines.c
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod           ../common_source/modules/groupdef_mod.F
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE W_LINE_STR(IGRSLIN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -54,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ISU,I,J,K,ERR,L_SLIN,ID,NSEG,TYPE,PROC,
+      INTEGER ISU,J,K,ERR,L_SLIN,ID,NSEG,TYPE,PROC,
      .        LEVEL,NSEG_R2R_ALL,NSEG_R2R_SHARE,
      .        NODE,ELTYP,ELEM,ITITLE(LTITR)
       CHARACTER(LEN=NCHARTITLE) :: TITR

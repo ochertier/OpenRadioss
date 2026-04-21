@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_tensstrain_b   ../engine/source/materials/fail/tensstrain/fail_tensstrain_b.F
-      !||--- called by ------------------------------------------------------
-      !||    fail_beam3          ../engine/source/elements/beam/fail_beam3.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter              ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    fail_tensstrain_b   ../engine/source/materials/fail/tensstrain/fail_tensstrain_b.F
+!||--- called by ------------------------------------------------------
+!||    fail_beam3          ../engine/source/elements/beam/fail_beam3.F
+!||--- calls      -----------------------------------------------------
+!||    finter              ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE FAIL_TENSSTRAIN_B(
      .           NEL      ,NGL      ,NUPARAM  ,UPARAM   ,
      .           TIME     ,EPSD     ,OFF      ,DFMAX    ,       
      .           TDEL     ,IOUT     ,ISTDO    ,IFUNC    ,
      .           EPSXX    ,AL       ,TSTAR    , 
      .           SNPC     ,NPF      ,STF      , 
-     .           TF       ,ISMSTR   ,NUVAR    ,UVAR     )
+     .           TF       ,ISMSTR   ,NUVAR    ,UVAR     ,
+     .           DMGSCL )
 C-----------------------------------------------
 c    tens strain failure model for integrated beams (TYPE 18) !irup=10
 C-----------------------------------------------
@@ -65,10 +66,11 @@ C-----------------------------------------------
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: AL
       my_real ,DIMENSION(NEL)     ,INTENT(IN)    :: EPSXX
       my_real ,DIMENSION(STF)     ,INTENT(IN)    :: TF
-      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: OFF     ! element desactivation flag
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: OFF     ! element deactivation flag
       my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: DFMAX   ! maximum damage
-      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: TDEL    ! desactivation time
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT) :: TDEL    ! deactivation time
       my_real ,DIMENSION(NEL,NUVAR),INTENT(INOUT) :: UVAR   
+      my_real, DIMENSION(NEL)     ,INTENT(INOUT) :: DMGSCL 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -317,8 +319,15 @@ c
 C-------------------
 c---  Maximum Damage for output : 0 < DFMAX < 1
       DO I=1,NEL
-        DFMAX(I)     = MAX(DFMAX(I), DAMAGE(I))
-      ENDDO           
+        R1 = EPSF1
+        R2 = EPSF2
+        IF (R1 < R2) THEN    
+          DMGSCL(I) = ONE - DAMAGE(I)
+        ENDIF
+        DFMAX(I) = MAX(DFMAX(I),DAMAGE(I))  ! Maximum Damage storing for output : 0 < DFMAX < 1
+      ENDDO     
+      
+
 C-------------------       
 c------------------------
 c     print

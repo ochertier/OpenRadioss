@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,48 +20,49 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cforc3_crk       ../engine/source/elements/xfem/cforc3_crk.F
-      !||--- called by ------------------------------------------------------
-      !||    forintc          ../engine/source/elements/forintc.F
-      !||--- calls      -----------------------------------------------------
-      !||    cbilan           ../engine/source/elements/shell/coque/cbilan.F
-      !||    ccoef3           ../engine/source/elements/shell/coque/ccoef3.F
-      !||    ccoor3_crk       ../engine/source/elements/xfem/ccoor3_crk.F
-      !||    ccurv3           ../engine/source/elements/shell/coque/ccurv3.F
-      !||    cdefo3           ../engine/source/elements/shell/coque/cdefo3.F
-      !||    cderi3           ../engine/source/elements/shell/coque/cderi3.F
-      !||    cdlen3           ../engine/source/elements/shell/coque/cdlen3.F
-      !||    cdt3             ../engine/source/elements/shell/coque/cdt3.F
-      !||    cfint3           ../engine/source/elements/shell/coque/cfint3.F
-      !||    chsti3           ../engine/source/elements/shell/coque/chsti3.F
-      !||    chvis3           ../engine/source/elements/shell/coque/chvis3.F
-      !||    cmain3           ../engine/source/materials/mat_share/cmain3.F
-      !||    cnvec3           ../engine/source/elements/shell/coque/cnvec3.F
-      !||    cpxpy3           ../engine/source/elements/shell/coque/cpxpy3.F
-      !||    csens3           ../engine/source/elements/shell/coque/csens3.F
-      !||    cssp2a11         ../engine/source/elements/sh3n/coque3n/cssp2a11.F
-      !||    cstra3           ../engine/source/elements/shell/coque/cstra3.F
-      !||    cupdt3_crk       ../engine/source/elements/xfem/xfemfsky.F
-      !||    mhvis3           ../engine/source/airbag/mhvis3.F
-      !||    startime         ../engine/source/system/timer_mod.F90
-      !||    stoptime         ../engine/source/system/timer_mod.F90
-      !||    tempcg           ../engine/source/materials/mat_share/tempcg.F
-      !||    thermc           ../engine/source/materials/mat_share/thermc.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod    ../engine/share/modules/crackxfem_mod.F
-      !||    drape_mod        ../engine/share/modules/drape_mod.F
-      !||    dt_mod           ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    failwave_mod     ../common_source/modules/failwave_mod.F
-      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||    stack_mod        ../engine/share/modules/stack_mod.F
-      !||    table_mod        ../engine/share/modules/table_mod.F
-      !||    timer_mod        ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    cforc3_crk       ../engine/source/elements/xfem/cforc3_crk.F
+!||--- called by ------------------------------------------------------
+!||    forintc          ../engine/source/elements/forintc.F
+!||--- calls      -----------------------------------------------------
+!||    cbilan           ../engine/source/elements/shell/coque/cbilan.F
+!||    ccoef3           ../engine/source/elements/shell/coque/ccoef3.F
+!||    ccoor3_crk       ../engine/source/elements/xfem/ccoor3_crk.F
+!||    ccurv3           ../engine/source/elements/shell/coque/ccurv3.F
+!||    cdefo3           ../engine/source/elements/shell/coque/cdefo3.F
+!||    cderi3           ../engine/source/elements/shell/coque/cderi3.F
+!||    cdlen3           ../engine/source/elements/shell/coque/cdlen3.F
+!||    cdt3             ../engine/source/elements/shell/coque/cdt3.F
+!||    cfint3           ../engine/source/elements/shell/coque/cfint3.F
+!||    chsti3           ../engine/source/elements/shell/coque/chsti3.F
+!||    chvis3           ../engine/source/elements/shell/coque/chvis3.F
+!||    cmain3           ../engine/source/materials/mat_share/cmain3.F
+!||    cnvec3           ../engine/source/elements/shell/coque/cnvec3.F
+!||    cpxpy3           ../engine/source/elements/shell/coque/cpxpy3.F
+!||    csens3           ../engine/source/elements/shell/coque/csens3.F
+!||    cssp2a11         ../engine/source/elements/sh3n/coque3n/cssp2a11.F
+!||    cstra3           ../engine/source/elements/shell/coque/cstra3.F
+!||    cupdt3_crk       ../engine/source/elements/xfem/xfemfsky.F
+!||    mhvis3           ../engine/source/airbag/mhvis3.F
+!||    startime         ../engine/source/system/timer_mod.F90
+!||    stoptime         ../engine/source/system/timer_mod.F90
+!||    tempcg           ../engine/source/materials/mat_share/tempcg.F
+!||    thermc           ../engine/source/materials/mat_share/thermc.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod    ../engine/share/modules/crackxfem_mod.F
+!||    drape_mod        ../engine/share/modules/drape_mod.F
+!||    dt_mod           ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||    failwave_mod     ../common_source/modules/failwave_mod.F
+!||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||    stack_mod        ../engine/share/modules/stack_mod.F
+!||    table_mod        ../engine/share/modules/table_mod.F
+!||    timer_mod        ../engine/source/system/timer_mod.F90
+!||====================================================================
        SUBROUTINE CFORC3_CRK(TIMERS, XFEM_STR,
      1            JFT    ,JLT    ,PM    ,IXC   ,X      ,
      2            F      ,M      ,V     ,VR    ,FAILWAVE,
@@ -86,7 +87,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      N            ISUBSTACK,UXINT_MEAN,UYINT_MEAN,UZINT_MEAN,NLEVXF,
      O            NODEDGE,CRKEDGE,DRAPE_SH4N,IPRI  ,NLOC_DMG,INDX_DRAPE, IGRE,
      P            DT     ,SNPC      ,  STF   ,GLOB_THERM, 
-     Q            USERL_AVAIL,MAXFUNC,SBUFMAT)
+     Q            USERL_AVAIL,MAXFUNC,SBUFMAT,IPART    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -102,6 +103,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE DT_MOD
       use glob_therm_mod
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -167,11 +169,14 @@ C     REAL
       TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
       TYPE (DT_), INTENT(IN) :: DT
       type (glob_therm_) ,intent(inout) :: glob_therm
+     
+      INTEGER, DIMENSION(LIPART1, NPART), INTENT(IN)     :: IPART
+     
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IGTYP,ICSEN,IXLAY,NXLAY,NLAYER,IFLAG,IUN,NPG,NPTT,IBID,
-     .   IR,IS,IT,IPT,NG,L_DIRA,L_DIRB,J1,J2,ILEV,IGMAT,IPTHK,IREP,
+      INTEGER I,IGTYP,ICSEN,IXLAY,NXLAY,NLAYER,IUN,NPG,NPTT,IBID,
+     .   IR,IS,IT,NG,L_DIRA,L_DIRB,J1,J2,ILEV,IGMAT,IPTHK,IREP,
      .   ACTIFXFEM,SEDRAPE,NUMEL_DRAPE
       INTEGER MAT(MVSIZ),PID(MVSIZ),NDT(MVSIZ),NGL(MVSIZ),FWAVE(MVSIZ)
 C
@@ -182,8 +187,8 @@ C
      .   VX1(MVSIZ),VX2(MVSIZ),VX3(MVSIZ),VX4(MVSIZ),
      .   VY1(MVSIZ),VY2(MVSIZ),VY3(MVSIZ),VY4(MVSIZ),
      .   VZ1(MVSIZ),VZ2(MVSIZ),VZ3(MVSIZ),VZ4(MVSIZ),
-     .   VX13(MVSIZ),VX24(MVSIZ),VY13(MVSIZ),VY24(MVSIZ),
-     .   VZ13(MVSIZ),VZ24(MVSIZ),THK02(MVSIZ), 
+     .   
+     .   THK02(MVSIZ), 
      .   X1G(MVSIZ),X2G(MVSIZ),X3G(MVSIZ),X4G(MVSIZ),
      .   Y1G(MVSIZ),Y2G(MVSIZ),Y3G(MVSIZ),Y4G(MVSIZ),
      .   Z1G(MVSIZ),Z2G(MVSIZ),Z3G(MVSIZ),Z4G(MVSIZ),
@@ -198,8 +203,8 @@ C
      .   VL1(MVSIZ,3),VL2(MVSIZ,3),VL3(MVSIZ,3),VL4(MVSIZ,3),
      .   VRL1(MVSIZ,3),VRL2(MVSIZ,3),VRL3(MVSIZ,3),VRL4(MVSIZ,3), 
      .   DT1C(MVSIZ),DT2C(MVSIZ),ALDT(MVSIZ),ALPE(MVSIZ),VHX(MVSIZ),
-     .   VHY(MVSIZ),DSUB(MVSIZ,3,4),DRSUB(MVSIZ,3,4),TSUB(MVSIZ),
-     .   DTCSUB(MVSIZ),AREAS(MVSIZ),A_I(MVSIZ)
+     .   VHY(MVSIZ),
+     .   DTCSUB(MVSIZ),A_I(MVSIZ)
       my_real 
      .   H1(MVSIZ),H2(MVSIZ),H3(MVSIZ),VOL0(MVSIZ),VOL00(MVSIZ),
      .   H11(MVSIZ),H12(MVSIZ),H13(MVSIZ),H14(MVSIZ),  
@@ -225,6 +230,7 @@ C---
       TARGET :: DIRA,DIRB
 !     variables for heat transfer
       my_real, dimension(mvsiz) :: fheat
+      my_real, dimension(mvsiz) :: ssp_eq
 !
 C---
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -470,7 +476,8 @@ C-----------------------------
      R    INDX_DRAPE ,THKE, SEDRAPE  ,NUMEL_DRAPE,DT   ,
      Q    NCYCLE     ,SNPC      ,  STF,NXLAYMAX ,
      S    IDEL7NOK   ,USERL_AVAIL ,MAXFUNC  ,NPTTOT    ,SBUFMAT,
-     T    SDIR_A     ,SDIR_B  )
+     T    SDIR_A     ,SDIR_B   ,GBUF%FOR_G,SSP_EQ,
+     X    IPART      ,LIPART1  ,IPARTC   )
 C-----------------------------
         IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 C-----------------------------
@@ -480,7 +487,7 @@ C-----------------------------
         VISCMX(I) = SQRT(ONE + VISCMX(I)*VISCMX(I)) - VISCMX(I)
       ENDDO
       IF (NODADT /= 0 .AND. MTN ==58 ) 
-     .            CALL CSSP2A11(PM,MAT(JFT),SSP ,A11  ,JLT   )
+     .            CALL CSSP2A11(PM,MAT(JFT),SSP ,A11  ,JLT   ,1 )
 c---------------------------------------------------
         IF (NPTT == 1) THEN
           CALL MHVIS3(JFT    ,JLT    ,PM     ,THKG    ,HOURGG    ,
@@ -530,7 +537,7 @@ c---------------------------------------------------
      D      IGMAT  ,A11R ,NEL)
         ENDIF
 C--------------------------
-C       BILANS PAR MATERIAU
+C       BALANCES BY MATERIAL
 C--------------------------
 c        IFLAG = MOD(NCYCLE,NCPRI)
         IF (IPRI>0) THEN
@@ -547,10 +554,11 @@ c        IFLAG = MOD(NCYCLE,NCPRI)
      A   Y2G,      Y3G,      Y4G,      Z1G,
      B   Z2G,      Z3G,      Z4G,      IXFEM,
      C   IEXPAN,   EINTTH,   ITASK,    GBUF%VOL,
-     D   ACTIFXFEM,IGRE,SENSORS)
+     D   ACTIFXFEM,IGRE,SENSORS,NEL,GBUF%G_WPLA,
+     E   GBUF%WPLA )
        ENDIF
 C--------------------------
-C     PAS DE TEMPS
+C     TIME STEP
 C--------------------------
        IF (ISMSTR /= 3 .AND.(NODADT == 0 .OR. IDTMIN(3) /= 0)) THEN 
          CALL CDT3(JFT     ,JLT    ,YM        ,OFF    ,DT2T    ,        
@@ -576,7 +584,7 @@ C----------------------------
      A              E1X    ,E1Y    ,E1Z     ,E2X     ,E2Y    ,E2Z    ,
      B              E3X    ,E3Y    ,E3Z     ,IHBE    ,NPTT    ,FZERO  )
 C-------------------------
-c     Thermique des coques 
+c     Shell thermal
 C--------------------------
         IF (JTHE /= 0) THEN
           IF (MAT_ELEM%MAT_PARAM(MAT(1))%HEAT_FLAG == 1) THEN

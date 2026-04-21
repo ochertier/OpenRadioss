@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps44c   ../engine/source/materials/mat/mat044/sigeps44c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    vinter      ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps44c   ../engine/source/materials/mat/mat044/sigeps44c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    vinter      ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE SIGEPS44C( 
      1     NEL     ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC  ,
      2     NPF     ,TF     ,TIME    ,TIMESTEP,UPARAM ,
-     2     RHO0    ,THKLY  ,OFF     ,ETSE    ,
+     2     RHO0    ,THKLY  ,OFF     ,ETSE    ,EPSD_PG,
      3     EPSPXX  ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
      4     DEPSXX  ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
      5     EPSXX   ,EPSYY  ,EPSXY   ,EPSYZ   ,EPSZX  ,
@@ -95,6 +95,7 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN) :: NEL,NUPARAM, NUVAR,NVARTMP,INLOC
       my_real ,INTENT(IN) :: TIME,TIMESTEP,ASRATE
       my_real ,DIMENSION(NUPARAM) ,INTENT(IN) :: UPARAM
+      my_real ,DIMENSION(NEL)     ,INTENT(IN) :: EPSD_PG
       my_real ,DIMENSION(NEL)     ,INTENT(IN) :: RHO0,THKLY,GS,DPLANL,
      .   EPSPXX,EPSPYY,EPSPXY,EPSPYZ,EPSPZX,
      .   DEPSXX,DEPSYY,DEPSXY,DEPSYZ,DEPSZX,
@@ -102,12 +103,13 @@ C-----------------------------------------------
      .   SIGOXX,SIGOYY,SIGOXY,SIGOYZ,SIGOZX
       INTEGER ,INTENT(IN) :: NPF(*),MFUNC,KFUNC(MFUNC)
       my_real ,INTENT(IN) :: TF(*)
-      my_real ,DIMENSION(NEL), INTENT(IN) :: LOFF
+      my_real ,DIMENSION(NEL), INTENT(IN)    :: LOFF
+      my_real ,DIMENSION(NEL), INTENT(INOUT) :: EPSP
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
       my_real ,DIMENSION(NEL) ,INTENT(OUT) :: SOUNDSP,VISCMAX,ETSE,
-     .    SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX,EPSP,DPLA_I
+     .    SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX,DPLA_I
 C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
@@ -118,9 +120,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,J,N,NINDX,NMAX,IADBUF,ICC1,ISRATE,VFLAG
-      my_real :: R,UMR,NUX,A,B,C,S11,S22,S12,P,P2,DEZZ, 
-     .   SIGZ,S1,S2,S3,VM2,EPST,F,DF,Q2,YLD_I,E1,A11,A21,
+      INTEGER :: I,J,N,NINDX,NMAX,ICC1,ISRATE,VFLAG
+      my_real :: NUX,P2,DEZZ, 
+     .   S1,S2,S3,EPST,F,DF,Q2,YLD_I,E1,A11,A21,
      .   G1,G31,NNU11,NU11,NU21,NU31,DEVE1,DEVE2,DEVE3,DEVE4,DPDT,
      .   EPSM1,EPSR11,EPSR21,FISOKIN1,CA1,CB1,CN1,CC1,CP1,
      .   DSXX,DSYY,DSXY,DEXX,DEYY,DEXY,ALPHA,YSCALE,DAV
@@ -196,41 +198,46 @@ C-----------------------------------------------
 C     TOTAL OR DEVIATORIC STRAIN-RATE COMPUTATION
 C-----------------------------------------------
        IF (VFLAG == 1) THEN 
-           EPSP(1:NEL) = UVAR(1:NEL,1)
+         EPSP(1:NEL) = UVAR(1:NEL,1)
        ENDIF
        IF (ISRATE > 0) THEN 
-           IF (VFLAG == 3) THEN
-             DO I=1,NEL
-                DAV = (EPSPXX(I)+EPSPYY(I))*THIRD
-                DEVE1  = EPSPXX(I) - DAV
-                DEVE2  = EPSPYY(I) - DAV
-                DEVE3  = - DAV
-                DEVE4  = HALF*EPSPXY(I)
-                EPSP(I)   = HALF*(DEVE1**2 + DEVE2**2 + DEVE3**2) + DEVE4**2
-                EPSP(I)   = SQRT(THREE*EPSP(I))/THREE_HALF             
-                EPSP(I)   = ASRATE*EPSP(I) + (ONE - ASRATE)*UVAR(I,1)
-                UVAR(I,1) = EPSP(I)
-              ENDDO
-           ENDIF
+         IF (VFLAG == 3) THEN
+           DO I=1,NEL
+              DAV = (EPSPXX(I)+EPSPYY(I))*THIRD
+              DEVE1  = EPSPXX(I) - DAV
+              DEVE2  = EPSPYY(I) - DAV
+              DEVE3  = - DAV
+              DEVE4  = HALF*EPSPXY(I)
+              EPSP(I)   = HALF*(DEVE1**2 + DEVE2**2 + DEVE3**2) + DEVE4**2
+              EPSP(I)   = SQRT(THREE*EPSP(I))/THREE_HALF             
+              EPSP(I)   = ASRATE*EPSP(I) + (ONE - ASRATE)*UVAR(I,1)
+              UVAR(I,1) = EPSP(I)
+            ENDDO
+         ELSEIF (VFLAG == 2) THEN
+           DO I=1,NEL
+             EPSP(I)   = ASRATE*EPSD_PG(I) + (ONE - ASRATE)*UVAR(I,1)
+             UVAR(I,1) = EPSP(I)
+           ENDDO
+         ENDIF
        ELSEIF (ISRATE == 0) THEN
-           IF (VFLAG == 3) THEN
-             DO I=1,NEL
-                 DAV = (EPSPXX(I)+EPSPYY(I))*THIRD
-                 DEVE1  = EPSPXX(I) - DAV
-                 DEVE2  = EPSPYY(I) - DAV
-                 DEVE3  = - DAV
-                 DEVE4  = HALF*EPSPXY(I)
-                 EPSP(I)   = HALF*(DEVE1**2 + DEVE2**2 + DEVE3**2) + DEVE4**2
-                 EPSP(I)   = SQRT(THREE*EPSP(I))/THREE_HALF             
-                 UVAR(I,1) = EPSP(I)
-             ENDDO
-       ELSEIF (VFLAG == 2) THEN
-             DO I=1,NEL
-                  EPSP(I) = HALF*( ABS(EPSPXX(I)+EPSPYY(I))
-     .               + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
-     .               + EPSPXY(I)*EPSPXY(I) ) )
-             ENDDO
-           ENDIF
+         IF (VFLAG == 3) THEN
+           DO I=1,NEL
+               DAV = (EPSPXX(I)+EPSPYY(I))*THIRD
+               DEVE1  = EPSPXX(I) - DAV
+               DEVE2  = EPSPYY(I) - DAV
+               DEVE3  = - DAV
+               DEVE4  = HALF*EPSPXY(I)
+               EPSP(I)   = HALF*(DEVE1**2 + DEVE2**2 + DEVE3**2) + DEVE4**2
+               EPSP(I)   = SQRT(THREE*EPSP(I))/THREE_HALF             
+               UVAR(I,1) = EPSP(I)
+           ENDDO
+         ELSEIF (VFLAG == 2) THEN
+           DO I=1,NEL
+             EPSP(I) = HALF*( ABS(EPSPXX(I)+EPSPYY(I))
+     .             + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
+     .             + EPSPXY(I)*EPSPXY(I) ) )
+           ENDDO
+         ENDIF
        ENDIF
 C-------------------
 C     STRAIN & TENSION FAILURE
@@ -238,11 +245,10 @@ C-------------------
 C
        DO I=1,NEL
          EPST = HALF*( EPSXX(I)+EPSYY(I)
-     .   + SQRT( (EPSXX(I)-EPSYY(I))*(EPSXX(I)-EPSYY(I))
-     .                 + EPSXY(I)*EPSXY(I) ) )
+     .        + SQRT( (EPSXX(I)-EPSYY(I))*(EPSXX(I)-EPSYY(I))
+     .        + EPSXY(I)*EPSXY(I) ) )
          FAIL(I) = MAX(ZERO,MIN(ONE,(EPSR21-EPST)/(EPSR21-EPSR11)))
          DPLA_I(I) = ZERO
-C
        ENDDO
 C-------------------
 C      CURRENT YIELD AND HARDENING

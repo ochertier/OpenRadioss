@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_exch_nor   ../engine/source/mpi/interfaces/spmd_exch_nor.F
-      !||--- called by ------------------------------------------------------
-      !||    i25normp        ../engine/source/interfaces/int25/i25norm.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_nor         ../engine/source/mpi/interfaces/spmd_exch_nor.F
+!||--- called by ------------------------------------------------------
+!||    i25normp              ../engine/source/interfaces/int25/i25norm.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod         ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_NOR(
      1   NI25,IAD_FREDG,FR_EDG,NOD_NORMAL,WNOD_NORMAL,SIZE,NADMSR,
      2   REQ_R  ,REQ_S  ,IRINDEX,ISINDEX,IAD_RECV    ,
@@ -40,6 +42,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -65,14 +68,15 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,INDEX, N, M, E, IS,
-     .        SIZ,J,K,L0,L,CC,II, MSGOFF,
+      INTEGER MSGTYP,I,NOD,LOC_PROC,IERROR,INDEX, M, E, IS,
+     .        SIZ,J,L0,L,CC,II, MSGOFF,
      .        STATUS(MPI_STATUS_SIZE)
       REAL*4 RZERO
       DATA MSGOFF/6014/
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
+      !SIZE = 3 here
       RZERO = 0.
 C
       LOC_PROC = ISPMD + 1
@@ -106,7 +110,7 @@ C
            ENDIF
 
             SIZ = L-L0
-c                  print *,'recoit siz',ispmd+1,i,siz
+c                  print *,'recoit siz',ispmd+1,i,ni25,siz
             IF(SIZ > 0)THEN
               MSGTYP = MSGOFF
               NBIRECV = NBIRECV + 1
@@ -139,6 +143,8 @@ C                WRITE(6,"(2I10,A,I10,3Z20)") E,M," SEND TO",I-1,NOD_NORMAL(1,E,
 C                ENDIF
 C#endif 
 c                  print *,'envoi',ispmd+1,i,j-IAD_FREDG(NI25,I)+1,mseglo(m),mvoisin(e,m)
+c       if((ispmd==1.or.ispmd==3).and.(i==2.or.i==4).and.ni25==1)print *,'envoi',ispmd+1,NI25,i,j-IAD_FREDG(NI25,I)+1,mseglo(m),mvoisin(e,m)
+
               ENDDO
             ENDIF
             IF(IAD_FRNOR(NI25,I+1)-IAD_FRNOR(NI25,I)>0) THEN
@@ -175,7 +181,7 @@ c                  print *,'envoi',ispmd+1,i,j-IAD_FREDG(NI25,I)+1,mseglo(m),mvo
             ENDIF
 
             SIZ = L-L0
-c                  print *,'envoi siz',ispmd+1,i,siz
+c                  print *,'envoi siz',ispmd+1,i,ni25,siz
             IF(SIZ > 0)THEN
               MSGTYP = MSGOFF
               NBISEND = NBISEND + 1

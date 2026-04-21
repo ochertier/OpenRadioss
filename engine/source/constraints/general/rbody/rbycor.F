@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rbycor     ../engine/source/constraints/general/rbody/rbycor.F
-      !||--- called by ------------------------------------------------------
-      !||    resol      ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    rgbcor     ../engine/source/constraints/general/rbody/rgbcor.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_dyna   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rbycor     ../engine/source/constraints/general/rbody/rbycor.F
+!||--- called by ------------------------------------------------------
+!||    resol      ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    rgbcor     ../engine/source/constraints/general/rbody/rgbcor.F
+!||--- uses       -----------------------------------------------------
+!||    imp_dyna   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE RBYCOR(RBY ,X   ,V    ,VR  ,SKEW    ,FSAV     ,
      2                  LPBY,NPBY,ISKEW,ITAB,WEIGHT  ,A        ,
      3                  AR  ,MS  ,IN   ,KIND,IRBKIN_L,NRBYKIN_L,
@@ -66,7 +66,7 @@ C     REAL
      .   XMOMT_T,YMOMT_T,ZMOMT_T,ENCIN2_T,ENROT2_T
 C-----------------------------------------------
 C-------------------------------------
-C CALCUL SUPER RIGID BODIES (non multi-thread) sur premiere tache libre
+C COMPUTATION FOR SUPER RIGID BODIES (non multi-thread) on first free task
 C-------------------------------------
 !$OMP SINGLE
       DO KK=1,NRBYKIN_L
@@ -93,7 +93,7 @@ C-------------------------------------
       ENDDO
 !$OMP END SINGLE
 C-------------------------------------
-C CALCUL FORCE RIGID BODIES CLASSIQUES (multi-thread)
+C FORCE COMPUTATION FOR CLASSICAL RIGID BODIES (multi-thread)
 C-------------------------------------
 C
 C   optimisation locks

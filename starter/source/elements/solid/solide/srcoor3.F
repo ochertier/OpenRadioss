@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    srcoor3            ../starter/source/elements/solid/solide/srcoor3.F
-      !||--- called by ------------------------------------------------------
-      !||    inisoldist         ../starter/source/initial_conditions/inivol/inisoldist.F
-      !||    multifluid_init3   ../starter/source/multifluid/multifluid_init3.F
-      !||    s8cinit3           ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||    s8zinit3           ../starter/source/elements/solid/solide8z/s8zinit3.F
-      !||    sinit3             ../starter/source/elements/solid/solide/sinit3.F
-      !||    suinit3            ../starter/source/elements/elbuf_init/suinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkvolume_8n     ../starter/source/elements/solid/solide/checksvolume.F
-      !||    mod_close          ../starter/source/elements/solid/solide/mod_close.F
-      !||    sortho3            ../starter/source/elements/solid/solide/sortho3.F
-      !||    srepiso3           ../starter/source/elements/solid/solide/srepiso3.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    srcoor3            ../starter/source/elements/solid/solide/srcoor3.F
+!||--- called by ------------------------------------------------------
+!||    inisoldist         ../starter/source/initial_conditions/inivol/inisoldist.F
+!||    multifluid_init3   ../starter/source/multifluid/multifluid_init3.F
+!||    s8cinit3           ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||    s8zinit3           ../starter/source/elements/solid/solide8z/s8zinit3.F
+!||    sinit3             ../starter/source/elements/solid/solide/sinit3.F
+!||    suinit3            ../starter/source/elements/elbuf_init/suinit3.F
+!||--- calls      -----------------------------------------------------
+!||    checkvolume_8n     ../starter/source/elements/solid/solide/checksvolume.F
+!||    mod_close          ../starter/source/elements/solid/solide/mod_close.F
+!||    sortho3            ../starter/source/elements/solid/solide/sortho3.F
+!||    srepiso3           ../starter/source/elements/solid/solide/srepiso3.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod        ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SRCOOR3(
      .         X    ,XREFS,IXS  ,GEO  ,MXT  ,NGEO ,NGL  ,JHBE  ,
      .         IX1  ,IX2  ,IX3  ,IX4  ,IX5  ,IX6  ,IX7  ,IX8 ,
@@ -50,6 +50,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .         YD1  ,YD2  ,YD3  ,YD4  ,YD5  ,YD6  ,YD7  ,YD8   ,
      .         ZD1  ,ZD2  ,ZD3  ,ZD4  ,ZD5  ,ZD6  ,ZD7  ,ZD8   )
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -90,7 +91,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
+      INTEGER I
       DOUBLE PRECISION 
      .   XL,YL,ZL
 C-----------------------------------------------
@@ -99,7 +100,7 @@ C-----------------------------------------------
       my_real
      .    CHECKVOLUME_8N
 C=======================================================================
-C     CONNECTIVITES ET NUMERO DE MATERIAU ET PID
+C     CONNECTIVITIES AND MATERIAL NUMBER AND PID
 C--------------------------------------------------
       DO I=LFT,LLT
         MXT(I)=IXS(1,I)
@@ -276,7 +277,7 @@ C
      .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
      .   Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8)
 C
-C     Repere isoparametrique conforme manuel pour les briques
+C     Isoparametric reference frame according to the manual for bricks
       CALL SREPISO3(
      .       X1, X2, X3, X4, X5, X6, X7, X8,
      .       Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
@@ -284,7 +285,7 @@ C     Repere isoparametrique conforme manuel pour les briques
      .       RX, RY, RZ, SX, SY, SZ, TX, TY,
      .       TZ ,F1X  ,F1Y  ,F1Z  ,F2X  ,F2Y  ,F2Z   )
 C-----------
-C     REPERE CONVECTE
+C     convected frame
 C-----------
       IF (JHBE == 14 .OR. JHBE == 24) THEN
 C       HA8 / HEPH
@@ -380,7 +381,7 @@ C-----------
         ENDDO
       END IF !(JHBE==14 .OR. JHBE==24 .OR. JHBE==17 ) THEN
 C
-        IF(JTHE < 0 ) THEN             
+        IF (JTHE < 0 .or. NINTEMP > 0) THEN             
            IF(NINTEMP > 0 ) THEN  
             DO I= LFT,LLT
               IF(TEMP(IX1(I))== ZERO) TEMP(IX1(I)) = TEMP0(I)

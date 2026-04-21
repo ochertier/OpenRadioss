@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21gap3       ../engine/source/interfaces/int21/i21gap3.F
-      !||--- called by ------------------------------------------------------
-      !||    i21main_gap   ../engine/source/interfaces/int21/i21main_gap.F
-      !||====================================================================
+!||====================================================================
+!||    i21gap3       ../engine/source/interfaces/int21/i21gap3.F
+!||--- called by ------------------------------------------------------
+!||    i21main_gap   ../engine/source/interfaces/int21/i21main_gap.F
+!||====================================================================
       SUBROUTINE I21GAP3(
      1 ITASK ,IRECTS ,NRTS ,NSN   ,NSV   ,
      2 GAP   ,IGAP  ,GAP_S ,GAPMIN,CRITER,
@@ -55,12 +55,12 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NSNF, NSNL, I, J, NELS, NELC, NELTG, NEL
+      INTEGER NSNF, NSNL, I
 C     REAL
       my_real
-     .   GAPM, CRITERL, GAPSUPL
+     .    CRITERL, GAPSUPL
 C------------------------------------
-C     GAP VARIABLE NOEUDS SECONDS
+C     GAP VARIABLE FOR SECONDARY NODES
 C------------------------------------
       NSNF = 1 + ITASK*NSN / NTHREAD
       NSNL = (ITASK+1)*NSN / NTHREAD
@@ -73,7 +73,7 @@ C------------------------------------
       ENDIF
 C---------------------------------------------
 C
-C Calcul du gap reel a utiliser lors du critere de retri
+C Calculation of the real gap to be used during the retry criterion
 C
       IF (IGAP==0) THEN
         CRITER =MAX(GAP,EM01*MAX(DEPTH,DRAD,GAP+DGAPLOAD))
@@ -94,7 +94,7 @@ C gap_s/=0 <=> node is still connected through non deleted shells
         CRITER=MIN(CRITER,CRITERL)
         DIST  =MIN(DIST,TZINF-MAX(GAPSUPL+DGAPLOAD,DEPTH,DRAD))
         IF( TZINF-GAPSUPL <= ZERO)THEN
-C assure le retri et remet la marge initiale (on a forcement depth  <= gapsupl)
+C ensures the retry and resets the initial margin (we necessarily have depth  <= gapsupl)
           TZINF= GAPSUPL+MARGE
           DIST =-ONE
         END IF

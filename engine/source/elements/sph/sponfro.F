@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sponfro   ../engine/source/elements/sph/sponfro.F
-      !||--- called by ------------------------------------------------------
-      !||    forintp   ../engine/source/elements/forintp.F
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox    ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    sponfro   ../engine/source/elements/sph/sponfro.F
+!||--- called by ------------------------------------------------------
+!||    forintp   ../engine/source/elements/forintp.F
+!||--- uses       -----------------------------------------------------
+!||    sphbox    ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPONFRO(X ,V        ,A       ,MS      ,
      2             SPBUF   ,ITAB    ,KXSP    ,IXSP    ,NOD2SP  ,
      3             ISPHIO  ,IPART   ,IPARTSP ,WASPACT ,WA_EPSD ,
@@ -80,7 +80,7 @@ C-------------------------------------------
           YI=X(2,INOD)
           ZI=X(3,INOD)
 C-------
-C         plus proche voisin en amont de l'outlet.
+C         closer neighbor upstream of the outlet.
           IPPV=0
           DMIN=1.E+20
 

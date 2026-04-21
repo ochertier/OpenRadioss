@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,42 +20,42 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_surf             ../starter/source/groups/hm_read_surf.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    deallocate_surf_elm      ../starter/source/groups/init_surf_elm.F
-      !||    hm_bigsbox               ../starter/source/groups/hm_bigsbox.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_submodpart            ../starter/source/groups/hm_submodpart.F
-      !||    hm_surfgr2               ../starter/source/groups/hm_surfgr2.F
-      !||    hm_tagpart2              ../starter/source/groups/hm_tagpart2.F
-      !||    init_surf_elm            ../starter/source/groups/init_surf_elm.F
-      !||    qsurftag                 ../starter/source/groups/qsurftag.F
-      !||    sboxboxsurf              ../starter/source/model/box/bigbox.F
-      !||    segsurf                  ../starter/source/groups/tsurftag.F
-      !||    ssurftag                 ../starter/source/groups/ssurftag.F
-      !||    ssurftagigeo             ../starter/source/groups/ssurftagigeo.F
-      !||    subrotpoint              ../starter/source/model/submodel/subrot.F
-      !||    surftag                  ../starter/source/groups/surftag.F
-      !||    surftagadm               ../starter/source/groups/surftag.F
-      !||    surftage                 ../starter/source/groups/surftage.F
-      !||    tsurftag                 ../starter/source/groups/tsurftag.F
-      !||    udouble_igr              ../starter/source/system/sysfus.F
-      !||    usr2sys                  ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    mapping_option_mod       ../starter/share/modules1/dichotomy_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||    surf_mod                 ../starter/share/modules1/surf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_surf             ../starter/source/groups/hm_read_surf.F
+!||--- called by ------------------------------------------------------
+!||    lectur                   ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    deallocate_surf_elm      ../starter/source/groups/init_surf_elm.F
+!||    hm_bigsbox               ../starter/source/groups/hm_bigsbox.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_submodpart            ../starter/source/groups/hm_submodpart.F
+!||    hm_surfgr2               ../starter/source/groups/hm_surfgr2.F
+!||    hm_tagpart2              ../starter/source/groups/hm_tagpart2.F
+!||    init_surf_elm            ../starter/source/groups/init_surf_elm.F
+!||    qsurftag                 ../starter/source/groups/qsurftag.F
+!||    sboxboxsurf              ../starter/source/model/box/bigbox.F
+!||    segsurf                  ../starter/source/groups/tsurftag.F
+!||    ssurftag                 ../starter/source/groups/ssurftag.F
+!||    ssurftagigeo             ../starter/source/groups/ssurftagigeo.F
+!||    subrotpoint              ../starter/source/model/submodel/subrot.F
+!||    surftag                  ../starter/source/groups/surftag.F
+!||    surftagadm               ../starter/source/groups/surftag.F
+!||    surftage                 ../starter/source/groups/surftage.F
+!||    tsurftag                 ../starter/source/groups/tsurftag.F
+!||    udouble_igr              ../starter/source/system/sysfus.F
+!||    usr2sys                  ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    mapping_option_mod       ../starter/share/modules1/dichotomy_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||    surf_mod                 ../starter/share/modules1/surf_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_SURF(
      1           ITAB    ,ITABM1  ,
      2           IGRSURF ,IXS     ,IXQ     ,IXC     ,IXT     ,
@@ -86,6 +86,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE MAPPING_OPTION_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      use element_mod , only : nixs, nixq, nixc, nixt, nixp, nixr, nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -199,8 +200,8 @@ C-----------------------------------------------
 !                             (computed in Radioss Engine, when receiving Datas from MaDyMo).
 !                             ID MaDyMo - for entity type which impose surface movement:
 !                             No systeme MaDyMo for entity type which impose surface movement
-!   IGRSURF(IGS)%NB_MADYMO   :: No de l'entite qui impose le mvt de la surface.
-!                                --> No systeme Radioss ou MaDyMO.
+! IGRSURF(IGS)%NB_MADYMO   :: Entity number imposing surface movement.
+!                                --> No Radioss or MaDyMO system.
 !   IGRSURF(IGS)%TYPE_MADYMO   :: Entity type which impose surface movement.
 !                                  = 1 : Rigid Body.
 !                                  = 2 : MADYMO Hyper-ellipsoide.
@@ -352,14 +353,14 @@ C             tag for surfaces defined from surface list
             ELSEIF(KEY(1:6)=='SUBSET'.OR. KEY(1:4)=='PART'.OR.
      .             KEY(1:3)=='MAT'   .OR. KEY(1:4)=='PROP'.OR.
      .             KEY(1:6)=='GRBRIC')THEN
-C             surf de SUBSET PART MAT OU PROP
+C             surf of SUBSET PART MAT OR PROP
               IT2=IT2+1
               IF (FLAG == 0) IGRSURF(IGS)%NSEG=0
                IGRSURF(IGS)%LEVEL=1
             ELSEIF(KEY(1:3) == 'BOX'.AND.NBBOX == 0 .AND.
      .       (KEY2(1:5) /= 'RECTA'.AND.
      .        KEY2(1:5) /= 'CYLIN'.AND.KEY2(1:5) /= 'SPHER'))THEN
-C             surf dans un box (old box)
+C             surf in a box (old box)
               lERROR=.TRUE.
             ELSEIF(KEY(1:2)=='GR')THEN
 C             surf d'un group d'elements
@@ -381,7 +382,7 @@ C             surface with formal equation (non-meshed).
                  IGRSURF(IGS)%ELEM(1:NSEG0) = 0
                ENDIF
             ELSEIF(KEY(1:6)=='SUBMOD')THEN
-C             une surface d'un submodel.
+C             a surface of a submodel.
               IT6=IT6+1
               IF (FLAG == 0) IGRSURF(IGS)%NSEG=0
                IGRSURF(IGS)%LEVEL=1

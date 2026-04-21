@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10deri3       ../starter/source/elements/solid/solide10/s10deri3.F
-      !||--- called by ------------------------------------------------------
-      !||    inirig_mat     ../starter/source/elements/initia/inirig_mat.F
-      !||    s10init3       ../starter/source/elements/solid/solide10/s10init3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../starter/source/output/message/message.F
-      !||    s10jacob       ../starter/source/elements/solid/solide10/s10deri3.F
-      !||    s10pijsav      ../starter/source/elements/solid/solide10/s10deri3.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s10deri3       ../starter/source/elements/solid/solide10/s10deri3.F
+!||--- called by ------------------------------------------------------
+!||    inirig_mat     ../starter/source/elements/initia/inirig_mat.F
+!||    s10init3       ../starter/source/elements/solid/solide10/s10init3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../starter/source/output/message/message.F
+!||    s10jacob       ../starter/source/elements/solid/solide10/s10deri3.F
+!||    s10pijsav      ../starter/source/elements/solid/solide10/s10deri3.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S10DERI3(VOL,NGL,
      .   XX, YY, ZZ, PX,PY,PZ, NX,
      .   RX,  RY,  RZ,  SX,  SY,  SZ , TX, TY, TZ,VOLU,VOLN,
@@ -66,12 +66,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NGL(*), I,IP,N,K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,
-     .        M,IPERM(10,4),
+     .        IPERM(10,4),
      .        NBAD(MVSIZ)
       DOUBLE PRECISION
      .   XA(MVSIZ,10),YA(MVSIZ,10),ZA(MVSIZ,10),
      .   XB(MVSIZ,10),YB(MVSIZ,10),ZB(MVSIZ,10),
-     .   A4,B4,A4M1,B4M1,AA
+     .   A4,B4,A4M1,B4M1
       my_real
      .   ALPH,BETA,W
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -253,12 +253,12 @@ C
 C  1000 FORMAT(/' ZERO OR NEGATIVE VOLUME : 3D-ELEMENT NB',I10/)
 C  2000 FORMAT(/' ZERO OR NEGATIVE VOLUME : DELETE 3D-ELEMENT NB',I10/)
       END
-      !||====================================================================
-      !||    s10jacob   ../starter/source/elements/solid/solide10/s10deri3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10deri3   ../starter/source/elements/solid/solide10/s10deri3.F
-      !||    s10jaci3   ../starter/source/elements/solid/solide10/s10jaci3.F
-      !||====================================================================
+!||====================================================================
+!||    s10jacob   ../starter/source/elements/solid/solide10/s10deri3.F
+!||--- called by ------------------------------------------------------
+!||    s10deri3   ../starter/source/elements/solid/solide10/s10deri3.F
+!||    s10jaci3   ../starter/source/elements/solid/solide10/s10jaci3.F
+!||====================================================================
       SUBROUTINE S10JACOB(ALPH,BETA,W,
      .   X1B,X2B,X3B,X4A,X5B,X6B,X7B,X8B,X9B,X10B,X8A,X9A,X10A,
      .   Y1B,Y2B,Y3B,Y4A,Y5B,Y6B,Y7B,Y8B,Y9B,Y10B,Y8A,Y9A,Y10A,
@@ -470,12 +470,12 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    s10pijsav   ../starter/source/elements/solid/solide10/s10deri3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10deri3    ../starter/source/elements/solid/solide10/s10deri3.F
-      !||    s10jaci3    ../starter/source/elements/solid/solide10/s10jaci3.F
-      !||====================================================================
+!||====================================================================
+!||    s10pijsav   ../starter/source/elements/solid/solide10/s10deri3.F
+!||--- called by ------------------------------------------------------
+!||    s10deri3    ../starter/source/elements/solid/solide10/s10deri3.F
+!||    s10jaci3    ../starter/source/elements/solid/solide10/s10jaci3.F
+!||====================================================================
       SUBROUTINE S10PIJSAV(PX,PY,PZ, PIJ,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -496,7 +496,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K
+      INTEGER I, J
 
 C-----------------------------------------------
       DO J=1,10

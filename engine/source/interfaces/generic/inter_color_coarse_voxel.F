@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inter_color_coarse_voxel   ../engine/source/interfaces/generic/inter_color_coarse_voxel.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_prepare_sort         ../engine/source/interfaces/generic/inter_prepare_sort.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier                 ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_sorting_mod          ../engine/share/modules/inter_sorting_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inter_color_coarse_voxel   ../engine/source/interfaces/generic/inter_color_coarse_voxel.F
+!||--- called by ------------------------------------------------------
+!||    inter_prepare_sort         ../engine/source/interfaces/generic/inter_prepare_sort.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier                 ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod              ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    inter_sorting_mod          ../engine/share/modules/inter_sorting_mod.F
+!||====================================================================
         SUBROUTINE INTER_COLOR_COARSE_VOXEL(ITASK,NB_INTER_SORTED,LIST_INTER_SORTED,IPARI,INTBUF_TAB,
      .                                      X,SORT_COMM)
 !$COMMENT
@@ -82,8 +83,8 @@ C-----------------------------------------------
         ! ------------------
         ! allocation of global omp array 
         IF(ITASK==0) THEN
-            ALLOCATE(CELL_BOOL(4,4,4))
-            CELL_BOOL(1:4,1:4,1:4) = .FALSE.
+            ALLOCATE(CELL_BOOL(NB_BOX_COARSE_GRID,NB_BOX_COARSE_GRID,NB_BOX_COARSE_GRID))
+            CELL_BOOL(1:NB_BOX_COARSE_GRID,1:NB_BOX_COARSE_GRID,1:NB_BOX_COARSE_GRID) = .FALSE.
         ENDIF
         CALL MY_BARRIER()
         ! ------------------
@@ -102,7 +103,7 @@ C-----------------------------------------------
                 XMINB = BOX_LIMIT(4)
                 YMINB = BOX_LIMIT(5)
                 ZMINB = BOX_LIMIT(6)
-                IF(ITASK==0) CELL_BOOL(1:4,1:4,1:4) = .FALSE.
+                IF(ITASK==0) CELL_BOOL(1:NB_BOX_COARSE_GRID,1:NB_BOX_COARSE_GRID,1:NB_BOX_COARSE_GRID) = .FALSE.
                 CALL MY_BARRIER()
                 ! ------------------
                 !   loop over the secondary node to color the coarse grid
@@ -128,9 +129,9 @@ C-----------------------------------------------
                     ENDIF
                     SORT_COMM(NIN)%COARSE_GRID(1:NB_BOX_COARSE_GRID**3 + 1) = 0
                     NEXT = 0
-                    DO IZ=1,4
-                        DO IY=1,4
-                            DO IX=1,4
+                    DO IZ=1,NB_BOX_COARSE_GRID
+                        DO IY=1,NB_BOX_COARSE_GRID
+                            DO IX=1,NB_BOX_COARSE_GRID
                                 IF(CELL_BOOL(IX,IY,IZ)) THEN
                                     NEXT = NEXT + 1
                                     SORT_COMM(NIN)%COARSE_GRID(NEXT) = 

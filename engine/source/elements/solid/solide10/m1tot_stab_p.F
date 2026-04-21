@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m1tot_stab_p   ../engine/source/elements/solid/solide10/m1tot_stab_p.F
-      !||--- called by ------------------------------------------------------
-      !||    m1lawtot       ../engine/source/materials/mat/mat001/m1lawtot.F
-      !||====================================================================
+!||====================================================================
+!||    m1tot_stab_p   ../engine/source/elements/solid/solide10/m1tot_stab_p.F
+!||--- called by ------------------------------------------------------
+!||    m1lawtot       ../engine/source/materials/mat/mat001/m1lawtot.F
+!||====================================================================
       SUBROUTINE M1TOT_STAB_P(SIG,G2,C1,NEL )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -48,9 +48,9 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,ISTAB
+      INTEGER I
       my_real
-     .   FF,FACG,FRHO,P,FACMAX,FACD,PHYD,FAC,DP
+     .   FF,P,FACD,DP
 C-----------------------------------------------
         DO I=1,NEL
          FF = -MIN(SIG(I,1),SIG(I,2),SIG(I,3))

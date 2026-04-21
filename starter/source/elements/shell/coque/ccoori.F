@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ccoori        ../starter/source/elements/shell/coque/ccoori.F
-      !||--- called by ------------------------------------------------------
-      !||    cbainit3      ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cinit3        ../starter/source/elements/shell/coque/cinit3.F
-      !||    inirig_mat    ../starter/source/elements/initia/inirig_mat.F
-      !||    inivoid       ../starter/source/elements/initia/inivoid.F
-      !||    lslocal       ../starter/source/elements/xfem/lslocal.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ccoori        ../starter/source/elements/shell/coque/ccoori.F
+!||--- called by ------------------------------------------------------
+!||    cbainit3      ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cinit3        ../starter/source/elements/shell/coque/cinit3.F
+!||    inirig_mat    ../starter/source/elements/initia/inirig_mat.F
+!||    inivoid       ../starter/source/elements/initia/inivoid.F
+!||    lslocal       ../starter/source/elements/xfem/lslocal.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CCOORI(X,XREFC,IXC,
      .           X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  , 
      .           Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
      .           IX1 ,IX2 ,IX3 ,IX4 ,NGL )
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,7 +69,7 @@ C-----------------------------------------------
       my_real XN14, XN13, XN24, XN23, XN12, X31,
      .   Y31, Z31, X42, Y42, Z42, E3X, E3Y, E3Z, SURF
 C=======================================================================
-C     CONNECTIVITES ET SHELL ID                   
+C     connectivities and shell id
 C----------------------------
       DO I=LFT,LLT
         IX1(I)=IXC(2,I)

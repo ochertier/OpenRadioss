@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,14 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    shell_offset_ini_mod   ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    shell_offset_ini_mod   ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||====================================================================
       module shell_offset_ini_mod
+
+      implicit none
 
       contains
 ! ======================================================================================================================
@@ -33,52 +35,49 @@
 ! ======================================================================================================================
 !
 !=======================================================================================================================
-!!\brief This subroutine do the initialization of shell offset treatment
+!!\brief This subroutine performs the initialization of shell offset treatment
 !=======================================================================================================================
-      !||====================================================================
-      !||    shell_offset_ini   ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur             ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    defaults_mod       ../starter/source/modules/defaults_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    shell_offset_ini   ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
+!||--- called by ------------------------------------------------------
+!||    lectur             ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    defaults_mod       ../starter/source/modules/defaults_mod.F90
+!||====================================================================
         subroutine shell_offset_ini(                                          &
-                       ngroup,    nparg,      iparg,        npropg,           &
-                       numgeo,      geo,     numelc,       numeltg,           &
-                       npropgi,    igeo,     itagsh,     elbuf_tab,           &
-                       defaults_shell)
+          ngroup,    nparg,      iparg,        npropg,           &
+          numgeo,      geo,     numelc,       numeltg,           &
+          npropgi,    igeo,     itagsh,     elbuf_tab,           &
+          defaults_shell)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use elbufdef_mod
           use constant_mod, only : zero,half
           use defaults_mod, only : shell_defaults_
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           integer, intent (in   )                          :: ngroup           !< number of elem group
-          integer, intent (in   )                          :: nparg            !< 1er dim of iparg
-          integer, intent (in   )                          :: npropg           !< 1er dim of geo
+          integer, intent (in   )                          :: nparg            !< first dimension of iparg
+          integer, intent (in   )                          :: npropg           !< first dimension of geo
           integer, intent (in   )                          :: numgeo           !< number of prop
-          integer, intent (in   )                          :: npropgi          !< 1er dim of igeo
+          integer, intent (in   )                          :: npropgi          !< first dimension of igeo
           integer, intent (in   )                          :: numelc           !< number shell 4n element
           integer, intent (in   )                          :: numeltg          !< number shell 3n element
           integer, intent (in   ) ,dimension(nparg,ngroup) :: iparg            !< elem group array
           integer, intent (inout),dimension(npropgi,numgeo):: igeo             !< property array
-          my_real, intent (inout),dimension(npropg,numgeo) :: geo              !< property array
-          integer, intent (in   ),dimension(numelc+numeltg):: itagsh           !< shell w/ offset
+          real(kind=WP), intent (inout),dimension(npropg,numgeo) :: geo              !< property array
+          integer, intent (in   ),dimension(numelc+numeltg):: itagsh           !< shell with offset
           type (elbuf_struct_),  target, dimension(ngroup) :: elbuf_tab        !< el_buf struct_
           type (shell_defaults_),intent(in)                :: defaults_shell   !< Default values for Shell : /DEF_SHELL option
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i,j,n,nel,nft,nn,ie,igtyp,nf1,ity,nnode,pid,ng
+          integer :: i,nel,nft,nn,ie,igtyp,ity,nnode,pid,ng
 !
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
@@ -98,7 +97,7 @@
                   if (itagsh(ie)>0) elbuf_tab(ng)%gbuf%sh_ioffset(i)=1
                   if (itagsh(ie)>0) nn = nn+1
                 end do
-              elseif (ity == 7)then
+              else if (ity == 7)then
                 nnode =3
                 do i=1,nel
                   ie = nft +numelc+ i
@@ -107,7 +106,7 @@
                 end do
               end if
             end do
-          elseif (defaults_shell%ioffset>=3) then
+          else if (defaults_shell%ioffset>=3) then
 !---change offset to zero after projection
             do  ng=1,ngroup
               ity=iparg(5,ng)

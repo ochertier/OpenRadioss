@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop36           ../starter/source/properties/spring/hm_read_prop36.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    set_u_geo                ../starter/source/user_interface/uaccess.F
-      !||    set_u_pnu                ../starter/source/user_interface/uaccess.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop36           ../starter/source/properties/spring/hm_read_prop36.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    set_u_geo                ../starter/source/user_interface/uaccess.F
+!||    set_u_pnu                ../starter/source/user_interface/uaccess.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP36(IOUT,NUVAR ,PARGEO, UNITAB,
      .                          ISKN,IG,TITR,IGTYP,PROP_TAG,GEO,LSUBMODEL,SUB_ID)
 C-----------------------------------------------
@@ -222,14 +222,11 @@ C
       PROP_TAG(IGTYP)%G_MOM = 5
       PROP_TAG(IGTYP)%G_SKEW = 6
       PROP_TAG(IGTYP)%G_MASS = 1
-      PROP_TAG(IGTYP)%G_V_REPCVT  = 3 ! -- VITESSES REPERE CONVECTEE (V_REPCVT)
-      PROP_TAG(IGTYP)%G_VR_REPCVT = 3  ! -- VITESSES REPERE CONVECTEE (VR_REPCVT)
+      PROP_TAG(IGTYP)%G_V_REPCVT  = 3 ! -- VELOCITIES convected frameE (V_REPCVT)
+      PROP_TAG(IGTYP)%G_VR_REPCVT = 3  ! -- VELOCITIES convected frameE (VR_REPCVT)
 C   if (IUTYP = 1 .or. NINT(GEO(25,I)) > 0 )  --> see lecg36.F
       IF(NINT(GEO(25)) > 0) PROP_TAG(IGTYP)%G_NUVAR = NINT(GEO(25))
 C
-      RETURN
- 999  CONTINUE
-      WRITE(IOUT,*)' **ERROR IN PROPERTY 36 INPUT'
       RETURN
  1000 FORMAT(
      & 5X,'  USER PROPERTY TYPE 1 (used by spring elements) ',/,
@@ -248,24 +245,21 @@ C
      & 5X,'BENDING SECTION INERTIA IZZ. . . . . . .=',1PG20.13/,
      & 5X,'BENDING SECTION  RAYON  RY . . . . . . .=',1PG20.13/,
      & 5X,'BENDING SECTION  RAYON  RZ . . . . . . .=',1PG20.13//)
- 3000 FORMAT(
-     & 5X,'USER PROPERTY SET'/,
-     & 5X,'PROPERTY SET NUMBER . . . . . . . . . .=',I10)
       END
-      !||====================================================================
-      !||    rini36      ../starter/source/properties/spring/hm_read_prop36.F
-      !||--- called by ------------------------------------------------------
-      !||    rinit3      ../starter/source/elements/spring/rinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_u_geo   ../starter/source/user_interface/uaccess.F
-      !||    get_u_mat   ../starter/source/user_interface/uaccess.F
-      !||    get_u_mid   ../starter/source/user_interface/uaccess.F
-      !||    get_u_mnu   ../starter/source/user_interface/uaccess.F
-      !||    get_u_pid   ../starter/source/user_interface/uaccess.F
-      !||    get_u_pnu   ../starter/source/user_interface/uaccess.F
-      !||====================================================================
+!||====================================================================
+!||    rini36      ../starter/source/properties/spring/hm_read_prop36.F
+!||--- called by ------------------------------------------------------
+!||    rinit3      ../starter/source/elements/spring/rinit3.F
+!||--- calls      -----------------------------------------------------
+!||    get_u_geo   ../starter/source/user_interface/uaccess.F
+!||    get_u_mat   ../starter/source/user_interface/uaccess.F
+!||    get_u_mid   ../starter/source/user_interface/uaccess.F
+!||    get_u_mnu   ../starter/source/user_interface/uaccess.F
+!||    get_u_pid   ../starter/source/user_interface/uaccess.F
+!||    get_u_pnu   ../starter/source/user_interface/uaccess.F
+!||====================================================================
       SUBROUTINE RINI36(NEL   ,IOUT   ,IPROP ,
-     3                  IX    ,XL     ,MASS  ,XINER  ,STIFM ,
+     3                  XL     ,MASS  ,XINER  ,STIFM ,
      4                  STIFR ,VISCM  ,VISCR ,UVAR   ,NUVAR )
 C-------------------------------------------------------------------------
 C     This subroutine initialize springs using user properties.
@@ -344,7 +338,6 @@ C----------------------------------------------------------
 C   D u m m y   A r g u m e n t s   a n d   F u n c t i o n
 C----------------------------------------------------------
       INTEGER IOUT,NUVAR,NEL,IPROP,
-     .        IX(4,NEL) ,
      .        GET_U_PNU,GET_U_PID,GET_U_MID,GET_U_MNU,
      .        KFUNC,KMAT,KPROP
       my_real
@@ -362,10 +355,9 @@ C-----------------------------------------------
      .        FAC,RHO,AREA,IXX,IYY,IZZ,IMYZ,YOUNG,G,
      .        AREA1,IXX1,IYY1,IZZ1,RHO1,YOUNG1,G1,
      .        AREA2,IXX2,IYY2,IZZ2,RHO2,YOUNG2,G2,
-     .        RY1,RZ1,RY2,RZ2,RY,RZ,xl3,ktran,krot,
-     .        K11,K22,K26,K33,K35,K44,K55,K5B,K66,K6C,
-     .        dt1,dt2,XL2,ATMP,ARY,ARZ
-      INTEGER I,IUTYP,n0,
+     .        RY1,RZ1,RY2,RZ2,RY,RZ,ktran,krot,
+     .        XL2,ATMP,ARY,ARZ
+      INTEGER I,n0,
      .        IMAT1,IPROP1,IUTYP1,
      .        IMAT2,IPROP2,IUTYP2
 C-----------------------------------------------

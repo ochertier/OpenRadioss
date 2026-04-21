@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_i25_prepare   ../engine/source/interfaces/int25/i25_prepare.F
-      !||--- called by ------------------------------------------------------
-      !||    resol              ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||    tri7box            ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_i25_prepare   ../engine/source/interfaces/int25/i25_prepare.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod      ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod        ../engine/share/message_module/message_mod.F
+!||    tri7box            ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE SPMD_I25_PREPARE(MODE,IPARI, INTBUF_TAB,
      *                         IAD_ELEM, FR_ELEM,INTLIST,NBINTC,
      *                         IAD_I25 , SFR_I25, FR_I25)
@@ -63,7 +64,7 @@ C-----------------------------------------------
       INTEGER P,I,J,NI,NIN,NOD,NTY,NSN,SN
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAG
 C-----------------------------------------------
-C Partie 1, calcul des tailles de FR_I25
+C part 1, calculation of the sizes of fr_i25
 C-----------------------------------------------
       ALLOCATE(ITAG(NUMNOD))
       ITAG(1:NUMNOD)=0
@@ -101,7 +102,7 @@ C Flush ITAG to zero again for next CPU
         SFR_I25=SZFRI25
       
 C-----------------------------------------------
-C Partie 2, on remplis FR_I25 et IAD_I25
+C Part 2, we fill out Fr_i25 and IAD_I25
 C-----------------------------------------------
       ELSEIF(MODE==2)THEN
         IAD_I25(1,1)=1

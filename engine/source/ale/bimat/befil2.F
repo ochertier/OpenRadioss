@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    befil2     ../engine/source/ale/bimat/befil2.F
-      !||--- called by ------------------------------------------------------
-      !||    bforc2     ../engine/source/ale/bimat/bforc2.F
-      !||--- calls      -----------------------------------------------------
-      !||    idp_free   ../engine/source/system/machine.F
-      !||    idp_lock   ../engine/source/system/machine.F
-      !||====================================================================
-      SUBROUTINE BEFIL2(PM,V,FILL,DFILL,IMS,X,ALPH1,ALPH2, 
-     .     AIRE, PY1, PY2, PZ1, PZ2, DALPH1, DALPH2, 
-     .     MAT, NC1, NC2, NC3, NC4)
+!||====================================================================
+!||    befil2     ../engine/source/ale/bimat/befil2.F
+!||--- called by ------------------------------------------------------
+!||    bforc2     ../engine/source/ale/bimat/bforc2.F
+!||--- calls      -----------------------------------------------------
+!||    idp_free   ../engine/source/system/machine.F
+!||    idp_lock   ../engine/source/system/machine.F
+!||====================================================================
+      SUBROUTINE BEFIL2(V,FILL,DFILL,IMS,X,
+     .     DALPH1, DALPH2,
+     .     NC1, NC2, NC3, NC4)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,23 +51,21 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IMS(NUMNOD,*)
       my_real
-     .   PM(NPROPM,*), V(3,*), FILL(NUMNOD,*), DFILL(NUMNOD,*),
-     .   X(3,*), ALPH1(*), ALPH2(*),
-     .   AIRE(*), PY1(*), PY2(*), PZ1(*), PZ2(*), DALPH1(*), DALPH2(*)
+     .   V(3,*), FILL(NUMNOD,*), DFILL(NUMNOD,*),
+     .   X(3,*),
+     .   DALPH1(*), DALPH2(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER MAT(MVSIZ), NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ), I, N1, N2, N3, N4,
+      INTEGER NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ), I, N1, N2, N3, N4,
      .   NP
       my_real
 !     .   GAMMA(MVSIZ), XMS(MVSIZ), 
      .   FI1(MVSIZ), FI2(MVSIZ), FI3(MVSIZ), FI4(MVSIZ), 
      .   FA(MVSIZ), VDY1(MVSIZ), VDY2(MVSIZ), VDY3(MVSIZ), VDY4(MVSIZ),
      .   VDZ1(MVSIZ), VDZ2(MVSIZ), VDZ3(MVSIZ), VDZ4(MVSIZ), VDY(MVSIZ), VDZ(MVSIZ), 
-     .   VY1, VY2, VY3, VY4,
-     .   VZ1, VZ2, VZ3, VZ4, ABF, DN, P1, P2, P3, P4, PT, PSY, PSZ, PTY,
-     .   PTZ, PS, PST, PTS, DS0, DT0, DS, DT, 
-     .    INC,     
+     .   ABF, DN, P1, P2, P3, P4, PT, PSY, PSZ, PTY,
+     .   PTZ, PS, PST, PTS, DS0, DT0, DS, DT,
      .   DF1(MVSIZ), DF2(MVSIZ), DF3(MVSIZ), DF4(MVSIZ)
 C-----------------------------------------------
       DO I=LFT,LLT
@@ -76,11 +74,11 @@ C-----------------------------------------------
         FI3(I)=FILL(NC3(I),1)
         FI4(I)=FILL(NC4(I),1)
         ABF=ABS(FI1(I))+ABS(FI2(I))+ABS(FI3(I))+ABS(FI4(I))
-        N1=SIGN(ONE,FI1(I))
-        N2=SIGN(ONE,FI2(I))
-        N3=SIGN(ONE,FI3(I))
-        N4=SIGN(ONE,FI4(I))
-        NP=MAX(0,N1)+MAX(0,N2)+MAX(0,N3)+MAX(0,N4)
+        N1=MERGE(1, 0, FI1(I) > ZERO) ! indicator function
+        N2=MERGE(1, 0, FI2(I) > ZERO) ! indicator function
+        N3=MERGE(1, 0, FI3(I) > ZERO) ! indicator function
+        N4=MERGE(1, 0, FI4(I) > ZERO) ! indicator function
+        NP=N1+N2+N3+N4
         DN=DT1*NP
         IF(DN/=ZERO)THEN
          FA(I)=-DALPH1(I)*ABF/DN
@@ -89,7 +87,7 @@ C-----------------------------------------------
         ENDIF
       ENDDO
 C-----------------------------------------------
-C     CALCUL PAR NOEUD DE V MATIERE - V MAILLAGE
+C     CALCULATION PER NODE OF V MATERIAL - V MESH
 C-----------------------------------------------
       DO I=LFT,LLT
         VDY1(I)=V(2,NC1(I))
@@ -208,10 +206,10 @@ C-------------------------------
         FI3(I)=FILL(NC3(I),2)
         FI4(I)=FILL(NC4(I),2)
         ABF=ABS(FI1(I))+ABS(FI2(I))+ABS(FI3(I))+ABS(FI4(I))
-        N1=SIGN(ONE,FI1(I))
-        N2=SIGN(ONE,FI2(I))
-        N3=SIGN(ONE,FI3(I))
-        N4=SIGN(ONE,FI4(I))
+        N1=NINT(SIGN(ONE,FI1(I)))
+        N2=NINT(SIGN(ONE,FI2(I)))
+        N3=NINT(SIGN(ONE,FI3(I)))
+        N4=NINT(SIGN(ONE,FI4(I)))
         NP=MAX(0,N1)+MAX(0,N2)+MAX(0,N3)+MAX(0,N4)
         DN=DT1*NP
         IF(DN/=ZERO)THEN
@@ -268,7 +266,7 @@ C
         ENDIF
         DS= MIN(ZERO,TWO*DS)
         DT= MAX(ZERO,TWO*DT)
-        DF2(I)=FOUR*((-TWO*DS       +DS*DT*DT1)*FI1(I)
+        DF2(I)=FOURTH*((-TWO*DS       +DS*DT*DT1)*FI1(I)
      .               +( TWO*DS-TWO*DT-DS*DT*DT1)*FI2(I)
      .               +(        +TWO*DT+DS*DT*DT1)*FI3(I)
      .               +(                -DS*DT*DT1)*FI4(I) )

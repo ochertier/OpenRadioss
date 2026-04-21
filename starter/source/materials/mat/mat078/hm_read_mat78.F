@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat78            ../starter/source/materials/mat/mat078/hm_read_mat78.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    calculp2                 ../starter/source/materials/mat/mat057/calculp2.F90
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    calculp2_mod             ../starter/source/materials/mat/mat057/calculp2.F90
-      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat78            ../starter/source/materials/mat/mat078/hm_read_mat78.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    calculp2                 ../starter/source/materials/mat/mat057/calculp2.F90
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    calculp2_mod             ../starter/source/materials/mat/mat057/calculp2.F90
+!||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT78(UPARAM   ,MAXUPARAM,NUPARAM  ,ISRATE   ,IMATVIS  ,
      .                         NUVAR    ,IFUNC    ,MAXFUNC  ,NFUNC    ,PARMAT   , 
      .                         UNITAB   ,MAT_ID   ,TITR     ,MTAG     ,LSUBMODEL,
@@ -81,10 +81,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,NORDRE,ISMSTR,NMAXW,OPTE,OPTR,FUNCID,ILAW,Iplas
-      my_real :: YOUNG,YIELD,BSAT,MYU,BYU,HYU,CYU,KYU,RSAT,
-     .           NU,SUM,GS,P,VISCMAX,FAC_L,FAC_T,FAC_M,FAC_C,
-     .           RBULK,SHEAR,LAMDA,EINF,COE,YFAC,RHO0,
+      INTEGER :: OPTE,OPTR,FUNCID,ILAW,Iplas
+      my_real :: YOUNG,YIELD,BSAT,MYU,BYU,HYU,CYU,RSAT,
+     .           NU,
+     .           EINF,COE,RHO0,
      .           R00,R45,R90,CST,CSTT,P1,P2,P3,P4,N3,MEXP,C1_KH
       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED
 c-----------------------------------------------

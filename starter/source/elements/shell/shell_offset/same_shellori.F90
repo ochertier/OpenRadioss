@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,14 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    same_shellori_mod     ../starter/source/elements/shell/shell_offset/same_shellori.F90
-      !||--- called by ------------------------------------------------------
-      !||    sh_offset_jonct_chk   ../starter/source/elements/shell/shell_offset/sh_offset_jonkt_chk.F90
-      !||====================================================================
+!||====================================================================
+!||    same_shellori_mod     ../starter/source/elements/shell/shell_offset/same_shellori.F90
+!||--- called by ------------------------------------------------------
+!||    sh_offset_jonct_chk   ../starter/source/elements/shell/shell_offset/sh_offset_jonkt_chk.F90
+!||====================================================================
       module same_shellori_mod
+
+      implicit none
 
       contains
 ! ======================================================================================================================
@@ -35,11 +37,11 @@
 !=======================================================================================================================
 !!\brief if the same orientation of two shell connected by i1,i2 (i2>i1)
 !=======================================================================================================================
-      !||====================================================================
-      !||    same_shellori         ../starter/source/elements/shell/shell_offset/same_shellori.F90
-      !||--- called by ------------------------------------------------------
-      !||    sh_offset_jonct_chk   ../starter/source/elements/shell/shell_offset/sh_offset_jonkt_chk.F90
-      !||====================================================================
+!||====================================================================
+!||    same_shellori         ../starter/source/elements/shell/shell_offset/same_shellori.F90
+!||--- called by ------------------------------------------------------
+!||    sh_offset_jonct_chk   ../starter/source/elements/shell/shell_offset/sh_offset_jonkt_chk.F90
+!||====================================================================
         subroutine same_shellori(i1,i2,ixm,ixn,isame)
 ! ------------------------------------------------------------------------------
 !
@@ -56,7 +58,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i,k,nextk(4),im1,im2,in1,in2,ivm,ivn
+          integer :: i,nextk(4),im1,im2,ivm,ivn
           data nextk/2,3,4,1/
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
@@ -71,8 +73,8 @@
                 ivm = 1
               else
                 ivm = -1
-              endif
-            endif
+              end if
+            end if
           end do
           do i=1,4
             im1=ixn(i)
@@ -82,8 +84,8 @@
                 ivn = 1
               else
                 ivn = -1
-              endif
-            endif
+              end if
+            end if
           end do
           isame = -ivm*ivn
 !

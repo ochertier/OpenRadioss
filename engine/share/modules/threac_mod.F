@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    threac_mod   ../engine/share/modules/threac_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    resol        ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    threac_mod   ../engine/share/modules/threac_mod.F
+!||--- called by ------------------------------------------------------
+!||    resol        ../engine/source/engine/resol.F
+!||====================================================================
       MODULE THREAC_MOD
 C-----------------------------------------------
 C   m y _ r e a l
 C-----------------------------------------------
 #include      "my_real.inc"
 C------------------------
-C tableau de travail
+C work array
 C------------------------
          my_real
      .          , DIMENSION(:), ALLOCATABLE :: FTHREAC,FTHDTM

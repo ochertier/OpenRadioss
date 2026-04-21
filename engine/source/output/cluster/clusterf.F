@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    clusterf       ../engine/source/output/cluster/clusterf.F
-      !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    cluster_mod    ../engine/share/modules/cluster_mod.F
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_mod        ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    clusterf       ../engine/source/output/cluster/clusterf.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    cluster_mod    ../engine/share/modules/cluster_mod.F
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    h3d_mod        ../engine/share/modules/h3d_mod.F
+!||====================================================================
       SUBROUTINE CLUSTERF(CLUSTER  ,ELBUF_TAB,X       ,A       ,AR       ,
      .                    SKEW     ,IXS      ,IPARG   ,FCLUSTER,MCLUSTER ,
      .                    H3D_DATA ,GEO      ) 
@@ -38,6 +39,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE CLUSTER_MOD         
       USE H3D_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chr|           scratchfile names are opened in 
-      !||====================================================================
-      !||    scratchfile_mod   ../engine/share/modules/scratchfiles_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    arret             ../engine/source/system/arret.F
-      !||    eigrrest          ../engine/source/output/restart/rdresb.F
-      !||    eigwrest          ../engine/source/output/restart/wrrest.F
-      !||    fxbresb           ../engine/source/output/restart/rdresb.F
-      !||    fxbwrest          ../engine/source/output/restart/wrrest.F
-      !||    radioss2          ../engine/source/engine/radioss2.F
-      !||====================================================================
+!||====================================================================
+!||    scratchfile_mod   ../engine/share/modules/scratchfiles_mod.F
+!||--- called by ------------------------------------------------------
+!||    arret             ../engine/source/system/arret.F
+!||    eigrrest          ../engine/source/output/restart/rdresb.F
+!||    eigwrest          ../engine/source/output/restart/wrrest.F
+!||    fxbresb           ../engine/source/output/restart/rdresb.F
+!||    fxbwrest          ../engine/source/output/restart/wrrest.F
+!||    radioss2          ../engine/source/engine/radioss2.F
+!||====================================================================
       MODULE SCRATCHFILE_MOD
         CHARACTER(LEN=10192) :: IINFNA,IUSC4_FNAM,IUSC2_FNAM,
      *                        IFXS_FN,IFXM_FN,IEIGM_FN

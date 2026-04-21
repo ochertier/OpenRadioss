@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lslocal                ../starter/source/elements/xfem/lslocal.F
-      !||--- called by ------------------------------------------------------
-      !||    inicrkfill             ../starter/source/elements/xfem/inicrkfill.F
-      !||--- calls      -----------------------------------------------------
-      !||    activ_xfem             ../starter/source/elements/xfem/lslocal.F
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    c3coori                ../starter/source/elements/sh3n/coque3n/c3coori.F
-      !||    ccoori                 ../starter/source/elements/shell/coque/ccoori.F
-      !||    edgetip3n              ../starter/source/elements/xfem/lslocal.F
-      !||    edgetip4n              ../starter/source/elements/xfem/lslocal.F
-      !||    elcut3n                ../starter/source/elements/xfem/lslocal.F
-      !||    elcut4n                ../starter/source/elements/xfem/lslocal.F
-      !||    preinicrk3n            ../starter/source/elements/xfem/preinicrk3N.F
-      !||    preinicrk4n            ../starter/source/elements/xfem/preinicrk4N.F
-      !||    xyzloc3n               ../starter/source/elements/xfem/lslocal.F
-      !||    xyzloc4n               ../starter/source/elements/xfem/lslocal.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lslocal                ../starter/source/elements/xfem/lslocal.F
+!||--- called by ------------------------------------------------------
+!||    inicrkfill             ../starter/source/elements/xfem/inicrkfill.F
+!||--- calls      -----------------------------------------------------
+!||    activ_xfem             ../starter/source/elements/xfem/lslocal.F
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    c3coori                ../starter/source/elements/sh3n/coque3n/c3coori.F
+!||    ccoori                 ../starter/source/elements/shell/coque/ccoori.F
+!||    edgetip3n              ../starter/source/elements/xfem/lslocal.F
+!||    edgetip4n              ../starter/source/elements/xfem/lslocal.F
+!||    elcut3n                ../starter/source/elements/xfem/lslocal.F
+!||    elcut4n                ../starter/source/elements/xfem/lslocal.F
+!||    preinicrk3n            ../starter/source/elements/xfem/preinicrk3N.F
+!||    preinicrk4n            ../starter/source/elements/xfem/preinicrk4N.F
+!||    xyzloc3n               ../starter/source/elements/xfem/lslocal.F
+!||    xyzloc4n               ../starter/source/elements/xfem/lslocal.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LSLOCAL(ELBUF_TAB,XFEM_TAB,
      .                   IPARG   ,IXC     ,IXTG    ,XREFC   ,XREFTG  ,
      .                   X       ,ICRK    ,INOD_CRK,NXSEG   ,NODLS   ,
@@ -54,6 +54,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -384,11 +385,11 @@ C-----------
       RETURN
       END
 c
-      !||====================================================================
-      !||    xyzloc4n   ../starter/source/elements/xfem/lslocal.F
-      !||--- called by ------------------------------------------------------
-      !||    lslocal    ../starter/source/elements/xfem/lslocal.F
-      !||====================================================================
+!||====================================================================
+!||    xyzloc4n   ../starter/source/elements/xfem/lslocal.F
+!||--- called by ------------------------------------------------------
+!||    lslocal    ../starter/source/elements/xfem/lslocal.F
+!||====================================================================
       SUBROUTINE XYZLOC4N(X1L,Y1L,X2L,Y2L,X3L,Y3L,X4L,Y4L,
      .                    X1,X2,X3,X4,Y1,Y2,
      .                    Y3,Y4,Z1,Z2,Z3,Z4)
@@ -416,7 +417,7 @@ C-----------------------------------------------
       INTEGER I
       my_real S1,S2,SUMA
       my_real, DIMENSION(MVSIZ) :: X21,Y21,Z21,X31,Y31,Z31,X41,Y41,Z41,
-     .   X42,Y42,Z42,E1X,E2X,E3X,E1Y,E2Y,E3Y,E1Z,E2Z,E3Z,SUM
+     .   X42,Y42,Z42,E1X,E2X,E3X,E1Y,E2Y,E3Y,E1Z,E2Z,E3Z
 C=======================================================================
       DO I=LFT,LLT
         X21(I) = X2(I)-X1(I)
@@ -487,13 +488,13 @@ c-----------
       RETURN
       END
 c
-      !||====================================================================
-      !||    xyzloc3n   ../starter/source/elements/xfem/lslocal.F
-      !||--- called by ------------------------------------------------------
-      !||    lslocal    ../starter/source/elements/xfem/lslocal.F
-      !||--- calls      -----------------------------------------------------
-      !||    clskew3    ../starter/source/elements/shell/coque/clskew.F
-      !||====================================================================
+!||====================================================================
+!||    xyzloc3n   ../starter/source/elements/xfem/lslocal.F
+!||--- called by ------------------------------------------------------
+!||    lslocal    ../starter/source/elements/xfem/lslocal.F
+!||--- calls      -----------------------------------------------------
+!||    clskew3    ../starter/source/elements/shell/coque/clskew.F
+!||====================================================================
       SUBROUTINE XYZLOC3N(X1L,Y1L,X2L,Y2L,X3L,Y3L,
      .                    X1G,X2G,X3G,Y1G,Y2G,Y3G,
      .                    Z1G,Z2G,Z3G)
@@ -552,12 +553,12 @@ C---------------------------------------------------------
       RETURN
       END
 c
-      !||====================================================================
-      !||    activ_xfem     ../starter/source/elements/xfem/lslocal.F
-      !||--- called by ------------------------------------------------------
-      !||    lslocal        ../starter/source/elements/xfem/lslocal.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    activ_xfem     ../starter/source/elements/xfem/lslocal.F
+!||--- called by ------------------------------------------------------
+!||    lslocal        ../starter/source/elements/xfem/lslocal.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE ACTIV_XFEM(IPARG ,NFT    ,LFT    ,LLT ,NXLAY,
      .                      NG    ,IEL_CRK,ITY    ,CRKEDGE)
 C-----------------------------------------------
@@ -604,12 +605,14 @@ C-----------
       RETURN
       END
 c
-      !||====================================================================
-      !||    elcut4n   ../starter/source/elements/xfem/lslocal.F
-      !||--- called by ------------------------------------------------------
-      !||    lslocal   ../starter/source/elements/xfem/lslocal.F
-      !||====================================================================
+!||====================================================================
+!||    elcut4n       ../starter/source/elements/xfem/lslocal.F
+!||--- called by ------------------------------------------------------
+!||    lslocal       ../starter/source/elements/xfem/lslocal.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE ELCUT4N(IEL   ,IXC ,XNOD, EDGEC, FAC , IED)
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -638,12 +641,14 @@ C=======================================================================
 C---
       RETURN
       END
-      !||====================================================================
-      !||    elcut3n   ../starter/source/elements/xfem/lslocal.F
-      !||--- called by ------------------------------------------------------
-      !||    lslocal   ../starter/source/elements/xfem/lslocal.F
-      !||====================================================================
+!||====================================================================
+!||    elcut3n       ../starter/source/elements/xfem/lslocal.F
+!||--- called by ------------------------------------------------------
+!||    lslocal       ../starter/source/elements/xfem/lslocal.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE ELCUT3N(IEL   ,IXTG ,XNOD, EDGETG, FAC , IED)
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -672,12 +677,12 @@ C=======================================================================
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    edgetip4n      ../starter/source/elements/xfem/lslocal.F
-      !||--- called by ------------------------------------------------------
-      !||    lslocal        ../starter/source/elements/xfem/lslocal.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    edgetip4n      ../starter/source/elements/xfem/lslocal.F
+!||--- called by ------------------------------------------------------
+!||    lslocal        ../starter/source/elements/xfem/lslocal.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE EDGETIP4N(LFT   ,LLT    ,NFT    ,IELCRKC ,IEDGESH4,
      .                     NXLAY  ,EDGEC  ,TAGEDGE,CRKLVSET,CRKEDGE)
 C-----------------------------------------------
@@ -729,12 +734,12 @@ C--------------------
 C-----------
       RETURN
       END
-      !||====================================================================
-      !||    edgetip3n      ../starter/source/elements/xfem/lslocal.F
-      !||--- called by ------------------------------------------------------
-      !||    lslocal        ../starter/source/elements/xfem/lslocal.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    edgetip3n      ../starter/source/elements/xfem/lslocal.F
+!||--- called by ------------------------------------------------------
+!||    lslocal        ../starter/source/elements/xfem/lslocal.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE EDGETIP3N(LFT   ,LLT    ,NFT    ,IELCRKTG,IEDGESH3,
      .                     NXLAY  ,EDGETG ,TAGEDGE,CRKLVSET,CRKEDGE)
 C-----------------------------------------------

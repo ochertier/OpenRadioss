@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_sphgat           ../engine/source/mpi/sph/spmd_sphgat.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep               ../engine/source/elements/sph/sphprep.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                ../engine/source/output/message/message.F
-      !||    arret                 ../engine/source/system/arret.F
-      !||    spmd_ialltoall        ../engine/source/mpi/generic/spmd_ialltoall.F
-      !||    spmd_ialltoallv_int   ../engine/source/mpi/generic/spmd_ialltoallv_int.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod           ../engine/share/message_module/message_mod.F
-      !||    sphbox                ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_sphgat           ../engine/source/mpi/sph/spmd_sphgat.F
+!||--- called by ------------------------------------------------------
+!||    sphprep               ../engine/source/elements/sph/sphprep.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                ../engine/source/output/message/message.F
+!||    arret                 ../engine/source/system/arret.F
+!||    spmd_ialltoall        ../engine/source/mpi/generic/spmd_ialltoall.F
+!||    spmd_ialltoallv_int   ../engine/source/mpi/generic/spmd_ialltoallv_int.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod           ../engine/share/message_module/message_mod.F
+!||    sphbox                ../engine/share/modules/sphbox.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_SPHGAT(KXSP ,IXSP, WSP2SORT, IREDUCE, LGAUGE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -42,6 +43,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -64,9 +66,9 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
       INTEGER P, I, NN, N, NN0, NSP, IDEB, INITV, IG,
-     .        MSGTYP, LOC_PROC, NBIRECV,
-     .        IERROR, IERROR1, LEN, NVOIS1, NVOIS2,
-     .        REQ_SD(NSPMD), REQ_SD2(NSPMD),
+     .        MSGTYP, LOC_PROC,
+     .        IERROR, IERROR1, NVOIS1, NVOIS2,
+     .         
      .        INDEX(NSPHR), STATUS(MPI_STATUS_SIZE),
      .        MSGOFF,MSGOFF2
        my_real
@@ -85,7 +87,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       LOC_PROC = ISPMD+1
 
-C Compactage des structures
+C compaction of structures
 C
       IDEB = 0
       NN = 0
@@ -127,7 +129,7 @@ C
 C
       IERROR = 0
       IF(ALLOCATED(XSPHR))DEALLOCATE(XSPHR)
-C reallocation avec nouveau NSPHR sur la taille totale
+C reallocation with new nsphr on the total size
       ALLOCATE(XSPHR(SIZSPC,NSPHR),STAT=IERROR1)
       IERROR = IERROR + IERROR1
       IF(ALLOCATED(WACOMPR))DEALLOCATE(WACOMPR)
@@ -140,7 +142,7 @@ C reallocation des tags cellule active a recevoir
       ALLOCATE(ISPHR(NSPHR),STAT=IERROR1)
       IERROR = IERROR + IERROR1
       IF(NSPCOND>0) THEN
-C reallocation du tableau gerant les particules symetrisees
+C reallocation of the array managing the symmetrized particles
         IF(ALLOCATED(ISPSYMR))DEALLOCATE(ISPSYMR)
         ALLOCATE(ISPSYMR(NSPCOND,NSPHR),STAT=IERROR1)
         IERROR = IERROR + IERROR1
@@ -153,8 +155,8 @@ C reallocation du tableau gerant les particules symetrisees
 
 C recopie + init
       IF(NSPCOND>0)THEN
-C si condition de symetrie alors pas d'optimisation sur particules active
-C car particule symetrique de particule inactive eventuellement active
+C If condition of symmetry then no optimization on active particles
+C Because symmetrical particle of inactive particle possibly active
         INITV = 1
       ELSE
         INITV = 0
@@ -179,7 +181,7 @@ C
           IF(IXSP(NN,N)<ZERO) THEN
 C renumerotation
             IXSP(NN,N) = -INDEX(-IXSP(NN,N))
-C flag differenciant les cellules actives des autres
+C flag distinguishing active cells from others
             ISPHR(-IXSP(NN,N)) = 1
           END IF
         END DO
@@ -191,7 +193,7 @@ C renumerotation
         END DO
       END DO
 C
-C Gauges : Renumerotation + selection particules actives
+C Gauges: renumeration + selection active particles
 C
       DO IG=1, NBGAUGE
         IF(LGAUGE(1,IG) > -(NUMELS+1))CYCLE
@@ -202,7 +204,7 @@ C
           IF(IXSP(NN,N)<ZERO) THEN
 C renumerotation
             IXSP(NN,N) = -INDEX(-IXSP(NN,N))
-C flag differenciant les cellules actives des autres
+C flag distinguishing active cells from others
             ISPHR(-IXSP(NN,N)) = 1
           END IF
         END DO
@@ -214,7 +216,7 @@ C renumerotation
         END DO
       END DO
 C
-C Renvoi frontiere
+C Frontier referral
 C
       IDEB = 0
       DO P = 1, NSPMD
@@ -254,7 +256,7 @@ C
 C reallocation liste cellule a envoyer
       IF(ALLOCATED(LSPHS))DEALLOCATE(LSPHS)
       ALLOCATE(LSPHS(NSPHS),STAT=IERROR)
-C reallocation des tags cellule active a envoyer
+C reallocation of active cell tags to send
       IF(ALLOCATED(ISPHS))DEALLOCATE(ISPHS)
       ALLOCATE(ISPHS(NSPHS),STAT=IERROR1)
       IERROR = IERROR + IERROR1

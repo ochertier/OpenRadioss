@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    volp_lfluid   ../engine/source/airbag/volp_lfluid.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol0       ../engine/source/airbag/monvol0.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter        ../engine/source/tools/curve/finter.F
-      !||--- uses       -----------------------------------------------------
-      !||    output_mod    ../common_source/modules/output/output_mod.F90
-      !||====================================================================
-      SUBROUTINE VOLP_LFLUID(IVOLU, RVOLU, VOL, FSAV, NPC, TF, PMAIN, OUTPUT)
+!||====================================================================
+!||    volp_lfluid        ../engine/source/airbag/volp_lfluid.F
+!||--- called by ------------------------------------------------------
+!||    monvol0            ../engine/source/airbag/monvol0.F
+!||--- uses       -----------------------------------------------------
+!||    finter_mixed_mod   ../engine/source/tools/finter_mixed.F90
+!||    output_mod         ../common_source/modules/output/output_mod.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||====================================================================
+      SUBROUTINE VOLP_LFLUID(IVOLU, RVOLU, VOL, FSAV, NPC, TF, PMAIN, OUTPUT,PYTHON, NFUNCT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE python_funct_mod
+      USE finter_mixed_mod
       USE OUTPUT_MOD , ONLY : OUTPUT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -50,15 +52,15 @@ C-----------------------------------------------
       INTEGER NPC(*),IVOLU(*), PMAIN
       my_real TF(*), RVOLU(*), FSAV(*), VOL
       TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
+      TYPE(PYTHON_), intent(inout) :: PYTHON
+      INTEGER, intent(in) :: NFUNCT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IFUNCT
 
-      my_real P0, VOL0, DYDX, AREA, VEPS, VINC, POLD, PEXT, VOLD, PRES, Q,  QOLD, DV,   XFUN
+      my_real P0, VOL0,  AREA, VEPS, VINC, POLD, PEXT, VOLD, PRES, Q,  QOLD, DV,   XFUN
       my_real SCALEF, BULK, PMAX, GMASS, DMASS, RHOI
-      my_real FINTER 
-      EXTERNAL FINTER
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -81,7 +83,7 @@ C   BULK
       IF(IFUNCT == 0) THEN
          BULK = SCALEF    
       ELSE
-         BULK = SCALEF * FINTER(IFUNCT,TT,NPC,TF,DYDX)
+         BULK = SCALEF * FINTER_MIXED(PYTHON,NFUNCT,IFUNCT,TT,NPC,TF)
       ENDIF
 
 C   FLUID MASS IN
@@ -90,7 +92,7 @@ C   FLUID MASS IN
       IF(IFUNCT == 0) THEN
          DMASS = SCALEF * DT1
       ELSE
-         DMASS = SCALEF * FINTER(IFUNCT,TT,NPC,TF,DYDX) * DT1
+         DMASS = SCALEF * FINTER_MIXED(PYTHON,NFUNCT,IFUNCT,TT,NPC,TF) * DT1
       ENDIF 
       GMASS = GMASS + DMASS
       RVOLU(54)=RVOLU(54)+DMASS
@@ -101,7 +103,7 @@ C   FLUID MASS OUT (time)
       IF(IFUNCT == 0) THEN
          DMASS = SCALEF * DT1
       ELSE
-         DMASS = SCALEF * FINTER(IFUNCT,TT,NPC,TF,DYDX) * DT1
+         DMASS = SCALEF * FINTER_MIXED(PYTHON,NFUNCT,IFUNCT,TT,NPC,TF) * DT1
       ENDIF 
       GMASS = GMASS - DMASS
 
@@ -111,7 +113,7 @@ C   FLUID MASS OUT (pressure)
       IF(IFUNCT == 0) THEN
          DMASS = SCALEF * DT1
       ELSE
-         DMASS = SCALEF * FINTER(IFUNCT,POLD,NPC,TF,DYDX) * DT1
+         DMASS = SCALEF * FINTER_MIXED(PYTHON,NFUNCT,IFUNCT,POLD,NPC,TF) * DT1
       ENDIF 
       GMASS = GMASS - DMASS
 
@@ -121,7 +123,7 @@ C   P0
       IF(IFUNCT == 0) THEN
          P0 = SCALEF    
       ELSE
-         P0 = SCALEF * FINTER(IFUNCT,TT,NPC,TF,DYDX)
+         P0 = SCALEF * FINTER_MIXED(PYTHON,NFUNCT,IFUNCT,TT,NPC,TF)
       ENDIF
 
 C   PMAX
@@ -130,7 +132,7 @@ C   PMAX
       IF(IFUNCT == 0) THEN
          PMAX = SCALEF    
       ELSE
-         PMAX = SCALEF * FINTER(IFUNCT,TT,NPC,TF,DYDX)
+         PMAX = SCALEF * FINTER_MIXED(PYTHON,NFUNCT,IFUNCT,TT,NPC,TF)
       ENDIF
 
       VOL0 = GMASS / RHOI
@@ -142,7 +144,7 @@ C   PMAX
 
       IF (ISPMD+1==PMAIN) THEN
         DV=VOL-VOLD
-        OUTPUT%WFEXT=OUTPUT%WFEXT+(HALF*(Q+QOLD+PRES+POLD))*DV
+        OUTPUT%TH%WFEXT=OUTPUT%TH%WFEXT+(HALF*(Q+QOLD+PRES+POLD))*DV
         FSAV(1)=GMASS
         FSAV(2)=VOL
         FSAV(3)=PRES

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sort_set                 ../starter/source/model/sets/sort_sets.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                   ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                    ../starter/source/system/arret.F
-      !||    create_set_array         ../starter/source/model/sets/create_set_clause.F
-      !||    create_setcol_array      ../starter/source/model/sets/create_setcol_clause.F
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_get_string_index      ../starter/source/devtools/hm_reader/hm_get_string_index.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    set_merge_simple         ../starter/source/model/sets/set_merge_simple.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    mapping_option_mod       ../starter/share/modules1/dichotomy_mod.F
-      !||    set_mod                  ../starter/share/modules1/set_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sort_set                 ../starter/source/model/sets/sort_sets.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                   ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    arret                    ../starter/source/system/arret.F
+!||    create_set_array         ../starter/source/model/sets/create_set_clause.F
+!||    create_setcol_array      ../starter/source/model/sets/create_setcol_clause.F
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_get_string_index      ../starter/source/devtools/hm_reader/hm_get_string_index.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    set_merge_simple         ../starter/source/model/sets/set_merge_simple.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    mapping_option_mod       ../starter/share/modules1/dichotomy_mod.F
+!||    set_mod                  ../starter/share/modules1/set_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE SORT_SET (LSUBMODEL ,MAP_TABLES, SET_LIST ,SET,CLAUSE)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -87,14 +87,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IGS,IGS2,ID1,ID2,IG,I,J,SET_CLAUSE_SIZE,SET_ARRAY_SIZE,NEW_SIZE,IERROR,S,T,ID
-      INTEGER SET_ID,ISET_TYPE,CLAUSES_MAX,ITMP,ICODE,NCOLLECT,SETCOL_ARRAY_SIZE
+      INTEGER IGS, IGS2, ID1, ID2, IG, I, J, SET_CLAUSE_SIZE, SET_ARRAY_SIZE, NEW_SIZE, IERROR, T, ID
+      INTEGER SET_ID, ISET_TYPE, CLAUSES_MAX, SETCOL_ARRAY_SIZE
       INTEGER OPT_D,OPT_O,OPT_G,OPT_B,OPT_A,OPT_E,OPT_I,OPT_C
       INTEGER IDEBUG
       LOGICAL IS_AVAILABLE
       INTEGER, DIMENSION(:),ALLOCATABLE  :: SET_ARRAY,SET_CLAUSE_ARRAY,RESULT,SETCOL_ARRAY
       INTEGER, DIMENSION(:),ALLOCATABLE  :: COLLECT_LIST,IS_COLLECT
-      INTEGER CLAUSE_OPERATOR
       
 C-----------------------------------------------
 C     Characters

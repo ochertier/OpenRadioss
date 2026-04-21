@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mat77              ../starter/source/materials/mat/mat077/hm_read_mat77.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim          ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    init_mat_keyword           ../starter/source/materials/mat/init_mat_keyword.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mat77              ../starter/source/materials/mat/mat077/hm_read_mat77.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim          ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    init_mat_keyword           ../starter/source/materials/mat/init_mat_keyword.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MAT77(
      .           UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR    ,NFUNC    ,
      .           MAXFUNC  ,IFUNC    ,PARMAT   ,MAT_ID   ,PM       ,
@@ -56,7 +56,7 @@ C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
 C   READ MAT LAW77 WITH HM READER
-C   this law is Ale law for air and foam is in lagrangian and is not activated thru ale option. 
+C   this law is Ale law for air and foam is in lagrangian and is not activated through ale option. 
 C-----------------------------------------------
 C   DUMMY ARGUMENTS DESCRIPTION:
 C   ===================
@@ -89,10 +89,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,J,ILAW,NRATEN,NRATEP,LFUNC,IUNLOAD,IFUNCR,IFUNCK,
-     .       IFLAG,NPAR_FOAM,ICLOS,INCGAS
-      my_real :: E,NU,G,RHOA,RHO0,RHOR,VISC,VISCV,EXPO,HYS,FRAC,
-     .    FCUT, A1,A2,E0,EMAX,EPSMAX,P0,AA,BB,KK,TAUX,BULK,EINT0,
+      INTEGER :: I,J,ILAW,NRATEN,NRATEP,IUNLOAD,IFUNCR,IFUNCK,
+     .       NPAR_FOAM,ICLOS,INCGAS
+      my_real :: NU,G,RHOA,RHO0,RHOR,EXPO,HYS,FRAC,
+     .    FCUT, A1,E0,EMAX,EPSMAX,P0,AA,BB,KK,TAUX,BULK,EINT0,
      .    GAMMA,PEXT,FP_INI,RHOEXT,EINT_EXT,FSCAL_UNIT
       INTEGER ,DIMENSION(15) :: FLOAD,FUNLOAD
       my_real ,DIMENSION(30) :: RATE,YFAC,RLOAD,SLOAD,RUNLOAD,SUNLOAD
@@ -291,7 +291,7 @@ c----------------
       ENDIF
       CALL INIT_MAT_KEYWORD(MATPARAM,"HOOK")
       ! Properties compatibility  
-      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_BRICK_ISOTROPIC")
 c--------------------------------------------------
 c     Starter output
 c--------------------------------------------------
@@ -360,7 +360,7 @@ c-----------------------------------------------------------------------
      & 5X,'DENSITY. . . . . . . . . . . . . . . . . . .=',1PG20.13/,
      & 5X,'PEXT. . . . . . . .. . . . . . . . . . . . .=',1PG20.13/,
      & 5X,'FLAG FOR CLOSED FOAM . . . . . . . . . . . .=',I10/
-     & 5X,'INCOMNIG GAS FLAG. . . . . . . . . . . . . .=',I10/ )
+     & 5X,'INCOMING GAS FLAG. . . . . . . . . . . . . .=',I10/ )
  3000 FORMAT(
      & 5X,'  DARCY PARAMETERS ',/,
      & 5X,'  -----------------',/)  

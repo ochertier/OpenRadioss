@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i21reset        ../engine/source/interfaces/int21/i21reset.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri          ../engine/source/interfaces/intsort/inttri.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i21reset        ../engine/source/interfaces/int21/i21reset.F
+!||--- called by ------------------------------------------------------
+!||    inttri          ../engine/source/interfaces/intsort/inttri.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I21RESET(
      1  IPARI  ,INTBUF_TAB  ,NIN    ,ITASK  )
 C-----------------------------------------------
@@ -55,12 +56,12 @@ C-----------------------------------------------
      .        NSN
 C     REAL
       my_real
-     .   STARTT, STOPT, TOL
+     .   STARTT, STOPT
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
 C---------------------------------------------------- 
-C  Calcul des adresses des buffers d'interfaces. 
+C  Calculation of the addresses of the interface buffers.
 C----------------------------------------------------
 C
       NSN   =IPARI(5,NIN)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,42 +20,44 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecsec42                 ../starter/source/tools/sect/hm_read_sect.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    anodset                  ../starter/source/output/analyse/analyse_node.c
-      !||    elegror                  ../starter/source/groups/elegror.F
-      !||    elegror_seatbelt         ../starter/source/groups/elegror_seatbelt.F
-      !||    fretitl                  ../starter/source/starter/freform.F
-      !||    grsize_ele_trans         ../starter/source/system/nintrr.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_sz_r2r                ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    nodgrnr5                 ../starter/source/starter/freform.F
-      !||    sec_nodes                ../starter/source/tools/sect/hm_read_sect.F
-      !||    sec_nodes_sol            ../starter/source/tools/sect/hm_read_sect.F
-      !||    sec_tri                  ../starter/source/tools/sect/hm_read_sect.F
-      !||    secstri                  ../starter/source/tools/sect/hm_read_sect.F
-      !||    subrotpoint              ../starter/source/model/submodel/subrot.F
-      !||    subrotvect               ../starter/source/model/submodel/subrot.F
-      !||    udouble                  ../starter/source/system/sysfus.F
-      !||    usr2sys                  ../starter/source/system/sysfus.F
-      !||    zerore                   ../starter/source/system/zerore.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                  ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecsec42                 ../starter/source/tools/sect/hm_read_sect.F
+!||--- called by ------------------------------------------------------
+!||    lectur                   ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    anodset                  ../starter/source/output/analyse/analyse_node.c
+!||    elegror                  ../starter/source/groups/elegror.F
+!||    elegror_seatbelt         ../starter/source/groups/elegror_seatbelt.F
+!||    fretitl                  ../starter/source/starter/freform.F
+!||    grsize_ele               ../starter/source/system/nintrr.F
+!||    grsize_ele_trans         ../starter/source/system/nintrr.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_sz_r2r                ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    nodgrnr5                 ../starter/source/starter/freform.F
+!||    sec_nodes                ../starter/source/tools/sect/hm_read_sect.F
+!||    sec_nodes_sol            ../starter/source/tools/sect/hm_read_sect.F
+!||    sec_tri                  ../starter/source/tools/sect/hm_read_sect.F
+!||    secstri                  ../starter/source/tools/sect/hm_read_sect.F
+!||    subrotpoint              ../starter/source/model/submodel/subrot.F
+!||    subrotvect               ../starter/source/model/submodel/subrot.F
+!||    udouble                  ../starter/source/system/sysfus.F
+!||    usr2sys                  ../starter/source/system/sysfus.F
+!||    zerore                   ../starter/source/system/zerore.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    r2r_mod                  ../starter/share/modules1/r2r_mod.F
+!||    restmod                  ../starter/share/modules1/restart_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE LECSEC42(IXS   ,IXQ   ,IXC    ,IXT    ,IXP    ,IXR    ,
-     2                    IXTG  ,X0    ,NSTRF  ,ITAB   ,ITABM1 ,
+     2                    IXTG  ,X0    ,ITAB   ,ITABM1 ,
      3                    IGRNOD,SECBUF ,
      4                    IPARI ,IXS10 ,IXS20  ,IXS16  ,UNITAB ,
      5                    ISKN  ,XFRAME,ISOLNOD,NOM_SECT,RTRANS,
@@ -65,6 +67,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      use extend_array_mod
       USE MESSAGE_MOD
       USE R2R_MOD
       USE SUBMODEL_MOD
@@ -72,6 +75,8 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARFIELD
+      USE RESTMOD, ONLY : NSTRF
+      use element_mod , only : nixs,nixq,nixc,nixp,nixt,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -93,7 +98,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER IXC(NIXC,NUMELC), IXTG(NIXTG,NUMELTG), NSTRF(*), ITAB(NUMNOD),
+      INTEGER IXC(NIXC,NUMELC), IXTG(NIXTG,NUMELTG),  ITAB(NUMNOD),
      .        ITABM1(*),IXS(NIXS,NUMELS), IXQ(NIXQ,NUMELQ), IXT(NIXT,NUMELT),
      .        IXP(NIXP,NUMELP), IXR(NIXR,NUMELR), IPARI(NPARI,NINTER),
      .        IXS10(6,*),IXS20(12,*),IXS16(8,*),ISKN(LISKN,*),
@@ -118,15 +123,14 @@ C-----------------------------------------------
       INTEGER ,DIMENSION(NSECT) :: SECTIDS
       INTEGER K1, I, J, L, KK, K2, K,LREC,
      .   NNOD, NBINTER,K0,K3,K4,K5,K6,K7,K8,K9,KR0,
-     .   NSEGQ,NSEGS,NSEGC,NSEGT,NSEGP,NSEGR,NSEGTG,I0,ID,
+     .   NSEGQ,NSEGS,NSEGC,NSEGT,NSEGP,NSEGR,NSEGTG,ID,
      .   IGU,IGS,IGUS,IGUQ,IGUC,IGUT,IGUP,IGUR,IGUTG,IFRAM,
-     .   NNSK1,NNSK2,NNSK3,UID,IFLAGUNIT,IE,IADV,
-     .   ISU,NFRAM,JJ,IUN,
-     .   TAGELEM1,TAGELEM2,TAGELEM3,
+     .   UID,IFLAGUNIT,
+     .   NFRAM,JJ,IUN,
      .   N1,CPT,
      .   NG,NOPRINT
       INTEGER L0,ISTYP,SUB_ID,ILEN
-      my_real DELTAT,ALPHA,FAC_T,A,B,C,D,E,F,POS,R,MAXDT
+      my_real DELTAT,ALPHA,FAC_T,A,B,C,D,E,F,R,MAXDT
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNODES !NUMNOD*2+NPART
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNDOUBL !NUMNOD
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGELEMS ! 1+NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELTG
@@ -139,12 +143,14 @@ C-----------------------------------------------
       my_real BID, XM, YM, ZM, X1, Y1, Z1, X2, Y2, Z2, NORM
       my_real X3, Y3, Z3, N3, PNOR1, PNOR2, PNORM1, DET, DET1, DET2, DET3
       LOGICAL :: IS_AVAILABLE
-      INTEGER :: NUMSECT,SNSTRF1
+      INTEGER :: SNSTRF1
+      integer :: max_extension
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER USR2SYS,NODGRNR5,ELEGROR,ELEGROR_SEATBELT,GRSIZE_ELE_TRANS
-      EXTERNAL USR2SYS,NODGRNR5,ELEGROR,ELEGROR_SEATBELT,GRSIZE_ELE_TRANS
+      INTEGER USR2SYS,NODGRNR5,ELEGROR,ELEGROR_SEATBELT,GRSIZE_ELE_TRANS,GRSIZE_ELE
+      EXTERNAL USR2SYS,NODGRNR5,ELEGROR,ELEGROR_SEATBELT,GRSIZE_ELE_TRANS,GRSIZE_ELE
+
 C
       DATA MESS/'SECTION DEFINITION                      '/
       DATA IUN/1/
@@ -170,7 +176,7 @@ C file run number
       NSTRF(4)=1
 C file next run number
       NSTRF(5)=2
-C file rec length
+C File Rec Length
       LREC=0
 C file record flip/flop
 
@@ -220,6 +226,7 @@ C-----------------------------------------------------------------
 C
        LREC = LREC+3
        K1 = K0+30
+        call extend_array(NSTRF,SIZE(NSTRF),K0+30)
         CALL HM_OPTION_READ_KEY(LSUBMODEL, OPTION_ID=ID, OPTION_TITR=TITR, UNIT_ID=UID, SUBMODEL_ID=SUB_ID, KEYWORD2=KEY2)
 
         NOM_OPT(1,I)=ID
@@ -310,6 +317,7 @@ C
      .               C1=TITR)
        END IF
 
+      call extend_array(NSTRF,SIZE(NSTRF),K1-1+NBINTER)
        DO J=1,NBINTER
          CALL HM_GET_INT_ARRAY_INDEX('int_id' ,NSTRF(K1-1+J) ,J ,IS_AVAILABLE, LSUBMODEL)
        ENDDO
@@ -428,51 +436,71 @@ C
          KK=1+NGRNOD
          NNOD = 0
          CPT = 1
-         CALL SEC_NODES_SOL(IGUS,ISTYP,NGRBRIC,IGRBRIC,X0,A,
-     2                 B,C,D,E,F,ITAB,IXS,IXS10,IXS16,IXS20,
-     3                 NIXS,KK,NNOD,NSTRF,NBINTER,N1 ,K1,
+         max_extension = 22 * GRSIZE_ELE(IGUS,IGRBRIC,NGRBRIC)     
+         call extend_array(NSTRF,size(nstrf),K0 + max_extension)
+         CALL SEC_NODES_SOL(IGUS,ISTYP,IGRBRIC,X0,A,
+     2                 B,C,D,E,F,IXS,IXS10,IXS16,IXS20,
+     3                 NIXS,NNOD,NSTRF,NBINTER,K1,
      4                 CPT,NODTAG,ISOLNOD,TAGELEMS,
      5                 X1,Y1,Z1,X2,Y2,Z2,R)
 
          KK=KK+NGRBRIC
+         max_extension = 6 * GRSIZE_ELE(IGUQ,IGRQUAD,NGRQUAD)
+         call extend_array(NSTRF,size(nstrf),CPT + max_extension)
          CALL SEC_NODES(IGUQ,ISTYP,NGRQUAD,IGRQUAD,X0,A,
-     2                 B,C,D,E,F,ITAB,IXQ,NIXQ,KK,NNOD,NSTRF,
-     3                 NBINTER,N1,K1,4,CPT,NODTAG,TAGELEMS(1+NUMELS),
+     2                 B,C,D,E,F,IXQ,NIXQ,NNOD,NSTRF,
+     3                 NBINTER,K1,4,CPT,NODTAG,TAGELEMS(1+NUMELS),
      4                 X1,Y1,Z1,X2,Y2,Z2,R)
+
          KK=KK+NGRQUAD
+         max_extension = 6 * GRSIZE_ELE(IGUC,IGRSH4N,NGRSHEL)
+         call extend_array(NSTRF,size(nstrf),CPT + max_extension)
          CALL SEC_NODES(IGUC,ISTYP,NGRSHEL,IGRSH4N,X0,A,
-     2                 B,C,D,E,F,ITAB,IXC,NIXC,KK,NNOD,NSTRF,
-     3                 NBINTER,N1,K1,4,CPT,NODTAG,TAGELEMS(1+NUMELS
+     2                 B,C,D,E,F,IXC,NIXC,NNOD,NSTRF,
+     3                 NBINTER,K1,4,CPT,NODTAG,TAGELEMS(1+NUMELS
      .               +NUMELQ),
      4               X1,Y1,Z1,X2,Y2,Z2,R)
          KK=KK+NGRSHEL
+
+         max_extension = 4 * GRSIZE_ELE(IGUT,IGRTRUSS,NGRTRUS)
+         call extend_array(NSTRF,size(nstrf),CPT + max_extension)
          CALL SEC_NODES(IGUT,ISTYP,NGRTRUS,IGRTRUSS,X0,A,
-     2                 B,C,D,E,F,ITAB,IXT,NIXT,KK,NNOD,NSTRF,
-     3                 NBINTER,N1,K1,2,CPT,NODTAG,TAGELEMS(1+NUMELS
+     2                 B,C,D,E,F,IXT,NIXT,NNOD,NSTRF,
+     3                 NBINTER,K1,2,CPT,NODTAG,TAGELEMS(1+NUMELS
      .              +NUMELQ+NUMELC),
      4               X1,Y1,Z1,X2,Y2,Z2,R)
          KK=KK+NGRTRUS
+
+
+         max_extension = 4 * GRSIZE_ELE(IGUP,IGRBEAM,NGRBEAM)
+         call extend_array(NSTRF,size(nstrf),CPT + max_extension)
          CALL SEC_NODES(IGUP,ISTYP,NGRBEAM,IGRBEAM,X0,A,
-     2                 B,C,D,E,F,ITAB,IXP,NIXP,KK,NNOD,NSTRF,
-     3                 NBINTER,N1,K1,2,CPT,NODTAG,TAGELEMS(1+NUMELS
+     2                 B,C,D,E,F,IXP,NIXP,NNOD,NSTRF,
+     3                 NBINTER,K1,2,CPT,NODTAG,TAGELEMS(1+NUMELS
      .              +NUMELQ+NUMELC+NUMELT),
      4               X1,Y1,Z1,X2,Y2,Z2,R)
          KK=KK+NGRBEAM
+
+         max_extension = 4 * GRSIZE_ELE(IGUR,IGRSPRING,NGRSPRI)     
+         call extend_array(NSTRF,size(nstrf),CPT + max_extension)
          CALL SEC_NODES(IGUR,ISTYP,NGRSPRI,IGRSPRING,X0,A,
-     2                 B,C,D,E,F,ITAB,IXR,NIXR,KK,NNOD,NSTRF,
-     3                 NBINTER,N1,K1,2,CPT,NODTAG,TAGELEMS(1+NUMELS
+     2                 B,C,D,E,F,IXR,NIXR,NNOD,NSTRF,
+     3                 NBINTER,K1,2,CPT,NODTAG,TAGELEMS(1+NUMELS
      .              +NUMELQ+NUMELC+NUMELT+NUMELP),
      4               X1,Y1,Z1,X2,Y2,Z2,R)
          KK=KK+NGRSPRI
+
+         max_extension = 6 * GRSIZE_ELE(IGUTG,IGRSH3N,NGRSH3N)
+         call extend_array(NSTRF,size(nstrf),CPT + max_extension)
          CALL SEC_NODES(IGUTG,ISTYP,NGRSH3N,IGRSH3N,X0,A,
-     2                B,C,D,E,F,ITAB,IXTG,NIXTG,KK,NNOD,NSTRF,
-     3                 NBINTER,N1,K1,3,CPT,NODTAG,TAGELEMS(1+NUMELS
+     2                B,C,D,E,F,IXTG,NIXTG,NNOD,NSTRF,
+     3                 NBINTER,K1,3,CPT,NODTAG,TAGELEMS(1+NUMELS
      .              +NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR),
      4               X1,Y1,Z1,X2,Y2,Z2,R)
        ENDIF
 
        K2=K1+NBINTER
-
+       call extend_array(NSTRF,size(NSTRF),K2+NUMNOD)
        IF (NFRAM == 0 .AND. ISTYP == 0) THEN
           NNOD=NODGRNR5(IGU,IGS,NSTRF(K2),IGRNOD,ITABM1,MESS)
        ENDIF
@@ -486,30 +514,37 @@ C
      .              I1=ID,
      .              C1=TITR)
 
+
        K3=K2+NNOD
+       call extend_array(NSTRF,SIZE(NSTRF),K3+2* GRSIZE_ELE(IGUS,IGRBRIC,NGRBRIC))
        NSEGS=ELEGROR(IGUS,IGRBRIC,NGRBRIC,'BRIC',
      .               NSTRF(K3),2,MESS,NFRAM,TAGELEMS,ISTYP,
      .               ID,TITR)
        K4=K3+2*NSEGS
+        call extend_array(NSTRF,SIZE(NSTRF),K4+2* GRSIZE_ELE(IGUQ,IGRQUAD,NGRQUAD))
        NSEGQ=ELEGROR(IGUQ,IGRQUAD,NGRQUAD,'QUAD',
      .               NSTRF(K4),2,MESS,NFRAM,TAGELEMS(1+NUMELS),ISTYP,
      .               ID,TITR)
        K5=K4+2*NSEGQ
+       call extend_array(NSTRF,SIZE(NSTRF),K5+2* GRSIZE_ELE(IGUC,IGRSH4N,NGRSHEL))
        NSEGC=ELEGROR(IGUC,IGRSH4N,NGRSHEL,'SHEL',
      .               NSTRF(K5),2,MESS,NFRAM,TAGELEMS(1+NUMELS
      .              +NUMELQ),ISTYP,
      .               ID,TITR)
        K6=K5+2*NSEGC
+       call extend_array(NSTRF,SIZE(NSTRF),K6+2* GRSIZE_ELE(IGUT,IGRTRUSS,NGRTRUS))
        NSEGT=ELEGROR(IGUT,IGRTRUSS,NGRTRUS,'TRUS',
      .               NSTRF(K6),2,MESS,NFRAM,TAGELEMS(1+NUMELS
      .              +NUMELQ+NUMELC),ISTYP,
      .               ID,TITR)
        K7=K6+2*NSEGT
+        call extend_array(NSTRF,SIZE(NSTRF),K7+2* GRSIZE_ELE(IGUP,IGRBEAM,NGRBEAM))
        NSEGP=ELEGROR(IGUP,IGRBEAM,NGRBEAM,'BEAM',
      .               NSTRF(K7),2,MESS,NFRAM,TAGELEMS(1+NUMELS
      .              +NUMELQ+NUMELC+NUMELT),ISTYP,
      .               ID,TITR)
        K8=K7+2*NSEGP
+        call extend_array(NSTRF,SIZE(NSTRF),K8+2* GRSIZE_ELE(IGUR,IGRSPRING,NGRSPRI))
        NSEGR=ELEGROR(IGUR,IGRSPRING,NGRSPRI,'SPRI',
      .               NSTRF(K8),2,MESS,NFRAM,TAGELEMS(1+NUMELS
      .              +NUMELQ+NUMELC+NUMELT+NUMELP),ISTYP,
@@ -517,6 +552,7 @@ C
 
        IF (NB_SEATBELT_SHELLS /=0) THEN
          SNSTRF1 = GRSIZE_ELE_TRANS(IGUC,IGRSH4N,NGRSHEL,SEATBELT_SHELL_TO_SPRING)
+         call extend_array(NSTRF,SIZE(NSTRF),K8+2*NSEGR+2*SNSTRF1)
          NSEGR=NSEGR+ELEGROR_SEATBELT(IGUC,IGRSH4N,NGRSHEL,
      .               NSTRF(K8),2,SNSTRF1,NFRAM,TAGELEMS(1+NUMELS
      .              +NUMELQ),ISTYP,
@@ -524,6 +560,7 @@ C
        ENDIF
 
        K9=K8+2*NSEGR
+       call extend_array(NSTRF,SIZE(NSTRF),K9+2* GRSIZE_ELE(IGUTG,IGRSH3N,NGRSH3N))
        NSEGTG=ELEGROR(IGUTG,IGRSH3N,NGRSH3N,'SH3N',
      .                NSTRF(K9),2,MESS,NFRAM,TAGELEMS(1+NUMELS
      .              +NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR),ISTYP,
@@ -593,43 +630,43 @@ C      SOLIDES
 C--------------------------------------------------------------
        WRITE (IOUT,3300) NSEGS
        CALL SECSTRI(NSEGS,NSTRF(K3),IXS,IXS10,IXS16,IXS20,
-     .              NSTRF(K2),NNOD,ITAB,I,NOPRINT)
+     .              NSTRF(K2),NNOD,NOPRINT)
 C-------------------------------------------------------------
 C      QUADS
 C--------------------------------------------------------------
        WRITE (IOUT,3400) NSEGQ
        CALL SEC_TRI(NSEGQ,NSTRF(K4),IXQ,NIXQ,4,NSTRF(K2),
-     .              NNOD,ITAB,NUMELQ,I,' QUADS')
+     .              NNOD)
 C-------------------------------------------------------------
 C      COQUES
 C--------------------------------------------------------------
        WRITE (IOUT,3100) NSEGC
        CALL SEC_TRI(NSEGC,NSTRF(K5),IXC,NIXC,4,NSTRF(K2),
-     .              NNOD,ITAB,NUMELC,I,' SHELLS')
+     .              NNOD)
 C-------------------------------------------------------------
 C      BARRES
 C--------------------------------------------------------------
        WRITE (IOUT,3500) NSEGT
        CALL SEC_TRI(NSEGT,NSTRF(K6),IXT,NIXT,2,NSTRF(K2),
-     .              NNOD,ITAB,NUMELT,I,' TRUSSES')
+     .              NNOD)
 C-------------------------------------------------------------
 C      POUTRES
 C--------------------------------------------------------------
        WRITE (IOUT,3600) NSEGP
        CALL SEC_TRI(NSEGP,NSTRF(K7),IXP,NIXP,2,NSTRF(K2),
-     .              NNOD,ITAB,NUMELP,I,' BEAMS')
+     .              NNOD)
 C-------------------------------------------------------------
 C      RESSORTS
 C--------------------------------------------------------------
        WRITE (IOUT,3700) NSEGR
        CALL SEC_TRI(NSEGR,NSTRF(K8),IXR,NIXR,2,NSTRF(K2),
-     .              NNOD,ITAB,NUMELR,I,' SPRINGS')
+     .              NNOD)
 C-------------------------------------------------------------
 C      COQUES 3N
 C--------------------------------------------------------------
        WRITE (IOUT,3200) NSEGTG
        CALL SEC_TRI(NSEGTG,NSTRF(K9),IXTG,NIXTG,3,NSTRF(K2),
-     .              NNOD,ITAB,NUMELTG,I,' 3 NODES SHELLS')
+     .              NNOD)
 
 C-------------------------------------------------------------
 C
@@ -691,7 +728,7 @@ C-------------------------------------------------------------
       ENDDO
       CALL UDOUBLE(SECTIDS,1,NSECT,MESS,0,BID)
 
-C file rec length
+C File Rec Length
       NSTRF(6)=LREC*4
       DEALLOCATE(TAGNODES)
       DEALLOCATE(TAGNDOUBL)
@@ -710,10 +747,6 @@ C-------------------------------------------------------------
      + '        FRAME TYPE . . . . . . . . . . . .',I10/
      + '        NUMBER OF INTERFACES . . . . . . .',I10/
      + '        INTERFACES:')
- 2901 FORMAT(/' SECTION',I10,' ID',I10/
-     +        ' ---------------'/
-     + '        TYPE . . . . . . . . . . . . . . .',I8/
-     + '        FRAME TYPE . . . . . . . . . . . .',I8/)
  3000 FORMAT(/
      + '        NUMBER OF NODES. . . . . . . . . .',I10/
      + '        NODES:')
@@ -743,14 +776,16 @@ C
       RETURN
       END
 C=========================================================================
-      !||====================================================================
-      !||    secstri       ../starter/source/tools/sect/hm_read_sect.F
-      !||--- called by ------------------------------------------------------
-      !||    lecsec42      ../starter/source/tools/sect/hm_read_sect.F
-      !||    lecsec4bolt   ../starter/source/tools/sect/lecsec4bolt.F
-      !||====================================================================
+!||====================================================================
+!||    secstri       ../starter/source/tools/sect/hm_read_sect.F
+!||--- called by ------------------------------------------------------
+!||    lecsec42      ../starter/source/tools/sect/hm_read_sect.F
+!||    lecsec4bolt   ../starter/source/tools/sect/lecsec4bolt.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SECSTRI(NSEG,ISECBUF,IXS,IXS10,IXS16,IXS20,
-     .                   NOD ,NNOD ,ITAB ,ISEC, NOPRINT )
+     .                   NOD ,NNOD ,NOPRINT )
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -763,15 +798,15 @@ C-----------------------------------------------
 
       INTEGER NSEG,ISECBUF(2,*),IXS(NIXS,NUMELS),
      .        IXS10(6,*),IXS16(8,*),IXS20(12,*),
-     .        NOD(*),NNOD,ITAB(NUMNOD),ISEC,NOPRINT
-      INTEGER I,J,JJ,K,N,NN,L,POWER2(20)
+     .        NOD(*),NNOD,NOPRINT
+      INTEGER J,JJ,K,N,NN,L,POWER2(20)
 
       DATA POWER2/1,2,4,8,16,32,64,128,256,512,
      .            1024,2048,4096,8192,16384,
      .            32768,65536,131072,262144,524288/
 C
 C-------------------------------------------------------------
-C      TRI SUR LES NUMEROS INTERNES
+C      sort by internal numbers
 C--------------------------------------------------------------
        DO J=1,NSEG-1
          N = ISECBUF(1,J)
@@ -785,7 +820,7 @@ C--------------------------------------------------------------
          ENDDO
        ENDDO
 C-------------------------------------------------------------
-C      RECHERCHE DES NOEUDS DES ELEMENTS DE LA SECTION
+C      search for the nodes of the section elements
 C--------------------------------------------------------------
        DO J=1,NSEG
          N = ISECBUF(1,J)
@@ -873,13 +908,13 @@ C
        RETURN
        END
 
-      !||====================================================================
-      !||    sec_tri    ../starter/source/tools/sect/hm_read_sect.F
-      !||--- called by ------------------------------------------------------
-      !||    lecsec42   ../starter/source/tools/sect/hm_read_sect.F
-      !||====================================================================
+!||====================================================================
+!||    sec_tri    ../starter/source/tools/sect/hm_read_sect.F
+!||--- called by ------------------------------------------------------
+!||    lecsec42   ../starter/source/tools/sect/hm_read_sect.F
+!||====================================================================
       SUBROUTINE SEC_TRI(NSEG,ISECBUF,IX,NIX,NNE,NOD,
-     .                   NNOD,ITAB   ,NUMEL,ISEC,TXT)
+     .                   NNOD)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -889,10 +924,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 C
-      INTEGER NIX,NSEG,ISECBUF(2,*),IX(NIX,*),NNE,NOD(*),NNOD,
-     .        ITAB(*),NUMEL,ISEC
+      INTEGER NIX,NSEG,ISECBUF(2,*),IX(NIX,*),NNE,NOD(*),NNOD
       INTEGER I,J,JJ,K,N,NN,L,POWER2(10),UNPACK(0:1023,10),IFIRST
-      CHARACTER*(*) TXT
 C
       DATA POWER2/1,2,4,8,16,32,64,128,256,512/
       DATA IFIRST/0/
@@ -910,7 +943,7 @@ C-----------------------------------------------
       ENDIF
 
 C-------------------------------------------------------------
-C      TRI SUR LES NUMEROS INTERNES
+C      sort by internal numbers
 C--------------------------------------------------------------
        DO J=1,NSEG-1
          N = ISECBUF(1,J)
@@ -924,7 +957,7 @@ C--------------------------------------------------------------
          ENDDO
        ENDDO
 C-------------------------------------------------------------
-C      RECHERCHE DES NOEUDS DES ELEMENTS DE LA SECTION
+C      search for the nodes of the section elements
 C--------------------------------------------------------------
        DO J=1,NSEG
          N = ISECBUF(1,J)
@@ -947,18 +980,18 @@ C
        RETURN
        END
 
-      !||====================================================================
-      !||    lecsec0                ../starter/source/tools/sect/hm_read_sect.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecsec0                ../starter/source/tools/sect/hm_read_sect.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE LECSEC0(LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1004,15 +1037,15 @@ C-----------------------------------------------
       RETURN
       END
 C
-      !||====================================================================
-      !||    sec_nodes      ../starter/source/tools/sect/hm_read_sect.F
-      !||--- called by ------------------------------------------------------
-      !||    lecsec42       ../starter/source/tools/sect/hm_read_sect.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    sec_nodes      ../starter/source/tools/sect/hm_read_sect.F
+!||--- called by ------------------------------------------------------
+!||    lecsec42       ../starter/source/tools/sect/hm_read_sect.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SEC_NODES(IGU1,ISTYP,NGRELE,IGRELE,X0,A,
-     2                  B,C,D,E,F,ITAB,IX,NIX,KK,NNOD,NSTRF,
-     3                  NBINTER,N1 ,K1,NBNODES,J,NODTAG,TAGELEMS,
+     2                  B,C,D,E,F,IX,NIX,NNOD,NSTRF,
+     3                  NBINTER,K1,NBNODES,J,NODTAG,TAGELEMS,
      4                  X1,Y1,Z1,X2,Y2,Z2,R)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1029,15 +1062,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IGU1,ISTYP,NGRELE,NIX,KK,NNOD,NBINTER,N1,K1,NBNODES,J
-      INTEGER ITAB(NUMNOD), IX(NIX,*), NSTRF(*),  NODTAG(NUMNOD),TAGELEMS(*)
+      INTEGER IGU1,ISTYP,NGRELE,NIX,NNOD,NBINTER,K1,NBNODES,J
+      INTEGER IX(NIX,*), NSTRF(*),  NODTAG(NUMNOD),TAGELEMS(*)
       my_real  X0(3,*),A,B,C,D,E,F,X1,Y1,Z1,X2,Y2,Z2,R
 C-----------------------------------------------
       TYPE (GROUP_)  ,DIMENSION(NGRELE)   :: IGRELE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,L,ISU,IADV,IE,TAGELEM1,TAGELEM2,TAGELEM3,NBPROJOK
+      INTEGER K,L,ISU,IE,TAGELEM1,TAGELEM2,TAGELEM3,NBPROJOK
       !TAGNDOUBL(NUMNOD),TAGNODES(NUMNOD*2+NPART)
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNDOUBL, TAGNODES
       my_real  POS,PROJX,PROJY,PROJZ,P1,P2
@@ -1162,16 +1195,16 @@ c
       RETURN
       END
 C
-      !||====================================================================
-      !||    sec_nodes_sol   ../starter/source/tools/sect/hm_read_sect.F
-      !||--- called by ------------------------------------------------------
-      !||    lecsec42        ../starter/source/tools/sect/hm_read_sect.F
-      !||    lecsec4bolt     ../starter/source/tools/sect/lecsec4bolt.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
-      SUBROUTINE SEC_NODES_SOL(IGU1,ISTYP,NGR,IGRBRIC,X0,A,
-     2                   B,C,D,E,F,ITAB,IXS,IXS10,IXS16,IXS20,
-     3                   NIX,KK,NNOD,NSTRF,NBINTER,N1 ,K1,
+!||====================================================================
+!||    sec_nodes_sol   ../starter/source/tools/sect/hm_read_sect.F
+!||--- called by ------------------------------------------------------
+!||    lecsec42        ../starter/source/tools/sect/hm_read_sect.F
+!||    lecsec4bolt     ../starter/source/tools/sect/lecsec4bolt.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
+      SUBROUTINE SEC_NODES_SOL(IGU1,ISTYP,IGRBRIC,X0,A,
+     2                   B,C,D,E,F,IXS,IXS10,IXS16,IXS20,
+     3                   NIX,NNOD,NSTRF,NBINTER,K1,
      4                   J,NODTAG,ISOLNOD,TAGELEMS,
      5                   X1,Y1,Z1,X2,Y2,Z2,R)
 C-----------------------------------------------
@@ -1189,8 +1222,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IGU1,ISTYP,NGR,NIX,KK,NNOD,NBINTER,N1,K1,J
-      INTEGER ITAB(NUMNOD),IXS(NIX,NUMELS), NSTRF(*),
+      INTEGER IGU1,ISTYP,NIX,NNOD,NBINTER,K1,J
+      INTEGER IXS(NIX,NUMELS), NSTRF(*),
      .        NODTAG(NUMNOD), IXS10(6,*),IXS16(8,*),IXS20(12,*),
      .        ISOLNOD(*),TAGELEMS(*)
       my_real X0(3,*),A,B,C,D,E,F,X1,Y1,Z1,X2,Y2,Z2,R
@@ -1199,7 +1232,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,L,ISU,IADV,IE,TAGELEM1,TAGELEM2,TAGELEM3, NBNODES,NBPROJOK,OFFSET
+      INTEGER K,L,ISU,IE,TAGELEM1,TAGELEM2,TAGELEM3, NBNODES,NBPROJOK,OFFSET
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNDOUBL,TAGNODES
       my_real POS,PROJX,PROJY,PROJZ,P1,P2
 C-----------------------------------------------
@@ -1227,7 +1260,7 @@ C
               TAGELEM3=0
               NBPROJOK = 0
               DO K=2,NBNODES+1
-C              tag les noeuds connectes a l'element
+C              tag nodes connected to the element
                 IF (NBNODES == 10 .AND. K > 5) THEN
                   OFFSET = NUMELS8
             POS = (X0(1,IXS10(K-5,IE-OFFSET))-D)*A +

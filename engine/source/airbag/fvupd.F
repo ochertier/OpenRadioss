@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvupd0                ../engine/source/airbag/fvupd.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    fvupd1                ../engine/source/airbag/fvupd.F
-      !||    spmd_fvb_gath_begin   ../engine/source/mpi/airbags/spmd_fvb.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod             ../engine/share/modules/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvupd0                ../engine/source/airbag/fvupd.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    fvupd1                ../engine/source/airbag/fvupd.F
+!||    spmd_fvb_gath_begin   ../engine/source/mpi/airbags/spmd_fvb.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod             ../engine/share/modules/fvbag_mod.F
+!||====================================================================
       SUBROUTINE FVUPD0(MONVOL, X, V, VOLMON, SMONVOL, SVOLMON)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -122,6 +122,10 @@ C
                ALLOCATE(FVSPMD(IFV)%VVV(3,MAX(1,NNT))) 
                ALLOCATE(FVSPMD(IFV)%WAV(3,MAX(1,NNA))) 
                ALLOCATE(FVSPMD(IFV)%WAX(3,MAX(1,NNA))) 
+               FVSPMD(IFV)%XXX(1:3,1:MAX(1,NNT)) = ZERO
+               FVSPMD(IFV)%VVV(1:3,1:MAX(1,NNT)) = ZERO
+               FVSPMD(IFV)%WAV(1:3,1:MAX(1,NNA)) = ZERO
+               FVSPMD(IFV)%WAX(1:3,1:MAX(1,NNA)) = ZERO
                IF( NSPMD > 1 ) THEN 
                  CALL SPMD_FVB_GATH_BEGIN(IFV,X,FVSPMD(IFV)%XXX,FVSPMD(IFV)%WAX,
      .                                 V,FVSPMD(IFV)%VVV,FVSPMD(IFV)%WAV )
@@ -232,17 +236,17 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    fvupd1                   ../engine/source/airbag/fvupd.F
-      !||--- called by ------------------------------------------------------
-      !||    fvupd0                   ../engine/source/airbag/fvupd.F
-      !||--- calls      -----------------------------------------------------
-      !||    fvtemp                   ../engine/source/airbag/fvtemp.F
-      !||    spmd_fvb_gath_end        ../engine/source/mpi/airbags/spmd_fvb.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
-      !||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvupd1                   ../engine/source/airbag/fvupd.F
+!||--- called by ------------------------------------------------------
+!||    fvupd0                   ../engine/source/airbag/fvupd.F
+!||--- calls      -----------------------------------------------------
+!||    fvtemp                   ../engine/source/airbag/fvtemp.F
+!||    spmd_fvb_gath_end        ../engine/source/mpi/airbags/spmd_fvb.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
+!||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
+!||====================================================================
       SUBROUTINE FVUPD1(NEL       , IBUF    , ELEM     , X    , NPOLH ,
      .                  MPOLH     , QPOLH   , EPOLH    , V    ,
      .                  PPOLH     , RPOLH   , GPOLH    , 
@@ -298,13 +302,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IEL, N1, N2, N3, NN1, NN2, NN3, J, JJ, K, KK, NPA,
+      INTEGER I, IEL, N1, N2, N3, J, JJ, K, KK, NPA,
      .        IMAX, IP1, IP2, ITAG(NPOLH), ITAGP(NPOLY),
      .        COUNT(NPOLH), II, CC, LEN, NPOLH_OLD, NNP,
      .        IFVPADR_OLD(NPOLH+1), REDIR(NPOLH), ILOOP,
-     .        POLHAPP(2,NPOLY), CMAX, JMIN, ITYPM,
+     .        POLHAPP(2,NPOLY), CMAX, ITYPM,
      .        IDP1, IDP2, IDPOLH_OLD(NPOLH), IBPOLH_OLD(NPOLH), I1, I2,
-     .        NNSA,JJJ,KKK,IP3,ITYPL,DTMERGV12
+     .        NNSA,KKK,IP3,ITYPL,DTMERGV12
       my_real
      .        KSI, ETA, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3,
      .        PNOD(3,NNS), X12, Y12, Z12, X13, Y13, Z13, NRX, NRY,
@@ -313,8 +317,8 @@ C-----------------------------------------------
      .        QPOLH_OLD(3,NPOLH), EPOLH_OLD(NPOLH), PVOLU_OLD(NPOLH),
      .        VOLUMIN, AREAPOLY(NPOLY), CPAPOLH_OLD(NPOLH),
      .        CPBPOLH_OLD(NPOLH), CPCPOLH_OLD(NPOLH), 
-     .        RMWPOLH_OLD(NPOLH), GPOLH_OLD(NPOLH), VOLUSORT(NPOLH),
-     .        VMIN, VTMP, VPOLH_INI_OLD(NPOLH), VVMAX(NPOLH), VOL1,
+     .        RMWPOLH_OLD(NPOLH), GPOLH_OLD(NPOLH),
+     .        VPOLH_INI_OLD(NPOLH), VVMAX(NPOLH), VOL1,
      .        VOL2, DTMIN, FAC, DTPOLH_OLD(NPOLH),
      .        TPOLH_OLD(NPOLH), CPDPOLH_OLD(NPOLH), CPEPOLH_OLD(NPOLH), 
      .        CPFPOLH_OLD(NPOLH), EFAC, CPA, CPB, CPC, CPD, CPE, CPF,
@@ -324,7 +328,7 @@ C
       INTEGER, ALLOCATABLE :: MERGE(:,:), IFVPOLH_OLD(:)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       IF (NSPMD == 1) THEN
-C traitement necessaire pour rester p/on
+C treatment necessary to stay p/we
          DO I=1,FVSPMD(IFV)%NN_L+FVSPMD(IFV)%NNI_L
            I1=FVSPMD(IFV)%IBUF_L(1,I)
            I2=FVSPMD(IFV)%IBUF_L(2,I)
@@ -356,7 +360,7 @@ C
                FVSPMD(IFV)%WAX(3,I1)=X(3,I2)
             ENDDO
          ENDIF
-C WA utilise temporairement pour stocker XXXA
+C WA uses temporarily to store xxxa
          DO I=1,NNA
            XXXA(1,I)=FVSPMD(IFV)%WAX(1,I)
            XXXA(2,I)=FVSPMD(IFV)%WAX(2,I)
@@ -394,7 +398,7 @@ C
                FVSPMD(IFV)%WAV(3,I1)=V(3,I2)
             ENDDO
          ENDIF
-C WA utilise temporairement pour stocker VVVA
+C WA uses temporarily to store VVVA
          DO I=1,NNA
             IF(NCONA(2,I) == 1) THEN
               VVVA(1,I)=FVSPMD(IFV)%WAV(1,I)
@@ -404,16 +408,21 @@ C WA utilise temporairement pour stocker VVVA
          ENDDO
 C
       ELSE
+
+
+
+
+
 C
          NNSA=FVSPMD(IFV)%NNSA
-C Cacher XXX, VVV WAX WA dans FVSPMD 
+C Cache XXX, VVV WAX WA in FVSPMD 
 c        CALL SPMD_FVB_GATH_BEGIN(IFV,X,FVSPMD(IFV)%XXX,FVSPMD(IFV)%WAX,
 c    .                                V,FVSPMD(IFV)%VVV,FVSPMD(IFV)%WAV )
          CALL SPMD_FVB_GATH_END(IFV,X,FVSPMD(IFV)%XXX,FVSPMD(IFV)%WAX,
      .                                V,FVSPMD(IFV)%VVV,FVSPMD(IFV)%WAV )
 
 c        CALL SPMD_FVB_GATH(IFV, X, XXX, WA, XXXSA, 3)
-C WA utilise temporairement pour stocker XXXA
+C WA uses temporarily to store xxxa
          IF (KMESH(IFV) >= 2) THEN
             DO I=1,NNA
                IF (NCONA(2, I) /= 0) THEN
@@ -432,8 +441,8 @@ C WA utilise temporairement pour stocker XXXA
          ENDIF
 C
 
-C XXXSA et VVVSA utilise temporairement
-C WA utilise temporairement pour stocker VVVA
+C XXXSA and VVVSA temporarily uses
+C WA uses temporarily to store VVVA
          DO I=1,NNA
            IF(NCONA(2,I) == 1) THEN
               VVVA(1,I)=FVSPMD(IFV)%WAV(1,I)
@@ -457,7 +466,7 @@ C
 !$OMP+ PRIVATE(X2,Y2,Z2,X3,Y3,Z3,NRX,NRY,NRZ,AREA2) 
 !$OMP+ PRIVATE(KSI,ETA,FAC,I1,I2)
 C
-C Calcul position et vitesse des noeuds internes 
+C calculation of position and velocity of internal nodes
 !$OMP DO SCHEDULE(DYNAMIC,MVSIZ)
       DO I=1,NNA
         IF(NCONA(2,I) == 0) THEN
@@ -491,7 +500,7 @@ C Calcul position et vitesse des noeuds internes
 !$OMP END DO
       ENDIF
 
-C Calcul la position des noeuds internes 
+C calculation of the position of internal nodes
 !$OMP DO SCHEDULE(DYNAMIC,MVSIZ)
       DO I=1,NNA
         IF(NCONA(2,I) == 0) THEN
@@ -506,7 +515,7 @@ C Calcul la position des noeuds internes
 !$OMP END DO 
 
 
-C Calcul la position de tous les points 
+C calculation of the position of all points
 !$OMP DO SCHEDULE(DYNAMIC,MVSIZ)
       DO I=1,NNS
          IF (IFVNOD(1,I)==1) THEN
@@ -574,7 +583,7 @@ C
 !$OMP END DO
       ENDIF 
             
-C Normale et aire des triangles
+C normal and area of triangles
 !$OMP DO SCHEDULE(DYNAMIC,MVSIZ)
       DO I=1,NNTR
          N1=IFVTRI(1,I)
@@ -612,15 +621,15 @@ C Normale et aire des triangles
       ENDDO
 !$OMP END DO
 C
-C Volume des polyhedres
+C volume of polyhedra
 !$OMP DO SCHEDULE(DYNAMIC,MVSIZ)
       DO I=1,NPOLH
          PVOLU(I)= ZERO
          PVOLTMP = ZERO
-C Boucle sur les polygones du polyhedre
+C loop over the polygons of the polyhedron
          DO J=IFVPADR(I),IFVPADR(I+1)-1
             JJ=IFVPOLH(J)
-C Boucle sur les triangles du polygone
+C loop over the triangles of the polygon
             DO K=IFVTADR(JJ), IFVTADR(JJ+1)-1
                KK=IFVPOLY(K)
                AREA=PAREA(KK)
@@ -662,12 +671,12 @@ C Boucle sur les triangles du polygone
 
       IF(IVOLU(39) == 0) RETURN
 
-C Pas de temps mini
+C minimum time step
 C      DTMIN=DTMIN1(52)
       DTMIN = FVBAG_DTMIN
       DTMERGV12=IDTMIN(52)
       IF(DTMERGV12==2) DTMERGV12=1
-C Volume moyen
+C Average volume
       VM=ZERO
       NPA=0
       DO I=1,NPOLH
@@ -694,7 +703,7 @@ C Volume moyen
          VOLUMIN=RVOLU(33)*RVOLU(31)
       ENDIF
 
-C Aire des polygones et polyhedres appuyes
+C Area of supported polygons and polyhedra
       DO I=1,NPOLY
          AREAPOLY(I)=ZERO
          POLHAPP(1,I)=0
@@ -720,7 +729,7 @@ C
       DO I=1,NPOLY
          ITAGP(I)=0
       ENDDO
-C Volume max de voisins
+C max volume of neighbors
 !$OMP PARALLEL PRIVATE(I,J,JJ,K,KK,IEL,II)
 !$OMP DO SCHEDULE(DYNAMIC,MVSIZ)
       DO I=1,NPOLH
@@ -763,7 +772,7 @@ C
             IF (MPOLH(I)<=ZERO.OR.EPOLH(I)<=ZERO) ITYPM=3
             IF (DTPOLH(I)<=DTMIN) ITYPM=4
 C
-C Recherche le polyedre voisin Imax ayant la plus grande surface commune avec le polyedre I
+C Search for the neighboring polyhedron Imax with the largest common surface with polyhedron I
 C
             AREAMAX=ZERO
             IMAX=0
@@ -789,12 +798,12 @@ C
 C Polyedre Imax a deja re   u un polyedre
                ILOOP=1
             ELSE
-C Merge polyedre I dans polyedre Imax
+C Merge polyhedron I into polyhedron Imax
                DO J=IFVPADR(IMAX),IFVPADR(IMAX+1)-1
                   JJ=IFVPOLH(J)
                   K=IFVTADR(JJ)
                   KK=IFVPOLY(K)
-C Tag polygone commun aux polyedres Imax et I
+C Tag Polygon common to Polyhedra Imax and I
                   IF (IFVTRI(4,KK)==0.AND.(IFVTRI(5,KK)==I.OR.
      .                                       IFVTRI(6,KK)==I))
      .               ITAGP(JJ)=1

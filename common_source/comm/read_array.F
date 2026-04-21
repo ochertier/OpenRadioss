@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_array   ../common_source/comm/read_array.F
-      !||--- called by ------------------------------------------------------
-      !||    rdcomi       ../engine/source/output/restart/rdcomm.F
-      !||====================================================================
+!||====================================================================
+!||    read_array   ../common_source/comm/read_array.F
+!||--- called by ------------------------------------------------------
+!||    rdcomi       ../engine/source/output/restart/rdcomm.F
+!||====================================================================
       SUBROUTINE READ_ARRAY(ARRAY,TABVINT, LVARINT, M_CHECK)
 C-----------------------------------------------
 C   Description
@@ -40,30 +40,29 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-       INTEGER,INTENT(INOUT) :: ARRAY(*),LVARINT
-       INTEGER,INTENT(IN)    :: TABVINT(*),M_CHECK
+        INTEGER,INTENT(INOUT) :: ARRAY(*),LVARINT
+        INTEGER,INTENT(IN)    :: TABVINT(*),M_CHECK
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LB,UB
-      INTEGER NUM
-      INTEGER I
+        INTEGER NUM
+        INTEGER I
 C-----------------------------------------------
-C   S o u r c e   L i n e s 
+C   S o u r c e   L i n e s
 C-----------------------------------------------
-      LVARINT=LVARINT+1
-      NUM=TABVINT(LVARINT)
-      
-      IF(M_CHECK/=0)THEN
-        DO I=1,NUM
-          LVARINT=LVARINT+1
-          ARRAY(TABVINT(LVARINT))=1
-        ENDDO
-      ELSE
-        LVARINT=LVARINT+NUM      
-      ENDIF
+        LVARINT=LVARINT+1
+        NUM=TABVINT(LVARINT)
 
-      RETURN 
+        IF(M_CHECK/=0)THEN
+          DO I=1,NUM
+            LVARINT=LVARINT+1
+            ARRAY(TABVINT(LVARINT))=1
+          ENDDO
+        ELSE
+          LVARINT=LVARINT+NUM
+        ENDIF
+
+        RETURN
 
 C-----------------------------------------------
       END SUBROUTINE READ_ARRAY

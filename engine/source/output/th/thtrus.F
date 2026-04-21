@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thtrus         ../engine/source/output/th/thtrus.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2          ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    nvar           ../engine/source/input/nvar.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    thtrus         ../engine/source/output/th/thtrus.F
+!||--- called by ------------------------------------------------------
+!||    hist2          ../engine/source/output/th/hist2.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE THTRUS(IPARG,NTHGRP2 , ITHGRP ,
      .                  ITHBUF ,ELBUF_TAB,WA   )
 C-----------------------------------------------
@@ -43,7 +41,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -59,7 +56,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER II,I,N,IH,NG,ITY,MTE,K,L,LWA,NEL,NFT,J,IP
+      INTEGER II,I,N,IH,NG,ITY,MTE,K,L,NEL,NFT,IP
       INTEGER :: NITER,IAD,NN,IADV,NVAR,ITYP,IJK
 C
       TYPE(G_BUFEL_)  ,POINTER :: GBUF
@@ -79,13 +76,10 @@ C-------------------------
 !   -------------------------------
                 II=0
                 IH=IAD
-                IF (IMACH == 3) THEN
-                    DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                        IH = IH + 1
-                    ENDDO
-                    IF (IH >= IAD+NN) GOTO 666 
-                ENDIF
-C
+                DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                    IH = IH + 1
+                ENDDO
+                IF (IH >= IAD+NN) GOTO 666 
                 DO NG=1,NGROUP
                     ITY=IPARG(5,NG)
                     GBUF => ELBUF_TAB(NG)%GBUF
@@ -99,12 +93,10 @@ C
                             IP=ITHBUF(IH+NN)
                             IF (K == N) THEN
                                 IH=IH+1
-                                IF (IMACH == 3) THEN
-                                    II = ((IH-1) - IAD)*NVAR
-                                    DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
-                                        IH = IH + 1
-                                    ENDDO
-                                ENDIF
+                                II = ((IH-1) - IAD)*NVAR
+                                DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
+                                  IH = IH + 1
+                                ENDDO
                                 IF (IH > IAD+NN) GOTO 666
                                 DO L=IADV,IADV+NVAR-1
                                     K=ITHBUF(L)

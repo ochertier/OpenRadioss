@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    report                 ../engine/source/output/report/report.F
-      !||--- called by ------------------------------------------------------
-      !||    arret                  ../engine/source/system/arret.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    inoutfile_mod          ../common_source/modules/inoutfile_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    output_mod             ../common_source/modules/output/output_mod.F90
-      !||    user_interface_mod     ../engine/source/modules/user_interface_mod.F90
-      !||====================================================================
-      SUBROUTINE REPORT(IH3DREADER,N,IMVW)
+!||====================================================================
+!||    report                 ../engine/source/output/report/report.F
+!||--- called by ------------------------------------------------------
+!||    arret                  ../engine/source/system/arret.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    inoutfile_mod          ../common_source/modules/inoutfile_mod.F
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||    output_mod             ../common_source/modules/output/output_mod.F90
+!||    user_interface_mod     ../engine/source/modules/user_interface_mod.F90
+!||====================================================================
+      SUBROUTINE REPORT(IH3DREADER,N,IMVW,WFEXT,WFEXT_MD,OUTPUT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INOUTFILE_MOD
       USE USER_INTERFACE_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: LPATH
-      USE OUTPUT_MOD, ONLY : WFEXT, WFEXT_MD
+      USE OUTPUT_MOD , ONLY : OUTPUT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,7 +49,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-!#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "com10_c.inc"
 #include      "commandline.inc"
@@ -62,34 +61,25 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER
-     .         IH3DREADER,N,IMVW
+      INTEGER IH3DREADER,N,IMVW
+      my_real WFEXT,WFEXT_MD
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER
-     .         IOUTREP,I,LEN_CWD, OUT_TMP, IS_MESSAGE, IS_WARNING,IS_FILE_FOUND, IEND
+      INTEGER IOUTREP,LEN_CWD, OUT_TMP, IS_MESSAGE, IS_WARNING,IS_FILE_FOUND, IEND
       INTEGER*4 GETCWD, STATUS
-
       CHARACTER FILNAM*100,MVWNAM*100
-      CHARACTER LINE*200
       CHARACTER(LEN=LPATH) :: CWD
-      CHARACTER*100  FMW
       CHARACTER*8  DATE
       CHARACTER*10  TIME
       CHARACTER ELTYP(0:105)*5
       CHARACTER*256 OUTNAME
       CHARACTER*120 CART  
-      my_real
-     .   ENTOT, ENTOT1, ERR, ERR1, X99, EMASS,MAS,
-     .   VX,VY,VZ,DT05,ENTMP(20)  ,RTMP(10),
-     .   MVX, MVY, MVZ, TS, MAS2, WEWE2, ENTOT1B
-      DOUBLE PRECISION ETIME, RETIME, TT0,
-     .                 ENCIND, XMOMTD, YMOMTD, ZMOMTD,
-     .                 XMASSD, ENROTD, ENINTD, ENCIND2,
-     .                 ENROTD2, ENTOTB, EAMSD 
+      my_real ENTOT, ENTOT1, ERR, ERR1, X99, EMASS,ENTOT1B,DM_INOUT,DE_INOUT
+      DOUBLE PRECISION ENTOTB
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=2148) :: TMP_NAME
+      TYPE(OUTPUT_),INTENT(IN) :: OUTPUT
 C-----------------------------------------------
       DATA ELTYP/'FIXED',
      1           'SOLID','QUAD ','SHELL','TRUSS','BEAM ',
@@ -120,9 +110,10 @@ C=======================================================================
       IF(ISPMD == 0) THEN 
 c
        ENTOT = ENCIN + ENINT + ENROT
-       ENTOTB = ENTOT + ENCIN2 + ENROT2 
-       ENTOT1=ENTOT0 + WFEXT
-       ENTOT1B=ENTOT0 + WFEXT + DELTAE + WFEXT_MD
+       ENTOTB = ENTOT + ENCIN2 + ENROT2
+       DE_INOUT = OUTPUT%DATA%INOUT%DE_IN + OUTPUT%DATA%INOUT%DE_OUT
+       ENTOT1=ENTOT0 + WFEXT + DE_INOUT
+       ENTOT1B=ENTOT0 + WFEXT + DELTAE + WFEXT_MD + DE_INOUT
        IF(ABS(ENTOT1B)>EM20)THEN
          ERR = ENTOTB/ENTOT1B - ONE
          ERR1 = MAX(-X99, MIN(X99,ERR*HUNDRED))     
@@ -130,7 +121,8 @@ c
         ERR = ZERO
         ERR1 =ZERO
        ENDIF
-       EMASS = (XMASS - MASS0) / MASS0
+       DM_INOUT = OUTPUT%DATA%INOUT%DM_IN + OUTPUT%DATA%INOUT%DM_OUT
+       EMASS = (XMASS - (MASS0+DM_INOUT)) / (MASS0+DM_INOUT)
         
        CALL DATE_AND_TIME(DATE,TIME)
        STATUS = GETCWD(CWD)
@@ -802,7 +794,7 @@ c     .HyperViewPlayer plugin installed.'
        WRITE(IOUTREP,'(A)')'<hr size="1" color="#000000" width="50%" noshade>'
        WRITE(IOUTREP,'(A)')'<center>'
        WRITE(IOUTREP,'(A)')'<font face="Arial" size="1">'
-       WRITE(IOUTREP,'(A)')'<b>&#169; 1996-2022 Altair Engineering, Inc.</b>'
+       WRITE(IOUTREP,'(A)')'<b>&#169; 1996-2026 Altair Engineering, Inc.</b>'
        WRITE(IOUTREP,'(A)')'</font> '
        WRITE(IOUTREP,'(A)')'</center> '
        WRITE(IOUTREP,'(A)')'</body>'

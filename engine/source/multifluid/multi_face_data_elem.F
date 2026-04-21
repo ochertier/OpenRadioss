@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_face_elem_data   ../engine/source/multifluid/multi_face_data_elem.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain                ../engine/source/ale/alemain.F
-      !||    multi_timeevolution    ../engine/source/multifluid/multi_timeevolution.F
-      !||--- calls      -----------------------------------------------------
-      !||    centroid2              ../engine/source/multifluid/centroid.F
-      !||    centroid2t             ../engine/source/multifluid/centroid.F
-      !||    centroid3              ../engine/source/multifluid/centroid.F
-      !||    centroid3t             ../engine/source/multifluid/centroid.F
-      !||    qnorm2                 ../engine/source/multifluid/qnorm2.F
-      !||    qnorm2t                ../engine/source/multifluid/qnorm2t.F
-      !||    snorm3                 ../engine/source/multifluid/snorm3.F
-      !||    snorm3t                ../engine/source/multifluid/snorm3t.F
-      !||--- uses       -----------------------------------------------------
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    multi_face_elem_data   ../engine/source/multifluid/multi_face_data_elem.F
+!||--- called by ------------------------------------------------------
+!||    alemain                ../engine/source/ale/alemain.F
+!||    multi_timeevolution    ../engine/source/multifluid/multi_timeevolution.F
+!||--- calls      -----------------------------------------------------
+!||    centroid2              ../engine/source/multifluid/centroid.F
+!||    centroid2t             ../engine/source/multifluid/centroid.F
+!||    centroid3              ../engine/source/multifluid/centroid.F
+!||    centroid3t             ../engine/source/multifluid/centroid.F
+!||    qnorm2                 ../engine/source/multifluid/qnorm2.F
+!||    qnorm2t                ../engine/source/multifluid/qnorm2t.F
+!||    snorm3                 ../engine/source/multifluid/snorm3.F
+!||    snorm3t                ../engine/source/multifluid/snorm3t.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||====================================================================
       SUBROUTINE MULTI_FACE_ELEM_DATA(ITASK, IPARG, IXS, IXQ, IXTG, XGRID, WGRID, MULTI_FVM)
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
       USE MULTI_FVM_MOD
+      use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------

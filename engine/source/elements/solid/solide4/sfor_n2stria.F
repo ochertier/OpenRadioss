@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sfor_n2stria   ../engine/source/elements/solid/solide4/sfor_n2stria.F
-      !||--- called by ------------------------------------------------------
-      !||    s4for_distor   ../engine/source/elements/solid/solide4/s4for_distor.F
-      !||    s6for_distor   ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
-      !||--- calls      -----------------------------------------------------
-      !||    sfor_n2s3      ../engine/source/elements/solid/solide4/sfor_n2s3.F
-      !||====================================================================
+!||====================================================================
+!||    sfor_n2stria   ../engine/source/elements/solid/solide4/sfor_n2stria.F
+!||--- called by ------------------------------------------------------
+!||    s4for_distor   ../engine/source/elements/solid/solide4/s4for_distor.F
+!||    s6for_distor   ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
+!||--- calls      -----------------------------------------------------
+!||    sfor_n2s3      ../engine/source/elements/solid/solide4/sfor_n2s3.F
+!||====================================================================
       SUBROUTINE SFOR_N2STRIA(XC,      YC,     ZC, 
      .                        X1,      X2,     X3,
      .                        Y1,      Y2,     Y3,
@@ -76,10 +76,10 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IFCTL1,IFC2(MVSIZ)
+      INTEGER I,IFC2(MVSIZ)
 C                                                                     12
       my_real
-     .   FX,FY,FZ,FKT(MVSIZ)
+     .   FKT(MVSIZ)
 C----------------------------
         IFC2(1:NEL) = 1
         FKT(1:NEL) = ONE

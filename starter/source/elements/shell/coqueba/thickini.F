@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thickini      ../starter/source/elements/shell/coqueba/thickini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3       ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cbainit3      ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cdkinit3      ../starter/source/elements/sh3n/coquedk/cdkinit3.F
-      !||    cinit3        ../starter/source/elements/shell/coque/cinit3.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    thickini      ../starter/source/elements/shell/coqueba/thickini.F
+!||--- called by ------------------------------------------------------
+!||    c3init3       ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cbainit3      ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cdkinit3      ../starter/source/elements/sh3n/coquedk/cdkinit3.F
+!||    cinit3        ../starter/source/elements/shell/coque/cinit3.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE THICKINI(JFT     ,JLT   ,NFT    ,PTSH  ,NUMEL ,
      2                    THK     ,THKE  ,IX     ,NIX   ,NSIGSH,
      3                    SIGSH   )

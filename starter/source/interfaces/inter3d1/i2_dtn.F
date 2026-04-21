@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2_dtn          ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2_dtn_0        ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||    i2_dtn_1        ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||    i2_dtn_25       ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_dtn          ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||--- called by ------------------------------------------------------
+!||    inintr2         ../starter/source/interfaces/inter3d1/inintr2.F
+!||--- calls      -----------------------------------------------------
+!||    i2_dtn_0        ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||    i2_dtn_1        ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||    i2_dtn_25       ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I2_DTN(X,INTBUF_TAB,IPARI,STIFN,MS,IN,N,ILEV)
 C-----------------------------------------------
 C   M o d u l e s
@@ -72,11 +72,11 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    i2_dtn_0   ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_dtn     ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||====================================================================
+!||====================================================================
+!||    i2_dtn_0   ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||--- called by ------------------------------------------------------
+!||    i2_dtn     ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||====================================================================
       SUBROUTINE I2_DTN_0(IRECT ,CRST    ,CSTS_BIS, NSV  ,
      2                    IRTL  ,IPARI , STIFN  ,
      2                    MS)
@@ -163,11 +163,11 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    i2_dtn_1   ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_dtn     ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||====================================================================
+!||====================================================================
+!||    i2_dtn_1   ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||--- called by ------------------------------------------------------
+!||    i2_dtn     ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||====================================================================
       SUBROUTINE I2_DTN_1(X,IRECT , NSV  ,IRTL  ,
      2                         IPARI, STIFN, STIFR, MS, IN,ILEV)
 C-----------------------------------------------
@@ -286,7 +286,7 @@ C
         FACT = ONE
         IF (IRODDL==1) THEN
         IF (IN(J1)>ZERO.AND.IN(J2)>ZERO.AND.IN(J3)>ZERO.AND.IN(J4)>ZERO) THEN
-C--       Inertie transmise sous forme d'inertie
+C- inertia transmitted in the form of inertia
           FACT = ZERO
         ENDIF
         ENDIF
@@ -331,12 +331,12 @@ C-----------
       RETURN
       END
 C
-      !||====================================================================
-      !||    i2_dtn_25   ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||--- called by ------------------------------------------------------
-      !||    i2_dtn      ../starter/source/interfaces/inter3d1/i2_dtn.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i2_dtn_25   ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||--- called by ------------------------------------------------------
+!||    i2_dtn      ../starter/source/interfaces/inter3d1/i2_dtn.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I2_DTN_25(X,IRECT ,CRST    ,NSV  ,IRTL,
      2                     IPARI,STIFN,STFN,VISC)
 C-----------------------------------------------
@@ -527,7 +527,7 @@ C------------------------------------------------
 
 C------------------------------------------------
 C
-C--   Secnd node of solids
+C--   Second node of solids
 C
           STR = ZERO
 c         update main forces (moment balance)  

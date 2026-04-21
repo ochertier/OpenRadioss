@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps42      ../engine/source/materials/mat/mat042/sigeps42.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw         ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8        ../engine/source/materials/mat_share/mulaw8.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter        ../engine/source/tools/curve/finter.F
-      !||    prodaat       ../engine/source/materials/tools/prodAAT.F
-      !||    prodmat       ../engine/source/materials/tools/prodmat.F
-      !||    valpvec_v     ../engine/source/materials/mat/mat033/sigeps33.F
-      !||    valpvecdp_v   ../engine/source/materials/mat/mat033/sigeps33.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps42      ../engine/source/materials/mat/mat042/sigeps42.F
+!||--- called by ------------------------------------------------------
+!||    mulaw         ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8        ../engine/source/materials/mat_share/mulaw8.F90
+!||--- calls      -----------------------------------------------------
+!||    finter        ../engine/source/tools/curve/finter.F
+!||    prodaat       ../engine/source/materials/tools/prodAAT.F
+!||    prodmat       ../engine/source/materials/tools/prodmat.F
+!||    valpvec_v     ../engine/source/materials/mat/mat033/sigeps33.F
+!||    valpvecdp_v   ../engine/source/materials/mat/mat033/sigeps33.F
+!||====================================================================
       SUBROUTINE SIGEPS42(
      1      NEL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
      2      TF      ,TIME    ,TIMESTEP,UPARAM  ,RHO0    ,RHO     ,
@@ -89,14 +89,14 @@ C----------------------------------------------------------------
 C----------------------------------------------------------------
 C  L O C A L  V A R I A B L E S
 C----------------------------------------------------------------
-      INTEGER I,II,J,K,KFP,NPRONY,NORDER,IFORM
+      INTEGER I, II, J, KFP, NPRONY, NORDER, IFORM
       my_real TENSIONCUT,AMAX,GVMAX,GMAX,FFAC,TRACE,RBULK,DPDMU,
-     .  AA,CC,FAC,INVE,ETV,RV_PUI,AMIN,NU_1
+     . CC,FAC,INVE,ETV,RV_PUI,AMIN,NU_1
       my_real, DIMENSION(3)   :: LAM_AL,FFT
       my_real, DIMENSION(10)  :: AL,MU
       my_real, DIMENSION(100) :: GI,TAUX
       my_real, DIMENSION(NEL) :: SUMDWDL,RV,J2THIRD,P,DWDRV,ETI,GTMAX 
-      my_real, DIMENSION(3,3) :: A
+ 
       my_real, DIMENSION(NEL,3) :: T1,SIGPRV,EV,EVM,DWDL,CII
       my_real, DIMENSION(NEL,6) :: DOTB,SVISC,C0,C1
       my_real, DIMENSION(NEL,3,3) :: F,LL,BB,LB,BLT
@@ -239,12 +239,13 @@ c
       ENDIF
 c--- avoid buckling
       P_FAC(1:NEL) = ONE
-      NU_1 = FOURTY*(HALF-(3*RBULK-GMAX)/(6*RBULK+GMAX))
-      DO I=1,NEL
-        AMIN = MIN(EV(I,1),EV(I,2),EV(I,3))
-        IF (AMIN<ZEP2) P_FAC(I) = MAX(ONE,NU_1/MAX(EM20,AMIN))
-      ENDDO
-!        
+      IF (RBULK > 24*GMAX) THEN
+        NU_1 = FORTY*(HALF-(3*RBULK-GMAX)/(6*RBULK+GMAX))
+        DO I=1,NEL
+          AMIN = MIN(EV(I,1),EV(I,2),EV(I,3))
+          IF (AMIN<ZEP2) P_FAC(I) = MAX(ONE,NU_1/MAX(EM20,AMIN))
+        ENDDO
+      END IF 
 c 
       ! Compute normalized (deviatoric) stretches and bulk modulus
       ! (Deviatoric principal stretches = lambda_bar_i)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sdlensh2   ../engine/source/elements/thickshell/solidec/sdlensh2.F
-      !||--- called by ------------------------------------------------------
-      !||    s16forc3   ../engine/source/elements/thickshell/solide16/s16forc3.F
-      !||    scforc3    ../engine/source/elements/thickshell/solidec/scforc3.F
-      !||====================================================================
+!||====================================================================
+!||    sdlensh2   ../engine/source/elements/thickshell/solidec/sdlensh2.F
+!||--- called by ------------------------------------------------------
+!||    s16forc3   ../engine/source/elements/thickshell/solide16/s16forc3.F
+!||    scforc3    ../engine/source/elements/thickshell/solidec/scforc3.F
+!||====================================================================
       SUBROUTINE SDLENSH2(
      1   VOLN,    LLSH, AREA, X1,      X2,
      2   X3,      X4,      X5,      X6,
@@ -58,7 +58,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N
+      INTEGER I
       my_real
      .   RX(MVSIZ),RY(MVSIZ),RZ(MVSIZ),SX(MVSIZ),SY(MVSIZ),SZ(MVSIZ),
      .   XN(MVSIZ,4) , YN(MVSIZ,4) , ZN(MVSIZ,4) 

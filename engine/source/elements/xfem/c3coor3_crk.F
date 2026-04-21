@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c3coor3_crk     ../engine/source/elements/xfem/c3coor3_crk.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3_crk     ../engine/source/elements/xfem/c3forc3_crk.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    c3coor3_crk     ../engine/source/elements/xfem/c3coor3_crk.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3_crk     ../engine/source/elements/xfem/c3forc3_crk.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||====================================================================
       SUBROUTINE C3COOR3_CRK(JFT    ,JLT    ,OFFG   ,OFF    ,SIGY    ,
      .                       DT1C   ,THKE   ,VL1    ,VL2    ,VL3     ,
      .                       VRL1   ,VRL2   ,VRL3   ,X1     ,X2      ,
@@ -63,7 +63,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NC1,NC2,NC3,ELCRK,ELCRK0,IADC1,IADC2,IADC3
+      INTEGER I,ELCRK,ELCRK0,IADC1,IADC2,IADC3
       my_real OFF_L    
 C=======================================================================
 C get elem from activ level: (superposed element)
@@ -151,13 +151,13 @@ C---
 C---
       RETURN
       END
-      !||====================================================================
-      !||    c3coor3_crk2    ../engine/source/elements/xfem/c3coor3_crk.F
-      !||--- called by ------------------------------------------------------
-      !||    c3bilan         ../engine/source/elements/sh3n/coque3n/c3bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
-      !||====================================================================
+!||====================================================================
+!||    c3coor3_crk2    ../engine/source/elements/xfem/c3coor3_crk.F
+!||--- called by ------------------------------------------------------
+!||    c3bilan         ../engine/source/elements/sh3n/coque3n/c3bilan.F
+!||--- uses       -----------------------------------------------------
+!||    crackxfem_mod   ../engine/share/modules/crackxfem_mod.F
+!||====================================================================
       SUBROUTINE C3COOR3_CRK2(
      1              JFT  ,JLT  ,NFT  ,ILEV     ,IEL_CRK,
      2              X    ,V    ,VR   ,VL1      ,VL2    ,

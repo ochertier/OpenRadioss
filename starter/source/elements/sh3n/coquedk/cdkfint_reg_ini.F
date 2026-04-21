@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cdkfint_reg_ini   ../starter/source/elements/sh3n/coquedk/cdkfint_reg_ini.F
-      !||--- called by ------------------------------------------------------
-      !||    nlocal_init_sta   ../starter/source/materials/fail/nlocal_init_sta.F
-      !||--- calls      -----------------------------------------------------
-      !||    cdkevec3          ../starter/source/elements/sh3n/coquedk/cdkevec3.F
-      !||    cnloc_matini      ../starter/source/materials/mat_share/cnloc_matini.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod       ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cdkfint_reg_ini   ../starter/source/elements/sh3n/coquedk/cdkfint_reg_ini.F
+!||--- called by ------------------------------------------------------
+!||    nlocal_init_sta   ../starter/source/materials/fail/nlocal_init_sta.F
+!||--- calls      -----------------------------------------------------
+!||    cdkevec3          ../starter/source/elements/sh3n/coquedk/cdkevec3.F
+!||    cnloc_matini      ../starter/source/materials/mat_share/cnloc_matini.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod       ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CDKFINT_REG_INI(ELBUF_TAB,NLOC_DMG ,AREA     ,IXTG     ,
      .                           DT_NL    ,X        ,XREFTG   ,NFT      ,
      .                           NEL      ,NG       ,IPM      ,BUFMAT   ,
@@ -40,6 +40,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE MESSAGE_MOD
       USE NLOCAL_REG_MOD
+      use element_mod , only : nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -77,7 +78,7 @@ C-----------------------------------------------
      . DIMENSION(:), POINTER  :: FNL,UNL,VNL,DNL,MNL,THCK
       my_real, DIMENSION(NEL) :: X1,X2,X3,Y1,Y2,Y3,
      .   PX1,PY1,PX2,PY2,E1X,E2X,E3X,E1Y,E2Y,E3Y,E1Z,E2Z,E3Z,
-     .   X2L,Y2L,X3L,Y3L,Z1,Z2,Z3,SURF,X31,Y31,Z31,OFFG,
+     .   X2L,Y2L,X3L,Y3L,Z1,Z2,Z3,SURF,OFFG,
      .   VOLS,BTB11,BTB12,BTB13,BTB22,BTB23,BTB33
       TYPE(BUF_NLOC_),POINTER :: BUFNL
       my_real, DIMENSION(:,:), POINTER :: 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,12 +22,12 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 C  119      SUBROUTINE I11GMX3(X,IRECT,I,GAPMAX)
-      !||====================================================================
-      !||    i11gmx3    ../starter/source/interfaces/inter3d1/i11gmx3.F
-      !||--- called by ------------------------------------------------------
-      !||    i11sti3    ../starter/source/interfaces/inter3d1/i11sti3.F
-      !||    i20sti3e   ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||====================================================================
+!||====================================================================
+!||    i11gmx3    ../starter/source/interfaces/inter3d1/i11gmx3.F
+!||--- called by ------------------------------------------------------
+!||    i11sti3    ../starter/source/interfaces/inter3d1/i11sti3.F
+!||    i20sti3e   ../starter/source/interfaces/inter3d1/i20sti3.F
+!||====================================================================
       SUBROUTINE I11GMX3(X,IRECT,I,GAPMAX,XL2)
 C
 C-----------------------------------------------
@@ -48,11 +48,11 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER JPERM(4), JJ, N1, N2
+      INTEGER JPERM(4), N1, N2
 C
       DATA JPERM/2,3,4,1/
 C-----------------------------------------------------------------
-C     LONGUEUR MINI DES COTES DE SEGMENT (CALCUL DU GAP MAX)
+C     MINIMUM LENGTH OF SEGMENT EDGES (CALCULATION OF MAX GAP)
 C-----------------------------------------------------------------
       N1=IRECT(1,I)
       N2=IRECT(2,I)

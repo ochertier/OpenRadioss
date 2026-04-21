@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_h3d_input       ../engine/source/output/h3d/h3d_build_fortran/create_h3d_input.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_read               ../engine/source/output/h3d/h3d_build_fortran/h3d_read.F
-      !||    lech3d                 ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                  ../engine/source/system/arret.F
-      !||    nvar                   ../engine/source/input/nvar.F
-      !||    wriusc2                ../engine/source/input/wriusc2.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_h3d_input       ../engine/source/output/h3d/h3d_build_fortran/create_h3d_input.F
+!||--- called by ------------------------------------------------------
+!||    h3d_read               ../engine/source/output/h3d/h3d_build_fortran/h3d_read.F
+!||    lech3d                 ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
+!||--- calls      -----------------------------------------------------
+!||    arret                  ../engine/source/system/arret.F
+!||    wriusc2                ../engine/source/input/wriusc2.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                ../engine/share/modules/h3d_mod.F
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE CREATE_H3D_INPUT(H3D_DATA,IKAD,IKEY,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -70,7 +69,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=NCHARLINE100):: CARTE,CARTE1,KEY3_GLOB
+      CHARACTER(LEN=NCHARLINE100):: CARTE,KEY3_GLOB
       INTEGER I,J,L,N_H3D_PART,CPT,
      .      IS_CHAR_KEY3,IS_CHAR_KEY4,IS_CHAR_KEY5,IS_CHAR_KEY6,IS_CHAR_KEY7,IS_CHAR_KEY8,
      .      IS_EMPTY_KEY3,IS_EMPTY_KEY4,IS_EMPTY_KEY5,IS_EMPTY_KEY6,IS_EMPTY_KEY7,IS_EMPTY_KEY8

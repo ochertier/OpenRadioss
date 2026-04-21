@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,32 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8cinit3               ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    failini                ../starter/source/elements/solid/solide/failini.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    s8zderi3               ../starter/source/elements/solid/solide8z/s8zderi3.F
-      !||    s8zderic3              ../starter/source/elements/solid/solide8z/s8zderi3.F
-      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
-      !||    scmorth3               ../starter/source/elements/thickshell/solidec/scmorth3.F
-      !||    scoor3                 ../starter/source/elements/solid/solide/scoor3.F
-      !||    sczero3                ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sdlensh14              ../starter/source/elements/thickshell/solide8c/sdlensh14.F
-      !||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
-      !||    smass3                 ../starter/source/elements/solid/solide/smass3.F
-      !||    srcoor3                ../starter/source/elements/solid/solide/srcoor3.F
-      !||    svalue0                ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s8cinit3               ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    failini                ../starter/source/elements/solid/solide/failini.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    s8zderi3               ../starter/source/elements/solid/solide8z/s8zderi3.F
+!||    s8zderic3              ../starter/source/elements/solid/solide8z/s8zderi3.F
+!||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+!||    scmorth3               ../starter/source/elements/thickshell/solidec/scmorth3.F
+!||    scoor3                 ../starter/source/elements/solid/solide/scoor3.F
+!||    sczero3                ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sdlensh14              ../starter/source/elements/thickshell/solide8c/sdlensh14.F
+!||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
+!||    smass3                 ../starter/source/elements/solid/solide/smass3.F
+!||    srcoor3                ../starter/source/elements/solid/solide/srcoor3.F
+!||    svalue0                ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S8CINIT3(ELBUF_STR,MAS     ,IXS     ,PM       ,X        ,
      .                    DETONATORS,GEO     ,VEUL    ,ALE_CONNECTIVITY    ,IPARG    ,
      .                    DTELEM   ,SIGI    ,NEL     ,SKEW     ,IGEO     ,
@@ -70,6 +70,7 @@ C-----------------------------------------------
       USE MATPARAM_DEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -140,6 +141,7 @@ C-----------------------------------------------
      .   BID(MVSIZ), FV, STI, WI
       my_real
      .   ANGLE(MVSIZ),DTX0(MVSIZ),WT,ZR,ZS,ZT,ZZ
+      my_real :: TEMPEL(NEL)
       DOUBLE PRECISION 
      .   XD1(MVSIZ), XD2(MVSIZ), XD3(MVSIZ), XD4(MVSIZ),
      .   XD5(MVSIZ), XD6(MVSIZ), XD7(MVSIZ), XD8(MVSIZ),
@@ -311,6 +313,20 @@ c
      .   Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,ICSTR,IDT1SOL)
       END IF        
 C
+!
+!     Initialize element temperature from /initemp
+!      
+      IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+        DO I=1,NEL
+          TEMPEL(I) = ONE_OVER_8 *(TEMP(IXS(2,I+NFT)) + TEMP(IXS(3,I+NFT))
+     .                           + TEMP(IXS(4,I+NFT)) + TEMP(IXS(5,I+NFT))        
+     .                           + TEMP(IXS(6,I+NFT)) + TEMP(IXS(7,I+NFT))        
+     .                           + TEMP(IXS(8,I+NFT)) + TEMP(IXS(9,I+NFT))) 
+        ENDDO
+      ELSE
+        TEMPEL(1:NEL) = TEMP0(1:NEL)
+      END IF
+!
       IP=0
       CALL MATINI(PM       ,IXS    ,NIXS       ,X         ,
      .            GEO      ,ALE_CONNECTIVITY  ,DETONATORS ,IPARG     ,
@@ -319,7 +335,7 @@ C
      .            MAT      ,IPM    ,NSIGS      ,NUMSOL    ,PTSOL  ,
      .            IP       ,NGL    ,NPF        ,TF        ,BUFMAT ,
      .            GBUF     ,LBUF   ,MBUF       ,ELBUF_STR ,ILOADP ,
-     .            FACLOAD, DELTAX)
+     .            FACLOAD, DELTAX  ,TEMPEL     ,MAT_PARAM )
 C
       CALL SCZERO3(GBUF%RHO,GBUF%SIG,GBUF%EINT,NEL)
 C
@@ -390,6 +406,18 @@ C
      .         E1X  ,E1Y  ,E1Z  ,E2X  ,E2Y  ,E2Z  ,E3X  ,E3Y  ,E3Z  ,
      .         NGL  ,ANGLE ,NSIGI,SIGSP,NSIGS,SIGI ,IXS(1,NF1),IL   ,
      .         ORTHOGLOB, PTSOL,NEL)
+!      
+         IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN                    
+           DO I=1,NEL                                                        
+             TEMPEL(I) = ONE_OVER_8 *(TEMP(IXS(2,I+NFT)) + TEMP(IXS(3,I+NFT))        
+     .                              + TEMP(IXS(4,I+NFT)) + TEMP(IXS(5,I+NFT))        
+     .                              + TEMP(IXS(6,I+NFT)) + TEMP(IXS(7,I+NFT))        
+     .                              + TEMP(IXS(8,I+NFT)) + TEMP(IXS(9,I+NFT)))       
+           ENDDO                                                             
+         ELSE                                                                
+           TEMPEL(1:NEL) = TEMP0(1:NEL)                                      
+         END IF                                                              
+!
          CALL MATINI(PM     ,IXS    ,NIXS      ,X          ,
      .               GEO    ,ALE_CONNECTIVITY  ,DETONATORS,IPARG      ,
      .               SIGI   ,NEL    ,SKEW      ,IGEO       ,
@@ -397,7 +425,7 @@ C
      .               MAT    ,IPM    ,NSIGS     ,NUMSOL     ,PTSOL  ,
      .               IP     ,NGL    ,NPF       ,TF         ,BUFMAT ,
      .               GBUF   ,LBUF   ,MBUF      ,ELBUF_STR  ,ILOADP ,
-     .               FACLOAD, DELTAX)
+     .               FACLOAD,DELTAX ,TEMPEL    ,MAT_PARAM )
 c
           IDEF =0
           IF (MTN >= 28) THEN
@@ -476,7 +504,7 @@ C Failure model initialization
      .             IPM,SIGSP,NSIGI,FAIL_INI ,
      .             SIGI,NSIGS,IXS,NIXS,PTSOL,RNOISE,PERTURB,MAT_PARAM)
 C
-C Element time step
+C Time Step element
         AIRE(:) = ZERO
         CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,
      .       LBUF%EINT ,LBUF%TEMP ,LBUF%DELTAX ,LBUF%RK ,LBUF%RE ,BUFMAT, DELTAX, AIRE, 

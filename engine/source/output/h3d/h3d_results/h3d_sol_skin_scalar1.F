@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_sol_skin_scalar1   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar1.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_sol_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||--- calls      -----------------------------------------------------
-      !||    dam_fld_sol            ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||    idx_fld_sol            ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
-      !||    initbuf                ../engine/share/resol/initbuf.F
-      !||    tens3dto2d             ../engine/source/output/h3d/h3d_results/h3d_skin_tensor.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_sol_skin_scalar1   ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar1.F
+!||--- called by ------------------------------------------------------
+!||    h3d_sol_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||--- calls      -----------------------------------------------------
+!||    dam_fld_sol            ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||    idx_fld_sol            ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+!||    initbuf                ../engine/share/resol/initbuf.F
+!||    tens3dto2d             ../engine/source/output/h3d/h3d_results/h3d_skin_tensor.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod            ../engine/share/resol/initbuf.F
+!||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE H3D_SOL_SKIN_SCALAR1(ELBUF_TAB,IPARG,IPARTS,IXS,IXS10,
      .                                SKIN_SCALAR,TAG_SKINS6,T6GPS,X  ,
      .                                NPF,TF,H3D_PART,IS_WRITTEN_SKIN,
@@ -46,6 +47,7 @@ C-----------------------------------------------
       USE MAT_ELEM_MOD
       USE ELBUFDEF_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,7 +76,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
-      INTEGER I,ISOLNOD,ICS,NG,N,J,K
+      INTEGER I,ISOLNOD,ICS,NG,N,J
       INTEGER 
      .        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      .        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
@@ -82,15 +84,12 @@ C-----------------------------------------------
      .        NVAUX   ,JPOR    ,KCVT    ,JCLOSE  ,JPLASOL ,    
      .        IREP    ,IINT    ,IGTYP   ,ISRAT   ,ISROT   ,    
      .        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS    , 
-     .        NN,NN1,N1,IDB,IOK_PART(MVSIZ),IS_WRITTEN_VALUE(MVSIZ)
-      INTEGER NC(10,MVSIZ),NMIN,PWR(7),LL,IXSK(5,6*MVSIZ)
-      INTEGER FACES(4,6),NS(4),JJ,II,K1,K2,NF,N2,T3(3),T6(6),TIA4S(3,4)
+     .        NN,NN1,N1,IOK_PART(MVSIZ),IS_WRITTEN_VALUE(MVSIZ)
+      INTEGER NC(10,MVSIZ),PWR(7),LL,IXSK(5,6*MVSIZ)
+      INTEGER FACES(4,6),NS(4),JJ,II,K1,K2,T3(3),T6(6),TIA4S(3,4)
       INTEGER IFUNC(MAXFUNC),IDEB
       INTEGER NPAR,NFUNC,MX,NSK,IL,IR,IS,IT,NFAIL,IFAIL,NSKI,NIPAR
-      my_real
-     .   EVAR(3,MVSIZ),VALUE(MVSIZ)
-      TYPE(L_BUFEL_)  ,POINTER :: LBUF  
-      TYPE(BUF_MAT_)  ,POINTER :: MBUF      
+      my_real EVAR(3,MVSIZ),VALUE(MVSIZ)
       TYPE(BUF_LAY_)  ,POINTER :: BUFLY     
       TYPE(BUF_FAIL_) ,POINTER :: FBUF 
       DATA PWR/1,2,4,8,16,32,64/
@@ -313,7 +312,7 @@ C----------- NSK could be > mvsiz
              DO II=1,NSK,MVSIZ
                NSKI = MIN(NSK-IDEB,MVSIZ)
                N = 1+IDEB
-               CALL TENS3DTO2D(NSKI,IXSK(1,N),X,T6GPS,EVAR)
+               CALL TENS3DTO2D(NSKI,IXSK(:,N),X,T6GPS,EVAR)
                DO I=1,NSKI
                  VALUE(I) = ZERO
                  IS_WRITTEN_VALUE(I) = 0

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dampdtnoda          ../starter/source/general_controls/damping/dampdtnoda.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur              ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    read_engine_dtmin   ../starter/source/general_controls/damping/read_engine_dtmin.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    dampdtnoda          ../starter/source/general_controls/damping/dampdtnoda.F
+!||--- called by ------------------------------------------------------
+!||    lectur              ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    read_engine_dtmin   ../starter/source/general_controls/damping/read_engine_dtmin.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE DAMPDTNODA(MS ,IN  ,STIFN ,STIFR ,IGRNOD   ,DAMPR )
 C-----------------------------------------------
 C   M o d u l e s
@@ -57,16 +57,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,I,J,ISK,IGR,ND,K,L,LL
-      my_real FACTB,DAMPBR,DAMPAR,D_TSTART,D_TSTOP,DAMPT,
-     .   DT2N(NUMNOD),BB,COEFF,DTN,DTN2,DAMPAI,DAMPBI,DT0,DAMPA3,
-     .   ALPHA05,BETA1,DTMAX,FAC,DTMI1,FAC0    
+      INTEGER I,J,IGR,ND,FL_FREQ_RANGE
+      my_real DAMPT,
+     .   DT2N(NUMNOD),BB,COEFF,DTN,DTN2,DAMPAI,DAMPBI,DT0,
+     .   DTMAX,FAC,DTMI1    
 C----------------------------------------------------------
         CALL READ_ENGINE_DTMIN(DTMI1)
         DTMAX = EP04
         DT0 = DTMAX
         DO I=1,NDAMP
-          IF (DAMPR(19,I)/=0) CYCLE                                               
+          FL_FREQ_RANGE = NINT(DAMPR(31,I))
+          IF ((DAMPR(19,I)/=0).OR.(FL_FREQ_RANGE > 0)) CYCLE                                                
           IGR   = NINT(DAMPR(2,I))
           DTN = DTMAX
           DO J=1,IGRNOD(IGR)%NENTITY

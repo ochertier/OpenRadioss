@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i9main3         ../engine/source/interfaces/int09/i9main3.F
-      !||--- called by ------------------------------------------------------
-      !||    intal1          ../engine/source/ale/inter/intal1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i3cst3          ../engine/source/interfaces/inter3d/i3cst3.F
-      !||    i3dis3          ../engine/source/interfaces/inter3d/i3dis3.F
-      !||    i3gap3          ../engine/source/interfaces/inter3d/i3gap3.F
-      !||    i3loc3          ../engine/source/interfaces/inter3d/i3loc3.F
-      !||    i3msr3          ../engine/source/interfaces/inter3d/i3msr3.F
-      !||    i9avel          ../engine/source/interfaces/int09/i9avel.F
-      !||    i9cor3          ../engine/source/interfaces/int09/i9cor3.F
-      !||    i9frms          ../engine/source/interfaces/int09/i9frms.F
-      !||    i9imp3          ../engine/source/interfaces/int09/i9imp3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i9main3         ../engine/source/interfaces/int09/i9main3.F
+!||--- called by ------------------------------------------------------
+!||    intal1          ../engine/source/ale/inter/intal1.F
+!||--- calls      -----------------------------------------------------
+!||    i3cst3          ../engine/source/interfaces/inter3d/i3cst3.F
+!||    i3dis3          ../engine/source/interfaces/inter3d/i3dis3.F
+!||    i3gap3          ../engine/source/interfaces/inter3d/i3gap3.F
+!||    i3loc3          ../engine/source/interfaces/inter3d/i3loc3.F
+!||    i3msr3          ../engine/source/interfaces/inter3d/i3msr3.F
+!||    i9avel          ../engine/source/interfaces/int09/i9avel.F
+!||    i9cor3          ../engine/source/interfaces/int09/i9cor3.F
+!||    i9frms          ../engine/source/interfaces/int09/i9frms.F
+!||    i9imp3          ../engine/source/interfaces/int09/i9imp3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I9MAIN3(IPARI,INTBUF_TAB        ,X         ,V         ,
      1           A            ,ISKEW   ,SKEW     ,LCOD      ,FN        ,
      2           FT           ,MS      ,MSMN     ,MSMT      ,ITAB      ,
@@ -60,10 +61,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARI(*), ISKEW(*), LCOD(*), ITAB(*)
-C     REAL
-      my_real
-     .   X(*), V(*), A(*), SKEW(*), FN(*), MSMN(*),
-     .   FT(*), MSMT(*), MS(*) ,FSAV(NTHVKI,*)
+      my_real X(*), V(*), A(*), SKEW(*), FN(*), MSMN(*), FT(*), MSMT(*), MS(*) ,FSAV(NTHVKI,*)
 
        TYPE(INTBUF_STRUCT_) INTBUF_TAB
 C-----------------------------------------------
@@ -88,23 +86,27 @@ C-----------------------------------------------
       my_real, DIMENSION(MVSIZ) :: ZN1,ZN2,ZN3,ZN4
       my_real, DIMENSION(MVSIZ) :: XP,YP,ZP
       my_real, DIMENSION(MVSIZ) :: H1,H2,H3,H4
-      my_real
-     .   STARTT, FRIC, GAP, STOPT,DIST
+      my_real  FRIC, GAP,DIST
       INTEGER :: NMN,NSN,NTY
       INTEGER :: LFT,LLT,NFT
 C-----------------------------------------------
-C
-      NSN   =IPARI(5)
+C   P r e c o n d i t i o n s
+C-----------------------------------------------
       NMN   =IPARI(6)
+      IF(NMN == 0)RETURN
+C-----------------------------------------------
+C   B o d y
+C-----------------------------------------------
+      NSN   =IPARI(5)
       NTY   =IPARI(7)
 C
-      IF(NMN==0)RETURN
+
 C
       FRIC =INTBUF_TAB%VARIABLES(1)
       GAP  =INTBUF_TAB%VARIABLES(2)
       NGROUS=1+(NSN-1)/NVSIZ
 C-----------------------------------------------------
-C     RECHERCHE DES POINTS IMPACTES
+C     SEARCH FOR IMPACTED POINTS
 C-----------------------------------------------------
         DO 150 NG=1,NGROUS
         NFT=(NG-1)*NVSIZ
@@ -165,7 +167,7 @@ C-----------------------------------------------------
      4   LLT,             NFT)
  150    CONTINUE
 C-----------------------------------------------------
-C     SOMME DES FORCES ET MASSES
+C     MASSES AND CUMULATIVES FORCES
 C-----------------------------------------------------
       CALL I9FRMS
      1   (X         ,SKEW      ,A         ,FN        ,FT        ,
@@ -174,7 +176,7 @@ C-----------------------------------------------------
      3    INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,MS        ,INTBUF_TAB%N,LCOD  ,
      4    ISKEW     ,FRIC      ,MSMN      ,MSMT      , NMN, NSN)
 C-----------------------------------------------------
-C     CALCUL DES ACCEL. MAINS ET VITESSES SECONDS
+C    ACCELERATION (MAIN) AND VELOCITIES (SECOND)
 C-----------------------------------------------------
       CALL I9AVEL
      1   (X         ,SKEW      ,A         ,FN        ,FT        ,

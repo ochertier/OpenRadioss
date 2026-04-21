@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r2r_clean_inter   ../starter/source/coupling/rad2rad/r2r_clean_inter.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur            ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal            ../starter/source/spmd/node/ddtools.F
-      !||    r2r_check_seg     ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    usr2sys           ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    r2r_mod           ../starter/share/modules1/r2r_mod.F
-      !||    restmod           ../starter/share/modules1/restart_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_clean_inter   ../starter/source/coupling/rad2rad/r2r_clean_inter.F
+!||--- called by ------------------------------------------------------
+!||    lectur            ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    r2r_check_seg     ../starter/source/coupling/rad2rad/routines_r2r.F
+!||--- uses       -----------------------------------------------------
+!||    r2r_mod           ../starter/share/modules1/r2r_mod.F
+!||    restmod           ../starter/share/modules1/restart_mod.F
+!||====================================================================
       SUBROUTINE R2R_CLEAN_INTER(IPARI2,INTBUF_TAB,IPARTC,IPARTG,IPARTS,ISOLNOD)
 C-----------------------------------------------
 C   M o d u l e s
@@ -56,14 +54,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER NI,I,J,K,L,NTYP,CUR_ID,IAD,NSN,NRTM,NRTS
+        INTEGER NI,J,NTYP,CUR_ID,NSN,NRTM,NRTS
         INTEGER ELTAG,FACE(4)
-C-----------------------------------------------
-
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-        INTEGER USR2SYS
-        INTEGER NLOCAL
 C-----------------------------------------------
 
         DO NI=1,NINTER

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    section_readp   ../engine/source/tools/sect/section_readp.F
-      !||--- called by ------------------------------------------------------
-      !||    section_fio     ../engine/source/tools/sect/section_fio.F
-      !||    section_io      ../engine/source/tools/sect/section_io.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../engine/source/output/message/message.F
-      !||    arret           ../engine/source/system/arret.F
-      !||    close_c         ../common_source/tools/input_output/write_routtines.c
-      !||    cur_fil_c       ../common_source/tools/input_output/write_routtines.c
-      !||    open_c          ../common_source/tools/input_output/write_routtines.c
-      !||    read_i_c        ../common_source/tools/input_output/write_routtines.c
-      !||    read_r_c        ../common_source/tools/input_output/write_routtines.c
-      !||    spmd_rbcast     ../engine/source/mpi/generic/spmd_rbcast.F
-      !||    spmd_sd_cut     ../engine/source/mpi/sections/spmd_section.F
-      !||--- uses       -----------------------------------------------------
-      !||    inoutfile_mod   ../common_source/modules/inoutfile_mod.F
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    section_readp   ../engine/source/tools/sect/section_readp.F
+!||--- called by ------------------------------------------------------
+!||    section_fio     ../engine/source/tools/sect/section_fio.F
+!||    section_io      ../engine/source/tools/sect/section_io.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../engine/source/output/message/message.F
+!||    arret           ../engine/source/system/arret.F
+!||    close_c         ../common_source/tools/input_output/write_routines.c
+!||    cur_fil_c       ../common_source/tools/input_output/write_routines.c
+!||    open_c          ../common_source/tools/input_output/write_routines.c
+!||    read_i_c        ../common_source/tools/input_output/write_routines.c
+!||    read_r_c        ../common_source/tools/input_output/write_routines.c
+!||    spmd_rbcast     ../engine/source/mpi/generic/spmd_rbcast.F
+!||    spmd_sd_cut     ../engine/source/mpi/sections/spmd_section.F
+!||--- uses       -----------------------------------------------------
+!||    inoutfile_mod   ../common_source/modules/inoutfile_mod.F
+!||    message_mod     ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SECTION_READP(TTT,NSTRF,SECBUF,NNODT,IAD_CUT,FR_CUT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -65,10 +65,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER
-     .   J, I, K, II, I1, I2, N, KR1,KR2,KR3,K0,KR0,K1,K2,KC,IFLG,
+     .    I, N, KR1,KR2,KR3,K0,KR0,KC,IFLG,
      .   IR1, IR2, IFRL1, IFRL2, FOUND, NR, L, LL, NSECR, ID_SEC,NNODG,
-     .   TYPE, IFILNAM(2148), LROOTLEN, LREC, NNOD,IR, NNODR,KR11,KR12,
-     .   KR21,KR22,NBINTER,IEXTRA, ADDSEC(2*NSECT)
+     .   TYPE, IFILNAM(2148), LROOTLEN, NNOD,IR, NNODR,
+     .   IEXTRA, ADDSEC(2*NSECT)
       my_real TT1, TT2, TT3, BUFCOM(3*NSECT+7), SECBUFG(24*NNODT)
       CHARACTER FILNAM*12,LCHRUN*2
       LOGICAL FEXIST
@@ -77,7 +77,7 @@ C-----------------------------------------------
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=2048) :: TMP_NAME
 C-----------------------------------------------
-C READ FILE dans l'ordre des sections lues sur le fichier
+C read file in the order of the sections read from the file
 C  TTT = TT ou TT + DT2
 C-----------------------------------------------
 C   debranchement pi <> p0
@@ -103,8 +103,16 @@ C
         IF(ISPMD==0) THEN
           CALL CUR_FIL_C(4)
         END IF
-        L = 0
-        DO WHILE(TT2<=TTT)
+           DO WHILE(TT2<=TTT)   ! Loop until Next timestep in SC01 file is reached / Keep only last state
+          L = 0
+          DO I = 1, NSECT                   ! In case of restart : looping over sections Times to reach good state 
+            BUFCOM(I) = ZERO                ! reset BUFCOM and ADDSEC, otherwise values from previous step are kept
+            BUFCOM(I+NSECT) = ZERO
+            BUFCOM(I+2*NSECT) = ZERO
+            ADDSEC(I) = ZERO
+            ADDSEC(I+NSECT) = ZERO
+          END DO
+
           IFRL1=IFRL2
           IFRL2=MOD(IFRL1+1,2)
           CALL READ_R_C(R4,1)
@@ -220,7 +228,7 @@ C            KR3 = KR2 + 12*NNOD
               CALL ARRET(2)
             END IF
             IF(FOUND==0.OR.NSTRF(K0)<100)THEN
-C skip deplacements et forces
+C skip displacements and forces
               IF(TYPE>=1)THEN
                 DO I=1,6*NNODR
                   CALL READ_R_C(R4,1)
@@ -232,7 +240,7 @@ C skip deplacements et forces
                 ENDDO
               ENDIF
             ELSEIF(NSTRF(K0)==100)THEN
-C lecture deplacements
+C Reading Deplacements
               IF(TYPE>=1)THEN
                 BUFCOM(N) = 1
                 BUFCOM(N+NSECT+IFRL1*NSECT) = 1
@@ -253,7 +261,7 @@ C lecture deplacements
                   L = L + 6
                 ENDDO
               ELSE
-C Pb de compatibilite type_new>=100 et type_old<1
+C compatibility issue type_new>=100 and type_old<1
               ENDIF
               IF(TYPE>=2)THEN
 C skip forces
@@ -262,7 +270,7 @@ C skip forces
                 ENDDO
               ENDIF
             ELSEIF(NSTRF(K0)==101)THEN
-C lecture deplacements
+C Reading Deplacements
               IF(TYPE>=1)THEN
                 BUFCOM(N) = 1
                 BUFCOM(N+NSECT+IFRL1*NSECT) = 1
@@ -283,10 +291,10 @@ C lecture deplacements
                   L = L + 6
                 ENDDO
               ELSE
-C Pb de compatibilite type_new>=101 et type_old<1
+C compatibility issue type_new>=101 and type_old<1
               ENDIF
               IF(TYPE>=2)THEN
-C lecture forces
+C reading forces
                 BUFCOM(N) = 2
 c                BUFCOM(N+NSECT+IFRL1*NSECT) = 1
 c                ADDSEC(N+IFRL1*NSECT) = L+1
@@ -306,7 +314,7 @@ c                ADDSEC(N+IFRL1*NSECT) = L+1
                   L = L + 6
                 ENDDO
               ELSE
-C Pb de compatibilite type_new>=101 et type_old<2
+C compatibility issue type_new>=101 and type_old<2
               ENDIF
             ELSEIF(NSTRF(K0)>=102)THEN
 C a faire
@@ -338,7 +346,7 @@ C
          SECBUF(4) = BUFCOM(3*NSECT+7)
       END IF
 C
-C Traitement Passage de SECBUFG a SECBUF local
+C Treatment Passage from Secou
 C
       L = 1
       KC = 1
@@ -354,7 +362,7 @@ C
           NNOD = NSTRF(K0+6)
           IFLG = NINT(BUFCOM(I))
           IF(NINT(BUFCOM(NSECT+I))==1) THEN
-C remplissage secbuf avec ifrl1 = 0
+C SECUBUF filling with IFRL1 = 0
             IFRL1 = 0
             KR1 = KR0 + 10 + IFRL1*6*NNOD
             KR2 = KR1 + 12*NNOD
@@ -367,7 +375,7 @@ C remplissage secbuf avec ifrl1 = 0
      2        FR_CUT(KC),IAD_CUT(1,I),IFLG                        )
           END IF
           IF(NINT(BUFCOM(2*NSECT+I))==1) THEN
-C remplissage secbuf avec ifrl1 = 1
+C SECUBUF filling with IFRL1 = 1
             IFRL1 = 1
             KR1 = KR0 + 10 + IFRL1*6*NNOD
             KR2 = KR1 + 12*NNOD

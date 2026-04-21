@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    find_edge_inter           ../engine/source/interfaces/interf/find_edge_inter.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                     ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    shooting_node_mod         ../engine/share/modules/shooting_node_mod.F
-      !||====================================================================
+!||====================================================================
+!||    find_edge_inter           ../engine/source/interfaces/interf/find_edge_inter.F
+!||--- called by ------------------------------------------------------
+!||    resol                     ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    element_mod               ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod             ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    shooting_node_mod         ../engine/share/modules/shooting_node_mod.F90
+!||====================================================================
         SUBROUTINE FIND_EDGE_INTER( ITAB,SHOOT_STRUCT,IXS,IXS10,
      1                              IXC,IXTG,IXQ,IXT,IXP,
      2                              IXR,GEO,NGROUP,IGROUPS,IPARG )
@@ -43,6 +45,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !$ENDCOMMENT
         USE INTBUFDEF_MOD  
         USE SHOOTING_NODE_MOD
+        use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -318,7 +321,7 @@ C-----------------------------------------------
                 POINTER_EDGE => EDGES_SHELL(1:2,1:4)
                 SHIFT_ELM = OFFSET_SHELL
             ELSEIF(ELEM_ID<=OFFSET_BEAM) THEN
-                ! truss element
+                ! truss
                 ! 2 nodes / 1 edges
                 !   o----o 
                 EDGE_NUMBER = 1 ! number of edges

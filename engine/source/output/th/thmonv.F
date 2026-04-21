@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thmonv     ../engine/source/output/th/thmonv.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2      ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl2   ../engine/source/input/freform.F
-      !||    wrtdes     ../engine/source/output/th/wrtdes.F
-      !||====================================================================
+!||====================================================================
+!||    thmonv     ../engine/source/output/th/thmonv.F
+!||--- called by ------------------------------------------------------
+!||    hist2      ../engine/source/output/th/hist2.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl2   ../engine/source/input/freform.F
+!||    wrtdes     ../engine/source/output/th/wrtdes.F
+!||====================================================================
       SUBROUTINE THMONV(J1 ,J2   ,ITHBUF  ,L1   ,L2   ,
      .                  WA ,FSAV ,FSAVVENT,IVOLU,IFORM)
 C-----------------------------------------------
@@ -39,7 +39,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
       INTEGER ITHBUF(*),IVOLU(NIMV,*),IFORM
       INTEGER J1,J2,L1,L2,K,IAD2
@@ -50,7 +49,7 @@ C
       CHARACTER TITR1*40,ID_TITR1*2
 C
 C   gather deja effectue, seul p0 ecrit 
-      IF (IMACH/=3.OR.ISPMD==0) THEN
+      IF (ISPMD==0) THEN
         II = 0
         DO J=J1,J2
           DO L=L1,L2

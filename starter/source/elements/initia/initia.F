@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,106 +20,124 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    initia                      ../starter/source/elements/initia/initia.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                      ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    addmaspart                  ../starter/source/tools/admas/addmaspart.F
-      !||    ancmsg                      ../starter/source/output/message/message.F
-      !||    arret                       ../starter/source/system/arret.F
-      !||    asstifi                     ../starter/source/interfaces/inter3d1/asstifi.F
-      !||    binit2                      ../starter/source/ale/bimat/binit2.F
-      !||    c3init3                     ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cbainit3                    ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cdkinit3                    ../starter/source/elements/sh3n/coquedk/cdkinit3.F
-      !||    checkmp                     ../starter/source/elements/initia/initia.F
-      !||    chekmp2                     ../starter/source/elements/initia/initia.F
-      !||    cinit3                      ../starter/source/elements/shell/coque/cinit3.F
-      !||    dtnoda_stifint              ../starter/source/interfaces/inter3d1/dtnoda_stifint.F
-      !||    eporin3                     ../starter/source/ale/ale3d/eporin3.F
-      !||    fretitl2                    ../starter/source/starter/freform.F
-      !||    fxbsini                     ../starter/source/constraints/fxbody/fxbsini.F
-      !||    ig3dinit3                   ../starter/source/elements/ige3d/ig3dinit3.F
-      !||    ini_fvminivel               ../starter/source/elements/initia/ini_fvminivel.F
-      !||    ini_fxbody                  ../starter/source/constraints/fxbody/ini_fxbody.F
-      !||    ini_inimap1d                ../starter/source/initial_conditions/inimap/ini_inimap1d.F
-      !||    ini_inimap2d                ../starter/stub/ini_inimap2d.F
-      !||    ini_seatbelt                ../starter/source/tools/seatbelts/ini_seatbelt.F
-      !||    iniboltprel                 ../starter/source/loads/bolt/iniboltprel.F
-      !||    inigrav_load                ../starter/source/initial_conditions/inigrav/inigrav_load.F
-      !||    ininode_rm                  ../starter/source/materials/mat/mat019/ininode_rm.F
-      !||    inintmass                   ../starter/source/interfaces/inter3d1/inintmass.F
-      !||    inirbe2                     ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
-      !||    inirby                      ../starter/source/constraints/general/rbody/inirby.F
-      !||    inirbys                     ../starter/source/constraints/general/rbody/inirby.F
-      !||    inirig_mat                  ../starter/source/elements/initia/inirig_mat.F
-      !||    inisrf                      ../starter/source/constraints/general/rbody/inisrf.F
-      !||    init_bcs_wall               ../starter/source/boundary_conditions/init_bcs_wall.F90
-      !||    init_inivol                 ../starter/source/initial_conditions/inivol/init_inivol.F90
-      !||    init_seatbelt_rbodies       ../starter/source/tools/seatbelts/init_seatbelt_rbodies.F90
-      !||    inivoid                     ../starter/source/elements/initia/inivoid.F
-      !||    inspcnd                     ../starter/source/elements/sph/inspcnd.F
-      !||    laser10                     ../starter/source/loads/laser/laser10.F
-      !||    lgmini_rby                  ../starter/source/tools/lagmul/lgmini_rby.F
-      !||    modbufel                    ../starter/source/constraints/fxbody/modbufel.F
-      !||    moddepl                     ../starter/source/constraints/fxbody/moddepl.F
-      !||    multifluid_global_tdet      ../starter/source/multifluid/multifluid_global_tdet.F
-      !||    multifluid_init2            ../starter/source/multifluid/multifluid_init2.F
-      !||    multifluid_init2t           ../starter/source/multifluid/multifluid_init2t.F
-      !||    multifluid_init3            ../starter/source/multifluid/multifluid_init3.F
-      !||    multifluid_init3t           ../starter/source/multifluid/multifluid_init3t.F
-      !||    nloc_dmg_init               ../starter/source/materials/fail/nloc_dmg_init.F
-      !||    outpart                     ../starter/source/elements/initia/initia.F
-      !||    outpart5                    ../starter/source/elements/initia/initia.F
-      !||    pinit3                      ../starter/source/elements/beam/pinit3.F
-      !||    q4init2                     ../starter/source/elements/solid_2d/quad4/q4init2.F
-      !||    qinit2                      ../starter/source/elements/solid_2d/quad/qinit2.F
-      !||    rcheckmass                  ../starter/source/elements/spring/rcheckmass.F
-      !||    retrirby                    ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||    rini33_rb                   ../starter/source/elements/joint/rjoint/rini33_rb.F
-      !||    rini45_rb                   ../starter/source/elements/joint/rjoint/rini45_rb.F
-      !||    rinit3                      ../starter/source/elements/spring/rinit3.F
-      !||    s10init3                    ../starter/source/elements/solid/solide10/s10init3.F
-      !||    s10jaci3                    ../starter/source/elements/solid/solide10/s10jaci3.F
-      !||    s16init3                    ../starter/source/elements/thickshell/solide16/s16init3.F
-      !||    s20init3                    ../starter/source/elements/solid/solide20/s20init3.F
-      !||    s4init3                     ../starter/source/elements/solid/solide4/s4init3.F
-      !||    s4refsta3                   ../starter/source/elements/solid/solide4/s4refsta3.F
-      !||    s6cinit3                    ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||    s8cinit3                    ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||    s8zinit3                    ../starter/source/elements/solid/solide8z/s8zinit3.F
-      !||    scaleini                    ../starter/source/elements/initia/scaleini.F
-      !||    scinit3                     ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sgsavini                    ../starter/source/elements/solid/solide/scoor3.F
-      !||    sgsavinieref                ../starter/source/elements/initia/initia.F
-      !||    sgsavinierefq               ../starter/source/elements/initia/initia.F
-      !||    sgsavref                    ../starter/source/elements/initia/initia.F
-      !||    sinit3                      ../starter/source/elements/solid/solide/sinit3.F
-      !||    sms_auto_dt                 ../starter/source/ams/sms_auto_dt.F
-      !||    spinit3                     ../starter/source/elements/sph/spinit3.F
-      !||    spmd_msin                   ../starter/source/elements/initia/spmd_msin.F
-      !||    spmd_msin_addmass           ../starter/source/elements/initia/spmd_msin_addmass.F
-      !||    spmd_partsav_pon            ../starter/source/elements/initia/spmd_msin_addmass.F
-      !||    srefsta3                    ../starter/source/elements/solid/solide/srefsta3.F
-      !||    suinit3                     ../starter/source/elements/elbuf_init/suinit3.F
-      !||    tinit3                      ../starter/source/elements/truss/tinit3.F
-      !||    uel2sys                     ../starter/source/initial_conditions/inista/yctrl.F
-      !||    xinit3                      ../starter/source/elements/xelem/xinit3.F
-      !||--- uses       -----------------------------------------------------
-      !||    bpreload_mod                ../starter/share/modules1/bpreload_mod.F
-      !||    defaults_mod                ../starter/source/modules/defaults_mod.F90
-      !||    detonators_mod              ../starter/share/modules1/detonators_mod.F
-      !||    drape_mod                   ../starter/share/modules1/drape_mod.F
-      !||    func2d_mod                  ../starter/share/modules1/func2d_mod.F
-      !||    inimap1d_mod                ../starter/share/modules1/inimap1d_mod.F
-      !||    inimap2d_mod                ../starter/share/modules1/inimap2d_mod.F
-      !||    init_seatbelt_rbodies_mod   ../starter/source/tools/seatbelts/init_seatbelt_rbodies.F90
-      !||    inivol_def_mod              ../starter/share/modules1/inivol_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    stack_mod                   ../starter/share/modules1/stack_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    initia                          ../starter/source/elements/initia/initia.F
+!||--- called by ------------------------------------------------------
+!||    lectur                          ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    addmaspart                      ../starter/source/tools/admas/addmaspart.F
+!||    ancmsg                          ../starter/source/output/message/message.F
+!||    arret                           ../starter/source/system/arret.F
+!||    asstifi                         ../starter/source/interfaces/inter3d1/asstifi.F
+!||    binit2                          ../starter/source/ale/bimat/binit2.F
+!||    c3init3                         ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cbainit3                        ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cdkinit3                        ../starter/source/elements/sh3n/coquedk/cdkinit3.F
+!||    checkmp                         ../starter/source/elements/initia/initia.F
+!||    chekmp2                         ../starter/source/elements/initia/initia.F
+!||    cinit3                          ../starter/source/elements/shell/coque/cinit3.F
+!||    damping_range_init              ../starter/source/general_controls/damping/damping_range_init.F90
+!||    detonation_times_printout       ../starter/source/initial_conditions/detonation/detonation_times_printout.F90
+!||    dtnoda_stifint                  ../starter/source/interfaces/inter3d1/dtnoda_stifint.F
+!||    eikonal_solver                  ../starter/source/initial_conditions/detonation/eikonal_solver.F90
+!||    eporin3                         ../starter/source/ale/ale3d/eporin3.F
+!||    fretitl2                        ../starter/source/starter/freform.F
+!||    fxbsini                         ../starter/source/constraints/fxbody/fxbsini.F
+!||    ig3dinit3                       ../starter/source/elements/ige3d/ig3dinit3.F
+!||    ini_fvminivel                   ../starter/source/elements/initia/ini_fvminivel.F
+!||    ini_fxbody                      ../starter/source/constraints/fxbody/ini_fxbody.F
+!||    ini_guided_cable                ../starter/source/tools/seatbelts/ini_guided_cable.F90
+!||    ini_inimap1d                    ../starter/source/initial_conditions/inimap/ini_inimap1d.F
+!||    ini_inimap2d                    ../starter/stub/ini_inimap2d.F
+!||    ini_seatbelt                    ../starter/source/tools/seatbelts/ini_seatbelt.F
+!||    iniboltprel                     ../starter/source/loads/bolt/iniboltprel.F
+!||    inigrav_load                    ../starter/source/initial_conditions/inigrav/inigrav_load.F
+!||    ininode_rm                      ../starter/source/materials/mat/mat019/ininode_rm.F
+!||    inintmass                       ../starter/source/interfaces/inter3d1/inintmass.F
+!||    inirbe2                         ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
+!||    inirby                          ../starter/source/constraints/general/rbody/inirby.F
+!||    inirbys                         ../starter/source/constraints/general/rbody/inirby.F
+!||    inirig_mat                      ../starter/source/elements/initia/inirig_mat.F
+!||    inisrf                          ../starter/source/constraints/general/rbody/inisrf.F
+!||    init_bcs_nrf                    ../starter/source/boundary_conditions/init_bcs_nrf.F90
+!||    init_bcs_wall                   ../starter/source/boundary_conditions/init_bcs_wall.F90
+!||    init_inivol                     ../starter/source/initial_conditions/inivol/init_inivol.F90
+!||    init_rwall_penalty              ../starter/source/constraints/general/rwall/init_rwall_penalty.F90
+!||    init_seatbelt_rbodies           ../starter/source/tools/seatbelts/init_seatbelt_rbodies.F90
+!||    inivoid                         ../starter/source/elements/initia/inivoid.F
+!||    inspcnd                         ../starter/source/elements/sph/inspcnd.F
+!||    laser10                         ../starter/source/loads/laser/laser10.F
+!||    lgmini_rby                      ../starter/source/tools/lagmul/lgmini_rby.F
+!||    modbufel                        ../starter/source/constraints/fxbody/modbufel.F
+!||    moddepl                         ../starter/source/constraints/fxbody/moddepl.F
+!||    multifluid_global_tdet          ../starter/source/multifluid/multifluid_global_tdet.F
+!||    multifluid_init2                ../starter/source/multifluid/multifluid_init2.F
+!||    multifluid_init2t               ../starter/source/multifluid/multifluid_init2t.F
+!||    multifluid_init3                ../starter/source/multifluid/multifluid_init3.F
+!||    multifluid_init3t               ../starter/source/multifluid/multifluid_init3t.F
+!||    nloc_dmg_init                   ../starter/source/materials/fail/nloc_dmg_init.F
+!||    outpart                         ../starter/source/elements/initia/initia.F
+!||    outpart5                        ../starter/source/elements/initia/initia.F
+!||    pinit3                          ../starter/source/elements/beam/pinit3.F
+!||    q4init2                         ../starter/source/elements/solid_2d/quad4/q4init2.F
+!||    qinit2                          ../starter/source/elements/solid_2d/quad/qinit2.F
+!||    rcheckmass                      ../starter/source/elements/spring/rcheckmass.F
+!||    retrirby                        ../starter/source/constraints/general/merge/hm_read_merge.F
+!||    rini33_rb                       ../starter/source/elements/joint/rjoint/rini33_rb.F
+!||    rini45_rb                       ../starter/source/elements/joint/rjoint/rini45_rb.F
+!||    rinit3                          ../starter/source/elements/spring/rinit3.F
+!||    s10init3                        ../starter/source/elements/solid/solide10/s10init3.F
+!||    s10jaci3                        ../starter/source/elements/solid/solide10/s10jaci3.F
+!||    s16init3                        ../starter/source/elements/thickshell/solide16/s16init3.F
+!||    s20init3                        ../starter/source/elements/solid/solide20/s20init3.F
+!||    s4init3                         ../starter/source/elements/solid/solide4/s4init3.F
+!||    s4refsta3                       ../starter/source/elements/solid/solide4/s4refsta3.F
+!||    s6cinit3                        ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||    s6zinit3                        ../starter/source/elements/solid/solide6z/s6zinit3.F90
+!||    s8cinit3                        ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||    s8zinit3                        ../starter/source/elements/solid/solide8z/s8zinit3.F
+!||    scaleini                        ../starter/source/elements/initia/scaleini.F
+!||    scinit3                         ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sgsavini                        ../starter/source/elements/solid/solide/scoor3.F
+!||    sgsavinieref                    ../starter/source/elements/initia/initia.F
+!||    sgsavinierefq                   ../starter/source/elements/initia/initia.F
+!||    sgsavref                        ../starter/source/elements/initia/initia.F
+!||    sinit3                          ../starter/source/elements/solid/solide/sinit3.F
+!||    sms_auto_dt                     ../starter/source/ams/sms_auto_dt.F
+!||    spinit3                         ../starter/source/elements/sph/spinit3.F
+!||    spmd_msin                       ../starter/source/elements/initia/spmd_msin.F
+!||    spmd_msin_addmass               ../starter/source/elements/initia/spmd_msin_addmass.F
+!||    spmd_partsav_pon                ../starter/source/elements/initia/spmd_msin_addmass.F
+!||    srefsta3                        ../starter/source/elements/solid/solide/srefsta3.F
+!||    suinit3                         ../starter/source/elements/elbuf_init/suinit3.F
+!||    tinit3                          ../starter/source/elements/truss/tinit3.F
+!||    uel2sys                         ../starter/source/initial_conditions/inista/yctrl.F
+!||    ush_init                        ../starter/source/elements/elbuf_init/ush_init.F90
+!||    xinit3                          ../starter/source/elements/xelem/xinit3.F
+!||--- uses       -----------------------------------------------------
+!||    bpreload_mod                    ../starter/share/modules1/bpreload_mod.F
+!||    damping_range_init_mod          ../starter/source/general_controls/damping/damping_range_init.F90
+!||    defaults_mod                    ../starter/source/modules/defaults_mod.F90
+!||    detonation_times_printout_mod   ../starter/source/initial_conditions/detonation/detonation_times_printout.F90
+!||    detonators_mod                  ../starter/share/modules1/detonators_mod.F
+!||    drape_mod                       ../starter/share/modules1/drape_mod.F
+!||    eikonal_solver_mod              ../starter/source/initial_conditions/detonation/eikonal_solver.F90
+!||    func2d_mod                      ../starter/share/modules1/func2d_mod.F
+!||    ini_guided_cable_mod            ../starter/source/tools/seatbelts/ini_guided_cable.F90
+!||    inimap1d_mod                    ../starter/share/modules1/inimap1d_mod.F
+!||    inimap2d_mod                    ../starter/share/modules1/inimap2d_mod.F
+!||    init_bcs_nrf_mod                ../starter/source/boundary_conditions/init_bcs_nrf.F90
+!||    init_bcs_wall_mod               ../starter/source/boundary_conditions/init_bcs_wall.F90
+!||    init_inivol_mod                 ../starter/source/initial_conditions/inivol/init_inivol.F90
+!||    init_rwall_penalty_mod          ../starter/source/constraints/general/rwall/init_rwall_penalty.F90
+!||    init_seatbelt_rbodies_mod       ../starter/source/tools/seatbelts/init_seatbelt_rbodies.F90
+!||    inivol_def_mod                  ../starter/share/modules1/inivol_mod.F
+!||    message_mod                     ../starter/share/message_module/message_mod.F
+!||    s6zinit3_mod                    ../starter/source/elements/solid/solide6z/s6zinit3.F90
+!||    stack_mod                       ../starter/share/modules1/stack_mod.F
+!||    submodel_mod                    ../starter/share/modules1/submodel_mod.F
+!||    ush_init_mod                    ../starter/source/elements/elbuf_init/ush_init.F90
+!||====================================================================
       SUBROUTINE INITIA(IPARG      ,ELBUF         ,MS               ,IN             ,V         ,
      1                  X          ,IXS           ,IXQ              ,IXC            ,IXT       ,
      2                  IXP        ,IXR           ,DETONATORS       ,GEO            ,PM        ,
@@ -130,10 +148,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      7                  IGRNOD     ,IGRSURF       ,BUFSF            ,VR             ,
      8                  BUFMAT     ,XLAS          ,LAS              ,DTELEM         ,MSS       ,
      9                  MSQ        ,MSC           ,MST              ,MSP            ,MSR       ,
-     A                  MSTG       ,PTG           ,INC              ,
+     A                  MSTG       ,PTG           ,INC              ,NOD2ELTG       ,KNOD2ELTG ,
      B                  INP        ,INR           ,INTG             ,INDEX          ,
      C                  ITRI       ,KXX           ,IXX              ,XELEMWA        ,
-     E                  IWA        ,
+     E                  IWA        ,NOD2ELQ       ,KNOD2ELQ         ,NOD2ELS        ,KNOD2ELS  ,
      F                  KXSP       ,IXSP          ,NOD2SP           ,ISPCOND        ,ICODE     ,
      G                  ISKEW      ,ISKN          ,ISPSYM           ,XFRAME         ,ISPTAG    ,
      H                  SPBUF      ,MSSX          ,NSIGI            ,
@@ -177,7 +195,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      K                  KNOD2EL1D  ,NOD2EL1D      ,EBCS_TAB         ,RBY_INIAXIS    ,ALEA      ,
      L                  KNOD2ELC   ,NOD2ELC       ,DR               ,SLRBODY        ,DRAPEG    ,
      M                  IPARI      ,INTBUF_TAB    ,INTERFACES       ,MAT_PARAM      ,NPRELOAD_A,
-     N                  PRELOAD_A  ,FAIL_FRACTAL  ,FAIL_BROKMANN    ,DEFAULTS )
+     N                  PRELOAD_A  ,FAIL_FRACTAL  ,FAIL_BROKMANN    ,DEFAULTS       ,NDAMP_FREQ_RANGE,
+     O                  DAMPR      ,IBEAM_VECTOR  ,RBEAM_VECTOR     ,IKINE          ,LSIGI     ,
+     P                  LSIGSP     ,SRNOISE       ,NPRW             ,LPRW           , RWSTIF_PEN,
+     M                  SLN_PEN    ,ROOTLEN       ,ROOTNAM          ,NGUIDED_CABLE  ,TOTMAS1  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
@@ -210,8 +231,19 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE ELBUFDEF_MOD
       USE MULTIMAT_PARAM_MOD , ONLY : M51_LC0MAX, M51_SSP0MAX, M51_TCP_REF, M51_lSET_IFLG6, M51_IFLG6, M51_ILOOP_NRF
-      use brokmann_random_def_mod
-      use glob_therm_mod
+      USE BROKMANN_RANDOM_DEF_MOD
+      USE GLOB_THERM_MOD
+      USE DAMPING_RANGE_INIT_MOD
+      USE EIKONAL_SOLVER_MOD, ONLY : EIKONAL_SOLVER
+      USE DETONATION_TIMES_PRINTOUT_MOD , ONLY : DETONATION_TIMES_PRINTOUT
+      USE S6ZINIT3_MOD
+      USE INIT_BCS_WALL_MOD , ONLY : INIT_BCS_WALL
+      USE INIT_BCS_NRF_MOD , ONLY : INIT_BCS_NRF
+      use init_inivol_mod , only : INIT_INIVOL
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
+      use init_rwall_penalty_mod , only : init_rwall_penalty
+      use ush_init_mod , only : ush_init
+      use ini_guided_cable_mod, ONLY : ini_guided_cable 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -244,6 +276,7 @@ C-----------------------------------------------
 #include      "boltpr_c.inc"
 #include      "titr_c.inc"
 #include      "tabsiz_c.inc"
+#include      "scry_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -304,6 +337,7 @@ C-----------------------------------------------
      .   SIGTRUSS(NSIGTRUSS,*),TOTMAS, KNOTLOCPC(*),KNOTLOCEL(*),VNIGE(*),BNIGE(*),
      .   FXBGLM(*),FXBCPM(*),FXBCPS(*),FXBLM(*),FXBFLS(*),FXBDLS(*),FXB_MATRIX(*),
      .   RBY_INIAXIS(7,*),ALEA(*),DR(SDR)
+      my_real,INTENT(INOUT) :: TOTMAS1
 
       my_real, DIMENSION(NUMNOD*2), TARGET :: STIFN
       my_real , DIMENSION(:), POINTER :: STIFR
@@ -311,6 +345,22 @@ C
       INTEGER NOM_OPT(LNOPT1,*),PTR_NOPT_RBE2,PTR_NOPT_ADM,PTR_NOPT_FUN,IOPT
       INTEGER FXBNOD(*), FXANI(2,*),ITAGND(*)
       INTEGER,INTENT(IN) :: NPRELOAD_A
+      INTEGER,INTENT(IN) :: NDAMP_FREQ_RANGE
+      my_real,INTENT(IN) :: DAMPR(NRDAMP,NDAMP)
+      INTEGER,INTENT(IN) :: IBEAM_VECTOR(NUMELP)
+      my_real,INTENT(IN) :: RBEAM_VECTOR(3,NUMELP)
+      INTEGER,INTENT(IN) :: IKINE(3*NUMNOD)
+      INTEGER,INTENT(IN) :: LSIGI
+      INTEGER,INTENT(IN) :: LSIGSP
+      INTEGER,INTENT(IN) :: SRNOISE
+!
+      INTEGER,INTENT(IN) :: SLN_PEN
+      INTEGER, DIMENSION(NNPRW*NRWALL),INTENT(IN) :: NPRW
+      INTEGER, DIMENSION(SLPRW),INTENT(IN)        :: LPRW
+      my_real, DIMENSION(SLN_PEN), INTENT(INOUT)  :: RWSTIF_PEN
+      INTEGER,INTENT(IN) :: ROOTLEN
+      CHARACTER (LEN=ROOTLEN), INTENT(IN) :: ROOTNAM
+      INTEGER,INTENT(IN) :: NGUIDED_CABLE
 C
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP,NXEL) :: XFEM_TAB
@@ -379,10 +429,16 @@ C      INTEGER *8 I8MI(6,NUMNOD)
       INTEGER, DIMENSION(:), ALLOCATABLE :: IRIG_NODE, CONNEC
       my_real, DIMENSION(:), ALLOCATABLE :: PART_AREA,ELE_AREA
 
-      my_real ADDEDMS(NPART), MST3(MVSIZ),PTTRIA(MVSIZ)
+      my_real ADDEDMS(NPART),MAS,MAS_1
       INTEGER ID,ISTOT, NF1,NNOD,NSROT,IDRAPE,ICPRE
       CHARACTER(LEN=NCHARTITLE)::TITR
       LOGICAL :: ERROR_THROWN
+      INTEGER,INTENT(IN) :: NOD2ELTG(3*NUMELTG)
+      INTEGER,INTENT(IN) :: NOD2ELQ(3*NUMELQ)
+      INTEGER,INTENT(IN) :: NOD2ELS(3*NUMELS)
+      INTEGER,INTENT(IN) :: KNOD2ELTG(NUMNOD+1)
+      INTEGER,INTENT(IN) :: KNOD2ELQ(NUMNOD+1)
+      INTEGER,INTENT(IN) :: KNOD2ELS(NUMNOD+1)
 C-----------------------------------------------
 C   D e r i v e d   T y p e   D e f i n i t i o n s
 C-----------------------------------------------
@@ -405,8 +461,8 @@ C                   1 2 3 4 5 6 7 8 9 10
      4              0,0,1,0,0,0,0,0,0,0/
       DATA COQPID/1,1,0,0,0,0,0,1,0,1,1,
      1              1,0,0,0,0,1,1,0,1,0,
-     2              0,0,0,0,0,0,0,0,0,0,
-     3              0,0,0,0,0,0,0,0,0,0,
+     2              0,0,0,0,0,0,0,0,1,1,
+     3              1,0,0,0,0,0,0,0,0,0,
      4              0,0,0,0,0,0,0,0,0,0,
      5              1,1/
       DATA TRUPID/0,0,1,0,0,0,0,0,0,0,0,
@@ -592,9 +648,12 @@ C     solids
       SOLMAT(120)= 1
       SOLMAT(121)= 1
       SOLMAT(122)= 1
+      SOLMAT(123)= 1
       SOLMAT(124)= 1
       SOLMAT(125)= 1
       SOLMAT(127)= 1
+      SOLMAT(132)= 1
+      SOLMAT(134)= 1
       SOLMAT(151)= 1
       SOLMAT(187)= 1
       SOLMAT(190)= 1
@@ -660,7 +719,9 @@ C     shells
       COQMAT(119) = 1
       COQMAT(121) = 1
       COQMAT(122) = 1
+      COQMAT(123) = 1
       COQMAT(125) = 1
+      COQMAT(132) = 1
       COQMAT(151) = 1
       COQMAT(158) = 1
       COQMAT(200) = 1
@@ -762,14 +823,22 @@ C--------------------------------------------
      .                     IXS,NIXS,NUMELS, IXQ,NIXQ,NUMELQ, IXTG,NIXTG,NUMELTG, N2D,
      .                     NGROUP,NPARG,IPARG,IPRI)
       ENDIF
+C------------------------------------------------------
+C  Initialisation of Non Reflecting BOundary Conditions
+C------------------------------------------------------
+      IF(BCS%NUM_NRF > 0)THEN
+        CALL INIT_BCS_NRF(IGRNOD,NGRNOD,NUMNOD,MULTI_FVM,
+     .                    IXS,NIXS,NUMELS, IXQ,NIXQ,NUMELQ, IXTG,NIXTG,NUMELTG, N2D,
+     .                    NGROUP,NPARG,IPARG,IPRI,ITAB,NUMMAT, MAT_PARAM)
+      ENDIF
 C---------------------------------------------------------
-C     Tri du vecteur de bolt Preloading
+C     Sorting of the bolt preloading vector
 C---------------------------------------------------------
       IF (NPRELOAD > 0) THEN
         CALL INIBOLTPREL(IXS,IPRELOAD ,PRELOAD  ,VPRELOAD, IFLAG_BPRELOAD)
       ENDIF
 C-----------------------------------------------------
-C     PREPARATION DU CALCUL DES MASSES PAR PARTICULE SI CONDITION(S) DE
+C     PREPARATION OF THE CALCULATION OF MASSES BY PARTICLE IF CONDITION(S) OF
 C     SYMETRIE
 C-----------------------------------------------------
       IF (NUMSPH/=0.AND.NSPCOND/=0)
@@ -783,9 +852,13 @@ C--------------------------------------------
       IF (N_SEATBELT > 0) CALL INI_SEATBELT(IPARG,ELBUF_TAB,KNOD2EL1D,NOD2EL1D,IXR,
      .                                      X,ITAB,IPM,ALEA,KNOD2ELC,
      .                                      NOD2ELC,IXC)
+C--------------------------------------------
+C Guide initialization :
+C--------------------------------------------     
+      IF ((NGUIDED_CABLE > 0).AND.(NSPMD > 1)) CALL INI_GUIDED_CABLE(NSPMD)
 C-----------------------------------------------------
-C     INITIALISATION DES BUFFERS DES ELEMENTS
-C     INITIALISATION DES MASSES ET DES INERTIES
+C     INITIALIZATION OF ELEMENT BUFFERS
+C     INITIALIZATION OF MASSES AND INERTIAS
 C-----------------------------------------------------
 C
 C  for heat transfer
@@ -909,9 +982,9 @@ C
      E        STRP       ,INP        ,STIFINT    ,MCPP      ,INR       ,
      F        MSR        ,MSRT       ,STR        ,IPART(I15F),ITAB     ,
      G        IXR       , IMERGE2    ,IADMERGE2  ,NEL       ,DEFAULTS  ,
-     H        GLOB_THERM )
+     H        GLOB_THERM,IBEAM_VECTOR,RBEAM_VECTOR)
 C
-       ELSEIF( MTN == 13) THEN
+       ELSEIF( IRIGID_MAT>0) THEN
 C Rigid material
            LFT=1
            LLT=NEL
@@ -937,7 +1010,7 @@ C
      E        GROUP_PARAM_TAB(NG)    ,IGTYP      ,DEFAULTS  ,GLOB_THERM)
 C
        ELSE
-C Element types
+C Type element
         LFT=1
         LLT=NEL
         OFFSET=0
@@ -1002,6 +1075,40 @@ C Case total strain
      .                             GBUF%SMSTR,GBUF%OFF,NEL)
                END IF
             ENDIF
+
+         ELSEIF( (ISOLNOD == 6) .AND. (IGTYP == 14 .OR. IGTYP == 6))THEN
+             !for the moment, there is no orthotropic penta solid element (IGTYP == 6)
+             JHBE  = IPARG(23,NG)
+             NFT   = IPARG(3,NG)
+             IPROP = IXS(10,NFT+1)
+             IF (JHBE /= 24)  THEN
+               CALL ANCMSG(
+     .           MSGID=3107,             
+     .           MSGTYPE=MSGERROR,       
+     .           ANMODE=ANINFO_BLIND_1,                                 
+     .           I1=IGEO(1,IPROP),
+     .           I2=IPART(LIPART1*(IPART(I15A)-1)+4),
+     .           PRMOD=MSG_CUMU)
+             ENDIF
+          CALL S6ZINIT3(
+     .      ELBUF_TAB(NG),NIXS ,NUMELS   ,IXS      ,NUMNOD    ,MS       ,
+     .      NPROPM   ,NUMMAT   ,PM       ,X        ,DETONATORS,NPROPG   ,
+     .      NUMGEO   ,GEO      ,ALE_CONNECTIVITY   ,NPARG     ,      
+     .      IPARG(1,NG),NEL    ,DTELEM   ,NSIGS    ,LSIGI     ,SIGI     ,
+     .      LSKEW    ,NUMSKW   ,SKEW     ,NPROPGI  ,IGEO      ,STIFN    ,
+     .      20       ,NPART    ,PARTSAV  ,V        ,IPART(I15A),MSS     ,
+     .      LIPART1  ,IPART    ,GLOB_THERM,NSIGI   ,LSIGSP    ,SIGSP    ,
+     .      NPROPMI  ,IPM      ,IUSER    ,VOLNOD   ,BVOLNOD   ,VNS      ,
+     .      BNS      ,PTSOL    ,SBUFMAT  ,BUFMAT   ,MCP       ,MCPS     ,
+     .      TEMP     ,SNPC     ,NPC      ,STF      ,PLD       ,STRSGLOB(NF1),
+     .      STRAGLOB(NF1),MSSA ,FAIL_INI ,SIZLOADP ,NLOADP    ,ILOADP   ,
+     .      LFACLOAD ,FACLOAD  ,NPERTURB ,SRNOISE  ,RNOISE    ,PERTURB  ,
+     .      MAT_PARAM,DEFAULTS%SOLID     ,NUMSOL   ,I7STIFS   ,ISORTH   ,
+     .      ISTRAIN  ,JTHE     ,MTN      ,NFT      ,ISMSTR    )
+          IF (ISMSTR >= 10.AND.ISMSTR <= 12) THEN  
+              CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
+          ENDIF
+
          ELSEIF(ISOLNOD == 10 .OR.(ISOLNOD == 4 .AND.ISROT == 1))THEN
           KK1=1+NUMELS*NIXS
           CALL S10INIT3(ELBUF_TAB(NG),
@@ -1054,7 +1161,7 @@ C Case total strain
      9         NPC         ,PLD       ,STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI   ,
      A         ILOADP      ,FACLOAD   ,PERTURB ,RNOISE     ,MAT_PARAM  ,              
      B         GLOB_THERM  )
-         ELSEIF(ITY==1)THEN
+         ELSE 
           JHBE=IPARG(23,NG)
           JCLOS=IPARG(33,NG)
           IINT =IPARG(36,NG)
@@ -1093,7 +1200,7 @@ C Case total strain
      .             BNS        ,WMA       ,PTSOL     ,BUFMAT      ,MCP        ,
      .             MCPS       ,TEMP      ,NPC       ,PLD         ,MSSA       ,
      .             STRSGLOB(NF1),STRAGLOB(NF1),ORTHOGLOB ,FAIL_INI    ,ILOADP     ,
-     .             FACLOAD   ,RNOISE     ,PERTURB   ,GLOB_THERM)
+     .             FACLOAD   ,RNOISE     ,PERTURB   ,GLOB_THERM, MAT_PARAM)
             ENDIF
           ELSEIF (JHBE == 14 .AND. 
      .           (IGTYP == 20 .OR. IGTYP == 21 .OR. IGTYP == 22)) THEN
@@ -1148,6 +1255,7 @@ C Case total strain
      .             MSSA    ,STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI,SPBUF   ,
      .             KXSP    ,IPART(I15J) ,NOD2SP  ,SOL2SPH ,IRST,
      .             ILOADP  ,FACLOAD     ,PERTURB ,RNOISE  ,MAT_PARAM)
+
               IF (NSIGI > 0 .AND. ISMSTR == 1) THEN
                  CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
      .                             GBUF%SMSTR,GBUF%OFF,NEL)
@@ -1157,7 +1265,7 @@ C Case total strain
      .             DETONATORS  ,GEO       ,VEUL  ,ALE_CONNECTIVITY ,IPARG(1,NG),
      .             DTELEM,SIGI      ,NEL   ,SKEW       ,IGEO       ,
      .             STIFN ,PARTSAV   ,V     ,IPART(I15A),MSS,
-     .             IPART ,SIGSP     ,GLOB_THERM, 
+     .             IPART ,SIGSP     ,GLOB_THERM,TEMP   , 
      .             NSIGI ,IN        ,VR    ,IPM        ,NSIGS   ,
      .             VOLNOD ,BVOLNOD  ,VNS   ,BNS        ,PTSOL   ,
      .             BUFMAT ,NPC      ,PLD   ,FAIL_INI   ,INS     ,
@@ -1165,6 +1273,7 @@ C Case total strain
           ELSE
             GBUF => ELBUF_TAB(NG)%GBUF
             IF (NPT == 1 .AND. ISTOT == 1) THEN
+
                 CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
                IF (NSIGI > 0 ) THEN
                   CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
@@ -1251,7 +1360,7 @@ C Case total strain: conf_ref <- XREF
      4                NEL   ,SKEW   , MSQ  ,IPART  ,IPART(I15B),
      5                IPM   ,NSIGS  ,WMA   ,PTQUAD ,BUFMAT     ,
      6                NPC   ,PLD    ,IPARG ,ILOADP ,FACLOAD    ,
-     7                PARTSAV,V     )
+     7                PARTSAV,V     ,MAT_PARAM,STIFN(1:NUMNOD))
               ELSE
                  CALL QINIT2(
      .                ELBUF_TAB(NG),MS,IXQ   ,PM   ,X       ,
@@ -1260,7 +1369,8 @@ C Case total strain: conf_ref <- XREF
      .                NEL   ,SKEW, MSQ, IPART, IPART(I15B),
      .                IPM     ,NSIGS  ,
      .                WMA     ,PTQUAD ,BUFMAT  ,NPC  ,PLD,
-     .                IPARG   ,ILOADP ,FACLOAD ,PARTSAV,V)
+     .                IPARG   ,ILOADP ,FACLOAD ,PARTSAV,V, MAT_PARAM,
+     .                STIFN(1:NUMNOD))
               ENDIF
            ELSE  ! JMULT > 0
               IF (MTN == 20) THEN
@@ -1313,6 +1423,14 @@ C 2D multifluid law
      E             IGEO_STACK ,STRC   ,PERTURB            ,IYLDINI ,ELE_AREA,
      F             NLOC_DMG   ,NG        ,GROUP_PARAM_TAB(NG),IDRAPE,DRAPEG,
      G             MAT_PARAM  ,FAIL_FRACTAL,FAIL_BROKMANN,GLOB_THERM)
+          ELSEIF (IGTYP>=29.AND.IGTYP<=31) THEN
+            CALL USH_INIT(ELBUF_TAB(NG),                                         
+     1             NUMNOD,   NPART,   NUMMAT,      NEL,       PM,                
+     2        IPARG(1,NG),  NUMELC,   NIXC,      IXC,IPART(I15C),                  
+     3            I7STIFS,USERL_AVAIL,  NSHNOD,                  
+     4                  X,      V,      VR,    STIFN,    STIFR,                  
+     5             DTELEM,THK(1+NFT), PARTSAV,   MSC,     INC ,                  
+     6                STC)
           ELSE
             NULLIFY(ptr_ITAGE)
             IF (SITAGE>0) ptr_ITAGE => ITAGE(1)       
@@ -1360,12 +1478,12 @@ C 2D multifluid law
         ELSEIF (ITY == 5) THEN
           CALL PINIT3(ELBUF_TAB(NG),
      1                STP        ,IXP      ,PM      ,X       ,GEO   ,
-     2                MS         ,IN       ,DTELEM  ,NFT     ,NEL  ,
+     2                DTELEM     ,NFT     ,NEL     ,
      3                STIFN      ,STIFR    ,PARTSAV ,V       ,IPART(I15E),
-     4                MSP        ,INP      ,IGEO    ,STIFINT ,STRP       ,
-     5                NSIGBEAM   ,SIGBEAM  ,PTBEAM  ,IUSER   ,MCP        ,
+     4                MSP        ,INP      ,IGEO    ,STRP    ,
+     5                NSIGBEAM   ,SIGBEAM  ,PTBEAM  ,IUSER   ,
      6                MCPP       ,TEMP     ,PRELOAD_A,IBOLTP ,NPRELOAD_A ,
-     7                GLOB_THERM)
+     7                GLOB_THERM ,IBEAM_VECTOR,RBEAM_VECTOR)
         !----------------------------------------!
         !   ITY == 6                      SPRING !
         !----------------------------------------!
@@ -1379,7 +1497,8 @@ C 2D multifluid law
      5                INR       ,STIFINT     ,STR(NFT+1),IGEO     ,SIGRS      ,
      6                NSIGRS    ,IMERGE2     ,IADMERGE2 ,MSRT(NFT+1),IXR_KJ   ,
      7                NOM_OPT(1,IOPT),STRR   ,PTSPRI    ,IPM       , PM     ,
-     8                BUFMAT    ,R_SKEW      ,PRELOAD_A ,IBOLTP    ,NPRELOAD_A)          
+     8                BUFMAT    ,R_SKEW      ,PRELOAD_A ,IBOLTP    ,NPRELOAD_A,
+     9                IKINE)          
         !----------------------------------------!
         !   ITY == 7                SH3N or TRIA !
         !----------------------------------------!
@@ -1405,12 +1524,21 @@ C 2D multifluid law
      C          SH3TRIM ,ISUBSTACK,STACK ,RNOISE,
      D          DRAPE,SH3ANG ,GEO_STACK,IGEO_STACK,STRTG,
      E          PERTURB,IYLDINI ,ELE_AREA,NLOC_DMG,
-     F          IDRAPE, DRAPEG,MAT_PARAM,GLOB_THERM)
+     F          IDRAPE, DRAPEG,MAT_PARAM,GLOB_THERM,LTITR )
           ELSEIF (MTN == 151 .OR. N2D > 0) THEN
              CALL MULTIFLUID_INIT2T(ELBUF_TAB(NG), NEL, NSIGS, NVC, IPARG, IXTG, ALE_CONNECTIVITY,
      .            IGEO, IPART, IPART(I15H), IPM, PTSH3N, NPC, ILOADP, 
      .            X, PM, GEO, SIGI, SKEW, PLD, BUFMAT, FACLOAD, MULTI_FVM, ERROR_THROWN, DETONATORS,
      .            MAT_PARAM)
+          ELSEIF (IGTYP>=29.AND.IGTYP<=31) THEN
+            CALL USH_INIT(ELBUF_TAB(NG),                                         
+     1             NUMNOD,   NPART,   NUMMAT,      NEL,       PM,
+     2        IPARG(1,NG),NUMELTG,   NIXTG,     IXTG,IPART(I15H),                  
+     3            I7STIFS,USERL_AVAIL,NSHNOD,                  
+     4                  X,      V,      VR,    STIFN,    STIFR,                  
+     5             DTELEM,THK(1+NFT+NUMELC), PARTSAV,   MSTG,     INTG ,                  
+     6               STTG)
+            PTG(1:3,NF1:NFT+NEL) = ONE
           ELSE
            NULLIFY(ptr_ITAGE)
            IF (SITAGE > 0) ptr_ITAGE => ITAGE(NUMELC+1)  
@@ -1456,7 +1584,7 @@ C         SPH cells
      7             SIGSPH  ,ISPTAG     ,IPART      ,
      8             IPM     ,NSIGSPH    ,PTSPH      ,NPC   ,
      9             PLD     ,ELBUF_TAB(NG),MCP,TEMP ,ILOADP,
-     A             FACLOAD ,STIFINT    ,I7STIFS,GLOB_THERM)
+     A             FACLOAD ,STIFINT    ,I7STIFS,GLOB_THERM , MAT_PARAM)
         !----------------------------------------------------------!
         !   ITY == 100   Pulley PID28 + User elements PID 29-30-31 !
         !----------------------------------------------------------!
@@ -1497,7 +1625,7 @@ c
      .             VNIGE  ,BNIGE   ,PTSOL   ,
      .             BUFMAT ,NPC     ,PLD    ,FAIL_INI,NCTRL,
      .             MSIG3D ,KNOT    ,NCTRLMAX,WIGE ,PX,PY,PZ,
-     .             KNOTLOCPC,KNOTLOCEL)
+     .             KNOTLOCPC,KNOTLOCEL,MAT_PARAM)
         ENDIF          
 C
         IF (ITY == 3) THEN
@@ -1510,6 +1638,37 @@ C
 C
        ENDIF
       END DO ! End loop on element group NG
+!
+      !<-----------------------------------------------------------------------
+      !< Print /PENTA6 error message if any
+      !<-----------------------------------------------------------------------
+      CALL ANCMSG(MSGID=3107,
+     .            MSGTYPE=MSGERROR,
+     .            ANMODE=ANINFO_BLIND_1,
+     .            PRMOD=MSG_PRINT)
+      !<-----------------------------------------------------------------------
+!
+C-----------
+!DETONATION TIMES WITH SHADOWING EFFECTS
+!FAST MARCHING METHOD
+      CALL EIKONAL_SOLVER(ixq      , nixq     , numelq   ,
+     .                    ixs      , nixs     , numels   ,
+     .                    ixtg     , nixtg    , numeltg  ,
+     .                    x        , numnod   , titre(55),
+     .                    elbuf_tab, ngroup   , nparg    ,
+     .                    nod2eltg , knod2eltg,
+     .                    nod2elq  , knod2elq ,
+     .                    nod2els  , knod2els ,
+     .                    iparg    , ale_connectivity, npropm, nummat, pm, n2d, detonators,
+     .                    npropmi  , ipm     )
+C---------------------------------------------------
+C Initialization of global detonation times (Law151)
+      CALL MULTIFLUID_GLOBAL_TDET(IPARG,ELBUF_TAB,MULTI_FVM,IPM)
+! DETONATION TIMES PRINTOUT
+C---------------------------------------------------
+! + DEFAULT INITIALIZATION TO 0.0 IN CASE OF NO DETONATOR
+      CALL DETONATION_TIMES_PRINTOUT(NPARG,NGROUP,IPARG,N2D,IPRI,ELBUF_TAB,
+     .                               NIXS,NIXQ,NIXTG,NUMELS,NUMELQ,NUMELTG,IXS,IXQ,IXTG)
 C-----------
       !loop over material initialisation done.
       !IF NRF outlet, print its automatic characteristic
@@ -1616,6 +1775,21 @@ C---------------------------------------------------------------
         IF(INTERFACES%PARAMETERS%ISTIF_DT > 0) THEN
           CALL DTNODA_STIFINT( MS   ,STIFN ,INTERFACES%PARAMETERS%DT_STIFINT)
         ENDIF
+!--------------------------------------------
+! RWALL penalty stiffness initialization
+!--------------------------------------------
+        IF (SLN_PEN>0) THEN
+           CALL INIT_RWALL_PENALTY(ELBUF_TAB,                          
+     1             numnod,  nparg,  ngroup,  iparg,   nummat,          
+     2             nrwall,  nnprw,    nprw,   lprw,    slprw,          
+     3             numelc,numeltg,  numels,numels8, numels10,          
+     4           numels16,numels20,    ixc,   ixtg,      ixs,          
+     5              ixs10,   ixs16,  ixs20,    ixt,      ixp,          
+     6                ixr,  numelt, numelp, numelr,    stifn,
+     7         mat_param,SLN_PEN,RWSTIF_PEN,nrbykin,  nnpby ,         
+     8            npby  , slpby ,   lpby  ,  nrbe2,    irbe2,         
+     9            nrbe2l, slrbe2,lrbe2 )
+        END IF
 C--------------------------------------------
 C Laser impact
 C--------------------------------------------
@@ -1675,10 +1849,6 @@ C---------------------------------
      4                    ALE_CONNECTIVITY, NV46       , IGRSURF   ,   ITAB   ,   EBCS_TAB   ,
      5                    NPC             , PLD        , MAT_PARAM)
       ENDIF
-C---------------------------------------------------
-C Initialization of global detonation times (Law151)
-C---------------------------------------------------
-      CALL MULTIFLUID_GLOBAL_TDET(IPARG,ELBUF_TAB,MULTI_FVM,IPM)
 C---------------------------------
 C Initialization on 1D curves
 C---------------------------------
@@ -1688,7 +1858,7 @@ C---------------------------------
      .                     IPART(I15B) ,X         ,V       ,IXS     ,IXQ        , 
      .                     IXTG        ,PM        ,IPM     ,BUFMAT  ,MULTI_FVM  ,
      .                     PLD         ,NPC       ,IGRBRIC ,IGRQUAD ,IGRSH3N    ,
-     .                     NPTS        ,MAT_PARAM )
+     .                     NPTS        ,MAT_PARAM ,SNPC    ,STF)
       ENDIF
 C---------------------------------
 C Initialization on 2D functions
@@ -1698,7 +1868,8 @@ C---------------------------------
          CALL INI_INIMAP2D(INIMAP2D    ,ELBUF_TAB ,IPART   ,IPARG   ,IPART(I15A),
      .                     IPART(I15B) ,X         ,V       ,IXS     ,IXQ        , 
      .                     IXTG        ,PM        ,IPM     ,BUFMAT  ,MULTI_FVM  ,
-     .                     FUNC2D      ,IGRBRIC   ,IGRQUAD ,IGRSH3N )
+     .                     FUNC2D      ,IGRBRIC   ,IGRQUAD ,IGRSH3N ,NPC,
+     .                     PLD         ,MAT_PARAM)
       ENDIF
 C---------------------------------
 C Initialization of FVM velocities
@@ -1864,7 +2035,7 @@ C
      .         NBNO        , IXS         , IXC , IXTG        , GEO  ,
      .         FXBRPM(ARPM), I   , FXBIPM(29,I), LVSIG ,FXBIPM(18,I),
      .         NME         , IRCS, FXBIPM(30,I), NELT,         NELP ,
-     .         IXT         , IXP )
+     .         IXT         , IXP ,IBEAM_VECTOR,RBEAM_VECTOR)
 C
             FXBIPM(33,I)=IRCS
             ADRRPM=FXBIPM(14,I)
@@ -1956,6 +2127,12 @@ C------------------------------------------------------
           ENDIF
         ENDIF
       ENDDO
+C------------------------------------------------------
+C Initialization of joint type spring (PID33 and PID45)
+C------------------------------------------------------
+      IF (NDAMP_FREQ_RANGE > 0) THEN
+        call damping_range_init(ndamp,nrdamp,dampr,ngroup,nparg,iparg,elbuf_tab)    
+      ENDIF      
 C
 C----------------------------------------------------------------
       IF(IPRI>=2) THEN
@@ -1996,7 +2173,39 @@ C-------------------------------------
 C-------------------------------------
 C Total mass and total inertia
 C-------------------------------------
-      IF (NS10E >0) THEN
+      IF (N2D==1) THEN ! nodal mass can't be used (rho*area)
+        TOTMAS1 =ZERO
+        DO I=1,NPART
+          NN1 = (I-1)*20
+          MAS = PARTSAV(2+NN1)
+          TOTMAS1=TOTMAS1+MAS
+          PARTSAV(2+NN1) = ZERO
+        END DO  
+        TOTMAS1=TOTMAS1+TOTMAS  ! total mass based on nodal mass (engine)
+        DO N=1,NUMNOD
+         NN3=3*N
+         NN2=NN3-1
+         NN1=NN2-1
+         TOTMAS=TOTMAS+MS(N)
+         XG=XG+MS(N)*X(NN1)
+         YG=YG+MS(N)*X(NN2)
+         ZG=ZG+MS(N)*X(NN3)
+!       
+         XX=(X(NN1))**2
+         YY=(X(NN2))**2
+         ZZ=(X(NN3))**2
+         XY=(X(NN1))*(X(NN2))
+         XZ=(X(NN1))*(X(NN3))
+         YZ=(X(NN2))*(X(NN3))
+!       
+         B1=B1+(YY+ZZ)*MS(N)
+         B5=B5+(XX+ZZ)*MS(N)
+         B9=B9+(XX+YY)*MS(N)
+         B2=B2-XY*MS(N)
+         B6=B6-YZ*MS(N)
+         B3=B3-XZ*MS(N)
+        ENDDO
+      ELSEIF (NS10E >0) THEN
       DO N=1,NUMNOD
        IF (ITAGND(N)/=0) CYCLE
        NN3=3*N
@@ -2091,7 +2300,7 @@ C-------------------------------------------------------------------------------
       CALL NLOC_DMG_INIT(ELBUF_TAB,NLOC_DMG ,IPARG    ,IXC      ,
      .                   IXS      ,IXTG     ,ELE_AREA ,DTELEM   ,
      .                   NUMEL    ,IPM      ,X        ,XREFS    ,
-     .                   XREFC    ,XREFTG   ,BUFMAT   ,PM       )
+     .                   XREFC    ,XREFTG   ,MAT_PARAM)
 c
 c-----------------------------------------------------------------------------------
 
@@ -2100,6 +2309,7 @@ c-------------------------------------------------------------------------------
         IF(NUMELS10 > 0.OR.NUMELS16 > 0 .OR.NUMELS20 > 0)
      .    DEALLOCATE(MCPSX)
       ENDIF
+      IF (N2D/=1) TOTMAS1=TOTMAS ! for mass0_start
 C
       DEALLOCATE (PARTSAV)
 
@@ -2145,16 +2355,16 @@ c-----------
       RETURN
       END
 C
-      !||====================================================================
-      !||    chekmp2                ../starter/source/elements/initia/initia.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    chekmp2                ../starter/source/elements/initia/initia.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CHEKMP2(NUMEL ,IPART   ,IPARTEL ,IX      ,NIX     ,
      1                  NE     ,EMAT    ,EPID    ,IPM      ,IGEO    ,
      2                  ELEM   )
@@ -2383,16 +2593,16 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    checkmp                ../starter/source/elements/initia/initia.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    checkmp                ../starter/source/elements/initia/initia.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE CHECKMP(NUMEL,IX,NIX,NG,NE,EMAT,EPID,IPM,IGEO,ELEM,IPARTEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -2685,14 +2895,14 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    outpart                ../starter/source/elements/initia/initia.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    outpart                ../starter/source/elements/initia/initia.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE OUTPART(PARTSAV,IPART,NPART)
 C-----------------------------------------------
 C   M o d u l e s
@@ -2760,11 +2970,11 @@ C        WRITE(IOUT,'(A)')       '----'
 C
       RETURN
       END
-      !||====================================================================
-      !||    sgsavref   ../starter/source/elements/initia/initia.F
-      !||--- called by ------------------------------------------------------
-      !||    initia     ../starter/source/elements/initia/initia.F
-      !||====================================================================
+!||====================================================================
+!||    sgsavref   ../starter/source/elements/initia/initia.F
+!||--- called by ------------------------------------------------------
+!||    initia     ../starter/source/elements/initia/initia.F
+!||====================================================================
       SUBROUTINE SGSAVREF(NPE,XREF,SAV,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2812,11 +3022,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    sgsavinieref   ../starter/source/elements/initia/initia.F
-      !||--- called by ------------------------------------------------------
-      !||    initia         ../starter/source/elements/initia/initia.F
-      !||====================================================================
+!||====================================================================
+!||    sgsavinieref   ../starter/source/elements/initia/initia.F
+!||--- called by ------------------------------------------------------
+!||    initia         ../starter/source/elements/initia/initia.F
+!||====================================================================
       SUBROUTINE SGSAVINIEREF(NPE,STRAGLOB,SIGSP,NSIGI,PTSOL,SAV,OFFG,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2878,13 +3088,15 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    sgsavinierefq   ../starter/source/elements/initia/initia.F
-      !||--- called by ------------------------------------------------------
-      !||    initia          ../starter/source/elements/initia/initia.F
-      !||====================================================================
+!||====================================================================
+!||    sgsavinierefq   ../starter/source/elements/initia/initia.F
+!||--- called by ------------------------------------------------------
+!||    initia          ../starter/source/elements/initia/initia.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SGSAVINIEREFQ(NPE,STRAGLOB,SIGSP,NSIGI,PTSOL,SAV,OFFG,
      .                         IXS,DR,NDR,NEL)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2944,14 +3156,14 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    outpart5               ../starter/source/elements/initia/initia.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    outpart5               ../starter/source/elements/initia/initia.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE OUTPART5(GROUP_PARAM_TAB,IPART,IPARTS,IPARG,IGEO, GEO ,PM )
 C-----------------------------------------------
 C   M o d u l e s

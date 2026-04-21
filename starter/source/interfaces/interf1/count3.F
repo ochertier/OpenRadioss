@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    count3      ../starter/source/interfaces/interf1/count3.F
-      !||--- called by ------------------------------------------------------
-      !||    inslin      ../starter/source/interfaces/interf1/inslin.F
-      !||    insurf      ../starter/source/interfaces/interf1/insurf.F
-      !||    insurf23    ../starter/source/interfaces/interf1/insurf23.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    count3      ../starter/source/interfaces/interf1/count3.F
+!||--- called by ------------------------------------------------------
+!||    inslin      ../starter/source/interfaces/interf1/inslin.F
+!||    insurf      ../starter/source/interfaces/interf1/insurf.F
+!||    insurf23    ../starter/source/interfaces/interf1/insurf23.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE COUNT3(IRECT,MNN,N,NRT,NTAG)
 C-----------------------------------------------------------------------
 C-----------------------------------------------

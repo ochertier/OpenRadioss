@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvbag2                   ../engine/source/airbag/fvbag2.F
-      !||--- called by ------------------------------------------------------
-      !||    fvbag0                   ../engine/source/airbag/fvbag0.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_ibcast_subcomm      ../engine/source/mpi/generic/spmd_ibcast_subcomm.F
-      !||    spmd_rbcast_subcomm      ../engine/source/mpi/generic/spmd_rbcast_subcomm.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod             ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
-      !||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
-      !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
-      !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvbag2                   ../engine/source/airbag/fvbag2.F
+!||--- called by ------------------------------------------------------
+!||    fvbag0                   ../engine/source/airbag/fvbag0.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_ibcast_subcomm      ../engine/source/mpi/generic/spmd_ibcast_subcomm.F
+!||    spmd_rbcast_subcomm      ../engine/source/mpi/generic/spmd_rbcast_subcomm.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod             ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
+!||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
+!||    h3d_mod                  ../engine/share/modules/h3d_mod.F
+!||    message_mod              ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE FVBAG2(IFV,   ITYP, NNA,  NVENT, NJET, IVOLU, IBAGHOL, RBAGHOL,
      .                  X,    RVOLU, XXXA, NCONA, RBAGJET ,
      .                  A,    LGAUGE , GAUGE , NNT   ,FEXT   , NSKIP,
@@ -222,7 +222,7 @@ C     Automatic switch to uniform pressure when dispersion of pressure is low
       IF (UP_SWITCH .AND. IVOLU(74)==2)THEN
         !Iswitch=2 : full merging request on Tswitch/Pswitch criteria
         IVOLU(74) = 0  ! Iswitch reset to 0
-        IVOLU(60) = -1 ! Igmerg/Ivmin => VOLUMIN=EP20 in fvupd.F => merge erverything     
+        IVOLU(60) = -1 ! Igmerg/Ivmin => VOLUMIN=EP20 in fvupd.F => merge everything     
         RVOLU(70) = EP20 ! TSWITCH=infinity to prevent from any switch to Uniform Pressure
         RVOLU(73) = ZERO ! PSWITCH RATIO=0 to prevent from any switch to Uniform Pressure
         UP_SWITCH = .FALSE.

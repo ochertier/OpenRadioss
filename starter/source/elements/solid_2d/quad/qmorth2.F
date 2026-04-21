@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    qmorth2                ../starter/source/elements/solid_2d/quad/qmorth2.F
-      !||--- called by ------------------------------------------------------
-      !||    q4init2                ../starter/source/elements/solid_2d/quad4/q4init2.F
-      !||    qinit2                 ../starter/source/elements/solid_2d/quad/qinit2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    qmorth2                ../starter/source/elements/solid_2d/quad/qmorth2.F
+!||--- called by ------------------------------------------------------
+!||    q4init2                ../starter/source/elements/solid_2d/quad4/q4init2.F
+!||    qinit2                 ../starter/source/elements/solid_2d/quad/qinit2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE QMORTH2(PID  ,GEO  ,IGEO ,GAMA, NEL,
      .                   RY   ,RZ   ,SY   ,SZ, 
      .                   E1Y  ,E1Z  ,E2Y  ,E2Z)
@@ -52,7 +52,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER JHBE,NEL
+      INTEGER NEL
       INTEGER PID(*),IGEO(NPROPGI,*)
       my_real
      .   GEO(NPROPG,*),GAMA(NEL,6),
@@ -61,7 +61,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IG,ID,ISK,IPNUM,IIS,II,J,JJ,N,IFLAGINI
+      INTEGER I, IG, ID, IPNUM
 C     REAL
       my_real
      .   XL,YL,ZL,SUM,HX,HY,HZ,KX,KY,KZ,
@@ -88,8 +88,8 @@ C=======================================================================
 c
         IF (JCVT == 0) THEN 
 c ------------------------------
-c Angle d'orthotropie defini par rapport
-c a la premiere direction du repere isoparametrique
+c DEFINI Orthotropy Angle compared
+c in the first direction of the isoparametric frame
 c ------------------------------
           IF(IPNUM==11) THEN
             SUM=SQRT(RY(I)**2+RZ(I)**2)
@@ -199,11 +199,11 @@ c ------------------------------
           ELSE
 c ------------------------------
 c ATTENTION !
-c Angle d'orthotropie est desormais toujours donne par l'utilisateur 
-c par rapport au repere isoparametrique
-c Puis transforme en interne en angle par rapport au repere corrotationnel
-c (pour plus de simplicite cote utilisateur)
-c (anciennement donne directement par rapport au repere corot)
+c Orthotropy angle is now given by the user 
+c Compared to the isoparametric mark
+c Then transforms internally into angle compared to the corrotational frame
+c (for user-side simplicity)
+c (formerly gives directly with respect to the Corot mark)
 c ------------------------------          
             SUM=SQRT(RY(I)**2+RZ(I)**2)
             SUM=ONE/MAX(SUM,EM20)

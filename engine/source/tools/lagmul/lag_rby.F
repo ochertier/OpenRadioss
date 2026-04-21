@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lag_rby        ../engine/source/tools/lagmul/lag_rby.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult       ../engine/source/tools/lagmul/lag_mult.F
-      !||--- calls      -----------------------------------------------------
-      !||    lag_rby_cond   ../engine/source/tools/lagmul/lag_rby_cond.F
-      !||====================================================================
+!||====================================================================
+!||    lag_rby        ../engine/source/tools/lagmul/lag_rby.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult       ../engine/source/tools/lagmul/lag_mult.F
+!||--- calls      -----------------------------------------------------
+!||    lag_rby_cond   ../engine/source/tools/lagmul/lag_rby_cond.F
+!||====================================================================
       SUBROUTINE LAG_RBY(RBYL   ,NPBYL  ,LPBYL  ,MASS   ,INER   ,
      2                   IADLL  ,LLL    ,JLL    ,SLL    ,XLL    ,
      3                   COMNTAG,V      ,VR     ,A      ,AR     ,
@@ -53,14 +53,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,JF,N,NN,M,IK,IC,IAD,IFX,IFR,MSL,TNSL,NFIX,NFRE
-      my_real RX,RY,RZ,R1,R2,R3,MMAS,XG(3),VG(3)
+      INTEGER I,J,JF,N,NN,M,IK,IFX,IFR,MSL,TNSL,NFIX,NFRE
+      my_real RX,RY,RZ,R1,R2,R3,VG(3)
 C-----------------------------------------------
-C        NC : nombre de condition cinematique 
-C        IC : numero de la condition cinematique (1,NC)
+C        NC: number of cinematic condition 
+C        IC : number of the kinematic condition (1,NC)
 C        IK : 
-C        I  : numero global du noeud (1,NUMNOD)
-C        J  : direction 1,2,3,4,5,6
+C        I  : global node number (1,NUMNOD)
+C        J ': direction 1,2,3,4,5,6
 C------
 C        IADLL(NC)        : IAD = IADLL(IC)
 C        IK = IAD,IAD+1,IAD+2,...

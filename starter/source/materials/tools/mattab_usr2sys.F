@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mattab_usr2sys         ../starter/source/materials/tools/mattab_usr2sys.F
-      !||--- called by ------------------------------------------------------
-      !||    func_table_copy        ../starter/source/materials/tools/func_table_copy.F90
-      !||    mat_table_copy         ../starter/source/materials/tools/mat_table_copy.F90
-      !||    updfail                ../starter/source/materials/updfail.F90
-      !||    updmat                 ../starter/source/materials/updmat.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    table_mod              ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mattab_usr2sys         ../starter/source/materials/tools/mattab_usr2sys.F
+!||--- called by ------------------------------------------------------
+!||    eos_table_copy         ../starter/source/materials/tools/eos_table_copy.F90
+!||    func_table_copy        ../starter/source/materials/tools/func_table_copy.F90
+!||    mat_table_copy         ../starter/source/materials/tools/mat_table_copy.F90
+!||    mat_table_table_copy   ../starter/source/materials/tools/mat_table_table_copy.F90
+!||    updfail                ../starter/source/materials/updfail.F90
+!||    updmat                 ../starter/source/materials/updmat.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    table_mod              ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE MATTAB_USR2SYS(TITR,MAT_ID, NTABLE ,TABLE ,NTABL ,ITABLE  )
 C-----------------------------------------------
 C   M o d u l e s
@@ -44,9 +46,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

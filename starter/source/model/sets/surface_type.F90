@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    surface_type_mod       ../starter/source/model/sets/surface_type.F90
-      !||--- called by ------------------------------------------------------
-      !||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
-      !||====================================================================
+!||====================================================================
+!||    surface_type_mod       ../starter/source/model/sets/surface_type.F90
+!||--- called by ------------------------------------------------------
+!||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
+!||====================================================================
       module surface_type_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   procedures
 ! ======================================================================================================================
 !! \brief get the kind of surface : /EXT or /ALL
-      !||====================================================================
-      !||    surface_type           ../starter/source/model/sets/surface_type.F90
-      !||--- called by ------------------------------------------------------
-      !||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
-      !||--- uses       -----------------------------------------------------
-      !||    set_mod                ../starter/share/modules1/set_mod.F
-      !||    surf_mod               ../starter/share/modules1/surf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    surface_type           ../starter/source/model/sets/surface_type.F90
+!||--- called by ------------------------------------------------------
+!||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
+!||--- uses       -----------------------------------------------------
+!||    set_mod                ../starter/share/modules1/set_mod.F
+!||    surf_mod               ../starter/share/modules1/surf_mod.F
+!||====================================================================
         subroutine surface_type( empty_condition,clause_operator,clause,set )
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -72,26 +73,26 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
-        old_value = set%ext_all
-        new_value = clause%ext_all
-        if(.not.empty_condition) then ! the set already contains some data
-          if(clause_operator==set_add) then ! add operator : new and old are merged
-            if(old_value==all_surf.or.new_value==all_surf) set%ext_all = all_surf
-          elseif(clause_operator==set_delete) then ! delete operator : new is removed from old
-            if(old_value==all_surf.and.new_value==ext_surf) set%ext_all = all_surf
-            if(old_value==ext_surf.and.new_value==all_surf) set%ext_all = ext_surf
-            if(old_value==all_surf.and.new_value==all_surf) set%ext_all = all_surf
-          elseif(clause_operator==set_intersect) then ! intersection operator : intersection of new and old
-            if(old_value==ext_surf.and.new_value==all_surf) set%ext_all = ext_surf
-            if(old_value==all_surf.and.new_value==ext_surf) set%ext_all = ext_surf
-          endif
-        else ! the set is empty
-          if(clause_operator==set_add) then ! add operator : set is now = new 
-            set%ext_all = new_value
-          elseif(clause_operator==set_intersect) then ! intersection operator : the set was empty, intersection = null
-            set%ext_all = 0
-          endif
-        endif
+          old_value = set%ext_all
+          new_value = clause%ext_all
+          if(.not.empty_condition) then ! the set already contains some data
+            if(clause_operator==set_add) then ! add operator : new and old are merged
+              if(old_value==all_surf.or.new_value==all_surf) set%ext_all = all_surf
+            else if(clause_operator==set_delete) then ! delete operator : new is removed from old
+              if(old_value==all_surf.and.new_value==ext_surf) set%ext_all = all_surf
+              if(old_value==ext_surf.and.new_value==all_surf) set%ext_all = ext_surf
+              if(old_value==all_surf.and.new_value==all_surf) set%ext_all = all_surf
+            else if(clause_operator==set_intersect) then ! intersection operator : intersection of new and old
+              if(old_value==ext_surf.and.new_value==all_surf) set%ext_all = ext_surf
+              if(old_value==all_surf.and.new_value==ext_surf) set%ext_all = ext_surf
+            end if
+          else ! the set is empty
+            if(clause_operator==set_add) then ! add operator : set is now = new
+              set%ext_all = new_value
+            else if(clause_operator==set_intersect) then ! intersection operator : the set was empty, intersection = null
+              set%ext_all = 0
+            end if
+          end if
 
 ! ----------------------------------------------------------------------------------------------------------------------
         end subroutine surface_type

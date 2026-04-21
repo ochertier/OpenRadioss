@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    admordr      ../engine/source/model/remesh/admordr.F
-      !||--- called by ------------------------------------------------------
-      !||    resol        ../engine/source/engine/resol.F
-      !||    resol_init   ../engine/source/engine/resol_init.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders    ../common_source/tools/sort/my_orders.c
-      !||--- uses       -----------------------------------------------------
-      !||    remesh_mod   ../engine/share/modules/remesh_mod.F
-      !||====================================================================
+!||====================================================================
+!||    admordr        ../engine/source/model/remesh/admordr.F
+!||--- called by ------------------------------------------------------
+!||    resol          ../engine/source/engine/resol.F
+!||    resol_init     ../engine/source/engine/resol_init.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders      ../common_source/tools/sort/my_orders.c
+!||--- uses       -----------------------------------------------------
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+!||    remesh_mod     ../engine/share/modules/remesh_mod.F
+!||====================================================================
       SUBROUTINE ADMORDR(SH4TREE,SH3TREE,IXC,IXTG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE REMESH_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,28 +60,35 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N,NN,LEVEL,IP,NLEV,PTR,SON,
      .        J,NI,IERR
-      INTEGER LTMP4(NSH4ACT),LTMP3(NSH3ACT)
-      INTEGER WORK(70000),
-     .  ITRI(MAX(NSH4ACT,NSH3ACT)), INDEX(2*MAX(NSH4ACT,NSH3ACT))
+      INTEGER,DIMENSION(:),ALLOCATABLE :: LTMP4
+      INTEGER,DIMENSION(:),ALLOCATABLE :: LTMP3
+      INTEGER,DIMENSION(:),ALLOCATABLE :: ITRI
+      INTEGER,DIMENSION(:),ALLOCATABLE :: SORT_INDEX
+      INTEGER WORK(70000)
+C-----------------------------------------------
+      CALL MY_ALLOC(LTMP4,NSH4ACT)
+      CALL MY_ALLOC(LTMP3,NSH3ACT)
+      CALL MY_ALLOC(ITRI,MAX(NSH4ACT,NSH3ACT))
+      CALL MY_ALLOC(SORT_INDEX,2*MAX(NSH4ACT,NSH3ACT))
 C-----------------------------------------------
       IF(IPARIT/=0)THEN
 
         DO NN = 1, NSH4ACT
           ITRI(NN) = IXC(NIXC,LSH4ACT(NN))
         ENDDO
-        CALL MY_ORDERS(0,WORK,ITRI,INDEX,NSH4ACT,1)
+        CALL MY_ORDERS(0,WORK,ITRI,SORT_INDEX,NSH4ACT,1)
         LTMP4(1:NSH4ACT)=LSH4ACT(1:NSH4ACT)
         DO NN = 1, NSH4ACT
-          LSH4ACT(NN)=LTMP4(INDEX(NN))
+          LSH4ACT(NN)=LTMP4(SORT_INDEX(NN))
         END DO
 
         DO NN = 1, NSH3ACT
           ITRI(NN) = IXTG(NIXTG,LSH3ACT(NN))
         ENDDO
-        CALL MY_ORDERS(0,WORK,ITRI,INDEX,NSH3ACT,1)
+        CALL MY_ORDERS(0,WORK,ITRI,SORT_INDEX,NSH3ACT,1)
         LTMP3(1:NSH3ACT)=LSH3ACT(1:NSH3ACT)
         DO NN = 1, NSH3ACT
-          LSH3ACT(NN)=LTMP3(INDEX(NN))
+          LSH3ACT(NN)=LTMP3(SORT_INDEX(NN))
         END DO
 
       END IF
@@ -194,6 +205,11 @@ C
         END DO
       END DO
       PSH3KIN(LEVELMAX+1)=PTR
+C--------------------------------------------
+      DEALLOCATE(LTMP4)
+      DEALLOCATE(LTMP3)
+      DEALLOCATE(ITRI)
+      DEALLOCATE(SORT_INDEX)
 
       RETURN
       END     

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_rbody_clause    ../starter/source/model/sets/create_rbody_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                 ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    create_rbody_box       ../starter/source/model/sets/create_rbody_box.F
-      !||    create_rbody_list      ../starter/source/model/sets/create_rbody_clause.F
-      !||    create_rbody_list_g    ../starter/source/model/sets/create_rbody_clause.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_rbody_clause    ../starter/source/model/sets/create_rbody_clause.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                 ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    create_rbody_box       ../starter/source/model/sets/create_rbody_box.F
+!||    create_rbody_list      ../starter/source/model/sets/create_rbody_clause.F
+!||    create_rbody_list_g    ../starter/source/model/sets/create_rbody_clause.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_RBODY_CLAUSE(
      .                        CLAUSE   ,IRBODYM  ,JCLAUSE ,OPT_G ,IS_AVAILABLE ,
      .                        LSUBMODEL,OPT_B   ,IBOX    ,X     ,SKEW         ,
@@ -108,20 +108,20 @@ C-----------------------------------------------
         ENDIF
 C-----------------------------------------------
       END
-      !||====================================================================
-      !||    create_rbody_list           ../starter/source/model/sets/create_rbody_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_rbody_clause         ../starter/source/model/sets/create_rbody_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                      ../starter/source/output/message/message.F
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_rbody_list           ../starter/source/model/sets/create_rbody_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_rbody_clause         ../starter/source/model/sets/create_rbody_clause.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                      ../starter/source/output/message/message.F
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_RBODY_LIST(
      .               CLAUSE,  IRBODYM  ,JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -167,7 +167,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IDS,NINDX,LIST_SIZE,IDS_MAX,NODSYS,RBYM
+      INTEGER I,IDS,NINDX,LIST_SIZE,IDS_MAX,RBYM
       INTEGER IWORK(70000)
 !
       INTEGER, ALLOCATABLE, DIMENSION(:) :: RBYM_READ_TMP,INDEX,SORT
@@ -250,19 +250,19 @@ C-------------------------
       RETURN
       END
 
-      !||====================================================================
-      !||    create_rbody_list_g         ../starter/source/model/sets/create_rbody_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    create_rbody_clause         ../starter/source/model/sets/create_rbody_clause.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
-      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_rbody_list_g         ../starter/source/model/sets/create_rbody_clause.F
+!||--- called by ------------------------------------------------------
+!||    create_rbody_clause         ../starter/source/model/sets/create_rbody_clause.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+!||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                 ../starter/share/message_module/message_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_RBODY_LIST_G(
      .               CLAUSE,  IRBODYM  ,JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -308,7 +308,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IDS,LIST_SIZE,IDS_MAX,GENE_MAX,K,R,R1
+      INTEGER GENE_MAX,K,R,R1
       INTEGER START_GENE,END_GENE,INCR_GENE,RSTART,RSTOP,STACK,STACK_ONE,NB_RESULT
 !-
       INTEGER, ALLOCATABLE, DIMENSION(:) :: RBYM_READ_TMP,

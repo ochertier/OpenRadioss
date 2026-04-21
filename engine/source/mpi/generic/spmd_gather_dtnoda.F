@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_gather_dtnoda                ../engine/source/mpi/generic/spmd_gather_dtnoda.F
-      !||--- called by ------------------------------------------------------
-      !||    find_dt_for_targeted_added_mass   ../engine/source/time_step/find_dt_for_targeted_added_mass.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_gather_dtnoda                ../engine/source/mpi/generic/spmd_gather_dtnoda.F
+!||--- called by ------------------------------------------------------
+!||    find_dt_for_targeted_added_mass   ../engine/source/time_step/find_dt_for_targeted_added_mass.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod               ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_GATHER_DTNODA(TAGN,STIFN,MS,WEIGHT,NUM,DT2_L,STF_L,MS_L)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -49,7 +52,7 @@ C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR,MS_LOFF,ID_G
-      INTEGER SIZ,MS_LTYP,I,K,NG,NREC,MS_LOFF2
+      INTEGER SIZ,MS_LTYP,I,K,NREC
 
       DATA MS_LOFF/7014/
        my_real, DIMENSION(:) , ALLOCATABLE :: BUFSR
@@ -68,9 +71,9 @@ C
            END IF
          END DO 
 
-C   a cause de la version simple precision, on ne peux pas metre l'entier
-C   dans le buffer flottant car on n a que 2puiss 24 bits dispo ~ 16 Million
-C   de noeuds au max
+C   Because of the simple precision version, we cannot put the integer
+C   In the floating buffer because there are only 2 24 bits available ~ 16 million
+C   nodes at most
 
          MS_LTYP = MS_LOFF 
          CALL MPI_SEND(BUFSR,SIZ,REAL,IT_SPMD(1),MS_LTYP,
@@ -94,7 +97,7 @@ C-------------
      .                    SPMD_COMM_WORLD,STATUS,ierror)
               CALL MPI_GET_COUNT(STATUS,REAL,SIZ,ierror) 
 
-C------------ Reception du buffer flottant
+C------------ Reception of the floating buffer
 
             CALL MPI_RECV(BUFSR,SIZ,REAL,IT_SPMD(I),MS_LTYP,
      .                  SPMD_COMM_WORLD,STATUS,ierror)

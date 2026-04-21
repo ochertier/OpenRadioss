@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,17 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    h3d_fld_strain    ../engine/source/output/h3d/h3d_results/h3d_fld_strain.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_skin_scalar   ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
-      !||--- calls      -----------------------------------------------------
-      !||    roto_sig2d        ../engine/source/output/h3d/h3d_results/h3d_skin_tensor.F
-      !||    tsh_dir2          ../engine/source/output/h3d/h3d_results/h3d_skin_tensor.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    h3d_fld_strain    ../engine/source/output/h3d/h3d_results/h3d_fld_strain.F
+!||--- called by ------------------------------------------------------
+!||    h3d_skin_scalar   ../engine/source/output/h3d/h3d_results/h3d_skin_scalar.F
+!||--- calls      -----------------------------------------------------
+!||    roto_sig2d        ../engine/source/output/h3d/h3d_results/h3d_skin_tensor.F
+!||    tsh_dir2          ../engine/source/output/h3d/h3d_results/h3d_skin_tensor.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod       ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE H3D_FLD_STRAIN(ELBUF_TAB,X  ,IXS   ,
      .                          JHBE,MLWI,ILAY,KCVT,IOR_TSH,
      .                          ICSTR,NPTR,NPTS,NEL,F_EXP,EVAR )
@@ -38,6 +39,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD    
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -62,7 +64,7 @@ C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
       my_real
      .   DIR(MVSIZ,2),DIRB(MVSIZ,2)
-      INTEGER I,I1,II,J,IR,IS,IT,IL,JJ(4)
+      INTEGER I,IR,IS,IT,JJ(4)
 
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF     

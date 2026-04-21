@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dmasanis       ../engine/source/output/anim/generate/dmasani6.F
-      !||--- called by ------------------------------------------------------
-      !||    genani         ../engine/source/output/anim/generate/genani.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf        ../engine/share/resol/initbuf.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod    ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    dmasanis       ../engine/source/output/anim/generate/dmasani6.F
+!||--- called by ------------------------------------------------------
+!||    genani         ../engine/source/output/anim/generate/genani.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf        ../engine/share/resol/initbuf.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod    ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE DMASANIS(ELBUF_TAB,X       ,D       ,GEO     ,IPARG   ,
      2                   IXS       ,MAS     ,PM      ,EL2FA   ,NBF     ,
      3                   IPART     ,IPARTSP ,ISPH3D  )
@@ -37,7 +38,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,7 +52,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
@@ -71,7 +72,7 @@ C     REAL
      .   EVAR(MVSIZ),
      .   OFF, P, VONM2, VONM, S1, S2, S12, S3, VALUE,THK0,A0,AL0,
      .   RHO0,XX1,XX2,XX3,YY1,YY2,YY3,ZZ1,ZZ2,ZZ3
-      INTEGER I, NG, NEL, ISS, ISC,
+      INTEGER I, NG, NEL, 
      .        IADD, N, J, MLW, 
      .        ISTRAIN,NN, K1, K2,JTURB,MT,IMID, IALEL,IPID,
      .        N1,N2,N3,N4,
@@ -98,7 +99,7 @@ C-----------------------------------------------
      6          IREP    ,IINT    ,IGTYP   ,ISRAT   ,ISROT   ,  
      7          ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS    )
         ISOLNOD = IPARG(28,NG)
-        IF (IMACH == 3.AND.ISPMD == 0) THEN
+        IF (ISPMD == 0) THEN
           IF (ITY/=ITY_OLD) THEN
             NEL_OLD = 0
             ITY_OLD= ITY
@@ -111,7 +112,7 @@ C-----------------------------------------------
           IAD   =IPARG(4,NG)
           LFT=1
           LLT=MIN(NVSIZ,NEL-OFFSET)
-          IF (IMACH == 3.AND.ISPMD == 0) THEN
+          IF (ISPMD == 0) THEN
             NFT_FA = NEL_OLD - NEL + OFFSET
           ELSE
             NFT_FA = NFT
@@ -174,7 +175,7 @@ C
         ELSE
         ENDIF
 C-----------------------------------------------
-C       FIN DE BOUCLE SUR LES OFFSET
+C       end of loop over offsets
 C-----------------------------------------------
        END DO
  490  CONTINUE

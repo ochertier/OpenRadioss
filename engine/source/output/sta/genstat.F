@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,76 +20,78 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    genstat                   ../engine/source/output/sta/genstat.F
-      !||--- called by ------------------------------------------------------
-      !||    sortie_main               ../engine/source/output/sortie_main.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                    ../engine/source/output/message/message.F
-      !||    arret                     ../engine/source/system/arret.F
-      !||    close_c                   ../common_source/tools/input_output/write_routtines.c
-      !||    cur_fil_c                 ../common_source/tools/input_output/write_routtines.c
-      !||    open_c                    ../common_source/tools/input_output/write_routtines.c
-      !||    spmd_outpitab             ../engine/source/mpi/interfaces/spmd_outp.F
-      !||    stat_beam_mp              ../engine/source/output/sta/stat_beam_mp.F
-      !||    stat_beam_spmd            ../engine/source/output/sta/stat_beam_spmd.F
-      !||    stat_brick_mp             ../engine/source/output/sta/stat_brick_mp.F
-      !||    stat_brick_spmd           ../engine/source/output/sta/stat_brick_spmd.F
-      !||    stat_c_auxf               ../engine/source/output/sta/stat_c_auxf.F
-      !||    stat_c_epspf              ../engine/source/output/sta/stat_c_epspf.F
-      !||    stat_c_fail               ../engine/source/output/sta/stat_c_fail.F
-      !||    stat_c_off                ../engine/source/output/sta/stat_c_off.F
-      !||    stat_c_orth_loc           ../engine/source/output/sta/stat_c_orth_loc.F
-      !||    stat_c_straf              ../engine/source/output/sta/stat_c_straf.F
-      !||    stat_c_strafg             ../engine/source/output/sta/stat_c_strafg.F
-      !||    stat_c_strsf              ../engine/source/output/sta/stat_c_strsf.F
-      !||    stat_c_strsfg             ../engine/source/output/sta/stat_c_strsfg.F
-      !||    stat_c_thk                ../engine/source/output/sta/stat_c_thk.F
-      !||    stat_inimap1d_file_spmd   ../engine/source/output/sta/stat_inimap1d_file_spmd.F
-      !||    stat_inimap1d_spmd        ../engine/source/output/sta/stat_inimap1d_spmd.F
-      !||    stat_inimap2d_file_spmd   ../engine/source/output/sta/stat_inimap2d_file_spmd.F
-      !||    stat_inimap2d_spmd        ../engine/source/output/sta/stat_inimap2d_spmd.F
-      !||    stat_n_bcs                ../engine/source/output/sta/stat_n_bcs.F
-      !||    stat_n_temp               ../engine/source/output/sta/stat_n_temp.F
-      !||    stat_n_vel                ../engine/source/output/sta/state_n_vel.F
-      !||    stat_node                 ../engine/source/output/sta/stat_node.F
-      !||    stat_p_aux                ../engine/source/output/sta/stat_p_aux.F
-      !||    stat_p_full               ../engine/source/output/sta/stat_p_full.F
-      !||    stat_quad_mp              ../engine/source/output/sta/stat_quad_mp.F
-      !||    stat_quad_spmd            ../engine/source/output/sta/stat_quad_spmd.F
-      !||    stat_r_full               ../engine/source/output/sta/stat_r_full.F
-      !||    stat_s_auxf               ../engine/source/output/sta/stat_s_auxf.F
-      !||    stat_s_eref               ../engine/source/output/sta/stat_s_eref.F
-      !||    stat_s_fail               ../engine/source/output/sta/stat_s_fail.F
-      !||    stat_s_ortho              ../engine/source/output/sta/stat_s_ortho.F
-      !||    stat_s_straf              ../engine/source/output/sta/stat_s_straf.F
-      !||    stat_s_strsf              ../engine/source/output/sta/stat_s_strsf.F
-      !||    stat_shel_mp              ../engine/source/output/sta/stat_shel_mp.F
-      !||    stat_shel_spmd            ../engine/source/output/sta/stat_shel_spmd.F
-      !||    stat_size_c               ../engine/source/output/sta/stat_size.F
-      !||    stat_sphcel_full          ../engine/source/output/sta/stat_sphcel_full.F90
-      !||    stat_sphcel_mp            ../engine/source/output/sta/stat_sphcel_mp.F90
-      !||    stat_sphcel_spmd          ../engine/source/output/sta/stat_sphcel_spmd.F90
-      !||    stat_spring_mp            ../engine/source/output/sta/stat_spring_mp.F
-      !||    stat_spring_spmd          ../engine/source/output/sta/stat_spring_spmd.F
-      !||    stat_t_full               ../engine/source/output/sta/stat_t_full.F
-      !||    stat_truss_mp             ../engine/source/output/sta/stat_truss_mp.F
-      !||    stat_truss_spmd           ../engine/source/output/sta/stat_truss_spmd.F
-      !||    strs_txt50                ../engine/source/output/sta/sta_txt.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod                 ../engine/share/modules/drape_mod.F
-      !||    elbufdef_mod              ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    inoutfile_mod             ../common_source/modules/inoutfile_mod.F
-      !||    mat_elem_mod              ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    message_mod               ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod             ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    output_mod                ../common_source/modules/output/output_mod.F90
-      !||    stack_mod                 ../engine/share/modules/stack_mod.F
-      !||    stat_sphcel_full_mod      ../engine/source/output/sta/stat_sphcel_full.F90
-      !||    stat_sphcel_mp_mod        ../engine/source/output/sta/stat_sphcel_mp.F90
-      !||    stat_sphcel_spmd_mod      ../engine/source/output/sta/stat_sphcel_spmd.F90
-      !||    state_inimap_mod          ../engine/share/modules/state_inimap_mod.F
-      !||====================================================================
+!||====================================================================
+!||    genstat                   ../engine/source/output/sta/genstat.F
+!||--- called by ------------------------------------------------------
+!||    sortie_main               ../engine/source/output/sortie_main.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                    ../engine/source/output/message/message.F
+!||    arret                     ../engine/source/system/arret.F
+!||    close_c                   ../common_source/tools/input_output/write_routines.c
+!||    cur_fil_c                 ../common_source/tools/input_output/write_routines.c
+!||    open_c                    ../common_source/tools/input_output/write_routines.c
+!||    spmd_outpitab             ../engine/source/mpi/interfaces/spmd_outp.F
+!||    stat_beam_mp              ../engine/source/output/sta/stat_beam_mp.F
+!||    stat_beam_spmd            ../engine/source/output/sta/stat_beam_spmd.F
+!||    stat_brick_mp             ../engine/source/output/sta/stat_brick_mp.F
+!||    stat_brick_spmd           ../engine/source/output/sta/stat_brick_spmd.F
+!||    stat_c_auxf               ../engine/source/output/sta/stat_c_auxf.F
+!||    stat_c_epspf              ../engine/source/output/sta/stat_c_epspf.F
+!||    stat_c_fail               ../engine/source/output/sta/stat_c_fail.F
+!||    stat_c_off                ../engine/source/output/sta/stat_c_off.F
+!||    stat_c_orth_loc           ../engine/source/output/sta/stat_c_orth_loc.F
+!||    stat_c_straf              ../engine/source/output/sta/stat_c_straf.F
+!||    stat_c_strafg             ../engine/source/output/sta/stat_c_strafg.F
+!||    stat_c_strsf              ../engine/source/output/sta/stat_c_strsf.F
+!||    stat_c_strsfg             ../engine/source/output/sta/stat_c_strsfg.F
+!||    stat_c_thk                ../engine/source/output/sta/stat_c_thk.F
+!||    stat_inimap1d_file_spmd   ../engine/source/output/sta/stat_inimap1d_file_spmd.F
+!||    stat_inimap1d_spmd        ../engine/source/output/sta/stat_inimap1d_spmd.F
+!||    stat_inimap2d_file_spmd   ../engine/source/output/sta/stat_inimap2d_file_spmd.F
+!||    stat_inimap2d_spmd        ../engine/source/output/sta/stat_inimap2d_spmd.F
+!||    stat_n_bcs                ../engine/source/output/sta/stat_n_bcs.F
+!||    stat_n_temp               ../engine/source/output/sta/stat_n_temp.F
+!||    stat_n_vel                ../engine/source/output/sta/state_n_vel.F
+!||    stat_node                 ../engine/source/output/sta/stat_node.F
+!||    stat_p_aux                ../engine/source/output/sta/stat_p_aux.F
+!||    stat_p_full               ../engine/source/output/sta/stat_p_full.F
+!||    stat_quad_mp              ../engine/source/output/sta/stat_quad_mp.F
+!||    stat_quad_spmd            ../engine/source/output/sta/stat_quad_spmd.F
+!||    stat_r_full               ../engine/source/output/sta/stat_r_full.F
+!||    stat_s_auxf               ../engine/source/output/sta/stat_s_auxf.F
+!||    stat_s_eref               ../engine/source/output/sta/stat_s_eref.F
+!||    stat_s_fail               ../engine/source/output/sta/stat_s_fail.F
+!||    stat_s_ortho              ../engine/source/output/sta/stat_s_ortho.F
+!||    stat_s_straf              ../engine/source/output/sta/stat_s_straf.F
+!||    stat_s_strsf              ../engine/source/output/sta/stat_s_strsf.F
+!||    stat_shel_mp              ../engine/source/output/sta/stat_shel_mp.F
+!||    stat_shel_spmd            ../engine/source/output/sta/stat_shel_spmd.F
+!||    stat_size_c               ../engine/source/output/sta/stat_size.F
+!||    stat_sphcel_full          ../engine/source/output/sta/stat_sphcel_full.F90
+!||    stat_sphcel_mp            ../engine/source/output/sta/stat_sphcel_mp.F90
+!||    stat_sphcel_spmd          ../engine/source/output/sta/stat_sphcel_spmd.F90
+!||    stat_spring_mp            ../engine/source/output/sta/stat_spring_mp.F
+!||    stat_spring_spmd          ../engine/source/output/sta/stat_spring_spmd.F
+!||    stat_t_full               ../engine/source/output/sta/stat_t_full.F
+!||    stat_truss_mp             ../engine/source/output/sta/stat_truss_mp.F
+!||    stat_truss_spmd           ../engine/source/output/sta/stat_truss_spmd.F
+!||    strs_txt50                ../engine/source/output/sta/sta_txt.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod                 ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod              ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod               ../common_source/modules/elements/element_mod.F90
+!||    inoutfile_mod             ../common_source/modules/inoutfile_mod.F
+!||    mat_elem_mod              ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    message_mod               ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod             ../common_source/modules/ale/multi_fvm_mod.F90
+!||    my_alloc_mod              ../common_source/tools/memory/my_alloc.F90
+!||    output_mod                ../common_source/modules/output/output_mod.F90
+!||    stack_mod                 ../engine/share/modules/stack_mod.F
+!||    stat_sphcel_full_mod      ../engine/source/output/sta/stat_sphcel_full.F90
+!||    stat_sphcel_mp_mod        ../engine/source/output/sta/stat_sphcel_mp.F90
+!||    stat_sphcel_spmd_mod      ../engine/source/output/sta/stat_sphcel_spmd.F90
+!||    state_inimap_mod          ../engine/share/modules/state_inimap_mod.F
+!||====================================================================
       SUBROUTINE GENSTAT(X       ,MS      ,ELBUF_TAB,BUFEL  ,SPBUF    ,
      2                  IXS      ,IXQ     ,IXC      ,IXT     ,IXP     ,
      3                  IXR      ,IXTG    ,KXSP     ,IPARG   ,IPM     ,
@@ -119,6 +121,8 @@ C-----------------------------------------------
       USE stat_sphcel_mp_mod
       USE stat_sphcel_spmd_mod
       USE stat_sphcel_full_mod
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs,nixq,nixc,nixp,nixr,nixt,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -132,7 +136,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
@@ -175,13 +178,22 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER CHSTAT*4,FILNAM*100,T10*10,MES*40
-      INTEGER FILEN,I,INNODA,IERR,J,N
-      INTEGER ITABG(LENG),LENR,SIZLOC,SIZP0
-      INTEGER I161,I16A,I16B,I16C,I16D,I16E,I16F,I16G,I16H,I16I
-      INTEGER NODTAG(NUMNOD), STAT_INDXC(2*LENGC), STAT_INDXTG(2*LENGTG), STAT_INDXQ(2*LENGQ)
-      INTEGER STAT_INDXS(2*LENGS),STAT_INDXR(2*LENGR),STAT_INDXP(2*LENGP),
-     .        STAT_INDXT(2*LENGT),STAT_INDXSPH(2*LENGSPH)
+      CHARACTER CHSTAT*4, FILNAM*100, T10*10, MES*40
+      INTEGER FILEN, I, IERR, J, N
+      INTEGER SIZLOC, SIZP0
+ 
+      INTEGER,DIMENSION(:),ALLOCATABLE :: ITABG
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NODTAG
+      INTEGER,DIMENSION(:),ALLOCATABLE :: STAT_INDXC
+      INTEGER,DIMENSION(:),ALLOCATABLE :: STAT_INDXTG
+      INTEGER,DIMENSION(:),ALLOCATABLE :: STAT_INDXQ
+      INTEGER,DIMENSION(:),ALLOCATABLE :: STAT_INDXS
+      INTEGER,DIMENSION(:),ALLOCATABLE :: STAT_INDXR
+      INTEGER,DIMENSION(:),ALLOCATABLE :: STAT_INDXP
+ 
+      INTEGER,DIMENSION(:),ALLOCATABLE :: STAT_INDXT
+      INTEGER,DIMENSION(:),ALLOCATABLE :: STAT_INDXSPH
+      
       INTEGER CTEXT(2149)
       double precision
      .      ,  DIMENSION(:),ALLOCATABLE :: WA,WAP0
@@ -192,6 +204,17 @@ C-----------------------------------------------
       CHARACTER*100 LINE
 C-----------------------------------------------
 C   S o u r c e   L i n e s
+C-----------------------------------------------
+      CALL MY_ALLOC(ITABG,LENG)
+      CALL MY_ALLOC(NODTAG,NUMNOD)
+      CALL MY_ALLOC(STAT_INDXC,2*LENGC)
+      CALL MY_ALLOC(STAT_INDXTG,2*LENGTG)
+      CALL MY_ALLOC(STAT_INDXQ,2*LENGQ)
+      CALL MY_ALLOC(STAT_INDXS,2*LENGS)
+      CALL MY_ALLOC(STAT_INDXR,2*LENGR)
+      CALL MY_ALLOC(STAT_INDXP,2*LENGP)
+      CALL MY_ALLOC(STAT_INDXT,2*LENGT)
+      CALL MY_ALLOC(STAT_INDXSPH,2*LENGSPH)
 C-----------------------------------------------
       IS_FILE_TO_BE_WRITTEN = ((ISPMD == 0) .AND. (.NOT.IS_STAT_INIMAP_SINGLE))  !/STATE/INIMAP* is using an independent state file
 C===============================================|
@@ -204,7 +227,7 @@ C-----------------------------------------------
       LEN_TMP_NAME = OUTFILE_NAME_LEN + FILEN
       TMP_NAME=OUTFILE_NAME(1:OUTFILE_NAME_LEN)//FILNAM(1:FILEN)
 
-      IF(IMACH/=3.OR.IS_FILE_TO_BE_WRITTEN) THEN
+      IF(IS_FILE_TO_BE_WRITTEN) THEN
         OPEN(UNIT=IUGEO,FILE=TMP_NAME(1:LEN_TMP_NAME),ACCESS='SEQUENTIAL',FORM='FORMATTED',STATUS='UNKNOWN')
         WRITE(IUGEO,'(2A)')'#RADIOSS STATE FILE ',FILNAM(1:FILEN)
         !   OPEN STRS FILE
@@ -226,7 +249,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   /BEGIN + UNITS
 C-----------------------------------------------
-      IF(IMACH/=3.OR.IS_FILE_TO_BE_WRITTEN) THEN
+      IF(IS_FILE_TO_BE_WRITTEN) THEN
           WRITE(IUGEO,'(A)')'/BEGIN'
           WRITE(IUGEO,'(A)') ROOTNAM(1:ROOTLEN)
           WRITE(IUGEO,'(I10,I10)') ST_INVERS, 0
@@ -519,23 +542,6 @@ C
      .   IPART_STATE,STAT_INDXC,STAT_INDXTG,SIZP0,
      .   NUMMAT,MAT_PARAM)
 C-----------------------------------------------
-C   SHELL TENSOR(2D)
-C-----------------------------------------------
-c      IF (IMACH==3) THEN
-c        CALL OUTP_ARSZ_CT(IPARG,DD_IAD,SIZLOC,SIZP0)
-c      ELSE
-c        SIZLOC=0
-c        SIZP0=0
-c      ENDIF
-
-c      IF(OUTP_CT(95)==1) CALL OUTP_C_TF(95,'STRESS_FUL',
-c     .   ' Full stress tensor + plastic strain    ',
-c     .   BUFEL,IPARG,TANI,DD_IAD,SIZLOC,SIZP0)
-
-c      IF(OUTP_CT(96)==1) CALL OUTP_C_TF(96,'STRAIN_FUL',
-c     .   ' Full strain tensor + plastic strain    ',
-c     .   BUFEL,IPARG,TANI,DD_IAD,SIZLOC,SIZP0 )
-C-----------------------------------------------
 C   BRICK TENSOR
 C-----------------------------------------------
       IF(STAT_S(4)==1) CALL STAT_S_STRSF(                     ! /INIBRI/STRESS/FULL
@@ -634,7 +640,17 @@ C-----------------------------------------------
         WRITE (IOUT,1000)  FILNAM(1:FILEN)
         WRITE (ISTDO,1000) FILNAM(1:FILEN)
       ENDIF
-      
+C-----------------------------------------------
+      DEALLOCATE(ITABG)
+      DEALLOCATE(NODTAG)
+      DEALLOCATE(STAT_INDXC)
+      DEALLOCATE(STAT_INDXTG)
+      DEALLOCATE(STAT_INDXQ)
+      DEALLOCATE(STAT_INDXS)
+      DEALLOCATE(STAT_INDXR)
+      DEALLOCATE(STAT_INDXP)
+      DEALLOCATE(STAT_INDXT)
+      DEALLOCATE(STAT_INDXSPH)
       
  1000 FORMAT (4X,' STATE FILE:',1X,A,' WRITTEN')
 C

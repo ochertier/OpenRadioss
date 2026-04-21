@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    shell_reactivation   ../engine/source/tools/seatbelts/shell_reactivation.F
-      !||--- called by ------------------------------------------------------
-      !||    update_slipring      ../engine/source/tools/seatbelts/update_slipring.F
-      !||--- calls      -----------------------------------------------------
-      !||    hencky_strain        ../engine/source/tools/seatbelts/shell_reactivation.F
-      !||====================================================================
+!||====================================================================
+!||    shell_reactivation   ../engine/source/tools/seatbelts/shell_reactivation.F
+!||--- called by ------------------------------------------------------
+!||    update_slipring      ../engine/source/tools/seatbelts/update_slipring.F
+!||--- calls      -----------------------------------------------------
+!||    hencky_strain        ../engine/source/tools/seatbelts/shell_reactivation.F
+!||====================================================================
       SUBROUTINE SHELL_REACTIVATION(I,II,L0FRAM1,L0FRAM2,NODE_FRAM1,
      .                              NODE_FRAM2,GSTR,NEL,XL2,YL2,
      .                              XL3,YL3,XL4,YL4,OFFSET,
@@ -175,13 +175,13 @@ C----------------------------------------------------------
 C                
       END
 C
-      !||====================================================================
-      !||    hencky_strain        ../engine/source/tools/seatbelts/shell_reactivation.F
-      !||--- called by ------------------------------------------------------
-      !||    shell_reactivation   ../engine/source/tools/seatbelts/shell_reactivation.F
-      !||--- calls      -----------------------------------------------------
-      !||    jacobiew             ../engine/source/materials/mat/mat033/sigeps33.F
-      !||====================================================================
+!||====================================================================
+!||    hencky_strain        ../engine/source/tools/seatbelts/shell_reactivation.F
+!||--- called by ------------------------------------------------------
+!||    shell_reactivation   ../engine/source/tools/seatbelts/shell_reactivation.F
+!||--- calls      -----------------------------------------------------
+!||    jacobiew             ../engine/source/materials/mat/mat033/sigeps33.F
+!||====================================================================
       SUBROUTINE HENCKY_STRAIN(FF,HH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -195,9 +195,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,L,NROT
-      my_real 
-     .        FTF(2,2),FTF_VAL(2),FTF_VEC(2,2),HHB(2,2)
+      INTEGER I,J,K,NROT
+      my_real FTF(2,2),FTF_VAL(2),FTF_VEC(2,2),HHB(2,2)
 C------------------------------------------------
 C
       FTF(1,1) = FF(1,1)**2 + FF(2,1)**2

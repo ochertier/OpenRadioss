@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,55 +20,50 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    get_list_remnode_mod   ../starter/source/interfaces/inter3d1/get_list_remnode.F90
-      !||--- called by ------------------------------------------------------
-      !||    i7remnode              ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||====================================================================
+!||====================================================================
+!||    get_list_remnode_mod   ../starter/source/interfaces/inter3d1/get_list_remnode.F90
+!||--- called by ------------------------------------------------------
+!||    i7remnode              ../starter/source/interfaces/inter3d1/i7remnode.F
+!||====================================================================
       module get_list_remnode_mod
+        implicit none
       contains
 ! ======================================================================================================================
 !                                                   procedures
 ! ======================================================================================================================
 !! \brief here is a small description of the routine, [after the header]
 !! \details if needed, more details can be added here
-      !||====================================================================
-      !||    get_list_remnode   ../starter/source/interfaces/inter3d1/get_list_remnode.F90
-      !||--- called by ------------------------------------------------------
-      !||    i7remnode          ../starter/source/interfaces/inter3d1/i7remnode.F
-      !||--- calls      -----------------------------------------------------
-      !||    upgrade_remnode    ../starter/source/interfaces/interf1/upgrade_remnode.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    get_list_remnode   ../starter/source/interfaces/inter3d1/get_list_remnode.F90
+!||--- called by ------------------------------------------------------
+!||    i7remnode          ../starter/source/interfaces/inter3d1/i7remnode.F
+!||--- calls      -----------------------------------------------------
+!||    upgrade_remnode    ../starter/source/interfaces/interf1/upgrade_remnode.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
         subroutine get_list_remnode(nrtm,igap ,numnod,npari,irect,kremnode, &
-                                    knod2seg,nod2seg,tagsecnd,   &
-                                    ipari,gapmin,gapmax,gap,drad,         &
-                                    gaps_mx,gaps_l_mx,  &
-                                    minseg,dgapload,x,gap_m,              &
-                                    gap_m_l,gapsecnd,gap_s_l_tmp,    &
-                                    intbuf_tab)
+          knod2seg,nod2seg,tagsecnd,   &
+          ipari,gapmin,gapmax,gap,drad,         &
+          gaps_mx,gaps_l_mx,  &
+          minseg,dgapload,x,gap_m,              &
+          gap_m_l,gapsecnd,gap_s_l_tmp,    &
+          intbuf_tab)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   modules
 ! ----------------------------------------------------------------------------------------------------------------------
-!  [ the module names in use must be in uppercase for now, it will change latter]
-!  [ only is mandatory, note the space before the ,]
           use intbufdef_mod , only : intbuf_struct_
           use constant_mod
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
-!                                                   included files
-! ----------------------------------------------------------------------------------------------------------------------
-
-#include "my_real.inc"
-! ----------------------------------------------------------------------------------------------------------------------
 !                                                   arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           integer, intent(in) :: nrtm !< number of segment
           integer, intent(in) :: igap !< gap value
-          integer, intent(in) :: numnod !< number of node    
+          integer, intent(in) :: numnod !< number of node
           integer, intent(in) :: npari !< first dim of ipari
           integer, dimension(4,nrtm), intent(in) ::  irect !< list of node for each segment
           integer, dimension(nrtm+1), intent(inout) ::  kremnode !< index for remnode array
@@ -76,25 +71,25 @@
           integer, dimension(4*nrtm), intent(in) ::  nod2seg !< list of segment connected to the same node
           integer, dimension(numnod), intent(in) :: tagsecnd !< 0 if the node is not a S type2 node
           integer, dimension(npari), intent(in) :: ipari !< interface data
-          my_real , intent(in) :: gapmin !< 
-          my_real , intent(in) :: gapmax !< 
-          my_real , intent(in) :: gap !< 
-          my_real , intent(in) :: drad !< 
-          my_real , intent(in) :: gaps_mx !< 
-          my_real , intent(in) :: gaps_l_mx !< 
-          my_real , intent(in) :: minseg !< 
-          my_real , intent(in) :: dgapload !< 
-          my_real, dimension(3,numnod), intent(in) :: x !< position
-          my_real, dimension(nrtm), intent(in) :: gap_m !< gap of M node
-          my_real, dimension(nrtm), intent(in) :: gap_m_l !< gap of M node
-          my_real, dimension(numnod), intent(in) :: gapsecnd !<  gap of S node
-          my_real, dimension(numnod), intent(in) :: gap_s_l_tmp !<  gap of S node
+          real(kind=WP) , intent(in) :: gapmin !<
+          real(kind=WP) , intent(in) :: gapmax !<
+          real(kind=WP) , intent(in) :: gap !<
+          real(kind=WP) , intent(in) :: drad !<
+          real(kind=WP) , intent(in) :: gaps_mx !<
+          real(kind=WP) , intent(in) :: gaps_l_mx !<
+          real(kind=WP) , intent(in) :: minseg !<
+          real(kind=WP) , intent(in) :: dgapload !<
+          real(kind=WP), dimension(3,numnod), intent(in) :: x !< position
+          real(kind=WP), dimension(nrtm), intent(in) :: gap_m !< gap of M node
+          real(kind=WP), dimension(nrtm), intent(in) :: gap_m_l !< gap of M node
+          real(kind=WP), dimension(numnod), intent(in) :: gapsecnd !<  gap of S node
+          real(kind=WP), dimension(numnod), intent(in) :: gap_s_l_tmp !<  gap of S node
           type(intbuf_struct_), intent(inout) :: intbuf_tab !< interface data
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-      
-          integer i,j,k,seg,iseg,level,cpt,nbseg,seg1,l,cpt1,cpt_total
+
+          integer :: i,j,k,seg,iseg,level,cpt,nbseg,seg1,l,cpt1,cpt_total
           integer :: cptoper
           integer :: jmax,kmax,nty
           integer :: my_size,my_new_size,local_remnode_size
@@ -104,8 +99,8 @@
           integer, dimension(:,:), allocatable :: local_kremnode
           integer, dimension(:), allocatable :: listseg,listsegtmp,listsegtotal,itagseg
           integer, dimension(:), allocatable :: id_nod,noddel,nod2expand,tagnod
-          my_real, dimension(:), allocatable :: dist1,gapv
-          my_real :: mindist,dmax
+          real(kind=WP), dimension(:), allocatable :: dist1,gapv
+          real(kind=WP) :: mindist,dmax
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   external functions
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -140,9 +135,9 @@
             dmax = zero
             if(igap==0)then
               dmax  = sqrt(two) * max(gap+dgapload,drad)
-            elseif(igap==1 .or. igap==2) then
+            else if(igap==1 .or. igap==2) then
               dmax  = sqrt(two) * max(gap_m(i)+gaps_mx+dgapload,drad)
-            elseif(igap==3) then
+            else if(igap==3) then
               dmax  = sqrt(two) * max(min(gap_m(i)+gaps_mx,gap_m_l(i)+gaps_l_mx)+dgapload,drad)
             end if
             ! ---------------
@@ -162,7 +157,7 @@
               node_id = irect(j,seg)
               tagnod(node_id) = 1
               dist1(node_id) = zero
-            enddo
+            end do
             listseg(1)=seg
 
             ! ----------------------------------
@@ -175,12 +170,12 @@
                 jmax = 4
                 if((irect(jmax,seg) == 0) .or. irect(3,seg) == irect(4,seg) ) jmax = 3 ! number of node
                 tagnod(irect(1:jmax,seg))=2 ! tag the node of the segment "seg"
-                
+
                 do j=1,jmax
                   node_id = irect(j,seg)
                   if(nod2expand(node_id)/=0) cycle ! this node was already done
-     
-                  nod2expand(node_id)=1 ! tag the node 
+
+                  nod2expand(node_id)=1 ! tag the node
                   do k=knod2seg(node_id)+1,knod2seg(node_id+1) ! loop over the segment connected to the node irect(j,seg)
                     seg1 = nod2seg(k) ! get the segment id
 
@@ -191,30 +186,30 @@
                       if(itagseg(seg1) == 0)then ! add the segment "seg1" to the list of segment
                         cpt = cpt + 1 ! number of new segment to be checked
                         listsegtmp(cpt)=seg1 ! list of new segment to be checked
-                      endif
+                      end if
                       itagseg(seg1)=level ! tag the segment seg1
-     
+
                       do l=1,kmax ! loop over the node of the segment "seg1"
-                        node_id_seg1 = irect(l,seg1)             
+                        node_id_seg1 = irect(l,seg1)
                         if(tagsecnd(node_id_seg1)== 0 .or.tagnod(node_id_seg1) == 2)cycle   ! the node irect(l,seg1) is also a node of the segment "seg"
-                      ! compute the distance between the node irect(l,seg1) & irect(j,seg)
+                        ! compute the distance between the node irect(l,seg1) & irect(j,seg)
                         dist1(node_id_seg1)=min(dist1(node_id_seg1),dist1(node_id)+  &
-                             sqrt((x(1,node_id_seg1) - x(1,node_id))**2 +             &
-                                  (x(2,node_id_seg1) - x(2,node_id))**2 +             &
-                                  (x(3,node_id_seg1) - x(3,node_id))**2 ))
+                          sqrt((x(1,node_id_seg1) - x(1,node_id))**2 +             &
+                          (x(2,node_id_seg1) - x(2,node_id))**2 +             &
+                          (x(3,node_id_seg1) - x(3,node_id))**2 ))
                         mindist=min(mindist,dist1(node_id_seg1))
                         if(tagnod(node_id_seg1) == 0) then ! node "irect(l,seg1)" was not already treated
                           cptoper = cptoper + 1
                           tagnod(node_id_seg1) = 1 ! tag the node "irect(l,seg1)"
                           id_nod(cptoper)=node_id_seg1 ! save the node id
-                        endif 
+                        end if
 
                         if(igap==1 .or. igap==2)then
                           gapv(irect(l,seg1))=gapsecnd(irect(l,seg1))+gap_m(i)
                           gapv(irect(l,seg1))=min(gapmax,gapv(irect(l,seg1)))
                           gapv(irect(l,seg1))=max(gapmin,gapv(irect(l,seg1)))
                           gapv(irect(l,seg1))=max(drad,gapv(irect(l,seg1))+dgapload)
-                        elseif(igap==3)then
+                        else if(igap==3)then
                           gapv(irect(l,seg1))=gapsecnd(irect(l,seg1))+gap_m(i)
                           gapv(irect(l,seg1))= min(gap_s_l_tmp(irect(l,seg1))+gap_m_l(i),gapv(irect(l,seg1)))
                           gapv(irect(l,seg1))=min(gapmax,gapv(irect(l,seg1)))
@@ -222,16 +217,16 @@
                           gapv(irect(l,seg1))=max(drad,gapv(irect(l,seg1))+dgapload)
                         end if
 
-                      enddo
-                    endif
-                     
-                  enddo 
-       
-                enddo
+                      end do
+                    end if
+
+                  end do
+
+                end do
 
                 tagnod(irect(1:4,seg))=1 ! tag the node of the segment "seg" to 1 (instead of 2)
 
-              enddo
+              end do
 
               do iseg=1,nbseg
                 seg  = listseg(iseg)
@@ -249,10 +244,10 @@
                 listseg(j)    =listsegtmp(j)
                 listsegtmp(j) = 0
                 listsegtotal(j+cpt_total) = listseg(j)
-              enddo
+              end do
               cpt_total = cpt_total + cpt
 
-            enddo
+            end do
             ! ----------------------------------
 
 
@@ -260,27 +255,27 @@
               kremnode(i+1) = 0
               local_kremnode(my_seg_number+1,1) = local_kremnode(my_seg_number,1)
               local_kremnode(my_seg_number,2) = i
-            else  
+            else
               dist1(irect(1,i)) = ep30
               dist1(irect(2,i)) = ep30
               dist1(irect(3,i)) = ep30
               dist1(irect(4,i)) = ep30
 
-              cpt1 = 0 
+              cpt1 = 0
               if(igap==0)then
-                do l=1,cptoper 
+                do l=1,cptoper
                   if(dist1(id_nod(l)) <= dmax)then ! check if the distance to the node id_nod(l) is < to dmax
-                    cpt1 = cpt1 + 1 
+                    cpt1 = cpt1 + 1
                     noddel(cpt1) = id_nod(l) ! save the node
-                  endif
-                enddo
+                  end if
+                end do
               else
-                do l=1,cptoper 
+                do l=1,cptoper
                   if(dist1(id_nod(l)) <= sqrt(two)*gapv(id_nod(l)))then
                     cpt1 = cpt1 + 1
                     noddel(cpt1) = id_nod(l)
-                  endif
-                enddo
+                  end if
+                end do
               end if
 
               kremnode(i+1) = cpt1
@@ -293,30 +288,30 @@
                 deallocate( local_remnode )
                 call move_alloc( tmp_array,local_remnode )
                 local_remnode_size = my_new_size
-              endif
+              end if
               do l=1,cpt1
                 local_remnode(local_kremnode(my_seg_number,1)+l) = noddel(l) ! save the forbidden node in remnode
-              enddo
+              end do
               do l=1,cptoper
                 dist1(id_nod(l)) = ep30
-              enddo
+              end do
               do l=1,cpt_total
                 tagnod(irect(1:4, listsegtotal(l))) = 0
                 itagseg(listsegtotal(l)) = 0
                 listsegtotal(l)          = 0
-              enddo
+              end do
               tagnod(irect(1:4,i)) = 0
               itagseg(i)           = 0
-            endif
-          enddo
+            end if
+          end do
 !$omp end do
 
 !$omp barrier
 
 !$omp single
           do i=1,nrtm
-            kremnode(i+1) = kremnode(i+1) + kremnode(i) 
-          enddo
+            kremnode(i+1) = kremnode(i+1) + kremnode(i)
+          end do
           my_size = intbuf_tab%s_remnode
           nty = ipari(7)
           if(kremnode(nrtm+1)>my_size) call upgrade_remnode( ipari,kremnode(nrtm+1),intbuf_tab,nty )
@@ -329,8 +324,8 @@
             my_address = kremnode(my_seg_id)
             do j=1,my_size
               intbuf_tab%remnode(my_address+j) = local_remnode(my_local_address+j)
-            enddo
-          enddo
+            end do
+          end do
 
 
           deallocate(noddel,nod2expand )

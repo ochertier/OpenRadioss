@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,19 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 CCgw|============================================================
-      !||====================================================================
-      !||    s4deri3             ../starter/source/elements/solid/solide4/s4deri3.F
-      !||--- called by ------------------------------------------------------
-      !||    inirig_mat          ../starter/source/elements/initia/inirig_mat.F
-      !||    inivoid             ../starter/source/elements/initia/inivoid.F
-      !||    multifluid_init3t   ../starter/source/multifluid/multifluid_init3t.F
-      !||    s4init3             ../starter/source/elements/solid/solide4/s4init3.F
-      !||    s4refsta3           ../starter/source/elements/solid/solide4/s4refsta3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg              ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod         ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s4deri3             ../starter/source/elements/solid/solide4/s4deri3.F
+!||--- called by ------------------------------------------------------
+!||    inirig_mat          ../starter/source/elements/initia/inirig_mat.F
+!||    inivoid             ../starter/source/elements/initia/inivoid.F
+!||    multifluid_init3t   ../starter/source/multifluid/multifluid_init3t.F
+!||    s4init3             ../starter/source/elements/solid/solide4/s4init3.F
+!||    s4refsta3           ../starter/source/elements/solid/solide4/s4refsta3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg              ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod         ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S4DERI3(VOL   ,VEUL  ,GEO   ,IGEO   ,RX     ,
      .                   RY    ,RZ    ,SX    ,SY     ,SZ     ,
      .                   TX    ,TY    ,TZ    ,
@@ -262,7 +262,7 @@ C
           VEUL(12,I)= PZ4(I)
           VEUL(13,I)= DELTAX(I)
 C------------------------------------------
-C     CALCUL DE LA NORMALE A CHAQUE FACE
+C     calculation of the normal to each face
 C------------------------------------------
           VEUL(14,I) = ZERO
           VEUL(15,I) = HALF*B1(I)

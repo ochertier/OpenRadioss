@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intti2v         ../engine/source/interfaces/interf/intti2v.F
-      !||--- called by ------------------------------------------------------
-      !||    intti2          ../engine/source/interfaces/interf/intti2.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2curvv         ../engine/source/interfaces/interf/i2curvv.F
-      !||    i2rot10         ../engine/source/interfaces/interf/i2vit10.F
-      !||    i2rot3          ../engine/source/interfaces/interf/i2vit3.F
-      !||    i2virot3        ../engine/source/interfaces/interf/i2vit3.F
-      !||    i2vit10         ../engine/source/interfaces/interf/i2vit10.F
-      !||    i2vit27         ../engine/source/interfaces/interf/i2vit27.F
-      !||    i2vit28         ../engine/source/interfaces/interf/i2vit28.F
-      !||    i2vit3          ../engine/source/interfaces/interf/i2vit3.F
-      !||    i2vit3n         ../engine/source/interfaces/interf/i2vit3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    intti2v         ../engine/source/interfaces/interf/intti2v.F
+!||--- called by ------------------------------------------------------
+!||    intti2          ../engine/source/interfaces/interf/intti2.F
+!||--- calls      -----------------------------------------------------
+!||    i2curvv         ../engine/source/interfaces/interf/i2curvv.F
+!||    i2rot10         ../engine/source/interfaces/interf/i2vit10.F
+!||    i2rot3          ../engine/source/interfaces/interf/i2vit3.F
+!||    i2virot3        ../engine/source/interfaces/interf/i2vit3.F
+!||    i2vit10         ../engine/source/interfaces/interf/i2vit10.F
+!||    i2vit27         ../engine/source/interfaces/interf/i2vit27.F
+!||    i2vit28         ../engine/source/interfaces/interf/i2vit28.F
+!||    i2vit3          ../engine/source/interfaces/interf/i2vit3.F
+!||    i2vit3n         ../engine/source/interfaces/interf/i2vit3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INTTI2V(IPARI,X    ,V   ,
      .                   A    ,VR   ,AR   ,MS  ,IN   ,
      .                   WEIGHT,INTBUF_TAB)
@@ -96,7 +97,7 @@ C
      5 X         ,WEIGHT)
       ELSEIF(ILEV == 2)THEN
 C
-C       FORMULATION AVEC MOMENT SUR MAIN
+C       formulation with moment on main
 C
         CALL I2VIT3(NSN       ,NMN       ,
      2 A         ,INTBUF_TAB%IRECTM,
@@ -113,7 +114,7 @@ C
 C
       ELSEIF(ILEV == 4)THEN
 C
-C       FORMULATION decouplant les ddl rot
+C       Formulation Standing DDL ROT
 C
         CALL I2VIT3(NSN       ,NMN       ,
      2 A         ,INTBUF_TAB%IRECTM,
@@ -121,7 +122,7 @@ C
      4 V         ,MS        ,WEIGHT    ,INTBUF_TAB%NMAS)
 C
       ELSEIF (ILEV >= 10 .AND. ILEV < 23) THEN       
-C       FORMULATION AVEC RUPTURE
+C       formulation with rupture
 C
          CALL I2VIT10(                                                  
      1       NSN       ,NMN       ,MS        ,V         ,A         ,     
@@ -134,14 +135,14 @@ C
      3        INTBUF_TAB%MSR,INTBUF_TAB%IRTLM,INTBUF_TAB%CSTS,INTBUF_TAB%IRUPT,WEIGHT ) 
          ENDIF                                                         
       ELSEIF (ILEV == 30 .AND. IRODDL /= 0) THEN       
-C       Formulation avec courbure du main 
+C       formulation with curvature of the main
          CALL I2CURVV(                                                  
      1       NSN       ,NMN       ,MS        ,V         ,A         ,     
      2       AR        ,VR        ,X         ,INTBUF_TAB%IRECTM,INTBUF_TAB%NSV,     
      3       INTBUF_TAB%MSR,INTBUF_TAB%IRTLM,INTBUF_TAB%CSTS,WEIGHT    )   
 C
       ELSEIF(ILEV == 0.OR.IRODDL == 0)THEN
-C       FORMULATION AVEC MOMENT SUR MAIN
+C       formulation with moment on main
 C
         CALL I2VIT3N(NSN       ,NMN       ,
      2 A         ,INTBUF_TAB%IRECTM,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thbcs    ../engine/source/output/th/thbcs.F
-      !||--- called by ------------------------------------------------------
-      !||    resol    ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    bcs1th   ../engine/source/output/th/bcs1th.F
-      !||====================================================================
+!||====================================================================
+!||    thbcs    ../engine/source/output/th/thbcs.F
+!||--- called by ------------------------------------------------------
+!||    resol    ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    bcs1th   ../engine/source/output/th/bcs1th.F
+!||====================================================================
       SUBROUTINE THBCS(NODFT  ,NODLAST,ICODT  ,ICODR ,ISKEW  ,
      2                 SKEW   ,A      ,AR     ,MS    ,IN     ,
      3                 FTHREAC,NODREAC,CPTREAC)
@@ -43,15 +43,15 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NODLAST,CPTREAC
-      INTEGER NODFT,NODLT,ICODT(*),ICODR(*),ISKEW(*),NODREAC(*)
+      INTEGER NODFT,ICODT(*),ICODR(*),ISKEW(*),NODREAC(*)
       my_real
      .    A(3,*), AR(3,*), MS(*),SKEW(LSKEW,*),
      .    FTHREAC(*),IN(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, K, ISK, LCOD, NINDX,
-     .        INDX(1024),L,J,FLAG_MOM
+      INTEGER I, N, NINDX,
+     .        INDX(1024),FLAG_MOM
 C-----------------------------------------------
 C
       IF (CPTREAC >= 1) THEN

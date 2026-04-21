@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,14 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sh_offset_setn_mod   ../starter/source/elements/shell/shell_offset/sh_offset_setn.F90
-      !||--- called by ------------------------------------------------------
-      !||    shell_offsetp        ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
-      !||====================================================================
+!||====================================================================
+!||    sh_offset_setn_mod   ../starter/source/elements/shell/shell_offset/sh_offset_setn.F90
+!||--- called by ------------------------------------------------------
+!||    shell_offsetp        ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
+!||====================================================================
       module sh_offset_setn_mod
+
+      implicit none
 
       contains
 ! ======================================================================================================================
@@ -33,23 +35,22 @@
 ! ======================================================================================================================
 !
 !=======================================================================================================================
-!!\brief This subroutine compute nodal shell offset
+!!\brief This subroutine computes nodal shell offset
 !=======================================================================================================================
-      !||====================================================================
-      !||    sh_offset_setn   ../starter/source/elements/shell/shell_offset/sh_offset_setn.F90
-      !||--- called by ------------------------------------------------------
-      !||    shell_offsetp    ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    sh_offset_setn   ../starter/source/elements/shell/shell_offset/sh_offset_setn.F90
+!||--- called by ------------------------------------------------------
+!||    shell_offsetp    ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
+!||--- uses       -----------------------------------------------------
+!||====================================================================
         subroutine sh_offset_setn(nshell,numnod,ix_offset,sh_oset,oset_n,itagn)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use constant_mod, only : zero
+          use precision_mod, only : WP
 !
           implicit none
-!
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -58,12 +59,12 @@
           integer, intent(in   )                      :: numnod         !< number of node
           integer, intent(in   ),dimension(4,nshell)  :: ix_offset        !< shell connectivity
           integer, intent(inout),dimension(numnod)     :: itagn         !< itag work array
-          my_real, intent(in   ),dimension(nshell)    :: sh_oset       !< elementary offset
-          my_real, intent(inout),dimension(numnod)     :: oset_n        !< nodal offset
+          real(kind=WP), intent(in   ),dimension(nshell)    :: sh_oset       !< elementary offset
+          real(kind=WP), intent(inout),dimension(numnod)     :: oset_n        !< nodal offset
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i,j,k,n,nnod
+          integer :: i,k,n,nnod
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------

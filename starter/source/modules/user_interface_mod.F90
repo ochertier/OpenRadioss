@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    user_interface_mod          ../starter/source/modules/user_interface_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    read_sensor_user            ../starter/source/tools/sensor/read_sensor_user.F
-      !||    set_u_sens_fpar             ../starter/source/user_interface/uaccess.F
-      !||    set_u_sens_ipar             ../starter/source/user_interface/uaccess.F
-      !||    set_u_sens_spmd_node_list   ../starter/source/tools/sensor/set_u_sens_spmd_node_list.F
-      !||    set_user_window_nodes       ../starter/source/user_interface/user_windows_tools.F
-      !||    starter0                    ../starter/source/starter/starter0.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    user_interface_mod          ../starter/source/modules/user_interface_mod.F90
+!||--- called by ------------------------------------------------------
+!||    read_sensor_user            ../starter/source/tools/sensor/read_sensor_user.F
+!||    set_u_sens_fpar             ../starter/source/user_interface/uaccess.F
+!||    set_u_sens_ipar             ../starter/source/user_interface/uaccess.F
+!||    set_u_sens_spmd_node_list   ../starter/source/tools/sensor/set_u_sens_spmd_node_list.F
+!||    set_user_window_nodes       ../starter/source/user_interface/user_windows_tools.F
+!||    starter0                    ../starter/source/starter/starter0.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       module user_interface_mod
-         use user_windows_mod
-         use sensor_mod
-#include "my_real.inc"
+        use user_windows_mod
+        use sensor_mod
+
 !-----------------------------------------------------------------------------------
 !     module dedicated to pass arrays from radioss to user routines.
 !-----------------------------------------------------------------------------------
@@ -47,18 +47,18 @@
 
       ! Need to have sensor_tab in a separate module as long as the array is not embedded in a Type
       ! Otherwise issues with Allocation / Reallocation
-      !||====================================================================
-      !||    user_sensor_mod   ../starter/source/modules/user_interface_mod.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur            ../starter/source/starter/lectur.F
-      !||    set_u_sens_fpar   ../starter/source/user_interface/uaccess.F
-      !||    set_u_sens_ipar   ../starter/source/user_interface/uaccess.F
-      !||    starter0          ../starter/source/starter/starter0.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    user_sensor_mod   ../starter/source/modules/user_interface_mod.F90
+!||--- called by ------------------------------------------------------
+!||    lectur            ../starter/source/starter/lectur.F
+!||    set_u_sens_fpar   ../starter/source/user_interface/uaccess.F
+!||    set_u_sens_ipar   ../starter/source/user_interface/uaccess.F
+!||    starter0          ../starter/source/starter/starter0.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       module user_sensor_mod
-         use sensor_mod
-#include "my_real.inc"
+        use sensor_mod
+        implicit none
 !-----------------------------------------------------------------------------------
 !     MODULE dedicated to pass sensors arrays
 !-----------------------------------------------------------------------------------

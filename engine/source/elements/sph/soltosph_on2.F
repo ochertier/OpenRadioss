@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    soltosph_on2   ../engine/source/elements/sph/soltosph_on2.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep        ../engine/source/elements/sph/sphprep.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||    my_barrier     ../engine/source/system/machine.F
-      !||    startimeg      ../engine/source/system/timer.F
-      !||    stoptimeg      ../engine/source/system/timer.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||    soltosph_mod   ../engine/share/modules/soltosph_mod.F
-      !||    sphbox         ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    soltosph_on2   ../engine/source/elements/sph/soltosph_on2.F
+!||--- called by ------------------------------------------------------
+!||    sphprep        ../engine/source/elements/sph/sphprep.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../engine/source/output/message/message.F
+!||    arret          ../engine/source/system/arret.F
+!||    my_barrier     ../engine/source/system/machine.F
+!||    startimeg      ../engine/source/system/timer.F
+!||    stoptimeg      ../engine/source/system/timer.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    message_mod    ../engine/share/message_module/message_mod.F
+!||    soltosph_mod   ../engine/share/modules/soltosph_mod.F
+!||    sphbox         ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SOLTOSPH_ON2(
      .   X      ,SPBUF    ,KXSP   ,IPARTSP ,ELBUF_TAB,
      .   IPARG  ,NGROUNC ,IGROUNC ,ITASK   ,IXSP     ,
@@ -72,13 +72,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,  N, IP, KP, NG, MG, J, NP, KFT, IG, NELEM,
+      INTEGER I, NG, J, NP, IG, NELEM, 
      .        NEL, OFFSET, NVOIS, M, JNOD, NN, IERROR
 C                                                                    
 C-----
-      TYPE(G_BUFEL_) ,POINTER :: GBUF, GBUFSP
-      TYPE(L_BUFEL_) ,POINTER :: LBUF     
-      TYPE(BUF_MAT_) ,POINTER :: MBUF  
+ 
+ 
+ 
 C-----------------------------------------------
       IF(ITASK==0)THEN
         ALLOCATE(WSPCLOUD(NUMSPH),STAT=IERROR)

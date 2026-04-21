@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbadefpinch   ../engine/source/elements/shell/coqueba/cbadefpinch.F
-      !||--- called by ------------------------------------------------------
-      !||    cbaforc3      ../engine/source/elements/shell/coqueba/cbaforc3.F
-      !||====================================================================
+!||====================================================================
+!||    cbadefpinch   ../engine/source/elements/shell/coqueba/cbadefpinch.F
+!||--- called by ------------------------------------------------------
+!||    cbaforc3      ../engine/source/elements/shell/coqueba/cbaforc3.F
+!||====================================================================
       SUBROUTINE CBADEFPINCH(
      1                       JFT  ,JLT  ,NG   ,VQG   ,VDEF  ,
      2                       VETA ,VKSI ,TC   ,NPLAT ,IPLAT ,
@@ -65,7 +65,7 @@ C----------------------------------
        DO I=JFT,JLT 
          EP=IPLAT(I)
 C----------------------------------
-C     MATRIX [BCP] FOR TRNASVERSE SHEAR DUE TO PINCHING
+C     MATRIX [BCP] FOR TRANSVERSE SHEAR DUE TO PINCHING
 C----------------------------------
 
 C-------Node 1 contribution

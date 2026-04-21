@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10defo3   ../engine/source/elements/solid/solide10/s10defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3   ../engine/source/elements/solid/solide10/s10forc3.F
-      !||====================================================================
+!||====================================================================
+!||    s10defo3   ../engine/source/elements/solid/solide10/s10defo3.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3   ../engine/source/elements/solid/solide10/s10forc3.F
+!||====================================================================
       SUBROUTINE S10DEFO3(
      1   PX,      PY,      PZ,      VX,
      2   VY,      VZ,      DXX,     DXY,
@@ -68,7 +68,7 @@ C     REAL
       my_real
      .   DT1D2
       my_real 
-     .   PXX2,PYY2,PZZ2,PXX2P,PYY2P,PZZ2P,AAA,BBB
+     .   PXX2,PYY2,PZZ2,AAA
 C-----------------------------------------------
 C   
       IF(ISROT /= 1)THEN                                                                 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    porfor6    ../engine/source/airbag/porfor6.F
-      !||--- called by ------------------------------------------------------
-      !||    airbagb1   ../engine/source/airbag/airbagb1.F
-      !||====================================================================
+!||====================================================================
+!||    porfor6    ../engine/source/airbag/porfor6.F
+!||--- called by ------------------------------------------------------
+!||    airbagb1   ../engine/source/airbag/airbagb1.F
+!||====================================================================
       SUBROUTINE PORFOR6(SVTFAC,IM,IPM,PM,STRAIN,P,PEXT,IEL,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -37,7 +37,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IPM(NPROPMI,*),NG,IM,IEL,NEL
+      INTEGER IPM(NPROPMI,*),IM,IEL,NEL
       my_real
      .   SVTFAC,PM(NPROPM,*),STRAIN(*),P,PEXT
 C-----------------------------------------------
@@ -61,11 +61,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    porform6   ../engine/source/airbag/porfor6.F
-      !||--- called by ------------------------------------------------------
-      !||    fvvent0    ../engine/source/airbag/fvvent0.F
-      !||====================================================================
+!||====================================================================
+!||    porform6   ../engine/source/airbag/porfor6.F
+!||--- called by ------------------------------------------------------
+!||    fvvent0    ../engine/source/airbag/fvvent0.F
+!||====================================================================
       SUBROUTINE PORFORM6(SVTFAC,IM,PM,AREA,AREA0,P,PEXT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

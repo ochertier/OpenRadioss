@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i6damp    ../engine/source/interfaces/inter3d/i6damp.F
-      !||--- called by ------------------------------------------------------
-      !||    i6main    ../engine/source/interfaces/inter3d/i6main.F
-      !||--- calls      -----------------------------------------------------
-      !||    ninterp   ../engine/source/interfaces/int14/ninterp.F
-      !||====================================================================
+!||====================================================================
+!||    i6damp    ../engine/source/interfaces/inter3d/i6damp.F
+!||--- called by ------------------------------------------------------
+!||    i6main    ../engine/source/interfaces/inter3d/i6main.F
+!||--- calls      -----------------------------------------------------
+!||    ninterp   ../engine/source/interfaces/int14/ninterp.F
+!||====================================================================
       SUBROUTINE I6DAMP(
      1   V,       NPC,     TF,      IRECT,
      2   MSR,     NSV,     IRTL,    IRTLO,
@@ -76,9 +76,9 @@ C     REAL
       my_real
      .   FDAMP
       my_real
-     .   VIS(LLT),VISCV(LLT),FACT(LLT),XX(LLT)
+     .   VISCV(LLT),FACT(LLT),XX(LLT)
 C-----------------------------------------------
-C     Coefficient d'amortissement
+C     Depreciation coefficient
 C--------------------------------
       IF (NDAMP1 > 0) THEN    ! velocity function
         DO I=LFT,LLT
@@ -133,7 +133,7 @@ C
           FY4(I)=FYI(I)*H4(I)
           FZ4(I)=FZI(I)*H4(I)
 c
-c         Force visc main        
+c         Hand visc strength        
 c
           J3=3*IRECT(1,L)
           J2=J3-1
@@ -163,8 +163,7 @@ C
           EM(J2)=EM(J2)+FY4(I)
           EM(J3)=EM(J3)+FZ4(I)
 c
-c         Force visc secnd        
-c
+c         Force visc second c
           I3 = 3*IL
           I2 = I3-1
           I1 = I2-1

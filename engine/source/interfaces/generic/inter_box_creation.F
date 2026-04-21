@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inter_box_creation   ../engine/source/interfaces/generic/inter_box_creation.F
-      !||--- called by ------------------------------------------------------
-      !||    inter_prepare_sort   ../engine/source/interfaces/generic/inter_prepare_sort.F
-      !||--- uses       -----------------------------------------------------
-      !||    inter_sorting_mod    ../engine/share/modules/inter_sorting_mod.F
-      !||====================================================================
-        SUBROUTINE INTER_BOX_CREATION( )
+!||====================================================================
+!||    inter_box_creation     ../engine/source/interfaces/generic/inter_box_creation.F
+!||--- called by ------------------------------------------------------
+!||    inter_init_component   ../engine/source/interfaces/generic/inter_init_component.F90
+!||    inter_prepare_sort     ../engine/source/interfaces/generic/inter_prepare_sort.F
+!||--- uses       -----------------------------------------------------
+!||    inter_sorting_mod      ../engine/share/modules/inter_sorting_mod.F
+!||====================================================================
+        SUBROUTINE INTER_BOX_CREATION(nb_cell_x,nb_cell_y,nb_cell_z,box_limit)
 !$COMMENT
 !       INTER_BOX_CREATION description :
 !       creation of the global box
@@ -41,7 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-        USE INTER_SORTING_MOD
+        USE INTER_SORTING_MOD , ONLY : NB_BOX_COARSE_GRID,NB_BOX_LIMIT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,7 +55,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-
+        integer, intent(inout) :: nb_cell_x !< number of cell in the x direction
+        integer, intent(inout) :: nb_cell_y !< number of cell in the y direction
+        integer, intent(inout) :: nb_cell_z !< number of cell in the z direction
+        my_real, dimension(6), intent(inout) :: box_limit !< upper & lower bound of the box
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -79,6 +83,7 @@ C-----------------------------------------------
         IF(DIST_MAX==DZ_BOX) LEADING_DIMENSION = 3
         
         !   compute the number of cell in the leading direction, then compute the number of cell in the other direction
+        !   Possible overflow in sp here
         RATIO = SQRT( NUMNODG / (DX_BOX*DY_BOX+DX_BOX*DZ_BOX+DY_BOX*DZ_BOX))
         IF(LEADING_DIMENSION==1) THEN
             NB_CELL_X = NINT( RATIO * DX_BOX )

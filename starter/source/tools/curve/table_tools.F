@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    table_zero   ../starter/source/tools/curve/table_tools.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur       ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    table_mod    ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    table_zero   ../starter/source/tools/curve/table_tools.F
+!||--- called by ------------------------------------------------------
+!||    lectur       ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    table_mod    ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE TABLE_ZERO(TABLE)
 C-----------------------------------------------
       USE TABLE_MOD
@@ -45,7 +45,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LEN, N
+      INTEGER :: N
 C--------------------------------------
       DO N=1,NTABLE
         TABLE(N)%NOTABLE  = 0
@@ -55,14 +55,14 @@ C--------------------------------------
       END DO
       RETURN
       END SUBROUTINE TABLE_ZERO
-      !||====================================================================
-      !||    table_wresti   ../starter/source/tools/curve/table_tools.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    table_mod      ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    table_wresti   ../starter/source/tools/curve/table_tools.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    table_mod      ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE TABLE_WRESTI(TABLE, LENI)
 C-----------------------------------------------
       USE TABLE_MOD
@@ -103,14 +103,14 @@ C--------------------------------------
       END DO
       RETURN
       END SUBROUTINE TABLE_WRESTI
-      !||====================================================================
-      !||    table_wrestr   ../starter/source/tools/curve/table_tools.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    table_mod      ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    table_wrestr   ../starter/source/tools/curve/table_tools.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    table_mod      ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE TABLE_WRESTR(TABLE, LENR)
 C-----------------------------------------------
       USE TABLE_MOD
@@ -146,15 +146,15 @@ C--------------------------------------
 c-----------
       RETURN
       END SUBROUTINE TABLE_WRESTR
-      !||====================================================================
-      !||    table_interp   ../starter/source/tools/curve/table_tools.F
-      !||--- called by ------------------------------------------------------
-      !||    get_u_table    ../starter/source/user_interface/utable.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret          ../starter/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    table_mod      ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    table_interp   ../starter/source/tools/curve/table_tools.F
+!||--- called by ------------------------------------------------------
+!||    get_u_table    ../starter/source/user_interface/utable.F
+!||--- calls      -----------------------------------------------------
+!||    arret          ../starter/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    table_mod      ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE TABLE_INTERP(TABLE,XX,YY)
 C-----------------------------------------------
       USE TABLE_MOD
@@ -178,10 +178,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       TYPE(TTABLE_XY), POINTER :: TY
-      INTEGER NDIM, K, NXK(4), I, IPOS(4), IB(2,2,2,2), 
-     .        IP,IN,IM,IL,P,N,M,L,N1,N12,N123
-      my_real 
-     .       DX1,DX2,R(4),UNR(4)
+      INTEGER :: NDIM, K, NXK(4), I, IPOS(4), IB(2,2,2,2), IP,IN,IM,IL,P,N,M,L,N1,N12,N123
+      my_real :: DX2,R(4),UNR(4)
 C-----------------------------------------------
       NDIM=TABLE%NDIM
       IF( SIZE(XX) < NDIM )THEN
@@ -311,15 +309,15 @@ C-----
 
       RETURN
       END SUBROUTINE TABLE_INTERP
-      !||====================================================================
-      !||    table_vinterp   ../starter/source/tools/curve/table_tools.F
-      !||--- called by ------------------------------------------------------
-      !||    get_u_vtable    ../starter/source/user_interface/utable.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret           ../starter/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    table_mod       ../starter/share/modules1/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    table_vinterp   ../starter/source/tools/curve/table_tools.F
+!||--- called by ------------------------------------------------------
+!||    get_u_vtable    ../starter/source/user_interface/utable.F
+!||--- calls      -----------------------------------------------------
+!||    arret           ../starter/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    table_mod       ../starter/share/modules1/table_mod.F
+!||====================================================================
       SUBROUTINE TABLE_VINTERP(TABLE,DIMX,NEL,IPOS,XX,YY,DYDX1)
 C-----------------------------------------------
       USE TABLE_MOD

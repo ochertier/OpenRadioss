@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s10fint3   ../engine/source/elements/solid/solide10/s10fint3.F
-      !||--- called by ------------------------------------------------------
-      !||    s10forc3   ../engine/source/elements/solid/solide10/s10forc3.F
-      !||====================================================================
+!||====================================================================
+!||    s10fint3   ../engine/source/elements/solid/solide10/s10fint3.F
+!||--- called by ------------------------------------------------------
+!||    s10forc3   ../engine/source/elements/solid/solide10/s10forc3.F
+!||====================================================================
       SUBROUTINE S10FINT3(
      1   SIG,     PX,      PY,      PZ,
      2   FX,      FY,      FZ,      VOL,
@@ -68,7 +68,7 @@ C     REAL
       my_real
      .   S1(MVSIZ), S2(MVSIZ), S3(MVSIZ),
      .   S4(MVSIZ), S5(MVSIZ), S6(MVSIZ),
-     .   FINT, QVIS_LOC, VOL_LOC
+     .    QVIS_LOC, VOL_LOC
 C-----------------------------------------------
       DO I=1,NEL
        QVIS_LOC = QVIS(I)

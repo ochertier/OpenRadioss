@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_type02     ../starter/source/interfaces/int02/hm_read_inter_type02.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_struct     ../starter/source/interfaces/reader/hm_read_inter_struct.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    definter                 ../starter/source/interfaces/interf1/definter.F
-      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||    ngr2usr                  ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_type02     ../starter/source/interfaces/int02/hm_read_inter_type02.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_struct     ../starter/source/interfaces/reader/hm_read_inter_struct.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    definter                 ../starter/source/interfaces/interf1/definter.F
+!||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||    ngr2usr                  ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE02(
      1        IPARI      ,STFAC      ,FRIGAP    ,NOINT    ,IGRNOD    ,
      2        IGRSURF    ,I2RUPT     ,AREASL    ,DEF_INTER,NPC1      ,
@@ -51,6 +51,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD , ONLY : SUBMODEL_DATA, NSUBMOD
       USE ALE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,7 +71,8 @@ C-----------------------------------------------
       INTEGER,INTENT(INOUT) :: INTHEAT
       INTEGER NOINT
       INTEGER IPARI(NPARI),DEF_INTER(100),NPC1(SNPC1)
-      my_real STFAC,AREASL,UNITAB(*)
+      my_real STFAC,AREASL !,UNITAB(*)
+      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       my_real FRIGAP(NPARIR),I2RUPT(6)
       CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
@@ -568,9 +570,6 @@ C--------------------------------------------------------------
       IF(IS1<0.AND.IS2<0) WRITE(IOUT,'(4X,A)')'SURFACE TO SURFACE INPUT'
 C
 C--------------------------------------------------------------
- 1000 FORMAT(/1X,'  INTERFACE NUMBER :',I10,1X,A)
- 1300 FORMAT(    /1X,'   INTERFACES               ' /
-     .            1X,' --------------             '// )
 C------------
       RETURN
  1502 FORMAT(//

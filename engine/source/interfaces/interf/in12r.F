@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    in12r      ../engine/source/interfaces/interf/in12r.F
-      !||--- called by ------------------------------------------------------
-      !||    int12w     ../engine/source/ale/inter/int12w.F
-      !||    intti12f   ../engine/source/interfaces/interf/intti12.F
-      !||    intti12v   ../engine/source/interfaces/interf/intti12.F
-      !||====================================================================
+!||====================================================================
+!||    in12r      ../engine/source/interfaces/interf/in12r.F
+!||--- called by ------------------------------------------------------
+!||    int12w     ../engine/source/ale/inter/int12w.F
+!||    intti12f   ../engine/source/interfaces/interf/intti12.F
+!||    intti12v   ../engine/source/interfaces/interf/intti12.F
+!||====================================================================
       SUBROUTINE IN12R(A,FRIGAP,NSV,NSN,FLAG,TAGKINE )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -49,7 +49,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-C TRANSFORMATION TEMPORAIRE DANS LE REPERE MAIN
+C temporary transformation in the main reference frame
         S11=FRIGAP(5)
         S21=FRIGAP(6)
         S31=FRIGAP(7)
@@ -72,7 +72,7 @@ C TRANSFORMATION TEMPORAIRE DANS LE REPERE MAIN
          ENDIF
         ENDDO
        ELSE
-C RETOUR REPERE SECOND
+C RETOUR frame SECOND
         DO II=1,NSN
          IF(TAGKINE(II)>0)THEN
            I=NSV(II)

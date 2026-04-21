@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    split_seg_ielem    ../starter/source/restart/ddsplit/split_seg_ielem.F
-      !||--- called by ------------------------------------------------------
-      !||    split_interfaces   ../starter/source/restart/ddsplit/split_interfaces.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    front_mod          ../starter/share/modules1/front_mod.F
-      !||====================================================================
+!||====================================================================
+!||    split_seg_ielem    ../starter/source/restart/ddsplit/split_seg_ielem.F
+!||--- called by ------------------------------------------------------
+!||    split_interfaces   ../starter/source/restart/ddsplit/split_interfaces.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    front_mod          ../starter/share/modules1/front_mod.F
+!||====================================================================
       SUBROUTINE SPLIT_SEG_IELEM(IELEM_M    ,PROC_MVOISIN  ,MVOISIN  ,NRTM      ,
      .                           NRTM_L     ,TAG_SEG       ,CEP      ,CEL       ,
      .                           IDEL_SOLID,INTERCEP       ,PROC     ,NUMELS    ,
@@ -69,14 +69,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,GLOB,IE1,IEL1,IE2,IEL2,N
+      INTEGER I,J,K,IE1,IEL1,IE2,IEL2,N
       INTEGER :: OFFSET_SHELL,OFFSET_SHELL3N
       INTEGER, DIMENSION(:),ALLOCATABLE :: IBUF1,IBUF3
 C ----------------------------------------
       ALLOCATE(IBUF1(2*NRTM_L))
-      ALLOCATE(IBUF3(4*NRTM_L))
       IBUF1(1:2*NRTM_L) = 0
-      IF(IDEL_SOLID > 0) IBUF3(1:4*NRTM_L) = 0
+      ALLOCATE(IBUF3(4*NRTM_L))
+      IF(IDEL_SOLID > 0) THEN
+        IBUF3(1:4*NRTM_L) = 0
+      ELSE
+        IBUF3(1:4*NRTM_L) = 0 !should always be allocated
+      ENDIF
       OFFSET_SHELL=NUMELS+NUMELQ
       OFFSET_SHELL3N=OFFSET_SHELL+NUMELC+NUMELT+NUMELP+NUMELR
       ! ---------------------

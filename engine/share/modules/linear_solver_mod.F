@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    linear_solver_mod   ../engine/share/modules/linear_solver_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    diffusion_mod       ../engine/share/modules/diffusion_mod.F
-      !||    init_diffusion      ../engine/share/modules/diffusion_mod.F
-      !||    radioss2            ../engine/source/engine/radioss2.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_global_dim      ../engine/share/modules/linear_solver_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    matrix_mod          ../common_source/linearalgebra/matrix_mod.F
-      !||    vector_mod          ../common_source/linearalgebra/vector_mod.F
-      !||====================================================================
+!||====================================================================
+!||    linear_solver_mod   ../engine/share/modules/linear_solver_mod.F
+!||--- called by ------------------------------------------------------
+!||    diffusion_mod       ../engine/share/modules/diffusion_mod.F
+!||    init_diffusion      ../engine/share/modules/diffusion_mod.F
+!||    radioss2            ../engine/source/engine/radioss2.F
+!||--- calls      -----------------------------------------------------
+!||    get_global_dim      ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    matrix_mod          ../common_source/linearalgebra/matrix_mod.F
+!||    vector_mod          ../common_source/linearalgebra/vector_mod.F
+!||====================================================================
       MODULE LINEAR_SOLVER_MOD
       USE MATRIX_MOD
       USE VECTOR_MOD
@@ -112,24 +112,27 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 
 !     Error
 !     -----
-      !||====================================================================
-      !||    error   ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    error   ../engine/share/modules/linear_solver_mod.F
+!||====================================================================
       SUBROUTINE ERROR()
         PRINT*, "ERROR"
       END SUBROUTINE ERROR
       
-      !||====================================================================
-      !||    get_global_dim      ../engine/share/modules/linear_solver_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    get_solution        ../engine/share/modules/diffusion_mod.F
-      !||    linear_solver_mod   ../engine/share/modules/linear_solver_mod.F
-      !||    solve_diffusion     ../engine/share/modules/diffusion_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_global_dim        ../engine/share/modules/linear_solver_mod.F
+!||--- called by ------------------------------------------------------
+!||    get_solution          ../engine/share/modules/diffusion_mod.F
+!||    linear_solver_mod     ../engine/share/modules/linear_solver_mod.F
+!||    solve_diffusion       ../engine/share/modules/diffusion_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       FUNCTION GET_GLOBAL_DIM(this)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_LINEAR_SOLVER), INTENT(IN) :: this
       INTEGER :: GET_GLOBAL_DIM
@@ -138,13 +141,16 @@ C-----------------------------------------------
 
 !     Solver initialization
 !     ---------------------
-      !||====================================================================
-      !||    init_solver   ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    init_solver           ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE INIT_SOLVER(this, MAT_DIM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_LINEAR_SOLVER), INTENT(INOUT) :: this
       INTEGER, INTENT(IN) :: MAT_DIM
@@ -163,11 +169,12 @@ C-----------------------------------------------
 
 !     Set matrix
 !     ----------
-      !||====================================================================
-      !||    set_matrix   ../engine/share/modules/linear_solver_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    matrix_mod   ../common_source/linearalgebra/matrix_mod.F
-      !||====================================================================
+!||====================================================================
+!||    set_matrix            ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    matrix_mod            ../common_source/linearalgebra/matrix_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SET_MATRIX(this, MAT)
 C-----------------------------------------------
 C     M o d u l e s
@@ -176,6 +183,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_LINEAR_SOLVER), INTENT(INOUT) :: this
       TYPE(T_CFS_MATRIX), INTENT(INOUT) :: MAT
@@ -193,11 +201,12 @@ C-----------------------------------------------
 
 !     Set right hand side
 !     -------------------
-      !||====================================================================
-      !||    set_rhs      ../engine/share/modules/linear_solver_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    vector_mod   ../common_source/linearalgebra/vector_mod.F
-      !||====================================================================
+!||====================================================================
+!||    set_rhs               ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    vector_mod            ../common_source/linearalgebra/vector_mod.F
+!||====================================================================
       SUBROUTINE SET_RHS(this, NRHS, RHS)
 C-----------------------------------------------
 C     M o d u l e s
@@ -206,6 +215,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_LINEAR_SOLVER), INTENT(INOUT) :: this
       INTEGER, INTENT(IN) :: NRHS
@@ -224,13 +234,16 @@ C-----------------------------------------------
 
 !     Solve the linear system
 !     -----------------------
-      !||====================================================================
-      !||    solve   ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    solve                 ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SOLVE(this, SOL, DIM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_LINEAR_SOLVER), INTENT(INOUT) :: this
       INTEGER, INTENT(IN) :: DIM
@@ -249,13 +262,16 @@ C-----------------------------------------------
 
 !     End the solver instance
 !     -----------------------
-      !||====================================================================
-      !||    terminate   ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    terminate             ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE TERMINATE(this)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_LINEAR_SOLVER), INTENT(INOUT) :: this
       SELECT TYPE(this)
@@ -277,14 +293,17 @@ C-----------------------------------------------
 !     Solver initialization
 !     ---------------------
 #ifdef MUMPS5
-      !||====================================================================
-      !||    init_solver_mumps   ../engine/share/modules/linear_solver_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    init_solver_mumps     ../engine/share/modules/linear_solver_mod.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE INIT_SOLVER_MUMPS(this, MAT_DIM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -307,15 +326,15 @@ C-----------------------------------------------
       this%MUMPS_PAR%ICNTL(5) = 0
 !     matrice distribuee
       this%MUMPS_PAR%ICNTL(18) = 3
-!     taille de la matrice
+! matrix size
       this%MUMPS_PAR%N = MAT_DIM
-!     matrice sym  trique d  finie positive
+!     positive defined symmetrical matrix
       this%MUMPS_PAR%SYM = 1
 !     distributed rhs
       this%MUMPS_PAR%ICNTL(20) = 10
 !     distributed solution
       !mumps_par%icntl(21) = 1
-!     un-distributed solution
+! un-distributed solution
       this%MUMPS_PAR%ICNTL(21) = 0
 !     info on solution
       this%MUMPS_PAR%ICNTL(11) = 1
@@ -328,11 +347,12 @@ C-----------------------------------------------
       
 !     Set matrix
 !     ----------
-      !||====================================================================
-      !||    set_matrix_mumps   ../engine/share/modules/linear_solver_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    matrix_mod         ../common_source/linearalgebra/matrix_mod.F
-      !||====================================================================
+!||====================================================================
+!||    set_matrix_mumps      ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    matrix_mod            ../common_source/linearalgebra/matrix_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SET_MATRIX_MUMPS(this, MAT)
 C-----------------------------------------------
 C     M o d u l e s
@@ -341,6 +361,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_MUMPS_SOLVER), INTENT(INOUT) :: this
       TYPE(T_CFS_MATRIX), INTENT(INOUT) :: MAT
@@ -350,11 +371,12 @@ C-----------------------------------------------
 
 !     Set right hand side
 !     -------------------
-      !||====================================================================
-      !||    set_rhs_mumps   ../engine/share/modules/linear_solver_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    vector_mod      ../common_source/linearalgebra/vector_mod.F
-      !||====================================================================
+!||====================================================================
+!||    set_rhs_mumps         ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    vector_mod            ../common_source/linearalgebra/vector_mod.F
+!||====================================================================
       SUBROUTINE SET_RHS_MUMPS(this, NRHS, RHS)
 C-----------------------------------------------
 C     M o d u l e s
@@ -363,6 +385,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_MUMPS_SOLVER), INTENT(INOUT) :: this
       INTEGER, INTENT(IN) :: NRHS
@@ -381,14 +404,17 @@ C-----------------------------------------------
 
 !     Solve the linear system
 !     -----------------------
-      !||====================================================================
-      !||    solve_mumps   ../engine/share/modules/linear_solver_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    solve_mumps           ../engine/share/modules/linear_solver_mod.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SOLVE_MUMPS(this, SOL, DIM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "com01_c.inc"
 #include      "task_c.inc"
@@ -436,14 +462,17 @@ C-----------------------------------------------
 
 !     End the solver instance
 !     -----------------------
-      !||====================================================================
-      !||    terminate_mumps   ../engine/share/modules/linear_solver_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    terminate_mumps       ../engine/share/modules/linear_solver_mod.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE TERMINATE_MUMPS(this)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -464,13 +493,16 @@ C END OF MUMPS5 SPECIFIC CODE
 !     ***********     !
 !     Solver initialization
 !     ---------------------
-      !||====================================================================
-      !||    init_solver_cg   ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    init_solver_cg        ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE INIT_SOLVER_CG(this, MAT_DIM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_CG_SOLVER), INTENT(INOUT) :: this
       INTEGER, INTENT(IN) :: MAT_DIM
@@ -486,11 +518,12 @@ C-----------------------------------------------
       
 !     Set matrix
 !     ----------
-      !||====================================================================
-      !||    set_matrix_cg   ../engine/share/modules/linear_solver_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    matrix_mod      ../common_source/linearalgebra/matrix_mod.F
-      !||====================================================================
+!||====================================================================
+!||    set_matrix_cg         ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    matrix_mod            ../common_source/linearalgebra/matrix_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SET_MATRIX_CG(this, MAT)
 C-----------------------------------------------
 C     M o d u l e s
@@ -499,6 +532,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_CG_SOLVER), INTENT(INOUT) :: this
       TYPE(T_CFS_MATRIX), INTENT(INOUT), TARGET :: MAT
@@ -509,11 +543,12 @@ C-----------------------------------------------
 
 !     Set right hand side
 !     -------------------
-      !||====================================================================
-      !||    set_rhs_cg   ../engine/share/modules/linear_solver_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    vector_mod   ../common_source/linearalgebra/vector_mod.F
-      !||====================================================================
+!||====================================================================
+!||    set_rhs_cg            ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    vector_mod            ../common_source/linearalgebra/vector_mod.F
+!||====================================================================
       SUBROUTINE SET_RHS_CG(this, NRHS, RHS)
 C-----------------------------------------------
 C     M o d u l e s
@@ -522,14 +557,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
       CLASS (T_CG_SOLVER), INTENT(INOUT) :: this
       INTEGER, INTENT(IN) :: NRHS
       TYPE(T_VECTOR), INTENT(INOUT), TARGET :: RHS
 
-      INTEGER :: II
-      INTEGER :: LGTH
-      
       this%RHS => RHS
       this%NRHS = NRHS
       
@@ -538,18 +571,20 @@ C-----------------------------------------------
 
 !     Solve the linear system
 !     -----------------------
-      !||====================================================================
-      !||    solve_cg     ../engine/share/modules/linear_solver_mod.F
-      !||--- calls      -----------------------------------------------------
-      !||    prod_vec     ../common_source/linearalgebra/matrix_mod.F
-      !||--- uses       -----------------------------------------------------
-      !||    vector_mod   ../common_source/linearalgebra/vector_mod.F
-      !||====================================================================
+!||====================================================================
+!||    solve_cg              ../engine/share/modules/linear_solver_mod.F
+!||--- calls      -----------------------------------------------------
+!||    prod_vec              ../common_source/linearalgebra/matrix_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||    vector_mod            ../common_source/linearalgebra/vector_mod.F
+!||====================================================================
       SUBROUTINE SOLVE_CG(this, SOL, DIM)
       USE VECTOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "com01_c.inc"
 #include      "task_c.inc"
@@ -567,7 +602,7 @@ C-----------------------------------------------
       INTEGER :: ITER, SYSTEM_SIZE, IRHS, II, I, J, MAT_NNZ
       MY_REAL :: ERROR, NORM_INIT
       MY_REAL :: ALPHA, BETA
-      ! a sortir sous forme de parametre
+      ! To go out in the form of a parameter
       INTEGER :: MAX_ITER
       MY_REAL :: TOL
 
@@ -590,7 +625,7 @@ C-----------------------------------------------
 
       DO IRHS = 1, this%NRHS
          this%SOL_VEC%VAL(1:SYSTEM_SIZE) = ZERO     
-!     initialisation du solver
+! solver initialization
          CALL PROD_VEC(this%MAT, this%SOL_VEC, this%TEMP)
          this%R%VAL(1:SYSTEM_SIZE) = this%RHS%VAL(SYSTEM_SIZE * (IRHS - 1) + 1 : SYSTEM_SIZE * (IRHS - 1) + SYSTEM_SIZE) - 
      .        this%TEMP%VAL(1:SYSTEM_SIZE)
@@ -624,13 +659,16 @@ C-----------------------------------------------
 
 !     End the solver instance
 !     -----------------------
-      !||====================================================================
-      !||    terminate_cg   ../engine/share/modules/linear_solver_mod.F
-      !||====================================================================
+!||====================================================================
+!||    terminate_cg          ../engine/share/modules/linear_solver_mod.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE TERMINATE_CG(this)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
         CLASS (T_CG_SOLVER), INTENT(INOUT) :: this
         CALL this%SOL_VEC%DESTROY()

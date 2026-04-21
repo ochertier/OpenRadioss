@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,33 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fvmesh1                ../starter/source/airbag/fvmesh.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh0                ../starter/source/airbag/fvmesh0.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    c_tricall              ../starter/stub/fvmbags_stub.F
-      !||    coorloc                ../starter/source/airbag/fvmesh.F
-      !||    facepoly               ../starter/source/airbag/facepoly.F
-      !||    fvnormal               ../starter/source/airbag/fvmbag1.F
-      !||    gpolcut                ../starter/source/airbag/gpolcut.F
-      !||    horiedge               ../starter/source/airbag/horipoly.F
-      !||    horipoly               ../starter/source/airbag/horipoly.F
-      !||    itribox                ../starter/source/airbag/itribox.F
-      !||    my_exit                ../starter/source/output/analyse/analyse.c
-      !||    polyhedr               ../starter/source/airbag/polyhedr.F
-      !||    polyhedr1              ../starter/source/airbag/polyhedr1.F
-      !||    tribox3                ../starter/stub/fvmbags_stub.F
-      !||    tritri3                ../starter/stub/fvmbags_stub.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod              ../starter/share/modules1/fvbag_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvmesh1                ../starter/source/airbag/fvmesh.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh0                ../starter/source/airbag/fvmesh0.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    c_tricall              ../starter/stub/fvmbags_stub.F
+!||    coorloc                ../starter/source/airbag/fvmesh.F
+!||    facepoly               ../starter/source/airbag/facepoly.F
+!||    fvbag_gpolcut          ../starter/source/airbag/gpolcut.F
+!||    fvnormal               ../starter/source/airbag/fvmbag1.F
+!||    horiedge               ../starter/source/airbag/horipoly.F
+!||    horipoly               ../starter/source/airbag/horipoly.F
+!||    itribox                ../starter/source/airbag/itribox.F
+!||    my_exit                ../starter/source/output/analyse/analyse.c
+!||    polyhedr               ../starter/source/airbag/polyhedr.F
+!||    polyhedr1              ../starter/source/airbag/polyhedr1.F
+!||    tribox3                ../starter/stub/fvmbags_stub.F
+!||    tritri3                ../starter/stub/fvmbags_stub.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_gpolcut_mod      ../starter/source/airbag/gpolcut.F
+!||    fvbag_mod              ../starter/share/modules1/fvbag_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+!||====================================================================
       SUBROUTINE FVMESH1(IBUF , ELEM  , X     , IVOLU, BRIC ,
      .                   XB   , RVOLU , NEL   , NELI,  NBRIC, TBRIC,
-     .                   SFAC , DXM   , NBA   , NELA , NNA  ,
+     .                   SFAC , DXM   , NBA   , NELA ,
      .                   TBA  , TFACA , TAGELS, IBUFA,
      .                   ELEMA, TAGELA, IXS   ,ID    ,TITR, NB_NODE, ITYP)
 C-----------------------------------------------
@@ -56,6 +57,8 @@ C-----------------------------------------------
       USE FVBAG_MOD
       USE REORDER_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FVBAG_GPOLCUT_MOD, ONLY : FVBAG_GPOLCUT
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,34 +72,32 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IBUF(*), ELEM(3,*), IVOLU(*), BRIC(8,*),
-     .        NEL, NELI, NBRIC, TBRIC(13,*), NBA, NELA, NNA, TBA(2,*),
+     .        NEL, NELI, NBRIC, TBRIC(13,*), NBA, NELA, TBA(2,*),
      .        TFACA(12,*), TAGELS(*), IBUFA(*), ELEMA(3,*), TAGELA(*),
      .        IXS(NIXS,*), NB_NODE, ITYP
-      my_real
-     .        X(3,*), XB(3,*), RVOLU(*), SFAC(6,4,*), DXM
+      my_real X(3,*), XB(3,*), RVOLU(*), SFAC(6,4,*), DXM
       INTEGER ID
       CHARACTER(len=nchartitle) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ILVOUT, NLAYER, NFACMAX, NPPMAX, I, J, IEL, N1, N2, N3,
-     .        NN1, NN2, NN3, GRBRIC, IAD, NPOLY, NNS, ITAGB(NBRIC),
-     .        NVMAX, NG, INFO, ICUT, NVERTS, NF1, NF2, NF3, NF4, NS,
+     .        NN1, NN2, NN3, IAD, NPOLY, NNS, ITAGB(NBRIC),
+     .        NVMAX, INFO, ICUT, NVERTS, NF1, NF2, NF3, NF4, NS,
      .        NSMAX, NV, K, KK, NNP, NPOLMAX, NRPMAX, N, M, MM, NPOLH,
      .        NPOLB, ITY, NN, NPHMAX, NPOLHMAX, JJ, JJJ, II,
      .        NNS_OLD, NNP_OLD, NPA, JMAX, IMAX, JJMAX, NP, NNTR,
      .        NPOLY_OLD, IPSURF, IC1, IC2, NHOL, NELP, NPOLH_OLD,
      .        L, LL, IFV, NNS2, NPOLY2, NPL, POLC, NSPOLY, NCPOLY,
-     .        NPOLHF, NNB, FILEN, LENP, LENH, IP, JMIN, LENIMAX,
-     .        LENRMAX, KKK, NSEG, IMIN, NFAC, N4, NN4, IB, IFOUND,
-     .        ITAGBA(NBA), IBSA(NBA), ITAGN(NB_NODE), NALL, III,
+     .        NPOLHF, LENP, LENH, IP, LENIMAX,
+     .        LENRMAX, KKK, NSEG, IMIN, NFAC, N4, NN4,
+     .        ITAGBA(NBA), IBSA(NBA), ITAGN(NB_NODE), NALL,
      .        NNS_ANIM, NBZ, NBNEDGE, NNS3, NPOLY_NEW, NNSP, NEDGE,
      .        ITYZ, INZ, J0, NNS1, K0, I1, I2, IDEP, NSTR, NCTR, IIZ,
-     .        NNS_OLD_SAVE,ITYZINT,IAD1, IAD2, ITMP1, ITMP2
+     .        NNS_OLD_SAVE,ITYZINT,IAD1, IAD2, ITMP1
       INTEGER, DIMENSION(:), ALLOCATABLE :: IFLAG
       PARAMETER (NVMAX=12)
-      my_real
-     .        X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, X12, Y12, Z12, 
+      my_real X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, X12, Y12, Z12,
      .        X13, Y13, Z13, NRX, NRY, NRZ, AREA2, ELAREA(NEL+NELI),
      .        NORM(3,NEL+NELI), XBMAX, YBMAX, ZBMAX, XBMIN, YBMIN, ZBMIN,
      .        XC, YC, ZC, XX, YY, ZZ, PP(3,3), XL7(3), BCENTER(3),
@@ -108,17 +109,13 @@ C-----------------------------------------------
      .        AREAMAX, VOLPH, AREAP, AREAEL, VPX, VPY, VPZ, 
      .        V1X, V1Y, V1Z, V2X, V2Y, V2Z, NRM1, VX, VY, VZ, SS,
      .        NORMF(3,4), KSI, ETA, VX1, VY1, VZ1, VX2, VY2, VZ2,
-     .        VMIN, VTMP, X4, Y4, Z4, X14, Y14, Z14, NORMA(3,NELA),
+     .        VMIN, X4, Y4, Z4, NORMA(3,NELA),
      .        DD2, XN(3), ZLMIN, ZLMAX, ZL, VNORM, VX3, VY3, VZ3, LZ,
      .        DZ, ALPHA, GAMAI, CPAI, CPBI, CPCI, RMWI, PINI, TI, CPI,
      .        CVI, RHOI, ZL1, ZL2, ZL3, ZLC, VAL, TMASS,
-     .        TI2, CPDI, CPEI, CPFI, R1, RTMP1, RTMP2
-
+     .        TI2, CPDI, CPEI, CPFI, R1
       INTEGER :: COUNT_ELEM_INT, COUNT_ELEM_EXT, COUNT_TRIA_INTERNE
       INTEGER :: COUNT_ELEM_INT_OLD, COUNT_ELEM_EXT_OLD, COUNT_TRIA_INTERNE_OLD
-C
-      CHARACTER CHFVB*7, CHMESH*5, FILNAM*116
-C
       INTEGER, ALLOCATABLE :: FACET(:,:), IPOLY(:,:),
      .                        IELNOD(:,:), POLH(:,:), IPOLY_F(:,:),
      .                        POLH_F(:,:), IFVNOD(:), IFVNOD_OLD(:),
@@ -128,15 +125,14 @@ C
      .                        TRI(:,:), ADR(:), ADR_OLD(:), IMERGED(:),
      .                        IPOLY_F_OLD(:,:), INEDGE(:,:), NREF(:,:),
      .                        IZ(:,:), LEDGE(:), IFVNOD2(:,:)
-      my_real
-     .       , ALLOCATABLE :: NORMT(:,:), POLY(:,:), RPOLY(:,:),
+      my_real, ALLOCATABLE :: NORMT(:,:), POLY(:,:), RPOLY(:,:),
      .                        RPOLY_F(:,:), VOLU(:), PNODES(:,:),
-     .                        PHOLES(:,:), RPOLY_OLD(:), VOLUSORT(:),
+     .                        PHOLES(:,:), RPOLY_OLD(:),
      .                        VOLU_OLD(:), RPOLY_F_OLD(:,:),
-     .                        RFVNOD_OLD(:,:), XNEW(:,:), RNEDGE(:,:),
+     .                        RNEDGE(:,:),
      .                        AREF(:,:), RFVNOD2(:,:), XNS(:,:), 
      .                        XNS2(:,:), AREATR(:)
-C
+
       INTEGER FAC(4,6), FACNOR(4,6), FAC4(3,4), FAC6(4,5)
       INTEGER FAC5(4,5), NFACE(4), NTYPE, IQUAD
       DATA FAC /1,4,3,2,
@@ -167,21 +163,20 @@ C
      .           1,4,3,2/
       DATA NFACE/6,4,5,5/
 C-------------------------
-C liste chainee polygones
+C linked list of polygons
       TYPE POLYGONE
          INTEGER IZ(3), NNSP
          INTEGER, DIMENSION(:), POINTER :: IPOLY, IELNOD
          INTEGER, DIMENSION(:,:), POINTER :: NREF
-         my_real
-     .          , DIMENSION(:), POINTER :: RPOLY
-         my_real
-     .          , DIMENSION(:,:), POINTER ::  AREF
+         my_real, DIMENSION(:), POINTER :: RPOLY
+         my_real, DIMENSION(:,:), POINTER ::  AREF
          TYPE(POLYGONE), POINTER :: PTR
       END TYPE POLYGONE
       TYPE(POLYGONE), POINTER :: FIRST, PTR_PREC, PTR_CUR, PTR_TMP,
      .                           PTR_OLD, FIRST2, PTR_CUR2, PTR_PREC2,
      .                           PTR_TMP2
-C liste chainee polyedres
+      TYPE(POLYGONE), TARGET :: NOTHING
+C linked list of polyhedra
       TYPE POLYHEDRE
          INTEGER RANK
          INTEGER, DIMENSION(:), POINTER :: POLH
@@ -192,26 +187,34 @@ C liste chainee polyedres
       my_real, DIMENSION(:), ALLOCATABLE :: RADIUS
       INTEGER, DIMENSION(:), ALLOCATABLE :: IDX
 C
-C Structure de donnees maillage volumes finis
-C    - NNS   : Nombre de nouveaux noeuds ( = IVOLU(46) )
-C    - NNTR  : Nombre de nouveaux triangles ( = IVOLU(47) )
-C    - NPOLY : Nombre de polygones ( = IVOLU(48) )
-C    - NPOLH : Nombre de polyedres ( volumes finis) ( = IVOLU(49) )
+C Finished volume meshing data structure
+C    - NNS: Number of new nodes (= IVolu (46))
+C    - NNTR: Number of new triangles (= IVolu (47))
+C    - NPOLY : Number of polygons ( = IVOLU(48) )
+C    - NPOLH: Number of polyidres (finished volumes) (= IVolu (49))
 C
-C    - IFVNOD(NNS)   : Triangle airbag de reference pour le nouveau noeud
-C    - RFVNOD(2,NNS) : Coordonnees locales du noeud dans le triangle
+C    - IFVNOD(NNS): Reference airbag triangle for the new node
+C    - RFVNOD(2,NNS): Local coordinates of the node in the triangle
 C
-C    - IFVTRI(6,NNTR) : Connectivite nouveaux triangles (1->3)
-C                       Element de reference si appuye sur surface (4)
-C                       Polyedres connectes si interne (5->6)
+C    - Ifvtri (6, NNTR): Connectivitis new triangles (1-> 3)
+C                       Reference element if supported on surface (4)
+C                       Polyedres Connects if internal (5-> 6)
 C
-C    - IFVPOLY(NNTR)    : Attribution triangles-polygones
-C    - IFVTADR(NPOLY+1) : Adresses dans le tableau precedent
+C    - IFVPOLY(NNTR)    : Triangle-polygon assignment
+C    - IFVTADR(NPOLY+1): Addresses in the previous array
 C
-C    - IFVPOLH(NPOLY)   : Attribution polygones-polyedres
-C    - IFVPADR(NPOLH+1) : Adresses dans le tableau precedent
+C    - IFVPOLH(NPOLY)   : Polygon-polyhedron assignment
+C    - IFVPADR(NPOLH+1): Addresses in the previous array
 C
 C
+      NOTHING%PTR => NOTHING
+      PTR_PREC => NOTHING
+      IQUAD = 0
+      n4 = 0
+      nx = 0
+      ny = 0
+      nz = 0
+      ipsurf = 0
       NULLIFY(FIRST)
       NULLIFY(PHFIRST)
       NULLIFY(PTR_CUR)
@@ -231,7 +234,7 @@ C
          ENDDO
       ENDDO    
 C---------------------------------------------------
-C Normales elementaires
+C Normal elementary
 C---------------------------------------------------
       DO IEL=1,NEL+NELI
          N1=ELEM(1,IEL)
@@ -268,7 +271,7 @@ C
          NORMA(3,IEL)=NRZ/AREA2
       ENDDO   
 C---------------------------------------------------
-C Creation de tous les polygones
+C Creation of all polygons
 C---------------------------------------------------
       NPOLY=0
       NNS=0
@@ -283,8 +286,8 @@ C
       DO I=1,NBRIC
          ITAGB(I)=0
       ENDDO
-C 1. Facettes airbag coupees
-C nullify sinon test sur associated vrai second appel fvmesh1
+C 1. Airbag facets cuts
+C nullify otherwise test on associated is true in second call to fvmesh1
       NULLIFY(FIRST2)
       IF (ILVOUT >=1) WRITE(ISTDO,'(8X,A)') 'BUILDING POLYGONS'
 C
@@ -325,7 +328,7 @@ C
             YC=YC+ONE_OVER_8*YY
             ZC=ZC+ONE_OVER_8*ZZ
          ENDDO
-C Passage repere local brique
+C BRICAL LOCAL PROCESS
          PP(1,1)=SFAC(4,2,I)
          PP(2,1)=SFAC(4,3,I)
          PP(3,1)=SFAC(4,4,I)
@@ -392,7 +395,7 @@ C
             TVERTS(9)=PP(1,3)*(X3-XC)+PP(2,3)*(Y3-YC)+PP(3,3)*(Z3-ZC)
 C
             CALL TRIBOX3(ICUT, BCENTER, BHALFSIZE, TVERTS)
-C Liste elargie pour faces laterales
+C Expanded list for lateral faces
             IF (ICUT == 0) THEN
                TOLE=EM5
 *               TOLE=ZERO
@@ -480,7 +483,7 @@ C
                      PTR_PREC => PTR_CUR
                   ENDIF
                ENDIF
-C Facettes coupees (1 quadrangle=2 triangles)
+C Cutting facets (1 quadrangle = 2 triangles)
                TOLE=EM5
 *               TOLE=ZERO
                XG=THIRD*(X1+X2+X3)
@@ -566,7 +569,7 @@ C
             IF(ILVOUT >=1) WRITE(IOUT,'(A,I10,A,I10)') 
      .                      ' MONITORED VOLUME ID: ',IVOLU(1),
      .                      ' NFACMAX IS RESET TO ',NSMAX
-C Destruction des polygones crees pour rien
+C Destruction of polygons created for nothing
             IF (NPOLY_OLD > 0) THEN
                PTR_CUR => PTR_OLD%PTR
             ELSE
@@ -596,7 +599,7 @@ C 2. Faces laterales
            DEALLOCATE(FACET, TRI, NORMT, POLY)
            CYCLE
          END IF
-C Debut boucle sur les 6 faces de la brique i
+C Start of loop on the 6 faces of brick i
          DO J=1,6
             NV=TBRIC(J,I)
             IF (NV == 0) CYCLE
@@ -617,14 +620,14 @@ C Debut boucle sur les 6 faces de la brique i
                         TRI(K,L)=LL
                      ENDDO
                      IF(TAGELA(IEL) <= NEL) THEN
-C Triangle sur airbag
+C Triangle on airbag
                        TRI(K,5)=1
                      ELSE
-C Triangle sur structure interne
+C Triangle on internal structure
                        TRI(K,5)=3
                      ENDIF
                   ELSEIF (TAGELA(IEL) < 0) THEN
-C Triangle sur brique additionelle
+C Triangle on additional brick
                      DO L=1,3
                         LL=IBUFA(ELEMA(L,IEL))
                         TRI(K,L)=LL
@@ -710,15 +713,15 @@ C
                DEALLOCATE(IPOLY, RPOLY, IELNOD)
             ENDIF
          ENDDO
-C Fin de boucle sur les faces des briques
+C End of loop on the faces of the bricks
          ITAGB(I)=1
 C
          DEALLOCATE(FACET, TRI, NORMT, POLY)
       ENDDO
-C Fin de boucle sur les briques
-C Fin de creation des polygones
+C End of loop on the bricks
+C End of polygon creation
 C-----------------------------------------------------------------------------------
-C Concatenation des deux listes
+C Concatenation of the two lists
       PTR_CUR2 => FIRST2
       PTR_PREC => PTR_CUR
       DO I=1,NPOLY2
@@ -762,7 +765,7 @@ C Concatenation des deux listes
 C
       NNS=NNS+NNS2
 C---------------------------------------------------
-C Decoupage des polygones selon la verticale locale
+C Cutting of polygons according to the local vertical
 C---------------------------------------------------
       NBZ=IVOLU(65)
       IF (NBZ > 1) THEN
@@ -836,7 +839,7 @@ C
             ZBMAX=MAX(ZBMAX,ZL2)
             ZBMAX=MAX(ZBMAX,ZL3)
          ENDDO
-C Clipping des polygones
+C Clipping of polygons
          X0=X0-LZ*VX3
          Y0=Y0-LZ*VY3
          Z0=Z0-LZ*VZ3
@@ -878,7 +881,7 @@ C
      .                     IELNOD(2*NN,NN),
      .                     NREF(2,NN), AREF(4,NN),
      .                     IZ(3,NN))
-                  CALL GPOLCUT(
+                  CALL FVBAG_GPOLCUT(
      .    IPOLY,   RPOLY,   PTR_CUR%IPOLY, PTR_CUR%RPOLY,  INEDGE,
      .    RNEDGE,  NBNEDGE, VX3,           VY3,            VZ3,   
      .    X0,      Y0,      Z0,            NREF,           AREF,    
@@ -1027,7 +1030,7 @@ C
             PTR_CUR => PTR_CUR%PTR
          ENDDO
          DEALLOCATE(REDIR)
-C Creation des nouveaux polygones horizontaux
+C Creation of new horizontal polygons
          PTR_CUR => FIRST
          DO I=1,NPOLY
             PTR_PREC => PTR_CUR
@@ -1113,7 +1116,7 @@ C
          ENDDO
       ENDIF
 C---------------------------------------------------
-C Construction des polyedres
+C Construction of polyhedra
 C---------------------------------------------------
       NPOLH=0
 C     
@@ -1122,7 +1125,7 @@ C
          !IF (ILVOUT >=1) CALL PROGALE_C(I, NBRIC, 2)    !dynamic screen output
 C
          IF (TBRIC(7,I) /= 2) CYCLE
-C Polygones de la brique
+C Brick polygons
          NPOLB=0
          NPPMAX=0
          PTR_CUR => FIRST
@@ -1192,7 +1195,7 @@ C
      .                       TAGELA )
             ENDIF
             IF (INFO == 1) GOTO 300
-C Modifications des polygones
+C Modifications of polygons
             PTR_CUR => FIRST
             NPL=1
             POLC=REDIR(POLB(NPL))
@@ -1245,7 +1248,7 @@ C
          DEALLOCATE(IPOLY, RPOLY, POLB, POLH, REDIR)
       ENDDO  !I=1,NBRIC
 C---------------------------------------------------
-C Passage listes chainees -> tableaux classiques pour la suite des traitements
+C Transition from linked lists to classic arrays for the continuation of processing
 C---------------------------------------------------
   370 CONTINUE     
 C      
@@ -1280,7 +1283,7 @@ C
       NPOLY_OLD=NPOLY
       NPOLH_OLD=NPOLH
 C--------------------------------------------
-C Briques additionelles
+C Additional bricks
 C--------------------------------------------
       IF (NBA > 0) THEN
          NPOLH=NPOLH+NBA
@@ -1310,7 +1313,7 @@ C
             DO J=1,NFAC
                ITY=TFACA(2*(J-1)+1,I)
                IF (ITY == 1 .OR. ITY == -2) THEN
-C Face interne brique/brique
+C Internal brick/brick face
                   NV=TFACA(2*(J-1)+2,I)
                   IF (ITAGBA(NV) == 0) THEN
                      IF (ITY == 1) COUNT_TRIA_INTERNE_OLD = COUNT_TRIA_INTERNE_OLD + 1
@@ -1361,7 +1364,7 @@ C
                   ENDIF
 C
                ELSEIF (ITY == 2) THEN
-C Face brique appuyee sur surface externe (ity == 2)
+C Face brick supported on external surface (iTy == 2)
                   COUNT_ELEM_EXT_OLD = COUNT_ELEM_EXT_OLD + 1
                   IF (NTYPE==2) THEN
                      NPOLY=NPOLY+1
@@ -1394,7 +1397,7 @@ C Face brique appuyee sur surface externe (ity == 2)
                   ENDIF
 C
                ELSEIF (ITY == 3) THEN
-C Face interne brique/polyedres
+C Internal brick/polyedres side
                   PTR_CUR => FIRST
                   DO K=1,NPOLY_OLD
                      IF (PTR_CUR%IPOLY(1) == 1) THEN
@@ -1407,7 +1410,7 @@ C Face interne brique/polyedres
             ENDDO    !J=1,NFAC
             ITAGBA(I)=1
             NPHMAX=MAX(NPHMAX,NNP)
-C Calcul de IBSA =1 si tous les noeuds de la brique sont sur l'airbag =0 autrement
+C Calculation of IBSA =1 if all the nodes of the brick are on the airbag =0 otherwise
             II=TBA(1,I)
             NALL=1
             IF (NTYPE==2) THEN
@@ -1554,7 +1557,7 @@ C
          IFVNOD2(1,I)=N1
          IFVNOD2(2,I)=N2
          IF (IDEP == 1) THEN
-C Recalcul des coordonnees barycentriques du point dependant
+C Recalculation of the barycentric coordinates of the dependent point
             II=1
             VAL=ABS(XNS(1,N1)-XNS(1,N2))
             DO J=2,3
@@ -1600,7 +1603,7 @@ C
             DO J=1,NFAC
                ITY=TFACA(2*(J-1)+1,I)
                IF (ITY == 1) THEN
-C Face interne brique/brique
+C Internal brick/brick face
                   NV=TFACA(2*(J-1)+2,I)
                   IF (ITAGBA(NV) == 0) THEN
                      COUNT_TRIA_INTERNE = COUNT_TRIA_INTERNE + 1
@@ -1786,7 +1789,7 @@ C
                      ENDDO
                   ENDIF
                ELSEIF (ITY == 2) THEN        
-C Face brique appuyee sur surface externe (traitee plus loin)
+C Face brick supported on external surface (treated further)
                   COUNT_ELEM_EXT = COUNT_ELEM_EXT + 1
                ELSEIF (ITY == -2) THEN
 C     Brick face lying on an internal surface element. 
@@ -1881,7 +1884,7 @@ C     Need to compute the normal in order to ensure proper orientation
                      IFLAG(NN4) = 0
                   ENDIF
                ELSEIF (ITY == 3) THEN
-C Face interne brique/polyedres
+C Internal brick/polyedres side
                   DO K=1,NPOLY_OLD
                      IF (IPOLY_F(1,K) == 1) THEN
                         IEL=IPOLY_F(3,K)
@@ -2024,7 +2027,7 @@ C     Internal surface elements have two neighbours
          ENDDO
       ENDIF 
 C---------------------------------------------------
-C Surface des polygones
+C Surface of the polygons
 C---------------------------------------------------
       DO I=1,NPOLY
          ITY=IPOLY_F(1,I)
@@ -2089,7 +2092,7 @@ C---------------------------------------------------
                AREA=AREA+(NNX*NX+NNY*NY+NNZ*NZ)
             ENDDO
             AREA=ABS(AREA)
-C On retranche la surface des trous
+C Subtracting the surface of the holes
             DO J=1,NHOL
                X1=RPOLY_F(4+3*ADR(J)+1,I)
                Y1=RPOLY_F(4+3*ADR(J)+2,I)
@@ -2122,7 +2125,7 @@ C On retranche la surface des trous
          RPOLY_F(1,I)=HALF*ABS(AREA)
       ENDDO
 C---------------------------------------------------
-C Volume des polyedres
+C Volume of the polyhedra
 C---------------------------------------------------
       DO I=1,NPOLH
          VOLU(I)=ZERO
@@ -2185,7 +2188,7 @@ C---------------------------------------------------
          ENDDO
       ENDIF 
 C---------------------------------------------------
-C Elimination des segments de longueur nulle dans les polygones
+C Elimination of zero-length segments in the polygons
 C---------------------------------------------------
       NNS_OLD=NNS
       NNS_OLD_SAVE=NNS_OLD
@@ -2420,7 +2423,7 @@ C
          IPOLY_F(2,I)=NNP
 C
          IF (NNP < NNP_OLD) THEN
-C Nouvelle aire du polygone
+C New area of the polygon
             AREA=ZERO
             NX=RPOLY_F(2,I)
             NY=RPOLY_F(3,I)
@@ -2516,7 +2519,7 @@ C
 C
       DEALLOCATE(IFVNOD_OLD, REDIR)
 C---------------------------------------------------
-C Fusion des polyedres a volume infinitesimal a leur voisin
+C Merger of polyidres with infinite volume to their neighbor
 C---------------------------------------------------
       NPHMAX=2*NPHMAX
       INFO=0
@@ -2570,7 +2573,7 @@ C         IF (VOLU(I) < ZERO) THEN
          ENDIF
       ENDDO
 C
-C Volume moyen
+C Average volume
       VM=ZERO
       NPA=0
       DO I=1,NPOLH
@@ -2619,8 +2622,8 @@ C
                JJMAX=POLH_NEW(2+JMAX,I)
                ITY=IPOLY_F(1,JJMAX)
                IF (ITY == 2) RPOLY_F(1,JJMAX)=-ONE
-C On merge certain polyedres de volume < volumin avec le polyedre 1
-C on ne devrait plus passer la
+C Merging certain polyhedra with volume < volumin with polyhedron 1
+C We shouldn't go through the
                IMAX=1
             ENDIF
             IF (IMERGED(IMAX) == 1) IMAX=POLH_NEW(2,IMAX)
@@ -2707,7 +2710,7 @@ C---------------------------------------------------
          AREAEL=AREAEL+ELAREA(IEL)
       ENDDO
 C---------------------------------------------------
-C Coordonnees elementaires des nouveaux noeuds
+C Elementary contact details of new nodes
 C---------------------------------------------------
       IFV=IVOLU(45)
       ALLOCATE(FVDATA(IFV)%IFVNOD(3,NNS+NNS2),
@@ -2736,12 +2739,12 @@ C
                END IF
 
                IF (IFVNOD(NNS) < 0) THEN
-C point de solide additionnel
+C additional solid point
                   FVDATA(IFV)%IFVNOD(1,NNS)=2
                   FVDATA(IFV)%IFVNOD(2,NNS)=-IFVNOD(NNS)
                   CYCLE
                ENDIF
-C point appuye sur airbag
+C point pressed on airbag
                FVDATA(IFV)%IFVNOD(1,NNS)=1
                IEL=IFVNOD(NNS)
                FVDATA(IFV)%IFVNOD(2,NNS)=IEL
@@ -2787,7 +2790,7 @@ C
                FVDATA(IFV)%RFVNOD(1,NNS)=KSI
                FVDATA(IFV)%RFVNOD(2,NNS)=ETA
             ELSE
-C point interne
+C internal point
                JJ=-IPOLY_F(6+J,I)
                FVDATA(IFV)%IFVNOD(1,NNS_OLD+JJ)=3
                FVDATA(IFV)%IFVNOD(2,NNS_OLD+JJ)=IFVNOD2(1,JJ)
@@ -2814,7 +2817,7 @@ C
      .               C1=TITR)
       END IF
 C---------------------------------------------------
-C Triangulation des polygones
+C Triangulation of polygons
 C---------------------------------------------------
       NNTR=0
       DO I=1,NPOLY
@@ -2875,7 +2878,7 @@ C
             IC2=IPOLY_F(6,I)
          ENDIF 
 C
-C Coordonnees des sommets dans le plan du polygone
+C Coordinates of the vertices in the plane of the polygon
          NX=RPOLY_F(2,I)
          NY=RPOLY_F(3,I)
          NZ=RPOLY_F(4,I)
@@ -2984,7 +2987,7 @@ C         CALL BIDON1(IFV)
             N1=PTRI(1,J)
             N2=PTRI(2,J)
             N3=PTRI(3,J)
-C Verification de la normale
+C Normal verification
             X1=RPOLY_F(4+3*(N1-1)+1,I)
             Y1=RPOLY_F(4+3*(N1-1)+2,I)
             Z1=RPOLY_F(4+3*(N1-1)+3,I)
@@ -3024,7 +3027,7 @@ C
       ENDDO
       FVDATA(IFV)%IFVTADR(NPOLY+1)=NNTR+1
 C---------------------------------------------------
-C Structure des polyedres
+C Structure of polyhedra
 C---------------------------------------------------
       ALLOCATE(FVDATA(IFV)%IFVPOLH(2*NPOLY),
      .         FVDATA(IFV)%IFVPADR(NPOLH+1),
@@ -3092,7 +3095,7 @@ C
       ALLOCATE(FVDATA(IFV)%CPDPOLH(NPOLH), FVDATA(IFV)%CPEPOLH(NPOLH),
      .         FVDATA(IFV)%CPFPOLH(NPOLH))
 C---------------------------------------------------
-C Initialisation des quantites dans les polyedres
+C Initialization of quantities in the polyhedra
 C---------------------------------------------------
       GAMAI=RVOLU(1)
       CPAI=RVOLU(7)
@@ -3165,7 +3168,7 @@ C
       WRITE(IOUT,1020) VOLPH,AREAP,TMASS
 C
 C---------------------------------------------------
-C Anim des volumes finis
+C Animation of finite volumes
 C---------------------------------------------------
       IVOLU(43)=0
       FVDATA(IFV)%NPOLH_ANIM=NPOLH
@@ -3192,7 +3195,7 @@ C---------------------------------------------------
          FVDATA(IFV)%IFVPADR_ANIM(I)=FVDATA(IFV)%IFVPADR(I)
       ENDDO
 C-----------------------------------------
-C Elimination des noeuds doubles pour anim
+C Elimination of double nodes for animation
 C-----------------------------------------
       TOLE=EM05*FAC_LENGTH
       TOLE2=TOLE**2
@@ -3304,7 +3307,7 @@ C
        DEALLOCATE(AREATR)
       ENDIF
 C-------------------------------------------
-C Merge des points coincidents
+C Merging of coincident points
 C-------------------------------------------
       IF (ILVOUT >=1) WRITE(ISTDO,'(8X,A)') 
      .   'MERGING COINCIDENT NODES FOR ANIM'
@@ -3405,11 +3408,11 @@ C
      .       /5X,'SUM MASS OF FINITE VOLUMES. . . . . . .=',1PG20.13)
 C
       END
-      !||====================================================================
-      !||    coorloc   ../starter/source/airbag/fvmesh.F
-      !||--- called by ------------------------------------------------------
-      !||    fvmesh1   ../starter/source/airbag/fvmesh.F
-      !||====================================================================
+!||====================================================================
+!||    coorloc   ../starter/source/airbag/fvmesh.F
+!||--- called by ------------------------------------------------------
+!||    fvmesh1   ../starter/source/airbag/fvmesh.F
+!||====================================================================
       SUBROUTINE COORLOC(VPX, VPY, VPZ, V1X, V1Y,
      .                   V1Z, V2X, V2Y, V2Z, KSI,
      .                   ETA)
@@ -3443,14 +3446,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    fvdim               ../starter/source/airbag/fvmesh.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur              ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod           ../starter/share/modules1/fvbag_mod.F
-      !||    monvol_struct_mod   ../starter/share/modules1/monvol_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvdim               ../starter/source/airbag/fvmesh.F
+!||--- called by ------------------------------------------------------
+!||    lectur              ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod           ../starter/share/modules1/fvbag_mod.F
+!||    monvol_struct_mod   ../starter/share/modules1/monvol_struct_mod.F
+!||====================================================================
       SUBROUTINE FVDIM(T_MONVOL)
 C-----------------------------------------------
 C   M o d u l e s 
@@ -3489,11 +3492,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    fvdeal      ../starter/source/airbag/fvmesh.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod   ../starter/share/modules1/fvbag_mod.F
-      !||====================================================================
+!||====================================================================
+!||    fvdeal      ../starter/source/airbag/fvmesh.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod   ../starter/share/modules1/fvbag_mod.F
+!||====================================================================
       SUBROUTINE FVDEAL()            
 C-----------------------------------------------
 C   M o d u l e s 
@@ -3506,8 +3509,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-C
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -3515,98 +3516,56 @@ C-----------------------------------------------
 C
       IF (ALLOCATED(FVDATA)) THEN
          DO I=1,NFVBAG
-            IF (ASSOCIATED(FVDATA(I)%IFVNOD)) 
-     .              DEALLOCATE(FVDATA(I)%IFVNOD)
-            IF (ASSOCIATED(FVDATA(I)%RFVNOD)) 
-     .              DEALLOCATE(FVDATA(I)%RFVNOD)
-            IF (ASSOCIATED(FVDATA(I)%IFVTRI)) 
-     .              DEALLOCATE(FVDATA(I)%IFVTRI)
-            IF (ASSOCIATED(FVDATA(I)%IFVPOLY)) 
-     .              DEALLOCATE(FVDATA(I)%IFVPOLY)
-            IF (ASSOCIATED(FVDATA(I)%IFVTADR)) 
-     .              DEALLOCATE(FVDATA(I)%IFVTADR)
-            IF (ASSOCIATED(FVDATA(I)%IFVPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%IFVPOLH)
-            IF (ASSOCIATED(FVDATA(I)%IFVPADR)) 
-     .              DEALLOCATE(FVDATA(I)%IFVPADR)
-            IF (ASSOCIATED(FVDATA(I)%IDPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%IDPOLH)
-            IF (ASSOCIATED(FVDATA(I)%IBPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%IBPOLH)
-            IF (ASSOCIATED(FVDATA(I)%IFVPOLY_ANIM)) 
-     .              DEALLOCATE(FVDATA(I)%IFVPOLY_ANIM)
-            IF (ASSOCIATED(FVDATA(I)%IFVTADR_ANIM)) 
-     .              DEALLOCATE(FVDATA(I)%IFVTADR_ANIM)
-            IF (ASSOCIATED(FVDATA(I)%IFVPOLH_ANIM)) 
-     .              DEALLOCATE(FVDATA(I)%IFVPOLH_ANIM)
-            IF (ASSOCIATED(FVDATA(I)%IFVPADR_ANIM)) 
-     .              DEALLOCATE(FVDATA(I)%IFVPADR_ANIM)
-            IF (ASSOCIATED(FVDATA(I)%REDIR_ANIM)) 
-     .              DEALLOCATE(FVDATA(I)%REDIR_ANIM)
-            IF (ASSOCIATED(FVDATA(I)%NOD_ANIM)) 
-     .              DEALLOCATE(FVDATA(I)%NOD_ANIM)
-            IF (ASSOCIATED(FVDATA(I)%MPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%MPOLH)
-            IF (ASSOCIATED(FVDATA(I)%QPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%QPOLH)
-            IF (ASSOCIATED(FVDATA(I)%EPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%EPOLH)
-            IF (ASSOCIATED(FVDATA(I)%PPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%PPOLH)
-            IF (ASSOCIATED(FVDATA(I)%RPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%RPOLH)
-            IF (ASSOCIATED(FVDATA(I)%GPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%GPOLH)
-            IF (ASSOCIATED(FVDATA(I)%CPAPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%CPAPOLH)
-            IF (ASSOCIATED(FVDATA(I)%CPBPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%CPBPOLH)
-            IF (ASSOCIATED(FVDATA(I)%CPCPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%CPCPOLH)
-            IF (ASSOCIATED(FVDATA(I)%RMWPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%RMWPOLH)
-            IF (ASSOCIATED(FVDATA(I)%VPOLH_INI)) 
-     .              DEALLOCATE(FVDATA(I)%VPOLH_INI)
-            IF (ASSOCIATED(FVDATA(I)%DTPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%DTPOLH)
+            IF (ASSOCIATED(FVDATA(I)%IFVNOD)) DEALLOCATE(FVDATA(I)%IFVNOD)
+            IF (ASSOCIATED(FVDATA(I)%RFVNOD)) DEALLOCATE(FVDATA(I)%RFVNOD)
+            IF (ASSOCIATED(FVDATA(I)%IFVTRI)) DEALLOCATE(FVDATA(I)%IFVTRI)
+            IF (ASSOCIATED(FVDATA(I)%IFVPOLY)) DEALLOCATE(FVDATA(I)%IFVPOLY)
+            IF (ASSOCIATED(FVDATA(I)%IFVTADR)) DEALLOCATE(FVDATA(I)%IFVTADR)
+            IF (ASSOCIATED(FVDATA(I)%IFVPOLH)) DEALLOCATE(FVDATA(I)%IFVPOLH)
+            IF (ASSOCIATED(FVDATA(I)%IFVPADR)) DEALLOCATE(FVDATA(I)%IFVPADR)
+            IF (ASSOCIATED(FVDATA(I)%IDPOLH)) DEALLOCATE(FVDATA(I)%IDPOLH)
+            IF (ASSOCIATED(FVDATA(I)%IBPOLH)) DEALLOCATE(FVDATA(I)%IBPOLH)
+            IF (ASSOCIATED(FVDATA(I)%IFVPOLY_ANIM)) DEALLOCATE(FVDATA(I)%IFVPOLY_ANIM)
+            IF (ASSOCIATED(FVDATA(I)%IFVTADR_ANIM)) DEALLOCATE(FVDATA(I)%IFVTADR_ANIM)
+            IF (ASSOCIATED(FVDATA(I)%IFVPOLH_ANIM)) DEALLOCATE(FVDATA(I)%IFVPOLH_ANIM)
+            IF (ASSOCIATED(FVDATA(I)%IFVPADR_ANIM)) DEALLOCATE(FVDATA(I)%IFVPADR_ANIM)
+            IF (ASSOCIATED(FVDATA(I)%REDIR_ANIM)) DEALLOCATE(FVDATA(I)%REDIR_ANIM)
+            IF (ASSOCIATED(FVDATA(I)%NOD_ANIM)) DEALLOCATE(FVDATA(I)%NOD_ANIM)
+            IF (ASSOCIATED(FVDATA(I)%MPOLH)) DEALLOCATE(FVDATA(I)%MPOLH)
+            IF (ASSOCIATED(FVDATA(I)%QPOLH)) DEALLOCATE(FVDATA(I)%QPOLH)
+            IF (ASSOCIATED(FVDATA(I)%EPOLH)) DEALLOCATE(FVDATA(I)%EPOLH)
+            IF (ASSOCIATED(FVDATA(I)%PPOLH)) DEALLOCATE(FVDATA(I)%PPOLH)
+            IF (ASSOCIATED(FVDATA(I)%RPOLH)) DEALLOCATE(FVDATA(I)%RPOLH)
+            IF (ASSOCIATED(FVDATA(I)%GPOLH)) DEALLOCATE(FVDATA(I)%GPOLH)
+            IF (ASSOCIATED(FVDATA(I)%CPAPOLH)) DEALLOCATE(FVDATA(I)%CPAPOLH)
+            IF (ASSOCIATED(FVDATA(I)%CPBPOLH)) DEALLOCATE(FVDATA(I)%CPBPOLH)
+            IF (ASSOCIATED(FVDATA(I)%CPCPOLH)) DEALLOCATE(FVDATA(I)%CPCPOLH)
+            IF (ASSOCIATED(FVDATA(I)%RMWPOLH)) DEALLOCATE(FVDATA(I)%RMWPOLH)
+            IF (ASSOCIATED(FVDATA(I)%VPOLH_INI)) DEALLOCATE(FVDATA(I)%VPOLH_INI)
+            IF (ASSOCIATED(FVDATA(I)%DTPOLH)) DEALLOCATE(FVDATA(I)%DTPOLH)
 C
-            IF (ASSOCIATED(FVDATA(I)%BRIC)) 
-     .              DEALLOCATE(FVDATA(I)%BRIC)
-            IF (ASSOCIATED(FVDATA(I)%TBRIC)) 
-     .              DEALLOCATE(FVDATA(I)%TBRIC)
-            IF (ASSOCIATED(FVDATA(I)%XB)) 
-     .              DEALLOCATE(FVDATA(I)%XB)
-            IF (ASSOCIATED(FVDATA(I)%SFAC)) 
-     .              DEALLOCATE(FVDATA(I)%SFAC)
+            IF (ASSOCIATED(FVDATA(I)%BRIC)) DEALLOCATE(FVDATA(I)%BRIC)
+            IF (ASSOCIATED(FVDATA(I)%TBRIC))  DEALLOCATE(FVDATA(I)%TBRIC)
+            IF (ASSOCIATED(FVDATA(I)%XB))  DEALLOCATE(FVDATA(I)%XB)
+            IF (ASSOCIATED(FVDATA(I)%SFAC)) DEALLOCATE(FVDATA(I)%SFAC)
 C
-            IF (ASSOCIATED(FVDATA(I)%TPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%TPOLH)
-            IF (ASSOCIATED(FVDATA(I)%CPDPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%CPDPOLH)
-            IF (ASSOCIATED(FVDATA(I)%CPEPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%CPEPOLH)
-            IF (ASSOCIATED(FVDATA(I)%CPFPOLH)) 
-     .              DEALLOCATE(FVDATA(I)%CPFPOLH)
+            IF (ASSOCIATED(FVDATA(I)%TPOLH)) DEALLOCATE(FVDATA(I)%TPOLH)
+            IF (ASSOCIATED(FVDATA(I)%CPDPOLH)) DEALLOCATE(FVDATA(I)%CPDPOLH)
+            IF (ASSOCIATED(FVDATA(I)%CPEPOLH)) DEALLOCATE(FVDATA(I)%CPEPOLH)
+            IF (ASSOCIATED(FVDATA(I)%CPFPOLH)) DEALLOCATE(FVDATA(I)%CPFPOLH)
          ENDDO
          DEALLOCATE(FVDATA)
       ENDIF
 C
-      IF (IMACH == 3) THEN
-         IF (ALLOCATED(FVSPMD)) THEN
-            DO I=1,NFVBAG
-               IF (ASSOCIATED(FVSPMD(I)%IBUF_L)) 
-     .            DEALLOCATE(FVSPMD(I)%IBUF_L)
-               IF (ASSOCIATED(FVSPMD(I)%IBUFA_L)) 
-     .            DEALLOCATE(FVSPMD(I)%IBUFA_L)
-               IF (ASSOCIATED(FVSPMD(I)%IBUFSA_L)) 
-     .            DEALLOCATE(FVSPMD(I)%IBUFSA_L)
-               IF (ASSOCIATED(FVSPMD(I)%IXSA)) 
-     .            DEALLOCATE(FVSPMD(I)%IXSA)
-               IF (ASSOCIATED(FVSPMD(I)%ELEMSA)) 
-     .            DEALLOCATE(FVSPMD(I)%ELEMSA)
-            ENDDO
-            DEALLOCATE(FVSPMD)
-         ENDIF
+      IF (ALLOCATED(FVSPMD)) THEN
+         DO I=1,NFVBAG
+            IF (ASSOCIATED(FVSPMD(I)%IBUF_L)) DEALLOCATE(FVSPMD(I)%IBUF_L)
+            IF (ASSOCIATED(FVSPMD(I)%IBUFA_L)) DEALLOCATE(FVSPMD(I)%IBUFA_L)
+            IF (ASSOCIATED(FVSPMD(I)%IBUFSA_L)) DEALLOCATE(FVSPMD(I)%IBUFSA_L)
+            IF (ASSOCIATED(FVSPMD(I)%IXSA)) DEALLOCATE(FVSPMD(I)%IXSA)
+            IF (ASSOCIATED(FVSPMD(I)%ELEMSA)) DEALLOCATE(FVSPMD(I)%ELEMSA)
+         ENDDO
+         DEALLOCATE(FVSPMD)
       ENDIF
 C
       RETURN

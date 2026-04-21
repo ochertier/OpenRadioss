@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i8loc3     ../engine/source/interfaces/inter3d/i8loc3.F
-      !||--- called by ------------------------------------------------------
-      !||    intvo8     ../engine/source/interfaces/inter3d/intvo8.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i8loc3     ../engine/source/interfaces/inter3d/i8loc3.F
+!||--- called by ------------------------------------------------------
+!||    intvo8     ../engine/source/interfaces/inter3d/intvo8.F
+!||--- uses       -----------------------------------------------------
+!||    int8_mod   ../common_source/modules/interfaces/int8_mod.F90
+!||====================================================================
       SUBROUTINE I8LOC3(
      1   X,       IRECT,   LMSR,    MSR,
      2   NSV,     ILOC,    NSEG,    XI,
@@ -38,7 +39,7 @@ C   I n f o r m a t i o n s
 C-----------------------------------------------
 C   This routine computes the local  
 C   ILOCS (i.e. main nodes on the SPMD domain 
-C   of each secnd).
+C   of each second).
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -62,7 +63,6 @@ C     REAL
      .   X(3,*),DISTANCE(*),
      .   XI(*), YI(*), ZI(*), XFACE(*)
       my_real  , INTENT(INOUT) :: DISTLIN(NSN)
-      TYPE(INT8_STRUCT_) :: T8
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------

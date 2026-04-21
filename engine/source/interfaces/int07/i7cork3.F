@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7cork3        ../engine/source/interfaces/int07/i7cork3.F
-      !||--- called by ------------------------------------------------------
-      !||    i10fku3        ../engine/source/interfaces/int10/i10ke3.F
-      !||    i10ke3         ../engine/source/interfaces/int10/i10ke3.F
-      !||    i7fku3         ../engine/source/interfaces/int07/i7ke3.F
-      !||    i7ke3          ../engine/source/interfaces/int07/i7ke3.F
-      !||    imp_i10mainf   ../engine/source/interfaces/int10/i10ke3.F
-      !||    imp_i7mainf    ../engine/source/interfaces/int07/i7ke3.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box        ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i7cork3        ../engine/source/interfaces/int07/i7cork3.F
+!||--- called by ------------------------------------------------------
+!||    i10fku3        ../engine/source/interfaces/int10/i10ke3.F
+!||    i10ke3         ../engine/source/interfaces/int10/i10ke3.F
+!||    i7fku3         ../engine/source/interfaces/int07/i7ke3.F
+!||    i7ke3          ../engine/source/interfaces/int07/i7ke3.F
+!||    imp_i10mainf   ../engine/source/interfaces/int10/i10ke3.F
+!||    imp_i7mainf    ../engine/source/interfaces/int07/i7ke3.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box        ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I7CORK3(JLT   ,X     ,IRECT ,NSV   ,CAND_E  ,
      1                CAND_N  ,STF   ,STFN  ,X1    ,X2     ,
      2                X3      ,X4    ,Y1    ,Y2    ,Y3     ,
@@ -57,19 +57,16 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*),
-     .    JLT,IDT, NOINT,IGAP , IGSTI,NIN,ITY,NSN
+     .    JLT,IGAP , IGSTI,NIN,ITY,NSN
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ)
-C     REAL
       my_real
      .   GAP, X(3,*), STF(*), STFN(*),GAP_S(*),GAP_M(*),
      .   MS(*), V(3,*)
-C     REAL
       my_real
      .   X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ),
      .   Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
@@ -81,89 +78,9 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,IL, L, NN, IG,JFT,NI,IX
+      INTEGER I   , L, NN, IG,NI,IX
 C-----------------------------------------------
 C
-      IF(IMACH/=3) THEN
-       IF(IGAP==0)THEN
-        DO I=1,JLT
-          GAPV(I)=GAP
-        ENDDO
-      ELSE
-          DO I=1,JLT
-            GAPV(I)=GAP_S(CAND_N(I))+GAP_M(CAND_E(I))
-            GAPV(I)=MIN(GAPV(I),GAPMAX)
-            GAPV(I)=MAX(GAPMIN,GAPV(I))
-          END DO
-      ENDIF
-C
-      DO I=1,JLT
-        IG = NSV(CAND_N(I))
-        NSVG(I) = IG
-        XI(I) = X(1,IG)
-        YI(I) = X(2,IG)
-        ZI(I) = X(3,IG)
-        VXI(I) = V(1,IG)
-        VYI(I) = V(2,IG)
-        VZI(I) = V(3,IG)
-        MSI(I)= MS(IG)
-C
-        L  = CAND_E(I)
-C
-        IX1(I)=IRECT(1,L)
-        X1(I)=X(1,IX1(I))
-        Y1(I)=X(2,IX1(I))
-        Z1(I)=X(3,IX1(I))
-C
-        IX2(I)=IRECT(2,L)
-        X2(I)=X(1,IX2(I))
-        Y2(I)=X(2,IX2(I))
-        Z2(I)=X(3,IX2(I))
-C
-        IX3(I)=IRECT(3,L)
-        X3(I)=X(1,IX3(I))
-        Y3(I)=X(2,IX3(I))
-        Z3(I)=X(3,IX3(I))
-C
-        IX4(I)=IRECT(4,L)
-        X4(I)=X(1,IX4(I))
-        Y4(I)=X(2,IX4(I))
-        Z4(I)=X(3,IX4(I))
-C
-      ENDDO
-       IF(IGSTI<=1)THEN
-        DO I=1,JLT
-         L  = CAND_E(I)
-         STIF(I)=STF(L)*ABS(STFN(CAND_N(I)))
-        ENDDO
-       ELSEIF(IGSTI==2)THEN
-        DO I=1,JLT
-         L  = CAND_E(I)
-         STIF(I)=HALF*(STF(L)+ABS(STFN(CAND_N(I))))
-         STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
-        ENDDO
-       ELSEIF(IGSTI==3)THEN
-        DO I=1,JLT
-         L  = CAND_E(I)
-         STIF(I)=MAX(STF(L),ABS(STFN(CAND_N(I))))
-         STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
-        ENDDO
-       ELSEIF(IGSTI==4)THEN
-        DO I=1,JLT
-         L  = CAND_E(I)
-         STIF(I)=MIN(STF(L),ABS(STFN(CAND_N(I))))
-         STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
-        ENDDO
-       ELSEIF(IGSTI==5)THEN
-        DO I=1,JLT
-         L  = CAND_E(I)
-         J  = CAND_N(I)
-         STIF(I)=STF(L)*ABS(STFN(J))/
-     .           MAX(EM30,(STF(L)+ABS(STFN(J))))
-         STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
-        ENDDO
-       ENDIF
-      ELSE
         IF(IGAP==0)THEN
           DO I=1,JLT
             GAPV(I)=GAP
@@ -357,18 +274,17 @@ C
 C
         END DO
        END IF
-      ENDIF
 C
       RETURN
       END
-      !||====================================================================
-      !||    i7corp3    ../engine/source/interfaces/int07/i7cork3.F
-      !||--- called by ------------------------------------------------------
-      !||    i7forcf3   ../engine/source/interfaces/int07/i7ke3.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm   ../engine/share/modules/imp_intm.F
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i7corp3    ../engine/source/interfaces/int07/i7cork3.F
+!||--- called by ------------------------------------------------------
+!||    i7forcf3   ../engine/source/interfaces/int07/i7ke3.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm   ../engine/share/modules/imp_intm.F
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I7CORP3(JLT   ,X     ,IRECT ,CAND_E  ,CAND_N  ,
      1                   STIF  ,H1    ,H2    ,H3      ,H4      ,
      2                   N1    ,N2    ,N3    ,IX1     ,IX2     ,
@@ -405,7 +321,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,NI, L, NN, NS ,NE
+      INTEGER I   ,NI, L, NN, NS ,NE
 C-----------------------------------------------
 C
 C
@@ -445,14 +361,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i7corkp3   ../engine/source/interfaces/int07/i7cork3.F
-      !||--- called by ------------------------------------------------------
-      !||    i10fku3    ../engine/source/interfaces/int10/i10ke3.F
-      !||    i7fku3     ../engine/source/interfaces/int07/i7ke3.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm   ../engine/share/modules/imp_intm.F
-      !||====================================================================
+!||====================================================================
+!||    i7corkp3   ../engine/source/interfaces/int07/i7cork3.F
+!||--- called by ------------------------------------------------------
+!||    i10fku3    ../engine/source/interfaces/int10/i10ke3.F
+!||    i7fku3     ../engine/source/interfaces/int07/i7ke3.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm   ../engine/share/modules/imp_intm.F
+!||====================================================================
       SUBROUTINE I7CORKP3(
      1                    JLT   ,XI      ,YI     ,ZI     ,D      ,   
      2                    DXI   ,DYI     ,DZI    ,NSVG   ,NIN    ,
@@ -482,7 +398,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,NI, L, NN, NS ,NE
+      INTEGER I   ,NI, NN, NS 
 C-----------------------------------------------
 C
 C

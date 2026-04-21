@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps66c          ../engine/source/materials/mat/mat066/sigeps66c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc             ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter             ../engine/source/tools/curve/finter.F
-      !||    finter2            ../engine/source/tools/curve/vinter.F
-      !||    vinter             ../engine/source/tools/curve/vinter.F
-      !||--- uses       -----------------------------------------------------
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sigeps66c          ../engine/source/materials/mat/mat066/sigeps66c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc             ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    finter             ../engine/source/tools/curve/finter.F
+!||    finter2            ../engine/source/tools/curve/vinter.F
+!||    vinter             ../engine/source/tools/curve/vinter.F
+!||--- uses       -----------------------------------------------------
+!||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||====================================================================
       SUBROUTINE SIGEPS66C(
      1     NEL    ,NUPARAM  ,NUVAR   ,MFUNC   ,KFUNC  ,
      2     NPF    ,NPT0     ,IPT     ,IFLAG   ,
      2     TF     ,TIME     ,TIMESTEP,UPARAM  ,RHO0   ,
-     3     AREA   ,EINT     ,THKLY   ,
+     3     AREA   ,EINT     ,THKLY   ,ISRATE  ,ASRATE ,
      4     EPSPXX ,EPSPYY   ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
      5     DEPSXX ,DEPSYY   ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
      6     EPSXX  ,EPSYY    ,EPSXY   ,EPSYZ   ,EPSZX  ,
@@ -44,7 +44,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9     SIGVXX ,SIGVYY   ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
      A     SOUNDSP,VISCMAX  ,THK     ,PLA     ,UVAR   ,
      B     OFF    ,NGL      ,IPM     ,MAT     ,ETSE   ,
-     C     GS     ,YLD      ,EPSP    ,ISRATE  ,INLOC  ,
+     C     GS     ,YLD      ,EPSD_PG ,EPSP    ,INLOC  ,
      D     DPLANL ,MAT_PARAM,NUVARV  ,UVARV   ,LOFF   )
 C-----------------------------------------------
 C   M o d u l e s
@@ -113,6 +113,9 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN) :: NUVARV
       INTEGER NEL, NUPARAM, NUVAR, NPT0, IPT,IFLAG(*),
      .   NGL(NEL),MAT(NEL),ISRATE,IPM(NPROPMI,*),INLOC
+      my_real ,INTENT(IN) :: ASRATE
+      my_real ,DIMENSION(NEL) ,INTENT(IN)    :: EPSD_PG !< global element strain rate in Gauss pt
+      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: EPSP    !< local strain rate used in equations
       my_real
      .   TIME,TIMESTEP(NEL),UPARAM(*),
      .   AREA(NEL),RHO0(NEL),EINT(NEL,2),
@@ -125,7 +128,7 @@ C-----------------------------------------------
      .   EPSXY(NEL) ,EPSYZ(NEL) ,EPSZX(NEL) ,
      .   SIGOXX(NEL),SIGOYY(NEL),
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
-     .   GS(*),EPSP(NEL),DPLANL(NEL)
+     .   GS(*),DPLANL(NEL)
       TYPE(MATPARAM_STRUCT_) ,INTENT(IN) :: MAT_PARAM
       my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
@@ -161,27 +164,27 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N,NINDX,NMAX,IRATE,NCC,NCT,NFUNC,
-     .        J1,J2,NPRONY,IADBUF,
+     .        J1,J2,IADBUF,
      .        IAD1(NEL),IPOS1(NEL),ILEN1(NEL),
      .        IAD2(NEL),IPOS2(NEL),ILEN2(NEL),
      .        INDEX(NEL),JJC(NEL),JJT(NEL),IFUNC(MFUNC)
       my_real EC, E1T,A11T,A21T,G1T,
-     .        YFACC,YFACT,CP,EDP,FISOKIN,
-     .        NU,PC,PT,RPCT, EPSPO,NNU11,EPSP0,G31,DSXX,DSYY,DSXY,
-     .        DEXX,DEYY,DEXY,SIGPXX,SIGPYY,SIGPXY,KV,VP,SIGY,
+     .        CP,FISOKIN,
+     .        NU,PC,PT,RPCT,NNU11,EPSP0,DSXX,DSYY,DSXY,
+     .        DEXX,DEYY,DEXY,SIGPXX,SIGPYY,SIGPXY,VP,SIGY,
      .        FAC,EPD,NU31,R,UMR,DEZZ,S2,S3,NU11,S1,NU21,
      .        NU110,NU210,P2,Q2,F,DF,A,YLD_I,YRATE,HKIN,ALPHA,
      .        DTINV
       my_real 
-     .        RATE0(MFUNC),GV(100),BETA(100),YFAC(MFUNC)
+     .        RATE0(MFUNC),YFAC(MFUNC)
       my_real ,DIMENSION(NEL)  :: 
-     .        E, A11 , A21, G,G3,C1, SIGEXX ,SIGEYY ,SIGEXY ,  
+     .        E, A11 , A21, G,G3, SIGEXX ,SIGEYY ,SIGEXY ,  
      .        DYDX1 ,DYDX2 ,SVM ,
      .        YC ,YT ,P ,H ,
-     .        HK ,NNU1 ,HI ,DPLA_J ,
+     .        HK  ,HI ,DPLA_J ,
      .        AA ,BB ,DR ,PP ,QQ ,
      .        SVM2 ,YLD2 ,Y1 ,
-     .        Y2 ,HT ,RATE ,HC ,EPSPZZ 
+     .        Y2 ,HT ,RATE ,HC  
  
       DATA NMAX/3/
 C-----------------------------------------------
@@ -235,7 +238,7 @@ C
         ENDIF
        ENDIF
 C------------------------------------------
-c      estimation if compression mode
+c      IF ESTIMATE MODE Compression
 C------------------------------------------
       DO I=1,NEL        
          SIGNXX(I)=SIGOXX(I) - UVAR(I,2)  + A11T*DEPSXX(I)+A21T*DEPSYY(I)
@@ -246,7 +249,9 @@ C------------------------------------------
       G(1:NEL) = G1T   
       IF(EC > ZERO)THEN
         DO I=1,NEL  
-          IF(P(I) <=  - RPCT * PT) THEN
+          IF(PC == ZERO .and. PT == ZERO .AND. ABS(P(I)) < EM10) THEN
+            E(I)   = EC
+          ELSEIF(P(I) <=  - RPCT * PT) THEN
             E(I)   = E1T
           ELSEIF(P(I) >= RPCT *PC) THEN
             E(I)   = EC
@@ -270,7 +275,7 @@ C   estiamte stress
 C------------------------------------------
        DO I=1,NEL 
 C
-C  en cas d'   crouissage cinematique
+C  In case of cinematic crumbling
 C       
        
          SIGNXX(I)=SIGOXX(I) - UVAR(I,2)  + A11(I)*DEPSXX(I)+A21(I)*DEPSYY(I)
@@ -291,10 +296,13 @@ C
 C-------------------
 C     STRAIN RATE
 C-------------------
-        IF (ISRATE == 0) EPSP(I) = 
-     .     HALF*( ABS(EPSPXX(I)+EPSPYY(I))
-     .   + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
-     .                 + EPSPXY(I)*EPSPXY(I) ) )
+        IF (ISRATE == 0) THEN
+          EPSP(I) = HALF*( ABS(EPSPXX(I)+EPSPYY(I))
+     .            + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
+     .            + EPSPXY(I)*EPSPXY(I) ) )
+         ELSE
+           EPSP(I) = ASRATE*EPSD_PG(I) + (ONE-ASRATE)*EPSP(I)
+         ENDIF
           JJC(I) = 1
           JJT(I) = NCC + 1
        ENDDO
@@ -521,7 +529,10 @@ c traction
          ENDIF
 C interpolation entre (tracation & compression         
         DO I=1,NEL   
-          IF(P(I) <=  -PT) THEN
+         IF(PC == ZERO .AND. PT == ZERO .AND. ABS(P(I)) < EM10) THEN
+            YLD(I) = MAX(YC(I), EM20)
+            H(I)   = HC(I)
+          ELSEIF(P(I) <=  -PT) THEN
             YLD(I) = MAX(YT(I),EM20)
             H(I)   = HT(I)
           ELSEIF(P(I) >= PC) THEN
@@ -561,7 +572,7 @@ C     PROJECTION
 C-------------------
        IF(IFLAG(1) == 0)THEN
          NU31 = ONE-NNU11
-C projection radiale 
+C radial projection 
          DO I=1,NEL
            SVM(I)=SQRT(SIGNXX(I)*SIGNXX(I)
      .             +SIGNYY(I)*SIGNYY(I)
@@ -585,7 +596,7 @@ C projection radiale
 C
        ELSEIF(IFLAG(1)==1)THEN
 C-------------------------
-C     CRITERE DE VON MISES
+C     von mises criterion
 C-------------------------
          DO I=1,NEL
            H(I) = MAX(ZERO,H(I))
@@ -689,7 +700,7 @@ C------------------------------------------
 C-------------------------------------------
        ELSEIF(IFLAG(1)==2)THEN
 C-------------------------
-C     CRITERE DE VON MISES
+C     von mises criterion
 C-------------------------
          DO I=1,NEL
            H(I) = MAX(ZERO,H(I))
@@ -717,7 +728,7 @@ C-------------------------
 C
          IF(NINDX/=0) THEN
 C-------------
-C   PROJ NORMALE AU CRITERE AVEC CALCUL APPROCHE DE LA NORMALE + RETOUR RADIAL
+C   normal projection to the criterion with approximate calculation of the normal + radial return
 C-------------
           NU31 = ONE-NNU11
           DO J=1,NINDX

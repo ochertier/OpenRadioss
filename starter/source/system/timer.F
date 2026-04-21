@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    initime        ../starter/source/system/timer.F
-      !||--- called by ------------------------------------------------------
-      !||    starter0       ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    initime        ../starter/source/system/timer.F
+!||--- called by ------------------------------------------------------
+!||    starter0       ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INITIME()
-C     initialisation des timers
+C     TIMER INITIALIZATION
 C     timer                       signification
 C
 C     1                           translator
@@ -71,8 +71,8 @@ C-----------------------------------------------
           REALTIME(J,I) = ZERO
         ENDDO 
       ENDDO
-      CALL SYSTEM_CLOCK(CLOCK0)   ! recuperation du temps de debut dans clock0
-      ELAPSED = ZERO  ! initialisation a zero de l'elapsed time
+      CALL SYSTEM_CLOCK(CLOCK0)   ! GETTING START TIME IN CLOCK0
+      ELAPSED = ZERO  ! initialize elapsed time to zero
 
 #ifdef _OPENMP
         OMP_STARTING_TIME = OMP_GET_WTIME( )
@@ -80,17 +80,17 @@ C-----------------------------------------------
 
       RETURN
       END
-      !||====================================================================
-      !||    startime       ../starter/source/system/timer.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||    starter0       ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_etime       ../starter/source/system/machine.F
-      !||====================================================================
+!||====================================================================
+!||    startime       ../starter/source/system/timer.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
+!||    lectur         ../starter/source/starter/lectur.F
+!||    starter0       ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    my_etime       ../starter/source/system/machine.F
+!||====================================================================
       SUBROUTINE STARTIME(EVENT,ITASK)
-C     routine d'incrementation du timer event
+C     Timer Event Incormenting Routine
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -122,17 +122,17 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    stoptime       ../starter/source/system/timer.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||    starter0       ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_etime       ../starter/source/system/machine.F
-      !||====================================================================
+!||====================================================================
+!||    stoptime       ../starter/source/system/timer.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit        ../starter/source/restart/ddsplit/ddsplit.F
+!||    lectur         ../starter/source/starter/lectur.F
+!||    starter0       ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    my_etime       ../starter/source/system/machine.F
+!||====================================================================
       SUBROUTINE STOPTIME(EVENT,ITASK)
-C     routine incrementation du timer event
+C     Timer Event Incontation Routine
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -165,23 +165,23 @@ C-----------------------------------------------
 #else
       CALL SYSTEM_CLOCK(COUNT=CLOCK1, COUNT_RATE=CLOCKRATE,
      +                  COUNT_MAX=NBMAX                   )
-      SECS = CLOCK1-CLOCKINI(EVENT,ITASK)    ! diff temps courant - temps initial
-      IF(SECS<ZERO) SECS = SECS + NBMAX   ! cas depassement nb de periode maximum
+      SECS = CLOCK1-CLOCKINI(EVENT,ITASK)    ! Different time common - Initial time
+      IF(SECS<ZERO) SECS = SECS + NBMAX   ! case overflow of maximum period number
       SECS = SECS/CLOCKRATE
 #endif
       REALTIME(EVENT,ITASK)=REALTIME(EVENT,ITASK)+SECS
 
       RETURN
       END
-      !||====================================================================
-      !||    printime        ../starter/source/system/timer.F
-      !||--- called by ------------------------------------------------------
-      !||    starter0        ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    elapstime       ../starter/source/system/timer.F
-      !||====================================================================
-      SUBROUTINE PRINTIME(ITASK,GOT_TIMER,STARTDATE,STARTTIME)
-C     routine d'affichage des timers
+!||====================================================================
+!||    printime        ../starter/source/system/timer.F
+!||--- called by ------------------------------------------------------
+!||    starter0        ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    elapstime       ../starter/source/system/timer.F
+!||====================================================================
+      SUBROUTINE PRINTIME(ITASK,GOT_TIMER,STARTDATE,STARTTIME,ENDDATE,ENDTIME)
+C     timers display routine
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -200,6 +200,9 @@ C-----------------------------------------------
         DOUBLE PRECISION ELAPSED
         CHARACTER(len=8), INTENT(IN) ::  STARTDATE
         CHARACTER(len=10), INTENT(IN) :: STARTTIME
+        CHARACTER(len=8), INTENT(OUT) ::  ENDDATE
+        CHARACTER(len=10), INTENT(OUT) :: ENDTIME
+
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -219,6 +222,8 @@ C-----------------------------------------------
         IS=SECS-IH*3600-IM*60
 
         CALL DATE_AND_TIME(DATE,TIME) 
+        ENDDATE = DATE
+        ENDTIME = TIME
 
         WRITE(IOUT,*)  ' '
         WRITE(ISTDO,*) ' '
@@ -351,14 +356,14 @@ c---Format
 
       RETURN
       END
-      !||====================================================================
-      !||    elapstime      ../starter/source/system/timer.F
-      !||--- called by ------------------------------------------------------
-      !||    printime       ../starter/source/system/timer.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    elapstime      ../starter/source/system/timer.F
+!||--- called by ------------------------------------------------------
+!||    printime       ../starter/source/system/timer.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
         SUBROUTINE ELAPSTIME(ETIME)
-C       reset timer elapsed time et calcul du temps elapsed courant
+C       reset timer elapsed time and calculate current elapsed time
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -398,23 +403,23 @@ C-----------------------------------------------
         SECS = OMP_ENDING_TIME-OMP_STARTING_TIME
         ELAPSED = SECS
 #else    
-        SECS = CLOCK1-CLOCK0         ! diff temps courant - temps initial (qui peut ne pas etre 0 !)
-        IF(SECS<ZERO) SECS = SECS + NBMAX   ! cas depassement nb de periode maximum
+        SECS = CLOCK1-CLOCK0         ! Different time common - Initial time (which may not be 0!)
+        IF(SECS<ZERO) SECS = SECS + NBMAX   ! case overflow of maximum period number
         SECS = SECS/CLOCKRATE
         ELAPSED = ELAPSED + SECS
 #endif
 
-        CLOCK0 = CLOCK1              ! recuperation du temps courant dans clock0
+        CLOCK0 = CLOCK1              ! GETTING CURRENT TIME IN CLOCK0
         ETIME = ELAPSED
 
         RETURN
         END SUBROUTINE ELAPSTIME
 
-      !||====================================================================
-      !||    elapstime_omp   ../starter/source/system/timer.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit         ../starter/source/restart/ddsplit/ddsplit.F
-      !||====================================================================
+!||====================================================================
+!||    elapstime_omp   ../starter/source/system/timer.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit         ../starter/source/restart/ddsplit/ddsplit.F
+!||====================================================================
         SUBROUTINE ELAPSTIME_OMP(ETIME)
 !       compute the current elapsed time 
 C-----------------------------------------------

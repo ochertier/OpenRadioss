@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r4mat3    ../engine/source/elements/spring/r4mat3.F
-      !||--- called by ------------------------------------------------------
-      !||    r4ke3     ../engine/source/elements/spring/r4ke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    rkenonl   ../engine/source/elements/spring/r4mat3.F
-      !||====================================================================
+!||====================================================================
+!||    r4mat3    ../engine/source/elements/spring/r4mat3.F
+!||--- called by ------------------------------------------------------
+!||    r4ke3     ../engine/source/elements/spring/r4ke3.F
+!||--- calls      -----------------------------------------------------
+!||    rkenonl   ../engine/source/elements/spring/r4mat3.F
+!||====================================================================
       SUBROUTINE R4MAT3(JFT    ,JLT    ,GEO    ,KX     ,MGN    ,
      1                  AL0    ,FX     ,DX     ,TF     ,NPF    ,
      2                  POS    ,IGEO   )
@@ -91,17 +91,17 @@ C        IFUNC2(I) =NINT(GEO(18,MGN(I)))
 C
       RETURN
       END
-      !||====================================================================
-      !||    rkenonl     ../engine/source/elements/spring/r4mat3.F
-      !||--- called by ------------------------------------------------------
-      !||    r12mat3     ../engine/source/elements/spring/r12mat3.F
-      !||    r13mat3     ../engine/source/elements/spring/r13mat3.F
-      !||    r4mat3      ../engine/source/elements/spring/r4mat3.F
-      !||--- calls      -----------------------------------------------------
-      !||    es_func     ../engine/source/elements/spring/r4mat3.F
-      !||    vinter2     ../engine/source/tools/curve/vinter.F
-      !||    vinter2dp   ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    rkenonl     ../engine/source/elements/spring/r4mat3.F
+!||--- called by ------------------------------------------------------
+!||    r12mat3     ../engine/source/elements/spring/r12mat3.F
+!||    r13mat3     ../engine/source/elements/spring/r13mat3.F
+!||    r4mat3      ../engine/source/elements/spring/r4mat3.F
+!||--- calls      -----------------------------------------------------
+!||    es_func     ../engine/source/elements/spring/r4mat3.F
+!||    vinter2     ../engine/source/tools/curve/vinter.F
+!||    vinter2dp   ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE RKENONL(JFT    ,JLT    ,KX     ,FX     ,DX     ,
      .                   IECROU ,IFUNC  ,IFUNC2 ,A      ,TF     ,
      .                   NPF    ,POS    )
@@ -127,7 +127,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
      . I, J,JPOS(MVSIZ), JLEN(MVSIZ),JAD(MVSIZ),
-     . JPOS0(MVSIZ),JFUNC,JFUNC2,INDEX(MVSIZ),NC
+     . JPOS0(MVSIZ),JFUNC,INDEX(MVSIZ),NC
       my_real
      .   XX(MVSIZ) ,DYDX(MVSIZ) ,YY(MVSIZ),E_SEG,E_T,E_MIN,
      .   X0(MVSIZ),F0(MVSIZ)
@@ -188,11 +188,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    es_func   ../engine/source/elements/spring/r4mat3.F
-      !||--- called by ------------------------------------------------------
-      !||    rkenonl   ../engine/source/elements/spring/r4mat3.F
-      !||====================================================================
+!||====================================================================
+!||    es_func   ../engine/source/elements/spring/r4mat3.F
+!||--- called by ------------------------------------------------------
+!||    rkenonl   ../engine/source/elements/spring/r4mat3.F
+!||====================================================================
       SUBROUTINE ES_FUNC(IFUNCT  ,TF     ,NPF    ,E_S    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -259,7 +259,7 @@ C------compression 1er point
         YN=TF(NPF(IFUNCT)+J1+1)-Y0
         E1 = ZERO
         IF (ABS(XN)>ZERO) E1= YN/XN
-C------traction 1er point
+C----- 1st point traction
         J1=2*(N0-2)
         X=TF(NPF(IFUNCT)+J1)
         IF (X==ZERO) THEN

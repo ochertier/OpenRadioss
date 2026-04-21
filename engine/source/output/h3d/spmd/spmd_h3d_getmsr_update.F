@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_h3d_getmsr_update   ../engine/source/output/h3d/spmd/spmd_h3d_getmsr_update.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_dxyz_rwall_update    ../engine/source/output/h3d/h3d_build_fortran/h3d_dxyz_rwall_update.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_h3d_getmsr_update   ../engine/source/output/h3d/spmd/spmd_h3d_getmsr_update.F
+!||--- called by ------------------------------------------------------
+!||    h3d_dxyz_rwall_update    ../engine/source/output/h3d/h3d_build_fortran/h3d_dxyz_rwall_update.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod      ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
         SUBROUTINE SPMD_H3D_GETMSR_UPDATE(FR_WALL,DISP,MSR,XWL,YWL,ZWL,RWL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------

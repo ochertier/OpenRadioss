@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    newskw        ../engine/source/tools/skew/newskw.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_sd_skw   ../engine/source/mpi/output/spmd_sd_skw.F
-      !||====================================================================
+!||====================================================================
+!||    newskw        ../engine/source/tools/skew/newskw.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_sd_skw   ../engine/source/mpi/output/spmd_sd_skw.F
+!||====================================================================
       SUBROUTINE NEWSKW(SKEW    ,ISKWN        ,X           ,ISKWP_L ,NSKWP,
      1                  NUMSKW_L,NUMSKW_L_SEND,ISKWP_L_SEND,RECVCOUNT,ISKWP)
 C-----------------------------------------------
@@ -79,7 +79,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, N1, N2, N3, K, I, J, LOC_PROC,IMOV,IDIR,NN
+      INTEGER N, N1, N2, N3, K, LOC_PROC, IMOV, IDIR, NN
 C     REAL
       my_real
      .   P(12), PP1, PP3, PP2
@@ -100,7 +100,7 @@ C-----------------------------------------------
 !        do n=1,NUMSKW
 !        IF(abs(ISKWP(N+1))==LOC_PROC)THEN
 
-C processeur concerne par le skew
+C processor concerned by the skew
           N1=ISKWN(1,N+1)
           N2=ISKWN(2,N+1)
           N3=ISKWN(3,N+1)
@@ -281,13 +281,13 @@ C-----------------
 C
             ELSEIF(IMOV == 2)THEN
 C-----------------
-C     CALCUL DE X0'
+C     CALCULATION OF X0'
 C-----------------
               P(1)=X(1,N3)-X(1,N1)
               P(2)=X(2,N3)-X(2,N1)
               P(3)=X(3,N3)-X(3,N1)
 C-----------------
-C     CALCUL DE Z'
+C     CALCULATION OF Z'
 C-----------------
               P(7)=X(1,N2)-X(1,N1)
               P(8)=X(2,N2)-X(2,N1)
@@ -370,11 +370,11 @@ C
 C
       RETURN
       END SUBROUTINE NEWSKW
-      !||====================================================================
-      !||    newskw_init   ../engine/source/tools/skew/newskw.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||====================================================================
+!||====================================================================
+!||    newskw_init   ../engine/source/tools/skew/newskw.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||====================================================================
       SUBROUTINE NEWSKW_INIT(ISKWP ,NUMSKW_L,NSKWP,NUMSKW_L_SEND,ISKWP_L_SEND,RECVCOUNT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -417,10 +417,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, N1, N2, N3, K, I, J, LOC_PROC,IMOV,IDIR,NN,NN2
+      INTEGER N, LOC_PROC, NN, NN2
 C     REAL
       my_real
-     .   P(12), PP1, PP3, PP2
+     . P1P3P2
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------

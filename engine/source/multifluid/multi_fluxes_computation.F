@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    multi_fluxes_computation   ../engine/source/multifluid/multi_fluxes_computation.F
-      !||--- called by ------------------------------------------------------
-      !||    multi_timeevolution        ../engine/source/multifluid/multi_timeevolution.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                      ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod       ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    elbufdef_mod               ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod                ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    multi_fluxes_computation   ../engine/source/multifluid/multi_fluxes_computation.F
+!||--- called by ------------------------------------------------------
+!||    multi_timeevolution        ../engine/source/multifluid/multi_timeevolution.F
+!||--- calls      -----------------------------------------------------
+!||    arret                      ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod       ../common_source/modules/ale/ale_connectivity_mod.F
+!||    elbufdef_mod               ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod                ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod                ../engine/share/resol/initbuf.F
+!||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F90
+!||====================================================================
       SUBROUTINE MULTI_FLUXES_COMPUTATION(NG, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .     PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, WGRID, XGRID, ITAB, NBMAT, CURRENT_TIME, BUFMAT,
      .     ID_GLOBAL_VOIS,NPF,TF)
@@ -55,6 +56,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MULTI_FVM_MOD
       USE ALE_CONNECTIVITY_MOD
+      use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -179,7 +181,7 @@ C     TRIANGLES
          CALL ARRET(2)
       END SELECT
 
-C     Flux computation
+C     Computation flow
       DO II = 1, NEL
          I = II + NFT
          IAD = ALE_CONNECTIVITY%ee_connect%iad_connect(I)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_preread_impacc    ../starter/source/constraints/general/impvel/hm_preread_impacc.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur               ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv          ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count      ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key   ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start      ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    ngr2usrn             ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod   ../starter/share/modules1/hm_option_read_mod.F
-      !||    submodel_mod         ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_preread_impacc    ../starter/source/constraints/general/impvel/hm_preread_impacc.F
+!||--- called by ------------------------------------------------------
+!||    lectur               ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv          ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count      ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key   ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start      ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    ngr2usrn             ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod   ../starter/share/modules1/hm_option_read_mod.F
+!||    submodel_mod         ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_PREREAD_IMPACC(NUM    ,IGRNOD,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -58,7 +58,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ID,IGU,IGS,NN,UID,NIMPACC
+      INTEGER I,ID,IGU,IGS,NN,NIMPACC
       CHARACTER(nchartitle)  :: TITR
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
@@ -84,9 +84,7 @@ C--------------------------------------------------
 C--------------------------------------------------
 C EXTRACT DATA OF /IMPACC/... LINE
 C--------------------------------------------------
-        CALL HM_OPTION_READ_KEY(LSUBMODEL,
-     .                          OPTION_ID = ID,
-     .                          OPTION_TITR = TITR)
+        CALL HM_OPTION_READ_KEY(LSUBMODEL,OPTION_ID = ID, OPTION_TITR = TITR)
 C--------------------------------------------------
 C EXTRACT DATA (INTEGER VALUES)
 C--------------------------------------------------

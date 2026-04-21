@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    insurf_dx              ../starter/source/interfaces/interf1/insurf_dx.F
-      !||--- called by ------------------------------------------------------
-      !||    lecint                 ../starter/source/interfaces/interf1/lecint.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    insurf_dx              ../starter/source/interfaces/interf1/insurf_dx.F
+!||--- called by ------------------------------------------------------
+!||    lecint                 ../starter/source/interfaces/interf1/lecint.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INSURF_DX(NRT       ,MSN   ,IR    ,IRECT ,NOINT  ,
      .                  SURF_NODES,ITAB  ,MSV   ,ID    ,TITR   ,
      .                  NTAG      ,S_MSV  ,SIRECT, X, STIFF_STAT)
@@ -38,9 +38,9 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE FORMAT_MOD , ONLY : FMW_4I
 C-----------------------------------------------
-C     LECTURE DES SURFACES ET DECOMPTE DES SEGMENTS
+C     READING SURFACES AND COUNTING SEGMENTS
 C           ENTREE : 
-C                    NRT NOMBRE DE RENSEIGNEMENTS A LIRE
+C                    NRT NUMBER OF ITEMS TO READ
 C           SORTIE : 
 C                    IRECT 
 C-----------------------------------------------
@@ -70,7 +70,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,K,K4
-      my_real :: SURF, S2n(3), D1(3), D2(3), SURF_MAX, SURF_MIN, SURF_MEAN, STVAL,VEL
+      my_real :: SURF, S2n(3), D1(3), D2(3), SURF_MAX, SURF_MIN, SURF_MEAN, STVAL
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------

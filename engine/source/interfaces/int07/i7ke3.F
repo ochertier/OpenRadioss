@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7ke3           ../engine/source/interfaces/int07/i7ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_int_k       ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    ass_spmd        ../engine/source/implicit/assem_int.F
-      !||    assem_int       ../engine/source/implicit/assem_int.F
-      !||    ffizero         ../engine/source/interfaces/int07/i7ke3.F
-      !||    i7cork3         ../engine/source/interfaces/int07/i7cork3.F
-      !||    i7dstk3         ../engine/source/interfaces/int07/i7dstk3.F
-      !||    i7keg3          ../engine/source/interfaces/int07/i7keg3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i7ke3           ../engine/source/interfaces/int07/i7ke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_int_k       ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    ass_spmd        ../engine/source/implicit/assem_int.F
+!||    assem_int       ../engine/source/implicit/assem_int.F
+!||    ffizero         ../engine/source/interfaces/int07/i7ke3.F
+!||    i7cork3         ../engine/source/interfaces/int07/i7cork3.F
+!||    i7dstk3         ../engine/source/interfaces/int07/i7dstk3.F
+!||    i7keg3          ../engine/source/interfaces/int07/i7keg3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I7KE3(  A     ,V      ,MS   ,
      1                   IPARI ,INTBUF_TAB,X    ,NIN   ,
      2                   NUM_IMP,CAND_N,CAND_E     ,INDEX2,
@@ -58,7 +59,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "impl2_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -72,10 +72,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER JD(50),KD(50), JFI, KFI,
-     .        I, I_STOK, JLT_NEW, JLT , NFT, IVIS2,
-     .        IBC, NOINT, NSEG, ISECIN, IBAG,
-     .        IGAP, INACTI, IFQ, MFROT, IGSTI
+      INTEGER  
+     .         I_STOK, JLT , NFT,
+     .          
+     .        IGAP, INACTI, IGSTI
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ), I3N 
 C     REAL
@@ -95,7 +95,7 @@ C     REAL
      .   Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
      .   Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
      .   XI(MVSIZ), YI(MVSIZ), ZI(MVSIZ), STIF(MVSIZ),
-     .   N1(MVSIZ), N2(MVSIZ), N3(MVSIZ), OFF(MVSIZ),
+     .      OFF(MVSIZ),
      .   GAPV(MVSIZ),VXI(MVSIZ),VYI(MVSIZ),VZI(MVSIZ),
      .    MSI(MVSIZ),KI11(9,MVSIZ),KJ11(9,MVSIZ),
      .    KK11(9,MVSIZ),KL11(9,MVSIZ),KI12(9,MVSIZ),
@@ -173,7 +173,7 @@ C
      2                  X1     ,X2     ,X3     ,X4     ,Y1     ,
      3                  Y2     ,Y3     ,Y4     ,Z1     ,Z2     ,
      4                  Z3     ,Z4     ,XI     ,YI     ,ZI     )
-           IF (IMACH==3.AND.NSPMD>1) THEN
+           IF (NSPMD>1) THEN
             LREM = LREM + JLT
             CALL ASS_SPMD(3        ,NSVG     ,IX1    ,IX2    ,IX3    ,       
      1         IX4      ,JLT       ,IDDL     ,K_DIAG    ,K_LT     ,
@@ -193,16 +193,17 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i7mainfr        ../engine/source/interfaces/int07/i7ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    fr_matv         ../engine/source/mpi/implicit/imp_fri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i10forcf3       ../engine/source/interfaces/int10/i10ke3.F
-      !||    i11forcf3       ../engine/source/interfaces/int11/i11ke3.F
-      !||    i7forcf3        ../engine/source/interfaces/int07/i7ke3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i7mainfr        ../engine/source/interfaces/int07/i7ke3.F
+!||--- called by ------------------------------------------------------
+!||    fr_matv         ../engine/source/mpi/implicit/imp_fri.F
+!||--- calls      -----------------------------------------------------
+!||    i10forcf3       ../engine/source/interfaces/int10/i10ke3.F
+!||    i11forcf3       ../engine/source/interfaces/int11/i11ke3.F
+!||    i7forcf3        ../engine/source/interfaces/int07/i7ke3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I7MAINFR(  A     ,V     ,D      ,X     ,MS    ,
      1                     IPARI  ,INTBUF_TAB    ,NUM_IMP,NS_IMP,
      2                     NE_IMP)
@@ -229,7 +230,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,N, IAD,NTY
+      INTEGER N, IAD,NTY
 C
       IAD=1
       DO N = 1, NINTER
@@ -254,16 +255,17 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i7forcf3        ../engine/source/interfaces/int07/i7ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    i7mainfr        ../engine/source/interfaces/int07/i7ke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24corp3        ../engine/source/interfaces/int24/i24cork3.F
-      !||    i7corp3         ../engine/source/interfaces/int07/i7cork3.F
-      !||    i7frf3          ../engine/source/interfaces/int07/i7keg3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i7forcf3        ../engine/source/interfaces/int07/i7ke3.F
+!||--- called by ------------------------------------------------------
+!||    i7mainfr        ../engine/source/interfaces/int07/i7ke3.F
+!||--- calls      -----------------------------------------------------
+!||    i24corp3        ../engine/source/interfaces/int24/i24cork3.F
+!||    i7corp3         ../engine/source/interfaces/int07/i7cork3.F
+!||    i7frf3          ../engine/source/interfaces/int07/i7keg3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I7FORCF3(  A     ,V      ,MS   ,X    ,D ,
      1                    IPARI   ,INTBUF_TAB,NIN     ,
      2                    NUM_IMP ,CAND_N ,CAND_E)
@@ -298,8 +300,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I_STOK, JLT_NEW, JLT , NFT, 
-     .        INACTI, NSN,NTY,L
+      INTEGER  I_STOK, JLT_NEW, JLT , NFT, 
+     .         NSN,NTY,L
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), 
      .        IX4(MVSIZ),NSVG(MVSIZ)
 C     REAL
@@ -382,17 +384,18 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    imp_i7mainf     ../engine/source/interfaces/int07/i7ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_tripi       ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    i7cdcor3        ../engine/source/interfaces/int07/i7cdcor3.F
-      !||    i7cork3         ../engine/source/interfaces/int07/i7cork3.F
-      !||    i7dstk3         ../engine/source/interfaces/int07/i7dstk3.F
-      !||    i7dstr3         ../engine/source/interfaces/int07/i7dstk3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    imp_i7mainf     ../engine/source/interfaces/int07/i7ke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_tripi       ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    i7cdcor3        ../engine/source/interfaces/int07/i7cdcor3.F
+!||    i7cork3         ../engine/source/interfaces/int07/i7cork3.F
+!||    i7dstk3         ../engine/source/interfaces/int07/i7dstk3.F
+!||    i7dstr3         ../engine/source/interfaces/int07/i7dstk3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE IMP_I7MAINF(
      1       IPARI  ,INTBUF_TAB,X        ,
      2       V      ,MS        ,NIN       ,LINDMAX  ,
@@ -415,7 +418,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -428,14 +430,14 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I_STOK, JLT_NEW, JLT , NFT, IVIS2,
-     .        IBC, NOINT, NSEG, ISECIN, IBAG,
-     .        IGAP, INACTI, IFQ, MFROT, IGSTI,
+      INTEGER I, I_STOK, JLT_NEW, JLT , NFT,
+     .          
+     .        IGAP, INACTI, IGSTI,
      .        NB_LOC,I_STOK_LOC,DEBUT
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ), CN_LOC(MVSIZ),CE_LOC(MVSIZ),
      .        CAND_N_N(MVSIZ),CAND_E_N(MVSIZ),INDEX2(LINDMAX),
-     .        I3N ,LREM
+     .        I3N 
 C     REAL
       my_real
      .   STARTT, FRIC, GAP, STOPT,STIGLO,GAPMIN,
@@ -453,7 +455,7 @@ C     REAL
      .   Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
      .   Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
      .   XI(MVSIZ), YI(MVSIZ), ZI(MVSIZ), STIF(MVSIZ),
-     .   N1(MVSIZ), N2(MVSIZ), N3(MVSIZ), OFF(MVSIZ),
+     .      
      .   GAPV(MVSIZ),VXI(MVSIZ),VYI(MVSIZ),VZI(MVSIZ),
      .    MSI(MVSIZ)
       INTEGER :: NSN,NTY
@@ -484,8 +486,8 @@ C
       ELSEIF(NTY==7)THEN
 C
         I_STOK = INTBUF_TAB%I_STOK(1)
-C decoupage statique
-        IF(INACTI/=7.OR.IMACH==3)THEN
+C static partitioning 
+        IF(INACTI/=7)THEN
           NB_LOC = I_STOK / NTHREAD
           IF (JTASK==NTHREAD) THEN
             I_STOK_LOC = I_STOK-NB_LOC*(NTHREAD-1)
@@ -493,7 +495,7 @@ C decoupage statique
             I_STOK_LOC = NB_LOC
           ENDIF
           DEBUT = (JTASK-1)*NB_LOC
-        ELSE ! INACTI = 7 et IMACH NE 3
+        ELSE ! INACTI = 7
           IF(JTASK==1)THEN
             I_STOK_LOC = I_STOK
             DEBUT = 0
@@ -506,7 +508,7 @@ C decoupage statique
 C
         NUM_IMP = 0
 C
-C recalcul du istok
+C recalculation of istok
 C
         IF (INACTI==5.OR.INACTI==6.OR.INACTI==7)THEN
           DO I = DEBUT+1, DEBUT+I_STOK_LOC
@@ -516,7 +518,7 @@ C
 C inbuf == cand_n
               INTBUF_TAB%CAND_N(I) = -INTBUF_TAB%CAND_N(I)
             ELSE
-C remise a 0 de cand_p
+C Discount at 0 of Cand_P
               INTBUF_TAB%CAND_P(I) = ZERO
             ENDIF
           ENDDO
@@ -536,7 +538,7 @@ c        I_STOK = NUM_IMP
 C
         DO NFT = 0 , I_STOK - 1 , NVSIZ
           JLT = MIN( NVSIZ, I_STOK - NFT )
-C preparation candidats retenus
+C preparation CANDIDATES retenus
           CALL I7CDCOR3(
      1         JLT,INDEX2(NFT+1),INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
      2         CAND_E_N,CAND_N_N)
@@ -582,17 +584,18 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i7fku3          ../engine/source/interfaces/int07/i7ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    int_fku3        ../engine/source/implicit/imp_int_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    i7cork3         ../engine/source/interfaces/int07/i7cork3.F
-      !||    i7corkp3        ../engine/source/interfaces/int07/i7cork3.F
-      !||    i7dstk3         ../engine/source/interfaces/int07/i7dstk3.F
-      !||    i7kfor3         ../engine/source/interfaces/int07/i7keg3.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i7fku3          ../engine/source/interfaces/int07/i7ke3.F
+!||--- called by ------------------------------------------------------
+!||    int_fku3        ../engine/source/implicit/imp_int_k.F
+!||--- calls      -----------------------------------------------------
+!||    i7cork3         ../engine/source/interfaces/int07/i7cork3.F
+!||    i7corkp3        ../engine/source/interfaces/int07/i7cork3.F
+!||    i7dstk3         ../engine/source/interfaces/int07/i7dstk3.F
+!||    i7kfor3         ../engine/source/interfaces/int07/i7keg3.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I7FKU3(A      ,V     ,MS     ,D     ,
      1                  IPARI ,INTBUF_TAB,X    ,NIN   ,
      2                  NUM_IMP,CAND_N,CAND_E ,INDEX2,IUPD  )
@@ -627,15 +630,15 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, I_STOK, JLT_NEW, JLT , NFT, IVIS2,
-     .        IBC, NOINT, NSEG, ISECIN, IBAG,
+      INTEGER  I_STOK, JLT , NFT,
+     .          
      .        IGAP, INACTI, IFQ, MFROT, IGSTI,IUPD
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ), I3N 
 C     REAL
       my_real
      .   STARTT, FRIC, GAP, STOPT,STIGLO,GAPMIN,
-     .   KMIN, KMAX, GAPMAX,GAP_IMP
+     .   KMIN, KMAX, GAPMAX
 C-----------------------------------------------
 C     REAL
       my_real
@@ -649,7 +652,7 @@ C     REAL
      .   Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
      .   Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
      .   XI(MVSIZ), YI(MVSIZ), ZI(MVSIZ), STIF(MVSIZ),
-     .   N1(MVSIZ), N2(MVSIZ), N3(MVSIZ), OFF(MVSIZ),
+     .      
      .   GAPV(MVSIZ),VXI(MVSIZ),VYI(MVSIZ),VZI(MVSIZ),
      .    DXI(MVSIZ),DYI(MVSIZ),DZI(MVSIZ),
      .    MSI(MVSIZ)
@@ -741,14 +744,14 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    ffizero    ../engine/source/interfaces/int07/i7ke3.F
-      !||--- called by ------------------------------------------------------
-      !||    i24ke3     ../engine/source/interfaces/int24/i24ke3.F
-      !||    i7ke3      ../engine/source/interfaces/int07/i7ke3.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_intm   ../engine/share/modules/imp_intm.F
-      !||====================================================================
+!||====================================================================
+!||    ffizero    ../engine/source/interfaces/int07/i7ke3.F
+!||--- called by ------------------------------------------------------
+!||    i24ke3     ../engine/source/interfaces/int24/i24ke3.F
+!||    i7ke3      ../engine/source/interfaces/int07/i7ke3.F
+!||--- uses       -----------------------------------------------------
+!||    imp_intm   ../engine/share/modules/imp_intm.F
+!||====================================================================
       SUBROUTINE FFIZERO(JLT    ,NIN    ,NSN     ,CAND_N   )
 C-----------------------------------------------
 C   M o d u l e s
@@ -780,7 +783,7 @@ C--------------------------------------------------------
          IF(NI > NSN)THEN
           NN = NI - NSN
           NS=IND_INT(NIN)%P(NN)
-C---------pour diag_ss---
+Cfor diag_ss
           FFI(1,NS)=ZERO
           FFI(2,NS)=ZERO
           FFI(3,NS)=ZERO

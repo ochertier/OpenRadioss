@@ -1,7 +1,6 @@
 name: Delivery stable CI
 
 on:
-
   workflow_dispatch:
     inputs:
       tag_name:
@@ -24,14 +23,8 @@ jobs:
   build_linux:
     if: ${{ github.repository_owner == 'OpenRadioss' }}
     # DEV ONLY # runs-on: ["${{ matrix.build }}","dev_pmci"]
-    runs-on: ["${{ matrix.build }}","prmerge_ci"]
-    container: 
-      image: fr-qafactorydev.europe.altair.com/build-linux64_gf:cos8-ompi411-devts11
-      credentials: 
-        username: ${{secrets.DOCKER_REGISTRY_USER}}
-        password: ${{secrets.DOCKER_REGISTRY_PASSWD}}
-      volumes: 
-        - /etc/localtime:/etc/localtime:ro
+
+    runs-on: ["${{ matrix.build }}","delivery_stable_ci"]
 
     env:
       BUILD_NB_THREAD: 2
@@ -43,37 +36,81 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          ### LINUX64 ###
           - build: starter_linux64_gf
             precision: dp
             os: linux64
             binary: starter
-
+            image_name: rd-linux64-cos8-bld:ompi4.1.1-ts11
           - build: starter_linux64_gf_sp
             precision: sp
             os: linux64
             binary: starter
-
+            image_name: rd-linux64-cos8-bld:ompi4.1.1-ts11
           - build: engine_linux64_gf_ompi
             precision: dp
             os: linux64
             binary: engine
             mpi: ompi
-
+            image_name: rd-linux64-cos8-bld:ompi4.1.1-ts11
           - build: engine_linux64_gf_ompi_sp
             precision: sp
             os: linux64
             binary: engine
             mpi: ompi
-
+            image_name: rd-linux64-cos8-bld:ompi4.1.1-ts11
           - build: engine_linux64_gf
             precision: dp
             os: linux64
             binary: engine
-
+            image_name: rd-linux64-cos8-bld:ompi4.1.1-ts11
           - build: engine_linux64_gf_sp
             precision: sp
             os: linux64 
             binary: engine
+            image_name: rd-linux64-cos8-bld:ompi4.1.1-ts11
+          ### LINUXA64 ###
+          - build: starter_linuxa64
+            binary: starter
+            precision: dp
+            os: linuxa64
+            image_name: linuxa64-rl8.9-bld:armfl24.04-ompi4.1.2-ts11
+          - build: starter_linuxa64_sp
+            binary: starter
+            precision: sp
+            os: linuxa64
+            image_name: linuxa64-rl8.9-bld:armfl24.04-ompi4.1.2-ts11
+          - build: engine_linuxa64
+            binary: engine
+            precision: dp
+            os: linuxa64
+            image_name: linuxa64-rl8.9-bld:armfl24.04-ompi4.1.2-ts11
+          - build: engine_linuxa64_sp
+            binary: engine
+            precision: sp
+            os: linuxa64
+            image_name: linuxa64-rl8.9-bld:armfl24.04-ompi4.1.2-ts11
+          - build: engine_linuxa64_ompi
+            binary: engine
+            precision: dp
+            os: linuxa64
+            mpi: ompi
+            image_name: linuxa64-rl8.9-bld:armfl24.04-ompi4.1.2-ts11
+          - build: engine_linuxa64_ompi_sp
+            binary: engine
+            precision: sp
+            os: linuxa64
+            mpi: ompi
+            image_name: linuxa64-rl8.9-bld:armfl24.04-ompi4.1.2-ts11
+
+    container: 
+      # Registry variable can't be a secret but can be a simple variable defined at organization level
+      image: "${{ vars.DOCKER_REGISTRY }}/${{ matrix.image_name }}"
+      credentials: 
+        username: ${{ secrets.DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.DOCKER_REGISTRY_PASSWD }}  
+      volumes: 
+        - /etc/localtime:/etc/localtime:ro
 
     steps:
 
@@ -94,11 +131,11 @@ jobs:
 
       # Get last git modifications, don't clean before (way to keep persistent obj files)
       - name: Checkout git sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{ env.WORKDIR }}
           clean: 'false'
-          lfs: 'true'
+          lfs: 'false'
           ref: ${{ env.LAST_STABLE_TAG_NAME }}
 
       - name: Running build
@@ -110,12 +147,27 @@ jobs:
             mpi_opts="-mpi=${{ matrix.mpi }}"
           fi
 
-          cmd="./build_script.sh -release -arch=${{ matrix.os }}_gf -prec=${{ matrix.precision }} -nt=${{ env.BUILD_NB_THREAD }} -static-link $mpi_opts"
+          arch_suffix=''
+          extra_opts=''
+          if [ "${{ matrix.os }}" = "linux64" ]
+          then
+            echo "Running BUILD for linux GF"
+            arch_suffix='_gf'
+            extra_opts='-static-link'
+            source /root/.bashrc
+          else
+            echo "Running BUILD for arm"
+            export MODULEPATH=$MODULEPATH:/opt/arm/modulefiles
+            source /etc/profile.d/modules.sh
+            module load binutils/13.2.0 gnu/13.2.0 acfl/24.04
+            export LD_LIBRARY_PATH=/opt/openmpi/lib:$LD_LIBRARY_PATH           
+          fi
+
+          cmd="./build_script.sh -release -arch=${{ matrix.os }}$arch_suffix -prec=${{ matrix.precision }} -nt=${{ env.BUILD_NB_THREAD }} $extra_opts $mpi_opts"
           echo "========================================="
           echo "--  BUILD ${{ matrix.build }} --"   
           echo "--  $cmd --"   
           echo "========================================="
-          source /home/adminqa/.bashrc
           chmod 755 Compiling_tools/script/*
           chmod 755 ${{ matrix.binary }}/build_script.sh 
 
@@ -165,7 +217,7 @@ jobs:
 
       # Upload artifact (since V4 we can't upload artifact using the same name, each one must be unique)
       - name: Upload built artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bins-${{ matrix.os }}-${{ matrix.precision }}-${{ matrix.build }}
           path: ${{ env.WORKDIR }}/exec
@@ -173,15 +225,15 @@ jobs:
 
       # We upload extlib only once, arbitrary choice
       - name: Upload extlib artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: extlib
-          path: ${{ env.WORKDIR }}/extlib
+          name: extlib.zip
+          path: ${{ env.WORKDIR }}/extlib.zip
         if: ${{ matrix.build == 'starter_linux64_gf' && env.CLOSE_BRANCH == 0 }}
 
       # Close the branch (= restrict push to team devopsadmins) if needed
       # Owner is not mandatory here ... PAT is sufficient ??? seems that as servbot has permissions on this repo so his PAT is sufficient ...
-      - uses: octokit/request-action@v2.x
+      - uses: octokit/request-action@v3.x
         id: close_branch_build
         env:
           GITHUB_TOKEN: ${{ env.SERVBOT_PAT }}
@@ -212,7 +264,6 @@ jobs:
           exit 1
 
         if: ${{ always() && env.CLOSE_BRANCH == 1 && steps.close_branch_build.outputs.status != 200 }} 
-
 
   build_windows_no_container:
     if: ${{ github.repository_owner == 'OpenRadioss' }}
@@ -286,11 +337,11 @@ jobs:
 
       # Get last git modifications, don't clean before (way to keep persistent obj files)
       - name: Checkout git sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{ env.WORKDIR }}
           clean: 'false'
-          lfs: 'true'
+          lfs: 'false'
           ref: ${{ env.LAST_STABLE_TAG_NAME }}
 
 
@@ -300,7 +351,9 @@ jobs:
           cd ${{ matrix.binary }}
           @"
           @echo off
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
+          call 'C:\Program Files (x86)\Intel\oneAPI\compiler\2025.0\env\vars.bat'
+          call 'C:\Program Files (x86)\Intel\oneAPI\mkl\2025.0\env\vars.bat'
+          call 'C:\Program Files (x86)\Intel\oneAPI\mpi\2021.10.0\env\vars.bat'
           cmake --version
           ninja --version
           if not '${{ matrix.mpi }}'=='' (
@@ -348,7 +401,7 @@ jobs:
 
       # Upload artifact (since V4 we can't upload artifact using the same name, each one must be unique)
       - name: Upload built artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bins-${{ matrix.os }}-${{ matrix.precision }}-${{ matrix.build }}
           path: ${{ env.WORKDIR }}/exec
@@ -357,7 +410,7 @@ jobs:
       # Close the branch (= restrict push to team devopsadmins) if needed
       # Owner is not mandatory here ... PAT is sufficient ??? seems that as servbot has permissions on this repo so his PAT is sufficient ...
       - name: Close the branch if errors
-        uses: octokit/request-action@v2.x
+        uses: octokit/request-action@v3.x
         id: close_branch_build
         env:
           GITHUB_TOKEN: ${{ env.SERVBOT_PAT }}
@@ -385,10 +438,11 @@ jobs:
     # DEV ONLY # runs-on: dev_delivery
     runs-on: delivery    
     container: 
-      image: fr-qafactorydev.europe.altair.com/common-linux64
+      # Registry variable can't be a secret but can be a simple variable defined at organization level
+      image: "${{ vars.DOCKER_REGISTRY }}/rd-linux64-common:latest"
       credentials: 
-        username: ${{secrets.DOCKER_REGISTRY_USER}}
-        password: ${{secrets.DOCKER_REGISTRY_PASSWD}}
+        username: ${{ secrets.DOCKER_REGISTRY_USER }}
+        password: ${{ secrets.DOCKER_REGISTRY_PASSWD }}  
       volumes: 
          - /etc/localtime:/etc/localtime:ro
          # DEV ONLY # - /github_download_counter_dev:/github_download_counter
@@ -428,16 +482,15 @@ jobs:
 
       # Get last git modifications, don't clean before (way to go faster)
       - name: Checkout git sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{ env.WORKDIR }}
-          clean: 'false'
-          lfs: 'true'
+          lfs: 'false'
           ref: ${{ env.LAST_STABLE_TAG_NAME }}
 
       # Get OpenRadioss extras from dedicated repository
       - name: Checkout git EXTRA sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           lfs: 'true'
           clean: 'false'
@@ -447,7 +500,7 @@ jobs:
 
       # Get OpenRadioss gui in Tools repository
       - name: Checkout git Tools sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           lfs: 'true'
           clean: 'false'
@@ -455,17 +508,12 @@ jobs:
           path: "${{ env.WORKDIR }}/TOOLS"
           token: '${{ secrets.EXTRA_REPOSITORY_PAT }}'
 
-      # Download ALL artifacts
+      # Download ALL artifacts (including extlib.zip)
       - name: Download ALL artifacts for packaging
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
+          merge-multiple: true
           path: "${{ env.WORKDIR }}/exec_tmp"
-
-      - name: Download extlib artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: extlib
-          path: ${{ env.WORKDIR }}/extlib
 
       - name: Check files in exec
         working-directory: ${{ env.WORKDIR }}
@@ -478,29 +526,33 @@ jobs:
           echo "List exec_tmp : "
           find exec_tmp -type f
 
-          for os in linux64 win64 
+          mv exec_tmp/extlib.zip ./
+
+          for os in linux64 linuxa64 win64 
           do
             mkdir -p exec/${os}
-            for file in `find exec_tmp/*${os}*/ -type f`
-            do
-              cp -p $file exec/${os}/
-            done
+            cp -p exec_tmp/*${os}* exec/${os}/
             chmod 755 exec/${os}/*
           done
 
           echo "List exec : "
           find exec -type f
 
-      - name: Provide ALL binaries
+      - name: Unzip extlib
         working-directory: ${{ env.WORKDIR }}
         run: |
+          unzip extlib.zip
+
+      - name: Provide ALL binaries
+        working-directory: ${{ env.WORKDIR }}
+        run: |          
           # Removed lfs hook (not supported in next action, not neeeded)
           rm -f .git/hooks/pre-push
 
           # Prepare tree architecture
           rm -rf todeliver
 
-          for os in linux64 win64 
+          for os in linux64 linuxa64 win64 
           do      
             mkdir -p todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/extlib/h3d/lib/${os} todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/extlib/hm_reader todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/exec
             cp -a extlib/h3d/lib/${os}/* todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/extlib/h3d/lib/${os}/
@@ -524,6 +576,7 @@ jobs:
 
             # Get some output converters from Tools repository
             jf rt download ${JF_OPTIONS} "${JF_TOOLS_OUTPUT_CONVERTERS}/${os}/*" todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/exec/ --flat=true
+            chmod 755 todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/exec/*
 
             cp -a hm_cfg_files todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/
 
@@ -554,7 +607,7 @@ jobs:
             echo "EOF"
           } >> $GITHUB_ENV
 
-      - uses: octokit/request-action@v2.x
+      - uses: octokit/request-action@v3.x
         id: get_commit_author
         env:
           GITHUB_TOKEN: ${{ env.SERVBOT_PAT }}
@@ -594,6 +647,10 @@ jobs:
 
             Commit message:
             ${{ env.LAST_STABLE_COMMIT_MESSAGE }}
+
+            Thank you for downloading OpenRadioss! We'd love to hear about your experience.  
+            👉 [Share your feedback here](https://app.sli.do/event/uxEN5N2jZqeUHnqZEyqrcx)
+
           files: |
             ${{ env.WORKDIR }}/todeliver/*
           clear_attachments: true    
@@ -624,3 +681,59 @@ jobs:
               --nb_releases_to_keep ${{ env.DELIVERY_NB_RELEASES_TO_KEEP }} \
               --counter_file_dir /github_download_counter \
               --tag_prefix ${{ env.DELIVERY_TAG_PREFIX }} 
+
+      - name: Create a new GitHub Discussion Annoucement
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Get the discussion categories for your repository
+            const { data: repository } = await github.rest.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+
+            // Create discussion using GraphQL
+            const query = `
+              query {
+                repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
+                  id
+                  discussionCategories(first: 10) {
+                    nodes {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
+            `;
+
+            const result = await github.graphql(query);
+            const repoId = result.repository.id;
+            const categories = result.repository.discussionCategories.nodes;
+            
+            // Use first available category or create with a default
+            const categoryId = categories.length > 0 ? categories[0].id : null;
+            
+            if (categoryId) {
+              const createMutation = `
+                mutation CreateDiscussion($repositoryId: ID!, $categoryId: ID!, $title: String!, $body: String!) {
+                  createDiscussion(input: {repositoryId: $repositoryId, categoryId: $categoryId, title: $title, body: $body}) {
+                    discussion {
+                      url
+                    }
+                  }
+                }
+              `;
+              
+              const discussion = await github.graphql(createMutation, {
+                repositoryId: repoId,
+                categoryId: categoryId,
+                title: `OpenRadioss Stable Update (${process.env.LAST_STABLE_TAG_NAME})`,
+                body: `We're excited to announce a new **stable release of OpenRadioss!**\nThis version, based on **tag ${process.env.LAST_STABLE_TAG_NAME}**, brings improved stability and performance based on community feedback.\n🔹 [Get it now](https://github.com/${context.repo.owner}/${context.repo.repo}/releases/tag/XXXX)\nPlease, try it out and share your appreciated feedback, thanks!`
+              });
+              
+              console.log(`Discussion created: ${discussion.createDiscussion.discussion.url}`);
+            } else {
+              console.log('No discussion categories found. Please create discussion categories first.');
+            }                

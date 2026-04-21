@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,28 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_mpc                ../starter/source/constraints/general/mpc/hm_read_mpc.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                     ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    fretitl                    ../starter/source/starter/freform.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_sz_r2r                  ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    ifrontplus                 ../starter/source/spmd/node/frontplus.F
-      !||    kinset                     ../starter/source/constraints/general/kinset.F
-      !||    usr2sys                    ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                    ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mpc                ../starter/source/constraints/general/mpc/hm_read_mpc.F
+!||--- called by ------------------------------------------------------
+!||    lectur                     ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    fretitl                    ../starter/source/starter/freform.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_sz_r2r                  ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    ifrontplus                 ../starter/source/spmd/node/frontplus.F
+!||    kinset                     ../starter/source/constraints/general/kinset.F
+!||    usr2sys                    ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    r2r_mod                    ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MPC(RBUF   ,IBUFNC ,IBUFNN  ,IBUFDL  ,IBUFSK  ,
      2                       ISKN   ,ITAB   ,ITABM   ,LAG_NCF ,LAG_NKF ,
      3                       LAG_NHF,IKINE  ,IKINE1LAG,NOM_OPT,ITAGND  ,
@@ -60,7 +60,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
@@ -73,8 +72,7 @@ C-----------------------------------------------
       INTEGER LAG_NCF, LAG_NKF, LAG_NHF, ITAB(*), ITABM(*),
      .        ISKN(LISKN,*),IBUFNC(*),IBUFNN(*),IBUFDL(*),IBUFSK(*),
      .        IKINE(*),IKINE1LAG(*),ITAGND(*)
-      my_real
-     .        RBUF(*)
+      my_real :: RBUF(*)
       INTEGER NOM_OPT(LNOPT1,*)
       TYPE(UNIT_TYPE_),INTENT(IN) ::UNITAB 
       TYPE(SUBMODEL_DATA), DIMENSION(*),INTENT(IN) :: LSUBMODEL
@@ -140,7 +138,7 @@ C------- error out
           END IF
           CALL KINSET(512,ITAB(NOSYS),IKINE(NOSYS),7,0,IKINE1LAG(NOSYS))
           IBUFNN(KF) = NOSYS
-            IF(IMACH==3) CALL IFRONTPLUS(NOSYS,1)
+          CALL IFRONTPLUS(NOSYS,1)
           IBUFDL(KF) = IDDL
           IBUFSK(KF) = 0
           DO J=0,NUMSKW+MIN(1,NSPCOND)*NUMSPH+NSUBMOD
@@ -183,18 +181,18 @@ C---
       END
 
 
-      !||====================================================================
-      !||    hm_read_mpc0           ../starter/source/constraints/general/mpc/hm_read_mpc.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_mpc0           ../starter/source/constraints/general/mpc/hm_read_mpc.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_MPC0 (LEN, LSUBMODEL)
 C-----------------------------------------------
       USE SUBMODEL_MOD

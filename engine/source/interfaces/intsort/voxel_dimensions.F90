@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,30 +21,33 @@
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    voxel_dimensions_mod         ../engine/source/interfaces/intsort/voxel_dimensions.F90
-      !||--- called by ------------------------------------------------------
-      !||    inter7_collision_detection   ../engine/source/interfaces/intsort/inter7_collision_detection.F90
-      !||    inter_prepare_sort           ../engine/source/interfaces/generic/inter_prepare_sort.F
-      !||====================================================================
+!||====================================================================
+!||    voxel_dimensions_mod         ../engine/source/interfaces/intsort/voxel_dimensions.F90
+!||--- called by ------------------------------------------------------
+!||    inter7_collision_detection   ../engine/source/interfaces/intsort/inter7_collision_detection.F90
+!||    inter_prepare_sort           ../engine/source/interfaces/generic/inter_prepare_sort.F
+!||====================================================================
       module voxel_dimensions_mod
+      implicit none
       contains
-      !||====================================================================
-      !||    compute_voxel_dimensions   ../engine/source/interfaces/intsort/voxel_dimensions.F90
-      !||--- called by ------------------------------------------------------
-      !||    inter_prepare_sort         ../engine/source/interfaces/generic/inter_prepare_sort.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod               ../common_source/modules/constant_mod.F
-      !||    inter_struct_mod           ../engine/share/modules/inter_struct_mod.F
-      !||    my_alloc_mod               ../common_source/tools/memory/my_alloc.F90
-      !||====================================================================
+!||====================================================================
+!||    compute_voxel_dimensions   ../engine/source/interfaces/intsort/voxel_dimensions.F90
+!||--- called by ------------------------------------------------------
+!||    inter_prepare_sort         ../engine/source/interfaces/generic/inter_prepare_sort.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    constant_mod               ../common_source/modules/constant_mod.F
+!||    inter_struct_mod           ../engine/share/modules/inter_struct_mod.F
+!||    my_alloc_mod               ../common_source/tools/memory/my_alloc.F90
+!||    precision_mod              ../common_source/modules/precision_mod.F90
+!||====================================================================
         subroutine compute_voxel_dimensions(nrtm,nmn, inter_struct)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use inter_struct_mod
           use MY_ALLOC_MOD, only: my_alloc
+          USE PRECISION_MOD, only : WP
           use constant_mod, only: third
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
@@ -53,7 +56,6 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +66,7 @@
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
           integer  :: nbx, nby, nbz
-          my_real :: aaa
+          real(kind=WP) :: aaa
           integer(kind=8) :: nbx8, nby8, nbz8, res8
           integer :: res
           integer(8), parameter :: lvoxel = HUGE(nbx)
@@ -82,7 +84,7 @@
             & (inter_struct%box_limit_main(7) - inter_struct%box_limit_main(10))))
           else
             aaa = 0
-          endif
+          end if
 
           aaa = 0.75 * aaa
 
@@ -109,7 +111,7 @@
             nbx = max(nbx, 1)
             nby = max(nby, 1)
             nbz = max(nbz, 1)
-          endif
+          end if
           nbx8=nbx
           nby8=nby
           nbz8=nbz
@@ -119,7 +121,7 @@
             nbx = min(100,max(nbx8,1))
             nby = min(100,max(nby8,1))
             nbz = min(100,max(nbz8,1))
-          endif
+          end if
           res = (nbx+2)*(nby+2)*(nbz+2)
 
 !$OMP SINGLE
@@ -128,10 +130,10 @@
             if(.not.allocated(inter_struct%voxel)) then
               call my_alloc(inter_struct%voxel,res8)
               inter_struct%voxel_size = res8
-            endif
+            end if
             do i=1,inter_struct%voxel_size
               inter_struct%voxel(i)=0
-            enddo
+            end do
             inter_struct%nbx = nbx
             inter_struct%nby = nby
             inter_struct%nbz = nbz

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,17 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    wrtsqi          ../starter/source/output/tools/wrtsqi.F
-      !||--- called by ------------------------------------------------------
-      !||    convwrest       ../starter/source/restart/ddsplit/wrrest.F
-      !||    dswrest         ../starter/source/restart/ddsplit/wrrest.F
-      !||    eigwrest        ../starter/source/restart/ddsplit/wrrest.F
-      !||    fxbwrestp       ../starter/source/restart/ddsplit/wrrest.F
-      !||    nfwrest         ../starter/source/restart/ddsplit/wrrest.F
-      !||    plyxfem_wrest   ../starter/source/restart/ddsplit/wrrest.F
-      !||    rigmatwrest     ../starter/source/restart/ddsplit/wrrest.F
-      !||====================================================================
+!||====================================================================
+!||    wrtsqi          ../starter/source/output/tools/wrtsqi.F
+!||--- called by ------------------------------------------------------
+!||    convwrest       ../starter/source/restart/ddsplit/wrrest.F
+!||    dswrest         ../starter/source/restart/ddsplit/wrrest.F
+!||    eigwrest        ../starter/source/restart/ddsplit/wrrest.F
+!||    fxbwrestp       ../starter/source/restart/ddsplit/wrrest.F
+!||    nfwrest         ../starter/source/restart/ddsplit/wrrest.F
+!||    plyxfem_wrest   ../starter/source/restart/ddsplit/wrrest.F
+!||    rigmatwrest     ../starter/source/restart/ddsplit/wrrest.F
+!||====================================================================
       SUBROUTINE WRTSQI(IA,L,IFORM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

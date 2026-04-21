@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    xdefo3   ../engine/source/elements/xelem/xdefo3.F
-      !||--- called by ------------------------------------------------------
-      !||    xforc3   ../engine/source/elements/xelem/xforc3.F
-      !||====================================================================
+!||====================================================================
+!||    xdefo3   ../engine/source/elements/xelem/xdefo3.F
+!||--- called by ------------------------------------------------------
+!||    xforc3   ../engine/source/elements/xelem/xforc3.F
+!||====================================================================
       SUBROUTINE XDEFO3(V  ,VR   ,KXX   ,IXX   ,NX   ,
      2                 VUSR ,VRUSR )
 C-----------------------------------------------
@@ -48,7 +48,7 @@ C-----------------------------------------------
       INTEGER K,I1,IADNOD
 C     REAL
 C--------------------------------------------
-C     VITESSES REPERE GLOBAL.
+C     VELOCITIES GLOBAL REFERENCE FRAME.
 C--------------------------------------------
       IADNOD=KXX(4)
       DO K=1,NX

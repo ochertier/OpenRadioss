@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_prop26                 ../starter/source/properties/spring/hm_read_prop26.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_properties             ../starter/source/properties/hm_read_properties.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                         ../starter/source/output/message/message.F
-      !||    fretitl2                       ../starter/source/starter/freform.F
-      !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
-      !||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_is_encrypted         ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod                   ../starter/share/modules1/elbuftag_mod.F
-      !||    message_mod                    ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_prop26                 ../starter/source/properties/spring/hm_read_prop26.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_properties             ../starter/source/properties/hm_read_properties.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                         ../starter/source/output/message/message.F
+!||    fretitl2                       ../starter/source/starter/freform.F
+!||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
+!||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_is_encrypted         ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+!||--- uses       -----------------------------------------------------
+!||    elbuftag_mod                   ../starter/share/modules1/elbuftag_mod.F
+!||    message_mod                    ../starter/share/message_module/message_mod.F
+!||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_PROP26(GEO     , IGEO  , UNITAB   , IG   , IGTYP,
-     .                          PROP_TAG, IDTITL, LSUBMODEL)
+     .                          PROP_TAG, LSUBMODEL)
 C-----------------------------------------------
       USE UNITAB_MOD
       USE ELBUFTAG_MOD    
@@ -62,17 +62,16 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER  IGEO(NPROPGI),IG,IGTYP,FLAG_FMT
+      INTEGER  IGEO(NPROPGI),IG,IGTYP
 C     REAL
       my_real
      .   GEO(NPROPG)
-      CHARACTER(LEN=NCHARTITLE)::IDTITL
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-       INTEGER I,J,NFUNC,NFUND,IFUN,IAD,ISENS,IFL,ILENG,IRTYP
+       INTEGER I,NFUNC,NFUND,IFUN,IAD,ISENS,IFL,ILENG,IRTYP
 C     REAL
       my_real
      .   MASS,KMAX,DMAX,XFAC,YFAC,RATE,ALPHA,DMIN,

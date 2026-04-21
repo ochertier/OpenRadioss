@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,42 +20,43 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intti2f         ../engine/source/interfaces/interf/intti2f.F
-      !||--- called by ------------------------------------------------------
-      !||    intti1          ../engine/source/interfaces/interf/intti1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i2curvf         ../engine/source/interfaces/interf/i2curvf.F
-      !||    i2curvfp        ../engine/source/interfaces/interf/i2curvfp.F
-      !||    i2fomo3         ../engine/source/interfaces/interf/i2for3.F
-      !||    i2fomo3p        ../engine/source/interfaces/interf/i2for3p.F
-      !||    i2for10         ../engine/source/interfaces/interf/i2for10.F
-      !||    i2for10p        ../engine/source/interfaces/interf/i2for10p.F
-      !||    i2for25         ../engine/source/interfaces/interf/i2for25.F
-      !||    i2for25p        ../engine/source/interfaces/interf/i2for25p.F
-      !||    i2for26         ../engine/source/interfaces/interf/i2for26.F
-      !||    i2for26p        ../engine/source/interfaces/interf/i2for26p.F
-      !||    i2for27         ../engine/source/interfaces/interf/i2for27.F
-      !||    i2for27p        ../engine/source/interfaces/interf/i2for27p.F
-      !||    i2for28         ../engine/source/interfaces/interf/i2for28.F
-      !||    i2for28p        ../engine/source/interfaces/interf/i2for28p.F
-      !||    i2for3          ../engine/source/interfaces/interf/i2for3.F
-      !||    i2for3n         ../engine/source/interfaces/interf/i2for3.F
-      !||    i2for3o         ../engine/source/interfaces/interf/i2for3.F
-      !||    i2for3p         ../engine/source/interfaces/interf/i2for3p.F
-      !||    i2for3pn        ../engine/source/interfaces/interf/i2for3p.F
-      !||    i2for3po        ../engine/source/interfaces/interf/i2for3p.F
-      !||    i2mom10         ../engine/source/interfaces/interf/i2for10.F
-      !||    i2mom10p        ../engine/source/interfaces/interf/i2for10p.F
-      !||    i2mom3          ../engine/source/interfaces/interf/i2for3.F
-      !||    i2mom3n         ../engine/source/interfaces/interf/i2for3.F
-      !||    i2mom3p         ../engine/source/interfaces/interf/i2for3p.F
-      !||    i2mom3pn        ../engine/source/interfaces/interf/i2for3p.F
-      !||    i2mzerop        ../engine/source/interfaces/interf/i2for3p.F
-      !||    i2therm         ../engine/source/interfaces/interf/i2therm.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod         ../engine/share/modules/h3d_mod.F
-      !||====================================================================
+!||====================================================================
+!||    intti2f         ../engine/source/interfaces/interf/intti2f.F
+!||--- called by ------------------------------------------------------
+!||    intti1          ../engine/source/interfaces/interf/intti1.F
+!||--- calls      -----------------------------------------------------
+!||    i2curvf         ../engine/source/interfaces/interf/i2curvf.F
+!||    i2curvfp        ../engine/source/interfaces/interf/i2curvfp.F
+!||    i2fomo3         ../engine/source/interfaces/interf/i2for3.F
+!||    i2fomo3p        ../engine/source/interfaces/interf/i2for3p.F
+!||    i2for10         ../engine/source/interfaces/interf/i2for10.F
+!||    i2for10p        ../engine/source/interfaces/interf/i2for10p.F
+!||    i2for25         ../engine/source/interfaces/interf/i2for25.F
+!||    i2for25p        ../engine/source/interfaces/interf/i2for25p.F
+!||    i2for26         ../engine/source/interfaces/interf/i2for26.F
+!||    i2for26p        ../engine/source/interfaces/interf/i2for26p.F
+!||    i2for27         ../engine/source/interfaces/interf/i2for27.F
+!||    i2for27p        ../engine/source/interfaces/interf/i2for27p.F
+!||    i2for28         ../engine/source/interfaces/interf/i2for28.F
+!||    i2for28p        ../engine/source/interfaces/interf/i2for28p.F
+!||    i2for3          ../engine/source/interfaces/interf/i2for3.F
+!||    i2for3n         ../engine/source/interfaces/interf/i2for3.F
+!||    i2for3o         ../engine/source/interfaces/interf/i2for3.F
+!||    i2for3p         ../engine/source/interfaces/interf/i2for3p.F
+!||    i2for3pn        ../engine/source/interfaces/interf/i2for3p.F
+!||    i2for3po        ../engine/source/interfaces/interf/i2for3p.F
+!||    i2mom10         ../engine/source/interfaces/interf/i2for10.F
+!||    i2mom10p        ../engine/source/interfaces/interf/i2for10p.F
+!||    i2mom3          ../engine/source/interfaces/interf/i2for3.F
+!||    i2mom3n         ../engine/source/interfaces/interf/i2for3.F
+!||    i2mom3p         ../engine/source/interfaces/interf/i2for3p.F
+!||    i2mom3pn        ../engine/source/interfaces/interf/i2for3p.F
+!||    i2mzerop        ../engine/source/interfaces/interf/i2for3p.F
+!||    i2therm         ../engine/source/interfaces/interf/i2therm.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod         ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INTTI2F(
      1   IPARI  ,X      ,V      ,A      ,
      2   VR     ,AR     ,MS     ,IN     ,WEIGHT ,STIFN  ,
@@ -98,7 +99,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -120,7 +120,7 @@ C=======================================================================
 C
           I0BASE = I0
 C
-      IF (IMACH /= 3.OR.(IMACH == 3.AND.IPARIT == 0)) THEN
+      IF (IPARIT == 0) THEN
        IF((ILEV == 1.OR.ILEV == 3).AND.IRODDL /= 0)THEN
 C       FORMULATION SANS MOMENT SUR MAIN
         CALL I2FOMO3(
@@ -132,7 +132,7 @@ C       FORMULATION SANS MOMENT SUR MAIN
      6   FNCONT    ,H3D_DATA  ,FNCONTP   ,FTCONTP   )
 
        ELSEIF(ILEV == 2)THEN
-C       FORMULATION AVEC MOMENT SUR MAIN
+C       formulation with moment on main
         CALL I2FOR3(
      1   NSN       ,NMN       ,A         ,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,
      2   INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%IRTLM,MS        ,WEIGHT    ,
@@ -147,7 +147,7 @@ C
      4   SAV_INER_POFF,INTBUF_TAB%CSTS_BIS)
         ENDIF
        ELSEIF (ILEV == 4)THEN
-C       FORMULATION decouplant les ddl rot
+C       Formulation Standing DDL ROT
         CALL I2FOR3O(
      1   NSN       ,NMN       ,A         ,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,
      2   INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%IRTLM,MS      ,WEIGHT    ,
@@ -155,7 +155,7 @@ C       FORMULATION decouplant les ddl rot
      5   FNCONT    ,INTBUF_TAB%CSTS_BIS,H3D_DATA ,FNCONTP,FTCONTP)
        ELSEIF (ILEV == 10 .OR. ILEV == 11 .OR. ILEV == 12 .OR. 
      .         ILEV == 20 .OR. ILEV == 21 .OR. ILEV == 22) THEN       
-C        FORMULATION AVEC RUPTURE
+C        formulation with rupture
          CALL I2FOR10(                                               
      1       A         ,MS        ,STIFN     ,WEIGHT    ,INTBUF_TAB%IRECTM,
      2       INTBUF_TAB%NSV,INTBUF_TAB%MSR,INTBUF_TAB%IRTLM,INTBUF_TAB%IRUPT,INTBUF_TAB%CSTS,
@@ -170,7 +170,7 @@ C
          ENDIF                                                          
 C
        ELSEIF (ILEV == 25) THEN       
-c        formulation en penalite avec rotations
+c        Penalty formulation with rotations
          PENFLAG = IPARI(43)
          IROT    = IPARI(48)         
 C
@@ -184,7 +184,7 @@ C
      .       MS_PENA   ,DT2T      ,NELTST ,ITYPTST ,
      .       IVISC     ,H3D_DATA  ,FNCONTP   ,FTCONTP   )
        ELSEIF (ILEV == 26) THEN       
-c        formulation en penalite + rot
+c        formulation en penalty + rot
 
          PENFLAG = IPARI(43)
          IROT    = IPARI(48)           
@@ -198,7 +198,7 @@ C
      .       MS_PENA   ,IN        ,DT2T      ,NELTST     ,ITYPTST ,
      .       SAV_INER_POFF,H3D_DATA ,FNCONTP   ,FTCONTP   )
        ELSEIF (ILEV == 27) THEN       
-c        formulation en penalite avec rotations
+c        Penalty formulation with rotations
          PENFLAG = IPARI(43)
          IROT    = IPARI(48)         
 c
@@ -215,7 +215,7 @@ c
      .   INTBUF_TAB%MSEGTYP2,INTBUF_TAB%CSTS_BIS,T2FAC_SMS ,FNCONTP   ,FTCONTP   )                                                                                     
 C
        ELSEIF (ILEV == 28) THEN       
-c        formulation en penalite avec rotations
+c        Penalty formulation with rotations
          PENFLAG = IPARI(43)
          IROT    = IPARI(48)         
 c
@@ -233,7 +233,7 @@ c
      .   H3D_DATA ,FNCONTP   ,FTCONTP   )                                                                                     
 C
        ELSEIF (ILEV == 30 .AND. IRODDL /= 0) THEN  
-c        formulation avec la courbure du main                   
+c        formulation with main curvature
          CALL I2CURVF(
      .        MS        ,IN        ,X         ,V         ,VR        ,       
      .        A         ,AR        ,STIFN     ,STIFR     ,WEIGHT    ,       
@@ -243,7 +243,7 @@ c        formulation avec la courbure du main
      .        FTCONTP)
 C  
        ELSEIF(ILEV == 0 .OR. IRODDL == 0)THEN
-C       FORMULATION AVEC MOMENT SUR MAIN
+C       formulation with moment on main
         CALL I2FOR3N(
      1   NSN       ,NMN       ,A         ,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,
      2   INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%IRTLM,MS   ,WEIGHT    ,
@@ -264,7 +264,7 @@ C-----------  Fin Parith OFF
       ELSE
 C
 C parith/on spmd
-C attention aux routines duales du parith/on spmd
+C Watch out for the duals of the parith/on SPMD
 C
        IF((ILEV == 1.OR.ILEV == 3).AND.IRODDL /= 0)THEN
 C       FORMULATION SANS MOMENT SUR MAIN
@@ -277,7 +277,7 @@ C       FORMULATION SANS MOMENT SUR MAIN
      6   INTBUF_TAB%SMAS,INTBUF_TAB%SINER,V         ,INTBUF_TAB%CSTS,FSAV   ,
      7   FNCONT    ,H3D_DATA   ,FNCONTP   ,FTCONTP  )
        ELSEIF(ILEV == 2)THEN
-C       FORMULATION AVEC MOMENT SUR MAIN
+C       formulation with moment on main
         I0BASE = I0
         CALL I2FOR3P(
      1   NSN       ,NMN       ,A         ,INTBUF_TAB%CSTS,INTBUF_TAB%MSR,
@@ -296,7 +296,7 @@ C
      5   INTBUF_TAB%CSTS_BIS)
         ENDIF
        ELSEIF(ILEV == 4)THEN
-C       FORMULATION decouplant les ddl rot
+C       Formulation Standing DDL ROT
         I0BASE = I0
         CALL I2FOR3PO(
      1   NSN       ,NMN       ,A         ,INTBUF_TAB%CSTS,INTBUF_TAB%MSR,
@@ -312,7 +312,7 @@ C       FORMULATION decouplant les ddl rot
         ENDIF
        ELSEIF (ILEV == 10 .OR. ILEV == 11 .OR. ILEV == 12 .OR. 
      .         ILEV == 20 .OR. ILEV == 21 .OR. ILEV == 22) THEN       
-C        FORMULATION AVEC RUPTURE
+C        formulation with rupture
          I0BASE = I0
          CALL I2FOR10P(
      1       A         ,MS        ,STIFN     ,WEIGHT    ,IADI2     ,
@@ -332,7 +332,7 @@ C
        ELSEIF (ILEV == 25) THEN       
          PENFLAG = IPARI(43)
          IROT    = IPARI(48)
-c        formulation en penalite         
+c        formulation en penalty         
 C
          CALL I2FOR25P(                                               
      .       X         ,V         ,VR        ,A         ,AR        ,
@@ -345,7 +345,7 @@ C
      .       IVISC     ,H3D_DATA  ,FNCONTP   ,FTCONTP   ) 
 C
        ELSEIF (ILEV == 26) THEN       
-c        formulation en penalite avec rotations         
+c        Penalty formulation with rotations         
          CALL I2FOR26P(                                               
      .       X         ,V         ,VR        ,A         ,AR        ,
      .       MS        ,STIFN     ,STIFR     ,WEIGHT    ,INTBUF_TAB%IRECTM,
@@ -356,7 +356,7 @@ c        formulation en penalite avec rotations
      .       FNCONTP   ,FTCONTP   )
 C
        ELSEIF (ILEV == 27) THEN       
-c        formulation en cinematique - penalite     
+c        Formulation in cinematics - Penalty     
          PENFLAG = IPARI(43)
          IROT    = IPARI(48)
 
@@ -374,7 +374,7 @@ c        formulation en cinematique - penalite
      .       INTBUF_TAB%MSEGTYP2  ,INTBUF_TAB%CSTS_BIS,T2FAC_SMS,FNCONTP   ,FTCONTP   ) 
 c
        ELSEIF (ILEV == 28) THEN       
-c        formulation en cinematique - penalite     
+c        Formulation in cinematics - Penalty     
          PENFLAG = IPARI(43)
          IROT    = IPARI(48)
          CALL I2FOR28P(                                               
@@ -391,7 +391,7 @@ c        formulation en cinematique - penalite
      .       INTBUF_TAB%NMAS,DMAST,ADM,H3D_DATA,FNCONTP   ,FTCONTP   ) 
 c
        ELSEIF (ILEV == 30 .AND. IRODDL /= 0) THEN  
-c        formulation avec la courbure du main  
+c        formulation with main curvature
          CALL I2CURVFP(
      .        MS        ,IN        ,X         ,V         ,VR        ,   
      .        A         ,AR        ,STIFN     ,STIFR     ,WEIGHT    ,   
@@ -401,7 +401,7 @@ c        formulation avec la courbure du main
      .        FSAV      ,FNCONT    ,H3D_DATA  ,FNCONTP   ,FTCONTP)
 C
        ELSEIF(ILEV == 0.OR.IRODDL == 0)THEN
-C       FORMULATION AVEC MOMENT SUR MAIN
+C       formulation with moment on main
           I0BASE = I0
          CALL I2FOR3PN(
      1   NSN       ,NMN       ,A         ,INTBUF_TAB%CSTS,INTBUF_TAB%NSV,

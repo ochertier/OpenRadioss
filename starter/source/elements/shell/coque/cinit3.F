@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,45 +20,49 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cinit3                    ../starter/source/elements/shell/coque/cinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                    ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                    ../starter/source/output/message/message.F
-      !||    c1buf3                    ../starter/source/elements/shell/coque/c1buf3.F
-      !||    cbufxfe                   ../starter/source/elements/xfem/cbufxfe.F
-      !||    ccoori                    ../starter/source/elements/shell/coque/ccoori.F
-      !||    cderii                    ../starter/source/elements/shell/coque/cderii.F
-      !||    cdleni                    ../starter/source/elements/shell/coque/cdleni.F
-      !||    cepschk                   ../starter/source/elements/shell/coque/cepsini.F
-      !||    cepsini                   ../starter/source/elements/shell/coque/cepsini.F
-      !||    ceveci                    ../starter/source/elements/shell/coque/ceveci.F
-      !||    cfailini                  ../starter/source/elements/shell/coque/cfailini.F
-      !||    cinmas                    ../starter/source/elements/shell/coque/cinmas.F
-      !||    cm27in3                   ../starter/source/materials/mat/mat027/cm27in3.F
-      !||    cm35in3                   ../starter/source/materials/mat/mat035/cm35in3.F
-      !||    cm58in3                   ../starter/source/materials/mat/mat058/cm58in3.F
-      !||    cmatini                   ../starter/source/materials/mat_share/cmatini.F
-      !||    corth3                    ../starter/source/elements/shell/coque/corth3.F
-      !||    corthdir                  ../starter/source/elements/shell/coque/corthdir.F
-      !||    corthini                  ../starter/source/elements/shell/coque/corthini.F
-      !||    csigini                   ../starter/source/elements/shell/coque/csigini.F
-      !||    csms11_ini                ../starter/source/elements/shell/coque/cinit3.F
-      !||    cuserini                  ../starter/source/elements/shell/coque/cuserini.F
-      !||    cveok3                    ../starter/source/elements/shell/coque/cveok3.F
-      !||    fail_windshield_init      ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
-      !||    fractal_dmg_init          ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
-      !||    fretitl2                  ../starter/source/starter/freform.F
-      !||    law158_init               ../starter/source/materials/mat/mat158/law158_init.F
-      !||    layini1                   ../starter/source/elements/shell/coqueba/layini1.F
-      !||    thickini                  ../starter/source/elements/shell/coqueba/thickini.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod                 ../starter/share/modules1/drape_mod.F
-      !||    fractal_dmg_init_mod      ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
-      !||    message_mod               ../starter/share/message_module/message_mod.F
-      !||    stack_mod                 ../starter/share/modules1/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cinit3                    ../starter/source/elements/shell/coque/cinit3.F
+!||--- called by ------------------------------------------------------
+!||    initia                    ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                    ../starter/source/output/message/message.F
+!||    c1buf3                    ../starter/source/elements/shell/coque/c1buf3.F
+!||    cbufxfe                   ../starter/source/elements/xfem/cbufxfe.F
+!||    ccoori                    ../starter/source/elements/shell/coque/ccoori.F
+!||    cderii                    ../starter/source/elements/shell/coque/cderii.F
+!||    cdleni                    ../starter/source/elements/shell/coque/cdleni.F
+!||    cepschk                   ../starter/source/elements/shell/coque/cepsini.F
+!||    cepsini                   ../starter/source/elements/shell/coque/cepsini.F
+!||    ceveci                    ../starter/source/elements/shell/coque/ceveci.F
+!||    cfailini                  ../starter/source/elements/shell/coque/cfailini.F
+!||    cinmas                    ../starter/source/elements/shell/coque/cinmas.F
+!||    cm27in3                   ../starter/source/materials/mat/mat027/cm27in3.F
+!||    cm35in3                   ../starter/source/materials/mat/mat035/cm35in3.F
+!||    cm58in3                   ../starter/source/materials/mat/mat058/cm58in3.F
+!||    cmatini                   ../starter/source/materials/mat_share/cmatini.F
+!||    corth3                    ../starter/source/elements/shell/coque/corth3.F
+!||    corthdir                  ../starter/source/elements/shell/coque/corthdir.F
+!||    corthini                  ../starter/source/elements/shell/coque/corthini.F
+!||    csigini                   ../starter/source/elements/shell/coque/csigini.F
+!||    csms11_ini                ../starter/source/elements/shell/coque/cinit3.F
+!||    cuserini                  ../starter/source/elements/shell/coque/cuserini.F
+!||    cveok3                    ../starter/source/elements/shell/coque/cveok3.F
+!||    fail_windshield_init      ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
+!||    fractal_dmg_init          ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
+!||    fretitl2                  ../starter/source/starter/freform.F
+!||    initemp_shell             ../starter/source/materials/therm/initemp_shell.F90
+!||    law158_init               ../starter/source/materials/mat/mat158/law158_init.F
+!||    law42c_ini                ../starter/source/materials/mat/mat042/law42c_ini.F90
+!||    layini1                   ../starter/source/elements/shell/coqueba/layini1.F
+!||    thickini                  ../starter/source/elements/shell/coqueba/thickini.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod                 ../starter/share/modules1/drape_mod.F
+!||    fractal_dmg_init_mod      ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
+!||    initemp_shell_mod         ../starter/source/materials/therm/initemp_shell.F90
+!||    law42c_ini_mod            ../starter/source/materials/mat/mat042/law42c_ini.F90
+!||    message_mod               ../starter/share/message_module/message_mod.F
+!||    stack_mod                 ../starter/share/modules1/stack_mod.F
+!||====================================================================
       SUBROUTINE CINIT3(ELBUF_STR,IXC     ,PM      ,X       ,GEO     ,
      2                  XMAS     ,IN      ,NVC     ,DTELEM  ,IGRSH4N ,
      3                  XREFC    ,NEL     ,ITHK    ,IHBE    ,IGRSH3N ,
@@ -91,6 +95,9 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       use brokmann_random_def_mod
       use glob_therm_mod
+      use initemp_shell_mod
+      use element_mod , only : nixc
+      use law42c_ini_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -156,6 +163,7 @@ C-----------------------------------------------
      .                             E1X,E2X,E3X,E1Y,E2Y,E3Y,E1Z,E2Z,E3Z,
      .                             X2S,Y2S,X3S,Y3S,X4S,Y4S,
      .                             X2L,X3L,X4L,Y2L,Y3L,Y4L
+      my_real, DIMENSION(NEL) :: TEMPEL
       my_real, DIMENSION(:) ,POINTER :: UVAR,DIR1,DIR2
       my_real, ALLOCATABLE, DIMENSION(:) :: DIR_A,DIR_B
       my_real, DIMENSION(:), ALLOCATABLE :: PHI1,PHI2,COOR1,COOR2,COOR3,COOR4
@@ -283,6 +291,12 @@ C         PART_AREA(IP) = PART_AREA(IP) + AREA(I)
           IF (GBUF%G_AREA > 0) GBUF%AREA(I) = AREA(I)
         ENDDO
       ENDIF
+!
+!     Initialize element temperature from /initemp
+!      
+      IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+        CALL INITEMP_SHELL(ELBUF_STR,TEMP,NEL,NUMNOD,NUMELC,4,NIXC,IXC)    
+      END IF
 C------------
       CALL CINMAS(X     ,XREFC(1,1,NFT+1),IXC       ,GEO       ,PM,
      .            XMAS  ,IN              ,THK       ,IHBE       ,PARTSAV,
@@ -343,7 +357,7 @@ c
      .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
      .                E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,
-     .                NPT_ALL  ,IDRAPE)
+     .                NPT_ALL  ,IDRAPE,LTITR ,NIXC      ,IXC(1,NFT+1))
 c
       ELSEIF (MTN == 27) THEN
         CALL CM27IN3(ELBUF_STR,
@@ -372,7 +386,7 @@ c
      .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
      .                E1X, E2X, E3X, E1Y, E2Y, E3Y ,E1Z, E2Z, E3Z ,
-     .                NPT_ALL  ,IDRAPE)
+     .                NPT_ALL  ,IDRAPE,LTITR ,NIXC      ,IXC(1,NFT+1))
       ENDIF
 c
       IF ((MTN == 58 .or. MTN == 158) .AND. 
@@ -455,9 +469,24 @@ C
             ENDIF ! IF (ILAW == 58) THEN
           ENDDO ! DO IL = 1,NLAY      
         ENDIF 
+      END IF !(IGTYP == 51 .OR. IGTYP == 52 .AND. IGMAT > 0) THEN
+      IF (MTN == 42 .OR. MTN == 69 .OR. IGTYP == 51 .OR. IGTYP == 52) THEN
+          DO IL = 1,NLAY
+            NPTT  = ELBUF_STR%BUFLY(IL)%NPTT
+            ILAW  = ELBUF_STR%BUFLY(IL)%ILAW
+            NUVAR = ELBUF_STR%BUFLY(IL)%NVAR_MAT
+!
+            IF (ILAW == 42 .OR. MTN == 69) THEN
+              DO IT=1,NPTT
+                LBUF => ELBUF_STR%BUFLY(IL)%LBUF(IR,IS,IT)
+                UVAR => ELBUF_STR%BUFLY(IL)%MAT(IR,IS,IT)%VAR 
+                CALL law42c_ini(NUVAR,UVAR,LLT)
+              ENDDO
+            ENDIF ! IF (ILAW == 42) THEN
+          ENDDO ! DO IL = 1,NLAY      
       ENDIF
 C-----------------------------------------------------------------------
-C     CALCUL DES CONTRAINTES INITIALES
+C     calculation of initial constraints
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       IF (ISIGSH/=0 .OR. ITHKSHEL == 2) THEN
 C to be checked for IGTYP = 51 : ok
@@ -485,6 +514,11 @@ C to be checked for IGTYP = 51 : ok
      6       E2X     ,E3X      ,E1Y      ,E2Y       ,E3Y       ,
      7       E1Z     ,E2Z      ,E3Z      ,ISIGSH    ,DIR_A     ,
      8       DIR_B   ,POSLY    ,IGTYP    )    
+           IF (MPT == 0) THEN
+             DO I=LFT,LLT
+               GBUF%FOR_G(I+JJ(1:5))=GBUF%FOR(I+JJ(1:5))
+             END DO
+           END IF 
       ELSEIF ( ITHKSHEL == 1 ) THEN
         CALL THICKINI(LFT     ,LLT   ,NFT    ,PTSHEL,NUMELC,
      2                GBUF%THK,THK   ,IXC    ,NIXC  ,NSIGSH,
@@ -576,7 +610,7 @@ C to be checked for IGTYP = 51
      .              NPTT     ,NLAY     ,SIGSH   ,NSIGSH  ,PTSHEL  ,
      .              RNOISE   ,PERTURB  ,ALDT    ,THK     )
 C-------------------------------------------
-C    CALCUL DES DT ELEMENTAIRES
+C    calculation of elementary dt
 C-------------------------------------------
 c        IGTYP=GEO(12,IXC(6,I+NFT))
         IF (IGTYP /= 0  .AND. IGTYP /= 1  .AND.
@@ -624,15 +658,20 @@ C---
 C-----------------------------
       RETURN
       END SUBROUTINE CINIT3      
-      !||====================================================================
-      !||    csms11_ini   ../starter/source/elements/shell/coque/cinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbainit3     ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cinit3       ../starter/source/elements/shell/coque/cinit3.F
-      !||====================================================================
+!||====================================================================
+!||    csms11_ini    ../starter/source/elements/shell/coque/cinit3.F
+!||--- called by ------------------------------------------------------
+!||    cbainit3      ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cinit3        ../starter/source/elements/shell/coque/cinit3.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE CSMS11_INI(
      1           JFT    ,JLT   ,IXC   ,X      ,X2S     ,
      2           Y2S    ,X3S   ,Y3S   ,X4S    ,Y4S     )
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -662,10 +701,7 @@ C-----------------------------------------------
       my_real
      .   E1X(MVSIZ), E1Y(MVSIZ), E1Z(MVSIZ),
      .   E2X(MVSIZ), E2Y(MVSIZ), E2Z(MVSIZ),
-     .   E3X(MVSIZ), E3Y(MVSIZ), E3Z(MVSIZ),
-     .   X31(MVSIZ), Y31(MVSIZ), Z31(MVSIZ),
-     .   X42(MVSIZ), Y42(MVSIZ), Z42(MVSIZ),
-     .   X21(MVSIZ), Y21(MVSIZ), Z21(MVSIZ)
+     .   E3X(MVSIZ), E3Y(MVSIZ), E3Z(MVSIZ)
 C---------------------------------------------------------------
        DO I=JFT,JLT
          X1(I)=ZERO

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    damping_vref_rby_mod   ../engine/source/assembly/damping_vref_rby.F90
-      !||--- called by ------------------------------------------------------
-      !||    rbyfor                 ../engine/source/constraints/general/rbody/rbyfor.F
-      !||====================================================================
+!||====================================================================
+!||    damping_vref_rby_mod   ../engine/source/assembly/damping_vref_rby.F90
+!||--- called by ------------------------------------------------------
+!||    rbyfor                 ../engine/source/constraints/general/rbody/rbyfor.F
+!||====================================================================
       module damping_vref_rby_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
@@ -35,38 +36,39 @@
 !!\brief This subroutine computes damping forces for /DAMP/VREL with RBODY
 !=======================================================================================================================
 !
-      !||====================================================================
-      !||    damping_vref_rby            ../engine/source/assembly/damping_vref_rby.F90
-      !||--- called by ------------------------------------------------------
-      !||    rbyfor                      ../engine/source/constraints/general/rbody/rbyfor.F
-      !||--- calls      -----------------------------------------------------
-      !||    damping_vref_sum6_rby       ../engine/source/assembly/damping_vref_sum6_rby.F90
-      !||    get_u_func                  ../engine/source/user_interface/ufunc.F
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod                ../common_source/modules/constant_mod.F
-      !||    damping_vref_sum6_rby_mod   ../engine/source/assembly/damping_vref_sum6_rby.F90
-      !||    groupdef_mod                ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    damping_vref_rby                 ../engine/source/assembly/damping_vref_rby.F90
+!||--- called by ------------------------------------------------------
+!||    rbyfor                           ../engine/source/constraints/general/rbody/rbyfor.F
+!||--- calls      -----------------------------------------------------
+!||    damping_vref_compute_dampa       ../engine/source/assembly/damping_vref_compute_dampa.F90
+!||    damping_vref_sum6_rby            ../engine/source/assembly/damping_vref_sum6_rby.F90
+!||    get_u_func                       ../engine/source/user_interface/ufunc.F
+!||--- uses       -----------------------------------------------------
+!||    constant_mod                     ../common_source/modules/constant_mod.F
+!||    damping_vref_compute_dampa_mod   ../engine/source/assembly/damping_vref_compute_dampa.F90
+!||    damping_vref_sum6_rby_mod        ../engine/source/assembly/damping_vref_sum6_rby.F90
+!||    groupdef_mod                     ../common_source/modules/groupdef_mod.F
+!||    precision_mod                    ../common_source/modules/precision_mod.F90
+!||====================================================================
         subroutine damping_vref_rby(igrnod,ngrnod,v,vr,a,                             &
           x,ms,dampr,nrdamp,ndamp,                          &
           ndamp_vrel,iparit,numnod,dt1,id_damp_vrel,        &
           tt,nnpby,nrbykin,npby,rby6,                       &
           rby6_c,tagslv_rby,weight,lskew,numskw,            &
-          dim,damp,skew,wfext,size_rby6_c)
+          dim,damp,skew,wfext,size_rby6_c,nhi)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use GROUPDEF_MOD , only: GROUP_
           use constant_mod , only: pi,one,zero,two,half,em20
           use damping_vref_sum6_rby_mod
+          use damping_vref_compute_dampa_mod
+          use precision_mod , only: WP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -87,16 +89,17 @@
           integer,                                   intent(in) :: numskw                      !< number of skews
           integer,                                   intent(in) :: dim                         !< first dimension of array damp
           integer,                                   intent(in) :: size_rby6_c                 !< dimension of array rby6c
-          my_real,                                   intent(in) :: v(3,numnod)                 !< nodal velocity
-          my_real,                                   intent(in) :: vr(3,numnod)                !< nodal rotational velocity
-          my_real,                                intent(inout) :: a(3,numnod)                 !< nodal force
-          my_real,                                   intent(in) :: x(3,numnod)                 !< node position
-          my_real,                                   intent(in) :: ms(numnod)                  !< nodal mass
-          my_real,                                intent(inout) :: dampr(nrdamp,ndamp)         !< main structure for option /DAMP
-          my_real,                                   intent(in) :: dt1                         !< time step
-          my_real,                                   intent(in) :: tt                          !< current time
-          my_real,                                intent(inout) :: damp(dim,numnod)            !< damping force at previous time step
-          my_real,                                   intent(in) :: skew(lskew,numskw)          !< main structure for skews
+          integer,                                   intent(in) :: nhi                         !< hierarchy level of Rbody
+          real(kind=WP),                                   intent(in) :: v(3,numnod)                 !< nodal velocity
+          real(kind=WP),                                   intent(in) :: vr(3,numnod)                !< nodal rotational velocity
+          real(kind=WP),                                intent(inout) :: a(3,numnod)                 !< nodal force
+          real(kind=WP),                                   intent(in) :: x(3,numnod)                 !< node position
+          real(kind=WP),                                   intent(in) :: ms(numnod)                  !< nodal mass
+          real(kind=WP),                                intent(inout) :: dampr(nrdamp,ndamp)         !< main structure for option /DAMP
+          real(kind=WP),                                   intent(in) :: dt1                         !< time step
+          real(kind=WP),                                   intent(in) :: tt                          !< current time
+          real(kind=WP),                                intent(inout) :: damp(dim,numnod)            !< damping force at previous time step
+          real(kind=WP),                                   intent(in) :: skew(lskew,numskw)          !< main structure for skews
           double precision,                       intent(inout) :: wfext                       !< external forces work
           double precision,                       intent(inout) :: rby6(8,6,nrbykin)           !< working array for rigid body assembly
           double precision,                       intent(inout) :: rby6_c(2,6,size_rby6_c)     !< working array for rigid body damping assembly
@@ -104,7 +107,7 @@
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
           integer :: nd,id,igr,isk,id_rby,id_func,im,nsn
-          my_real :: freq,damp_a(3),damp_a2(3),fact,get_u_func,dxdy,dtini,t_start,t_stop
+          real(kind=WP) :: damp_a(3),damp_a2(3),get_u_func,t_start,t_stop
           double precision :: dw
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   External functions
@@ -125,46 +128,19 @@
             t_stop  = dampr(18,id)
 !
             if ((id_rby > 0).and.(tt>=t_start).and.(tt<=t_stop)) then
+              if (npby(20,id_rby)/=nhi) cycle
               igr   = nint(dampr(2,id))
               isk   = nint(dampr(15,id))
               id_func = nint(dampr(26,id))
-              freq = dampr(28,id)
-              dtini = dampr(29,id)
               im = npby(1,id_rby)
               nsn = igrnod(igr)%nentity
 !
-              if (id_func > 0) THEN
-                fact = get_u_func(id_func,tt,dxdy)
-              else
-                fact = one
-              endif
+!             computation of damping parameters - function of time
+              call damping_vref_compute_dampa(id,ndamp,nrdamp,dampr,dt1,tt,damp_a)
 !
-              if (dt1 > zero) then
-                if (freq > zero) then
-                  damp_a(1)  = fact*dampr(3,id)*4*pi*freq
-                  damp_a(2)  = fact*dampr(5,id)*4*pi*freq
-                  damp_a(3)  = fact*dampr(7,id)*4*pi*freq
-                else
-                  if (dtini == zero) then
-!                   Initial time step is saved
-                    dtini = dt1
-                    dampr(29,id) = dt1
-                  endif
-                  damp_a(1)  = fact*dampr(3,id)*(one/dtini)
-                  damp_a(2)  = fact*dampr(5,id)*(one/dtini)
-                  damp_a(3)  = fact*dampr(7,id)*(one/dtini)
-                endif
-              else
-                damp_a(1)  = zero
-                damp_a(2)  = zero
-                damp_a(3)  = zero
-              endif
               damp_a2(1)  = dampr(22,id)
               damp_a2(2)  = dampr(23,id)
               damp_a2(3)  = dampr(24,id)
-!
-!             damping coefficient is saved for timestep computation in dtnodarayl.F
-              dampr(30,id) = max(damp_a(1),damp_a(1),damp_a(3))
 !
               call damping_vref_sum6_rby(nsn,igr,id_rby,isk,im,                  &
                 igrnod,ngrnod,v,vr,a,                   &
@@ -173,9 +149,9 @@
                 numskw,skew,damp_a,dim,damp,            &
                 dw,damp_a2,iparit,size_rby6_c)
 !
-            endif
+            end if
 !
-          enddo
+          end do
 !
           wfext = wfext + dw
 !

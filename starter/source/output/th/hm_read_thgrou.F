@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,41 +20,44 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_thgrou         ../starter/source/output/th/hm_read_thgrou.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_read_thgrki         ../starter/source/output/th/hm_read_thgrki.F
-      !||    hm_read_thgrki_rbody   ../starter/source/output/th/hm_read_thgrki_rbody.F
-      !||    hm_read_thgrne         ../starter/source/output/th/hm_read_thgrne.F
-      !||    hm_read_thgrns         ../starter/source/output/th/hm_read_thgrns.F
-      !||    hm_read_thgrpa         ../starter/source/output/th/hm_read_thgrpa.F
-      !||    hm_read_thgrpa_sub     ../starter/source/output/th/hm_read_thgrpa.F
-      !||    hm_read_thgrsens       ../starter/source/output/th/hm_read_thgrsens.F
-      !||    hm_read_thgrsurf       ../starter/source/output/th/hm_read_thgrsurf.F
-      !||    hm_thgrki_vent         ../starter/source/output/th/hm_thgrki_vent.F
-      !||    th_titles              ../starter/source/output/th/th_titles.F90
-      !||    thprin                 ../starter/source/output/th/thprin.F
-      !||    thprin_sub             ../starter/source/output/th/thprin.F
-      !||    udouble                ../starter/source/system/sysfus.F
-      !||    ulist2s                ../starter/source/system/sysfus.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||    write_thnms1           ../starter/source/output/th/write_thnms1.F90
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    mapping_option_mod     ../starter/share/modules1/dichotomy_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    monvol_struct_mod      ../starter/share/modules1/monvol_struct_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||    th_titles_mod          ../starter/source/output/th/th_titles.F90
-      !||    write_thnms1_mod       ../starter/source/output/th/write_thnms1.F90
-      !||====================================================================
+!||====================================================================
+!||    hm_read_thgrou                ../starter/source/output/th/hm_read_thgrou.F
+!||--- called by ------------------------------------------------------
+!||    lectur                        ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                        ../starter/source/output/message/message.F
+!||    fretitl                       ../starter/source/starter/freform.F
+!||    hm_option_count               ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key            ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start               ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_read_thchecksum            ../starter/source/output/th/hm_read_thchecksum.F90
+!||    hm_read_thgrki                ../starter/source/output/th/hm_read_thgrki.F
+!||    hm_read_thgrki_rbody          ../starter/source/output/th/hm_read_thgrki_rbody.F
+!||    hm_read_thgrne                ../starter/source/output/th/hm_read_thgrne.F
+!||    hm_read_thgrns                ../starter/source/output/th/hm_read_thgrns.F
+!||    hm_read_thgrpa                ../starter/source/output/th/hm_read_thgrpa.F
+!||    hm_read_thgrpa_sub            ../starter/source/output/th/hm_read_thgrpa.F
+!||    hm_read_thgrsens              ../starter/source/output/th/hm_read_thgrsens.F
+!||    hm_read_thgrsurf              ../starter/source/output/th/hm_read_thgrsurf.F
+!||    hm_thgrki_vent                ../starter/source/output/th/hm_thgrki_vent.F
+!||    th_titles                     ../starter/source/output/th/th_titles.F90
+!||    thprin                        ../starter/source/output/th/thprin.F
+!||    thprin_sub                    ../starter/source/output/th/thprin.F
+!||    udouble                       ../starter/source/system/sysfus.F
+!||    ulist2s                       ../starter/source/system/sysfus.F
+!||    usr2sys                       ../starter/source/system/sysfus.F
+!||    write_thnms1                  ../starter/source/output/th/write_thnms1.F90
+!||--- uses       -----------------------------------------------------
+!||    checksum_starter_option_mod   ../starter/source/output/checksum/checksum_option.F90
+!||    hm_option_read_mod            ../starter/share/modules1/hm_option_read_mod.F
+!||    hm_read_th_checksum_mod       ../starter/source/output/th/hm_read_thchecksum.F90
+!||    mapping_option_mod            ../starter/share/modules1/dichotomy_mod.F
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    monvol_struct_mod             ../starter/share/modules1/monvol_struct_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||    th_titles_mod                 ../starter/source/output/th/th_titles.F90
+!||    write_thnms1_mod              ../starter/source/output/th/write_thnms1.F90
+!||====================================================================
       SUBROUTINE HM_READ_THGROU(
      1      ITHGRP        ,ITHBUF        ,ITAB             ,ITABM1            ,IXTG          ,
      2      IXS           ,IXQ           ,IXC              ,IXT               ,IXP           ,
@@ -70,7 +73,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      C      IPARTS        ,IPARTQ        ,IPARTC           ,IPARTT            ,IPARTP        ,IPARTR ,
      D      IPARTG        ,IPARTX        ,IPARTSP          ,IPARTIG3D         ,LITHBUFMX     ,
      E      MAP_TABLES    ,IFLAG         ,PTR_NOPT_SLIPRING,PTR_NOPT_RETRACTOR,SENSORS       ,
-     F      INTERFACES    ,IPARI         ,DUMP_THNMS1_FILE ,ITHERM_FE)
+     F      INTERFACES    ,IPARI         ,DUMP_THNMS1_FILE ,ITHERM_FE         ,CHECKSUM      ,
+     G      NSUBDOM       ,IPRI)
 C-----------------------------------------------
       USE MY_ALLOC_MOD
       USE MESSAGE_MOD
@@ -85,6 +89,11 @@ C-----------------------------------------------
       USE write_thnms1_mod
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE
       USE USER_ID_MOD , ONLY : ID_LIMIT
+      USE checksum_output_option_mod
+      USE checksum_starter_option_mod
+      use hm_read_th_checksum_mod
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
+      use seatbelt_mod , only : NGUIDED_CABLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -103,6 +112,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER,INTENT(IN) :: NSUBDOM
+      INTEGER,INTENT(IN) :: IPRI
       INTEGER,INTENT(IN) :: LITHBUFMX
       INTEGER,INTENT(IN) :: ITHERM_FE
       INTEGER ITAB(NUMNOD),ITABM1(*), IFLAG,
@@ -135,6 +146,7 @@ C-----------------------------------------------
       TYPE (SUBSET_) , DIMENSION(NSUBS) :: SUBSET
       TYPE (SURF_)   , DIMENSION(NSURF) :: IGRSURF
       INTEGER, INTENT(IN)::  DUMP_THNMS1_FILE
+      TYPE(checksum_option_) , INTENT(IN) :: checksum
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -150,6 +162,7 @@ C-----------------------------------------------
       INTEGER NVARNS,NVARSPH
       INTEGER NVARIN,NVARRW,NVARRB,NVARAC,NVARSE,NVARJO,NVARFX,NVARFXM
       INTEGER NVARAB,NVARMV4,NVARMV,NVARPA,NVARMVENT,NVARSENS,NVARSENSG
+      INTEGER NVARCHECKSUM,NVARCHECKSUMG
       INTEGER NVARF1,NVARFR,NVARGAU,NVARCLUS,NVARCLUSG,NVARFLOW,NVARSURF
       INTEGER NVARRIV,NVARRIVG,NVARSLIP,NVARRET,NSELRT,INOUT
       INTEGER HM_NTHGRP,NTHACCEL,NTHINTER,NTHRWALL,NTHSECTIO,NTHCLUS
@@ -157,12 +170,12 @@ C-----------------------------------------------
       INTEGER NTHMONVOL,HM_NTHPART ,NUMTHPART, HM_NTHSUBS, HM_NTHSURF
       INTEGER HM_NTHSPHCEL, HM_NTHQUAD, HM_NTHSPHFLOW
       INTEGER HM_NTHGAUGE, HM_NTHFXBODY, HM_NTHFRAME, HM_NTHCYLJO, HM_NTHNSTRAND   
-      INTEGER HM_NTHTRIA,HM_NTHSLIPRING,HM_NTHRETRACTOR,HM_NTHSENS
+      INTEGER HM_NTHTRIA,HM_NTHSLIPRING,HM_NTHRETRACTOR,HM_NTHSENS,HM_NTHCHECKSUM
       PARAMETER (NVARRIV = 10,NVARRIVG = 1)
       INTEGER IVARRIV(18,NVARRIVG)
       CHARACTER*10 VARRIV(NVARRIV),VARRIVG(NVARRIVG)
 C-----------------------------------------------
-      PARAMETER (NVARN = 637,NVARN1 = 19,NVARN1A = 600,NVARN2 = 9 ,NVARNPINCH = 9)
+      PARAMETER (NVARN1 = 19,NVARN1A = 600,NVARN2 = 10 ,NVARNPINCH = 9)
       PARAMETER (NVARS1 = 196,NVARS2 = 567,NVARS3 = 369,NVARS4 = 492,NVARS5 = 22)
       PARAMETER (NVARS6 = 97200,NVARS7 = 97200,NVARS8 = 516,NVARS9 = 6,NVARS10 = 1,NVARSNLOC = 2)
       PARAMETER (NVARS =239555 ,NVARC = 37856,NVART = 6)
@@ -172,10 +185,10 @@ C-----------------------------------------------
       PARAMETER (NVARFXM = 3)
       PARAMETER (NVARAC = 6,NVARSE =39,NVARJO = 6)
       PARAMETER (NVARAB = 7,NVARMV4= 9,NVARMV = 19,NVARMVENT = 150)
-      PARAMETER (NVARPA = 31)
-      PARAMETER (NVARF1 = 18,NVARFR = 24,NVARGAU = 8,NVARCLUS=11,NVARFLOW=1,
-     .           NVARSURF = 6,NVARSLIP=6,NVARRET=3)
-      CHARACTER*10 VARN(NVARN),VART(NVART)
+      PARAMETER (NVARPA = 32)
+      PARAMETER (NVARF1 = 18,NVARFR = 24,NVARGAU = 8,NVARCLUS=11,NVARFLOW=1,NVARSURF = 6,NVARSLIP=6,NVARRET=3)
+      CHARACTER*10, DIMENSION(:), ALLOCATABLE :: VARN
+      CHARACTER*10 :: VART(NVART)
       CHARACTER*10 VARP(NVARP),VARR(NVARR),VARUR(NVARUR)
       CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE::VARS
       CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE::VARC
@@ -216,6 +229,7 @@ C-----------------------------------------------
       PARAMETER (NVARF1G = 3,NVARFRG = 4,NVARGAUG = 1,NVARCLUSG=2,NVARFLOWG=1,
      .           NVARSURFG = 1,NVARSLIPG=1,NVARRETG = 1)
       PARAMETER (NVARSENS = 1,NVARSENSG = 1)
+      PARAMETER (NVARCHECKSUM = 1,NVARCHECKSUMG = 1)
       CHARACTER*10 VARNG(NVARNG)
       CHARACTER*10 VARCG(NVARCG),VARTG(NVARTG)
       CHARACTER*10 VARPG(NVARPG),VARRG(NVARRG),VARURG(NVARURG)
@@ -223,7 +237,8 @@ C-----------------------------------------------
       CHARACTER*10 VARING(NVARING),VARRWG(NVARRWG),VARRBG(NVARRBG)
       CHARACTER*10 VARACG(NVARACG),VARSEG(NVARSEG),VARJOG(NVARJOG)
       CHARACTER*10 VARABG(NVARABG),VARMVG4(NVARMG4),VARMVG(NVARMVG),
-     .             VARMVENTG(NVARMVENTG),VARSENS(NVARSENS),VARSENSG(NVARSENSG)
+     .             VARMVENTG(NVARMVENTG),VARSENS(NVARSENS),VARSENSG(NVARSENSG),
+     .             VARCHECKSUM(NVARCHECKSUM),VARCHECKSUMG(NVARCHECKSUMG)
       CHARACTER*10 VARPAG(NVARPAG),VARFXG(NVARFXG),VARFXMG(NVARFXMG)
       CHARACTER*10 VARF1G(NVARF1G),VARFRG(NVARFRG),VARGAUG(NVARGAUG)
       CHARACTER*10 VARCLUSG(NVARCLUSG),VARFLOWG(NVARFLOWG)
@@ -245,7 +260,8 @@ C-----------------------------------------------
       INTEGER IVARF1G(18,NVARF1G),IVARFRG(18,NVARFRG),
      .        IVARGAUG(18,NVARGAUG),IVARCLUSG(18,NVARCLUSG),
      .        IVARFLOWG(18,NVARFLOWG),IVARSURFG(18,NVARSURFG),
-     .        IVARSLIPG(18,NVARSLIPG),IVARRETG(18,NVARRETG)
+     .        IVARSLIPG(18,NVARSLIPG),IVARRETG(18,NVARRETG),
+     .        IVARCHECKSUMG(18,NVARCHECKSUMG)
       INTEGER NSMA
       INTEGER IUN,INODACC,INODFRA
       INTEGER NNOD, NSHEL, NTRUS, NBEAM, NSPRG, NCHTG, NCHINT, NCHJNT,
@@ -279,6 +295,11 @@ C-----------------------------------------------
      .                              VARSLIP_TITLE,VARRET_TITLE,
      .                              VARCLUS_TITLE,VARFLOW_TITLE,
      .                              VARSURF_TITLE,VARSENS_TITLE
+     
+        INTEGER :: LEN_TITLE
+        INTEGER :: LEN_CHECKSUM
+        CHARACTER(LEN=NCHARLINE):: CHECKSUM_TITLE
+        CHARACTER(LEN=64):: DECK_CHECKSUM
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -293,6 +314,11 @@ C-----------------------------------------------
 C   TH TITLES
 C   DON T MISS TO ADD TH TITLES FOR NEW TH OPTIONS 
 C-----------------------------------------------
+
+      NVARN = NVARN1 + NVARN1A + NVARN2 + NVARNPINCH
+      ALLOCATE(VARN(NVARN))
+
+
       ALLOCATE(VARN1_TITLE(NVARN1),VARN1A_TITLE(NVARN1A),VARN2_TITLE(NVARN2),VARNPINCH_TITLE(NVARNPINCH),
      .         VARP_TITLE(NVARP),VARR_TITLE(NVARR),VART_TITLE(NVART),
      .         VARS1_TITLE(NVARS1),VARS2_TITLE(NVARS2),VARS3_TITLE(NVARS3),VARS4_TITLE(NVARS4),
@@ -308,6 +334,7 @@ C-----------------------------------------------
      .         VARCLUS_TITLE(NVARCLUS),VARFLOW_TITLE(NVARFLOW),
      .         VARSURF_TITLE(NVARSURF),VARSENS_TITLE(1))
 
+    
       CALL TH_TITLES(
      1      NVARN1        ,NVARN1A       ,NVARN2           ,NVARNPINCH        ,NVARS1           ,
      1      NVARS2        ,NVARS3        ,NVARS4           ,NVARS5            ,NVARS6           ,
@@ -338,10 +365,15 @@ C-----------------------------------------------
       ALLOCATE(VARS7(97200))
       VARS7(1:97200) = ' '
       ALLOCATE(VARSG2(19782))
+      VARSG2(1:19782) = ' '
       ALLOCATE(VARSG3(19782))
+      VARSG3(1:19782) = ' '
       ALLOCATE(VARS(NVARS))
+      VARS(1:NVARS) = ' '
       ALLOCATE(VARC(NVARC))
+      VARC(1:NVARC) = ' '
       ALLOCATE(VARSG(NVARSG))
+      VARSG(1:NVARSG) = ' '
 
       ! INTEGER Arrays - use MY_ALLOC
       CALL MY_ALLOC(IVARSG,18,NVARSG)
@@ -355,7 +387,8 @@ C   nodes
      .           'TEMP    '/
       DATA VARN2/'REACX   ','REACY   ','REACZ   ',
      .           'REACXX  ','REACYY  ','REACZZ  ',
-     .           'DRX     ','DRY     ','DRZ     '/
+     .           'DRX     ','DRY     ','DRZ     ',
+     .           'PEXT    '/
       DATA VARNPINCH/
      .          'APINCHX ','APINCHY ','APINCHZ ',
      .          'VPINCHX ','VPINCHY ','VPINCHZ ',
@@ -1154,6 +1187,9 @@ C   monitored volume
      . 'AO      ','UO      ','AC      ','UC      ','CP      ',
      . 'CV      ','GAMA    ','DTBAG   ','NFV     ','MASS-IN ',
      . 'ENTHA-IN','ENER-INT','WORK    ','UPCRIT  '/
+C
+C Caution : all variables added or defined in VARMV/ must be added also in VARMVENT/
+C
       DATA VARMVENT/
      . 'MASS    ','VOL     ','P       ','A       ','T       ',
      . 'AO      ','UO      ','AC      ','UC      ','CP      ',
@@ -1193,7 +1229,7 @@ C   part
      . 'IYY     ','IZZ     ','IXY     ','IYZ     ','IZX     ',
      . 'RIE     ','KERB    ','RKERB   ','RKE     ','ERODED  ',
      . 'UNUSED  ','UNUSED  ','HEAT    ','VX      ','VY      ',
-     . 'VZ      '/
+     . 'VZ      ','PW      '/
 C   rivets
       DATA VARRIV/
      . 'OFF     ','F1X     ','F1Y     ','F1Z     ','F2X     ',
@@ -1213,7 +1249,7 @@ C   frames
       DATA VARGAU/
      . 'P       ','IE      ','DENS    ','T       ','PA      ',
      . 'PAX     ','PAY     ','PAZ     '/
-C     element cluster
+C     cluster element
       DATA VARCLUS/
      . 'FX      ','FY      ','FZ      ','MX      ','MY      ',
      . 'MZ      ','FS      ','FN      ','MS      ','MN      ',
@@ -1231,6 +1267,9 @@ C
 c
       DATA VARSENS/
      . 'STATUS   '/
+c
+      DATA VARCHECKSUM/
+     . 'CHECKSUM '/
 C-----------------------------------------------
 C   TH GENERIC VARIABLES
 C-----------------------------------------------
@@ -1245,7 +1284,7 @@ C-----------------------------------------------
      .         10,11,12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      .         13,14,15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      .         16,17,18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     .         629,630,631,632,633,634,635,636,637, 0, 0, 0, 0, 0, 0, 0, 0, 0/
+     .         630,631,632,633,634,635,636,637,638, 0, 0, 0, 0, 0, 0, 0, 0, 0/
       DATA VARSG1/
      .'DEF     ','STRESS  ','LOCSTRS ','SXGP    ','SYGP    ','SZGP    ',
      .'SXYGP   ','SYZGP   ','SXZGP   ','LSXGP   ','LSYGP   ','LSZGP   ',
@@ -1745,6 +1784,10 @@ C   frames
      . 'DEF      '/
       DATA IVARSENSG
      .         / 1, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
+      DATA VARCHECKSUMG/
+     . 'DEF      '/
+      DATA IVARCHECKSUMG
+     .         / 1, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
 C=======================================================================
       TAGP=0
       TAGS=0
@@ -1851,14 +1894,14 @@ C   options 20--->100  IVSG=196
        ENDDO
        IVSG = IVSG + 7
       ENDDO
-C  Options  101--->118 IVSG= 763
+C  Options 101 ---> 118 IVSG = 763
       DO I=101,118
        DO J=1,7
         IVARSG(J,I)= IVSG + J
        ENDDO
        IVSG = IVSG + 7
       ENDDO
-C  Options  118--->199 IVSG= 889
+C  Options 118 ---> 199 IVSG = 889
       DO I=119,199
        DO J=1,9
         IVARSG(J,I)= IVSG + J
@@ -1869,28 +1912,28 @@ C  Options  118--->199 IVSG= 889
         IVARSG(J,200)= IVSG + J
        ENDDO
          IVSG = IVSG + 6
-C  Options 201--->202 IVSG= 1624
+C  Options 201 ---> 202 IVSG = 1624
       DO I=201,202
        DO J=1,11
         IVARSG(J,I)= IVSG + J
        ENDDO
        IVSG = IVSG + 11
       ENDDO
-C  Options 203--->19984    IVSG= 1646
+C  Options 203 ---> 19984 IVSG = 1646
       DO I=203,19984
        DO J=1,6
         IVARSG(J,I)= IVSG + J
        ENDDO
        IVSG = IVSG + 6
       ENDDO
-C  Options 203--->19984    IVSG= 120338
+C  Options 203 ---> 19984 IVSG = 120338
       DO I=19985,39766
        DO J=1,6
         IVARSG(J,I)= IVSG + J
        ENDDO
        IVSG = IVSG + 6
       ENDDO
-C  Option LOCSTRN
+C  Locstrn option
       DO J=1,6
        IVARSG(J,39767)= 239030 + J
       ENDDO
@@ -2176,10 +2219,10 @@ C  ---- node + displacement by ply for shell
           VARN1A((J-1)*3  + 3 )= VAR
        ENDDO
       DO I=1,NVARN2
-       VARN(619+I) = VARN2(I)
+       VARN(NVARN1+NVARN1A+I) = VARN2(I)
       ENDDO
-      DO I=1,NVARNPINCH 
-       VARN(628+I) = VARNPINCH(I)
+      DO I=1,NVARNPINCH
+       VARN(NVARN1+NVARN1A+NVARN2+I) = VARNPINCH(I)
       ENDDO
       NNOD = 0
       CHNOD = 78
@@ -2296,7 +2339,7 @@ C
           CALL HM_READ_THGRKI(
      1      101      ,KEY      ,PTR_NOPT_INTER,
      2      IAD      ,IFI      ,ITHGRP(1,IGS) ,ITHBUF  ,
-     3      NVARIN   ,VARIN    ,NINTER+NINTSUB,VARING  ,NVARING  ,
+     3      NVARIN   ,VARIN,NINTER+NINTSUB+NGUIDED_CABLE,VARING  ,NVARING  ,
      4      IVARING  ,NSNE     ,NVALL  ,ITHVAR,FLAGABF ,NVARABF   ,
      5      NOM_OPT  ,IGS      ,LSUBMODEL, LITHBUFMX)
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS))
@@ -2518,7 +2561,7 @@ C
      4      NVARN ,VARN  ,0     ,VARNG   ,NVARNG   ,       
      5      IVARNG,NSNOD ,NVALL ,IMERGE  ,ITHVAR   ,ITHERM_FE,       
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,IBID,IBID)                          
-C         decode les numeros de skews.                               
+C         decode les numeros de skews.
           NNE =ITHGRP(4,IGS)                                         
           IAD2=ITHGRP(5,IGS)+NNE                                     
           DO K=1,NNE                                                 
@@ -2529,7 +2572,7 @@ C         decode les numeros de skews.
              GO TO 110                                               
             ENDIF                                                    
  100       CONTINUE                                                  
-C          decode les numeros de frames.                             
+C          decode les numeros de frames.
            DO 101 J=(NUMSKW+1)+MIN(IUN,NSPCOND)*NUMSPH+1+NSUBMOD,    
      .              (NUMSKW+1)+MIN(IUN,NSPCOND)*NUMSPH+NSUBMOD+      
      .               (NUMFRAM+1)                                     
@@ -2572,7 +2615,7 @@ C          decode les numeros de frames.
      4      NVARC ,VARC  ,NUMELC,VARCG ,NVARCG   ,
      5      IVARCG,NSELC,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%ISH4NM, NUMELC)                           
-C         decode les numeros de skews.                                  
+C         decode les numeros de skews.
           NNE =ITHGRP(4,IGS)                                            
           IAD2=ITHGRP(5,IGS)+3*NNE                                      
           DO K=1,NNE                                                    
@@ -3092,12 +3135,37 @@ c
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS))    
         ENDDO
       ENDIF
+      !-------------------------------------------
+      ! /TH/CHECKSUM ( activated automaticaly if /CHECKSUM is used )
+      !-------------------------------------------
+      HM_NTHCHECKSUM=CHECKSUM%checksum_count
+      IF (HM_NTHCHECKSUM > 0) THEN 
+        HM_NTHGRP = HM_NTHGRP + 1
+        IGS = IGS+1
+        CHECKSUM_TITLE = ''
+        DECK_CHECKSUM = ''
+          
+        TITR = 'CHECKSUM  '
+        CALL FRETITL(TITR,ITHGRP(NITHGR-LTITR+1,IGS),LTITR)
+
+
+        ITHGRP(1,IGS) = 100000
+        NVALL = 1
+        ITYP  = 121
+        KEY   = 'CHECKSUM  ' 
+        CALL HM_READ_THCHECKSUM(
+     1      121            ,KEY      ,IAD          ,IFI          ,NSNE ,
+     2      ITHGRP(1:,IGS) ,ITHBUF   ,NVARCHECKSUM ,VARCHECKSUM  ,LITHBUFMX,
+     3      CHECKSUM       ,NSUBDOM  ,NITHGR       ,LTITR        ,IPRI )
+c
+        NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS))    
+      ENDIF
 C
       DO N=1,NPART
         IF(IPART(8,N)>0) NSMAT=NSMAT+1
       ENDDO
 C=======================================================================
-C Tag des groupes avec des parts dans les TH PART et SUBSET non DEF
+C Tag groups with shares in th part and subset not def
 C=======================================================================
       DO NG=1,NGROUP
         NEL=IPARG(2,NG)
@@ -3141,7 +3209,7 @@ C=======================================================================
         ENDDO
       ENDDO
 C=======================================================================
-C print groupe de PART et SUBSET
+C print group of PART and SUBSET
 C=======================================================================
       CALL THPRIN(
      1          'PART      ',IPART ,LIPART1    ,4     ,
@@ -3150,11 +3218,11 @@ C=======================================================================
      1          'SUBSET    ',SUBSET ,ITHFLAG  ,1     ,
      2          NVSUBTH  ,ITHBUF    ,VARPA    ,NSUBS )
 C
-C     LES GROUPES TH PART ET SUBSET NE SONT PLUS UTILISES
+C     TH GROUPS PART AND SUBSET ARE NO LONGER USED
 C
       NTHGRP2=IGS
 C------------------------------------------------
-C Recherce des parts ou subsets dans plusieurs TH
+C Search for shares or subsets in several th
 C------------------------------------------------
       DO I=1,TAGP
         DO J=1, TAGP
@@ -3193,7 +3261,7 @@ C-------------------------------------
      2      NVARS2        ,NVARS3        ,NVARS4           ,NVARS5            ,NVARS6           ,
      3      NVARS7        ,NVARS8        ,NVARS9           ,NVARS10           ,NVARSNLOC        ,
      4      NVARP         ,NVARR         ,NVART            ,NVARNS            ,NVARSPH          ,
-     5      NVARIN        ,NVARRW        ,NVARRB           ,NVARMV            ,NVARSE           ,
+     5      NVARIN        ,NVARRW        ,NVARRB           ,NVARSE            ,
      5      NVARAC        ,NVARJO        ,NVARMVENT        ,NVARPA            ,NVARFX           ,
      6      NVARGAU       ,NVARFR        ,NVARSLIP         ,NVARRET           ,NVARCLUS         ,
      7      NVARFLOW      ,NVARSURF      ,NVARC            ,NVARSENS          ,
@@ -3203,17 +3271,17 @@ C-------------------------------------
      B      VARS6_TITLE   ,VARS7_TITLE   ,VARS8_TITLE      ,VARS9_TITLE       ,VARSNLOC_TITLE   ,
      C      VARC_TITLE    ,VARS10_TITLE  ,
      D      VARNS_TITLE   ,VARSPH_TITLE  ,VARIN_TITLE      ,
-     E      VARRW_TITLE   ,VARRB_TITLE   ,VARMV_TITLE      ,VARSE_TITLE       ,VARAC_TITLE      ,
+     E      VARRW_TITLE   ,VARRB_TITLE   ,VARSE_TITLE      ,VARAC_TITLE       ,
      F      VARJO_TITLE   ,VARMVENT_TITLE,VARPA_TITLE      ,VARFX_TITLE       ,VARGAU_TITLE     ,
      G      VARFR_TITLE   ,VARSLIP_TITLE ,VARRET_TITLE     ,VARCLUS_TITLE     ,VARFLOW_TITLE    ,
      H      VARSURF_TITLE ,VARSENS_TITLE ,
-     I      VARN1         ,VARN1A        ,VARN2            ,VARNPINCH        ,
+     I      VARN1         ,VARN1A        ,VARN2            ,VARNPINCH         ,
      J      VARP          ,VARR          ,VART             ,VARS1             ,VARS2            ,
      K      VARS3         ,VARS4         ,VARS5            ,VARS6             ,VARS7            ,
-     L      VARS8         ,VARS9         ,VARS10           ,VARSNLOC         ,
+     L      VARS8         ,VARS9         ,VARS10           ,VARSNLOC          ,
      M      VARC          ,
      N      VARNS         ,VARSPH        ,VARIN            ,
-     O      VARRW         ,VARRB         ,VARMV            ,VARSE             ,VARAC            ,
+     O      VARRW         ,VARRB         ,VARSE            ,VARAC             ,
      P      VARJO         ,VARMVENT      ,VARPA            ,VARFX             ,VARGAU           ,
      Q      VARFR         ,VARSLIP       ,VARRET           ,VARCLUS           ,VARFLOW          ,
      R      VARSURF       ,VARSENS       )
@@ -3246,6 +3314,8 @@ C-------------------------------------
      .           VARSLIP_TITLE,VARRET_TITLE,
      .           VARCLUS_TITLE,VARFLOW_TITLE,
      .           VARSURF_TITLE,VARSENS_TITLE)
+
+      DEALLOCATE(VARN)
       
 
       RETURN

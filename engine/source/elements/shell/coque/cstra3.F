@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cstra3       ../engine/source/elements/shell/coque/cstra3.F
-      !||--- called by ------------------------------------------------------
-      !||    cforc3       ../engine/source/elements/shell/coque/cforc3.F
-      !||    cforc3_crk   ../engine/source/elements/xfem/cforc3_crk.F
-      !||====================================================================
+!||====================================================================
+!||    cstra3       ../engine/source/elements/shell/coque/cstra3.F
+!||--- called by ------------------------------------------------------
+!||    cforc3       ../engine/source/elements/shell/coque/cforc3.F
+!||    cforc3_crk   ../engine/source/elements/xfem/cforc3_crk.F
+!||====================================================================
       SUBROUTINE CSTRA3(JFT    ,JLT  ,GSTR   ,SHF     ,AREA  , 
      2                  EXX    ,EYY  ,EXY    ,EXZ     ,EYZ   ,  
      3                  KXX    ,KYY  ,KXY    ,DT1C    ,EPSDOT, 
@@ -66,10 +66,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
-     .        I, MX, J, K
+     .        I, K
 C     REAL
       my_real
-     .   FAC1(MVSIZ), FAC2, Q1(MVSIZ), R1(MVSIZ), R2(MVSIZ),FC1P,
+     .   FAC1(MVSIZ), Q1(MVSIZ), R1(MVSIZ), R2(MVSIZ),
      .   FTMP1(MVSIZ),FTMP2(MVSIZ),FTMP5(MVSIZ),MTMP1(MVSIZ),
      .   MTMP2(MVSIZ),FTMP4(MVSIZ),MTMP3(MVSIZ),FTMP3(MVSIZ),
      .   GTMP1(MVSIZ),GTMP2(MVSIZ),GTMP3(MVSIZ),GTMP4(MVSIZ),

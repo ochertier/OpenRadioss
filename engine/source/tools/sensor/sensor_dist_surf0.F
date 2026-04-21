@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sensor_dist_surf0   ../engine/source/tools/sensor/sensor_dist_surf0.F
-      !||--- called by ------------------------------------------------------
-      !||    resol               ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    dist_node_seg3n     ../engine/source/tools/sensor/dist_node_seg3n.F
-      !||    dist_node_seg4n     ../engine/source/tools/sensor/dist_node_seg4n.F
-      !||    spmd_allreduce_db   ../engine/source/mpi/generic/spmd_allreduce_db.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod        ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sensor_dist_surf0   ../engine/source/tools/sensor/sensor_dist_surf0.F
+!||--- called by ------------------------------------------------------
+!||    resol               ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    dist_node_seg3n     ../engine/source/tools/sensor/dist_node_seg3n.F
+!||    dist_node_seg4n     ../engine/source/tools/sensor/dist_node_seg4n.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod        ../common_source/modules/groupdef_mod.F
+!||    sensor_mod          ../common_source/modules/sensor_mod.F90
+!||    spmd_mod            ../engine/source/mpi/spmd_mod.F90
+!||====================================================================
       SUBROUTINE SENSOR_DIST_SURF0(NSENSOR,SENSOR_TAB,X,IGRSURF,COMM_SENS16)
 !$COMMENT
 !       SENSOR_DIST_SURF0 description
@@ -45,6 +45,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 c-----------------------------------------------
 C   M o d u l e s
 c-----------------------------------------------
+      USE SPMD_MOD
       USE GROUPDEF_MOD
       USE SENSOR_MOD
 C-----------------------------------------------
@@ -69,11 +70,10 @@ C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------
        INTEGER I,ISURF,INOD,NP1,NP2,NP3,NP4,NSEG,IJK
-       my_real DIST,DMIN,DMAX,ALPHA,TMIN,TDELAY
+       my_real DIST,DMIN,DMAX,TMIN,TDELAY
        my_real XNOD,YNOD,ZNOD,XP1,YP1,ZP1,XP2,YP2,ZP2,XP3,YP3,ZP3,
-     .    XP4,YP4,ZP4,NORM,INFINITY
+     .    XP4,YP4,ZP4
       TYPE (SURF_) ,POINTER :: SURFACE
-      PARAMETER (INFINITY = 1.0E20)
       INTEGER :: ISENS
       my_real, DIMENSION(COMM_SENS16%NUM_SENS) :: LOCAL_VALUE,GLOBAL_VALUE
 !     -----------------------------------------------------------
@@ -175,7 +175,7 @@ c--------------------
       ! -----------------
       ! reduction with mpi comm
       IF(NSPMD>1) THEN
-        CALL SPMD_ALLREDUCE_DB(LOCAL_VALUE,GLOBAL_VALUE,COMM_SENS16%NUM_SENS,"MIN")
+        CALL SPMD_ALLREDUCE(LOCAL_VALUE,GLOBAL_VALUE,COMM_SENS16%NUM_SENS,SPMD_MIN)
       ELSE
         GLOBAL_VALUE(1:COMM_SENS16%NUM_SENS) = LOCAL_VALUE(1:COMM_SENS16%NUM_SENS)
       ENDIF

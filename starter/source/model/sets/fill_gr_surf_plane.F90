@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,13 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fill_surf_plane_mod   ../starter/source/model/sets/fill_gr_surf_plane.F90
-      !||--- called by ------------------------------------------------------
-      !||    fill_igr              ../starter/source/model/sets/fill_igr.F
-      !||====================================================================
+!||====================================================================
+!||    fill_surf_plane_mod   ../starter/source/model/sets/fill_gr_surf_plane.F90
+!||--- called by ------------------------------------------------------
+!||    fill_igr              ../starter/source/model/sets/fill_igr.F
+!||====================================================================
       module fill_surf_plane_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
@@ -34,26 +35,23 @@
 !=======================================================================================================================
 !\brief This subroutine creates a new igrsurf from a /SET of plane surface
 !=======================================================================================================================
-      !||====================================================================
-      !||    fill_surf_plane   ../starter/source/model/sets/fill_gr_surf_plane.F90
-      !||--- called by ------------------------------------------------------
-      !||    fill_igr          ../starter/source/model/sets/fill_igr.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    fill_surf_plane   ../starter/source/model/sets/fill_gr_surf_plane.F90
+!||--- called by ------------------------------------------------------
+!||    fill_igr          ../starter/source/model/sets/fill_igr.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
         subroutine fill_surf_plane(set,igrsurf,igrs,bufsf,lisurf1,nsurf)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use GROUPDEF_MOD
           use SETDEF_MOD
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included files
-! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +60,7 @@
           integer,                                   intent(inout) :: igrs                           !< surface group increment
           integer,                                   intent(in) :: nsurf                             !< total number of model surfaces
           integer,                                   intent(in) :: lisurf1                           !< number of variable in surface buffer bufsf
-          my_real,                                   intent(inout) :: bufsf(lisurf1*(nsurf+lisurf1)) !<surface real bufsf storage
+          real(kind=WP),                                   intent(inout) :: bufsf(lisurf1*(nsurf+lisurf1)) !<surface real bufsf storage
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------

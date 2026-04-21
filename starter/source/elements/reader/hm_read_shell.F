@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,22 +21,21 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    hm_read_shell          ../starter/source/elements/reader/hm_read_shell.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    anodset                ../starter/source/output/analyse/analyse_node.c
-      !||    apartset               ../starter/source/output/analyse/analyse_part.c
-      !||    nintrn                 ../starter/source/system/nintrn.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||    vdouble                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_shell          ../starter/source/elements/reader/hm_read_shell.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    anodset                ../starter/source/output/analyse/analyse_node.c
+!||    apartset               ../starter/source/output/analyse/analyse_part.c
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||    vdouble                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_SHELL(IXC   ,ITAB  ,ITABM1,IPART,IPARTC,
      .                  THK   ,IPM   ,IGEO  ,UNITAB,ITAG ,ANGLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -70,9 +69,10 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE READER_OLD_MOD , ONLY : LINE
       USE USER_ID_MOD , ONLY : ID_LIMIT
+      use element_mod , only : nixc
 C--------------------------------------------------------
-C     LECTURE DES ELEMENTS COQUES 4 NOEUDS
-C     VERSIION NUMEROTATION DES NOEUDS LIBRE/MARS 90/DIM
+C     READING DES ELEMENTS COQUES 4 NODES
+C     VERSIION NUMEROTATION DES NODES LIBRE/MARS 90/DIM
 C--------------------------------------------------------
 C
 C-----------------------------------------------
@@ -115,10 +115,9 @@ C OUTPUT ARGUMENTS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, I1, I2, ID,IDS,IPID,MT,N,MID,PID,UID,NDEGEN,JC,STAT,
-     .   IFLAGUNIT,FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,ISHXFEM,IOUTN,IERROR,INDEX_PART
+      INTEGER I, J, I1, I2, ID,IDS,IPID,MT,MID,PID,UID,NDEGEN,STAT,
+     .   IFLAGUNIT,ISHXFEM,INDEX_PART
       CHARACTER MESS*40, MESS2*40
-      CHARACTER(LEN=NCHARTITLE) :: TITR
       my_real
      .   BID,FAC_L
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_SHELL,UID_SHELL
@@ -126,7 +125,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER NINTRN
       INTEGER USR2SYS
       DATA MESS/'3D SHELL ELEMENTS DEFINITION            '/
       DATA MESS2/'3D SHELL ELEMENTS SELECTION FOR TH PLOT '/

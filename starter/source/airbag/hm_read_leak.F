@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_leak           ../starter/source/airbag/hm_read_leak.F
-      !||--- called by ------------------------------------------------------
-      !||    read_material_models   ../starter/source/materials/read_material_models.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_leak           ../starter/source/airbag/hm_read_leak.F
+!||--- called by ------------------------------------------------------
+!||    read_material_models   ../starter/source/materials/read_material_models.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_LEAK(IPM,PM,UNITAB,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -68,36 +68,28 @@ C-----------------------------------------------
       INTEGER UID,HM_NLEAK,IFLAGUNIT,IUNIT
       INTEGER I, K, ILAW, IMID, IMAT, ILEAKAGE, IFTLC, IFTAC, IFTACP,
      .        NFUNC
-      my_real 
-     .   ASCALET, ASCALEP, SCALELC, SCALEAC, FLC, FAC,
-     .   X0, X1, X2, X3,
-     .   LR1,LR2,FTHK,C1,C2,C3,
-     .   FACP, SCALEACP
-C
+      my_real ASCALET, ASCALEP, SCALELC, SCALEAC, FLC, FAC,
+     .        X0, X1, X2, X3, LR1, FTHK, C1, C2, C3, FACP, SCALEACP
+
       CHARACTER(len=nchartitle) :: TITR
-      CHARACTER(len=ncharline) :: LINESAVE
       LOGICAL :: IS_AVAILABLE
       IS_AVAILABLE = .FALSE.
 C=================================================================================
 C     START READING
 C=================================================================================
-c
+
       ! Count number of /LEAK
       CALL HM_OPTION_COUNT('/LEAK/MAT',HM_NLEAK)
-c
+
       ! Start reading /LEAK
       CALL HM_OPTION_START('/LEAK/MAT')
-c
+
       ! Loop over /LEAK cards
       DO K = 1, HM_NLEAK
 c
         ! Read keys
         TITR = ''
-        CALL HM_OPTION_READ_KEY(LSUBMODEL,
-     .                          OPTION_ID   = IMAT  ,
-     .                          OPTION_TITR = TITR  ,
-     .                          UNIT_ID     = UID   )
-     
+        CALL HM_OPTION_READ_KEY(LSUBMODEL, OPTION_ID=IMAT, OPTION_TITR=TITR, UNIT_ID=UID)
 c
         ! Checking unit IDs
         IFLAGUNIT = 0

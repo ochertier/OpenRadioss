@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_list_shell_scalar   ../engine/source/output/h3d/input_list/h3d_list_shell_scalar.F
-      !||--- called by ------------------------------------------------------
-      !||    lech3d                  ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                 ../engine/share/modules/h3d_mod.F
-      !||    message_mod             ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    stack_mod               ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_list_shell_scalar   ../engine/source/output/h3d/input_list/h3d_list_shell_scalar.F
+!||--- called by ------------------------------------------------------
+!||    lech3d                  ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                 ../engine/share/modules/h3d_mod.F
+!||    message_mod             ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
+!||    stack_mod               ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE H3D_LIST_SHELL_SCALAR(H3D_KEYWORD_SHELL_SCALAR,GEO,IGEO,MULTI_FVM,NKEY)
 C-----------------------------------------------
 C   M o d u l e s
@@ -58,7 +58,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,J,NIPMAX,IPLYMAX,CPTPLY,IPTMAX
+      INTEGER I,II
 C=========================================================================
       I = 0
 c-----------------------------------------------
@@ -452,6 +452,10 @@ c-----------------------------------------------
       H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Detonation Time'
 c-----------------------------------------------
       I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'BFRAC'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Burn Fraction'
+c-----------------------------------------------
+      I = I + 1
       H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'DT'
       H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Time Step'
 c-----------------------------------------------
@@ -617,6 +621,62 @@ c-----------------------------------------------
       H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'DIV(U)'
       H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'div(u)'
       H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'Volumetric dilatation rate'
+c-----------------------------------------------
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/1'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 1'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/2'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 2'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/3'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 3'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/4'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 4'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/5'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 5'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/6'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 6'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/7'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 7'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/8'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 8'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/9'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 9'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SHELL_SCALAR(I)%KEY3  = 'VSTRAIN/10'
+      H3D_KEYWORD_SHELL_SCALAR(I)%TEXT1  = 'Volumetric Strain 10'
+      H3D_KEYWORD_SHELL_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
 c-----------------------------------------------
 
       NKEY=I

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i2vit10   ../engine/source/interfaces/interf/i2vit10.F
-      !||--- called by ------------------------------------------------------
-      !||    intti2v   ../engine/source/interfaces/interf/intti2v.F
-      !||====================================================================
+!||====================================================================
+!||    i2vit10   ../engine/source/interfaces/interf/i2vit10.F
+!||--- called by ------------------------------------------------------
+!||    intti2v   ../engine/source/interfaces/interf/intti2v.F
+!||====================================================================
       SUBROUTINE I2VIT10(
      1 NSN     ,NMN     ,MS      ,V       ,A       ,
      2 AR      ,VR      ,X       ,IRECT   ,NSV     ,
@@ -44,11 +44,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIR, I, J, II,JJ,L,NN, ISK, ICOD
+      INTEGER NIR, I, J, II, JJ, L
 C     REAL
       my_real
-     .   H(4), SS, TT, AMX, AMY, AMZ, VMX, VMY, VMZ,SP,SM,TP,TM,MAS,
-     .   FAC, V1X2, V2X1, V2X3, V3X2, V3X1, V1X3,XC0,YC0,ZC0
+     . H(4), SS, TT, AMX, AMY, AMZ, VMX, VMY, VMZ,SP,SM,TP,TM
 C=======================================================================
       NIR=4
 C
@@ -95,11 +94,11 @@ C
 C----
       RETURN
       END
-      !||====================================================================
-      !||    i2rot10   ../engine/source/interfaces/interf/i2vit10.F
-      !||--- called by ------------------------------------------------------
-      !||    intti2v   ../engine/source/interfaces/interf/intti2v.F
-      !||====================================================================
+!||====================================================================
+!||    i2rot10   ../engine/source/interfaces/interf/i2vit10.F
+!||--- called by ------------------------------------------------------
+!||    intti2v   ../engine/source/interfaces/interf/intti2v.F
+!||====================================================================
       SUBROUTINE I2ROT10(
      1 NSN     ,NMN     ,MS      ,V       ,A       ,
      2 AR      ,VR      ,X       ,IRECT   ,NSV     ,
@@ -119,11 +118,11 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NIR, I, J, II,JJ,L,NN, ISK, ICOD
+      INTEGER NIR, I, J, II, JJ, L
 C     REAL
       my_real
-     .   H(4), SS, TT, AMX, AMY, AMZ, VMX, VMY, VMZ,SP,SM,TP,TM,MAS,
-     .   FAC, V1X2, V2X1, V2X3, V3X2, V3X1, V1X3,XC0,YC0,ZC0
+     . H(4), SS, TT, AMX, AMY, AMZ, VMX, VMY, VMZ,SP,SM,TP,TM,
+     . V1X2, V2X1, V2X3, V3X2, V3X1, V1X3,XC0,YC0,ZC0
 C=======================================================================
       NIR=4
 C

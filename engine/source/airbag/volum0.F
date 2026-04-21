@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    volum0              ../engine/source/airbag/volum0.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_exch_fr6       ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
-      !||    sum_6_float         ../engine/source/system/parit.F
-      !||--- uses       -----------------------------------------------------
-      !||    monvol_struct_mod   ../engine/share/modules/monvol_struct_mod.F
-      !||====================================================================
+!||====================================================================
+!||    volum0              ../engine/source/airbag/volum0.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_exch_fr6       ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
+!||    sum_6_float         ../engine/source/system/parit.F
+!||--- uses       -----------------------------------------------------
+!||    monvol_struct_mod   ../engine/share/modules/monvol_struct_mod.F
+!||====================================================================
       SUBROUTINE VOLUM0(IVOLU   ,RVOLU ,VOL  ,X  ,SURF_NODES,
      2                  N       ,NN    ,SURF_ELTYP,SURF_ELEM,
      3                  ICONTACT,PORO  ,FR_MV, T_MONVOLN)
@@ -57,18 +57,15 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,IS,K,NOD1,NOD2,NOD3,NOD4
-      my_real
-     .   AREA,XX,YY,ZZ,X12,Y12,Z12,X13,Y13,Z13,X24,Y24,Z24,DIR,
-     .     NX, NY, NZ
+      INTEGER I,II,K,NOD1,NOD2,NOD3,NOD4
+      my_real AREA,XX,YY,ZZ,X13,Y13,Z13,X24,Y24,Z24,NX, NY, NZ
       my_real, DIMENSION(:), ALLOCATABLE :: F1, F2
-      DOUBLE PRECISION 
-     .   FRMV6(2,6)
+      DOUBLE PRECISION FRMV6(2,6)
 C--------------------------------------------------------------
-C CALCUL DU VOLUME (variable locale dans MONVOL0)
-C CALCUL DE LA SURFACE (stockee dans RVOLU(18))
-C PORO(*) : PORO=0 aucun noeud en contact
-C           PORO=1 tous les noeuds en contact ...
+C CALCULATION OF THE VOLUME (local variable in MONVOL0)
+C CALCULATION OF THE SURFACE (stored in RVOLU(18))
+C PORO(*) : PORO=0 no node in contact
+C           Poro = 1 All the nodes in contact ...
 C--------------------------------------------------------------
 
       ALLOCATE(F1(NN + T_MONVOLN%NB_FILL_TRI), F2(NN + T_MONVOLN%NB_FILL_TRI))

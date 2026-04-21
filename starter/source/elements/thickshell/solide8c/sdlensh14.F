@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sdlensh14   ../starter/source/elements/thickshell/solide8c/sdlensh14.F
-      !||--- called by ------------------------------------------------------
-      !||    s8cinit3    ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    clsys3      ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||====================================================================
+!||====================================================================
+!||    sdlensh14   ../starter/source/elements/thickshell/solide8c/sdlensh14.F
+!||--- called by ------------------------------------------------------
+!||    s8cinit3    ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||--- calls      -----------------------------------------------------
+!||    clsys3      ../starter/source/elements/thickshell/solidec/scinit3.F
+!||====================================================================
       SUBROUTINE SDLENSH14(
      1   NEL,     LLSH,    X1,      X2,
      2   X3,      X4,      X5,      X6,
@@ -55,7 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N
+      INTEGER I
       my_real
      .   RX(MVSIZ),RY(MVSIZ),RZ(MVSIZ),SX(MVSIZ),SY(MVSIZ),SZ(MVSIZ),
      .   VQ(3,3,MVSIZ), LXYZ0(3),DETA1(MVSIZ),XX,YY,ZZ,

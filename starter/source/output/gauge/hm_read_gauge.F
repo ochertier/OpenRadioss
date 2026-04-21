@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_gauge          ../starter/source/output/gauge/hm_read_gauge.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl                ../starter/source/starter/freform.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    sz_r2r                 ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    usr2sys                ../starter/source/system/sysfus.F
-      !||    vdouble                ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
-      SUBROUTINE HM_READ_GAUGE(LGAUGE,GAUGE,ITABM1,UNITAB,IXC,
-     .                  ISKN, NOM_OPT,LSUBMODEL)
+!||====================================================================
+!||    hm_read_gauge          ../starter/source/output/gauge/hm_read_gauge.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl                ../starter/source/starter/freform.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    sz_r2r                 ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    usr2sys                ../starter/source/system/sysfus.F
+!||    vdouble                ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
+      SUBROUTINE HM_READ_GAUGE(LGAUGE,GAUGE,ITABM1,UNITAB,IXC,NOM_OPT,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -52,6 +51,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD    
       USE SUBMODEL_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,7 +68,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER ITABM1(*), LGAUGE(3,*), IXC(NIXC,*),ISKN(LISKN,*)
+      INTEGER,INTENT(IN) :: IXC(NIXC,*),ITABM1(*)
+      INTEGER,INTENT(INOUT) ::  LGAUGE(3,*)
       INTEGER NOM_OPT(LNOPT1,*)
       my_real GAUGE(LLGAUGE,*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
@@ -81,18 +82,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,ID, NGAU, NOD, ISK, UID, IFLAGUNIT, IG, L,NBGAUGE_SPH,NBGAUGE_POINT
-      INTEGER FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,N,NS,NG,OFFS
+      INTEGER I, J, NGAU, NOD, NBGAUGE_SPH, NBGAUGE_POINT
+      INTEGER NS, NG
       my_real FF,BID,DIST,Xgauge,Ygauge,Zgauge
       CHARACTER MESS*40
       CHARACTER(LEN=NCHARTITLE) :: TITR
-      CHARACTER(LEN=NCHARKEY) :: KEY, KEY2
+      CHARACTER(LEN=NCHARKEY) :: KEY
       DATA MESS/'GAUGE DEFINITION                        '/
 C=======================================================================
       IS_AVAILABLE = .FALSE.
 C-----------------------------------------------
 C---------------------------------------------
-C     LECTURE DES PARAMETRES DE GAUGES
+C     READING DES PARAMETRES DE GAUGES
 C-----------------------------------------------
 c     LGAUGE(3,*)
 c 1:  -Isolid                              -(NUMELS_G+1) if SPH gauge
@@ -109,7 +110,7 @@ c 6:                                       XSAV (SPH sorting)
 c 7:                                       YSAV (SPH sorting)
 c 8:                                       ZSAV (SPH sorting)
 c 9:                                       FF (sph only)
-c 10:                                      intantaneous Pressure
+c 10: Intantaneous Pressure
 c 11:                                      intantaneous PA
 c 12:                                      intantaneous Rho
 c 13:                                      intantaneous E
@@ -147,16 +148,13 @@ C-----------------------------------------------------------------
        CALL HM_OPTION_START('/GAUGE/SPH')       
        DO I=1,NBGAUGE_SPH
         NG=NG+1
-        !---Multidomaines --> on ignore les sections non tagees----
+        !--- Multidomatic-> We do not know the non-tagged sections ----
         IF(NSUBDOM > 0) THEN
-           IF(TAGGAU(NG) == 0) CALL SZ_R2R(TAGGAU,NG)
+          IF(TAGGAU(NG) == 0) CALL SZ_R2R(TAGGAU,NG)
         ENDIF
         !---------------------------------------------------------- 
         KEY=''
-        CALL HM_OPTION_READ_KEY(LSUBMODEL,
-     .                           OPTION_ID   = NGAU, 
-     .                           KEYWORD2    = KEY   ,
-     .                           OPTION_TITR = TITR)    
+        CALL HM_OPTION_READ_KEY(LSUBMODEL,OPTION_ID=NGAU,KEYWORD2=KEY,OPTION_TITR=TITR)
         CALL FRETITL(TITR,NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
 
 
@@ -168,9 +166,6 @@ C-----------------------------------------------------------------
         CALL HM_GET_INTV   ('shell_ID' ,NS    ,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_FLOATV ('DIST'     ,DIST  ,IS_AVAILABLE, LSUBMODEL, UNITAB)
         CALL HM_GET_FLOATV ('Fcut'     ,FF    ,IS_AVAILABLE, LSUBMODEL, UNITAB)
-C
-        ! ISK (skew ID) is not documented not in cfg
-C
 
         GAUGE(1,I) =DIST
         GAUGE(9,I) =FF
@@ -178,27 +173,22 @@ C
 
         WRITE (IOUT,'(///,A)')'      SPH GAUGE'
         WRITE (IOUT,'(A/)')   '      ---------'
-        WRITE (IOUT,'(A,I10)')
-     .      ' SPH GAUGE NUMBER . . . . . . . . . . .',NGAU
+        WRITE (IOUT,'(A,I10)')' SPH GAUGE NUMBER . . . . . . . . . . .',NGAU
 
-        IF(NOD/=0)THEN
+        IF(NOD /= 0)THEN
           LGAUGE(3,I)=USR2SYS(NOD,ITABM1,MESS,NGAU)
-          WRITE (IOUT,'(A,I10)')
-     .      ' NODE NUMBER. . . . . . . . . . . . . .',NOD
-        ELSEIF(NS/=0)THEN
+          WRITE (IOUT,'(A,I10)')' NODE NUMBER. . . . . . . . . . . . . .',NOD
+        ELSEIF(NS /= 0)THEN
             DO J=1,NUMELC
               IF(IXC(NIXC,J)==NS)THEN
                 LGAUGE(3,I)=-J
                 EXIT
               ENDIF
             ENDDO
-            WRITE (IOUT,'(A,I10)')
-     .    ' SHELL NUMBER . . . . . . . . . . . . .',NS
-            WRITE (IOUT,'(A,1PG20.13)')
-     .    ' DISTANCE . . . . . . . . . . . . . . .',DIST
+            WRITE (IOUT,'(A,I10)')     ' SHELL NUMBER . . . . . . . . . . . . .',NS
+            WRITE (IOUT,'(A,1PG20.13)')' DISTANCE . . . . . . . . . . . . . . .',DIST
         ENDIF
-        WRITE (IOUT,'(A,1PG20.13)')
-     .    ' 4-POLE BUTTERWORTH CORNER FREQUENCY. .',FF
+        WRITE (IOUT,'(A,1PG20.13)')    ' 4-POLE BUTTERWORTH CORNER FREQUENCY. .',FF
 C-------------------------------------
 
        ENDDO ! NBGAUGE_SPH
@@ -213,45 +203,32 @@ C-----------------------------------------------------------------
       IF ( NBGAUGE_POINT > 0)THEN
         CALL HM_OPTION_START('/GAUGE/POINT')       
           DO I=1,NBGAUGE_POINT
-
             KEY=''
-            CALL HM_OPTION_READ_KEY(LSUBMODEL,
-     .                              OPTION_ID   = NGAU, 
-     .                              KEYWORD2    = KEY ,
-     .                              OPTION_TITR = TITR)    
+            CALL HM_OPTION_READ_KEY(LSUBMODEL,OPTION_ID=NGAU,KEYWORD2=KEY,OPTION_TITR=TITR)
             NOM_OPT(1,I)=NGAU
             CALL FRETITL(TITR,NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
-
             NG=NG+1
-            !Multidomaines --> on ignore les sections non tagees----
+            !Multidomatic-> We do not know the non-tagged sections ----
             IF(NSUBDOM > 0) THEN
               IF(TAGGAU(NG) == 0) CALL SZ_R2R(TAGGAU,NG)
             ENDIF
             !----------------------------------------------------------------- 
             LGAUGE(1,NG)=0
-
             CALL HM_GET_FLOATV ('Xi'     ,Xgauge  ,IS_AVAILABLE, LSUBMODEL, UNITAB)
             CALL HM_GET_FLOATV ('Yi'     ,Ygauge  ,IS_AVAILABLE, LSUBMODEL, UNITAB)
             CALL HM_GET_FLOATV ('Zi'     ,Zgauge  ,IS_AVAILABLE, LSUBMODEL, UNITAB)
-
             LGAUGE(2,NG)=NGAU
             LGAUGE(3,NG)=0  ! ID shell or node only
-
             GAUGE(1,NG)=ZERO ! DIST
             GAUGE(9,NG)=ZERO ! FF
             GAUGE(34,NG)=Xgauge
             GAUGE(35,NG)=Ygauge
             GAUGE(36,NG)=Zgauge
-    
             WRITE (IOUT,'(///,A)')'          GAUGE'
             WRITE (IOUT,'(A/)')   '          -----'
-            WRITE (IOUT,'(A,I10)')
-     .      ' GAUGE NUMBER . . . . . . . . . . . . .',NGAU
-            WRITE (IOUT,'(A,I10)')
-     .      ' GAUGE POINT coordinate:'
-            WRITE (IOUT,'(A,/1P3G20.13/)')
-     .    '        Xg                  Yg                  Zg',Xgauge, Ygauge, Zgauge
-      
+            WRITE (IOUT,'(A,I10)')' GAUGE NUMBER . . . . . . . . . . . . .',NGAU
+            WRITE (IOUT,'(A,I10)')' GAUGE POINT coordinate:'
+            WRITE (IOUT,'(A,/1P3G20.13/)')'        Xg                  Yg                  Zg',Xgauge, Ygauge, Zgauge
             WRITE (IOUT,'(A,1PG20.13)')' 4-POLE BUTTERWORTH CORNER FREQUENCY. .',FF
           ENDDO ! DO I=1,NBGAUGE_POINT
       ENDIF ! IF ( NBGAUGE_POINT > 0)
@@ -260,19 +237,15 @@ c--------/GAUGE
 C-----------------------------------------------
       CALL HM_OPTION_START('/GAUGE')       
 C-----------------------------------------------
-       DO I=1,NBGAUGE 
-
+       DO I=1,NBGAUGE
         KEY=''
-        CALL HM_OPTION_READ_KEY(LSUBMODEL,
-     .                           OPTION_ID   = NGAU, 
-     .                           KEYWORD2    = KEY   ,
-     .                          OPTION_TITR  = TITR)    
+        CALL HM_OPTION_READ_KEY(LSUBMODEL,OPTION_ID=NGAU,KEYWORD2=KEY,OPTION_TITR=TITR)
         NOM_OPT(1,I)=NGAU
         CALL FRETITL(TITR,NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
 
-        IF (KEY == 'SPH'.OR.KEY == 'POINT') CYCLE  
+        IF (KEY == 'SPH' .OR. KEY == 'POINT') CYCLE
         NG=NG+1
-        !Multidomaines --> on ignore les sections non tagees----
+        !Multidomatic-> We do not know the non-tagged sections ----
         IF(NSUBDOM > 0) THEN
           IF(TAGGAU(NG) == 0) CALL SZ_R2R(TAGGAU,NG)
         ENDIF
@@ -283,8 +256,6 @@ C-----------------------------------------------
         CALL HM_GET_INTV   ('NODE1'    ,NOD   ,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_INTV   ('shell_ID' ,NS    ,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_FLOATV ('DIST'     ,DIST  ,IS_AVAILABLE, LSUBMODEL, UNITAB)
-C
-C
 
         GAUGE(1,NG)=DIST
         GAUGE(9,NG)=ZERO
@@ -292,30 +263,24 @@ C
 
         WRITE (IOUT,'(///,A)')'          GAUGE'
         WRITE (IOUT,'(A/)')   '          -----'
-        WRITE (IOUT,'(A,I10)')
-     .      ' GAUGE NUMBER . . . . . . . . . . . . .',NGAU
-        IF(NOD/=0)THEN
+        WRITE (IOUT,'(A,I10)')' GAUGE NUMBER . . . . . . . . . . . . .',NGAU
+        IF(NOD /= 0)THEN
           LGAUGE(3,NG)=USR2SYS(NOD,ITABM1,MESS,NGAU)
-          WRITE (IOUT,'(A,I10)')
-     .      ' NODE NUMBER. . . . . . . . . . . . . .',NOD
-        ELSEIF(NS/=0)THEN
+          WRITE (IOUT,'(A,I10)')' NODE NUMBER. . . . . . . . . . . . . .',NOD
+        ELSEIF(NS /= 0)THEN
             DO J=1,NUMELC
               IF(IXC(NIXC,J)==NS)THEN
                 LGAUGE(3,NG)=-J
                 EXIT
               ENDIF
             ENDDO
-            IF (LGAUGE(3,NG) == 0)
-     .      CALL ANCMSG(MSGID=3013,MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=NGAU,C1=TITR,I2=NS)
-            WRITE (IOUT,'(/,A,I10)')
-     .    ' SHELL NUMBER . . . . . . . . . . . . .',NS
-            WRITE (IOUT,'(A,1PG20.13)')
-     .    ' DISTANCE . . . . . . . . . . . . . . .',DIST
+            IF (LGAUGE(3,NG) == 0)CALL ANCMSG(MSGID=3013,MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=NGAU,C1=TITR,I2=NS)
+            WRITE (IOUT,'(/,A,I10)')' SHELL NUMBER . . . . . . . . . . . . .',NS
+            WRITE (IOUT,'(A,1PG20.13)')' DISTANCE . . . . . . . . . . . . . . .',DIST
         ENDIF
         WRITE (IOUT,'(A,1PG20.13)')' 4-POLE BUTTERWORTH CORNER FREQUENCY. .',FF
 C-------------------------------------
       ENDDO ! NBGAUGE
-
 
 C-------------------------------------
 C Recherche des ID doubles

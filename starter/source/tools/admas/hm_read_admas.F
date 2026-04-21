@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_admas              ../starter/source/tools/admas/hm_read_admas.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                     ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../starter/source/output/message/message.F
-      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    surfmas                    ../starter/source/tools/admas/surfmas.F
-      !||    usr2sys                    ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                    ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_admas              ../starter/source/tools/admas/hm_read_admas.F
+!||--- called by ------------------------------------------------------
+!||    lectur                     ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../starter/source/output/message/message.F
+!||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    surfmas                    ../starter/source/tools/admas/surfmas.F
+!||    usr2sys                    ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                ../starter/share/message_module/message_mod.F
+!||    r2r_mod                    ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_ADMAS(
      .                   MS       ,ITABM1   ,IGRNOD   ,UNITAB  ,IGRSURF,
      .                   IPART    ,IPMAS    ,TOTADDMAS,FLAG    ,IGRPART,
@@ -84,7 +84,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,K,ITYPE,ID,UID,IGR,IGRS,NOSYS,ISU,NNOD,
      .        ISS,NN,IBUFN(4),CAPT,ITY,IPA,IP,IGRPA,IDP,
-     .        NEL,IFLAG,JCURR,FIRST,CPT_LAST,IMS,ENTITYMAX
+     .        NEL,IFLAG,JCURR,CPT_LAST,IMS,ENTITYMAX
       my_real
      .   AMAS,COEFF_R2R
       LOGICAL LOOP_2
@@ -229,7 +229,7 @@ C---
             IF (ITYPE == 1) THEN 
                 COEFF_R2R = 1
               NNOD = IGRNOD(IGRS)%NENTITY
-C-----------Multidomaines : on corrige la masse totale avec le nouveau nb de noeuds--------------
+C-----------Multidomains: the total mass is corrected with the new number of nodes--------------
               IF (NSUBDOM > 0) THEN
                    IF (IPID==0) NNOD = NNOD-IGRNOD(IGRS)%R2R_SHARE
                    COEFF_R2R=(1.00*NNOD)/(1.00*MAX(1,IGRNOD(IGRS)%R2R_ALL))
@@ -240,7 +240,7 @@ C
             IF (IGRS /= 0) THEN
               DO J=1,IGRNOD(IGRS)%NENTITY
                 NOSYS=IGRNOD(IGRS)%ENTITY(J)
-C-----------Multidomaines : les noeuds communs ne sont traites que sur 1 domaine--------------      
+C-----------Multidomains: common nodes are only processed on 1 domain--------------
                 IF ((NSUBDOM > 0).AND.(IPID == 0)) THEN
                   IF (TAGNO(NPART+NOSYS) > 1) GOTO 150
                 ENDIF
@@ -293,7 +293,7 @@ C-----------Multidomaines : les noeuds communs ne sont traites que sur 1 domaine
                 EXIT
               ENDIF
             ENDDO
-C-----------Multidomaines -> on decompte les seg communs, on ne les compte qu'une foi---
+C-----------Multidomains -> we count the common segments, we only count them once---
             IF (NSUBDOM > 0) THEN
                 IF (IDDOM > 0) NN = NN-ISURF_R2R(1,ISS)
             ENDIF
@@ -301,7 +301,7 @@ C-----------
             IF (ISS /= 0) THEN
               DO J=1,NN
                   IF (IDDOM > 0) THEN
-C-----------Multidomaines -> on elimine les seg communs, on ne les traite qu'une foi---
+C-----------Multidomains -> we eliminate the common segments, we only process them once---
                     CAPT=0
                   DO K=1,4
                       CAPT=CAPT+TAGNO(NPART+IGRSURF(ISS)%NODES(J,K))
@@ -392,13 +392,13 @@ C---
               IMASADD = IMASADD + 1
 C
               NEL = IGRPART(IGRS)%NENTITY
-C-----------Multidomaines : on ne peut pas splitter la masse dans ce cas--------------
-              IF ((NSUBDOM > 0) .AND.(NEL /= IGRPART(IGRS)%R2R_ALL)) THEN
-              CALL ANCMSG(MSGID=893,
-     .                    MSGTYPE=MSGERROR,
-     .                    ANMODE=ANINFO,
-     .                    I1=ID)
-                ENDIF        
+C-----------Multidomains: we cannot split the mass in this case--------------
+              IF ((NSUBDOM > 0) .AND.(NEL /= IGRPART(IGRS)%R2R_ALL).AND.(NEL > 0)) THEN
+                CALL ANCMSG(MSGID=893,
+     .                      MSGTYPE=MSGERROR,
+     .                      ANMODE=ANINFO,
+     .                      I1=ID)
+              ENDIF        
               DO J=1,NEL
                 IDP=IGRPART(IGRS)%ENTITY(J)
                 IPMAS(I)%PARTID(J) = IDP
@@ -440,7 +440,7 @@ C-----------Multidomaines : on ne peut pas splitter la masse dans ce cas--------
      .                      I2=ENTITY_MULTI(J))
               ENDIF
               NOSYS = USR2SYS(ENTITY_MULTI(J),ITABM1,MESS,ID)
-C-----------Multidomaines : les noeuds communs ne sont traits que sur 1 domaine--------------      
+C-----------multidomains: common nodes are only processed in one domain--------------
               IF ((NSUBDOM > 0) .AND. (IPID == 0)) THEN
                    IF (TAGNO(NPART+NOSYS) > 1) GOTO 170
                 ENDIF
@@ -506,7 +506,7 @@ C-----------Multidomaines : les noeuds communs ne sont traits que sur 1 domaine-
                 ENDIF
               ENDDO
 !
-C-----------Multidomaines : on ignore les parts qui ne sont pas propres au domaine--------------
+C-----------multidomains: parts that do not belong to the domain are ignored--------------
               IF (NSUBDOM > 0) THEN
                   IF (TAG_PART(IP) == 0) THEN
                   IPMAS(I)%NPART = IPMAS(I)%NPART -1

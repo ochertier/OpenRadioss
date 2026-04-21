@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lag_fxv               ../engine/source/tools/lagmul/lag_fxv.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult              ../engine/source/tools/lagmul/lag_mult.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    lag_fxv                       ../engine/source/tools/lagmul/lag_fxv.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult                      ../engine/source/tools/lagmul/lag_mult.F
+!||--- calls      -----------------------------------------------------
+!||    finter                        ../engine/source/tools/curve/finter.F
+!||    finter_smooth                 ../engine/source/tools/curve/finter_smooth.F
+!||--- uses       -----------------------------------------------------
+!||    nodal_arrays_mod              ../common_source/modules/nodal_arrays.F90
+!||    python_call_funct_cload_mod   ../engine/source/loads/general/python_call_funct_cload.F90
+!||    python_funct_mod              ../common_source/modules/python_mod.F90
+!||====================================================================
       SUBROUTINE LAG_FXV(IBFV   ,VEL    ,SKEW   ,NPF    ,TF     ,
      2                   BLL    ,IADLL  ,LLL    ,JLL    ,SLL    ,
      3                   XLL    ,COMNTAG,ICFTAG ,JCFTAG ,MS     ,
      4                   IN     ,V      ,VR     ,A      ,AR     ,
-     5                   ISKIP  ,NCF_S  ,NC     ,PYTHON)
+     5                   ISKIP  ,NCF_S  ,NC     ,PYTHON, nodes)
 
       USE PYTHON_FUNCT_MOD
+      USE python_call_funct_cload_mod
+      USE nodal_arrays_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,19 +61,20 @@ C-----------------------------------------------
      .  XLL(*),BLL(*),SKEW(LSKEW,*),VEL(LFXVELR,*),TF(*),MS(*),IN(*),
      .  V(3,*),VR(3,*),A(3,*),AR(3,*)
       TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
+      TYPE(nodal_arrays_), intent(in) :: NODES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, IC, N, K1, K2, K3, IK, ISK, IFUN, NNO, ISMOOTH
+      INTEGER  J, IC, N, K1, K2, K3, IK, ISK, IFUN, NNO, ISMOOTH
       my_real
      .  TS, DERI, VF, FAC, FACX, FINTER, FINTER_SMOOTH
       EXTERNAL FINTER, FINTER_SMOOTH
 C-----------------------------------------------
-C        NC : nombre de condition cinematique
-C        IC : numero de la condition cinematique (1,NC)
+C        NC: number of cinematic condition
+C        ic: number of the kinematic condition (1,nc)
 C        IK :
-C        I  : numero global du noeud (1,NUMNOD)
-C        J  : direction 1,2,3,4,5,6
+C        I  : global node number (1,NUMNOD)
+C        J ': direction 1,2,3,4,5,6
 C------
 C        IADLL(NC)        : IAD = IADLL(IC)
 C        IK = IAD,IAD+1,IAD+2,...
@@ -93,7 +98,7 @@ C======================================================================|
           ELSE IF (ISMOOTH > 0) THEN
             VF = FINTER_SMOOTH(IFUN, TS, NPF, TF, DERI)
           ELSE
-            CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH, TS, VF) 
+            CALL PYTHON_CALL_FUNCT_CLOAD(PYTHON, -ISMOOTH,TS, VF,NNO,NODES)
           ENDIF ! IF (ISMOOTH == 0)
           NC = NC + 1
           BLL(NC) = -VF*FAC / DT12
@@ -156,20 +161,24 @@ C---
       RETURN
       END
 C
-      !||====================================================================
-      !||    lag_fxvp              ../engine/source/tools/lagmul/lag_fxv.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_multp             ../engine/source/tools/lagmul/lag_mult.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
-      !||--- uses       -----------------------------------------------------
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    lag_fxvp                      ../engine/source/tools/lagmul/lag_fxv.F
+!||--- called by ------------------------------------------------------
+!||    lag_multp                     ../engine/source/tools/lagmul/lag_mult.F
+!||--- calls      -----------------------------------------------------
+!||    finter                        ../engine/source/tools/curve/finter.F
+!||    finter_smooth                 ../engine/source/tools/curve/finter_smooth.F
+!||--- uses       -----------------------------------------------------
+!||    nodal_arrays_mod              ../common_source/modules/nodal_arrays.F90
+!||    python_call_funct_cload_mod   ../engine/source/loads/general/python_call_funct_cload.F90
+!||    python_funct_mod              ../common_source/modules/python_mod.F90
+!||====================================================================
       SUBROUTINE LAG_FXVP(IBFV   ,VEL    ,SKEW   ,NPF    ,TF     ,
      2                    LAGCOMC,LAGCOMK,NC     ,NODGLOB,WEIGHT ,
-     3                    IK     ,PYTHON)
+     3                    IK     ,PYTHON,NODES)
       USE PYTHON_FUNCT_MOD
+      USE nodal_arrays_mod
+      use python_call_funct_cload_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -189,32 +198,35 @@ C-----------------------------------------------
      .        LAGCOMK(4,*),LAGCOMC(2,*),SKEW(LSKEW,*),VEL(LFXVELR,*),
      .        TF(*)
       TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
+      TYPE(nodal_arrays_), intent(in) :: NODES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, IC, N, K1, K2, K3, ISK, IFUN, NNO,ISMOOTH
+      INTEGER  J, N, K1, K2, K3, ISK, IFUN, NNO,ISMOOTH
       my_real
      .        TS, DERI, VF, FAC, FACX, FINTER, FINTER_SMOOTH
       EXTERNAL FINTER, FINTER_SMOOTH
+      INTEGER :: node_id
 C-----------------------------------------------
-C        NC : nombre de condition cinematique
-C        IC : numero de la condition cinematique (1,NC)
+C        NC: number of cinematic condition
+C        ic: number of the kinematic condition (1,nc)
 C        IK :
-C        I  : numero global du noeud (1,NUMNOD)
-C        J  : direction 1,2,3,4,5,6
+C        I  : global node number (1,NUMNOD)
+C        J ': direction 1,2,3,4,5,6
 C------
-C        BLL => LAGCOMC(2)
-C        IADLL => LAGCOMC(1)
-C        LLL => LAGCOMK(1)
-C        JLL => LAGCOMK(2)
-C        SLL => LAGCOMK(3)
+C        BLL => Lagcomc (2)
+C        Iadll => lagcomc (1)
+C        LLL => Lagcomk (1)
+C        JLL => LAGCOMK (2)
+C        SLL => LAGCOMK (3)
 C        XLL => LAGCOMK(4)
 C======================================================================|
       DO N=1,NFXVEL
         IF (IBFV(8,N)/=0) THEN
          NNO = IABS(IBFV(1,N))
-         IF(WEIGHT(NNO)==1) THEN  ! une seule fois en SPMD
-C   numerotation globale
+         node_id = NNO
+         IF(WEIGHT(NNO)==1) THEN  ! Only once in SPMD
+C   global numbering
           FACX   = VEL(5,N)
           TS = (TT + HALF*DT2)*FACX
           NNO = NODGLOB(NNO)
@@ -230,7 +242,7 @@ C   numerotation globale
           ELSE IF(ISMOOTH > 0) THEN
             VF = FINTER_SMOOTH(IFUN, TS, NPF, TF, DERI)
           ELSE
-            CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH, TS, VF) 
+            CALL PYTHON_CALL_FUNCT_CLOAD(PYTHON, -ISMOOTH,TS, VF,node_id,NODES)
           ENDIF
           NC = NC + 1
           LAGCOMC(2,NC) = -VF*FAC / DT12

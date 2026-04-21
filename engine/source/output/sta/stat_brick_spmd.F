@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_brick_spmd       ../engine/source/output/sta/stat_brick_spmd.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat               ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders             ../common_source/tools/sort/my_orders.c
-      !||    spmd_iget_partn_sta   ../engine/source/mpi/output/spmd_stat.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    stat_brick_spmd       ../engine/source/output/sta/stat_brick_spmd.F
+!||--- called by ------------------------------------------------------
+!||    genstat               ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders             ../common_source/tools/sort/my_orders.c
+!||    spmd_iget_partn_sta   ../engine/source/mpi/output/spmd_stat.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod          ../common_source/tools/memory/my_alloc.F90
+!||====================================================================
       SUBROUTINE STAT_BRICK_SPMD(ITAB,IPART,IGEO,IXS,IPARTS,
      .                     IPART_STATE,NODTAG,STAT_INDXS,
      .                     IPARG, LENGS,IXS10,IXS16,IXS20,
@@ -38,6 +40,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD 
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,20 +70,28 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, JJ, IPRT, BUF, IPRT0, K, STAT_NUMELS_1
+      INTEGER I, N, JJ, IPRT, IPRT0, K
       INTEGER NG, NEL, NFT, LFT, LLT, ITY, ISOLNOD, IOFF
-      INTEGER IADD(NPART+1), IADG(NSPMD,NPART)
-      INTEGER NP(24*NUMELSG),
-     .        NPGLOB(24*NUMELSG),
-     .        WORK(70000),CLEF(2,NUMELSG)
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: IADG
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IADD
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NP
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NPGLOB
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: CLEF
+      INTEGER WORK(70000)
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C-----------------------------------------------
 C     8 NODES BRICK
 C-----------------------------------------------
+      CALL MY_ALLOC(IADG,NSPMD,NPART)
+      CALL MY_ALLOC(IADD,NPART+1)
+      CALL MY_ALLOC(NP,24*NUMELSG)
+      CALL MY_ALLOC(NPGLOB,24*NUMELSG)
+      CALL MY_ALLOC(CLEF,2,NUMELSG)
+C-----------------------------------------------
       IADD = 0
       NPGLOB(1:24*NUMELSG) = 0
 C
-C en spmd il faut envoyer l'info meme qd on a 0 elem local
+C In SPMD you must send the info even qd we have 0 local elem
       JJ = 0
       DO NG=1,NGROUP
         ITY   =IPARG(5,NG)
@@ -470,6 +482,12 @@ C-----
          ENDIF
         END DO
       ENDIF
+C-----------------------------------------------
+      DEALLOCATE(IADG)
+      DEALLOCATE(IADD)
+      DEALLOCATE(NP)
+      DEALLOCATE(NPGLOB)
+      DEALLOCATE(CLEF)
 C-----------------------------------------------
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    srmalla11   ../engine/source/elements/solid/solide/srmalla11.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3      ../engine/source/elements/solid/solide/sforc3.F
-      !||    szforc3     ../engine/source/elements/solid/solidez/szforc3.F
-      !||====================================================================
+!||====================================================================
+!||    srmalla11   ../engine/source/elements/solid/solide/srmalla11.F
+!||--- called by ------------------------------------------------------
+!||    sforc3      ../engine/source/elements/solid/solide/sforc3.F
+!||    szforc3     ../engine/source/elements/solid/solidez/szforc3.F
+!||====================================================================
       SUBROUTINE SRMALLA11(
      1   SAV,     OFFG,    WXX,     WYY,
      2   WZZ,     R11,     R12,     R13,
@@ -53,13 +53,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,j
+      INTEGER I
 C     REAL
       DOUBLE PRECISION
      .   X , Y, Z    ,WXXG,WYYG,WZZG
 C-----------------------------------------------
 C-----------------------------
-C     ROTATION RBY DES COORDONNEES(REF)POUR SMALL STRAIN
+C     ROTATION RBY COORDINATES(REF) FOR SMALL STRAIN
 C-----------------------------
       IF(ISMSTR==11)THEN
 C------------Wxx,y,z from local system to global 

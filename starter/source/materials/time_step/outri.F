@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    outri          ../starter/source/materials/time_step/outri.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    outri          ../starter/source/materials/time_step/outri.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE OUTRI(DTELEM,IXS   ,IXQ   ,IXC   ,IXT   ,
      .                 IXP   ,IXR   ,IXTG  ,KXX   ,
      .                 KXSP  ,KXIG3D,IGEO  ,NUMEL)
 C
-C     TRI DES DTEL (POUR CHAQUE TYPE D'ELEMENT) ET IMPRESSIONS
+C     SORTING OF DTEL (FOR EACH TYPE OF ELEMENT) AND PRINTING
 C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MY_ALLOC_MOD
       USE MESSAGE_MOD
+      use element_mod , only : nixs,nixq,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -71,7 +72,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: PERM
       DATA VINGTR4 /20./
 C=======================================================================
-C     INITIALISATION DES NOS INTERNES DES ELEMENTS AVANT TRI
+C     INITIALIZATION OF INTERNAL NUMBERS OF ELEMENTS BEFORE SORTING
 C
       CALL MY_ALLOC(PERM,NUMEL)
       ! --------------------
@@ -130,7 +131,7 @@ C
       ENDDO
       ! --------------------
 C
-C     TRIS DES ELEMENTS EN FONCTION DU PAS DE TEMPS
+C     SORTING OF ELEMENTS ACCORDING TO THE TIME STEP
 C
       IF (NUMELS>1) THEN
         NUM2 = 1
@@ -177,7 +178,7 @@ C
       DTELEM(NUMEL+1:2*NUMEL) = PERM(1:NUMEL)
 
 C
-C     IMPRESSIONS PAR GROUPES DES ELEMENTS TRIES
+C     PRINTING IN GROUPS OF SORTED ELEMENTS
 C
       IF (NUMELS>0) THEN
         TEMPO = NUMELS*TWOEM2
@@ -354,15 +355,15 @@ C--------------------------------------------------------
       RETURN
       END
 C
-      !||====================================================================
-      !||    outrin           ../starter/source/materials/time_step/outri.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||    r2r_mod          ../starter/share/modules1/r2r_mod.F
-      !||====================================================================
+!||====================================================================
+!||    outrin           ../starter/source/materials/time_step/outri.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||    r2r_mod          ../starter/share/modules1/r2r_mod.F
+!||====================================================================
       SUBROUTINE OUTRIN(MS,IN,STIFN,STIFR,ITAB,DTNODA)
 C-----------------------------------------------
 C   M o d u l e s
@@ -372,7 +373,7 @@ C-----------------------------------------------
       USE PLOT_CURVE_MOD
       USE MESSAGE_MOD
 C-----------------------------------------------
-C     TRI DES DT NODAUX ET IMPRESSIONS
+C     SORTING OF NODAL DT AND PRINTING
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -424,7 +425,7 @@ C
       DO I=1,NUMNOD
              IF(DT(I)/=EP30)DT(I)=SQRT(ABS(TWO*DT(I)))
       END DO
-C---- Multidomains : Nodal time step is deactivated for splited RBODY
+C---- Multidomains : Nodal time step is deactivated for split RBODY
       IF(NSUBDOM>0) THEN
         DO I=1,NUMNOD
           IF(TAGNO(I+N_PART)==3) DT(I) = EP30
@@ -439,7 +440,6 @@ C
 C
       DTNODA = MIN(DTNODA,DT(1))
 C
-      IF ( N2D/=1) THEN        
         WRITE(IOUT,1000)
         WRITE(IOUT,1001)
         N=PERM(1)
@@ -509,7 +509,6 @@ C
         WRITE(IOUT,2004)
         CALL PLOT_CURVE(DTNODA_STAT, NB_NOD_STAT, NB_OF_COLUM, INPUT_SIZE_X=60, INPUT_SIZE_Y=24, INPUT_CURVE_TYPE = 1,
      .                  INPUT_TXT_X="NODAL TIME STEP",INPUT_TXT_Y="% OF NODES")
-      ENDIF
 C
 
       DEALLOCATE( PERM )

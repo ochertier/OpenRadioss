@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    anim_nodal_contour_fvmbags   ../engine/source/output/anim/generate/anim_nodal_contour_fvmbags.F
-      !||--- called by ------------------------------------------------------
-      !||    nodald                       ../engine/source/output/anim/generate/nodald.F
-      !||    nodaldt                      ../engine/source/output/anim/generate/nodaldt.F
-      !||    nodalp                       ../engine/source/output/anim/generate/nodalp.F
-      !||    nodalssp                     ../engine/source/output/anim/generate/nodalssp.F
-      !||    nodalt                       ../engine/source/output/anim/generate/nodalt.F
-      !||    nodalvol                     ../engine/source/output/anim/generate/nodalvol.F
-      !||--- uses       -----------------------------------------------------
-      !||    fvbag_mod                    ../engine/share/modules/fvbag_mod.F
-      !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    anim_nodal_contour_fvmbags   ../engine/source/output/anim/generate/anim_nodal_contour_fvmbags.F
+!||--- called by ------------------------------------------------------
+!||    nodald                       ../engine/source/output/anim/generate/nodald.F
+!||    nodaldt                      ../engine/source/output/anim/generate/nodaldt.F
+!||    nodalp                       ../engine/source/output/anim/generate/nodalp.F
+!||    nodalssp                     ../engine/source/output/anim/generate/nodalssp.F
+!||    nodalt                       ../engine/source/output/anim/generate/nodalt.F
+!||    nodalvol                     ../engine/source/output/anim/generate/nodalvol.F
+!||--- uses       -----------------------------------------------------
+!||    fvbag_mod                    ../engine/share/modules/fvbag_mod.F
+!||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE ANIM_NODAL_CONTOUR_FVMBAGS(KEY, WA4, MONVOL,VOLMON, FVDATA_P, NFVBAG, SMONVOL, SVOLMON, AIRBAGS_TOTAL_FVM,
      .                                      IS_WRITTEN_NODE_FVM, AIRBAGS_NODE_ID_SHIFT)
 C-----------------------------------------------
@@ -82,11 +82,11 @@ C-----------------------------------------------
       INTEGER :: NN, II    !< loop
       INTEGER :: ITYP      !< monvol type (refer to read_monvol.F)
       INTEGER :: IH3D_FLAG !< node group identifier
-      INTEGER :: NNODES    !< number of nodes in group
+ 
       INTEGER :: IFV       !< FVMBAG identifier in [1, NFVBAG] where NFVBAG <= NVOLU
       my_real :: VALUE     !< polyhedron value
       INTEGER :: K_SHIFT   !< shift value for index : sum of previous NPOLH
-      INTEGER :: INDX
+ 
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------    

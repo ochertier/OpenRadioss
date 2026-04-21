@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cmatc3         ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3ke3          ../engine/source/elements/sh3n/coque3n/c3ke3.F
-      !||    cbake3         ../engine/source/elements/shell/coqueba/cbake3.F
-      !||    czke3          ../engine/source/elements/shell/coquez/czke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    cctoglob       ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||    gepm_lc        ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||    get_etfac_s    ../engine/source/elements/solid/solide8z/get_etfac_s.F
-      !||    layini         ../engine/source/elements/shell/coque/layini.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod      ../engine/share/modules/drape_mod.F
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    stack_mod      ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cmatc3         ../engine/source/elements/shell/coqueba/cmatc3.F
+!||--- called by ------------------------------------------------------
+!||    c3ke3          ../engine/source/elements/sh3n/coque3n/c3ke3.F
+!||    cbake3         ../engine/source/elements/shell/coqueba/cbake3.F
+!||    czke3          ../engine/source/elements/shell/coquez/czke3.F
+!||--- calls      -----------------------------------------------------
+!||    cctoglob       ../engine/source/elements/shell/coqueba/cmatc3.F
+!||    gepm_lc        ../engine/source/elements/shell/coqueba/cmatc3.F
+!||    get_etfac_s    ../engine/source/elements/solid/solide8z/get_etfac_s.F
+!||    layini         ../engine/source/elements/shell/coque/layini.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod      ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    stack_mod      ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE CMATC3(JFT    ,JLT     ,PM     ,MAT     ,GEO      ,
      1                  PID    ,AREA    ,THK0   ,THK02   ,THK      , 
      2                  THKE   ,VOLG    ,MTN    ,NPT     ,ITHK     ,
@@ -114,14 +114,14 @@ c  O   GS(NEL)           - out of plane shear isotropic shear modulus (for QEPH 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,MX,IPID,J,J2,J3,JJ,NEL,L,IGMAT,IPGMAT,
+      INTEGER I,MX,IPID,J,J2,J3,JJ,NEL,IGMAT,IPGMAT,
      .        LAYNPT_MAX, NLAY_MAX,ILAY
 C     REAL
       my_real
      .   SHF(MVSIZ),NU(MVSIZ),G(MVSIZ),YM(MVSIZ),A11(MVSIZ),A12(MVSIZ),
-     .   E11,E22,NU12,G31,G23,A22,WMC,FACG,COEF,WM
+     .   WMC,FACG,COEF,WM
       my_real
-     .   FAC(MVSIZ),HMLY(MVSIZ,4),HCLY(MVSIZ,2), HMORLY(MVSIZ,2),SFAC(MVSIZ)
+     .   HMLY(MVSIZ,4),HCLY(MVSIZ,2), HMORLY(MVSIZ,2),SFAC(MVSIZ)
       INTEGER, DIMENSION(:)   , ALLOCATABLE :: MATLY   !! 
       my_real, DIMENSION(:)   , ALLOCATABLE :: THKLY   !! 
       my_real, DIMENSION(:,:) , ALLOCATABLE :: POSLY,THK_LY  
@@ -203,7 +203,7 @@ C----this will do only for QEPH and change also in CNCOEF!!!look at starter firs
             A12(I)=SFAC(I)*A12(I)
           ENDDO
       ENDIF
-      IF (MTN==19.OR.MTN==15.OR.MTN==25) THEN
+      IF (MTN==19.OR.MTN==15.OR.MTN==25 .OR. MTN == 123 .OR. MTN == 125 .OR. MTN == 127 .OR. MTN == 132) THEN
        IORTH=1
       ELSE
        IORTH=0
@@ -229,7 +229,7 @@ C----this will do only for QEPH and change also in CNCOEF!!!look at starter firs
          HFOR(I,2)=ONE_OVER_12*HMOR(I,2)
          HZ(I)= MAX(HF(I,1),HF(I,2),HF(I,4))*KZ_TOL
         ENDDO
-       ELSEIF (MTN==15.OR.MTN==25) THEN
+       ELSEIF (MTN==15.OR.MTN==25 .OR. MTN == 123 .OR.  MTN == 125 .OR. MTN == 127 .OR. MTN == 132) THEN
         IF (IGTYP==9) THEN
          CALL GEPM_LC(JFT,JLT,MAT,PM,SHF,HM,HC)
          CALL CCTOGLOB(JFT,JLT,HM,HC,HMOR,DIR,NEL)
@@ -244,7 +244,7 @@ C----this will do only for QEPH and change also in CNCOEF!!!look at starter firs
          ENDDO
         ELSEIF(IGTYP == 10.OR.IGTYP == 11.OR.IGTYP == 17.OR.
      .         IGTYP==51 .OR. IGTYP == 52)THEN
-C         INTEGRATION PAR COUCHES
+C         INTEGRATION BY LAYERS
           CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO    ,  
      .                MAT      ,PID      ,THKLY    ,MATLY    ,POSLY   ,  
      .                IGTYP    ,0        ,0        ,NLAY     ,NPT     ,  
@@ -393,12 +393,12 @@ C
       DEALLOCATE(MATLY, THKLY, POSLY, THK_LY)
       RETURN
       END
-      !||====================================================================
-      !||    cctoglob    ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||--- called by ------------------------------------------------------
-      !||    cmatc3      ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||    cncoefort   ../engine/source/elements/sh3n/coquedk/cncoef3.F
-      !||====================================================================
+!||====================================================================
+!||    cctoglob    ../engine/source/elements/shell/coqueba/cmatc3.F
+!||--- called by ------------------------------------------------------
+!||    cmatc3      ../engine/source/elements/shell/coqueba/cmatc3.F
+!||    cncoefort   ../engine/source/elements/sh3n/coquedk/cncoef3.F
+!||====================================================================
       SUBROUTINE CCTOGLOB(JFT,JLT,HM,HC,HMOR,DIR,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -417,10 +417,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J
+      INTEGER I
       my_real
      .  M2(MVSIZ),N2(MVSIZ),MN(MVSIZ),M4(MVSIZ),N4(MVSIZ),
-     .  MN2(MVSIZ),CM(6),CC(2),T1,T2,T3
+     .  MN2(MVSIZ),CM(6),T1,T2,T3
 C-----------------------------------------------
       DO I=JFT,JLT
        M2(I)= DIR(I,1)*DIR(I,1)
@@ -458,12 +458,12 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    gepm_lc     ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||--- called by ------------------------------------------------------
-      !||    cmatc3      ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||    cncoefort   ../engine/source/elements/sh3n/coquedk/cncoef3.F
-      !||====================================================================
+!||====================================================================
+!||    gepm_lc     ../engine/source/elements/shell/coqueba/cmatc3.F
+!||--- called by ------------------------------------------------------
+!||    cmatc3      ../engine/source/elements/shell/coqueba/cmatc3.F
+!||    cncoefort   ../engine/source/elements/sh3n/coquedk/cncoef3.F
+!||====================================================================
       SUBROUTINE GEPM_LC(JFT,JLT,MAT,PM,SHF,HM,HC)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -486,7 +486,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,MX
+      INTEGER I,MX
       my_real
      .   G,A11,A12,E11,E22,NU12,G31,G23,A22
 C-----------------------------------------------
@@ -511,15 +511,15 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    putsignorc3     ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc          ../engine/source/materials/mat_share/mulawc.F90
-      !||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_ktan        ../engine/share/modules/impbufdef_mod.F
-      !||    imp_ktan_def    ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    putsignorc3     ../engine/source/elements/shell/coqueba/cmatc3.F
+!||--- called by ------------------------------------------------------
+!||    mulawc          ../engine/source/materials/mat_share/mulawc.F90
+!||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
+!||--- uses       -----------------------------------------------------
+!||    imp_ktan        ../engine/share/modules/impbufdef_mod.F
+!||    imp_ktan_def    ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE PUTSIGNORC3(JFT ,JLT ,IR,IS,IT,G_IMP ,SIGNOR)
 C-----------------------------------------------
 C   M o d u l e s
@@ -547,7 +547,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,MX,J,K
+      INTEGER I,J
       TYPE(L_KTBUFEP_)    , POINTER :: SKBUF
 C-----------------------------------------------
        IF (IKT==0) RETURN
@@ -564,18 +564,18 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    cmatip3        ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3ke3          ../engine/source/elements/sh3n/coque3n/c3ke3.F
-      !||    cbake3         ../engine/source/elements/shell/coqueba/cbake3.F
-      !||    czke3          ../engine/source/elements/shell/coquez/czke3.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_etfac_s    ../engine/source/elements/solid/solide8z/get_etfac_s.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_ktan       ../engine/share/modules/impbufdef_mod.F
-      !||    imp_ktan_def   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cmatip3        ../engine/source/elements/shell/coqueba/cmatc3.F
+!||--- called by ------------------------------------------------------
+!||    c3ke3          ../engine/source/elements/sh3n/coque3n/c3ke3.F
+!||    cbake3         ../engine/source/elements/shell/coqueba/cbake3.F
+!||    czke3          ../engine/source/elements/shell/coquez/czke3.F
+!||--- calls      -----------------------------------------------------
+!||    get_etfac_s    ../engine/source/elements/solid/solide8z/get_etfac_s.F
+!||--- uses       -----------------------------------------------------
+!||    imp_ktan       ../engine/share/modules/impbufdef_mod.F
+!||    imp_ktan_def   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE CMATIP3(JFT    ,JLT     ,PM     ,MAT     ,PID    ,
      1                   MTN    ,NPT     ,HM     ,HF      ,IORTH  ,
      2                   HMOR   ,HFOR    ,HMFOR  ,IPG     )
@@ -630,14 +630,14 @@ c                          (1:C11,2:C22,3:C12,4:G,5:C13,6:C23)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,MX,IPID,J,J2,J3,JJ,L,IR,IS,IT,IPLAS,IR4(4),IS4(4),NEL
+      INTEGER I,MX,J,IR,IS,IT,IPLAS,IR4(4),IS4(4),NEL
 C     REAL
       my_real
      .   NU,G,YM,A11,A12,BETA,
      .   THETA1,THETA2,HK(MVSIZ),HH(MVSIZ),DHK(MVSIZ),DHH(MVSIZ),
      .   GAMA(MVSIZ),C11(MVSIZ),C12(MVSIZ),C33(MVSIZ),SIG(MVSIZ,3),
      .   SIGM(MVSIZ,3),COEF,WM0,WF0,AA,B11,B12,D11,D12,DET,F_Y2,SPS,
-     .   NORM,CEP11,CEP12,CEP13,CEP23,CEP22,CEP33,FAC(MVSIZ),
+     .   CEP11,CEP12,CEP13,CEP23,CEP22,CEP33,FAC(MVSIZ),
      .   NORM_1(MVSIZ)
       TYPE(L_KTBUFEP_)    , POINTER :: LBUF
       TYPE(MLAW_TAG_)     , POINTER :: MTAG
@@ -807,14 +807,14 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    cmatch3        ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||--- called by ------------------------------------------------------
-      !||    czke3          ../engine/source/elements/shell/coquez/czke3.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_ktan       ../engine/share/modules/impbufdef_mod.F
-      !||    imp_ktan_def   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    cmatch3        ../engine/source/elements/shell/coqueba/cmatc3.F
+!||--- called by ------------------------------------------------------
+!||    czke3          ../engine/source/elements/shell/coquez/czke3.F
+!||--- uses       -----------------------------------------------------
+!||    imp_ktan       ../engine/share/modules/impbufdef_mod.F
+!||    imp_ktan_def   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE CMATCH3(JFT    ,JLT     ,PM     ,MAT     ,GEO   ,
      1                  PID     ,MTN     ,IDRIL  ,IGEO    ,HM    ,
      2                  HF      ,HZ      )
@@ -866,10 +866,10 @@ c  I   IDRIL             - flag of using drilling dof
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,MX,IPID,J,J2,J3,JJ,NEL,L,IGMAT,IPGMAT,IGTYP
+      INTEGER I,MX,IGMAT,IPGMAT,IGTYP
       my_real
      .   NU(MVSIZ),G(MVSIZ),YM(MVSIZ),A11(MVSIZ),A12(MVSIZ),
-     .   E11,E22,NU12,G31,G23,A22,WMC,FACG,COEF,WM
+     .   FACG,COEF
       my_real
      .   FAC(MVSIZ)
 C-----------------------------------------------
@@ -933,9 +933,9 @@ C-------elastic only; allows changing module by KZ_TOL----
 C
       RETURN
       END
-      !||====================================================================
-      !||    cdmstif   ../engine/source/elements/shell/coqueba/cmatc3.F
-      !||====================================================================
+!||====================================================================
+!||    cdmstif   ../engine/source/elements/shell/coqueba/cmatc3.F
+!||====================================================================
       SUBROUTINE CDMSTIF(JFT ,JLT   ,VOL  ,THK0 ,THK2 ,
      1                   HM  ,HF    ,HC   ,HZ   ,HMOR ,
      2                   HFOR ,HMFOR,IPLAT,DM   ,DF   ,
@@ -959,10 +959,10 @@ c FUNCTION:   stiffness modulus matrix after integration
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,M,EP
+      INTEGER M,EP
 C     REAL
       my_real
-     .   C1,C2,FAC
+     .   C1,C2
 C-----------------------------------------------
 #include "vectorize.inc"
 C-----------------------

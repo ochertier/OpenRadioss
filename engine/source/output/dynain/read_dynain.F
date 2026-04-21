@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    read_dynain        ../engine/source/output/dynain/read_dynain.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur             ../engine/source/input/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../engine/source/output/message/message.F
-      !||    arret              ../engine/source/system/arret.F
-      !||    my_orders          ../common_source/tools/sort/my_orders.c
-      !||    spmd_gather_int    ../engine/source/mpi/generic/spmd_gather_int.F
-      !||    spmd_gatherv_int   ../engine/source/mpi/generic/spmd_gatherv_int.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||    state_mod          ../common_source/modules/state_mod.F
-      !||====================================================================
+!||====================================================================
+!||    read_dynain        ../engine/source/output/dynain/read_dynain.F
+!||--- called by ------------------------------------------------------
+!||    lectur             ../engine/source/input/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg             ../engine/source/output/message/message.F
+!||    arret              ../engine/source/system/arret.F
+!||    my_orders          ../common_source/tools/sort/my_orders.c
+!||    spmd_gather_int    ../engine/source/mpi/generic/spmd_gather_int.F
+!||    spmd_gatherv_int   ../engine/source/mpi/generic/spmd_gatherv_int.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    message_mod        ../engine/share/message_module/message_mod.F
+!||    state_mod          ../common_source/modules/state_mod.F
+!||====================================================================
       SUBROUTINE READ_DYNAIN(IPART,DYNAIN_DATA,IPARTC,IPARTTG,IXC,IXTG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE STATE_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,7 +63,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IDPRT,K_STAT,J,IP
+      INTEGER I,IDPRT,J,IP
       INTEGER N ,NELC , NELTG , NELCG , NELTGG , 
      .   FLG_CHK , IS_CHECK , JWARN, NELMIN , NELMAX,
      .   MY_SIZEC ,MY_SIZETG ,IERR ,
@@ -72,8 +74,6 @@ C
       INTEGER ,  DIMENSION(:),ALLOCATABLE :: NELIDC ,NELIDTG,
      .        CLEFC ,CLEFTG ,INDXC ,INDXTG ,IDWARN ,NELIDCG ,
      .        NELIDTGG 
-      my_real
-     .   T0,DT0
 C-----------------------------------------------
       ALLOCATE( DYNAIN_DATA%IPART_DYNAIN(NPART))
       DYNAIN_DATA%IPART_DYNAIN(1:NPART) = 0 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    xforc30      ../engine/source/elements/xelem/xforc30.F
-      !||--- called by ------------------------------------------------------
-      !||    xforc3       ../engine/source/elements/xelem/xforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_u_func   ../engine/source/user_interface/ufunc.F
-      !||    get_u_mid    ../engine/source/user_interface/upidmid.F
-      !||    get_u_mnu    ../engine/source/user_interface/upidmid.F
-      !||    get_u_pid    ../engine/source/user_interface/upidmid.F
-      !||    get_u_pnu    ../engine/source/user_interface/upidmid.F
-      !||====================================================================
+!||====================================================================
+!||    xforc30      ../engine/source/elements/xelem/xforc30.F
+!||--- called by ------------------------------------------------------
+!||    xforc3       ../engine/source/elements/xelem/xforc3.F
+!||--- calls      -----------------------------------------------------
+!||    get_u_func   ../engine/source/user_interface/ufunc.F
+!||    get_u_mid    ../engine/source/user_interface/upidmid.F
+!||    get_u_mnu    ../engine/source/user_interface/upidmid.F
+!||    get_u_pid    ../engine/source/user_interface/upidmid.F
+!||    get_u_pnu    ../engine/source/user_interface/upidmid.F
+!||====================================================================
       SUBROUTINE XFORC30(NX     ,
      2             XEL     ,VEL     ,VREL   ,UIX    ,UID    ,
      3             IOUT    ,IPROP   ,IMAT   ,OFF    ,KEINT  ,
@@ -73,7 +73,7 @@ C VISCM    |   NX    | F | W | NODAL VISCOSITY (TIME STEP)
 C VISCR    |   NX    | F | W | NODAL ROTATION VISCOSITY (TIME STEP)
 C----------+---------+---+---+--------------------------------------------
 C FORC     | 3*NX    | F | W | NODAL FORCES
-C TORQ     | 3*NX    | F | W | NODAL TORQUS
+C TORQ     | 3*NX    | F | W | NODAL TORQUE
 C----------+---------+---+---+--------------------------------------------
 C NUVAR    |  1      | I | R | NUMBER OF USER ELEMENT VARIABLES
 C UVAR     |NUVAR    | F |R/W| USER ELEMENT VARIABLES 

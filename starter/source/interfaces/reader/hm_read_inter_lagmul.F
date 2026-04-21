@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_lagmul          ../starter/source/interfaces/reader/hm_read_inter_lagmul.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_interfaces            ../starter/source/interfaces/reader/hm_read_interfaces.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                        ../starter/source/output/message/message.F
-      !||    fretitl                       ../starter/source/starter/freform.F
-      !||    hm_read_inter_lagmul_type02   ../starter/source/interfaces/int02/hm_read_inter_lagmul_type02.F
-      !||    hm_read_inter_lagmul_type07   ../starter/source/interfaces/int07/hm_read_inter_lagmul_type07.F
-      !||    hm_read_inter_lagmul_type16   ../starter/source/interfaces/int16/hm_read_inter_lagmul_type16.F
-      !||    hm_read_inter_lagmul_type17   ../starter/source/interfaces/int17/hm_read_inter_lagmul_type17.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod                   ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_lagmul          ../starter/source/interfaces/reader/hm_read_inter_lagmul.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_interfaces            ../starter/source/interfaces/reader/hm_read_interfaces.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                        ../starter/source/output/message/message.F
+!||    fretitl                       ../starter/source/starter/freform.F
+!||    hm_read_inter_lagmul_type02   ../starter/source/interfaces/int02/hm_read_inter_lagmul_type02.F
+!||    hm_read_inter_lagmul_type07   ../starter/source/interfaces/int07/hm_read_inter_lagmul_type07.F
+!||    hm_read_inter_lagmul_type16   ../starter/source/interfaces/int16/hm_read_inter_lagmul_type16.F
+!||    hm_read_inter_lagmul_type17   ../starter/source/interfaces/int17/hm_read_inter_lagmul_type17.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod                   ../starter/share/message_module/message_mod.F
+!||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_LAGMUL(
      1        IPARI    ,STFAC      ,FRIGAP    ,IGRNOD      ,IGRSURF    ,
      2        ILAGM    ,NI         ,NOM_OPT   ,TITR        ,DEF_INTER  ,
@@ -63,7 +63,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN) :: NPARI, NPARIR !< array sizes IPARI and FRIGAP
       INTEGER NOM_OPT(LNOPT1,*)
-      INTEGER ISU1,ISU2,ILAGM,NI,NOINT
+      INTEGER ILAGM,NI,NOINT
       INTEGER IPARI(NPARI),DEF_INTER(100)
       my_real STFAC
       my_real FRIGAP(NPARIR)
@@ -83,7 +83,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER UID,NTYP,USR_TYP
+      INTEGER NTYP,USR_TYP
 C=======================================================================
 C     READING LAGRANGE MULTIPLIER INTERFACES (/INTER/LAGMUL/TYPE2, 
 C         /INTER/LAGMUL/TYPE7, /INTER/LAGMUL/TYPE16,/INTER/LAGMUL/TYPE17)

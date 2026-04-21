@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps80              ../engine/source/materials/mat/mat080/sigeps80.F
-      !||--- called by ------------------------------------------------------
-      !||    mulaw                 ../engine/source/materials/mat_share/mulaw.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    kirkaldykinetics      ../engine/source/materials/mat/mat080/kirkaldykinetics.F
-      !||    phasekinetic2         ../engine/source/materials/mat/mat080/phasekinetic2.F
-      !||    table_vinterp         ../engine/source/tools/curve/table_tools.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps80              ../engine/source/materials/mat/mat080/sigeps80.F
+!||--- called by ------------------------------------------------------
+!||    mulaw                 ../engine/source/materials/mat_share/mulaw.F90
+!||--- calls      -----------------------------------------------------
+!||    finter                ../engine/source/tools/curve/finter.F
+!||    kirkaldykinetics      ../engine/source/materials/mat/mat080/kirkaldykinetics.F
+!||    phasekinetic2         ../engine/source/materials/mat/mat080/phasekinetic2.F
+!||    table_vinterp         ../engine/source/tools/curve/table_tools.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE SIGEPS80(
      1   NEL,     NUPARAM, NUVAR,   MFUNC,
      2   KFUNC,   NPF,     TF,      TIME,
@@ -115,11 +115,11 @@ C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
-      INTEGER NEL, NUPARAM, NUVAR,NVARTMP, NPT0, IPT,
-     .   NGL(NEL),MAT(NEL),IPM(NPROPMI,*),ITHK
+      INTEGER NEL, NUPARAM, NUVAR,NVARTMP,
+     .   NGL(NEL),MAT(NEL),IPM(NPROPMI,*)
       my_real TIME,TIMESTEP,UPARAM(*),
-     .   AREA(NEL),RHO0(NEL),EINT(NEL,2),
-     .   THKLY(NEL),PLA(NEL),RHO(NEL),
+     .   RHO0(NEL),EINT(NEL,2),
+     .   PLA(NEL),RHO(NEL),
      .   EPSPXX(NEL),EPSPYY(NEL),EPSPZZ(NEL),
      .   EPSPXY(NEL),EPSPYZ(NEL),EPSPZX(NEL),
      .   DEPSXX(NEL),DEPSYY(NEL),DEPSZZ(NEL),
@@ -129,7 +129,7 @@ C
      .   SIGOXX(NEL),SIGOYY(NEL),SIGOZZ(NEL),
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
      .   VOL(NEL) ,TEMP(NEL),
-     .   DIE(NEL),COEF(NEL) 
+     .   DIE(NEL) 
       INTEGER, INTENT(IN) :: JTHE
       INTEGER, INTENT(IN) :: IDT_THERM
       my_real ,intent(in) :: THEACCFACT
@@ -145,7 +145,7 @@ C   I N P U T   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
       my_real 
      .   UVAR(NEL,NUVAR),EPSP(NEL),
-     .   OFF(NEL),THK(NEL),YLD(NEL),EINTTH(NEL)
+     .   OFF(NEL),YLD(NEL),EINTTH(NEL)
       INTEGER :: VARTMP(NEL,NVARTMP)
 
       TYPE(TTABLE) TABLE(*)
@@ -158,27 +158,27 @@ C-----------------------------------------------
 c-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,NRATE(NEL),II,J1,J2,N,NINDX,IADBUF,NINDXGLOB,NINDXLOC,
-     .        NMAX,INDEX(NEL),K2,ITERK2,ITER,NITER,NPFG(2),ITABLE(5),
-     .        EFUNC,IFUNC(5),ITERK,FLAG,NTAB,HEATFLAG,HEATOPTION,
-     .        NIHEAT,NICOOL,FLAG_LOC ,LOCAL,FLAG_TR_STRAIN,FLAG_TR_KINETICS
+      INTEGER I,J,II,NINDXGLOB,NINDXLOC,
+     .        INDEX(NEL),ITERK2,ITER,NITER,NPFG(2),ITABLE(5),
+     .        ITERK,NTAB,HEATFLAG,HEATOPTION,
+     .        NICOOL,FLAG_LOC ,FLAG_TR_STRAIN,FLAG_TR_KINETICS
 
       INTEGER, DIMENSION(NEL)   :: INDXLOC,INDXGLOB
       my_real
-     .        CUN ,CDEUX,CTROIS,DENO,EFAC,
-     .        ALAMBDA,BLAMBDA,CEPS,PEPS,SOL1,SOL2,
-     .        YSCALE(5),TETA2,TETA3,TETA4,TETA5,QR2,QR3,QR4,PP,
-     .        ALFA1,ALFA2,T2,T3,T4,T5,T1,VOLI,XFAC(5),RSCALE(5),
-     .        PPXX,PPYY,PPZZ,PPXY,PPYZ,PPZX,ESFIM1,
-     .        ALPHA,TREF,AE1,AE3,BS,MS,GSIZE,NU,FCFER,FCPER,FCBAI,FG,
-     .        E1PO(NEL),RHNEW,EODE,FGRAIN,KPER,HFCTN,KBAIN,XEQ2,
-     .        XEQ4,LAT1,LAT2,HFP,HB,HM,VOL0,TINI,UNITT,
-     .        TGZ(12),CRIT,TEST, HEATFLAG1,DXRHO,
-     .        CONV,HUITCENT,SSPSHELL,SSPSOL,QPTT,SLOPE,DYDXR,
+     .        CUN ,CDEUX,CTROIS,EFAC,
+     .        CEPS,PEPS,
+     .        YSCALE(5),TETA2,TETA3,TETA4,TETA5,QR2,QR3,QR4,
+     .        ALFA1,ALFA2,XFAC(5),RSCALE(5),
+     .        
+     .        ALPHA,TREF,AE1,AE3,BS,MS,GSIZE,NU,FCFER,FCPER,FCBAI,
+     .        FGRAIN,KPER,KBAIN,XEQ2,
+     .        XEQ4,LAT1,LAT2,HFP,HB,HM,TINI,UNITT,
+     .        TGZ(12), HEATFLAG1,DXRHO,
+     .        HUITCENT,QPTT,SLOPE,DYDXR,
      .         TAU1, TAU3,
      .         GFAC_F,PHI_F,PSI_F,CR_F,CF,GFAC_P,PHI_P,PSI_P,CR_P,CP,
      .         GFAC_B,PHI_B,PSI_B,CR_B,CB,PHI_M,PSI_M,N_M,FGFER,FGPER,FGBAI,
-     .         FAC,DSVM,
+     .         
      .         NORMXX,NORMYY,NORMZZ,NORMXY,NORMYZ,NORMZX,DDLAM,DFDSIG_DSIG,DPLA_DLAM,DDEP
 
       my_real
@@ -186,40 +186,40 @@ C-----------------------------------------------
      .        LAMDA(NEL),DYDXGZ(NEL),DYDXE(NEL),
      .        FRAC1(NEL),FRAC2(NEL),FRAC3(NEL)  ,FRAC4(NEL), 
      .        FRAC5(NEL),TOTFRAC(NEL),TOTFRACOLD(NEL) ,SOXX(NEL) ,
-     .        GZ(NEL)   ,TREO(NEL)   ,SIGOM(NEL),SOYY(NEL),SOZZ(NEL),
+     .        GZ(NEL)      ,SIGOM(NEL),SOYY(NEL),SOZZ(NEL),
      .        DYDX1(NEL),DYDX2(NEL)  ,DYDX3(NEL),
      .        DYDX4(NEL),DYDX5(NEL)  ,YIELD(NEL),
      .        Y1(NEL)   ,Y2(NEL),Y3(NEL),Y4(NEL),Y5(NEL),
-     .        STRIALXX(NEL),STRIALYY(NEL),STRIALZZ(NEL),
-     .        STRIALXY(NEL),STRIALYZ(NEL),STRIALZX(NEL),SVM(NEL),
-     .        EOXX(NEL),EOYY(NEL),EOZZ(NEL),EPSTH(NEL),
-     .        EOXY(NEL),EOYZ(NEL),EOZX(NEL),
-     .        EODEXX(NEL),EODEYY(NEL),EODEZZ(NEL),
-     .        EODEXY(NEL),EODEZX(NEL),EODEYZ(NEL),Y1INI(NEL),
-     .        EPSOXX(NEL),EPSOYY(NEL),EPSOZZ(NEL),
-     .        EPSOXY(NEL),EPSOYZ(NEL),EPSOZX(NEL),
-     .        DPLA(NEL)  ,SNORM(NEL),SEFF(NEL),
-     .        SIGM(NEL)  ,SXX(NEL),SYY(NEL),SZZ(NEL),
+     .        
+     .        SVM(NEL),
+     .        
+     .        
+     .        
+     .        Y1INI(NEL),
+     .        
+     .        
+     .        DPLA(NEL)  ,
+     .        SXX(NEL),SYY(NEL),SZZ(NEL),
      .        SXY(NEL)   ,SYZ(NEL),SZX(NEL)   ,
-     .        DEPLXX(NEL),DEPLYY(NEL),DEPLZZ(NEL),DEPLXY(NEL),DEPLYZ(NEL),DEPLZX(NEL),
+     .        
      .        DPLA1(NEL),DPLA2(NEL),DPLA3(NEL),DPLA4(NEL),DPLA5(NEL),
      .        PLA1(NEL) ,PLA2(NEL) ,PLA3(NEL) ,PLA4(NEL) ,PLA5(NEL),
-     .        DEPSELZZ(NEL),DEPSPLZZ(NEL),DEPSIM1(NEL),DEPSI(NEL),
-     .        DEPSIP1(NEL),SIGZIM1(NEL),SIGI(NEL),
-     .        VOLOLD(NEL),RH(NEL),DE12(NEL),YLDOLD(NEL),
-     .        DEPSELOZZ(NEL),DEPSPLOZZ(NEL),
-     .        SVMI(NEL),TRDEPSTH(NEL),SVMIM1(NEL),SVMTR(NEL),TRDEPS,
-     .        DEPSTHXX(NEL),DEPSTHYY(NEL),DEPSTHZZ(NEL),DEPSTH(NEL),
-     .        X1(NEL),X2(NEL),X3(NEL),X4(NEL),X5(NEL),HARD(NEL),
-     .        DEXX(NEL),DEYY(NEL),DEZZ(NEL),GOLD(NEL),SVMtest(NEL),
-     .        EPLXX(NEL),EPLYY(NEL),EPLZZ(NEL) ,EPLXY(NEL),EPLYZ(NEL),EPLZX(NEL),
-     .        EELOXX(NEL),EELOYY(NEL),EELOYZ(NEL),EELOZX(NEL),
-     .        EELOXY(NEL),EELOZZ(NEL),SIGKK(NEL),
-     .        XGAMA(NEL),TEMPMIN(NEL),VR(NEL),H(NEL),TEMPO(NEL),
+     .        
+     .        
+     .        
+     .        
+     .        TRDEPSTH(NEL),
+     .        DEPSTH(NEL),
+     .        X2(NEL),X3(NEL),X4(NEL),X5(NEL),HARD(NEL),
+     .        GOLD(NEL),
+     .        
+     .        
+     .        SIGKK(NEL),
+     .        XGAMA(NEL),TEMPMIN(NEL),VR(NEL),TEMPO(NEL),
      .        ZEQ(NEL), TAU(NEL),NORMDEV(NEL),DETH12(NEL),DEPSTR(NEL),
      .        RHO_A(NEL),RHO_F(NEL),RHO_P(NEL),RHO_B(NEL),RHO_M(NEL),RHO_N(NEL)
       my_real, DIMENSION(NEL) ::
-     .        A1, A2,FCT,DF,SVMO,DEPSVOL,HFCT,A,B,C,DH,GSIG,DGSIG,ESF,DESF,P,SVMT,
+     .        A1, A2,FCT,DF,SVMO,HFCT,A,B,C,GSIG,P,SVMT,
      .        LNF2,LNF3,LNF4,LNF5,FACCS,STXX,STYY,STZZ,STXY,STYZ,STZX,LOGZ,LOGZM1,
      .        DPXX,DPYY,DPZZ,DPXY,DPYZ,DPZX,PHI2,PHI3,PHI4,PHI5,PSI2 ,PSI3,PSI4,PSI5
       my_real,
@@ -396,38 +396,33 @@ c
             UVAR(I,35)=VOL(I) 
             UVAR(I,43)=RHO(I)
             IF(HEATFLAG == 1)THEN
-               UVAR(I,2) = ZERO!  ! fraction of austenite
-               UVAR(I,3) = ONE ! ! fraction of ferrite
+               UVAR(I,2) = ZERO    ! fraction of austenite
+               UVAR(I,3) = ONE     ! fraction of ferrite
             ELSE
-               UVAR(I,2) = ONE! fraction of austenite
+               UVAR(I,2) = ONE     ! fraction of austenite
             ENDIF
-            UVAR(I,8)   = UPARAM(45) !temperature 
-            UVAR(I,1)   = UPARAM(45) !TINI
+            UVAR(I,8) = TINI       ! initial temperature 
+            UVAR(I,1) = TINI
  
-            IF(JTHE==-1) UVAR(I,8)  =TEMP(I)
-            !UVAR(I,9)=FINTER(KFUNC(2),ZERO,NPF,TF,DYDX1(I))!  initial yield
-            XX1(I,1)=ZERO
-            XX1(I,2)=UVAR(I,8) ! temp initial
-            XX1(I,3)=ZERO
+            IF (JTHE == -1) UVAR(I,8) = TEMP(I)
+            XX1(I,1) = ZERO
+            XX1(I,2) = TINI
+            XX1(I,3) = ZERO
             IPOS1(I,1) = 0
             IPOS1(I,2) = 0
             IPOS1(I,3) = 0 
           ENDDO 
+!
           CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,NEL,IPOS1,XX1,Y1,DYDX1)!  initial yield
-          DO I=1,NEL        
-           UVAR(I,9)= Y1 (I)
-          ENDDO 
+!
+          UVAR(1:NEL,9) = Y1(1:NEL)
         ENDIF                
       ENDIF
-      IF(JTHE /= 0 ) THEN
-         DO I=1,NEL     
-           TEMPEL(I) = TEMP(I)
-         ENDDO
+!
+      IF (JTHE /= 0 ) THEN
+        TEMPEL(1:NEL) = TEMP(1:NEL)
       ELSE
-         !RHOCP=UPARAM(21)
-         DO I=1,NEL
-           TEMPEL(I) = TINI
-         ENDDO
+        TEMPEL(1:NEL) = TINI
       ENDIF
       DO I=1,NEL
         TEMPO(I)   = UVAR(I,8)
@@ -444,13 +439,11 @@ c         IF (UVAR(I,8)<=EP03)THEN
 c           CP(I)= 1.117*EP06/(1010.0-TEMPO(I))/(1010.0-TEMPO(I))+12622.
 c     .        /(1010.0 - TEMPO(I) )+ 0.3485*TEMPO(I)+ 355.6
 c         ELSE
-c           CP(I)= 1.225*EP08/((TEMPO(I)-990.)**4)+0.1381*TEMPO(I)
-c     .       + 585.7
+c           CP(I)= 1.225*EP08/((TEMPO(I)-990.)**4)+0.1381*TEMPO(I) + 585.7
 c         ENDIF
 c         TEMP = UPARAM(45)
-c         VOL0    = VOL(I) * RHO0(I)
-         !TEMPEL(I) = UPARAM(45)  
-c     .    +(EINT(I,1)+ EINT(I,2))/VOL(I)/(RHO0(I)*CP(I))
+c         VOL0 = VOL(I) * RHO0(I)
+c         ! TEMPEL(I) = TINI + (EINT(I,1)+ EINT(I,2))/VOL(I)/(RHO0(I)*CP(I))
 c       ENDDO
 c      ENDIF
 c-------------------------------------        
@@ -608,7 +601,7 @@ c-----------------------------------------------
       ENDDO
 c-----------------------------------------------
 c-------------------------------------
-c interpolatin of yield for each phase 
+c interpolation of yield for each phase 
 c-------------------------------------
       DO I=1,NEL
         
@@ -1260,8 +1253,12 @@ C
      .             +            FRAC3(I)-UVAR(I,4)
      .             +            FRAC4(I)-UVAR(I,5) ) ) *VOL (I) 
    
-         ENDIF !(OFF(I) == ONE ) 
+         ENDIF ! OFF(I) == ONE
       ENDDO
-      
+!-----------
+      IF (JTHE == 0) THEN
+        TEMP(1:NEL) = TEMPEL(1:NEL)   ! for output
+      END IF     
+!-----------      
       RETURN
       END

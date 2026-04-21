@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cbalke3       ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbake3        ../engine/source/elements/shell/coqueba/cbake3.F
-      !||--- calls      -----------------------------------------------------
-      !||    cbalkeorfm    ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||    cbalkeorfm1   ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||    cbalkeormf    ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||    cbalkeormf1   ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||====================================================================
+!||====================================================================
+!||    cbalke3       ../engine/source/elements/shell/coqueba/cbalke3.F
+!||--- called by ------------------------------------------------------
+!||    cbake3        ../engine/source/elements/shell/coqueba/cbake3.F
+!||--- calls      -----------------------------------------------------
+!||    cbalkeorfm    ../engine/source/elements/shell/coqueba/cbalke3.F
+!||    cbalkeorfm1   ../engine/source/elements/shell/coqueba/cbalke3.F
+!||    cbalkeormf    ../engine/source/elements/shell/coqueba/cbalke3.F
+!||    cbalkeormf1   ../engine/source/elements/shell/coqueba/cbalke3.F
+!||====================================================================
         SUBROUTINE CBALKE3(JFT,JLT,CDET,THK0,THK2,HM,HF,HC,HZ,
      1                      BM,BMF,BF,BC,TC,BZZ,NPLAT,IPLAT,VOL,
      2                      IKGEO,FOR  ,MOM  ,
@@ -83,11 +83,11 @@ C-----------------------------------------------
      .    FXX(MVSIZ),FYY(MVSIZ),DM5(MVSIZ),DM6(MVSIZ),DF5(MVSIZ),
      .    FXY(MVSIZ),FXY2(MVSIZ),KM12,KM21,
      .    DF6(MVSIZ),DM5_2(MVSIZ),DM6_2(MVSIZ),DF5_2(MVSIZ),
-     .    DF6_2(MVSIZ),DMF(3,3,MVSIZ),FAC2Z,CBR1(4,MVSIZ),
-     .    CBR2(4,MVSIZ),CBR3(4,MVSIZ),BB0(2,2,MVSIZ),T0IJ(2,2,MVSIZ),
+     .    DF6_2(MVSIZ),DMF(3,3,MVSIZ),
+     .    BB0(2,2,MVSIZ),T0IJ(2,2,MVSIZ),
      .    T1IJ(2,2,MVSIZ)
        DATA IN/2,1/
-C-----------Attention Matrice sym Kii ne calcul que la moitie---------72
+C----------- CAPTE Matrix Sym KII only calculates half ---------- 72
 #include "vectorize.inc"
        DO M=JFT,JLT 
         EP=IPLAT(M)
@@ -303,7 +303,7 @@ C
        ENDDO
        ENDDO
       END IF
-C ----ajoute termes sup. due au orthotrope-----
+C ---- Add terms sup.due to orthotropic -----
        IF (IORTH>0) THEN
 C ----add mem-bending coupling terms of orthotrope--coplanar first---
 #include "vectorize.inc"
@@ -869,7 +869,7 @@ C
      2                BBC(2,1,4,EP)*DC(2,2,EP)*BBC(2,J1,3,EP)
         ENDDO
        ENDDO
-C------ Mzz  pour tous----x:1,3,5,7;y:2,4,6,8---
+C------ Mzz for all ---- x: 1.3,5,7; Y: 2.4,6,8 ---
       IF (IDRIL==0) THEN
         DO EP=JFT,JLT
           M11(3,3,EP)=M11(3,3,EP)+DHZ(EP)
@@ -1065,7 +1065,7 @@ C---+----1----+----2----+shear contribution-+----5----+----6----+----7----+----8
        ENDDO
        ENDDO
 C
-C---+----1----+----2----+couplage part--[MF](3x2)[FM](2x3)-6----+----7----+----8
+C---+---- 1 ----+---- 2 ----+Part coupling-[MF] (3x2) [FM] (2x3) -6 ----+---- 7 ----+---- 8
        DO I=1,3
        DO J=1,2
         J1=J+3
@@ -1626,11 +1626,11 @@ C
 C    
       RETURN
       END
-      !||====================================================================
-      !||    cbalkec3   ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbake3     ../engine/source/elements/shell/coqueba/cbake3.F
-      !||====================================================================
+!||====================================================================
+!||    cbalkec3   ../engine/source/elements/shell/coqueba/cbalke3.F
+!||--- called by ------------------------------------------------------
+!||    cbake3     ../engine/source/elements/shell/coqueba/cbake3.F
+!||====================================================================
         SUBROUTINE CBALKEC3(JFT,JLT, VOL  ,X13  ,X24  ,Y13  ,Y24,HM,
      1                      K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
      2                      NPLAT,IPLAT,IKGEO,FOR ,M11,M22,M33,M44,
@@ -1749,11 +1749,11 @@ C------ renforce positive  ----------
 C
        RETURN
        END
-      !||====================================================================
-      !||    cbalkerz   ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbake3     ../engine/source/elements/shell/coqueba/cbake3.F
-      !||====================================================================
+!||====================================================================
+!||    cbalkerz   ../engine/source/elements/shell/coqueba/cbalke3.F
+!||--- called by ------------------------------------------------------
+!||    cbake3     ../engine/source/elements/shell/coqueba/cbake3.F
+!||====================================================================
         SUBROUTINE CBALKERZ(JFT ,JLT   ,VOL  ,THK0 ,
      2                     HM   ,HZ   ,BM   ,
      6                    K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
@@ -1799,14 +1799,14 @@ C-----------------------------------------------
      .    T11(3,3,MVSIZ),T12(3,3,MVSIZ),T13(3,3,MVSIZ),T14(3,3,MVSIZ),
      .    T22(3,3,MVSIZ),T23(3,3,MVSIZ),T24(3,3,MVSIZ),T33(3,3,MVSIZ),
      .    T44(3,3,MVSIZ),T34(3,3,MVSIZ),
-     .    BB(2,4,MVSIZ),GM(MVSIZ),BMRZ1(MVSIZ,4,4),BMRZ2(MVSIZ,4,4),
+     .    BB(2,4,MVSIZ),BMRZ1(MVSIZ,4,4),BMRZ2(MVSIZ,4,4),
      .    BMRZ3(MVSIZ,4,4),DHZ(MVSIZ),
      .    DM(3,3,MVSIZ),DPRZ(4,MVSIZ),PX(4,MVSIZ),PY(4,MVSIZ),
-     .    C1,C2,CBRX(4,MVSIZ),CBRY(4,MVSIZ),CBRZ(4,MVSIZ),FRZV(MVSIZ)
+     .    C2,CBRX(4,MVSIZ),CBRY(4,MVSIZ),CBRZ(4,MVSIZ),FRZV(MVSIZ)
       my_real
      .   PRX(4,MVSIZ),PRY(4,MVSIZ),PRXY(4,MVSIZ),PRZ(4,MVSIZ),
      .   DMF(3,3,MVSIZ),CBR1(4,MVSIZ),CBR2(4,MVSIZ),CBR3(4,MVSIZ)
-C-----------Attention Matrice sym Kii ne calcul que la moitie---------72
+C----------- CAPTE Matrix Sym KII only calculates half ---------- 72
         NF =NPLAT+1
 #include "vectorize.inc"
        DO M=JFT,JLT
@@ -2501,11 +2501,11 @@ C
 C
        RETURN
        END
-      !||====================================================================
-      !||    cbalkeormf   ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbalke3      ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||====================================================================
+!||====================================================================
+!||    cbalkeormf   ../engine/source/elements/shell/coqueba/cbalke3.F
+!||--- called by ------------------------------------------------------
+!||    cbalke3      ../engine/source/elements/shell/coqueba/cbalke3.F
+!||====================================================================
         SUBROUTINE CBALKEORMF(JFT    ,JLT   ,KMFIJ    ,DMF   ,TIJ   )
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -2551,11 +2551,11 @@ C
 C
        RETURN
        END
-      !||====================================================================
-      !||    cbalkeorfm   ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbalke3      ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||====================================================================
+!||====================================================================
+!||    cbalkeorfm   ../engine/source/elements/shell/coqueba/cbalke3.F
+!||--- called by ------------------------------------------------------
+!||    cbalke3      ../engine/source/elements/shell/coqueba/cbalke3.F
+!||====================================================================
         SUBROUTINE CBALKEORFM(JFT    ,JLT   ,KFMIJ    ,DMF   ,TIJ   )
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -2602,11 +2602,11 @@ C
 C
        RETURN
        END
-      !||====================================================================
-      !||    cbalkeormf1   ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbalke3       ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||====================================================================
+!||====================================================================
+!||    cbalkeormf1   ../engine/source/elements/shell/coqueba/cbalke3.F
+!||--- called by ------------------------------------------------------
+!||    cbalke3       ../engine/source/elements/shell/coqueba/cbalke3.F
+!||====================================================================
         SUBROUTINE CBALKEORMF1(JFT  ,JLT  ,KMFIJ  ,DMF   ,TIJ  ,T0IJ )
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -2652,11 +2652,11 @@ C
 C
        RETURN
        END
-      !||====================================================================
-      !||    cbalkeorfm1   ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||--- called by ------------------------------------------------------
-      !||    cbalke3       ../engine/source/elements/shell/coqueba/cbalke3.F
-      !||====================================================================
+!||====================================================================
+!||    cbalkeorfm1   ../engine/source/elements/shell/coqueba/cbalke3.F
+!||--- called by ------------------------------------------------------
+!||    cbalke3       ../engine/source/elements/shell/coqueba/cbalke3.F
+!||====================================================================
         SUBROUTINE CBALKEORFM1(JFT  ,JLT  ,KFMIJ  ,DMF  ,TIJ  ,T0IJ )
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S

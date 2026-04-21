@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_gene_keyword       ../engine/source/output/h3d/input_list/h3d_gene_keyword.F
-      !||--- called by ------------------------------------------------------
-      !||    lech3d                 ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_gene_keyword       ../engine/source/output/h3d/input_list/h3d_gene_keyword.F
+!||--- called by ------------------------------------------------------
+!||    lech3d                 ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
+!||    prelech3d              ../engine/source/output/h3d/h3d_build_fortran/prelech3d.F90
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                ../engine/share/modules/h3d_mod.F
+!||    message_mod            ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+!||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
+!||====================================================================
       SUBROUTINE H3D_GENE_KEYWORD(KEY2_READ,KEY2,KEY3_READ,KEY3_GLOB,NB_KEY,CPT_KEY,MULTI_FVM,
      .                            IS_MODEL_NPT,IS_MODEL_LAYER,IS_MODEL_PLY,IS_MDSVAR,IS_MDSVAR_DEF,
      .                            IS_PLY_ALL,IS_LAYER_ALL,IS_IPT,IS_LAYER,IS_PLY,IS_ID)
@@ -54,10 +55,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NIPMAX,I1,I2,II,IS_MODEL_NPT,IS_MODEL_LAYER,IS_MODEL_PLY,
+      INTEGER II, IS_MODEL_NPT, IS_MODEL_LAYER, IS_MODEL_PLY, 
      .        IS_MDSVAR,IS_MDSVAR_DEF,IS_PLY_ALL,IS_LAYER_ALL,IS_IPT,
      .        IS_LAYER,IS_PLY,IS_ID
-      CHARACTER(LEN=2) :: CH_OPTION
+ 
 c-----------------------------------------------
       IF (KEY2_READ == 'MASS') THEN
 c-----------------------------------------------
@@ -125,10 +126,10 @@ c     known a priori
             ENDDO
           ELSE
             NB_KEY = 4
-            IF (CPT_KEY == 1) KEY3_GLOB = 'VFRAC1'
-            IF (CPT_KEY == 2) KEY3_GLOB = 'VFRAC2'
-            IF (CPT_KEY == 3) KEY3_GLOB = 'VFRAC3'
-            IF (CPT_KEY == 4) KEY3_GLOB = 'VFRAC4'
+            IF (CPT_KEY == 1) KEY3_GLOB = 'VFRAC/1'
+            IF (CPT_KEY == 2) KEY3_GLOB = 'VFRAC/2'
+            IF (CPT_KEY == 3) KEY3_GLOB = 'VFRAC/3'
+            IF (CPT_KEY == 4) KEY3_GLOB = 'VFRAC/4'
           ENDIF
         ELSE
           NB_KEY = 1

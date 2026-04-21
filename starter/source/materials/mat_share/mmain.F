@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mmain          ../starter/source/materials/mat_share/mmain.F
-      !||--- called by ------------------------------------------------------
-      !||    s4refsta3      ../starter/source/elements/solid/solide4/s4refsta3.F
-      !||    srefsta3       ../starter/source/elements/solid/solide/srefsta3.F
-      !||--- calls      -----------------------------------------------------
-      !||    mulaw          ../starter/source/materials/mat_share/mulaw.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    mmain          ../starter/source/materials/mat_share/mmain.F
+!||--- called by ------------------------------------------------------
+!||    s4refsta3      ../starter/source/elements/solid/solide4/s4refsta3.F
+!||    srefsta3       ../starter/source/elements/solid/solide/srefsta3.F
+!||--- calls      -----------------------------------------------------
+!||    mulaw          ../starter/source/materials/mat_share/mulaw.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE MMAIN(PM      ,ELBUF_STR,IX   ,NIX    ,X       ,
      2                  GEO    ,IPARG  ,NEL    ,SKEW   ,BUFMAT  ,
      3                  IPART  ,IPARTEL,NUMMAT ,MATPARAM,
@@ -85,7 +85,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NUVAR,NVARTMP,NUVARR
+      INTEGER NUVAR, NVARTMP
       my_real
      .   TX(MVSIZ), TY(MVSIZ), TZ(MVSIZ),
      .   VIS(MVSIZ), CXX(MVSIZ), OFF(MVSIZ), EPSD(MVSIZ)
@@ -118,7 +118,7 @@ C
      F             TZ       ,ISMSTR   ,
      G             MFXX     ,MFXY     ,MFXZ     ,MFYX     ,MFYY   ,
      H             MFYZ     ,MFZX     ,MFZY     ,MFZZ     ,IPM    ,
-     I             ISORTH   ,NEL      ,MATPARAM)
+     I             ISORTH   ,NEL      ,MATPARAM ,LBUF%DMG )
      J             
       ENDIF
 C------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    tke3           ../engine/source/elements/truss/tke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
-      !||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_p        ../engine/source/implicit/assem_p.F
-      !||    peoff          ../engine/source/elements/beam/peoff.F
-      !||    r4sumg3        ../engine/source/elements/spring/r4sumg3.F
-      !||    tcoork3        ../engine/source/elements/truss/tcoork3.F
-      !||    tkeg3          ../engine/source/elements/truss/tkeg3.F
-      !||    tmat3          ../engine/source/elements/truss/tmat3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    tke3           ../engine/source/elements/truss/tke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
+!||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_p        ../engine/source/implicit/assem_p.F
+!||    peoff          ../engine/source/elements/beam/peoff.F
+!||    r4sumg3        ../engine/source/elements/spring/r4sumg3.F
+!||    tcoork3        ../engine/source/elements/truss/tcoork3.F
+!||    tkeg3          ../engine/source/elements/truss/tkeg3.F
+!||    tmat3          ../engine/source/elements/truss/tmat3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE TKE3(JFT    ,JLT      ,PM      ,GEO    ,NCT   ,
      1                X      ,ELBUF_TAB,NEL     ,OFFSET ,IKGEO ,
      2                ETAG   ,IDDL     ,NDOF    ,K_DIAG ,K_LT  ,
@@ -43,6 +44,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixt
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,7 +68,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NB1, NB2, NB3, NB4, NB5, NB6, NB10, NB11, LCO
+ 
       INTEGER MAT(MVSIZ),NGL(MVSIZ)
       my_real 
      .  AL(MVSIZ),KX(MVSIZ),EX(MVSIZ),EY(MVSIZ),EZ(MVSIZ)
@@ -85,7 +87,7 @@ c      NB5 =NB4  + NEL
 c      NB6 =NB5  + NEL
 c      NB10=NB6
 c      NB11=NB10 + NEL
-c      !offsetting des super-groupes
+c      !offsetting of super-groups
 c      NB1 =NB1 + OFFSET
 c      NB2 =NB2 + OFFSET
 c      NB3 =NB3 + OFFSET
@@ -100,7 +102,7 @@ C
       CALL TMAT3(JFT    ,JLT    ,PM    ,MAT    ,GBUF%AREA,
      .           AL     ,KX     )
 C-------------------------
-C     MATRICE de RIGIDITE
+C     STIFFNESS MATRIX
 C-------------------------
       CALL R4SUMG3(JFT    ,JLT    ,AL      ,KX      ,EX     ,
      1             EY     ,EZ     ,KE11    ,KE12    ,KE22   )

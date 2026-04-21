@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i20cor3    ../engine/source/interfaces/int20/i20cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i20cor3    ../engine/source/interfaces/int20/i20cor3.F
+!||--- called by ------------------------------------------------------
+!||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I20COR3(
      1                JLT     ,XA    ,IRECT ,NSV   ,CAND_E ,
      2                CAND_N  ,STF   ,STFA  ,X1    ,X2     ,
@@ -62,7 +62,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*),KINET(*),KINI(*),
-     .        JLT,IDT, NOINT,IGAP ,NSN, ITY, NIN, IGSTI,
+     .        JLT,IGAP ,NSN, ITY, NIN, IGSTI,
      .        IADM,INTTH, NLN, NLG(*)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ),IELEC(*),IELECI(MVSIZ),  NSMS(MVSIZ), 
@@ -85,7 +85,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J  ,IL, L, NN, IG,JFT, IX,  NI
+      INTEGER I   ,IL, L, NN, IG, IX,  NI
 C-----------------------------------------------
 C
       IF(IGAP==0)THEN
@@ -337,13 +337,13 @@ C
 
       RETURN
       END
-      !||====================================================================
-      !||    i20cor3e   ../engine/source/interfaces/int20/i20cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i20cor3e   ../engine/source/interfaces/int20/i20cor3.F
+!||--- called by ------------------------------------------------------
+!||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I20COR3E(
      1      JLT    ,IXLINS ,IXLINM ,XA     ,VA     ,
      2      CAND_S ,CAND_M ,STFS   ,STFM   ,GAPMIN ,
@@ -372,7 +372,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "sms_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -399,60 +398,6 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I ,NN
 C-----------------------------------------------
-      IF(IMACH/=3) THEN
-        IF(IGAP==0)THEN
-          DO I=1,JLT
-            GAPV(I)=GAPMIN
-          ENDDO
-        ELSE
-          DO I=1,JLT
-            GAPV(I)=GAP_S(CAND_S(I))+GAP_M(CAND_M(I))
-            GAPV(I)=MAX(GAPMIN,GAPV(I))
-          ENDDO
-        ENDIF
-C
-        DO I=1,JLT
-          NL1(I)=IXLINS(1,CAND_S(I))
-          NL2(I)=IXLINS(2,CAND_S(I))
-          ML1(I)=IXLINM(1,CAND_M(I))
-          ML2(I)=IXLINM(2,CAND_M(I))
-          N1(I)=NLG(NL1(I))
-          N2(I)=NLG(NL2(I))
-          M1(I)=NLG(ML1(I))
-          M2(I)=NLG(ML2(I))
-          STIF(I)=ABS(STFS(CAND_S(I)))*STFM(CAND_M(I))
-     .          / MAX(EM20,ABS(STFS(CAND_S(I)))+STFM(CAND_M(I)))
-          XXS1(I) = XA(1,NL1(I))
-          XYS1(I) = XA(2,NL1(I))
-          XZS1(I) = XA(3,NL1(I))
-          XXS2(I) = XA(1,NL2(I))
-          XYS2(I) = XA(2,NL2(I))
-          XZS2(I) = XA(3,NL2(I))
-          XXM1(I) = XA(1,ML1(I))
-          XYM1(I) = XA(2,ML1(I))
-          XZM1(I) = XA(3,ML1(I))
-          XXM2(I) = XA(1,ML2(I))
-          XYM2(I) = XA(2,ML2(I))
-          XZM2(I) = XA(3,ML2(I))
-          VXS1(I) = VA(1,NL1(I))
-          VYS1(I) = VA(2,NL1(I))
-          VZS1(I) = VA(3,NL1(I))
-          VXS2(I) = VA(1,NL2(I))
-          VYS2(I) = VA(2,NL2(I))
-          VZS2(I) = VA(3,NL2(I))
-          VXM1(I) = VA(1,ML1(I))
-          VYM1(I) = VA(2,ML1(I))
-          VZM1(I) = VA(3,ML1(I))
-          VXM2(I) = VA(1,ML2(I))
-          VYM2(I) = VA(2,ML2(I))
-          VZM2(I) = VA(3,ML2(I))
-          MS1(I) = MS(N1(I))
-          MS2(I) = MS(N2(I))
-          MM1(I) = MS(M1(I))
-          MM2(I) = MS(M2(I))
-        ENDDO
-C
-      ELSE
         IF(IGAP==0)THEN
           DO I=1,JLT
             GAPV(I)=GAPMIN
@@ -548,7 +493,6 @@ C
             MM2(I) = MS(M2(I))
           END IF
         END DO
-      END IF
 
       DO I=1,JLT
         STIF(I)=MAX(STFAC,ONE)*STIF(I)
@@ -577,11 +521,11 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    i20dst3e   ../engine/source/interfaces/int20/i20cor3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
-      !||====================================================================
+!||====================================================================
+!||    i20dst3e   ../engine/source/interfaces/int20/i20cor3.F
+!||--- called by ------------------------------------------------------
+!||    i20mainf   ../engine/source/interfaces/int20/i20mainf.F
+!||====================================================================
       SUBROUTINE I20DST3E(
      1   JLT    ,CAND_S,CAND_M,H1S   ,H2S   ,
      2   H1M    ,H2M   ,NX    ,NY    ,NZ    ,
@@ -629,8 +573,8 @@ C-----------------------------------------------
       my_real
      .     PENE2(MVSIZ),
      .     XS12,YS12,ZS12,XM12,YM12,ZM12,XA,XB,
-     .     XS2,XM2,XSM,XS2M2,YS2,YM2,YSM,YS2M2,ZS2,ZM2,ZSM,ZS2M2,
-     .     XX,YY,ZZ,ALS,ALM,DET,AAA,GAP2,
+     .     XS2,XM2,XSM,XS2M2,YS2M2,ZS2M2,
+     .     DET,AAA,GAP2,
      .     SX1,SX2,SX3,SX4,SY1,SY2,SY3,SY4,SZ1,SZ2,SZ3,SZ4
 C-----------------------------------------------
        JLT_NEW = 0
@@ -694,7 +638,7 @@ C
            SY2 = SOLIDN_NORMAL(2,N2(I))*AAA
            SZ2 = SOLIDN_NORMAL(3,N2(I))*AAA
          ELSE
-C noeuds remote en SPMD
+C nodes remote en SPMD
            SX1 = SOLIDN_NORMAL_FE(1,N1(I))*AAA
            SY1 = SOLIDN_NORMAL_FE(2,N1(I))*AAA
            SZ1 = SOLIDN_NORMAL_FE(3,N1(I))*AAA
@@ -753,7 +697,7 @@ C
        H2S(I) = ONE -H1S(I)
        H2M(I) = ONE -H1M(I)
 C !!!!!!!!!!!!!!!!!!!!!!!
-C  PENE = GAP^2 - DIST^2 UTILISE POUR TESTER SI NON NUL
+C  PENE = GAP^2 - DIST^2 USED TO TEST IF NON-NULL
 C!!!!!!!!!!!!!!!!!!!!!!!!
        NX(I) = H1S(I)*XXS1(I) + H2S(I)*XXS2(I)
      .       - H1M(I)*XXM1(I) - H2M(I)*XXM2(I)

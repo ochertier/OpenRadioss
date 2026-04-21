@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,39 +20,40 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mmain8              ../engine/source/materials/mat_share/mmain8.F
-      !||--- called by ------------------------------------------------------
-      !||    s8forc3             ../engine/source/elements/solid/solide8/s8forc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    fail_biquad_s       ../engine/source/materials/fail/biquad/fail_biquad_s.F
-      !||    fail_emc            ../engine/source/materials/fail/emc/fail_emc.F
-      !||    fail_johnson        ../engine/source/materials/fail/johnson_cook/fail_johnson.F
-      !||    fail_orthbiquad_s   ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_s.F
-      !||    fail_rtcl_s         ../engine/source/materials/fail/rtcl/fail_rtcl_s.F
-      !||    fail_spalling_s     ../engine/source/materials/fail/spalling/fail_spalling_s.F
-      !||    fail_tab_old_s      ../engine/source/materials/fail/tabulated/fail_tab_old_s.F
-      !||    fail_tab_s          ../engine/source/materials/fail/tabulated/fail_tab_s.F
-      !||    fail_tbutcher_s     ../engine/source/materials/fail/tuler_butcher/fail_tbutcher_s.F
-      !||    fail_wierzbicki_s   ../engine/source/materials/fail/wierzbicki/fail_wierzbicki_s.F
-      !||    fail_wilkins_s      ../engine/source/materials/fail/wilkins/fail_wilkins_s.F
-      !||    m1law8              ../engine/source/materials/mat/mat001/m1law8.F
-      !||    m2law8              ../engine/source/materials/mat/mat002/m2law8.F
-      !||    m3law8              ../engine/source/materials/mat/mat003/m3law8.F
-      !||    meos8               ../engine/source/materials/mat_share/meos8.F
-      !||    mulaw8              ../engine/source/materials/mat_share/mulaw8.F90
-      !||    nvar                ../engine/source/input/nvar.F
-      !||    put_etfac           ../engine/source/elements/solid/solide8z/put_etfac.F
-      !||    startime            ../engine/source/system/timer_mod.F90
-      !||    stoptime            ../engine/source/system/timer_mod.F90
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mulaw8_mod          ../engine/source/materials/mat_share/mulaw8.F90
-      !||    table_mod           ../engine/share/modules/table_mod.F
-      !||    timer_mod           ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE MMAIN8(TIMERS, PM     ,GEO      ,ELBUF_STR,MAT_ELEM ,
+!||====================================================================
+!||    mmain8                ../engine/source/materials/mat_share/mmain8.F
+!||--- called by ------------------------------------------------------
+!||    s8forc3               ../engine/source/elements/solid/solide8/s8forc3.F
+!||--- calls      -----------------------------------------------------
+!||    fail_biquad_s         ../engine/source/materials/fail/biquad/fail_biquad_s.F
+!||    fail_emc              ../engine/source/materials/fail/emc/fail_emc.F
+!||    fail_johnson          ../engine/source/materials/fail/johnson_cook/fail_johnson.F
+!||    fail_orthbiquad_s     ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_s.F
+!||    fail_rtcl_s           ../engine/source/materials/fail/rtcl/fail_rtcl_s.F
+!||    fail_spalling_s       ../engine/source/materials/fail/spalling/fail_spalling_s.F90
+!||    fail_tab_old_s        ../engine/source/materials/fail/tabulated/fail_tab_old_s.F
+!||    fail_tab_s            ../engine/source/materials/fail/tabulated/fail_tab_s.F
+!||    fail_tbutcher_s       ../engine/source/materials/fail/tuler_butcher/fail_tbutcher_s.F
+!||    fail_wierzbicki_s     ../engine/source/materials/fail/wierzbicki/fail_wierzbicki_s.F
+!||    fail_wilkins_s        ../engine/source/materials/fail/wilkins/fail_wilkins_s.F
+!||    m1law8                ../engine/source/materials/mat/mat001/m1law8.F
+!||    m2law8                ../engine/source/materials/mat/mat002/m2law8.F
+!||    m3law8                ../engine/source/materials/mat/mat003/m3law8.F
+!||    meos8                 ../engine/source/materials/mat_share/meos8.F
+!||    mulaw8                ../engine/source/materials/mat_share/mulaw8.F90
+!||    put_etfac             ../engine/source/elements/solid/solide8z/put_etfac.F
+!||    startime              ../engine/source/system/timer_mod.F90
+!||    stoptime              ../engine/source/system/timer_mod.F90
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    fail_spalling_s_mod   ../engine/source/materials/fail/spalling/fail_spalling_s.F90
+!||    mat_elem_mod          ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    mulaw8_mod            ../engine/source/materials/mat_share/mulaw8.F90
+!||    output_mod            ../common_source/modules/output/output_mod.F90
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||    timer_mod             ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE MMAIN8(TIMERS , OUTPUT, PM     ,GEO      ,ELBUF_STR,MAT_ELEM ,
      2                  IX     ,IPARG    ,V        ,TF       ,
      3                  NPF    ,BUFMAT   ,STIFN    ,X        ,D1      ,
      4                  D2     ,D3       ,D4       ,D5       ,D6      ,
@@ -69,10 +70,12 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TIMER_MOD
+      USE OUTPUT_MOD, ONLY : OUTPUT_
       USE TABLE_MOD
       USE MAT_ELEM_MOD         
       USE MULAW8_MOD
       USE ELBUFDEF_MOD
+      USE FAIL_SPALLING_S_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -94,6 +97,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER, INTENT(IN) :: SNPC
       INTEGER, INTENT(IN) :: NUMGEO
       INTEGER, INTENT(IN) :: SBUFMAT
@@ -102,7 +106,6 @@ C-----------------------------------------------
       INTEGER IX(*), IPARG(*), NPF(*),MAT(*),NC(*),NGL(*),
      .        NEL, NELTST, ITYPTST, PID(MVSIZ,*),IPM(NPROPMI,*),
      .        ITASK
-C     REAL
       my_real
      .   PM(NPROPM,*), GEO(*), FV(*), V(*), TF(*), 
      .   BUFMAT(*), STIFN(*), X(3,*),WXX(*),WYY(*),WZZ(*),
@@ -120,12 +123,13 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,J,JJ(6),J1,J2,IR,NFUNC,NUVAR,NUPARAM,NUVARR, 
-     .        NVARF,IRUPT,NUMBER_FAILURE,IADBUF,IMAT,NTABL_FAIL
-      INTEGER IFUNC(MAXFUNC)
-      INTEGER, DIMENSION(:), POINTER :: ITABL_FAIL
+      INTEGER I,J,JJ(6),J1,IR,NFUNC,NUVAR,NUPARAM,
+     .        NVARF,IRUPT,NUMBER_FAILURE,IMAT,NTABL_FAIL,
+     .        NIPARAM
+      INTEGER IFUNC(MAXFUNC), LF_DAMMX
+      INTEGER, DIMENSION(:), POINTER :: ITABL_FAIL, IPARAMF
       my_real
-     .   QNEW(MVSIZ),VIS(MVSIZ),EPSD(MVSIZ),ET(MVSIZ),
+     .   VIS(MVSIZ),ET(MVSIZ),
      .    DPLA(8*MVSIZ), EPSP(8*MVSIZ),TSTAR(MVSIZ),SXX(MVSIZ),
      .    SYY(MVSIZ),SZZ(MVSIZ),SXY(MVSIZ),SYZ(MVSIZ),SZX(MVSIZ)   
       my_real,
@@ -141,7 +145,7 @@ C=======================================================================
         JJ(I) = NEL*(I-1)
       ENDDO
 !
-C     tangent module
+C     module
       DO I=1,NEL
         ET(I)=ZERO
       ENDDO 
@@ -155,7 +159,8 @@ C
         SVIS(I,5)= ZERO 
         SVIS(I,6)= ZERO 
         TSTAR(I) = ZERO        
-      ENDDO 
+      ENDDO
+      IMAT = MAT(1)
 C-----------------------------------------------------------------
       IF (MTN == 1) THEN
         CALL M1LAW8(
@@ -170,7 +175,7 @@ C-----------------------------------------------------------------
      9   DMELS,    BUFLY,    SSP,      ITY,
      A   NPT,      JTUR,     JTHE,     JSMS)
       ELSEIF (MTN == 2) THEN
-        CALL M2LAW8(
+        CALL M2LAW8(MAT_ELEM%MAT_PARAM(IMAT),
      1   PM,       OFF,      GBUF%SIG, GBUF%EINT,
      2   GBUF%RHO, GBUF%QVIS,GBUF%VOL, STIFN,
      3   NEL,      D1,       D2,       D3,
@@ -211,8 +216,8 @@ c     user-type laws
           NUVAR  = MAX(NUVAR,IPM(8,MAT(I)))  
         ENDDO
 c
-        CALL MULAW8(TIMERS,
-     1   1,        NEL,      MTN,
+        CALL MULAW8(TIMERS,OUTPUT,
+     1   NEL,      MTN,
      2   NPT,      D1,       D2,       D3,
      3   D4,       D5,       D6,       PM,
      4   OFF,      GBUF%SIG, GBUF%EINT,GBUF%RHO,
@@ -242,12 +247,13 @@ C --------------------------
       IF ((ITASK==0).AND.((IMON_MAT==1)))CALL STARTIME(TIMERS,121)
       IF (IFAILURE == 1)THEN
         IF (MTN < 28) THEN
-        IMAT = MAT(1)
         NUMBER_FAILURE = MAT_ELEM%MAT_PARAM(IMAT)%NFAIL
 c
         DO IR = 1,NUMBER_FAILURE 
           NUPARAM = MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IR)%NUPARAM
+          NIPARAM = MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IR)%NIPARAM
           UPARAMF =>MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IR)%UPARAM(1:NUPARAM)
+          IPARAMF =>MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IR)%IPARAM(1:NIPARAM)
           NFUNC   = MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IR)%NFUNC 
           IRUPT   = MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IR)%IRUPT
           IFUNC(1:NFUNC) = MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IR)%IFUNC(1:NFUNC)     
@@ -260,6 +266,7 @@ C----
             NVARF  =  BUFLY%FAIL(1,1,J)%FLOC(IR)%NVAR
             DFMAX  => BUFLY%FAIL(1,1,J)%FLOC(IR)%DAMMX
             TDELE  => BUFLY%FAIL(1,1,J)%FLOC(IR)%TDEL
+            LF_DAMMX = BUFLY%FAIL(1,1,J)%FLOC(IR)%LF_DAMMX
             
             J1 = 1 + NEL*(J-1)
             DO I=1,NEL
@@ -292,11 +299,12 @@ C -----------wilkins
      5                 DPLA(J1),UVARF,OFF,DFMAX,TDELE)
              ELSEIF(IRUPT == 8)THEN
 C---- JC  + spalling
-              CALL FAIL_SPALLING_S(NEL ,NUPARAM,NVARF,
-     2                 TT  ,DT1  ,UPARAMF,NGL ,
+              CALL FAIL_SPALLING_S(NEL ,NUPARAM,
+     2                 TT  ,UPARAMF,NGL ,
      4                 SXX  ,SYY  ,SZZ  ,SXY   ,SYZ   ,SZX,
-     5                 DPLA(J1),EPSP(J1),TSTAR,UVARF,OFF,
-     6                 DFMAX ,TDELE,GBUF%OFF)
+     5                 DPLA(J1),EPSP(J1),TSTAR,OFF,
+     6                 LF_DAMMX,DFMAX ,TDELE,GBUF%OFF,
+     7                 NIPARAM ,IPARAMF, MVSIZ)
              ELSEIF(IRUPT == 9)THEN
 C---- wierzbicki
                CALL FAIL_WIERZBICKI_S(NEL ,NUPARAM,NVARF,
@@ -322,9 +330,9 @@ c ---   extended mohr coulomb failure model
      5         OFF      ,DFMAX    ,TDELE)
 c ---   Biquadratic failure
              ELSEIF (IRUPT == 30) THEN
-               CALL FAIL_BIQUAD_S(
-     1         NEL      ,NUPARAM  ,NVARF    ,NFUNC    ,IFUNC    ,DELTAX   ,
-     2         NPF      ,TF       ,TT       ,BUFMAT   ,TDELE    ,
+               CALL FAIL_BIQUAD_S(mat_elem%mat_param(imat)%fail(ir),
+     1         NEL      ,NVARF    ,NFUNC    ,IFUNC    ,DELTAX   ,
+     2         NPF      ,TF       ,TT       ,TDELE    ,
      3         NGL      ,DPLA(J1) ,UVARF    ,OFF      ,DFMAX    ,LBUF%DMGSCL,
      4         SXX      ,SYY      ,SZZ      ,SXY      ,SYZ      ,SZX      )
 c

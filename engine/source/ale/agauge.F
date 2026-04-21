@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    agauge                 ../engine/source/ale/agauge.F
-      !||--- called by ------------------------------------------------------
-      !||    alemain                ../engine/source/ale/alemain.F
-      !||--- calls      -----------------------------------------------------
-      !||    agaug3                 ../engine/source/ale/agauge.F
-      !||    agaug30                ../engine/source/ale/agauge.F
-      !||    agaug3q                ../engine/source/ale/agaug3q.F
-      !||    agaug3t                ../engine/source/ale/agaug3t.F
-      !||    initbuf                ../engine/share/resol/initbuf.F
-      !||    my_barrier             ../engine/source/system/machine.F
-      !||    spmd_e1vois            ../engine/source/mpi/fluid/spmd_cfd.F
-      !||    spmd_rbcast            ../engine/source/mpi/generic/spmd_rbcast.F
-      !||    spmd_sd_gaug           ../engine/source/mpi/output/spmd_sd_gaug.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    agauge                 ../engine/source/ale/agauge.F
+!||--- called by ------------------------------------------------------
+!||    alemain                ../engine/source/ale/alemain.F
+!||--- calls      -----------------------------------------------------
+!||    agaug3                 ../engine/source/ale/agauge.F
+!||    agaug30                ../engine/source/ale/agauge.F
+!||    agaug3q                ../engine/source/ale/agaug3q.F
+!||    agaug3t                ../engine/source/ale/agaug3t.F
+!||    initbuf                ../engine/share/resol/initbuf.F
+!||    my_barrier             ../engine/source/system/machine.F
+!||    spmd_e1vois            ../engine/source/mpi/fluid/spmd_cfd.F
+!||    spmd_rbcast            ../engine/source/mpi/generic/spmd_rbcast.F
+!||    spmd_sd_gaug           ../engine/source/mpi/output/spmd_sd_gaug.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||    initbuf_mod            ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE AGAUGE(
      1  IPARG    ,ELBUF_STR   ,PHI     ,IXS      ,IXQ     ,
      2  X        ,ALE_CONNECT ,ITASK   ,NERCVOIS ,NESDVOIS,
@@ -50,6 +51,7 @@ C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD            
       USE ALE_CONNECTIVITY_MOD
+      use element_mod , only : nixs,nixq,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -71,15 +73,13 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,NGROUP), ITASK, LENCOM,IXTG(NIXTG,NUMELTG),
      .        NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),
      .        IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ),LGAUGE(3,NBGAUGE),IGAUP(NBGAUGE),NGAUP(NSPMD)   
-C     REAL
       my_real PHI(SPHI),GAUGE(LLGAUGE,NBGAUGE),X(3,NUMNOD),V(3,NUMNOD)
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_STR
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NG, JMUL, IADR, I, II,J,JJ(6), K,N,IG,IS,IGAUGE,IG0,
-     .        ITAG(NBGAUGE),NEL,NUMEL,NCONNECT
+      INTEGER NG, JMUL, IADR, I, II,J,JJ(6),N,IG,IS,IGAUGE,IG0,ITAG(NBGAUGE),NEL,NUMEL,NCONNECT
       my_real P,RHO,E,PA,U2,ALPHA(NBGAUGE)
       TYPE(G_BUFEL_) ,POINTER :: GBUF
 C-----------------------------------------------
@@ -98,7 +98,7 @@ c 6:               XSAV (SPH sorting)
 c 7:               YSAV (SPH sorting)
 c 8:               ZSAV (SPH sorting)
 c 9:               FF (sph only)
-c 10:              intantaneous Pressure
+c 10: Intantaneous Pressure
 c 11:              intantaneous PA
 c 12:              intantaneous Rho
 c 13:              intantaneous E
@@ -364,11 +364,11 @@ C
       ENDIF 
       RETURN
       END
-      !||====================================================================
-      !||    agaug30   ../engine/source/ale/agauge.F
-      !||--- called by ------------------------------------------------------
-      !||    agauge    ../engine/source/ale/agauge.F
-      !||====================================================================
+!||====================================================================
+!||    agaug30   ../engine/source/ale/agauge.F
+!||--- called by ------------------------------------------------------
+!||    agauge    ../engine/source/ale/agauge.F
+!||====================================================================
       SUBROUTINE AGAUG30(LGAUGE ,GAUGE ,IX  ,X ,NIX, NUMEL,NCONNECT)
 C-----------------------------------------------
 C   Description
@@ -396,7 +396,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,J,N,IG,IGAUGE
+      INTEGER I,II,J,IG,IGAUGE
       my_real XX1,YY1,ZZ1,XX2,YY2,ZZ2,XG,YG,ZG
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -456,15 +456,17 @@ c in case of multiple solutions do not need to choose the best one : AGAUG3 will
 
       RETURN
       END
-      !||====================================================================
-      !||    agaug3                 ../engine/source/ale/agauge.F
-      !||--- called by ------------------------------------------------------
-      !||    agauge                 ../engine/source/ale/agauge.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||====================================================================
+!||====================================================================
+!||    agaug3                 ../engine/source/ale/agauge.F
+!||--- called by ------------------------------------------------------
+!||    agauge                 ../engine/source/ale/agauge.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE AGAUG3(LGAUGE,GAUGE,PHI,IXS  ,X    ,ALE_CONNECT )
       USE ALE_CONNECTIVITY_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -550,15 +552,18 @@ c element associated to the gauge
 
       RETURN
       END
-      !||====================================================================
-      !||    agauge0       ../engine/source/ale/agauge.F
-      !||--- called by ------------------------------------------------------
-      !||    resol         ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_rbcast   ../engine/source/mpi/generic/spmd_rbcast.F
-      !||    spmd_sd_gau   ../engine/source/mpi/output/spmd_sd_gau.F
-      !||====================================================================
+!||====================================================================
+!||    agauge0       ../engine/source/ale/agauge.F
+!||--- called by ------------------------------------------------------
+!||    resol         ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_rbcast   ../engine/source/mpi/generic/spmd_rbcast.F
+!||    spmd_sd_gau   ../engine/source/mpi/output/spmd_sd_gau.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod   ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE AGAUGE0(LGAUGE ,GAUGE,X ,IXC,IGAUP,NGAUP)
+      use element_mod , only : nixc
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -577,7 +582,7 @@ c 6:               XSAV (SPH sorting)
 c 7:               YSAV (SPH sorting)
 c 8:               ZSAV (SPH sorting)
 c 9:               FF (sph only)
-c 10:              intantaneous Pressure
+c 10: Intantaneous Pressure
 c 11:              intantaneous PA
 c 12:              intantaneous Rho
 c 13:              intantaneous E
@@ -638,7 +643,7 @@ C
       DO IG=1,NBGAUGE
         IS = -LGAUGE(1,IG)
 C
-C all gauges (ale, sph, ..)
+C ALL GAUGES (ALE, SPH, ..)
         IF(IS >= 0)THEN
           GAUGE(5,IG) = -EP20
           N = LGAUGE(3,IG)

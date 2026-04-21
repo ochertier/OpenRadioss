@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    alefvm_scheme        ../engine/source/ale/alefvm/alefvm_scheme.F
-      !||--- called by ------------------------------------------------------
-      !||    alefvm_main          ../engine/source/ale/alefvm/alefvm_main.F
-      !||--- calls      -----------------------------------------------------
-      !||    alefvm_expand_mom2   ../engine/source/ale/alefvm/alefvm_expand_mom2.F
-      !||--- uses       -----------------------------------------------------
-      !||    alefvm_mod           ../common_source/modules/ale/alefvm_mod.F
-      !||    i22bufbric_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22tri_mod           ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||====================================================================
+!||====================================================================
+!||    alefvm_scheme        ../engine/source/ale/alefvm/alefvm_scheme.F
+!||--- called by ------------------------------------------------------
+!||    alefvm_main          ../engine/source/ale/alefvm/alefvm_main.F
+!||--- calls      -----------------------------------------------------
+!||    alefvm_expand_mom2   ../engine/source/ale/alefvm/alefvm_expand_mom2.F
+!||--- uses       -----------------------------------------------------
+!||    alefvm_mod           ../common_source/modules/ale/alefvm_mod.F
+!||    element_mod          ../common_source/modules/elements/element_mod.F90
+!||    i22bufbric_mod       ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22tri_mod           ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||====================================================================
       SUBROUTINE ALEFVM_SCHEME (
-     1                          IXS,  NV46,  IALEFVM_FLG, ITASK ,    
-     2                          MOM,  VOL ,  RHO  , V          , VEUL  ,
-     3                          IPM,  MSNF,  X    , NALE       , IAD22 ,
+     1                          IXS,  IALEFVM_FLG,
+     2                          MOM,  VOL ,  RHO  ,
+     3                          IPM,  IAD22 ,
      4                          SSP,  SIG ,  NEL  )
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -51,6 +52,7 @@ C-----------------------------------------------
       USE ALEFVM_MOD
       USE I22TRI_MOD
       USE I22BUFBRIC_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,13 +78,13 @@ C using finit volume scheme
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER :: IXS(NIXS,*), NV46, IALEFVM_FLG, ITASK,IPM(NPROPMI,*),NALE(*),NEL
-      my_real :: MOM(NEL,3), VOL(MVSIZ), RHO(MVSIZ), V(3,*),VEUL(*),MSNF(NUMNOD),X(3,*),IAD22(*),SSP(*),SIG(NEL,6)
+      INTEGER :: IXS(NIXS,*), IALEFVM_FLG, IPM(NPROPMI,*),NEL
+      my_real :: MOM(NEL,3), VOL(MVSIZ), RHO(MVSIZ), IAD22(*),SSP(*),SIG(NEL,6)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I, II, IV, J, IMAT, ILAW, NIN, IB
-      my_real :: FORCE(3,6), F0(3), MASS, DMOM(3,MVSIZ)
+      INTEGER :: I, II, IMAT, ILAW, NIN, IB
+      my_real :: DMOM(3,MVSIZ)
       LOGICAL :: debug_outp
       INTEGER :: idbf,idbl
 C-----------------------------------------------
@@ -171,9 +173,7 @@ C-----------------------------------------------
       
       !EXPAND MOMENTUM TO NODES FOR POST-TREATMENT
       !call my_barrier
-      CALL ALEFVM_EXPAND_MOM2 (
-     .                        X   ,V   , IXS  , NV46,
-     .                        MOM ,VEUL, ITASK, NALE , NEL )
+      CALL ALEFVM_EXPAND_MOM2 (IXS, MOM, NEL)
       
       DO I=1,NEL
         !MOM=[rhoU]*VOL -> U : needed for fluxes calculation

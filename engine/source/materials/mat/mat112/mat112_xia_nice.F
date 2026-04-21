@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mat112_xia_nice       ../engine/source/materials/mat/mat112/mat112_xia_nice.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps112             ../engine/source/materials/mat/mat112/sigeps112.F
-      !||--- calls      -----------------------------------------------------
-      !||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mat112_xia_nice       ../engine/source/materials/mat/mat112/mat112_xia_nice.F
+!||--- called by ------------------------------------------------------
+!||    sigeps112             ../engine/source/materials/mat/mat112/sigeps112.F
+!||--- calls      -----------------------------------------------------
+!||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE MAT112_XIA_NICE(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
      2     UPARAM  ,UVAR    ,JTHE    ,OFF     ,RHO0    ,RHO     ,

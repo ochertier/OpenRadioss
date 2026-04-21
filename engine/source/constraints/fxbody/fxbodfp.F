@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fxbodfp1       ../engine/source/constraints/fxbody/fxbodfp.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbyfor        ../engine/source/constraints/fxbody/fxbyfor.F
-      !||--- calls      -----------------------------------------------------
-      !||    fxbdepla       ../engine/source/constraints/fxbody/fxbdepla.F
-      !||    fxbmajp1       ../engine/source/constraints/fxbody/fxbodfp.F
-      !||    fxbsgmaj       ../engine/source/constraints/fxbody/fxbsgmaj.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    fxbodfp1       ../engine/source/constraints/fxbody/fxbodfp.F
+!||--- called by ------------------------------------------------------
+!||    fxbyfor        ../engine/source/constraints/fxbody/fxbyfor.F
+!||--- calls      -----------------------------------------------------
+!||    fxbdepla       ../engine/source/constraints/fxbody/fxbdispl.F
+!||    fxbmajp1       ../engine/source/constraints/fxbody/fxbodfp.F
+!||    fxbsgmaj       ../engine/source/constraints/fxbody/fxbsgmaj.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE FXBODFP1(FXBIPM , FXBRPM, FXBNOD  , FXBMOD  , FXBDEP ,
      .                    FXBVIT , FXBACC, A       , AR      , NME    ,
      .                    NMOD   , ITN   , FXBELM  , FXBSIG  , ELBUF  ,
@@ -219,26 +219,29 @@ C
 C
       RETURN
       END SUBROUTINE FXBODFP1
-      !||====================================================================
-      !||    fxbodfp2     ../engine/source/constraints/fxbody/fxbodfp.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbyfor      ../engine/source/constraints/fxbody/fxbyfor.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter       ../engine/source/tools/curve/finter.F
-      !||    fxbmajp2     ../engine/source/constraints/fxbody/fxbodfp.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod   ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    fxbodfp2           ../engine/source/constraints/fxbody/fxbodfp.F
+!||--- called by ------------------------------------------------------
+!||    fxbyfor            ../engine/source/constraints/fxbody/fxbyfor.F
+!||--- calls      -----------------------------------------------------
+!||    fxbmajp2           ../engine/source/constraints/fxbody/fxbodfp.F
+!||--- uses       -----------------------------------------------------
+!||    finter_mixed_mod   ../engine/source/tools/finter_mixed.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||    sensor_mod         ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE FXBODFP2(FXBIPM , FXBRPM , FXBGLM, FXBCPM, FXBCPS ,
      .                    FXBLM  , FXBFLS , FXBDLS, FXBDEP, FXBVIT ,
      .                    NME    , NMOD   , MVN   , MCD   , SE     ,
      .                    SV     , FSAV   , FXBFP , WFEXT , FXBFC  ,
      .                    FXBGRVI, FXBGRVR, NLGRAV, IGRV  , NPC    ,
      .                    TF     , FXBGRP , TFGRAV, SENSOR_TAB, NSENSOR,
-     .                    MFEXT  , AGRV   )
+     .                    MFEXT  , AGRV  ,PYTHON )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
+      USE python_funct_mod, ONLY : python_
+      use finter_mixed_mod, ONLY : finter_mixed
       USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -263,6 +266,7 @@ C-----------------------------------------------
      .        FXBFC(*), FXBGRVR(*), TF(*), FXBGRP(*), TFGRAV,
      .        MFEXT(*), AGRV(LFACGRV,*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE(python_), intent(inout) :: python
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -270,10 +274,8 @@ C-----------------------------------------------
      .        IAD, II, III, IIAD
       my_real
      .        MC(NME*NMOD), RC(NME*NMOD), TS, FI, ALPHA, BETA,
-     .        MFINT(NME+NMOD), FDALPHA(NMOD), ENINT, DYDX,
+     .        MFINT(NME+NMOD), FDALPHA(NMOD), ENINT,
      .        MFGRAV(NMOD+NME) 
-      my_real FINTER 
-      EXTERNAL FINTER
 C
       IBLO=FXBIPM(28)
       IF (NMOD>0) CALL FXBMAJP2(MC,  RC,     MVN,    NME,   NMOD,
@@ -302,7 +304,7 @@ C
                IF (TS<ZERO) CYCLE
             ENDIF
             IF (IFUNC > 0) THEN
-              FI=AGRV(1,NL)*FINTER(IFUNC,TS,NPC,TF,DYDX)
+              FI=AGRV(1,NL)*FINTER_MIXED(python,nfunct,IFUNC,TS,NPC,TF)
             ELSE
               FI=AGRV(1,NL)
             ENDIF
@@ -443,11 +445,11 @@ C-----------------------------------------------
 C
       RETURN
       END SUBROUTINE FXBODFP2
-      !||====================================================================
-      !||    fxbmajp1   ../engine/source/constraints/fxbody/fxbodfp.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbodfp1   ../engine/source/constraints/fxbody/fxbodfp.F
-      !||====================================================================
+!||====================================================================
+!||    fxbmajp1   ../engine/source/constraints/fxbody/fxbodfp.F
+!||--- called by ------------------------------------------------------
+!||    fxbodfp1   ../engine/source/constraints/fxbody/fxbodfp.F
+!||====================================================================
       SUBROUTINE FXBMAJP1(FXBDEP,FXBVIT,FXBACC,FXBRPM,DT1 ,
      .                    NME   ,NMOD  ,TMROT )
 C-----------------------------------------------
@@ -463,7 +465,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,II
+      INTEGER I,J
       my_real
      .   DDEP(NME+NMOD)
 C  
@@ -487,11 +489,11 @@ C-----------------------------------------------
 C      
       RETURN
       END SUBROUTINE FXBMAJP1  
-      !||====================================================================
-      !||    fxbmajp2   ../engine/source/constraints/fxbody/fxbodfp.F
-      !||--- called by ------------------------------------------------------
-      !||    fxbodfp2   ../engine/source/constraints/fxbody/fxbodfp.F
-      !||====================================================================
+!||====================================================================
+!||    fxbmajp2   ../engine/source/constraints/fxbody/fxbodfp.F
+!||--- called by ------------------------------------------------------
+!||    fxbodfp2   ../engine/source/constraints/fxbody/fxbodfp.F
+!||====================================================================
       SUBROUTINE FXBMAJP2(MC , RC    , MVN   , NME  , NMOD  ,
      .                    DT1, FXBCPM, FXBCPS, FXBLM, FXBRPM)
 C-----------------------------------------------

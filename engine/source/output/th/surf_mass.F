@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    surf_mass_monv   ../engine/source/output/th/surf_mass.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2            ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||    surf_mass_com    ../engine/source/output/th/surf_mass.F
-      !||    surf_mass_fvm    ../engine/source/output/th/surf_mass.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod     ../common_source/modules/groupdef_mod.F
-      !||    th_surf_mod      ../common_source/modules/interfaces/th_surf_mod.F
-      !||====================================================================
+!||====================================================================
+!||    surf_mass_monv   ../engine/source/output/th/surf_mass.F
+!||--- called by ------------------------------------------------------
+!||    hist2            ../engine/source/output/th/hist2.F
+!||--- calls      -----------------------------------------------------
+!||    surf_mass_com    ../engine/source/output/th/surf_mass.F
+!||    surf_mass_fvm    ../engine/source/output/th/surf_mass.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod     ../common_source/modules/groupdef_mod.F
+!||    th_surf_mod      ../common_source/modules/interfaces/th_surf_mod.F
+!||====================================================================
       SUBROUTINE SURF_MASS_MONV(FSAVSURF, IGRSURF, MONVOL, VOLMON, FR_MV)
 C-----------------------------------------------
 C   M o d u l e s
@@ -57,9 +57,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, NN, IAD, KAD, ITYP, NCA, IDSURF, PMAIN
+      INTEGER I, N, KAD, ITYP, NCA, IDSURF, PMAIN
       INTEGER NTG, NTGI, NNT, KIBALE, KRBALE
-      INTEGER K1, K2, KK2, KI4, KR5, KR6, KR7, NNS, NNI, NTGT
+      INTEGER K1, K2, KK2, KR5, KR6, KR7, NNS, NNI, NTGT
       INTEGER :: KR1, KR2, KR3, KR4
 C-----------------------------------------------------------------------
          K1 = 1
@@ -112,11 +112,11 @@ C-----------------------------------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    surf_mass_fvm    ../engine/source/output/th/surf_mass.F
-      !||--- called by ------------------------------------------------------
-      !||    surf_mass_monv   ../engine/source/output/th/surf_mass.F
-      !||====================================================================
+!||====================================================================
+!||    surf_mass_fvm    ../engine/source/output/th/surf_mass.F
+!||--- called by ------------------------------------------------------
+!||    surf_mass_monv   ../engine/source/output/th/surf_mass.F
+!||====================================================================
       SUBROUTINE SURF_MASS_FVM(NTGI, ITAG, ELFMASS, MASS, ELFVEL, VEL, ELSINI)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -148,11 +148,11 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    surf_mass_com    ../engine/source/output/th/surf_mass.F
-      !||--- called by ------------------------------------------------------
-      !||    surf_mass_monv   ../engine/source/output/th/surf_mass.F
-      !||====================================================================
+!||====================================================================
+!||    surf_mass_com    ../engine/source/output/th/surf_mass.F
+!||--- called by ------------------------------------------------------
+!||    surf_mass_monv   ../engine/source/output/th/surf_mass.F
+!||====================================================================
       SUBROUTINE SURF_MASS_COM(ICBAG, RCBAG, NCA, IDSURF, MASS, VEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

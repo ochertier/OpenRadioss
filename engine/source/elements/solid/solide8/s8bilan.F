@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8bilan               ../engine/source/elements/solid/solide8/s8bilan.F
-      !||--- called by ------------------------------------------------------
-      !||    s8forc3               ../engine/source/elements/solid/solide8/s8forc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
-      !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    s8bilan               ../engine/source/elements/solid/solide8/s8bilan.F
+!||--- called by ------------------------------------------------------
+!||    s8forc3               ../engine/source/elements/solid/solide8/s8forc3.F
+!||--- calls      -----------------------------------------------------
+!||    grelem_sav            ../engine/source/output/th/grelem_sav.F
+!||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE S8BILAN(PARTSAV,EINT,RHO,RK,VOL,VNEW,
      .                   VX,VY,VZ,IPARTS,
      .                   GRESAV,GRTH,IGRTH,X,Y,Z,ITASK,IPARG,SENSORS)
@@ -64,12 +64,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, M, FLAG
-      INTEGER NC(8,MVSIZ)
-C     REAL
+      INTEGER I, M, FLAG
       my_real
      .   VXA(MVSIZ), VYA(MVSIZ) , VZA(MVSIZ), 
-     .   VA2(MVSIZ), XMAS(MVSIZ), RBIDON(1),
+     .   VA2(MVSIZ), XMAS(MVSIZ),
      .   OFF(MVSIZ), EI(MVSIZ) , EK(MVSIZ),
      .   XM(MVSIZ) , YM(MVSIZ) , ZM(MVSIZ),
      .   XX(MVSIZ) , YY(MVSIZ) , ZZ(MVSIZ),
@@ -81,7 +79,7 @@ C     REAL
      .   IXY(MVSIZ), IYZ(MVSIZ), IZX(MVSIZ),
      .   REI(MVSIZ), REK(MVSIZ), OFF_L(MVSIZ)
 C-----------------------------------------------
-      FLAG = IPARG(80) ! Flag pour sorties additionnelles
+      FLAG = IPARG(80) ! flag for additional outputs
 C-----------------------------------------------
 C     CALCUL BILAN SORTIES DEF 
 C-----------------------------------------------

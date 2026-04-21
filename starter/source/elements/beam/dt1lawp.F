@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dt1lawp   ../starter/source/elements/beam/dt1lawp.F
-      !||--- called by ------------------------------------------------------
-      !||    pinit3    ../starter/source/elements/beam/pinit3.F
-      !||====================================================================
+!||====================================================================
+!||    dt1lawp   ../starter/source/elements/beam/dt1lawp.F
+!||--- called by ------------------------------------------------------
+!||    pinit3    ../starter/source/elements/beam/pinit3.F
+!||====================================================================
       SUBROUTINE DT1LAWP(PM,GEO,MAT,MXG,DELTAX,DTX,IGTYP)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -42,19 +42,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER MAT(MVSIZ), MXG(MVSIZ),IGTYP
-C     REAL
-      my_real
-     .   PM(NPROPM,*), GEO(NPROPG,*), DELTAX(MVSIZ), DTX(MVSIZ)
+      INTEGER :: MAT(MVSIZ), MXG(MVSIZ),IGTYP
+      my_real :: PM(NPROPM,*), GEO(NPROPG,*), DELTAX(MVSIZ), DTX(MVSIZ)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, MX, IG,INEW
-C     REAL
-      my_real
-     .   RHO0, G, C1, SSP, C,
-     .   IYY, IZZ, SL2I, SHF, DMP, 
-     .   DSH, PHI, F1, F2, FAC, YOUNG,CST,FSH
+      INTEGER :: I, MX, IG
+      my_real :: RHO0, G, C1, SSP, IYY, IZZ, SL2I, DMP, FAC, CST,FSH
 C=======================================================================
         DO I=LFT,LLT
          MX   = MAT(I)

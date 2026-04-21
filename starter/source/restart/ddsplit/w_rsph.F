@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    w_rsph        ../starter/source/restart/ddsplit/w_rsph.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    w_rsph        ../starter/source/restart/ddsplit/w_rsph.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE W_RSPH(SPBUF ,NUMSPH_L,CEPSP,PROC,
      2                  VSPHIO,LEN_AM,SSPHVELN_L)
       USE MESSAGE_MOD
@@ -81,7 +81,7 @@ C
         IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                             MSGTYPE=MSGERROR)       
         SPHVELN_L(1:SSPHVELN_L)=ZERO
-C ecriture faite sur p0 en monodomaine pour inlet/outlet
+C writing done on p0 in monodomain for inlet/outlet
         CALL WRITE_DB(VSPHIO,SVSPHIO)
         CALL WRITE_DB(SPHVELN_L,SSPHVELN_L)
         LEN_AM = LEN_AM + SVSPHIO + SSPHVELN_L

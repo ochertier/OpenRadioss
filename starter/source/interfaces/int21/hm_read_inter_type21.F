@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,34 +20,36 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_type21   ../starter/source/interfaces/int21/hm_read_inter_type21.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    inter_dcod_function    ../starter/source/interfaces/reader/inter_dcod_function.F
-      !||    inter_dcod_sensor      ../starter/source/interfaces/reader/inter_dcod_sensor.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_type21   ../starter/source/interfaces/int21/hm_read_inter_type21.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    inter_dcod_friction    ../starter/source/interfaces/reader/inter_dcod_friction.F
+!||    inter_dcod_function    ../starter/source/interfaces/reader/inter_dcod_function.F
+!||    inter_dcod_sensor      ../starter/source/interfaces/reader/inter_dcod_sensor.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE21(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT    ,NI        ,
      2        IGRSURF    ,XFILTR     ,FRIC_P     ,NPC1     ,SENSORS   ,
      3        NOM_OPT    ,UNITAB     ,LSUBMODEL  ,TITR     ,NPC       ,
      4        TF         ,NPARI      ,NPARIR     ,SNPC     ,SNPC1     ,
-     5        LNOPT1     ,ITHERM_FE  ,INTHEAT)
+     5        LNOPT1     ,ITHERM_FE  ,INTHEAT    ,NOM_OPTFRIC ,INTBUF_FRIC_TAB )
 C============================================================================
 C    
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE INTBUF_FRIC_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE UNITAB_MOD
@@ -64,8 +66,9 @@ C-----------------------------------------------
       INTEGER,INTENT(IN)    :: NPARI,NPARIR,SNPC,SNPC1,LNOPT1
       INTEGER,INTENT(IN)    :: ITHERM_FE
       INTEGER,INTENT(INOUT) :: INTHEAT
+      INTEGER,INTENT(IN)    :: NOM_OPTFRIC(LNOPT1,NINTERFRIC)
       INTEGER NOM_OPT(LNOPT1,*)
-      INTEGER ISU1,ISU2,ILAGM,NI
+      INTEGER ISU1, ISU2, NI
       INTEGER IPARI(NPARI),NPC1(SNPC1),NPC(SNPC)
       my_real STFAC,XFILTR
       my_real FRIGAP(NPARIR),FRIC_P(10),TF(*)
@@ -75,10 +78,10 @@ C-----------------------------------------------
       TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(NSUBMOD)
       TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB 
       TYPE (SENSORS_)  ,INTENT(IN) :: SENSORS
+      TYPE(INTBUF_FRIC_STRUCT_),INTENT(INOUT) ::  INTBUF_FRIC_TAB(NINTERFRIC)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
@@ -89,18 +92,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=NCHARTITLE) :: TITR1
-      INTEGER I,J,L,IBC1, IBC2, IBC3, NOINT, NTYP, IBID,INACTI, IBC1M,
-     .    IBC2M, IBC3M, IGSTI,IEULT, IVIS2,IS1, IS2,ILEV, IGAP,MULTIMP,
-     .    HIERA,MFROT,IFQ,MODFR,IADM,UID,NRADM,INTTH,IFORM,IERR1,IKTHE,
-     .    IDEL21,IMOD,IFILTR,IFUNS,IFUNN,IFUNT,IFUN1,IFUN2,HFLAG,NUVAR, 
-     .    IFSTF,KK,II,IGAP0,FLAGREMNOD,IDSENS,IDELKEEP,INTKG,IRSTH,INVN,
-     .    IFRICTH,IFTLIM,FCOND
+
+      INTEGER I,IBC1, IBC2, IBC3, NOINT, NTYP,INACTI, IBC1M,
+     .    IBC2M, IBC3M, IGSTI,IS1, IS2,ILEV, IGAP,MULTIMP,
+     .    MFROT,IFQ,MODFR,IADM,NRADM,INTTH,IFORM,IKTHE,
+     .    IDEL21,IDSENS,IDELKEEP,INTKG,INVN,
+     .    IFRICTH,IFTLIM,FCOND,INTFRIC
       my_real
-     .   FRIC,GAP,STARTT,BUMULT,STOPT,FHEAT,FHEATS,FHEATM,RSTH,TINT,PADM, 
+     .   FRIC,GAP,STARTT,BUMULT,STOPT,FHEAT,TINT,PADM, 
      .   ANGLADM, CADM, DEPTH,C1,C2,C3,C4,C5,C6, ALPHA,GAPSCALE,GAPMAX, 
-     .   STMIN,STMAX,STIFF, PMAX,AREA, KTHE, XTHE, FRAD, DRAD,
-     .   VISC,XFRICTH,PTMAX,PSKID,DCOND,XTHE_UNIT,KTHE_UNIT
+     .   STMIN,STMAX, PMAX, KTHE, XTHE, FRAD, DRAD,
+     .   VISC,XFRICTH,PSKID,DCOND,XTHE_UNIT,KTHE_UNIT
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
@@ -140,6 +142,7 @@ C Initializations
       FCOND = 0
       IGAP = 0
       MULTIMP = 0
+      INTFRIC = 0
 C
       PADM =ONE
       ANGLADM=ZERO
@@ -204,6 +207,8 @@ C
       CALL HM_GET_INTV('Ifiltr',IFQ,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('ISENSOR',IDSENS,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('Crx_Fun',IFRICTH,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV('Ifric',MFROT,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV('Fric_ID',INTFRIC,IS_AVAILABLE,LSUBMODEL)
 C
       IF(IADM==2) CALL HM_GET_INTV('NRadm',NRADM,IS_AVAILABLE,LSUBMODEL)
 C
@@ -315,13 +320,7 @@ C.......* Storage IPARI FRIGAP *........
        IPARI(44)=IADM
 
         IF(MULTIMP==0)THEN
-          IF(IMACH/=3)THEN
-C set MULTIMP default value = 4 for SMP
-            MULTIMP=4
-          ELSE
-C set MULTIMP default value = 12 for SPMD
-            MULTIMP=12
-          END IF
+          MULTIMP=12
         END IF
         IPARI(23)=MULTIMP
 
@@ -334,7 +333,7 @@ C.....* CHECKS *........
 C
           IF(GAPSCALE==ZERO)GAPSCALE=ONE
 
-ce flag dit sil faut calculer les epaisseurs nodales dans l'engine
+cE FLAG says if you have to calculate the nodal thickness in the engine
           IF(IGAP==2) INTER_ITHKNOD=1 !defined in interface module (common_source directory)
 C
           IF(IGAP==2)THEN
@@ -476,6 +475,7 @@ C.....* Storage IPARI FRIGAP *.........
         FRIGAP(34) =  XFRICTH
         IPARI(30) = MFROT
         IPARI(31) = IFQ
+        IPARI(72) =  INTFRIC
 
 C------------------------------------------------------------
 C  Option Card8 :Adm = 2 adaptative mesh
@@ -597,6 +597,8 @@ C------------------------------------------------------------
 C
         CALL INTER_DCOD_FUNCTION(NTYP,NI,IPARI,NPC1,NOM_OPT,NPC,TF)
         CALL INTER_DCOD_SENSOR (NTYP,NI,IPARI,NOM_OPT,SENSORS)
+        CALL INTER_DCOD_FRICTION(NTYP,NI,IPARI,NOM_OPT,NOM_OPTFRIC,
+     .                INTBUF_FRIC_TAB)
 
 C
 C------------------------------------------------------------
@@ -616,26 +618,31 @@ C
      .                 BUMULT,INACTI,VISC,PMAX,MULTIMP,INVN,IFTLIM,
      .                 PSKID
         ENDIF
+
+        IF(INTFRIC > 0 ) THEN
+          WRITE(IOUT,1527) INTFRIC
+        ELSE
 C
-        WRITE(IOUT,1520)MOD(IFQ,10), XFILTR
+          WRITE(IOUT,1520)MOD(IFQ,10), XFILTR
 C
-        IF(MFROT==0)THEN
-           IF(IFRICTH ==0 ) THEN
-             WRITE(IOUT,1524) FRIC
-           ELSE
-             WRITE(IOUT,1525) IFRICTH,XFRICTH,FRIC
-           ENDIF   
-        ELSEIF(MFROT==1)THEN
-          WRITE(IOUT,1515)FRIC_P(1),FRIC_P(2),FRIC_P(3),
-     .    FRIC_P(4),FRIC_P(5)
-        ELSEIF(MFROT==2)THEN
-          WRITE(IOUT,1522)FRIC,FRIC_P(1),FRIC_P(2),FRIC_P(3),
-     .    FRIC_P(4),FRIC_P(5),FRIC_P(6)
-        ELSEIF(MFROT==3)THEN
-          WRITE(IOUT,1523)FRIC_P(1),FRIC_P(2),FRIC_P(3),
-     .    FRIC_P(4),FRIC_P(5),FRIC_P(6)
-        ELSEIF(MFROT==4)THEN
-          WRITE(IOUT,1526)  FRIC,FRIC_P(1),FRIC_P(2)
+          IF(MFROT==0)THEN
+             IF(IFRICTH ==0 ) THEN
+               WRITE(IOUT,1524) FRIC
+             ELSE
+               WRITE(IOUT,1525) IFRICTH,XFRICTH,FRIC
+             ENDIF   
+          ELSEIF(MFROT==1)THEN
+            WRITE(IOUT,1515)FRIC_P(1),FRIC_P(2),FRIC_P(3),
+     .      FRIC_P(4),FRIC_P(5)
+          ELSEIF(MFROT==2)THEN
+            WRITE(IOUT,1522)FRIC,FRIC_P(1),FRIC_P(2),FRIC_P(3),
+     .      FRIC_P(4),FRIC_P(5),FRIC_P(6)
+          ELSEIF(MFROT==3)THEN
+            WRITE(IOUT,1523)FRIC_P(1),FRIC_P(2),FRIC_P(3),
+     .      FRIC_P(4),FRIC_P(5),FRIC_P(6)
+          ELSEIF(MFROT==4)THEN
+            WRITE(IOUT,1526)  FRIC,FRIC_P(1),FRIC_P(2)
+          ENDIF
         ENDIF
 C
         IF(IDEL21/=0) THEN
@@ -690,12 +697,8 @@ C--------------------------------------------------------------
       ENDIF
 C
 C--------------------------------------------------------------
- 1000 FORMAT(/1X,'  INTERFACE NUMBER :',I10,1X,A)
 C------------
       RETURN
- 1534 FORMAT(
-     .    '    THERMAL INTERFACE . . . . . . . . . . . . . ',//
-     .    '    THERMAL heat exchange coefficient .. . . . .',1PG20.13/)
  2502 FORMAT('    RUPTURE PARAMETERS '
      .         /10X,'SCAL_F  . . . . . . . . . . . . . . ',1PG20.13
      .         /10X,'SCAL_DISP . . . . . . . . . . . . . ',1PG20.13
@@ -751,10 +754,11 @@ C------------
      .    '      STATIC COEFFICIENT MUo . . . . . . . . . ',1PG20.13/,
      .    '      DYNAMIC COEFFICIENT C1 . . . . . . . . . ',1PG20.13/,
      .    '      EXPONENTIAL DECAY COEFFICIENT C2 . . . . ',1PG20.13/)
- 1518 FORMAT( '    FRICTION FORMULATION: INCREMENTAL (STIFFNESS) ',
-     .             'FORMULATION')
- 1519 FORMAT( '    FRICTION FORMULATION: TOTAL (VISCOUS) ',
-     .             'FORMULATION')
+C
+ 1527 FORMAT(/
+     .       '    INTERFACE FRICTION MODEL.  . . . . . . . . ',I10)
+
+
  1520 FORMAT(
      .    '    FRICTION FILTERING FLAG. . . . . . . . . ',I10/,
      .    '    FILTERING FACTOR . . . . . . . . . . . . ',1PG20.13)
@@ -792,12 +796,12 @@ C------------
      .       '    BUCKET FACTOR . . . . . . . . . . . . . . . ',1PG20.13/,
      .       '    DE-ACTIVATION OF INITIAL PENETRATIONS . . . ',I10/,
      .       '    CRITICAL DAMPING FACTOR . . . . . . . . . . ',1PG20.13/,
-     .       '    MAXIMUM PRESURE DUE TO THICKNESS VARIATION  '/,
+     .       '    MAXIMUM PRESSURE DUE TO THICKNESS VARIATION '/,
      .       '                    CASE OF IGAP=2. . . . . . . ',1PG20.13/,
      .       '    MEAN POSSIBLE NUMBER OF IMPACT/NODE . . . . ',I5/,
      .       '    INVERTED NORMALS DETECTION FLAG . . . . . . ',I5/,
      .       '    TANGENTIAL FORCE LIMITATION FLAG . . . . . . ',I5/,
-     .       '    MAXIMUM PRESURE FOR SKID LINE OUTPUT         ',1PG20.13)
+     .       '    MAXIMUM PRESSURE FOR SKID LINE OUTPUT        ',1PG20.13)
  2104 FORMAT(//
      .       '    TYPE==21   PARALLEL/STAMPING              ' //,
      .       '    BOUND. COND. DELETED AFTER IMPACT IN X DIR  ',I1/,
@@ -824,12 +828,12 @@ C------------
      .       '    BUCKET FACTOR . . . . . . . . . . . . . . ',1PG20.13/,
      .       '    DE-ACTIVATION OF INITIAL PENETRATIONS . . ',I10/,
      .       '    CRITICAL DAMPING FACTOR . . . . . . . . . ',1PG20.13/,
-     .       '    MAXIMUM PRESURE DUE TO THICKNESS VARIATION'/,
+     .       '    MAXIMUM PRESSURE DUE TO THICKNESS VARIATION'/,
      .       '                    CASE OF IGAP=2. . . . . . ',1PG20.13/,
      .       '    MEAN POSSIBLE NUMBER OF IMPACT/NODE . . . ',I5/,
      .       '    INVERTED NORMALS DETECTION FLAG . . . . . . ',I5/,
      .       '    TANGENTIAL FORCE LIMITATION FLAG . . . . . . ',I5/,
-     .       '    MAXIMUM PRESURE FOR SKID LINE OUTPUT         ',1PG20.13)        
+     .       '    MAXIMUM PRESSURE FOR SKID LINE OUTPUT         ',1PG20.13)        
  2102   FORMAT(//
      .      '    Thermal interface                          ' //,
      .      '    Thermal heat exchange coefficient . . . . .',1PG20.13/,

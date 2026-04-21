@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_bigsbox               ../starter/source/groups/hm_bigsbox.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_lines            ../starter/source/groups/hm_read_lines.F
-      !||    hm_read_surf             ../starter/source/groups/hm_read_surf.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    box_surf_sh              ../starter/source/model/box/bigbox.F
-      !||    boxboxs                  ../starter/source/model/box/boxbox.F
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_bigsbox               ../starter/source/groups/hm_bigsbox.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_lines            ../starter/source/groups/hm_read_lines.F
+!||    hm_read_surf             ../starter/source/groups/hm_read_surf.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    box_surf_sh              ../starter/source/model/box/bigbox.F
+!||    boxboxs                  ../starter/source/model/box/boxbox.F
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_BIGSBOX(NUMEL ,IX     ,NIX    ,NIX1 ,NIX2,IELTYP,
      .                   X     ,        NSEG ,FLAG,SKEW  ,
      .                   ISKN  ,ISURF0 ,ITABM1 ,IBOX,
@@ -103,7 +103,7 @@ C-------
         BOXTYPE = 2
       END IF
 C-------
-C get box de box ID'S dans LINE :
+C get box of box IDs in LINE:
 C-------
       ISU = 0
       DO I=1,NBBOX
@@ -124,7 +124,7 @@ C---
        END IF
       END IF
 C---
-C   simple box dans /LINE :
+C   simple box in /LINE:
 C---
       BOOL=.FALSE.
       IF(ISU>0)THEN
@@ -166,7 +166,7 @@ C---
         ENDDO
       ENDIF
 C---
-C tag lines (ou surfaces) in main-box:
+C Tag Lines (or surfaces) in Main-Box:
 C---
 C---count lines within BOX
       IF(ISU > 0)THEN

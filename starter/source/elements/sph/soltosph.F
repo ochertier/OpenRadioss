@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    soltosphx8       ../starter/source/elements/sph/soltosph.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_sphcel   ../starter/source/elements/reader/hm_read_sphcel.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    soltosphx8       ../starter/source/elements/sph/soltosph.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_sphcel   ../starter/source/elements/reader/hm_read_sphcel.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SOLTOSPHX8(
      .   NSPHDIR ,NCELL   ,INOD    ,IDS     ,IDMAX  ,
      .   X       ,IXS     ,KXSP    ,IPARTSP ,NOD2SP ,
@@ -35,6 +35,7 @@ C-----------------------------------------------
 C    M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -173,15 +174,15 @@ C
 C-----------------------------------------------
       RETURN
       END SUBROUTINE SOLTOSPHX8
-      !||====================================================================
-      !||    soltosphx4       ../starter/source/elements/sph/soltosph.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_sphcel   ../starter/source/elements/reader/hm_read_sphcel.F
-      !||--- calls      -----------------------------------------------------
-      !||    checkvolume_4n   ../starter/source/elements/solid/solide/checksvolume.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod      ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    soltosphx4       ../starter/source/elements/sph/soltosph.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_sphcel   ../starter/source/elements/reader/hm_read_sphcel.F
+!||--- calls      -----------------------------------------------------
+!||    checkvolume_4n   ../starter/source/elements/solid/solide/checksvolume.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod      ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SOLTOSPHX4(
      .   NSPHDIR ,NCELL   ,INOD    ,IDS     ,IDMAX  ,
      .   X       ,IXS     ,KXSP    ,IPARTSP ,NOD2SP ,
@@ -190,6 +191,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -320,16 +322,16 @@ C
 C-----------------------------------------------
       RETURN
       END SUBROUTINE SOLTOSPHX4
-      !||====================================================================
-      !||    soltosphv8    ../starter/source/elements/sph/soltosph.F
-      !||--- called by ------------------------------------------------------
-      !||    s8zinit3      ../starter/source/elements/solid/solide8z/s8zinit3.F
-      !||    sinit3        ../starter/source/elements/solid/solide/sinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    soltosphv8    ../starter/source/elements/sph/soltosph.F
+!||--- called by ------------------------------------------------------
+!||    s8zinit3      ../starter/source/elements/solid/solide8z/s8zinit3.F
+!||    sinit3        ../starter/source/elements/solid/solide/sinit3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SOLTOSPHV8(
      .   NSPHDIR ,RHO     ,NCELL   ,X      ,SPBUF   ,
      .   IXS     ,KXSP    ,IPARTSP ,IRST   )
@@ -337,6 +339,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -573,20 +576,21 @@ C
 C-----------------------------------------------
       RETURN
       END SUBROUTINE SOLTOSPHV8
-      !||====================================================================
-      !||    soltosphv4    ../starter/source/elements/sph/soltosph.F
-      !||--- called by ------------------------------------------------------
-      !||    s4init3       ../starter/source/elements/solid/solide4/s4init3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    soltosphv4    ../starter/source/elements/sph/soltosph.F
+!||--- called by ------------------------------------------------------
+!||    s4init3       ../starter/source/elements/solid/solide4/s4init3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SOLTOSPHV4(
      .   NSPHDIR ,RHO     ,NCELL   ,X      ,SPBUF   ,
      .   IXS     )
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

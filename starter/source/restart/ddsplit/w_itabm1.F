@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    w_itabm1    ../starter/source/restart/ddsplit/w_itabm1.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    usr2sys     ../starter/source/system/sysfus.F
-      !||====================================================================
+!||====================================================================
+!||    w_itabm1    ../starter/source/restart/ddsplit/w_itabm1.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    usr2sys     ../starter/source/system/sysfus.F
+!||====================================================================
       SUBROUTINE W_ITABM1(ITABM1,ITABM2,NODGLOB,NODLOCAL,NUMNOD_L,
      2                   ITAB, LEN_IA)
 C-----------------------------------------------
@@ -60,13 +60,13 @@ C-----------------------------------------------
         INDX(I) = I
       ENDDO
 C
-C Retris ordre croissant itabm1 (num user)
+C Retris Croissant order Itabm1 (Num User)
 C
       CALL MY_ORDERS(0,WORK,ITMPM1,INDX,NUMNOD_L,1)
       DO I = 1, NUMNOD_L
         ITMPM2(I)= ITMPM1(INDX(I))
       ENDDO
-C Ecriture ITABM1 num user tries ordre croissant
+C ITABM1 NUM STRIES CRIES CROISANT
       CALL WRITE_I_C(ITMPM2,NUMNOD_L)
       LEN_IA = LEN_IA + NUMNOD_L
 C
@@ -76,7 +76,7 @@ C
         ITMPM1(I) = NODLOCAL(ND)
       END DO
 
-C Ecriture ITABM2 (num systemes)
+C ITABM2 Writing (NUM SYSTEMES)
       CALL WRITE_I_C(ITMPM1,NUMNOD_L)
       LEN_IA = LEN_IA + NUMNOD_L
 C

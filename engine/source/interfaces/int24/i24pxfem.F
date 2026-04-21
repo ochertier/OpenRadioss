@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24pxfem            ../engine/source/interfaces/int24/i24pxfem.F
-      !||--- called by ------------------------------------------------------
-      !||    resol               ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24gap              ../engine/source/interfaces/int24/i24pxfem.F
-      !||    spmd_exch_i24_gap   ../engine/source/mpi/interfaces/spmd_exch_i24_gap.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i24pxfem            ../engine/source/interfaces/int24/i24pxfem.F
+!||--- called by ------------------------------------------------------
+!||    resol               ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    i24gap              ../engine/source/interfaces/int24/i24pxfem.F
+!||    spmd_exch_i24_gap   ../engine/source/mpi/interfaces/spmd_exch_i24_gap.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod       ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I24PXFEM(
      1   IPARI    ,INTBUF_TAB,WAGAP ,IAD_ELEM,FR_ELEM)
 C-----------------------------------------------
@@ -95,11 +96,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    i24gap     ../engine/source/interfaces/int24/i24pxfem.F
-      !||--- called by ------------------------------------------------------
-      !||    i24pxfem   ../engine/source/interfaces/int24/i24pxfem.F
-      !||====================================================================
+!||====================================================================
+!||    i24gap     ../engine/source/interfaces/int24/i24pxfem.F
+!||--- called by ------------------------------------------------------
+!||    i24pxfem   ../engine/source/interfaces/int24/i24pxfem.F
+!||====================================================================
       SUBROUTINE I24GAP(
      1  NRTM,IRECT,WAGAP,GAP_MN,GAP_M,MSEGTYP, GAPMAX,NVOISIN,DGAP_MN,
      .  DGAP_M ,DGAPMAX,STFM)
@@ -113,13 +114,13 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRTM, IRECT(4,*),MSEGTYP(*), NVOISIN(8,*)
       my_real
-     .        XMAX, YMAX, ZMAX, XMIN, YMIN, ZMIN, C_MAX,
+     .           
      .        GAP_MN(12,*),WAGAP(2,*),GAP_M(*),GAPMAX,DGAP_MN(4,*),
      .        DGAP_M(*),DGAPMAX,STFM(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  II,M1,M2,M3,M4,NE,L
+      INTEGER  M1,M2,M3,M4,NE,L
       my_real
      .    GAPN_OLD(4),GAP_MMAX
 C-----------------------------------------------

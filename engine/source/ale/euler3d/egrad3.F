@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    egrad3                 ../engine/source/ale/euler3d/egrad3.F
-      !||--- called by ------------------------------------------------------
-      !||    agrad0                 ../engine/source/ale/agrad0.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||====================================================================
-      SUBROUTINE EGRAD3(IXS,X,ALE_CONNECT,GRAD,VEUL)
+!||====================================================================
+!||    egrad3                 ../engine/source/ale/euler3d/egrad3.F
+!||--- called by ------------------------------------------------------
+!||    agrad0                 ../engine/source/ale/agrad0.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||====================================================================
+      SUBROUTINE EGRAD3(IXS,X,ALE_CONNECT,GRAD,VEUL,s_flux)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,9 +59,10 @@ C-----------------------------------------------
 ! X(1:3,1:NUMNOD) : local nodes
 !  (1:3, NUMNOD+1:) additional nodes (also on adjacent domains but connected to the boundary of the current domain)
 C-----------------------------------------------
+      integer, intent(in) :: s_flux !< first dimension of flux array
       INTEGER,INTENT(IN) :: IXS(NIXS,SIXS/NIXS)
       my_real,INTENT(IN) :: X(3,SX/3), VEUL(LVEUL,*)
-      my_real,INTENT(INOUT) :: GRAD(6,*)
+      my_real,INTENT(INOUT) :: GRAD(s_flux,6)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -112,9 +115,9 @@ C-----------------------------------------------
         Y8(I)=X(2,IXS(9,II))
         Z8(I)=X(3,IXS(9,II))
       ENDDO
-C------------------------------------------
-C     NORMAL VECTORS
-C------------------------------------------
+C-------------------------------------------
+C     NORMAL VECTORS ( N = 2S.n where |n|=1)
+C-------------------------------------------
       DO I=LFT,LLT
         II=I+NFT
         
@@ -236,7 +239,11 @@ C------------------------------------------
      .  +X(3,IXS(2,IV6))+X(3,IXS(3,IV6))+X(3,IXS(4,IV6))+X(3,IXS(5,IV6))
      .  +X(3,IXS(6,IV6))+X(3,IXS(7,IV6))+X(3,IXS(8,IV6))+X(3,IXS(9,IV6))
       ENDDO
-C
+
+      ! DiX = 8.dx[i]
+      ! DiY = 8.dy[i]
+      ! DiZ = 8.dz[i]
+      ! => DDi = 64 (dx^2 + dy^2 + dz^2)
       DO I=LFT,LLT
         DD1(I)=D1X(I)**2+D1Y(I)**2+D1Z(I)**2
         DD2(I)=D2X(I)**2+D2Y(I)**2+D2Z(I)**2
@@ -247,14 +254,21 @@ C
       ENDDO
 C---------------------------------
 C     GRADIENTS * SURFACES
+C       Ni=2Sn,  |n|=1
+C       DiX = 8.dx[i], DiY = 8.dy[i], DiZ = 8.dz[i],
+C       DDi = 64 (dx^2 + dy^2 + dz^2)
+C       Finally
+C           GRADi =  Si . < di,ni > / di^2
+C             where di is the distance between the centers of the two elements (current and adjacent #i)
 C---------------------------------
       DO I=LFT,LLT
-        GRAD(1,I)= FOUR*(D1X(I)*N1X(I)+D1Y(I)*N1Y(I)+D1Z(I)*N1Z(I)) / MAX(EM15,DD1(I))
-        GRAD(2,I)= FOUR*(D2X(I)*N2X(I)+D2Y(I)*N2Y(I)+D2Z(I)*N2Z(I)) / MAX(EM15,DD2(I))
-        GRAD(3,I)= FOUR*(D3X(I)*N3X(I)+D3Y(I)*N3Y(I)+D3Z(I)*N3Z(I)) / MAX(EM15,DD3(I))
-        GRAD(4,I)= FOUR*(D4X(I)*N4X(I)+D4Y(I)*N4Y(I)+D4Z(I)*N4Z(I)) / MAX(EM15,DD4(I))
-        GRAD(5,I)= FOUR*(D5X(I)*N5X(I)+D5Y(I)*N5Y(I)+D5Z(I)*N5Z(I)) / MAX(EM15,DD5(I))
-        GRAD(6,I)= FOUR*(D6X(I)*N6X(I)+D6Y(I)*N6Y(I)+D6Z(I)*N6Z(I)) / MAX(EM15,DD6(I))
+        ie = i + nft
+        GRAD(ie,1)= FOUR*(D1X(I)*N1X(I)+D1Y(I)*N1Y(I)+D1Z(I)*N1Z(I)) / MAX(EM15,DD1(I))
+        GRAD(ie,2)= FOUR*(D2X(I)*N2X(I)+D2Y(I)*N2Y(I)+D2Z(I)*N2Z(I)) / MAX(EM15,DD2(I))
+        GRAD(ie,3)= FOUR*(D3X(I)*N3X(I)+D3Y(I)*N3Y(I)+D3Z(I)*N3Z(I)) / MAX(EM15,DD3(I))
+        GRAD(ie,4)= FOUR*(D4X(I)*N4X(I)+D4Y(I)*N4Y(I)+D4Z(I)*N4Z(I)) / MAX(EM15,DD4(I))
+        GRAD(ie,5)= FOUR*(D5X(I)*N5X(I)+D5Y(I)*N5Y(I)+D5Z(I)*N5Z(I)) / MAX(EM15,DD5(I))
+        GRAD(ie,6)= FOUR*(D6X(I)*N6X(I)+D6Y(I)*N6Y(I)+D6Z(I)*N6Z(I)) / MAX(EM15,DD6(I))
       ENDDO
 C---------------------------------
       RETURN

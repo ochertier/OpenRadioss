@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,44 +20,45 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_solid_scalar_1             ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||--- called by ------------------------------------------------------
-      !||    funct_python_update_elements   ../engine/source/tools/curve/funct_python_update_elements.F90
-      !||    h3d_solid_scalar               ../engine/source/output/h3d/h3d_results/h3d_solid_scalar.F
-      !||--- calls      -----------------------------------------------------
-      !||    h3d_write_scalar               ../engine/source/output/h3d/h3d_results/h3d_write_scalar.F
-      !||    initbuf                        ../engine/share/resol/initbuf.F
-      !||    output_div_u                   ../engine/source/output/anim/generate/output_div_u.F
-      !||    output_schlieren               ../engine/source/output/anim/generate/output_schlieren.F
-      !||    srotorth                       ../engine/source/elements/solid/srotorth.F
-      !||    ths_marea                      ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||    ths_vol                        ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod           ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    aleanim_mod                    ../engine/share/modules/aleanim_mod.F
-      !||    alefvm_mod                     ../common_source/modules/ale/alefvm_mod.F
-      !||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_mod                        ../engine/share/modules/h3d_mod.F
-      !||    initbuf_mod                    ../engine/share/resol/initbuf.F
-      !||    mat_elem_mod                   ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    multimat_param_mod             ../common_source/modules/multimat_param_mod.F90
-      !||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
-      !||    schlieren_mod                  ../engine/share/modules/schlieren_mod.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_solid_scalar_1             ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||--- called by ------------------------------------------------------
+!||    funct_python_update_elements   ../engine/source/tools/curve/funct_python_update_elements.F90
+!||    h3d_solid_scalar               ../engine/source/output/h3d/h3d_results/h3d_solid_scalar.F
+!||--- calls      -----------------------------------------------------
+!||    h3d_write_scalar               ../engine/source/output/h3d/h3d_results/h3d_write_scalar.F
+!||    initbuf                        ../engine/share/resol/initbuf.F
+!||    output_div_u                   ../engine/source/output/anim/generate/output_div_u.F
+!||    output_schlieren               ../engine/source/output/anim/generate/output_schlieren.F
+!||    srotorth                       ../engine/source/elements/solid/srotorth.F
+!||    ths_marea                      ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||    ths_vol                        ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod           ../common_source/modules/ale/ale_connectivity_mod.F
+!||    aleanim_mod                    ../common_source/modules/aleanim_mod.F
+!||    alefvm_mod                     ../common_source/modules/ale/alefvm_mod.F
+!||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod                    ../common_source/modules/elements/element_mod.F90
+!||    h3d_mod                        ../engine/share/modules/h3d_mod.F
+!||    initbuf_mod                    ../engine/share/resol/initbuf.F
+!||    mat_elem_mod                   ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F90
+!||    multimat_param_mod             ../common_source/modules/multimat_param_mod.F90
+!||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
+!||    schlieren_mod                  ../engine/share/modules/schlieren_mod.F
+!||====================================================================
       SUBROUTINE H3D_SOLID_SCALAR_1(CALLED_FROM_PYTHON,
      .                  ELBUF_TAB       ,SOLID_SCALAR ,IPARG       ,
-     .                  IXS          ,PM          ,BUFMAT      ,
-     .                  EHOUR        ,
-     .                  IPM            ,
-     .                  X            ,V         ,W           ,ALE_CONNECT ,
-     .                  ID_ELEM      ,ITY_ELEM  ,IPARTS      ,LAYER_INPUT ,
-     .                  IR_INPUT        ,IS_INPUT     ,IT_INPUT  ,IUVAR_INPUT ,H3D_PART    ,
-     .                  IS_WRITTEN_SOLID,INFO1        ,KEYWORD   ,FANI_CELL   ,
-     .                  MULTI_FVM       , NG        ,IDMDS       ,IMDSVAR     ,
-     .                  ID              ,MAT_PARAM ,MODE        )
+     .                  IXS             ,PM           ,BUFMAT      ,
+     .                  EHOUR           ,
+     .                  IPM             ,
+     .                  X               ,V            ,W           ,ALE_CONNECT ,
+     .                  ID_ELEM         ,ITY_ELEM     ,IPARTS      ,LAYER_INPUT ,
+     .                  IR_INPUT        ,IS_INPUT     ,IT_INPUT    ,IUVAR_INPUT , H3D_PART    ,
+     .                  IS_WRITTEN_SOLID,INFO1        ,KEYWORD     ,FANI_CELL   ,
+     .                  MULTI_FVM       ,NG           ,IDMDS       ,IMDSVAR     ,
+     .                  ID              ,MAT_PARAM    ,MODE        )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -73,6 +74,7 @@ C-----------------------------------------------
         USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
         USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
         USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
+        use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -122,8 +124,7 @@ C-----------------------------------------------
      .     S11,S22,S33,S4,S5,S6,VONM,GAMA(6),
      .     T11,T21,T31,T12,T22,T32,T13,T23,T33,
      .     PHI,THETA,PSI,DAMMAX,VEL(0:3),VFRAC(MVSIZ,1:21),
-     .     CUMUL(3),VX,VY,VZ,NX,NY,NZ,SURF,TMP_2(MVSIZ,3),
-     .     VOLFRAC,BFRAC
+     .     CUMUL(3),VX,VY,VZ,NX,NY,NZ,SURF,TMP_2(MVSIZ,3)
         my_real
      .     G1(MVSIZ,3),G2(MVSIZ,3),G3(MVSIZ,3),VOLN(MVSIZ),AREAM(MVSIZ),
      .     RHO0,DET(MVSIZ),EZZ(MVSIZ),MAXDAMINI,E33
@@ -132,24 +133,29 @@ C-----------------------------------------------
      .          N,K,JTURB,MT,IALEL,
      .          NLAY_FAIL,
      .          OFFSET, IPT,
-     .          IUVAR,IPOS,ITRIMAT,
+     .          IUVAR,IPOS,
      .          IALEFVM_FLG, IMAT,IADBUF,NUPARAM,ICSIG,NC(8),IEOS,NMOD,MAT_ID,FAIL_ID
         INTEGER
      .          ISOLNOD,IVISC,NPTG,TSHELL,TSH_ORT,
      .          IOK_PART(MVSIZ),JJ(6),IRUPT,IOK,NPG_PLANE,IIR,
-     .          IS_WRITTEN_VALUE(MVSIZ),NFRAC,IU(4),IV,NB_FACE,KFACE,IS_EULER,IS_ALE,IAD2,
-     .          SUBMATLAW
+     .          IS_WRITTEN_VALUE(MVSIZ),NFRAC,IU(4),IV,NB_FACE,KFACE,IS_EULER,IS_ALE,IAD2
         LOGICAL DETECTED
         CHARACTER*5 BUFF
         TYPE(G_BUFEL_)  ,POINTER :: GBUF
-        TYPE(L_BUFEL_)  ,POINTER :: LBUF
+        TYPE(L_BUFEL_)  ,POINTER :: LBUF, LBUF1,LBUF2
         TYPE(BUF_MAT_)  ,POINTER :: MBUF
         TYPE(BUF_FAIL_) ,POINTER :: FBUF
         TYPE(BUF_EOS_)  ,POINTER :: EBUF
         my_real, DIMENSION(:), POINTER  :: UVARF,DAMF,DFMAX,TDELE
         my_real, DIMENSION(:) ,POINTER  :: UPARAM
         INTEGER :: ISUBMAT,NVAREOS,NTILLOTSON,IMAT_TILLOTSON
-
+        INTEGER :: MID,IERR
+        my_real :: vi(21) !< submaterial volumes at reference densities (max submat : 21)
+        my_real :: v0i(21) !< submaterial volumes at reference densities (max submat : 21)
+        my_real :: v0g !< global volume at reference density (mixture)
+        my_real :: RHO0i(21) !< submaterial initial mass densities (max submat : 21)
+        my_real :: RHOi(21) !< submaterial  mass densities (max submat : 21)
+        my_real :: RHO0g !< global initial mass density (mixture)
 C-----------------------------------------------
 
         CALL INITBUF(   IPARG   ,NG      ,
@@ -313,7 +319,8 @@ C--------------------------------------------------
                 ENDDO
                 IF (ISOLNOD == 16 .OR. ISOLNOD == 20.OR.
      .             (ISOLNOD == 8  .AND.JHBE == 14).OR.
-     .             ((ISOLNOD == 6 .OR.I SOLNOD == 8).AND.JHBE == 15))THEN
+     .             ((ISOLNOD == 6 .OR.ISOLNOD == 8).AND.JHBE == 15).OR. 
+     .             ((ISOLNOD == 6).AND.JHBE == 24))THEN
                   DO IL=1,NLAY
                     IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA > 0) THEN
                       DO IS=1,NPTS
@@ -375,24 +382,25 @@ C--------------------------------------------------
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'TEMP')THEN
 C--------------------------------------------------
-                IF (GBUF%G_TEMP > 0) THEN
-                  VALUE(1:NEL) = ZERO
-                  DO IL=1,NLAY
-                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_TEMP > 0) THEN
+              IF (JTHE /= 0) THEN
+                VALUE(1:NEL) = ELBUF_TAB(NG)%GBUF%TEMP(1:NEL)
+                IS_WRITTEN_VALUE(1:NEL) = 1
+              ELSE
+                VALUE(1:NEL) = ZERO
+                DO IL=1,NLAY
+                  IF (ELBUF_TAB(NG)%BUFLY(IL)%L_TEMP > 0) THEN
+                    IS_WRITTEN_VALUE(1:NEL) = 1
+                    DO IT=1,ELBUF_TAB(NG)%BUFLY(IL)%NPTT
                       DO IS=1,NPTS
-                        DO IT=1,NPTT
-                          DO IR=1,NPTR
-                            LBUF=>ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)
-                            DO I=LFT,LLT
-                              VALUE(I) = VALUE(I) + LBUF%TEMP(I)/NPTG
-                              IS_WRITTEN_VALUE(I) = 1
-                            ENDDO
-                          ENDDO
+                        DO IR=1,NPTR
+                          LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)
+                          VALUE(1:NEL) = VALUE(1:NEL) + LBUF%TEMP(1:NEL)/NPTG
                         ENDDO
                       ENDDO
-                    ENDIF
-                  ENDDO
-                ENDIF
+                    ENDDO
+                  ENDIF
+                ENDDO
+              ENDIF
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'P')THEN
 C--------------------------------------------------
@@ -719,7 +727,7 @@ c UVAR=IUVAR
                     IF (ISOLNOD == 8 .AND. MLW == 59) THEN
 c                     output = global damage variables of /fail/connect
                       MT = IXS(1,NFT+1)
-                      IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT
+                      IRUPT = mat_param(MT)%FAIL(1)%IRUPT
                       NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL
                       IF (IRUPT == 20) THEN
                         NPTG = 4
@@ -767,16 +775,12 @@ C--------------------------------------------------
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'EPSD') THEN
 C--------------------------------------------------
-                IF (GBUF%G_EPSD > 0) THEN
-                  DO I=1,NEL
-                    VALUE(I) = GBUF%EPSD(I)
-                    IS_WRITTEN_VALUE(I) = 1
-                  ENDDO
-                ENDIF
+                VALUE(1:NEL) = GBUF%EPSD(1:NEL)
+                IS_WRITTEN_VALUE(1:NEL) = 1
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'WPLA' .AND. MLW == 25) THEN
 C--------------------------------------------------
-C               WPLA par couche pour loi 25
+C               wpla by layer for law 25
                 IOK = 0
                 DO I=1,NEL
                   EVAR(I) = ZERO
@@ -784,8 +788,8 @@ C               WPLA par couche pour loi 25
                 IUS = INFO1
                 IF (ISOLNOD == 16.OR.ISOLNOD == 20.OR.
      .             (ISOLNOD == 8.AND.JHBE == 14).OR.
-     .             ((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15))THEN
-
+     .             ((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15).OR. 
+     .             ((ISOLNOD == 6).AND.JHBE == 24))THEN
                   IF (IUS <= NPTG) THEN
                     DO IL=1,NLAY
                       IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA > 0) THEN
@@ -808,13 +812,14 @@ C               WPLA par couche pour loi 25
 C--------------------------------------------------
               ELSEIF (KEYWORD == 'FLAY' .AND. MLW == 25) THEN
 C--------------------------------------------------
-C---            FAILED LAYERS par elem pour loi 25
+C---            failed layers per element for law 25
                 DO I=1,NEL
                   EVAR(I) = ZERO
                 ENDDO
                 IF( ISOLNOD == 16.OR.ISOLNOD == 20.OR.
      .             (ISOLNOD == 8.AND.JHBE == 14).OR.
-     .            ((ISOLNOD == 6 .OR. ISOLNOD == 8).AND.JHBE == 15))THEN
+     .            ((ISOLNOD == 6 .OR. ISOLNOD == 8).AND.JHBE == 15).OR. 
+     .             ((ISOLNOD == 6).AND.JHBE == 24)) THEN
 c
                   NPG_PLANE = NPTR * NPTS * NPTT
                   DO I=1,NEL
@@ -842,7 +847,7 @@ C--------------------------------------------------
                   IMAT = IXS(1,NFT+1)
                   IADBUF = IPM(7,IMAT)
                   NUPARAM= IPM(9,IMAT)
-                  UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
+                  uparam => bufmat(iadbuf:iadbuf+nuparam-1)
                   ISUBMAT=UPARAM(276+1)
                   IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                 ENDIF
@@ -870,7 +875,7 @@ C--------------------------------------------------
                   IMAT = IXS(1,NFT+1)
                   IADBUF = IPM(7,IMAT)
                   NUPARAM= IPM(9,IMAT)
-                  UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
+                  uparam => bufmat(iadbuf:iadbuf+nuparam-1)
                   ISUBMAT=UPARAM(276+2)
                   IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                 ENDIF
@@ -898,7 +903,7 @@ C--------------------------------------------------
                   IMAT = IXS(1,NFT+1)
                   IADBUF = IPM(7,IMAT)
                   NUPARAM= IPM(9,IMAT)
-                  UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
+                  uparam => bufmat(iadbuf:iadbuf+nuparam-1)
                   ISUBMAT=UPARAM(276+3)
                   IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                 ENDIF
@@ -926,7 +931,7 @@ C--------------------------------------------------
                   IMAT = IXS(1,NFT+1)
                   IADBUF = IPM(7,IMAT)
                   NUPARAM= IPM(9,IMAT)
-                  UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
+                  uparam => bufmat(iadbuf:iadbuf+nuparam-1)
                   ISUBMAT=UPARAM(276+4)
                   IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                 ENDIF
@@ -1003,14 +1008,14 @@ C--------------------------------------------------
 C--------------------------------------------------
 C           EULER ANGLE : rotation of ORTHOTROPIC SYSTEM wrt GLOBAL SYSTEM
 c ILAYER=NULL NPT=NULL
-                IF ( (ILAY <= NLAY .AND. ILAY > 0) .OR.
+                IF ( (ILAY <= NLAY .AND. ILAY > 0) .AND.
      .              IR <= NPTR .AND. IR > 0 .AND.  IS <= NPTS .AND. IS > 0 .AND. IT <= NPTT .AND. IT > 0) THEN
                   IF ( IGTYP == 6 .OR. IGTYP == 21 .OR. IGTYP == 22 ) THEN
                     LBUF => ELBUF_TAB(NG)%BUFLY(MAX(1,ILAY))%LBUF(1,1,1)
                     DO I=1,NEL
                       N = I + NFT
                       IF(ISORTH ==1) THEN
-C                      pour JHBE=14, valeurs moyennes est dans rep. corota.
+C                      for jhbe=14, average values are in the corota frame.
                         IF(IGTYP == 21 .OR. IGTYP == 22) THEN
                           GAMA(1)= LBUF%GAMA(JJ(1)+I)
                           GAMA(2)= LBUF%GAMA(JJ(2)+I)
@@ -1059,14 +1064,14 @@ C--------------------------------------------------
 C--------------------------------------------------
 C           EULER ANGLE : rotation of ORTHOTROPIC SYSTEM wrt GLOBAL SYSTEM
 c ILAYER=NULL NPT=NULL
-                IF ( (ILAY <= NLAY .AND. ILAY > 0) .OR.
+                IF ( (ILAY <= NLAY .AND. ILAY > 0) .AND.
      .              IR <= NPTR .AND. IR > 0 .AND.  IS <= NPTS .AND. IS > 0 .AND. IT <= NPTT .AND. IT > 0) THEN
                   IF ( IGTYP == 6 .OR. IGTYP == 21 .OR. IGTYP == 22 ) THEN
                     LBUF => ELBUF_TAB(NG)%BUFLY(MAX(1,ILAY))%LBUF(1,1,1)
                     DO I=1,NEL
                       N = I + NFT
                       IF(ISORTH ==1) THEN
-C                      pour JHBE=14, valeurs moyennes est dans rep. corota.
+C                      for jhbe=14, average values are in the corota frame.
                         IF(IGTYP == 21 .OR. IGTYP == 22) THEN
                           GAMA(1)= LBUF%GAMA(JJ(1)+I)
                           GAMA(2)= LBUF%GAMA(JJ(2)+I)
@@ -1114,14 +1119,14 @@ C--------------------------------------------------
 C--------------------------------------------------
 C           EULER ANGLE : rotation of ORTHOTROPIC SYSTEM wrt GLOBAL SYSTEM
 c ILAYER=NULL NPT=NULL
-                IF ( (ILAY <= NLAY .AND. ILAY > 0) .OR.
+                IF ( (ILAY <= NLAY .AND. ILAY > 0) .AND.
      .              IR <= NPTR .AND. IR > 0 .AND.  IS <= NPTS .AND. IS > 0 .AND. IT <= NPTT .AND. IT > 0) THEN
                   IF ( IGTYP == 6 .OR. IGTYP == 21 .OR. IGTYP == 22 ) THEN
                     LBUF => ELBUF_TAB(NG)%BUFLY(MAX(1,ILAY))%LBUF(1,1,1)
                     DO I=1,NEL
                       N = I + NFT
                       IF(ISORTH ==1) THEN
-C                      pour JHBE=14, valeurs moyennes est dans rep. corota.
+C                      for jhbe=14, average values are in the corota frame.
                         IF(IGTYP == 21 .OR. IGTYP == 22) THEN
                           GAMA(1)= LBUF%GAMA(JJ(1)+I)
                           GAMA(2)= LBUF%GAMA(JJ(2)+I)
@@ -1189,7 +1194,7 @@ c ILAYER=NULL IR=NULL IS=NULL IT=NULL
                   IF (ISOLNOD == 8 .AND. MLW == 83) THEN
 c                   output = damage variables of /fail/snconnect
                     MT = IXS(1,NFT+1)
-                    IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT
+                    IRUPT = mat_param(MT)%FAIL(1)%IRUPT
                     NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL! ng= ngroup
                     IF (IRUPT == 26) THEN
                       NPTG = 4
@@ -1214,7 +1219,7 @@ c ILAYER=NULL IR= IS= IT=
                   IF (ISOLNOD == 8 .AND. MLW == 83) THEN
 c                   output = damage variables of /fail/snconnect
                     MT = IXS(1,NFT+1)
-                    IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT
+                    IRUPT = mat_param(MT)%FAIL(1)%IRUPT
                     NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL! ng= ngroup
                     IF (IRUPT == 26) THEN
                       DO IIR=1,NFAIL
@@ -1239,7 +1244,7 @@ c ILAYER=NULL IR=NULL IS=NULL IT=NULL
                   IF (ISOLNOD == 8 .AND. MLW == 83) THEN
 c                   output = damage variables of /fail/snconnect
                     MT = IXS(1,NFT+1)
-                    IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT
+                    IRUPT = mat_param(MT)%FAIL(1)%IRUPT
                     NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL! ng= ngroup
                     IF (IRUPT == 26) THEN
                       NPTG = 4
@@ -1264,7 +1269,7 @@ c ILAYER=NULL IR= IS= IT=
                   IF (ISOLNOD == 8 .AND. MLW == 83) THEN
 c                   output = damage variables of /fail/snconnect
                     MT = IXS(1,NFT+1)
-                    IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT
+                    IRUPT = mat_param(MT)%FAIL(1)%IRUPT
                     NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL! ng= ngroup
                     IF (IRUPT == 26) THEN
                       DO IIR=1,NFAIL
@@ -1289,7 +1294,7 @@ c ILAYER=NULL IR=NULL IS=NULL IT=NULL
                   IF (ISOLNOD == 8 .AND. MLW == 83) THEN
 c                   output = damage variables of /fail/snconnect
                     MT = IXS(1,NFT+1)
-                    IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT
+                    IRUPT = mat_param(MT)%FAIL(1)%IRUPT
                     NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL! ng= ngroup
                     IF (IRUPT == 26) THEN
                       NPTG = 4
@@ -1314,7 +1319,7 @@ c ILAYER=NULL IR= IS= IT=
                   IF (ISOLNOD == 8 .AND. MLW == 83) THEN
 c                   output = damage variables of /fail/snconnect
                     MT = IXS(1,NFT+1)
-                    IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT
+                    IRUPT = mat_param(MT)%FAIL(1)%IRUPT
                     NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL! ng= ngroup
                     IF (IRUPT == 26) THEN
                       DO IIR=1,NFAIL
@@ -1437,9 +1442,9 @@ c ILAYER=NULL IR=NULL IS=NULL IT=NULL
                       NLAY_FAIL = 0
                       DO IL=1,NLAY
                         IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
-                        NFAIL = MAT_PARAM(IMAT)%NFAIL
+                        NFAIL = mat_param(IMAT)%NFAIL
                         DO IFAIL = 1,NFAIL
-                          FAIL_ID = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID
+                          FAIL_ID = mat_param(IMAT)%FAIL(IFAIL)%FAIL_ID
                           IF (FAIL_ID == ID) THEN
                             DO IS=1,NPTS
                               DO IT=1,NPTT
@@ -1466,9 +1471,9 @@ c ILAYER=NULL IR= IS= IT=
                         NLAY_FAIL = 0
                         DO IL=1,NLAY
                           IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
-                          NFAIL = MAT_PARAM(IMAT)%NFAIL
+                          NFAIL = mat_param(IMAT)%NFAIL
                           DO IFAIL = 1,NFAIL
-                            FAIL_ID = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID
+                            FAIL_ID = mat_param(IMAT)%FAIL(IFAIL)%FAIL_ID
                             IF (FAIL_ID == ID) THEN
                               FBUF => ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IIR,IS,IT)
                               VALUE(I) = VALUE(I) + FBUF%FLOC(IFAIL)%DAMMX(I)
@@ -1483,9 +1488,9 @@ c ILAYER=NULL IR= IS= IT=
                   ELSEIF ( ILAY > 0 .AND. ILAY <= NLAY .AND. IR >= 0 .AND. IR <= NPTR .AND.
      .                     IS >= 0 .AND.  IS <= NPTS) THEN
                     IMAT = ELBUF_TAB(NG)%BUFLY(ILAY)%IMAT
-                    NFAIL = MAT_PARAM(IMAT)%NFAIL
+                    NFAIL = mat_param(IMAT)%NFAIL
                     DO IFAIL = 1,NFAIL
-                      FAIL_ID = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID
+                      FAIL_ID = mat_param(IMAT)%FAIL(IFAIL)%FAIL_ID
                       IF (FAIL_ID == ID) THEN
                         FBUF => ELBUF_TAB(NG)%BUFLY(ILAY)%FAIL(IR,IS,IT)
                         DO I = 1,NEL
@@ -1502,10 +1507,10 @@ c ILAYER=NULL IR=NULL IS=NULL IT=NULL
                       NLAY_FAIL = 0
                       DO IL=1,NLAY
                         IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
-                        NFAIL = MAT_PARAM(IMAT)%NFAIL
+                        NFAIL = mat_param(IMAT)%NFAIL
                         DO IFAIL = 1,NFAIL
-                          FAIL_ID = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID
-                          NMOD    = MAT_PARAM(IMAT)%FAIL(IFAIL)%NMOD
+                          FAIL_ID = mat_param(IMAT)%FAIL(IFAIL)%FAIL_ID
+                          NMOD    = mat_param(IMAT)%FAIL(IFAIL)%NMOD
                           IF ((FAIL_ID == ID).AND.(MODE <= NMOD)) THEN
                             DO IS=1,NPTS
                               DO IT=1,NPTT
@@ -1532,10 +1537,10 @@ c ILAYER=NULL IR= IS= IT=
                         NLAY_FAIL = 0
                         DO IL=1,NLAY
                           IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
-                          NFAIL = MAT_PARAM(IMAT)%NFAIL
+                          NFAIL = mat_param(IMAT)%NFAIL
                           DO IFAIL = 1,NFAIL
-                            FAIL_ID = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID
-                            NMOD    = MAT_PARAM(IMAT)%FAIL(IFAIL)%NMOD
+                            FAIL_ID = mat_param(IMAT)%FAIL(IFAIL)%FAIL_ID
+                            NMOD    = mat_param(IMAT)%FAIL(IFAIL)%NMOD
                             IF ((FAIL_ID == ID).AND.(MODE <= NMOD)) THEN
                               FBUF => ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IIR,IS,IT)
                               VALUE(I) = VALUE(I) + FBUF%FLOC(IFAIL)%DAMMX(MODE*NEL + I)
@@ -1550,10 +1555,10 @@ c ILAYER=NULL IR= IS= IT=
                   ELSEIF ( ILAY > 0 .AND. ILAY <= NLAY .AND. IR >= 0 .AND. IR <= NPTR .AND.
      .                     IS >= 0 .AND.  IS <= NPTS) THEN
                     IMAT  = ELBUF_TAB(NG)%BUFLY(ILAY)%IMAT
-                    NFAIL = MAT_PARAM(IMAT)%NFAIL    
+                    NFAIL = mat_param(IMAT)%NFAIL
                     DO IFAIL = 1,NFAIL
-                      FAIL_ID = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID
-                      NMOD    = MAT_PARAM(IMAT)%FAIL(IFAIL)%NMOD
+                      FAIL_ID = mat_param(IMAT)%FAIL(IFAIL)%FAIL_ID
+                      NMOD    = mat_param(IMAT)%FAIL(IFAIL)%NMOD
                       IF ((FAIL_ID == ID).AND.(MODE <= NMOD)) THEN
                         FBUF => ELBUF_TAB(NG)%BUFLY(ILAY)%FAIL(IR,IS,IT)
                         DO I = 1,NEL
@@ -1583,7 +1588,7 @@ c
                       ! Filling the value table
                       DO IL=1,NLAY
                         IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
-                        MAT_ID = MAT_PARAM(IMAT)%MAT_ID
+                        MAT_ID = mat_param(IMAT)%MAT_ID
                         IF ((ID == -1) .OR. ((ID > 0).AND.(MAT_ID == ID))) THEN 
                           DO IS=1,NPTS
                             DO IT=1,NPTT
@@ -1607,7 +1612,7 @@ c
                       ! Filling the value table
                       DO IL=1,NLAY
                         IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
-                        MAT_ID = MAT_PARAM(IMAT)%MAT_ID
+                        MAT_ID = mat_param(IMAT)%MAT_ID
                         IF ((ID == -1) .OR. ((ID > 0).AND.(MAT_ID == ID))) THEN 
                           LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)
                           DO I=1,NEL
@@ -1620,7 +1625,7 @@ c
                     ! If the layer is specified by the user
                     ELSEIF (ILAY > 0 .AND. ILAY <= NLAY) THEN
                       IMAT = ELBUF_TAB(NG)%BUFLY(ILAY)%IMAT
-                      MAT_ID = MAT_PARAM(IMAT)%MAT_ID
+                      MAT_ID = mat_param(IMAT)%MAT_ID
                       IF ((ID == -1) .OR. ((ID > 0).AND.(MAT_ID == ID))) THEN 
                         DO IS=1,NPTS
                           DO IT=1,NPTT
@@ -1644,8 +1649,8 @@ c
                       ! Filling the value table
                       DO IL=1,NLAY
                         IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
-                        NMOD = MAT_PARAM(IMAT)%NMOD
-                        MAT_ID = MAT_PARAM(IMAT)%MAT_ID
+                        NMOD = mat_param(IMAT)%NMOD
+                        MAT_ID = mat_param(IMAT)%MAT_ID
                         IF ((NMOD > 0 .AND. MODE <= NMOD) .AND. (MAT_ID == ID)) THEN 
                           DO IS=1,NPTS
                             DO IT=1,NPTT
@@ -1669,8 +1674,8 @@ c
                       ! Filling the value table
                       DO IL=1,NLAY
                         IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
-                        NMOD = MAT_PARAM(IMAT)%NMOD
-                        MAT_ID = MAT_PARAM(IMAT)%MAT_ID
+                        NMOD = mat_param(IMAT)%NMOD
+                        MAT_ID = mat_param(IMAT)%MAT_ID
                         IF ((NMOD > 0 .AND. MODE <= NMOD) .AND. (MAT_ID == ID)) THEN 
                           LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)
                           DO I=1,NEL
@@ -1683,8 +1688,8 @@ c
                     ! If the layer is specified by the user
                     ELSEIF (ILAY > 0 .AND. ILAY <= NLAY) THEN
                       IMAT = ELBUF_TAB(NG)%BUFLY(ILAY)%IMAT
-                      NMOD = MAT_PARAM(IMAT)%NMOD
-                      MAT_ID = MAT_PARAM(IMAT)%MAT_ID
+                      NMOD = mat_param(IMAT)%NMOD
+                      MAT_ID = mat_param(IMAT)%MAT_ID
                       IF ((NMOD > 0 .AND. MODE <= NMOD) .AND. (MAT_ID == ID)) THEN 
                         DO IS=1,NPTS
                           DO IT=1,NPTT
@@ -2000,39 +2005,11 @@ C--------------------------------------------------
 C--------------------------------------------------
               ELSEIF (KEYWORD == 'TDET') THEN  !  /ANIM/ELEM/TDET
 C--------------------------------------------------
-                IF (MLW  /= 51 .AND. MLW /= 151 .AND. GBUF%G_TB > 0) THEN
+                IF (GBUF%G_TB > 0) THEN
                   DO I=1,NEL
                     VALUE(I) = -GBUF%TB(I)
                     IS_WRITTEN_VALUE(I) = 1
                   ENDDO
-                ELSEIF (MLW == 51)THEN
-                  IPOS      = 15
-                  ITRIMAT   = 4
-                  MBUF => ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)
-                  K         = IPARG(2,NG) * ((M51_N0PHAS + (ITRIMAT-1)*M51_NVPHAS )+IPOS-1)
-                  DO I=1,IPARG(2,NG)
-                    VALUE(I) = -MBUF%VAR(K+I)
-                    IS_WRITTEN_VALUE(I) = 1
-                  ENDDO
-                ELSEIF(MLW == 151 .AND. GBUF%G_TB > 0)THEN
-                   DO I=1,NEL
-                     DETECTED = .FALSE.
-                     VALUE(I) = ZERO
-                     DO ILAY=1,NLAY
-                       SUBMATLAW = ELBUF_TAB(NG)%BUFLY(ILAY)%ILAW
-                       IF(SUBMATLAW == 5 )THEN
-                         VOLFRAC = ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)%VOL(I)/GBUF%VOL(I)
-                         BFRAC = MULTI_FVM%BFRAC(ILAY,I+NFT)
-                         IF(VOLFRAC > ZERO .OR. BFRAC > ZERO)THEN
-                           DETECTED = .TRUE.
-                         ENDIF
-                       ENDIF
-                     ENDDO
-                     IF(DETECTED)THEN
-                       VALUE(I) = -GBUF%TB(I)
-                     ENDIF
-                     IS_WRITTEN_VALUE(I) = 1
-                   ENDDO
                 ENDIF
 C--------------------------------------------------
               ELSEIF (KEYWORD == 'MOMX') THEN
@@ -2135,7 +2112,12 @@ C--------------------------------------------------
 C--------------------------------------------------
                 MT          = IXS(1,NFT+1)
                 IALEFVM_FLG = IPM(251,MT)
-                IF(IALEFVM_FLG >= 2)THEN
+                IF (MLW == 151) THEN
+                  DO I = 1, NEL
+                    VALUE(I) = MULTI_FVM%VEL(1, I + NFT)
+                    IS_WRITTEN_VALUE(I) = 1
+                  ENDDO
+                ELSEIF(IALEFVM_FLG >= 2)THEN
                   IF (ISOLNOD == 8)THEN
                     DO I=1,NEL
                       VALUE(I) = GBUF%MOM(JJ(1) + I) / GBUF%RHO(I)
@@ -2148,7 +2130,12 @@ C--------------------------------------------------
 C--------------------------------------------------
                 MT          = IXS(1,NFT+1)
                 IALEFVM_FLG = IPM(251,MT)
-                IF(IALEFVM_FLG >= 2)THEN
+                IF (MLW == 151) THEN
+                  DO I = 1, NEL
+                    VALUE(I) = MULTI_FVM%VEL(2, I + NFT)
+                    IS_WRITTEN_VALUE(I) = 1
+                  ENDDO
+                ELSEIF(IALEFVM_FLG >= 2)THEN
                   IF (ISOLNOD == 8)THEN
                     DO I=1,NEL
                       VALUE(I) = GBUF%MOM(JJ(2) + I) / GBUF%RHO(I)
@@ -2161,7 +2148,12 @@ C--------------------------------------------------
 C--------------------------------------------------
                 MT          = IXS(1,NFT+1)
                 IALEFVM_FLG = IPM(251,MT)
-                IF(IALEFVM_FLG >= 2)THEN
+                IF (MLW == 151) THEN
+                  DO I = 1, NEL
+                    VALUE(I) = MULTI_FVM%VEL(3, I + NFT)
+                    IS_WRITTEN_VALUE(I) = 1
+                  ENDDO
+                ELSEIF(IALEFVM_FLG >= 2)THEN
                   IF (ISOLNOD == 8)THEN
                     DO I=1,NEL
                       VALUE(I) = GBUF%MOM(JJ(3) + I) / GBUF%RHO(I)
@@ -2742,7 +2734,7 @@ C--------------------------------------------------
                   IMAT = IXS(1,NFT+1)
                   IADBUF = IPM(7,IMAT)
                   NUPARAM= IPM(9,IMAT)
-                  UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
+                  uparam => bufmat(iadbuf:iadbuf+nuparam-1)
                   !bijective order           !indexes
                   ISUBMAT=UPARAM(276+1);     IU(1)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                   ISUBMAT=UPARAM(276+2);     IU(2)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
@@ -2807,7 +2799,7 @@ C--------------------------------------------------
                   !count number of submaterial based on /EOS/TILLOTSON (IEOS=3)
                   NTILLOTSON = 0
                   DO IMAT=1,NLAY
-                    IEOS =  IPM(4, MAT_PARAM(MT)%MULTIMAT%MID(IMAT) )
+                    IEOS =  IPM(4, mat_param(MT)%MULTIMAT%MID(IMAT) )
                     IF(IEOS == 3)THEN
                       NTILLOTSON = NTILLOTSON + 1
                       IMAT_TILLOTSON = IMAT
@@ -2817,7 +2809,7 @@ C--------------------------------------------------
                   IF(NTILLOTSON > 1)THEN
                     FAC=ONE
                     DO IMAT=1,NLAY
-                      IEOS =  IPM(4, MAT_PARAM(MT)%MULTIMAT%MID(IMAT) )
+                      IEOS =  IPM(4, mat_param(MT)%MULTIMAT%MID(IMAT) )
                       IF(IEOS == 3)THEN
                         EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1,1,1)
                         NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
@@ -2872,15 +2864,205 @@ C--------------------------------------------------
                     ENDDO
                 ENDIF
 !--------------------------------------------------
-              ELSEIF (KEYWORD == 'VSTRAIN') then
+              elseif(keyword == 'VSTRAIN') then
 !--------------------------------------------------
-                DO I=1,NEL
-                  MT = IXS(1,I+NFT)
-                  IF(PM(89,MT) > ZERO)THEN
-                    VALUE(I) = GBUF%RHO(I) / PM(89,MT) - ONE
-                    IS_WRITTEN_VALUE(I) = 1
-                  END IF
-                ENDDO
+                do i=1,nel
+                  mt = ixs(1,i+nft)
+                  if(mlw == 151)then
+                    !multimaterial 151 (collocated scheme)
+                      do ilay=1,nlay
+                        mid = mat_param(mt)%multimat%mid(ilay)
+                        rho0i (ilay) = pm(89,mid)
+                        Vi (ilay) = multi_fvm%phase_alpha(ilay,i+nft) * gbuf%vol(i)
+                        V0i (ilay) =  multi_fvm%phase_rho(ilay,i+nft) * Vi(ilay) / rho0i(ilay)         !rho0.V0 = rho.V
+                      enddo
+                      V0g = sum(V0i)
+                      RHO0g = zero
+                      do ilay=1,nlay
+                        RHO0g = RHO0g + rho0i(ilay)*V0i(ilay)
+                      end do
+                      RHO0g = RHO0g / V0g
+                      value(i) = multi_fvm%rho(i+nft) / RHO0g - ONE
+                      is_written_value(i) = 1
+
+                  elseif(mlw == 51)then
+                    !multimaterial 51 (staggered scheme)
+                    imat   = ixs(1,nft+1)
+                    iadbuf = ipm(7,imat)
+                    nuparam= ipm(9,imat)
+                    uparam => bufmat(iadbuf:iadbuf+nuparam-1)
+                    mbuf => elbuf_tab(ng)%bufly(1)%mat(1,1,1)
+                    ipos = 1
+                    !bijective order           !indexes
+                    isubmat = nint(uparam(276+1));   iu(1)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                    isubmat = nint(uparam(276+2));   iu(2)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                    isubmat = nint(uparam(276+3));   iu(3)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                    isubmat = nint(uparam(276+4));   iu(4)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                    vfrac(i,1) = mbuf%var(i+iu(1)*nel)
+                    vfrac(i,2) = mbuf%var(i+iu(2)*nel)
+                    vfrac(i,3) = mbuf%var(i+iu(3)*nel)
+                    vfrac(i,4) = mbuf%var(i+iu(4)*nel)
+                    ipos = 12
+                    !bijective order           !indexes
+                    isubmat = nint(uparam(276+1));   iu(1)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                    isubmat = nint(uparam(276+2));   iu(2)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                    isubmat = nint(uparam(276+3));   iu(3)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                    isubmat = nint(uparam(276+4));   iu(4)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                    rhoi(1) = mbuf%var(i+iu(1)*nel)
+                    rhoi(2) = mbuf%var(i+iu(2)*nel)
+                    rhoi(3) = mbuf%var(i+iu(3)*nel)
+                    rhoi(4) = mbuf%var(i+iu(4)*nel)
+                    do ilay=1,4
+                      mid = mat_param(mt)%multimat%mid(ilay)
+                      rho0i (ilay) = pm(89,mid)
+                      Vi (ilay) = vfrac(i,ilay) * gbuf%vol(i)
+                      ipos = 12
+                      V0i (ilay) =  rhoi(ilay) * Vi(ilay) / rho0i(ilay)         !rho0.V0 = rho.V
+                    enddo
+                    V0g = sum(V0i)
+                    RHO0g = zero
+                    do ilay=1,4
+                      RHO0g = RHO0g + rho0i(ilay)*V0i(ilay)
+                    end do
+                    RHO0g = RHO0g / V0g
+                    value(i) = gbuf%rho(i) / RHO0g - ONE
+                    is_written_value(i) = 1
+
+                  elseif(mlw == 37)then
+                    !multimaterial 37 (staggered scheme)
+                    imat   = ixs(1,nft+1)
+                    iadbuf = ipm(7,imat)
+                    nuparam= ipm(9,imat)
+                    uparam => bufmat(iadbuf:iadbuf+nuparam-1)
+                    mbuf => elbuf_tab(ng)%bufly(1)%mat(1,1,1)
+                    rho0i(1) = uparam(11)
+                    rho0i(2) = uparam(12)
+                    Vi(1) = mbuf%var(i+3*nel) * gbuf%vol(i) !UVAR(I,4)  = VFRAC1
+                    Vi(2) = mbuf%var(i+4*nel) * gbuf%vol(i) !UVAR(I,5)  = VFRAC2
+                    rhoi(1) = mbuf%var(i+2*nel) !UVAR(I,3)  = RHO1
+                    rhoi(2) = mbuf%var(i+1*nel) !UVAR(I,2)  = RHO2
+                    V0i(1) =  rhoi(1) * Vi(1) / rho0i(1)         !rho0.V0 = rho.V
+                    V0i(2) =  rhoi(2) * Vi(2) / rho0i(2)         !rho0.V0 = rho.V
+                    V0g = sum(V0i)
+                    RHO0g = zero
+                    do ilay=1,nlay
+                      RHO0g = RHO0g + rho0i(ilay)*V0i(ilay)
+                    end do
+                    RHO0g = RHO0g / V0g
+                    value(i) = gbuf%rho(i) / RHO0g - ONE
+                    is_written_value(i) = 1
+
+                  elseif(mlw == 20)then
+                    !multimaterial 20 (staggered scheme)
+                    lbuf1  => elbuf_tab(ng)%bufly(1)%lbuf(1,1,1)
+                    lbuf2  => elbuf_tab(ng)%bufly(2)%lbuf(1,1,1)
+                    mid = mat_param(mt)%multimat%mid(1)
+                    rho0i(1) = pm(89,mid)
+                    mid = mat_param(mt)%multimat%mid(2)
+                    rho0i(2) = pm(89,mid)
+                    Vi(1) = lbuf1%vol(i)
+                    Vi(2) = lbuf2%vol(i)
+                    rhoi(1) = lbuf1%rho(i)
+                    rhoi(2) = lbuf2%rho(i)
+                    V0i(1) =  rhoi(1) * Vi(1) / rho0i(1)         !rho0.V0 = rho.V
+                    V0i(2) =  rhoi(2) * Vi(2) / rho0i(2)         !rho0.V0 = rho.V
+                    V0g = sum(V0i)
+                    RHO0g = zero
+                    do ilay=1,nlay
+                      RHO0g = RHO0g + rho0i(ilay)*V0i(ilay)
+                    end do
+                    RHO0g = RHO0g / V0g
+                    value(i) = gbuf%rho(i) / RHO0g - ONE
+                    is_written_value(i) = 1
+
+                  else
+                    !general case (monomaterial law)
+                    if(pm(89,mt) > zero)then
+                      value(i) = gbuf%rho(i) / pm(89,mt) - one
+                      is_written_value(i) = 1
+                    end if
+                  end if
+
+                enddo
+!--------------------------------------------------
+              elseif(keyword(1:8) == 'VSTRAIN/') then
+!--------------------------------------------------
+                detected = .false.
+                read(keyword(9:), '(I2)', IOSTAT=ierr) ilay
+                if(ierr == 0 .and. ilay > 0) then
+                  if(mlw == 151 .and. ilay <= min(10,multi_fvm%nbmat))detected = .true.
+                  if(mlw ==  51 .and. ilay <= 4                      )detected = .true.
+                  if(mlw ==  37 .and. ilay <= 2                      )detected = .true.
+                  if(mlw ==  20 .and. ilay <= 2                      )detected = .true.
+                end if
+                if(detected)then
+                  do i=1,nel
+                    mt = ixs(1,i+nft)
+
+                    if(mlw == 151)then
+                      !multimaterial 151 (collocated scheme)
+                        mid = mat_param(mt)%multimat%mid(ilay)
+                        rho0i(ilay) = pm(89,mid)
+                        Vi(ilay) = multi_fvm%phase_alpha(ilay,i+nft) * gbuf%vol(i)
+                        V0i(ilay) = multi_fvm%phase_rho(ilay,i+nft) * Vi(ilay) / rho0i(ilay)         !rho0.V0 = rho.V
+                        value(i) = multi_fvm%phase_rho(ilay,i+nft) / rho0i(ilay) - ONE
+                        is_written_value(i) = 1
+
+                    elseif(mlw == 51)then
+                      !multimaterial 51 (staggered scheme)
+                      imat = ixs(1,nft+1)
+                      iadbuf = ipm(7,imat)
+                      nuparam= ipm(9,imat)
+                      uparam => bufmat(iadbuf:iadbuf+nuparam-1)
+                      mbuf => elbuf_tab(ng)%bufly(1)%mat(1,1,1)
+                      mid = mat_param(mt)%multimat%mid(ilay)
+                      rho0i(ilay) = pm(89,mid)
+                      ipos = 1
+                      !bijective order           !indexes
+                      isubmat = nint(uparam(276+ilay));   iu(1)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                      vfrac(i,ilay) = mbuf%var(i+iu(ilay)*nel)
+                      Vi(ilay) = vfrac(i,ilay) * gbuf%vol(i)
+                      ipos = 12
+                      !bijective order           !indexes
+                      isubmat = nint(uparam(276+ilay));   iu(ilay)=m51_n0phas +(isubmat-1)*m51_nvphas  + ipos-1
+                      rhoi(ilay) = mbuf%var(i+iu(ilay)*nel)
+                      V0i (ilay) =  rhoi(ilay) * Vi(ilay) / rho0i(ilay)         !rho0.V0 = rho.V
+                      value(i) = rhoi(ilay) / rho0i(ilay) - ONE
+                      is_written_value(i) = 1
+
+                    elseif(mlw == 37)then
+                      !multimaterial 37 (staggered scheme)
+                      imat = ixs(1,nft+1)
+                      iadbuf = ipm(7,imat)
+                      nuparam= ipm(9,imat)
+                      uparam => bufmat(iadbuf:iadbuf+nuparam-1)
+                      mbuf => elbuf_tab(ng)%bufly(1)%mat(1,1,1)
+                      rho0i(ilay) = uparam(10+ilay)
+                      Vi(ilay) = mbuf%var(i+(ilay+2)*nel) * gbuf%vol(i)
+                      rhoi(ilay) = mbuf%var(i+(3-ilay)*nel) !UVAR(I,3)  = RHO1
+                      V0i(ilay) =  rhoi(ilay) * Vi(ilay) / rho0i(ilay)
+                      value(i) = rhoi(ilay) / rho0i(ilay) - ONE
+                      is_written_value(i) = 1
+
+                    elseif(mlw == 20)then
+                      !multimaterial 20 (staggered scheme)
+                      lbuf  => elbuf_tab(ng)%bufly(ilay)%lbuf(1,1,1)
+                      mid = mat_param(mt)%multimat%mid(ilay)
+                      rho0i(ilay) = pm(89,mid)
+                      Vi(ilay) = lbuf%vol(i)
+                      rhoi(ilay) = lbuf%rho(i)
+                      V0i(ilay) =  rhoi(ilay) * Vi(ilay) / rho0i(ilay)         !rho0.V0 = rho.V
+                      value(i) = rhoi(ilay) / rho0i(ilay) - ONE
+                      is_written_value(i) = 1
+
+                    else
+                      !general case (monomaterial law)
+                      is_written_value(i) = 0
+                    end if
+                enddo
+
+              end if
+!--------------------------------------------------
 !--------------------------------------------------
               ENDIF
 C--------------------------------------------------
@@ -2897,11 +3079,11 @@ C--------------------------------------------------
 C-----------------------------------------------
         RETURN
       END
-      !||====================================================================
-      !||    ths_marea            ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_solid_scalar_1   ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||====================================================================
+!||====================================================================
+!||    ths_marea            ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||--- called by ------------------------------------------------------
+!||    h3d_solid_scalar_1   ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||====================================================================
       SUBROUTINE THS_MAREA(RX, RY, RZ, SX, SY, SZ, DET,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2935,11 +3117,11 @@ C---------E3------------
 c-----------
         RETURN
       END
-      !||====================================================================
-      !||    ths_vol              ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_solid_scalar_1   ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-      !||====================================================================
+!||====================================================================
+!||    ths_vol              ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||--- called by ------------------------------------------------------
+!||    h3d_solid_scalar_1   ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+!||====================================================================
       SUBROUTINE THS_VOL(RX, RY, RZ, SX, SY, SZ, TX, TY, TZ,DET,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

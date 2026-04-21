@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    bemsolvp         ../engine/source/fluid/bemsolvp.F
-      !||--- called by ------------------------------------------------------
-      !||    incpflow         ../engine/source/fluid/incpflow.F
-      !||--- calls      -----------------------------------------------------
-      !||    glbemp           ../engine/source/fluid/bemsolvp.F
-      !||    glsinfp          ../engine/source/fluid/bemsolvp.F
-      !||    intgtg           ../engine/source/fluid/bemsolv.F
-      !||    inthtg           ../engine/source/fluid/bemsolv.F
-      !||    progcondp_c      ../engine/source/system/progcond_c.c
-      !||    spmd_fl_sum      ../engine/source/mpi/generic/spmd_fl_sum.F
-      !||====================================================================
+!||====================================================================
+!||    bemsolvp         ../engine/source/fluid/bemsolvp.F
+!||--- called by ------------------------------------------------------
+!||    incpflow         ../engine/source/fluid/incpflow.F
+!||--- calls      -----------------------------------------------------
+!||    glbemp           ../engine/source/fluid/bemsolvp.F
+!||    glsinfp          ../engine/source/fluid/bemsolvp.F
+!||    intgtg           ../engine/source/fluid/bemsolv.F
+!||    inthtg           ../engine/source/fluid/bemsolv.F
+!||    progcondp_c      ../engine/source/system/progcond_c.c
+!||    spmd_fl_sum      ../engine/source/mpi/generic/spmd_fl_sum.F
+!||====================================================================
       SUBROUTINE BEMSOLVP(
      .   ELEM         , NORM , X          , NNRP       , CR_LOC_GLOB,
      .   CR_GLOB_LOC  , NNCP , CC_LOC_GLOB, CC_GLOB_LOC, NCEIP      ,
@@ -72,11 +72,11 @@ C-----------------------------------------------
      .        NRX, NRY, NRZ, AREA2, RVAL(3), LSUM(NNO), LSUMT(NNO)
 #if defined(MPI) && defined(MYREAL8) && !defined(WITHOUT_LINALG)
 C---------------------------------------------------
-C 0- Initialisations pour utilisation SCALAPACK
+C 0- Initializations for scalapack use
 C---------------------------------------------------
-C Initialisation de la process grid
+C Initialization of the process grid
       CALL SL_INIT(ICTXT, NPROW, NPCOL)
-C Descripteur pour HBEM
+C Descriptor for HBEM
       DESC_H(1)=1
       DESC_H(2)=ICTXT
       DESC_H(3)=NNO
@@ -86,7 +86,7 @@ C Descripteur pour HBEM
       DESC_H(7)=0
       DESC_H(8)=0
       DESC_H(9)=MAX(1,NNRP)
-C Descripteur pour GBEM
+C Descriptor for GBEM
       DESC_G(1)=1
       DESC_G(2)=ICTXT
       DESC_G(3)=NNO
@@ -96,7 +96,7 @@ C Descripteur pour GBEM
       DESC_G(7)=0
       DESC_G(8)=0
       DESC_G(9)=MAX(1,NNRP)
-C Descripteur pour Q
+C Descriptor for Q
       DESC_Q(1)=1
       DESC_Q(2)=ICTXT
       DESC_Q(3)=NEL
@@ -106,7 +106,7 @@ C Descripteur pour Q
       DESC_Q(7)=0
       DESC_Q(8)=0
       DESC_Q(9)=MAX(1,NERP)
-C Descripteur pour PHI
+C Descriptor for PHI
       DESC_P(1)=1
       DESC_P(2)=ICTXT
       DESC_P(3)=NNO
@@ -122,7 +122,7 @@ C---------------------------------------------------
       IF (L_ASSEMB) THEN
          IF (ILVOUT>=1.AND.ISPMD==0) WRITE(ISTDO,'(A)') ' ** BEMSOLV : ASSEMBLY OF INTEGRAL OPERATORS'
          IF (IFORM==1) THEN
-C Assemblage de H
+C Assembly of H
             DO I=1,NNRP
                DO J=1,NNCP
                   HBEM(I,J)=ZERO
@@ -172,7 +172,7 @@ C Assemblage de H
                   IF (NL3/=0) HBEM(J,NL3)=HBEM(J,NL3)+RVAL(3)
                ENDDO
             ENDDO
-C Assemblage de G
+C Assembly of G
             DO I=1,NEP
                IF (ILVOUT==2) 
      .            CALL PROGCONDP_C(NCEIP+I,NCEIP+NEP, ISPMD+1, IBID)
@@ -212,7 +212,7 @@ C Assemblage de G
                   GBEM(J,I)=GBEM(J,I)+RVAL(1)
                ENDDO
             ENDDO
-C Somme des lignes pour le terme diagonal de H
+C Sum of rows for the diagonal term of H
             DO I=1,NNO
                LSUM(I)=ZERO
             ENDDO
@@ -291,7 +291,7 @@ C
      .                     OFFNR, OFFNC)
             ENDDO
          ENDIF
-C Somme des lignes de G pour remplacer la derniere colonne de H
+C Sum of G rows to replace the last column of H
          DO I=1,NNO
             LSUM(I)=ZERO
          ENDDO
@@ -309,7 +309,7 @@ C Somme des lignes de G pour remplacer la derniere colonne de H
                IF (IR>0) HBEM(IR,IC)=-LSUMT(I)
             ENDDO
          ENDIF
-C Factorisation de HBEM
+C Factorization of HBEM
          CALL PDGETRF(NNO,    NNO,  HBEM, 1, 1, 
      .                DESC_H, IPIV, INFO)
       ENDIF            
@@ -371,13 +371,13 @@ C
 #endif
       RETURN
       END
-      !||====================================================================
-      !||    glbemp     ../engine/source/fluid/bemsolvp.F
-      !||--- called by ------------------------------------------------------
-      !||    bemsolvp   ../engine/source/fluid/bemsolvp.F
-      !||--- calls      -----------------------------------------------------
-      !||    intanl     ../engine/source/fluid/bemsolv.F
-      !||====================================================================
+!||====================================================================
+!||    glbemp     ../engine/source/fluid/bemsolvp.F
+!||--- called by ------------------------------------------------------
+!||    bemsolvp   ../engine/source/fluid/bemsolvp.F
+!||--- calls      -----------------------------------------------------
+!||    intanl     ../engine/source/fluid/bemsolv.F
+!||====================================================================
       SUBROUTINE GLBEMP(X1    , Y1   , Z1    , X2  , Y2   ,
      .                  Z2    , X3   , Y3    , Z3  , X0   ,
      .                  Y0    , Z0   , TELNOR, HBEM, GBEM ,
@@ -538,11 +538,11 @@ C Matrice G
 C
       RETURN
       END
-      !||====================================================================
-      !||    glsinfp    ../engine/source/fluid/bemsolvp.F
-      !||--- called by ------------------------------------------------------
-      !||    bemsolvp   ../engine/source/fluid/bemsolvp.F
-      !||====================================================================
+!||====================================================================
+!||    glsinfp    ../engine/source/fluid/bemsolvp.F
+!||--- called by ------------------------------------------------------
+!||    bemsolvp   ../engine/source/fluid/bemsolvp.F
+!||====================================================================
       SUBROUTINE GLSINFP(N1     , N2,  N3,  JAC, S    ,
      .                   PHI_INF, NL1, NL2, NL3, OFFNR)
 C-----------------------------------------------

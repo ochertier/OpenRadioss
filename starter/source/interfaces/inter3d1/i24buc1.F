@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24buc1                ../starter/source/interfaces/inter3d1/i24buc1.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    i24s1s2                ../starter/source/interfaces/inter3d1/i24buc1.F
-      !||    i24tri                 ../starter/source/interfaces/inter3d1/i24tri.F
-      !||    i24xfic_ini            ../starter/source/interfaces/inter3d1/i24surfi.F
-      !||    i7cmp3                 ../starter/source/interfaces/inter3d1/i7cmp3.F
-      !||    i7cor3                 ../starter/source/interfaces/inter3d1/i7cor3.F
-      !||    i7dst3                 ../starter/source/interfaces/inter3d1/i7dst3.F
-      !||    i7pen3                 ../starter/source/interfaces/inter3d1/i7pen3.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i24buc1                ../starter/source/interfaces/inter3d1/i24buc1.F
+!||--- called by ------------------------------------------------------
+!||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    i24s1s2                ../starter/source/interfaces/inter3d1/i24buc1.F
+!||    i24tri                 ../starter/source/interfaces/inter3d1/i24tri.F
+!||    i24xfic_ini            ../starter/source/interfaces/inter3d1/i24surfi.F
+!||    i7cmp3                 ../starter/source/interfaces/inter3d1/i7cmp3.F
+!||    i7cor3                 ../starter/source/interfaces/inter3d1/i7cor3.F
+!||    i7dst3                 ../starter/source/interfaces/inter3d1/i7dst3.F
+!||    i7pen3                 ../starter/source/interfaces/inter3d1/i7pen3.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I24BUC1(
      1   X     ,IRECT,NSV    ,BUMULT,NSEG    ,
      2   NMN   ,NRTM ,MWA    ,NSN   ,CAND_E  ,
@@ -82,7 +82,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "vect07_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -136,7 +135,7 @@ C     REAL
      .   DX4,DY4,DZ4,
      .   DX6,DY6,DZ6,
      .   DD1,DD2,DD3,DD4,DD,DD0,XMIN,YMIN,ZMIN,
-     .   XMAX,YMAX,ZMAX,TZINF0,MINBOX0,MAXBOX0,GAPSMAX,
+     .   XMAX,YMAX,ZMAX,TZINF0,MINBOX0,MAXBOX0,
      .   BID,TZINF_ST,MARGE_ST,GAPV(MVSIZ),DD_ST,D_MAX,PENSOL,D_MOY
       INTEGER ,
      .         DIMENSION(:),ALLOCATABLE :: IWORK
@@ -173,16 +172,16 @@ C------don't use no more MWA which is not sufficient; I_ADD<=1000
 C-------use temporarily GAP_N(1,*)=V/A; MVOISN(1,*)-> MTYPE(solid),MVOISN(2,*)-> E_id
 C
 C
-C     1-CALCUL TAILLE DES ZONES INFLUENCES
-C     DD EST LA LONGEUR MOYENNE ELEMENT
-C     DD_ST EST LA LONGEUR MAX ELEMENT
+C     1-CALCULATION TAILLE DES ZONES INFLUENCES
+C     DD IS THE AVERAGE ELEMENT LENGTH
+C     DD_ST IS THE MAX ELEMENT LENGTH
       DD=ZERO
       DD_ST=ZERO
       PENSOL=EP30
       D_MOY = ZERO
       N_SOL = 0
       DO 10 L=1,NRTM
-C      CONNECIVITES ELEMENT
+C      ELEMENT CONNECTIVITIES
        N1=IRECT(1,L)
        N2=IRECT(2,L)
        N3=IRECT(3,L)
@@ -228,9 +227,9 @@ C     DD = DD/NRTM/4
 C      DD = MAX(DD0,ONEP251*GAP)
 C     TZINF = BUMULT*DD
       MARGE = BUMULT*DD
-C calcul de TZINF en fct de la marge et non le contraire
+C calculation of TZINF based on the margin and not the opposite
       TZINF = MARGE + GAP + DGAPLOAD
-C MARGE_ST : marge independante du BUMULT en input pour trouver les memes pene initiales (cas delete ou chgt coord.)
+C MARGE_ST: independent margin of BUMULT as input to find the same initial penetrations (delete or coord change cases)
       MARGE_ST = BMUL0*DD
 C--------suppose PEN_ini< DD_ST/2 (half thickness of solids )   
       IF (INACTI /=0 ) THEN
@@ -255,12 +254,11 @@ C--------should also think about shells----
 #endif
        END IF!(PENMAX/=ZERO)
       ELSE
-C-----il faut pas eliminer tiny penetration----      
+C-----must pas eliminer tiny penetration----      
        PENMAX = MAX(PENSOL,GAP)
       END IF
-C 1er passage avec marge x2 pour trouver plus de candidats
-C      IF(IMACH==3.AND.IDDLEVEL==0) MARGE_ST = 2*MARGE_ST
-      IF(IMACH==3.AND.IDDLEVEL==0) MARGE_ST = MARGE
+C 1st pass with margin x2 to find more candidates
+      IF(IDDLEVEL==0) MARGE_ST = MARGE
       TZINF_ST = MARGE_ST + GAP + DGAPLOAD
       BID = FOUR_OVER_5*DD
       IF (INACTI/=7.AND.TZINF>BID) THEN
@@ -268,16 +266,16 @@ C      IF(IMACH==3.AND.IDDLEVEL==0) MARGE_ST = 2*MARGE_ST
         IBID =(2*IBID+4)*IBID*2
       ENDIF
 C      MAXBOX= ZEP9*(DD - TZINF)
-C DD + 2*TZINF : taille element augmentee de zone influence
+C DD + 2*Tzinfo: Size element increased in influence zone
       MAXBOX= HALF*(DD + 2*TZINF)
       MINBOX= HALF*MAXBOX
       TZINF0 = TZINF
       MINBOX0 = MINBOX
       MAXBOX0 = MAXBOX
-C     MIS A ZERO POUR FAIRE SEARCH COMPLET CYCLE 0 ENGINE
+C     SET TO ZERO TO PERFORM COMPLETE SEARCH CYCLE 0 ENGINE
       DIST = ZERO     
 C--------------------------------
-C     CALCUL DES BORNES DU DOMAINE
+C     CALCULATION OF DOMAIN BOUNDS
 C--------------------------------
       XMIN=EP30
       XMAX=-EP30
@@ -312,12 +310,12 @@ C
  25   CONTINUE
 C
 C
-C-----2- TRI PAR BOITES DES ELEMENTS ET DES NOEUDS
+C-----2- SORTING BY BOXES OF ELEMENTS AND NODES
 C
       NB_N_B = 1
       I_MEM = 0
-C SI ON A PAS ASSEZ DE MEMOIRE POUR LES PILES ON RECOMMENCE LE TRI
-C EN INCREMENTANT LE NB_N_B (NOMBRE DE NOEUDS PAR BOITE FINIE)
+C IF NOT ENOUGH MEMORY FOR STACKS, RESUME SORTING
+C BY INCREMENTING NB_N_B (NUMBER OF NODES PER FINAL BOX)
  100  CONTINUE
 C     POINTEUR  NOM                 TAILLE
 C     P1........Elt Bas Pile        NRTM
@@ -326,7 +324,7 @@ C     P21.......BPN                 NSN
 C     P22.......PN                  NSN
 C     P31.......ADDI                2000
 C
-C  POUR ONE MAILLAGE DE TOPOLOGIE CARRE LA TAILLE DE P2 PEUT ETRE ESTIMEE A:
+C  FOR A SQUARE TOPOLOGY MESH, THE SIZE OF P2 CAN BE ESTIMATED AT:
 C 4n:     NUMELC + 6*SQRT(NUMELC) + 8*LOG2(NUMELC) 
 C 3n:     NUMELTG + 6*SQRT(2*NUMELTG) + 8*LOG2(NUMELTG)
 C 
@@ -335,14 +333,14 @@ C 3n:     NUMELTG + 6*SQRT(2*NUMELTG) + 12*LOG(NUMELTG)
 C 
 C NUMELC + NUMELTG + 6*SQRT(NUMELC+2*NUMELTG) + 12*LOG(NUMELC+NUMELTG)
 C 
-C  POUR ONE MAILLAGE DE TOPOLOGIE LINEAIRE LA TAILLE DE P2 PEUT ETRE ESTIMEE A:
+C  FOR A LINEAR TOPOLOGY MESH, THE SIZE OF P2 CAN BE ESTIMATED AT:
 C NUMELC + NUMELTG + (NUMELC+NUMELTG)*(1 + 1/2 + 1/4 +...) + LOG2(NUMELC+NUMELTG)
 C 3*(NUMELC+NUMELTG) + LOG2(NUMELC+NUMELTG)
 C 3*(NUMELC+NUMELTG) + 300
 C
 C     IFIN= IP22+2000
 C
-C-----INITIALISATION DES ADRESSES ET X,Y,Z
+C-----INITIALIZATION OF ADDRESSES AND X,Y,Z
 C
 C     ADDE     ADDN     X      Y      Z
 C     1        1        XMIN   YMIN   ZMIN
@@ -384,7 +382,7 @@ C      IP21= IP2+2*MAXSIZ
       IP31= IP22+NUMNOD
 C     IFIN= IP22+2000
 C
-C-----INITIALISATION DES ADRESSES ET X,Y,Z
+C-----INITIALIZATION OF ADDRESSES AND X,Y,Z
 C
 C     ADDE     ADDN     X      Y      Z
 C     1        1        XMIN   YMIN   ZMIN
@@ -409,7 +407,7 @@ C
       NB_NC = NSN
       NB_EC = NRTM
 C
-C-----COPIE DES NOS DE SEGMENTS ET DE NOEUDS DANS MWA(IP1) ET IP21
+C-----COPY OF SEGMENT AND NODE NUMBERS INTO MWA(IP1) AND IP21
 C
       DO 120 I=1,NB_EC
         MWA(IP1+I-1) = I
@@ -418,9 +416,9 @@ C
         MWA(IP21+I-1) = I
   140 CONTINUE
       END IF !(NSNE >0) THEN
-C-----DEBUT DE LA PHASE DE TRI 
+C-----BEGINNING OF THE SORTING PHASE
 C 
-C     TANT QUE IL RESTE UNE ADRESSE A TRIER
+C     AS LONG AS THERE IS AN ADDRESS TO SORT
 C------------------
   200 CONTINUE
 C------------------
@@ -488,14 +486,14 @@ C------------------
         RETURN
       ENDIF
 C     I_MEM = 1 ==> PAS ASSEZ DE MEMOIRE PILE
-C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATS
+C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATES
       IF(I_MEM==1)THEN
         NB_N_B = NB_N_B + 1
         I_MEM = 0
         GO TO 100
       ENDIF
       IF(I_ADD/=0) GO TO 200
-C     FIN BOUCLE TANT QUE
+C     END OF WHILE LOOP
 C---------------------------------
       IF(J_STOK/=0)THEN
          LFT = 1
@@ -571,7 +569,7 @@ C
 #endif
 
 C
-C     MISE A ZERO DE TAG POUR I24PEN3
+C     ZEROING OF TAG FOR I24PEN3
 C
       DO I=1,NUMNOD+NSNE
         MWA(I)=0
@@ -589,14 +587,14 @@ C
       DEALLOCATE( TAG_REMOVED_NODE )
       RETURN
       END
-      !||====================================================================
-      !||    i24s1s2   ../starter/source/interfaces/inter3d1/i24buc1.F
-      !||--- called by ------------------------------------------------------
-      !||    i24buc1   ../starter/source/interfaces/inter3d1/i24buc1.F
-      !||    i24tri    ../starter/source/interfaces/inter3d1/i24tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    bitget    ../starter/source/interfaces/inter3d1/bitget.F
-      !||====================================================================
+!||====================================================================
+!||    i24s1s2   ../starter/source/interfaces/inter3d1/i24buc1.F
+!||--- called by ------------------------------------------------------
+!||    i24buc1   ../starter/source/interfaces/inter3d1/i24buc1.F
+!||    i24tri    ../starter/source/interfaces/inter3d1/i24tri.F
+!||--- calls      -----------------------------------------------------
+!||    bitget    ../starter/source/interfaces/inter3d1/bitget.F
+!||====================================================================
       SUBROUTINE I24S1S2(PROV_N,PROV_E,NBINFLG,MBINFLG,PENE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

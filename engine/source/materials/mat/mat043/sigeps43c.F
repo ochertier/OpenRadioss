@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps43c   ../engine/source/materials/mat/mat043/sigeps43c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    finter      ../engine/source/tools/curve/finter.F
-      !||    vinter      ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps43c   ../engine/source/materials/mat/mat043/sigeps43c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    finter      ../engine/source/tools/curve/finter.F
+!||    vinter      ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE SIGEPS43C(
      1     NEL      ,NUPARAM  ,NUVAR    ,NPF      ,TF       ,
      2     NFUNC    ,IFUNC    ,ISRATE   ,TIME     ,TIMESTEP ,
@@ -40,7 +40,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9     SOUNDSP  ,THK      ,PLA      ,UVAR     ,OFF      ,
      A     NGL      ,ETSE     ,HARDM    ,SIGY     ,GS       , 
      B     DPLA1    ,EPSP     ,SHF      ,INLOC    ,DPLANL   ,
-     C     SEQ      ,LOFF     )
+     C     SEQ      ,LOFF     ,ASRATE   ,EPSD_PG  )
 C=======================================================================
 C   Tabulated Hill material model
 C=======================================================================
@@ -56,6 +56,9 @@ C   I N P U T   A R G U M E N T S
 C-----------------------------------------------
       INTEGER NEL, NUPARAM, NUVAR, NFUNC ,ISRATE,INLOC
       INTEGER NGL(NEL),IFUNC(NFUNC)
+      my_real ,INTENT(IN) :: ASRATE
+      my_real ,DIMENSION(NEL) ,INTENT(IN)    :: EPSD_PG
+      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: EPSP
       my_real 
      .   TIME,TIMESTEP,UPARAM(NUPARAM),AREA(NEL),RHO0(NEL),EINT(NEL,2),
      .   THKLY(NEL),PLA(NEL),EPSPXX(NEL),EPSPYY(NEL),GS(NEL),SHF(NEL),
@@ -77,8 +80,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I N P U T   O U T P U T   A R G U M E N T S 
 C-----------------------------------------------
-      my_real UVAR(NEL,NUVAR), OFF(NEL),THK(NEL),
-     .        DPLA1(NEL),EPSP(NEL)
+      my_real UVAR(NEL,NUVAR), OFF(NEL),THK(NEL),DPLA1(NEL)
 C-----------------------------------------------
 C   VARIABLES FOR FUNCTION INTERPOLATION 
 C-----------------------------------------------
@@ -92,21 +94,21 @@ C-----------------------------------------------
      .   IAD2(MVSIZ),IPOS2(MVSIZ),ILEN2(MVSIZ),
      .   JJ(MVSIZ),INDEX(MVSIZ)
       my_real 
-     .   A,B,S12,FAC,DEZZ,SIGZ,S1,S2,S3,DPLA,VM2,EPST,
+     .   A,B,S12,FAC,DEZZ,S1,S2,S3,EPST,
      .   A_1,A_2,A_3,P_1,P_2,P_3,PP1,PP2,PP3,DR,DR0,
      .   E(MVSIZ),A1(MVSIZ),A2(MVSIZ),G(MVSIZ),G3(MVSIZ),
      .   A01,A02,A03,A12,
      .   AXX(MVSIZ),AYY(MVSIZ),AXY(MVSIZ),A_XY(MVSIZ),
      .   DYDX1(MVSIZ),DYDX2(MVSIZ),RATE(MVSIZ,2),SVM(MVSIZ),
-     .   SVM0(MVSIZ),YLD(MVSIZ),Y1(MVSIZ),Y2(MVSIZ),
+     .   YLD(MVSIZ),Y1(MVSIZ),Y2(MVSIZ),
      .   YFAC(MVSIZ,2),NNU1,NU,NU2(MVSIZ),
      .   NU3(MVSIZ),NU4(MVSIZ),NU5(MVSIZ),JQ(MVSIZ),JQ2(MVSIZ),
      .   DPLA_I(MVSIZ),DPLA_J(MVSIZ),FAIL(MVSIZ),EPSMAX,
      .   EPSR1,EPSR2,S11(MVSIZ),S22(MVSIZ),
      .   B_1(MVSIZ),B_2(MVSIZ),B_3(MVSIZ),Q12(MVSIZ),Q21(MVSIZ),
-     .   ERR,F,DF,PLA_I,YLD_I,H(MVSIZ),
+     .   F,DF,YLD_I,H(MVSIZ),
      .   FISOKIN,HK(MVSIZ),FHK,FA01,FA02,FA03,NU1,
-     .   CE,EINF,ESCALE(MVSIZ),C1(MVSIZ),NORMXX,NORMYY,
+     .   CE,EINF,ESCALE(MVSIZ),NORMXX,NORMYY,
      .   DYDXE(MVSIZ)
       DATA NMAX/2/,NS/10/
 C=======================================================================
@@ -164,22 +166,8 @@ c------------------------------------------------------
            ENDIF                                                                    
         ENDDO
       ENDIF
-
 c--------------------------------------------------------------
-c      IF (TIME == ZERO) THEN  
-c        DO I=1,NEL            
-c          DO J=1,NRATE(I)     
-c            UVAR(I,J+4) = ONE
-c          ENDDO               
-c        ENDDO                 
-c      ENDIF                   
-C
-      DO I=1,NEL
-!        SIGOXX(I) = SIGOXX(I) - UVAR(I,2)
-!        SIGOYY(I) = SIGOYY(I) - UVAR(I,3)
-!        SIGOXY(I) = SIGOXY(I) - UVAR(I,4)
-        DPLA1(I) = ZERO           
-      ENDDO
+      DPLA1(1:NEL) = ZERO           
       DO I=1,NEL
         SIGNXX(I)=SIGOXX(I) - UVAR(I,2) +A1(I)*DEPSXX(I)+A2(I)*DEPSYY(I)
         SIGNYY(I)=SIGOYY(I) - UVAR(I,3) +A2(I)*DEPSXX(I)+A1(I)*DEPSYY(I)
@@ -190,12 +178,14 @@ C
         SOUNDSP(I) = SQRT(A1(I)/RHO0(I))
         ETSE(I) = ONE
 C-------------------
-C     STRAIN RATE
+C       STRAIN RATE
 C-------------------
         IF (ISRATE == 0) THEN
           EPSP(I) = HALF*( ABS(EPSPXX(I)+EPSPYY(I))
      .            + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
      .            + EPSPXY(I)*EPSPXY(I) ) )
+        ELSE
+          EPSP(I) = ASRATE*EPSD_PG(I) + (ONE-ASRATE)*EPSP(I)
         ENDIF
 C-------------------
 C     STRAIN 
@@ -287,7 +277,7 @@ C---------------------------
          I=INDEX(J)
          DPLA_J(I)=(SVM(I)-YLD(I))/(G3(I)+H(I))
          ETSE(I)= H(I)/(H(I)+E(I))
-C        +++cette partie peut etre neglige quand FHK est tres petit
+C        +++ This part can be Neglige when FHK is very small
          HK(I) = H(I)*FISOKIN
          FHK = FOUR_OVER_3*HK(I)/A1(I)
          FA01 =A01*FHK

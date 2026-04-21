@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spadasm0   ../engine/source/elements/sph/spadasm.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep    ../engine/source/elements/sph/sphprep.F
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox     ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    spadasm0   ../engine/source/elements/sph/spadasm.F
+!||--- called by ------------------------------------------------------
+!||    sphprep    ../engine/source/elements/sph/sphprep.F
+!||--- uses       -----------------------------------------------------
+!||    sphbox     ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPADASM0(
      1    X       ,V       ,MS      ,SPBUF   ,ITAB    ,
      2    KXSP    ,IXSP    ,NOD2SP  ,ISPCOND ,ISPSYM  ,
@@ -57,12 +57,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,N,INOD,JS,
+      INTEGER N,INOD,JS,
      .        IS,IC,NC,NS
       my_real
      .       XI,YI,ZI,
      .       OX,OY,OZ,NX,NY,NZ,
-     .       XS,YS,ZS,VXS,VYS,VZS,VN,DD
+     .       XS,YS,ZS,DD
 C-----------------------------------------------
        DO NC=1,NSPCOND
         IS=ISPCOND(3,NC)
@@ -92,7 +92,7 @@ C
          ENDIF
         ENDDO
 C
-C Particules symetriques de particules remotes
+C Symmetrical particles of remote particles
 C
         DO NS = 1+ITASK, NSPHR,NTHREAD
          JS=ISPSYMR(NC,NS)
@@ -115,13 +115,13 @@ C-------------------------------------------
       RETURN
       END
 C
-      !||====================================================================
-      !||    spadasm   ../engine/source/elements/sph/spadasm.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep   ../engine/source/elements/sph/sphprep.F
-      !||--- uses       -----------------------------------------------------
-      !||    sphbox    ../engine/share/modules/sphbox.F
-      !||====================================================================
+!||====================================================================
+!||    spadasm   ../engine/source/elements/sph/spadasm.F
+!||--- called by ------------------------------------------------------
+!||    sphprep   ../engine/source/elements/sph/sphprep.F
+!||--- uses       -----------------------------------------------------
+!||    sphbox    ../engine/share/modules/sphbox.F
+!||====================================================================
       SUBROUTINE SPADASM(
      1    X       ,V       ,MS      ,SPBUF   ,ITAB    ,
      2    KXSP    ,IXSP    ,NOD2SP  ,ISPCOND ,ISPSYM  ,
@@ -152,14 +152,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,N,INOD,JS,
+      INTEGER N,INOD,JS,
      .        IS,IC,NC,ISLIDE,NS
       my_real
      .       VXI,VYI,VZI,
      .       NX,NY,NZ,
      .       VXS,VYS,VZS,VN
 C-----------------------------------------------
-C   routine simplifiee (traitement sur XSPSYM effectue ds SPADASM0)
+C   Simplified routine (treatment on XSP Sym performs spadas M0)
       DO NC=1,NSPCOND
         IS=ISPCOND(3,NC)
         IC=ISPCOND(2,NC)
@@ -192,7 +192,7 @@ C
          ENDIF
         ENDDO
 C
-C Particules symetriques de particules remotes
+C Symmetrical particles of remote particles
 C
         DO NS = 1+ITASK,NSPHR,NTHREAD
          JS=ISPSYMR(NC,NS)

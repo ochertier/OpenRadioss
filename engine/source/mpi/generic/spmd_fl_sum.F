@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,19 +22,22 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 C
-      !||====================================================================
-      !||    spmd_fl_sum   ../engine/source/mpi/generic/spmd_fl_sum.F
-      !||--- called by ------------------------------------------------------
-      !||    bemsolvp      ../engine/source/fluid/bemsolvp.F
-      !||    daaacc        ../engine/source/fluid/daaacc.F
-      !||    daasolvp      ../engine/source/fluid/daasolvp.F
-      !||    incpflow      ../engine/source/fluid/incpflow.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_fl_sum           ../engine/source/mpi/generic/spmd_fl_sum.F
+!||--- called by ------------------------------------------------------
+!||    bemsolvp              ../engine/source/fluid/bemsolvp.F
+!||    daaacc                ../engine/source/fluid/daaacc.F
+!||    daasolvp              ../engine/source/fluid/daasolvp.F
+!||    incpflow              ../engine/source/fluid/incpflow.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_FL_SUM(LSUM, LEN, LSUMT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g

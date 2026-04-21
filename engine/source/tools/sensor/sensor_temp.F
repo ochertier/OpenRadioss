@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sensor_temp    ../engine/source/tools/sensor/sensor_temp.F
-      !||--- called by ------------------------------------------------------
-      !||    sensor_base    ../engine/source/tools/sensor/sensor_base.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod     ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sensor_temp    ../engine/source/tools/sensor/sensor_temp.F
+!||--- called by ------------------------------------------------------
+!||    sensor_base    ../engine/source/tools/sensor/sensor_base.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||    sensor_mod     ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SENSOR_TEMP(SENSOR   ,ISENS     ,IGRNOD   ) 
 c-----------------------------------------------------------------------
 !$COMMENT
@@ -62,8 +62,7 @@ C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------
       INTEGER :: I,IGN,ICRIT,TFLAG
-      my_real :: TSTART,TDELAY,TMIN,TEMP_MAX,TEMP_MIN,TEMP_AVG,INFINITY
-      PARAMETER (INFINITY = 1.0E20)
+      my_real :: TSTART,TDELAY,TMIN,TEMP_MAX,TEMP_MIN,TEMP_AVG
 c----------------------------------------------------------
 c     SENSOR%VAR(1)   = TEMP_MAX
 c     SENSOR%VAR(2)   = TEMP_MIN 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    int18_alloc     ../engine/source/interfaces/int18/int18_alloc.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    array_mod       ../common_source/modules/array_mod.F
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    tri7box         ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    int18_alloc     ../engine/source/interfaces/int18/int18_alloc.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    array_mod       ../common_source/modules/array_mod.F
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
+!||    tri7box         ../engine/share/modules/tri7box.F
+!||====================================================================
         SUBROUTINE INT18_ALLOC(NUMBER_INTER18,INTER18_LIST,MULTI_FVM,IPARI,XCELL_REMOTE, NSPMD)
 !$COMMENT
 !       INT18_ALLOC description
@@ -69,8 +69,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: N,NN,II,JJ,MY_SIZE,MY_SIZE_2,MY_SIZE_3
-        INTEGER :: ISU1,NBRIC,NSN,NTY,INACTI,NODE_ID,IBRIC,NODFI
+        INTEGER :: N,II,MY_SIZE,MY_SIZE_2,MY_SIZE_3
+        INTEGER :: NTY,INACTI,NODFI
         INTEGER :: P
 C-----------------------------------------------
         !   check if int18 + law151 is used in the model

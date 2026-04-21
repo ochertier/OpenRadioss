@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    iniparsen     ../starter/source/tools/sensor/iniparsen.F
-      !||--- called by ------------------------------------------------------
-      !||    inisen        ../starter/source/tools/sensor/inisen.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    iniparsen     ../starter/source/tools/sensor/iniparsen.F
+!||--- called by ------------------------------------------------------
+!||    inisen        ../starter/source/tools/sensor/inisen.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE INIPARSEN(SENSORS,NSECT,NINTER,NINTSUB,NRWALL,NRBODY)
 C-----------------------------------------------
 C   M o d u l e s
@@ -49,13 +49,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,NOSYS,ISECT,IINT,IRWAL,IRBOD,COMPTEUR,SENS_TYPE,
-     .   SECT_ID,INT_ID,SUB_ID,RWAL_ID,RBOD_ID
+      INTEGER I,NOSYS,ISECT,IINT,IRWAL,IRBOD,COMPTEUR,SENS_TYPE,SECT_ID,INT_ID,SUB_ID,RWAL_ID,RBOD_ID
       INTEGER, DIMENSION(0:NSECT+NINTER+NINTSUB+NRWALL+NRBODY) :: TABLOCAL
 C-----------------------------------------------
 C     Special treatment of sensors with Parith/on (type 6,11,12,13)
 C     Tabsensor(i) pointe vers les interfaces/sections/rwalls/rbodies concernees 
-C     par les sensors type force
+C     by sensors of type force
 c=======================================================================
       TABLOCAL(:) = 0
 c

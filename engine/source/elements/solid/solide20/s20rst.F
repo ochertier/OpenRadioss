@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-      !||====================================================================
-      !||    s20rst     ../engine/source/elements/solid/solide20/s20rst.F
-      !||--- called by ------------------------------------------------------
-      !||    s20forc3   ../engine/source/elements/solid/solide20/s20forc3.F
-      !||    s20ke3     ../engine/source/elements/solid/solide20/s20ke3.F
-      !||====================================================================
+!||====================================================================
+!||    s20rst     ../engine/source/elements/solid/solide20/s20rst.F
+!||--- called by ------------------------------------------------------
+!||    s20forc3   ../engine/source/elements/solid/solide20/s20forc3.F
+!||    s20ke3     ../engine/source/elements/solid/solide20/s20ke3.F
+!||====================================================================
       SUBROUTINE S20RST(R,S,T,
      2   NI   ,DNIDR ,DNIDS ,DNIDT )
 C-----------------------------------------------
@@ -42,7 +42,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I
       my_real
      .  U_M_R,U_P_R,U_M_S,U_P_S,U_M_T,U_P_T,
      .  UMS_UMT,UMS_UPT,UPS_UMT,UPS_UPT,

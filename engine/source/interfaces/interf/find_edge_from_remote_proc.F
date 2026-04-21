@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    find_edge_from_remote_proc    ../engine/source/interfaces/interf/find_edge_from_remote_proc.F
-      !||--- called by ------------------------------------------------------
-      !||    spmd_exch_deleted_surf_edge   ../engine/source/mpi/interfaces/spmd_exch_deleted_surf_edge.F
-      !||--- calls      -----------------------------------------------------
-      !||    check_edge_state              ../engine/source/interfaces/interf/check_edge_state.F
-      !||    get_local_node_id             ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||--- uses       -----------------------------------------------------
-      !||    nodal_arrays_mod              ../engine/source/engine/node_spliting/nodal_arrays.F90
-      !||    shooting_node_mod             ../engine/share/modules/shooting_node_mod.F
-      !||====================================================================
+!||====================================================================
+!||    find_edge_from_remote_proc    ../engine/source/interfaces/interf/find_edge_from_remote_proc.F
+!||--- called by ------------------------------------------------------
+!||    spmd_exch_deleted_surf_edge   ../engine/source/mpi/interfaces/spmd_exch_deleted_surf_edge.F
+!||--- calls      -----------------------------------------------------
+!||    check_edge_state              ../engine/source/interfaces/interf/check_edge_state.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod                   ../common_source/modules/elements/element_mod.F90
+!||    intbufdef_mod                 ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    nodal_arrays_mod              ../common_source/modules/nodal_arrays.F90
+!||    shooting_node_mod             ../engine/share/modules/shooting_node_mod.F90
+!||====================================================================
         SUBROUTINE FIND_EDGE_FROM_REMOTE_PROC(SHOOT_STRUCT,NB_EDGE,LIST_NODE,INTBUF_TAB,NODES,
      .                                        NEWFRONT,IPARI,GEO,
      .                                        IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
@@ -48,6 +49,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
         USE nodal_arrays_mod
         USE INTBUFDEF_MOD   
         USE SHOOTING_NODE_MOD
+        use element_mod , only : nixs,nixc,nixt,nixp,nixr,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

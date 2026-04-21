@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C new routine (starter input format >= 4.4)
-      !||====================================================================
-      !||    volpvga   ../engine/source/airbag/volpvg.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol0   ../engine/source/airbag/monvol0.F
-      !||====================================================================
+!||====================================================================
+!||    volpvga   ../engine/source/airbag/volpvg.F
+!||--- called by ------------------------------------------------------
+!||    monvol0   ../engine/source/airbag/monvol0.F
+!||====================================================================
       SUBROUTINE VOLPVGA(IVOLU  ,RVOLU   ,VOL  , FSAV    ,NVENT   ,
      .                  IBAGHOL ,RBAGHOL ,PMAIN, WFEXT )
 C-----------------------------------------------
@@ -50,13 +50,11 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IDEF,IV, II
-      my_real
-     .   VINC,GAMA,PRES,PMAX,VEPS,AREA,POLD,VOLD,
-     .   Q,QOLD,DV,AMU,ROT,
-     .   AMTOT,AMTOT_OLD,ENERGY,ENERG_OLD,DMOUT,DEOUT,FAC,
-     .   PDEF,DTPDEFC,M0, VOL0
-      my_real
-     .   TRELAX,DEIN, PEXT, PINI, CV, TEMPERATURE
+      my_real VINC,GAMA,PRES,PMAX,VEPS,AREA,POLD,VOLD,
+     .        Q,QOLD,DV,AMU,ROT,
+     .        AMTOT,ENERGY,ENERG_OLD,DMOUT,DEOUT,FAC,
+     .        PDEF,DTPDEFC,M0, VOL0
+      my_real TRELAX,DEIN, PEXT, PINI, CV, TEMPERATURE
       INTEGER :: IEQUI
       my_real :: MIN_TVENT
       DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
@@ -109,7 +107,7 @@ C
          IF (IEQUI == 0 .OR. TRELAX == ZERO) THEN
             AMTOT=AMTOT-DMOUT*DT1
 C     
-C     CALCUL DE L ENERGIE PUIS DE LA PRESSION
+C     CALCULATION OF ENERGY THEN PRESSURE
             FAC  = HALF*(GAMA-ONE)*DV
             IF(TRELAX == ZERO .OR. TT > TRELAX)THEN
                DEIN = ZERO
@@ -192,18 +190,18 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    volpvgb         ../engine/source/airbag/volpvg.F
-      !||--- called by ------------------------------------------------------
-      !||    monvol0         ../engine/source/airbag/monvol0.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_u_func      ../engine/source/user_interface/ufunc.F
-      !||    spmd_exch_fr6   ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
-      !||    sum_6_float     ../engine/source/system/parit.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    volpvgb         ../engine/source/airbag/volpvg.F
+!||--- called by ------------------------------------------------------
+!||    monvol0         ../engine/source/airbag/monvol0.F
+!||--- calls      -----------------------------------------------------
+!||    get_u_func      ../engine/source/user_interface/ufunc.F
+!||    spmd_exch_fr6   ../engine/source/mpi/kinematic_conditions/spmd_exch_fr6.F
+!||    sum_6_float     ../engine/source/system/parit.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE VOLPVGB(IVOLU ,RVOLU   ,VOL     ,FSAV    ,NVENT   ,
      .                 IBAGHOL ,RBAGHOL ,NORMAL  ,NN      ,IGRSURF ,
      .                 IPARG   ,ELBUF_TAB,FR_MV, IGROUPC,IGROUPTG)
@@ -241,13 +239,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, K,IDEF,KK,PMAIN,
-     .   II,IPVENT,NNC,KAD,IPORT,IPORP,IPORA,
-     .   IOFF,NG,NEL,ISTRA,IEXPAN,IOK
+      INTEGER K,IDEF,KK,PMAIN,
+     .        II,IPVENT,NNC,KAD,IPORT,IPORP,IPORA,
+     .        IOFF,NG,NEL,ISTRA,IEXPAN,IOK
 
       my_real
      .   GAMA, PEXT, PDEF, AVENT, VOL, VINC,
-     .   AMTOT, ENERGY, P, RO, TEMP(4), M0, VOL0,
+     .   AMTOT, ENERGY, P, RO,
      .   U, DEOUT, DMOUT, TVENT,AREA, PCRIT, AOUTOT,
      .   APVENT,AOUT,FLOUT,DE,DERI,DTPDEFI,DTPDEFC,
      .   F1(NN),SCALT,SCALP,SCALS
@@ -279,7 +277,7 @@ C
        RO    = AMTOT/(VOL-VINC)
        PCRIT = P*(TWO/(GAMA+ONE))**(GAMA/(GAMA-ONE))
 C
-C      FLUX SORTANT PAR LES TROUS
+C      OUTGOING FLUX THROUGH THE HOLES
 C
        AOUTOT=ZERO
        DO II = 1, NVENT

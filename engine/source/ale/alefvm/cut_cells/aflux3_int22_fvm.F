@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    aflux3_int22_fvm   ../engine/source/ale/alefvm/cut_cells/aflux3_int22_fvm.F
-      !||--- called by ------------------------------------------------------
-      !||    aflux0             ../engine/source/ale/aflux0.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_barrier         ../engine/source/system/machine.F
-      !||--- uses       -----------------------------------------------------
-      !||    alefvm_mod         ../common_source/modules/ale/alefvm_mod.F
-      !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    i22bufbric_mod     ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||    i22tri_mod         ../common_source/modules/interfaces/cut-cell-search_mod.F
-      !||====================================================================
-      SUBROUTINE AFLUX3_INT22_FVM(
-     .           PM         , IXS    , V        , FLUX     , FLU1    ,
-     .           VEUL       , IPARG  , ELBUF_TAB, ITASK    ,
-     .           NV46       , IPM    , X        , W)
+!||====================================================================
+!||    aflux3_int22_fvm   ../engine/source/ale/alefvm/cut_cells/aflux3_int22_fvm.F
+!||--- called by ------------------------------------------------------
+!||    aflux0             ../engine/source/ale/aflux0.F
+!||--- calls      -----------------------------------------------------
+!||    my_barrier         ../engine/source/system/machine.F
+!||--- uses       -----------------------------------------------------
+!||    alefvm_mod         ../common_source/modules/ale/alefvm_mod.F
+!||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod        ../common_source/modules/elements/element_mod.F90
+!||    i22bufbric_mod     ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||    i22tri_mod         ../common_source/modules/interfaces/cut-cell-search_mod.F
+!||====================================================================
+      SUBROUTINE AFLUX3_INT22_FVM( PM         , IXS      , FLUX     , FLU1    ,
+     .                             IPARG      , ELBUF_TAB, ITASK    ,
+     .                             NV46       , IPM      , X        , W       ,
+     .                             s_flux)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -47,7 +48,7 @@ C
 C This subroutine is computing fluxes for cut cells.
 C Result are stored in cut cell buffer (currently called BRICK_LIST) 
 C Main Cell flux is already computed with the usual
-C subroutine (EFLUX3)
+C SUBROUTINE (EFLUX3)
 C All Cell not in cut cell buffer only have uncut adjacent cells. Since
 C a cut cell has all its adjacent cells in the cut cell buffer.
 C Cells in cut cell buffer might have adjacent cut cells.
@@ -66,6 +67,7 @@ C-----------------------------------------------
       USE I22TRI_MOD 
       USE ELBUFDEF_MOD 
       USE ALEFVM_MOD          
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -86,43 +88,36 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      integer, intent(in) :: s_flux !< first dimension of flux array
       INTEGER :: IXS(NIXS,*), IPARG(NPARG,*),ISILENT, NV46,IPM(NPROPMI,*)
-      my_real :: PM(NPROPM,*), V(3,*), FLUX(6,*), FLU1(*),VEUL(LVEUL,*),X(3,*)
+      my_real :: PM(NPROPM,*),FLUX(s_flux,6), FLU1(*),X(3,*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP),TARGET :: ELBUF_TAB
       my_real, INTENT(IN) :: W(3,NUMNOD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER MAT, MLW, NC(8), I, IE,J, K, Kv,L,ITASK, IDm, IDV, IDV2, IFLAG,IFV,IFvv,IC,II
-      INTEGER ID, IDvm, IBvm, NGvm, IEvm, IEV, Jm, IMAT, IALEFVM_FLG
-      INTEGER IB,IBv,IBvv, NIN, NBCUT,NBCUTv, ICELL,NCELL,NCELLv,FV,NGv,NGm, IPOS,NadjCell
-      my_real
-     .   NX(6),NY(6), NZ(6),
-     .   VX1(MVSIZ), VX2(MVSIZ), VX3(MVSIZ), VX4(MVSIZ), VX5(MVSIZ), VX6(MVSIZ),
-     .   VY1(MVSIZ), VY2(MVSIZ), VY3(MVSIZ), VY4(MVSIZ), VY5(MVSIZ), VY6(MVSIZ), VZ1(MVSIZ), VZ2(MVSIZ),
-     .   VZ3(MVSIZ), VZ4(MVSIZ), VZ5(MVSIZ), VZ6(MVSIZ), VD(3,8),cellFLUX(6,9,NB,5),
-     .   UPW(1),REDUC,UPWL(6),MLN
-      my_real :: RATIOFACE(6), VF(3), Norm(3,6), LNorm(6),TERM2
-      INTEGER :: NBF,NBL, MCELL,MNOD,iNOD,NNOD(6),ICELLv,ICELLvv, numnod_, numnod_V
-      INTEGER,DIMENSION(:),   POINTER     :: pIsMain, pIsMainV  
-      INTEGER,                POINTER     :: pNum, pNumv
+      INTEGER MAT, MLW, NC(8), I, IE,J, K, Kv,L,ITASK, IDm, IDV, II
+      INTEGER IDvm, IBvm, NGvm, IEvm, IEV, Jm, IMAT, IALEFVM_FLG
+      INTEGER IB,IBv, NIN, NBCUT, ICELL,NCELL,NGm
+      my_real :: cellFLUX(6,9,NB,5),REDUC,UPWL(6)
+      my_real :: VF(3), Norm(3,6), LNorm(6),TERM2
+      INTEGER :: NBF,NBL, MCELL,iNOD,ICELLv, numnod_, numnod_V
       TYPE(G_BUFEL_)  ,POINTER            :: GBUF   
-      my_real                             :: AREA , BAK , PHI , SGN, FACE , Z(3), Zadj(3), ZZadj_, CF(3), ZCf(3),ZZadj(3)
+      my_real                             :: FACE , Z(3), Zadj(3), ZZadj_, CF(3), ZCf(3),ZZadj(3)
       my_real                             :: PS, LAMBDA
-      INTEGER,POINTER                     :: pMainID, pMainIDv 
       INTEGER                             :: NUM, NADJ, IADJ, JV, NG, IE_M, IEm, IBm
       my_real                             :: FACEv, DDVOL, VALEL(6), VALVOIS(6,6,5), SR1, SR2, SRF
       my_real :: Wface(3), WfaceV(3), WfaceB(3,6)
-      LOGICAL debug_outp,bFOUND
+      LOGICAL debug_outp
       INTEGER                             :: NC1,NC2,NC3,NC4,NC5,NC6,NC7,NC8
 C-----------------------------------------------
 C   P r e - C o n d i t i o n 
 C-----------------------------------------------
-      IF(INT22==0)RETURN      
+      IF(INT22 == 0)RETURN
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------      
-
+      IBVm = 0
       !======================================================!
       ! INITIALIZATIONS                                      !
       !======================================================! 
@@ -172,7 +167,7 @@ C-----------------------------------------------
         !======================================================!
         ! RESET FLUXES                                         !
         !======================================================!
-        FLUX(1:6,IE) = ZERO
+        FLUX(IE,1:6) = ZERO
         FLU1(IE)     = ZERO
         
         !======================================================!
@@ -299,7 +294,7 @@ C-----------------------------------------------
               IALEFVM_FLG                   = IPM(251,IMAT)
               IF(ALEFVM_Param%IFORM/=0)IALEFVM_FLG = ALEFVM_Param%IFORM !for debug purpose if set in alefvm_init.F
               
-              
+              VF = ZERO 
               SELECT CASE(ALEFVM_Param%ISOLVER)
                 CASE(1)
                   !CENTERED FVM - U average              
@@ -469,7 +464,7 @@ C                 endif
               ENDDO
               Face                          = BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Surf
               IF(IBv==0)THEN
-                !calcul de facette
+                !calculation of facet
                 FaceV                       = Face
                 NUMNOD_v                    = 8
                 Kv                          = 1
@@ -483,8 +478,8 @@ C                 endif
                 ENDDO   
               ENDIF
               Face                          = min(Face,FaceV)
-              If(K==0 .OR. Kv==0) Face = ZERO !facette non communicante si pas de noeud de brique.
-              IF(IBv/=0 .AND. IBm==IBvm) Face=ZERO         !blocage flux entre le main et son escalve
+              If(K==0 .OR. Kv==0) Face = ZERO !non-communicating facet if no brick node.
+              IF(IBv/=0 .AND. IBm==IBvm) Face=ZERO         !blockage of flow between the master and its secondary
               cellFLUX(J,ICELL,IB,IADj)     = Face * cellFLUX(J,ICELL,IB,IADj)
               brick_list(nin,ib)%POLY(icell)%FACE(j)%Adjacent_FLUX(iadj) = cellFLUX(J,ICELL,IB,IADj)
             ENDDO!next IADj
@@ -548,9 +543,11 @@ C                 endif
           BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Adjacent_upwFLUX (3)  = ZERO
           BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Adjacent_upwFLUX (4)  = ZERO
           BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Adjacent_upwFLUX (5)  = ZERO
+          BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Adjacent_upwFLUX_mat(1:5,0:4) = ZERO
           ENDDO!next J
           
           BRICK_LIST(NIN,IB)%POLY(ICELL)%Adjacent_FLU1         = ZERO
+          BRICK_LIST(NIN,IB)%POLY(ICELL)%Adjacent_FLU1_mat(0:4)  = ZERO
           !======================================================!
           !  MONOMATERIAL UPWIND TREATMENT                       !          
           !======================================================!          
@@ -561,7 +558,7 @@ C                 endif
           DDVOL     = ZERO
           DO J=1,6
             NADJ   = BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%NAdjCell
-            ICLOSE = BRICK_LIST(NIN,IB)%ClosedSurf(J)   !pour l'hypothese de surface fermee : double coupe sur la facette et pas de partitionnement de l'autre cote => ON FERME.
+            ICLOSE = BRICK_LIST(NIN,IB)%ClosedSurf(J)   !for the hypothesis of closed surface: double cut on the facet and no partitioning on the other side => CLOSED.
             IF(ICLOSE==1) NADJ=0
             DO IADJ = 1,NADJ
               IDV    = BRICK_LIST(NIN,IB)%Adjacent_Brick(J,1)
@@ -580,8 +577,11 @@ C                 endif
               ENDIF 
               BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Adjacent_upwFLUX(IADJ) = 
      .         cellFLUX(J,ICELL,IB,IADJ)-UPWL(J)*ABS(cellFLUX(J,ICELL,IB,IADJ))
+              BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Adjacent_upwFLUX_mat(IADJ,0) = 
+     .         BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Adjacent_upwFLUX(IADJ)     
               BRICK_LIST(NIN,IB)%POLY(ICELL)%Adjacent_FLU1 = 
      .        BRICK_LIST(NIN,IB)%POLY(ICELL)%Adjacent_FLU1 + cellFLUX(J,ICELL,IB,IADJ)+UPWL(J)*ABS(cellFLUX(J,ICELL,IB,IADJ))
+              BRICK_LIST(NIN,IB)%POLY(ICELL)%Adjacent_FLU1_mat(0)  = BRICK_LIST(NIN,IB)%POLY(ICELL)%Adjacent_FLU1
               !-----DDVOL
               DDVOL = DDVOL + cellFLUX(J,ICELL,IB,IADJ) 
               !-----DDVOL*DT IS SUM FOR INCOMING AND OUTCOMING VOLUMES             

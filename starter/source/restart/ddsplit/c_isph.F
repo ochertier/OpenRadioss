@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    c_isph    ../starter/source/restart/ddsplit/c_isph.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit   ../starter/source/restart/ddsplit/ddsplit.F
-      !||====================================================================
+!||====================================================================
+!||    c_isph    ../starter/source/restart/ddsplit/c_isph.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit   ../starter/source/restart/ddsplit/ddsplit.F
+!||====================================================================
       SUBROUTINE C_ISPH(KXSP,CEPSP,PROC,NUMSPH_L,
      .                  SLONFSPH_L,SLPRTSPH,SLPRTSPH_L,IPARTSP,
      .      SSPHVELN_L,NSPHSOL_L,FIRST_SPHSOL_L)
@@ -66,7 +66,7 @@ C
 C
       NUMSPH_L = NB_L
 C
-c inlet spmd calcul SLONFSPH_L
+c inlet spmd calculation SLONFSPH_L
       SLONFSPH_L = 0
 
       DO IPRT=1,NPART

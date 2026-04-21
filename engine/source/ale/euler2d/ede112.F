@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ede112                 ../engine/source/ale/euler2d/ede112.F
-      !||--- called by ------------------------------------------------------
-      !||    qforc2                 ../engine/source/elements/solid_2d/quad/qforc2.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||====================================================================
-      SUBROUTINE EDE112(PM  ,V   ,VEUL ,X   ,IXQ ,ALE_CONNECT ,
-     .                  WYZ ,DYZ ,DZY  ,EYY ,EZZ ,ETT         ,EYZ ,EYT ,EZT)
+!||====================================================================
+!||    ede112                 ../engine/source/ale/euler2d/ede112.F
+!||--- called by ------------------------------------------------------
+!||    qforc2                 ../engine/source/elements/solid_2d/quad/qforc2.F
+!||--- uses       -----------------------------------------------------
+!||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+!||    element_mod            ../common_source/modules/elements/element_mod.F90
+!||====================================================================
+      SUBROUTINE EDE112(PM  ,V   ,X   ,IXQ ,ALE_CONNECT ,
+     .                  WYZ ,DYZ ,DZY  ,EYY ,EZZ )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
+      use element_mod , only : nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,7 +59,7 @@ C-----------------------------------------------
 !  (1:3, NUMNOD+1:) additional nodes (also on adjacent domains but connected to the boundary of the current domain)
       my_real,INTENT(IN) :: X(3,SX/3)
 !
-      my_real,INTENT(IN) :: V(3,NUMNOD), VEUL(10,*), PM(NPROPM,NUMMAT), ETT(*), EYZ(*), EYT(*), EZT(*)
+      my_real,INTENT(IN) :: V(3,NUMNOD), PM(NPROPM,NUMMAT)
       my_real,INTENT(INOUT) :: EYY(*),EZZ(*),DYZ(*), DZY(*),WYZ(*)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
 C-----------------------------------------------

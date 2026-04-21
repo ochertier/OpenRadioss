@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i20pwr3ae    ../starter/source/interfaces/inter3d1/i20pwr3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20ini3      ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod   ../starter/share/modules1/format_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    i20pwr3ae    ../starter/source/interfaces/inter3d1/i20pwr3.F
+!||--- called by ------------------------------------------------------
+!||    i20ini3      ../starter/source/interfaces/inter3d1/i20ini3.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod   ../starter/share/modules1/format_mod.F90
+!||====================================================================
       SUBROUTINE I20PWR3AE(ITAB  ,INACTI,CAND_M,CAND_S,
      2                   STFS  ,STFM  ,XANEW ,NSV   ,IWPENE,
      3                   N1    ,N2    ,M1    ,M2    ,NX    ,
@@ -59,11 +59,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IS, IM
+      INTEGER I
 C     REAL
       my_real
      .     PENE(MVSIZ), 
-     .     PENEOLD, S2, D, PPLUS,PS2, PENMAX
+     .     PENEOLD, S2,PS2, PENMAX
 C-----------------------------------------------
 C
 
@@ -95,19 +95,19 @@ C
             PENE(I) = PENE(I) + EM8*PENE(I)
             PENMAX = FPENMAX*GAPV(I)
             IF (INACTI == 1 .OR. PENE(I) > PENMAX) THEN
-C               DESACTIVATION DES NOEUDS
+C               Deactivation of nodes
                 IF (PENE(I) > PENMAX) 
      .          WRITE(IOUT,'(A,1PG20.13,A)')
      .                ' MAX INITIAL PENETRATION ',PENMAX,' IS REACHED'
                 WRITE(IOUT,'(A)')' SECONDARY STIFFNESS IS SET TO ZERO'
                 STFS(CAND_S(I)) = ZERO
             ELSE IF(INACTI==2) THEN
-C               DESACTIVATION DES ELEMENTS
+C               Deactivation of elements
                 WRITE(IOUT,'(A)')'MAIN STIFFNESS IS SET TO ZERO'
                 STFM(CAND_M(I)) = ZERO
             ELSE IF(INACTI==6) THEN
 C             INACTI==6
-C               CHANGE LES COORDONNEES DES NOEUDS SECONDARY
+C               Change coordinates of secondary nodes
                 WRITE(IOUT,'(A)')'NODE COORD IS CHANGED AS PROPOSED'
                 PS2 = HALF*PENE(I)
                 PENEOLD = SQRT( (XANEW(1,N1(I))-X(1,N1(I)))**2 +
@@ -126,7 +126,7 @@ C               CHANGE LES COORDONNEES DES NOEUDS SECONDARY
                   XANEW(2,N2(I)) = X(2,N2(I))+PS2*NY(I)
                   XANEW(3,N2(I)) = X(3,N2(I))+PS2*NZ(I)
                 ENDIF
-C               CHANGE LES COORDONNEES DES NOEUDS MAIN
+C               Change coordinates of main nodes
                 WRITE(IOUT,'(A)')'SEG. COORD IS CHANGED AS PROPOSED'
                 PENEOLD = SQRT( (XANEW(1,M1(I))-X(1,M1(I)))**2 +
      .                          (XANEW(2,M1(I))-X(2,M1(I)))**2 +
@@ -155,16 +155,16 @@ C
      . ' POSSIBLE NEW COORDINATES OF SECONDARY NODES')
       RETURN
       END
-      !||====================================================================
-      !||    i20pwr3a               ../starter/source/interfaces/inter3d1/i20pwr3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i20pwr3a               ../starter/source/interfaces/inter3d1/i20pwr3.F
+!||--- called by ------------------------------------------------------
+!||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I20PWR3A(ITAB,INACTI,CAND_E,CAND_N,STFN,
      1                  STF ,XANEW   ,NSV   ,IWPENE,IWRN ,
      2                  CAND_EN,CAND_NN,TAG,NOINT,GAPV ,NTY,
@@ -212,9 +212,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IS,IM
+      INTEGER I
 C     REAL
-      my_real ::PENEOLD,PPLUS,PS2,PENMAX
+      my_real ::PENEOLD,PS2,PENMAX
       my_real
      .  DN
 C-----------------------------------------------
@@ -268,18 +268,18 @@ C
             ENDIF
 
             IF (INACTI == 1 .OR. PENE(I) > PENMAX) THEN
-C               DESACTIVATION DES NOEUDS
+C               Deactivation of nodes
                 IF (PENE(I) > PENMAX) 
      .          WRITE(IOUT,'(A,I8,A,1PG20.13,A)')' NODE ',ITAB(NSVG(I)),
      .                ' : MAX INITIAL PENETRATION ',PENMAX,' IS REACHED'
                 WRITE(IOUT,'(A)')' SECONDARY STIFFNESS IS SET TO ZERO'
                 STFN(CAND_N(I)) = ZERO
             ELSE IF(INACTI==2) THEN
-C               DESACTIVATION DES ELEMENTS
+C               Deactivation of elements
                 WRITE(IOUT,'(A)')'ELEMENT STIFFNESS IS SET TO ZERO'
                 STF(CAND_E(I)) = ZERO
             ELSE IF(INACTI==3) THEN
-C               CHANGE LES COORDONNEES DES NOEUDS SECONDARY
+C               Change coordinates of secondary nodes
                 WRITE(IOUT,'(A)')'NODE COORD IS CHANGED AS PROPOSED'
                 PENEOLD = SQRT( (XANEW(1,NSV(CAND_N(I)))-XI(I))**2 +
      .                          (XANEW(2,NSV(CAND_N(I)))-YI(I))**2 +
@@ -290,7 +290,7 @@ C               CHANGE LES COORDONNEES DES NOEUDS SECONDARY
                   XANEW(3,NSV(CAND_N(I))) = ZI(I)+PENE(I)*N3(I)
                 ENDIF
             ELSE IF(INACTI==4) THEN
-C               CHANGE LES COORDONNEES DES NOEUDS MAIN
+C               Change coordinates of main nodes
                 WRITE(IOUT,'(A)')'SEG. COORD IS CHANGED AS PROPOSED'
                 PENEOLD = SQRT( (XANEW(1,IX1(I))-X1(I))**2 +
      .                          (XANEW(2,IX1(I))-Y1(I))**2 +
@@ -329,7 +329,7 @@ C
                 ENDIF
             ELSE IF(INACTI == 6) THEN
 C               INACTI == 6
-C               CHANGE LES COORDONNEES DES NOEUDS SECONDARY
+C               Change coordinates of secondary nodes
                 WRITE(IOUT,'(A)')'NODE COORD IS CHANGED AS PROPOSED'
                 PS2 = HALF*PENE(I)
                 PENEOLD = SQRT( (XANEW(1,NSV(CAND_N(I)))-XI(I))**2 +
@@ -340,7 +340,7 @@ C               CHANGE LES COORDONNEES DES NOEUDS SECONDARY
                   XANEW(2,NSV(CAND_N(I))) = YI(I)+PS2*N2(I)
                   XANEW(3,NSV(CAND_N(I))) = ZI(I)+PS2*N3(I)
                 ENDIF
-C               CHANGE LES COORDONNEES DES NOEUDS MAIN
+C               Change coordinates of main nodes
                 WRITE(IOUT,'(A)')'SEG. COORD IS CHANGED AS PROPOSED'
                 PENEOLD = SQRT( (XANEW(1,IX1(I))-X1(I))**2 +
      .                          (XANEW(2,IX1(I))-Y1(I))**2 +
@@ -391,16 +391,16 @@ C
      . ' IMPOSSIBLE TO CALCULATE NEW COORDINATES OF SECONDARY NODE',I8)
       RETURN
       END
-      !||====================================================================
-      !||    i20pwr3                ../starter/source/interfaces/inter3d1/i20pwr3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i20pwr3                ../starter/source/interfaces/inter3d1/i20pwr3.F
+!||--- called by ------------------------------------------------------
+!||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I20PWR3(ITAB,INACTI,CAND_E,CAND_N,STFN ,
      1                   STF ,X     ,NSV   ,IWPENE,IWRN ,
      2                   CAND_EN,CAND_NN,TAG,NOINT,GAPV ,
@@ -442,7 +442,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,IS,IM,JWARN
-      my_real PENEOLD,PPLUS,AAA
+      my_real PPLUS
       my_real DN
 C-----------------------------------------------
       JWARN = 0
@@ -537,13 +537,13 @@ C
      . ' IMPOSSIBLE TO CALCULATE NEW COORDINATES OF SECONDARY NODE',I8)
       RETURN
       END
-      !||====================================================================
-      !||    i20pwr3e     ../starter/source/interfaces/inter3d1/i20pwr3.F
-      !||--- called by ------------------------------------------------------
-      !||    i20ini3      ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod   ../starter/share/modules1/format_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    i20pwr3e     ../starter/source/interfaces/inter3d1/i20pwr3.F
+!||--- called by ------------------------------------------------------
+!||    i20ini3      ../starter/source/interfaces/inter3d1/i20ini3.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod   ../starter/share/modules1/format_mod.F90
+!||====================================================================
       SUBROUTINE I20PWR3E(ITAB  ,INACTI,CAND_M,CAND_S,
      2                   STFS  ,STFM  ,X     ,NSV   ,IWPENE,
      3                   N1    ,N2    ,M1    ,M2    ,NX    ,
@@ -577,7 +577,7 @@ C-----------------------------------------------
 C     REAL
       my_real
      .     PENE(MVSIZ), 
-     .     PENEOLD, S2, D, PPLUS
+     .      S2, PPLUS
 C-----------------------------------------------
 C
       JWARN = 0

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    build_msg              ../starter/source/output/message/build_msg.F
-      !||--- called by ------------------------------------------------------
-      !||    execargcheck           ../starter/source/starter/execargcheck.F
-      !||    starter0               ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    fredec2im              ../starter/source/output/message/fredec2im.F
-      !||    fredec3m               ../starter/source/output/message/fredec3m.F
-      !||    stock_msg              ../starter/source/output/message/stock_msg.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    build_msg              ../starter/source/output/message/build_msg.F
+!||--- called by ------------------------------------------------------
+!||    execargcheck           ../starter/source/starter/execargcheck.F
+!||    starter0               ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    fredec2im              ../starter/source/output/message/fredec2im.F
+!||    fredec3m               ../starter/source/output/message/fredec3m.F
+!||    stock_msg              ../starter/source/output/message/stock_msg.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE BUILD_MSG()
 C-----------------------------------------------
 C   M o d u l e s
@@ -53,7 +53,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       CHARACTER(LEN=NCHARLINE) :: LINE1,KEY,KEYST
-      INTEGER I,J,ID,ITYPE,INDX,SBUFMSG,ISTYPE
+      INTEGER I, J, ID, ITYPE, SBUFMSG
 C predim
       SMESSAGES=1
       DO I=1,100
@@ -80,7 +80,7 @@ C fill MESSAGES
       SBUFMSG=0
       ITYPE=0
       DO I=1,SMESSAGESFILE
-C remplir MESSAGES
+C fill messages
         LINE1=MESSAGESFILE(I)
         IF (LINE1(1:9)=='/MESSAGE/') THEN
           IF (ID>0.AND.ID<=SMESSAGESMAX.AND.ITYPE/=0) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,40 +20,40 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cmain3           ../engine/source/materials/mat_share/cmain3.F
-      !||--- called by ------------------------------------------------------
-      !||    c3forc3          ../engine/source/elements/sh3n/coque3n/c3forc3.F
-      !||    c3forc3_crk      ../engine/source/elements/xfem/c3forc3_crk.F
-      !||    cbaforc3         ../engine/source/elements/shell/coqueba/cbaforc3.F
-      !||    cdk6forc3        ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
-      !||    cdkforc3         ../engine/source/elements/sh3n/coquedk/cdkforc3.F
-      !||    cforc3           ../engine/source/elements/shell/coque/cforc3.F
-      !||    cforc3_crk       ../engine/source/elements/xfem/cforc3_crk.F
-      !||    czforc3          ../engine/source/elements/shell/coquez/czforc3.F
-      !||    czforc3_crk      ../engine/source/elements/xfem/czforc3_crk.F
-      !||--- calls      -----------------------------------------------------
-      !||    delamination     ../engine/source/properties/composite_options/stack/delamination.F
-      !||    finter           ../engine/source/tools/curve/finter.F
-      !||    layini           ../engine/source/elements/shell/coque/layini.F
-      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
-      !||    mulawglc         ../engine/source/materials/mat_share/mulawglc.F
-      !||    put_etfac        ../engine/source/elements/solid/solide8z/put_etfac.F
-      !||    thermexpc        ../engine/source/materials/mat_share/thermexpc.F
-      !||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod        ../engine/share/modules/drape_mod.F
-      !||    dt_mod           ../engine/source/modules/dt_mod.F
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    failwave_mod     ../common_source/modules/failwave_mod.F
-      !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mulawc_mod       ../engine/source/materials/mat_share/mulawc.F90
-      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
-      !||    stack_mod        ../engine/share/modules/stack_mod.F
-      !||    table_mod        ../engine/share/modules/table_mod.F
-      !||    timer_mod        ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    cmain3           ../engine/source/materials/mat_share/cmain3.F
+!||--- called by ------------------------------------------------------
+!||    c3forc3          ../engine/source/elements/sh3n/coque3n/c3forc3.F
+!||    c3forc3_crk      ../engine/source/elements/xfem/c3forc3_crk.F
+!||    cbaforc3         ../engine/source/elements/shell/coqueba/cbaforc3.F
+!||    cdk6forc3        ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
+!||    cdkforc3         ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+!||    cforc3           ../engine/source/elements/shell/coque/cforc3.F
+!||    cforc3_crk       ../engine/source/elements/xfem/cforc3_crk.F
+!||    czforc3          ../engine/source/elements/shell/coquez/czforc3.F
+!||    czforc3_crk      ../engine/source/elements/xfem/czforc3_crk.F
+!||--- calls      -----------------------------------------------------
+!||    delamination     ../engine/source/properties/composite_options/stack/delamination.F
+!||    finter           ../engine/source/tools/curve/finter.F
+!||    layini           ../engine/source/elements/shell/coque/layini.F
+!||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
+!||    mulawglc         ../engine/source/materials/mat_share/mulawglc.F
+!||    put_etfac        ../engine/source/elements/solid/solide8z/put_etfac.F
+!||    thermexpc        ../engine/source/materials/mat_share/thermexpc.F
+!||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod        ../engine/share/modules/drape_mod.F
+!||    dt_mod           ../engine/source/modules/dt_mod.F
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    failwave_mod     ../common_source/modules/failwave_mod.F
+!||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    mulawc_mod       ../engine/source/materials/mat_share/mulawc.F90
+!||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+!||    sensor_mod       ../common_source/modules/sensor_mod.F90
+!||    stack_mod        ../engine/share/modules/stack_mod.F
+!||    table_mod        ../engine/share/modules/table_mod.F
+!||    timer_mod        ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE CMAIN3 (TIMERS,
      1           ELBUF_STR ,JFT       ,JLT       ,NFT       ,IPARG      ,
      2           NEL       ,MTN       ,IPLA      ,ITHK      ,GROUP_PARAM,
@@ -65,7 +65,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      8           FOR       ,MOM       ,GSTR      ,FAILWAVE  ,FWAVE_EL   ,
      9           THK       ,EINT      ,IOFC      ,
      A           G         ,A11       ,A12       ,VOL0      ,INDXDEL    ,
-     B           NGL       ,ZCFAC     ,SHF       ,GS        ,EPSP       ,
+     B           NGL       ,ZCFAC     ,SHF       ,GS        ,EPSD_PG  ,
      C           KFTS      ,JHBE      ,ALPE      ,
      D           DIR_A     ,DIR_B     ,IGEO      ,  
      E           IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
@@ -83,7 +83,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      R           INDX_DRAPE,THKE      ,SEDRAPE   ,NUMEL_DRAPE,DT        ,
      Q           NCYCLE    , SNPC     ,STF       ,NXLAYMAX  ,IDEL7NOK   ,
      S           USERL_AVAIL, MAXFUNC ,VARNL_NPTTOT, SBUFMAT   ,SDIR_A    ,
-     T          SDIR_B  )
+     T           SDIR_B    ,FOR_G      ,SSP_EQ   ,IPART     ,LIPART1,
+     T           IPARTC    )
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -139,9 +140,9 @@ C-----------------------------------------------
       INTEGER , DIMENSION(SEDRAPE) :: INDX_DRAPE
       INTEGER, INTENT(IN) :: IDT_THERM
       my_real ,intent(in) :: THEACCFACT
-      my_real
-     .   PM(NPROPM,*), GEO(NPROPG,*),TF(*),THK(*),EINT(JLT,*),FOR(NEL,5), 
-     .   MOM(NEL,3),EPSP(*),GSTR(NEL,8),BUFMAT(*),G(*),A11(*),A12(*),VOL0(*),
+      my_real ,dimension(mvsiz) ,intent(in) :: EPSD_PG
+      my_real PM(NPROPM,*), GEO(NPROPG,*),TF(*),THK(*),EINT(JLT,*),FOR(NEL,5), 
+     .   MOM(NEL,3),GSTR(NEL,8),BUFMAT(*),G(*),A11(*),A12(*),VOL0(*),
      .   SHF(*),GS(*),SIGY(MVSIZ),RHO(MVSIZ),SSP(MVSIZ),VISCMX(MVSIZ),
      .   OFF(MVSIZ) ,THK0(MVSIZ) ,NU(MVSIZ),DT1C(MVSIZ),
      .   EXX(MVSIZ), EYY(MVSIZ), EXY(MVSIZ), EXZ(MVSIZ), EYZ(MVSIZ),
@@ -154,10 +155,11 @@ C-----------------------------------------------
      .   E1X(MVSIZ), E1Y(MVSIZ), E1Z(MVSIZ),
      .   E2X(MVSIZ), E2Y(MVSIZ), E2Z(MVSIZ),
      .   E3X(MVSIZ), E3Y(MVSIZ), E3Z(MVSIZ),OFFI(MVSIZ,*),
-     .   DIR1_CRK(*),DIR2_CRK(*),DMG_SCALE(MVSIZ),
+     .   DIR1_CRK(*),DIR2_CRK(*),
      .   F_DEF(MVSIZ,*),ALDT(MVSIZ),VARNL(NEL,*)
       my_real, DIMENSION(NEL), INTENT(IN) :: THKE
       my_real, dimension(mvsiz), intent(inout) :: fheat
+      my_real, dimension(mvsiz), intent(  out) :: SSP_EQ
       TYPE (TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
@@ -168,29 +170,28 @@ C-----------------------------------------------
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
       TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
       TYPE (DT_), INTENT(IN) :: DT
+      my_real, dimension(nel,5), intent(inout) :: FOR_G
+      integer, intent(in) :: LIPART1
+      
+      INTEGER, DIMENSION(LIPART1,NPART), INTENT(IN)     :: IPART
+      INTEGER, DIMENSION(NEL), INTENT(IN)           :: IPARTC
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IT,MX,IGTYP,IFUNC_ALPHA,IPMAT_IPLY,ILAY,LAYNPT_MAX,NLAY_MAX
-      INTEGER MAT_IPLY(MVSIZ,NPT)
+      INTEGER I,J,IT,MX,IGTYP,IFUNC_ALPHA,IPMAT_IPLY,ILAW,ILAY,LAYNPT_MAX,NLAY_MAX
+      INTEGER MAT_IPLY(MVSIZ,NPT),IDAMP_FREQ_RANGE
+      INTEGER MAT_USR,MAT_RAD
       INTEGER, DIMENSION(:) , ALLOCATABLE :: MATLY   !!  MATLY(MVSIZ*LAY_MAX)
       my_real, DIMENSION(:) , ALLOCATABLE :: THKLY   !!  THKLY(MVSIZ*LAY_MAX*LAYNPT_MAX)
       my_real, DIMENSION(:,:), ALLOCATABLE :: POSLY,THK_LY
-        !!         POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX) THK_LY(NEL,LAY_MAX*LAYNPT_MAX)
-      my_real
-     .   TSTAR(MVSIZ),DTEMP(MVSIZ),
-     .   SXX(MVSIZ),SYY(MVSIZ), SXY(MVSIZ),SYZ(MVSIZ),SZX(MVSIZ),
-     .   EPSXX(MVSIZ),EPSYY(MVSIZ),EPSXY(MVSIZ),EPSYZ(MVSIZ),EPSZX(MVSIZ),
-     .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
-     .   DEPSZX(MVSIZ), EPSPXX(MVSIZ),EPSPYY(MVSIZ),EPSPXY(MVSIZ),
-     .   EPSPYZ(MVSIZ), EPSPZX(MVSIZ),ETIMP(MVSIZ),TENS(NEL,5),ETH(MVSIZ)
-      my_real ALPHA,DF,DEINTTH,T0,TM,FSCAL_ALPHA,DM,ZSHIFT
-      INTEGER, DIMENSION(:) ,POINTER :: FLD_IDX
+      my_real DTEMP(MVSIZ),ETIMP(MVSIZ),TENS(NEL,5),ETH(MVSIZ)
+      my_real EPSYZ(MVSIZ),EPSZX(MVSIZ)
+      my_real ALPHA,DF,DEINTTH,FSCAL_ALPHA,DM,ZSHIFT
 C-------------------------------------
-      TYPE(BUF_LAY_) ,POINTER :: BUFLY
-      TYPE(BUF_FAIL_),POINTER :: FBUF
+ 
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
+      TYPE(BUF_DAMP_RANGE_)  ,POINTER :: DAMP_BUF
 C-----------------------------------------------
        my_real FINTER 
       EXTERNAL FINTER
@@ -199,6 +200,23 @@ C=======================================================================
       IGTYP=IGEO(11,PID(1))
       MX = MAT(JFT) 
       DM = GROUP_PARAM%VISC_DM   ! membrane damping
+      IF (IMPL_S>0) DM = ZERO
+      IDAMP_FREQ_RANGE = IPARG(93)
+      DAMP_BUF => ELBUF_STR%DAMP_RANGE
+      ZCFAC(1:MVSIZ,1:2) = ZERO
+      SSP_EQ = ZERO
+!
+      ! check material type used in shell layers    
+      mat_usr = 0
+      mat_rad = 0
+      do ilay=1,nlay
+        ilaw = elbuf_str%bufly(ilay)%ilaw
+        if (ilaw > 28 .and. ilaw < 32 .or. ilaw == 99 .or. ilaw == 200) then
+          mat_usr = 1
+        else
+          mat_rad = 1
+        end if
+      end do
 C--------------------------------------------------
 C     add source terme for law not user
       IF (JTHE > 0 .AND. (MTN < 28 .OR. MTN == 32)) THEN
@@ -226,16 +244,6 @@ c
           ENDDO 
         ENDIF 
       ENDIF    
-c-----Tstar computation for Jhonson cook failure : T* = (T-T0)/(TM-T0)----
-      IF (JTHE > 0) THEN
-        T0 = PM(79, MX) 
-        TM = PM(80, MX) 
-        DO I=JFT,JLT   
-           TSTAR(I)=MAX(ZERO,(TEMPEL(I)-T0)/(TM-T0))
-        ENDDO
-      ELSE
-        TSTAR(JFT:JLT) = ZERO
-      ENDIF  
 ! Npt_max
       LAYNPT_MAX = 1
       IF(IGTYP == 51 .OR. IGTYP == 52) THEN
@@ -264,11 +272,13 @@ c
      5       PID     ,TF      ,NPF     ,MTN     ,DT1C    ,A11     ,
      6       BUFMAT  ,SSP     ,RHO     ,VISCMX  ,IOFC    ,A12     ,
      7       INDXDEL ,NGL     ,ZCFAC   ,GS      ,SIGY    ,G       ,
-     8       THK0    ,EPSP    ,IPLA    ,IGEO    ,IPM     ,TABLE   ,
+     8       THK0    ,EPSD_PG,IPLA    ,IGEO    ,IPM     ,TABLE   ,
      9       IR      ,IS      ,F_DEF   ,ISMSTR  ,NU      ,VOL0    ,
-     A       KFTS    ,ZSHIFT  )
+     A       KFTS    ,ZSHIFT  ,IDAMP_FREQ_RANGE,MAT_ELEM,DAMP_BUF ,
+     B       FOR_G )
+             SSP_EQ(JFT:JLT) = SSP(JFT:JLT)
 c----------------------------
-      ELSE IF (MTN > 28 .AND. MTN < 32 .or. MTN == 99 .or. MTN == 200) THEN
+      ELSE IF (MAT_USR == 1) THEN
 c---    user material law libraries here
 c
         CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO     ,
@@ -282,22 +292,21 @@ c
      2       GSTR    ,THK     ,EINT    ,OFF     ,DIR_A   ,DIR_B   ,
      3       MAT     ,AREA    ,EXX     ,EYY     ,EXY     ,EXZ     ,
      4       EYZ     ,KXX     ,KYY     ,KXY     ,GEO     ,THK_LY  ,
-     5       PID     ,TF      ,NPF     ,MTN     ,DT1C    ,DM      ,
+     5       PID     ,TF      ,NPF     ,DT1C    ,DM      ,
      6       BUFMAT  ,SSP     ,RHO     ,VISCMX  ,IPLA    ,IOFC    ,
-     7       INDXDEL ,NGL     ,THKLY   ,MATLY   ,ZCFAC   ,NG      ,
-     8       SHF     ,GS      ,SIGY    ,THK0    ,EPSP    ,
+     7       INDXDEL ,NGL     ,THKLY   ,ZCFAC   ,NG      ,
+     8       SHF     ,SIGY    ,THK0    ,EPSD_PG,
      9       POSLY   ,IGEO    ,IPM     ,FAILWAVE,FWAVE_EL,
      A       IFAILURE,ALDT    ,TEMPEL  ,DIE     ,
      B       E1X     ,E1Y     ,E1Z     ,E2X     ,E2Y     ,E2Z     ,
      C       E3X     ,E3Y     ,E3Z     ,TABLE   ,IXFEM   ,ELCRKINI,
      D       DIR1_CRK,DIR2_CRK,IPARG   ,JHBE    ,ISMSTR  ,JTHE    ,
      E       TENS    ,IR      ,IS      ,NLAY    ,NPT     ,IXLAY   ,
-     F       IXEL    ,ITHK    ,F_DEF   ,ISHPLYXFEM,
-     G       ITASK   ,STACK%PM ,ISUBSTACK,STACK ,TSTAR   ,ALPE    ,
-     H       PLY_EXX ,PLY_EYY ,PLY_EXY ,PLY_EXZ ,PLY_EYZ ,PLY_F   ,
-     I       VARNL   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX,DT    )
+     F       IXEL    ,F_DEF   ,ITASK   ,STACK%PM ,ISUBSTACK,STACK ,
+     G       VARNL   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX,DT    ,SSP_EQ  ,
+     J       IPART   ,IPARTC  ) 
 cc----------------------------
-      ELSE   ! User-type Radioss laws , NPT > 0
+      ELSE   ! Radioss material laws , NPT > 0
 c----------------------------
 !
 !       position, thickness and material in integration points
@@ -309,14 +318,14 @@ c----------------------------
      .              NEL      ,THK_LY   ,INDX_DRAPE, SEDRAPE,NUMEL_DRAPE)
 c 
         CALL MULAWC(TIMERS,ELBUF_STR ,
-     1       JFT     ,JLT     ,NEL     ,PM      ,FOR     ,MOM     ,
+     1       JLT     ,NEL     ,PM      ,FOR     ,MOM     ,
      2       GSTR    ,THK     ,EINT    ,OFF     ,DIR_A   ,DIR_B   ,
      3       MAT     ,AREA    ,EXX     ,EYY     ,EXY     ,EXZ     ,
      4       EYZ     ,KXX     ,KYY     ,KXY     ,GEO     ,THK_LY  ,
      5       PID     ,TF      ,NPF     ,MTN     ,DT1C    ,DM      ,
      6       BUFMAT  ,SSP     ,RHO     ,VISCMX  ,IPLA    ,IOFC    ,
      7       INDXDEL ,NGL     ,THKLY   ,MATLY   ,ZCFAC   ,MAT_ELEM,
-     8       SHF     ,GS      ,SIGY    ,THK0    ,EPSP    ,
+     8       SHF     ,GS      ,SIGY    ,THK0    ,EPSD_PG ,VOL0    ,
      9       POSLY   ,IGEO    ,IPM     ,FAILWAVE,FWAVE_EL,
      A       IFAILURE,ALDT    ,TEMPEL  ,DIE     ,FHEAT   ,
      B       TABLE   ,IXFEM   ,ELCRKINI,
@@ -324,13 +333,15 @@ c
      E       DIR1_CRK,DIR2_CRK,IPARG   ,JHBE    ,ISMSTR  ,JTHE    ,
      F       TENS    ,IR      ,IS      ,NLAY    ,NPT     ,IXLAY   ,
      G       IXEL    ,ITHK    ,F_DEF   ,ISHPLYXFEM,
-     H       ITASK   ,ISUBSTACK,STACK ,TSTAR   ,ALPE    ,
+     H       ITASK   ,ISUBSTACK,STACK  ,ALPE    ,
      I       PLY_EXX ,PLY_EYY ,PLY_EXY ,PLY_EXZ ,PLY_EYZ ,PLY_F   ,
      J       VARNL   ,ETIMP   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX ,DT,
      K       NCYCLE  ,SNPC    ,STF,IMPL_S  ,IMCONV  ,NPROPGI,
      *       NPROPMI ,NPROPM  ,NPROPG,IMON_MAT,NUMGEO  ,
      *       NUMSTACK, DT1    ,TT  ,NXLAYMAX ,IDEL7NOK,USERL_AVAIL,
-     *       MAXFUNC,NUMMAT,VARNL_NPTTOT,    SBUFMAT ,SDIR_A  ,SDIR_B  ,NPARG)
+     *       MAXFUNC,NUMMAT,VARNL_NPTTOT,    SBUFMAT ,SDIR_A  ,SDIR_B  ,NPARG,
+     *       IDAMP_FREQ_RANGE,DAMP_BUF ,SSP_EQ  ,IPART  ,LIPART1,
+     T       IPARTC  ,NPART)
       ENDIF ! IF (NPT == 0) 
 C----------------------------------------------------------------------
       IF (IEXPAN > 0 .AND. JTHE > 0. AND. IDT_THERM==0) THEN
@@ -340,7 +351,7 @@ C----------------------------------------------------------------------
      3                  PM   ,NPT   ,AREA        ,A11   ,A12   ,
      4                  MAT  ,MTN   ,GBUF%EINTTH ,DIR_A ,IR    ,
      5                  IS   ,NLAY  ,THK         ,NEL   ,IGTYP ,
-     6                  NPF  , TF   , IPM        , TEMPEL ,DTEMP,
+     6                  NPF  , TF   , IPM        ,TEMPEL ,DTEMP,
      7                  THKLY ,POSLY,MOM, MATLY )    
       ENDIF
 
@@ -348,7 +359,10 @@ C----------------------------------------------------------------------
          DO I=JFT,JLT          
            DIE(I) = (EINT(I,1) + EINT(I,2) - DIE(I)) * PM(90,MAT(1))          
          ENDDO  
-       ENDIF  
+       ENDIF
+       IF (JTHE /= 0) THEN
+         GBUF%TEMP(1:NEL) = TEMPEL(1:NEL)
+       ENDIF
 C-------------------------------------------------------------------
 C     delamination  for new formulation of shells 
 C-----------------------------------------------

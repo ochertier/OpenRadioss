@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i14cmp          ../engine/source/interfaces/int14/i14cmp.F
-      !||--- called by ------------------------------------------------------
-      !||    intfop1         ../engine/source/interfaces/interf/intfop1.F
-      !||--- calls      -----------------------------------------------------
-      !||    i14can          ../engine/source/interfaces/int14/i14can.F
-      !||    i14dmp          ../engine/source/interfaces/int14/i14dmp.F
-      !||    i14ela          ../engine/source/interfaces/int14/i14ela.F
-      !||    i14frt          ../engine/source/interfaces/int14/i14frt.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    h3d_mod         ../engine/share/modules/h3d_mod.F
-      !||====================================================================
-      SUBROUTINE I14CMP(IPARI ,INTBUF_TAB ,IGRSURF ,BUFSF ,
+!||====================================================================
+!||    i14cmp          ../engine/source/interfaces/int14/i14cmp.F
+!||--- called by ------------------------------------------------------
+!||    intfop1         ../engine/source/interfaces/interf/intfop1.F
+!||--- calls      -----------------------------------------------------
+!||    i14can          ../engine/source/interfaces/int14/i14can.F
+!||    i14dmp          ../engine/source/interfaces/int14/i14dmp.F
+!||    i14ela          ../engine/source/interfaces/int14/i14ela.F
+!||    i14frt          ../engine/source/interfaces/int14/i14frt.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    h3d_mod         ../engine/share/modules/h3d_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    output_mod      ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE I14CMP(OUTPUT,IPARI ,INTBUF_TAB ,IGRSURF ,BUFSF ,
      2            A ,X ,V ,WA ,FSAV ,
      3            IN ,STIFN ,FCONT , MS ,FSKYI , 
      4            ISKY ,NPC ,PLD   ,H3D_DATA)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE OUTPUT_MOD, ONLY : OUTPUT_
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE GROUPDEF_MOD
@@ -66,12 +69,13 @@ C     REAL
      .   PLD(*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
+      TYPE(OUTPUT_) :: OUTPUT
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,K,IGI,IGS,IM,NSN,NSC,NSP
+      INTEGER NSN,NSC,NSP
       INTEGER NLO,NFRIC,NDAMP1,NDAMP2
 C-----------------------------------------------
 C     REAL
@@ -105,13 +109,12 @@ C-----------------------------------------------
      5      WA(2*NUMNOD+1) ,WA(3*NUMNOD+1) ,STF )
 C-----------------------------------------------
 C     Frottement calcule apres amortissement.
-      CALL I14FRT(A  ,X     ,V     ,INTBUF_TAB%KSURF ,IGRSURF  ,
+      CALL I14FRT(OUTPUT,A  ,X     ,V     ,INTBUF_TAB%KSURF ,IGRSURF  ,
      2      BUFSF ,NSC  ,WA(1) ,NSP   ,WA(NUMNOD+1) ,
      3      INTBUF_TAB%NSV,INTBUF_TAB%IMPACT,INTBUF_TAB%CIMP,INTBUF_TAB%NIMP,
      4      FRIC   ,NFRIC ,NPC    ,PLD  ,GAPMIN ,STF  ,
      5      WA(2*NUMNOD+1),WA(3*NUMNOD+1),INTBUF_TAB%VARIABLES(9),MS,STIFN ,
      6      FSAV   ,FCONT  ,FSKYI ,ISKY  ,H3D_DATA)
 C-----------------------------------------------
-9999  CONTINUE
       RETURN
       END

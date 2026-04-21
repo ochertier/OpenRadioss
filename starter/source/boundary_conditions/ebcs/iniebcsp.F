@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    iniebcsp       ../starter/source/boundary_conditions/ebcs/iniebcsp.F
-      !||--- called by ------------------------------------------------------
-      !||    iniebcsp0      ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    iniebcsp       ../starter/source/boundary_conditions/ebcs/iniebcsp.F
+!||--- called by ------------------------------------------------------
+!||    iniebcsp0      ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INIEBCSP(NSEG,NOD,ISEG,IELEM,IRECT,LISTE,LA,IPARG,ELBUF_STR,P0,X)
 C-----------------------------------------------
 C   M o d u l e s
@@ -54,7 +54,7 @@ C-----------------------------------------------
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C-----------------------------------------------
       GBUF => ELBUF_STR%GBUF
-C   Initialisation de la surface nodale
+C   Initialization of the nodal surface
           DO I=1,NOD
             LA(1,I)=ZERO
             LA(2,I)=ZERO
@@ -111,17 +111,20 @@ C
             ENDIF
           ENDDO
 C
-C Calcul pression initiale nodale
+C Calculation pression initiale nodale
 C
           DO I=1,NOD
             P0(I)=ZERO
           ENDDO
 
+        MFT = 0
+        KLT = 0
+        KTY = 0
         DO IS=1,NSEG
           KSEG=ABS(ISEG(IS))
           ORIENT=ZERO
           IF(KSEG /= 0)ORIENT=FLOAT(ISEG(IS)/KSEG)
-c         pression voisin
+c         neighboring pressure
           ESEG=IELEM(IS)
           DO N=1,NGROUP
             KTY = IPARG(5,N)

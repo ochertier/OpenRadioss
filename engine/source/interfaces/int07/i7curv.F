@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7norm    ../engine/source/interfaces/int07/i7curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i7mainf   ../engine/source/interfaces/int07/i7mainf.F
-      !||====================================================================
+!||====================================================================
+!||    i7norm    ../engine/source/interfaces/int07/i7curv.F
+!||--- called by ------------------------------------------------------
+!||    i7mainf   ../engine/source/interfaces/int07/i7mainf.F
+!||====================================================================
       SUBROUTINE I7NORM(NRTM,IRECT,NUMNOD,X,NOD_NORMAL,
      .                  NMN ,MSR  )
 C-----------------------------------------------
@@ -41,12 +41,12 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J ,N1,N2,N3,N4
+      INTEGER I  ,N1,N2,N3,N4
       my_real
      .   SURFX,SURFY,SURFZ,X13,Y13,Z13,X24,Y24,Z24
 C-----------------------------------------------
 
-C optimisable en spmd si ajout flag pour routine de comm, spmd_exchange_n
+C Optimizable in SPMD If Addition Flag for comm, SPMD_exchange_n
       DO N1=1,NUMNOD
         NOD_NORMAL(1,N1) = ZERO
         NOD_NORMAL(2,N1) = ZERO
@@ -88,14 +88,14 @@ C optimisable en spmd si ajout flag pour routine de comm, spmd_exchange_n
       RETURN
       END
 C
-      !||====================================================================
-      !||    i7normp          ../engine/source/interfaces/int07/i7curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i7mainf          ../engine/source/interfaces/int07/i7mainf.F
-      !||--- calls      -----------------------------------------------------
-      !||    myqsort          ../common_source/tools/sort/myqsort.F
-      !||    spmd_i7curvcom   ../engine/source/mpi/interfaces/spmd_i7curvcom.F
-      !||====================================================================
+!||====================================================================
+!||    i7normp          ../engine/source/interfaces/int07/i7curv.F
+!||--- called by ------------------------------------------------------
+!||    i7mainf          ../engine/source/interfaces/int07/i7mainf.F
+!||--- calls      -----------------------------------------------------
+!||    myqsort          ../common_source/tools/sort/myqsort.F
+!||    spmd_i7curvcom   ../engine/source/mpi/interfaces/spmd_i7curvcom.F
+!||====================================================================
       SUBROUTINE I7NORMP(NRTM  ,IRECT   ,NUMNOD ,X    ,NOD_NORMAL,
      .                   NMN   ,MSR     ,LENT   ,MAXCC,ISDSIZ    ,
      .                   IRCSIZ,IAD_ELEM,FR_ELEM,ITAG )
@@ -123,7 +123,8 @@ C-----------------------------------------------
      .        ADSKYT(0:NUMNOD+1)
       my_real
      .        SURFX,SURFY,SURFZ,X13,Y13,Z13,X24,Y24,Z24,
-     .        FSKYT(3,LENT), FSKYT2(MAXCC), PERM(MAXCC)
+     .        FSKYT(3,LENT), FSKYT2(MAXCC)
+      INTEGER :: PERM(MAXCC)
 C-----------------------------------------------
       ADSKYT(0) = 1
       ADSKYT(1) = 1
@@ -182,7 +183,7 @@ C
      .                      ISDSIZ,IRCSIZ,ITAG  ,LENR    ,LENS   )
       END IF
 C
-C     tri par packet des normales
+C     sorting normals by packet
 C
       DO N1 = 1, NUMNOD
         N2 = ADSKYT(N1-1)
@@ -199,7 +200,7 @@ C            IF(N4>MAXCC)print*,'error cc:',n4,maxcc
               NOD_NORMAL(J,N1) = NOD_NORMAL(J,N1) + FSKYT2(CC-N2+1)
             END DO
           END DO
-        ELSEIF(N4==1)THEN    ! cas 1 seule contribution => direct
+        ELSEIF(N4==1)THEN    ! Case 1 single contribution => direct
           NOD_NORMAL(1,N1) = FSKYT(1,N2)
           NOD_NORMAL(2,N1) = FSKYT(2,N2)
           NOD_NORMAL(3,N1) = FSKYT(3,N2)
@@ -209,11 +210,11 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    i7curvsz   ../engine/source/interfaces/int07/i7curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i7mainf    ../engine/source/interfaces/int07/i7mainf.F
-      !||====================================================================
+!||====================================================================
+!||    i7curvsz   ../engine/source/interfaces/int07/i7curv.F
+!||--- called by ------------------------------------------------------
+!||    i7mainf    ../engine/source/interfaces/int07/i7mainf.F
+!||====================================================================
       SUBROUTINE I7CURVSZ(NRTM,IRECT,NUMNOD,ITAG,LENT,MAXCC)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -228,7 +229,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I ,J ,N1, N2, N3, N4
+      INTEGER I  ,N1, N2, N3, N4
 C-----------------------------------------------
 C
       DO N1=1,NUMNOD
@@ -256,11 +257,11 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    i7cmaj   ../engine/source/interfaces/int07/i7curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i7dst3   ../engine/source/interfaces/int07/i7dst3.F
-      !||====================================================================
+!||====================================================================
+!||    i7cmaj   ../engine/source/interfaces/int07/i7curv.F
+!||--- called by ------------------------------------------------------
+!||    i7dst3   ../engine/source/interfaces/int07/i7dst3.F
+!||====================================================================
       SUBROUTINE I7CMAJ(JLT    ,CMAJ   ,IRECT  ,NOD_NORMAL,CAND_E,
      2                  X1     ,X2     ,X3     ,X4        ,
      3                  Y1     ,Y2     ,Y3     ,Y4        ,
@@ -283,7 +284,7 @@ c          r = e
 c          tmaj = (e+1)t1' = (e-1)t'2
 c    => en 2D      t = t'max => Z = (Lmax/2)t'max
 c
-c       vecteurs:Z,L,N
+c       Vectors: Z, L, N
 c            Z^2 = (L/2.N)^2(L/2)^2 / (N^2(L/2)^2 - (L/2.N)^2)
 c            Z^2 = (L.N)^2 L^2 / 4(N^2 L^2 - (L.N)^2)
 c
@@ -424,14 +425,14 @@ c            Z^2 = (L.N)^2 L^2 / 4(N^2 L^2 - (L.N)^2)
 
       RETURN
       END
-      !||====================================================================
-      !||    i7curv    ../engine/source/interfaces/int07/i7curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i20for3   ../engine/source/interfaces/int20/i20for3.F
-      !||    i7for3    ../engine/source/interfaces/int07/i7for3.F
-      !||--- calls      -----------------------------------------------------
-      !||    i7cubic   ../engine/source/interfaces/int07/i7curv.F
-      !||====================================================================
+!||====================================================================
+!||    i7curv    ../engine/source/interfaces/int07/i7curv.F
+!||--- called by ------------------------------------------------------
+!||    i20for3   ../engine/source/interfaces/int20/i20for3.F
+!||    i7for3    ../engine/source/interfaces/int07/i7for3.F
+!||--- calls      -----------------------------------------------------
+!||    i7cubic   ../engine/source/interfaces/int07/i7curv.F
+!||====================================================================
       SUBROUTINE I7CURV(JLT    ,PENE   ,N1     ,N2        ,
      1                  N3     ,GAPV   ,X      ,NOD_NORMAL,
      2                  IX1    ,IX2    ,IX3    ,IX4       ,
@@ -486,11 +487,11 @@ C-----------------------------------------------
      .   CRX(MVSIZ),CRY(MVSIZ),CRZ(MVSIZ),
      .   R(MVSIZ),S(MVSIZ),TT(MVSIZ),TA(MVSIZ),TB(MVSIZ),AAA,
      .   BBB,CCC,DDD,EEE,RM,RP,SM,SP,RPMM,SPMM,RPPM,SPPM,
-     .   NX,NY,NZ,DIST,EPS,XP,YP,ZP,XX,YY,ZZ,XXP,YYP,ZZP,A,B
+     .   NX,NY,NZ,DIST,EPS,XP,YP,ZP,XX,YY,ZZ,XXP,YYP,ZZP
 C-----------------------------------------------
-C     Interpolation bicubique
-c     avec continuit  des coordonn s,
-c     des d riv s tagente et normale sur les bords
+C     Bicubic interpolation
+c     with continuity of coordinates
+c     of tangent and normal derivatives on the edges
 C-----------------------------------------------
 
       DO I=1,JLT
@@ -511,7 +512,7 @@ C-----------------------------------------------
         NNZ4(I)=NOD_NORMAL(3,IX4(I))  
 
 C-----------------------------------------------
-c       calcul de r,s   partir des Hi
+c       calculation of r,s from the Hi
 C-----------------------------------------------
         RM = (H2(I)-H1(I))/MAX(EM20,H2(I)+H1(I))
         RP = (H3(I)-H4(I))/MAX(EM20,H3(I)+H4(I))
@@ -568,8 +569,8 @@ c ligne r
       DO I=1,JLT
 
 C-----------------------------------------------
-c       normale   la surface cubique en r,s 
-c       produit vectoriel des vecteurs directeurs cr et cs
+c       normal the cubic surface in r, s 
+c       cross product of the direction vectors cr and cs
 C-----------------------------------------------
         NX = CRY(I)*CSZ(I)-CRZ(I)*CSY(I)
         NY = CRZ(I)*CSX(I)-CRX(I)*CSZ(I)
@@ -580,25 +581,25 @@ C-----------------------------------------------
         NZ = NZ*AAA
 
 C-----------------------------------------------
-c       point calcul  sur la surface cubique (r,s)
+c       point calculated on the cubic surface (r,s)
 C-----------------------------------------------
         XA(I) = HALF*(XA(I)+XB(I))
         YA(I) = HALF*(YA(I)+YB(I))
         ZA(I) = HALF*(ZA(I)+ZB(I))
  
 C-----------------------------------------------
-c       vecteur: point calcul  -> noeud second. 
+c       Vector: Calculation point -> Second node. 
 C-----------------------------------------------
         XD = XI(I) - XA(I)
         YD = YI(I) - YA(I)
         ZD = ZI(I) - ZA(I) 
 C-----------------------------------------------
-c       distance: surface cubique -> noeud second. 
+c       Distance: Cubic surface -> Second node. 
 C-----------------------------------------------
         DIST = NX*XD + NY*YD + NZ*ZD
 
 C-----------------------------------------------
-c       projection du noeud second. sur la surface cubique
+c       projection of the secondary node on the cubic surface
 C-----------------------------------------------
         XP = XI(I) - DIST*NX
         YP = YI(I) - DIST*NY
@@ -617,7 +618,7 @@ C-----------------------------------------------
 C        IF(BBB<ZERO.OR.BBB>CCC)THEN
 C-----------------------------------------------
 c         s<-1 ou s>1
-c         on conserve la normale et la p n tration ancienne 
+c         keep the normal and the previous penetration
 C-----------------------------------------------
 C        ELSE
           XX = X23(I) - X14(I)
@@ -633,13 +634,13 @@ C        ELSE
 C          IF(DDD<ZERO.OR.DDD>EEE)THEN
 C-----------------------------------------------
 c           r<-1 ou r>1
-c           on conserve la normale et la p n tration ancienne 
+c           keep the normal and the previous penetration
 C-----------------------------------------------
 C          ELSE
 C-----------------------------------------------
 c           -1<r<+1 et -1<s<+1
 C-----------------------------------------------
-c           r et s peuvent  tres recalcul s
+c           r and can very recalculate
 c           R(I) = TWO*DDD/EEE - ONE
 c           S(I) = TWO*BBB/CCC - ONE
 C-----------------------------------------------
@@ -661,11 +662,11 @@ C        ENDIF
 
       RETURN
       END
-      !||====================================================================
-      !||    i7cubic   ../engine/source/interfaces/int07/i7curv.F
-      !||--- called by ------------------------------------------------------
-      !||    i7curv    ../engine/source/interfaces/int07/i7curv.F
-      !||====================================================================
+!||====================================================================
+!||    i7cubic   ../engine/source/interfaces/int07/i7curv.F
+!||--- called by ------------------------------------------------------
+!||    i7curv    ../engine/source/interfaces/int07/i7curv.F
+!||====================================================================
       SUBROUTINE I7CUBIC(JLT,R,TT,
      .                   X1,NNX1,X2,NNX2,X12,NNX12,CX,
      .                   Y1,NNY1,Y2,NNY2,Y12,NNY12,CY,
@@ -697,13 +698,13 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K
+      INTEGER I
       my_real 
-     .    AAA,A1,A2,A3,RR,DTDR,DTDR1,DTDR2,NR,NS,NT,NX,NY,NZ,R2,
+     .    AAA,A1,RR,DTDR,DTDR1,DTDR2,NX,NY,NZ,R2,
      .    UPR2,UMR2,A3RR2,A2RR,
      .    ERX,ERY,ERZ,ESX,ESY,ESZ,ETX,ETY,ETZ
 c---------------------------------------------------
-c       vecteur directeur en r
+c       Director vector in R
 c---------------------------------------------------
 c
 c         ^t
@@ -766,7 +767,7 @@ c
         ESZ = ETX*ERY-ETY*ERX
       
 c---------------------------------------------------
-c       d riv  calcul e   partir des normales(non norm es)
+c       of RIV Calculation of normal (not norms)
 c---------------------------------------------------
         DTDR1 = -(NNX1(I)*ERX+NNY1(I)*ERY+NNZ1(I)*ERZ) 
      .        /  (NNX1(I)*ETX+NNY1(I)*ETY+NNZ1(I)*ETZ)
@@ -774,8 +775,8 @@ c---------------------------------------------------
         DTDR2 = -(NNX2(I)*ERX+NNY2(I)*ERY+NNZ2(I)*ERZ) 
      .        /  (NNX2(I)*ETX+NNY2(I)*ETY+NNZ2(I)*ETZ)
 c---------------------------------------------------
-c       la d riv  est born e   +- 1 pour limiter la taille
-c       des boites dans i7tri
+c       the derivative is limited to +- 1 to restrict the size
+c       of the boxes in i7tri
 c---------------------------------------------------
         DTDR1 = DTDR1/MAX(ONE,ABS(DTDR1))
         DTDR2 = DTDR2/MAX(ONE,ABS(DTDR2))
@@ -811,7 +812,7 @@ c---------------------------------------------------
         DTDR = THREE*A3RR2 + A2RR + A2RR + A1
 
 c---------------------------------------------------
-c       vecteur directeur en r
+c       Director vector in R
 c---------------------------------------------------
         CX(I) = ERX + DTDR*ETX
         CY(I) = ERY + DTDR*ETY
@@ -856,7 +857,7 @@ c   a1 = dr1
 c   a2 = - (dr2 + 2 dr1)/r2
 c   a3 = + (dr2 + dr1  )/r2^2
 c--------------------------------------   
-c calcul tmax
+c calculation tmax
 c
 c   t'r = 3 a3 rr^2 + 2 a2 rr + a1 = 0
 c

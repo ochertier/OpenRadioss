@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    noise             ../engine/source/general_controls/computation/noise.F
-      !||--- called by ------------------------------------------------------
-      !||    sortie_main       ../engine/source/output/sortie_main.F
-      !||--- calls      -----------------------------------------------------
-      !||    cur_fil_c         ../common_source/tools/input_output/write_routtines.c
-      !||    initnoise         ../engine/source/general_controls/computation/initnoise.F
-      !||    initnoise2        ../engine/source/general_controls/computation/initnoise.F
-      !||    pnoise            ../engine/source/general_controls/computation/pnoise.F
-      !||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||    wrtdes            ../engine/source/output/th/wrtdes.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    noise             ../engine/source/general_controls/computation/noise.F
+!||--- called by ------------------------------------------------------
+!||    sortie_main       ../engine/source/output/sortie_main.F
+!||--- calls      -----------------------------------------------------
+!||    cur_fil_c         ../common_source/tools/input_output/write_routines.c
+!||    initnoise         ../engine/source/general_controls/computation/initnoise.F
+!||    initnoise2        ../engine/source/general_controls/computation/initnoise.F
+!||    pnoise            ../engine/source/general_controls/computation/pnoise.F
+!||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
+!||    wrtdes            ../engine/source/output/th/wrtdes.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||====================================================================
       SUBROUTINE NOISE(
      1   DT2R  ,IN,J     ,BUF  ,V     ,
      2   A     ,IXS,ELBUF_TAB,IPARG,WEIGHT,
@@ -69,26 +69,25 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER , DIMENSION(:), ALLOCATABLE :: ELNOI,ELG,NOIADD
       my_real,DIMENSION(:),ALLOCATABLE ::  C
-      INTEGER IPELNOI,IPNOIADD,IPTC
       INTEGER IFIRST,I,K,L,NE,NC,KK,IAD, LEN
-      my_real PI1,PI2,TOL,TE,TC,FNE,FAC,DEC,TO,TRANS,XI,W,CC,TTN
+      my_real PI2,TOL,TE,TC,FAC,DEC,TO,TRANS,XI,W,CC,TTN
       INTEGER LENGTH, ITAG(0:NUMNOD)
-      SAVE IFIRST,TE,IPTC,C,NC,TO,IPELNOI,ELNOI,ELG,IPNOIADD,NOIADD
+      SAVE IFIRST,TE,C,NC,TO,ELNOI,ELG,NOIADD
       DATA IFIRST/0/
       my_real WA(NNOISE)
 C-----------------------------------------------
-C INITIALIALISATION DES COEFFICIENTS DU FILTRE
+C initialization of the filter coefficients
 C-----------------------------------------------
       NE = 0 
       TOL=EM01
-      IF(IMACH/=3.OR.ISPMD==0) THEN
+      IF(ISPMD==0) THEN
         IUNIT=IUNOI
         IF(ITFORM==3) CALL CUR_FIL_C(IUNIT)
       ENDIF
       IF(IFIRST==0)THEN
         IFIRST=1
         IF(RNOI==0)THEN
-C NE : NOMBRE D'ECHANTILLON ENTRE CHAQUE SORTIE
+C NE : NUMBER OF SAMPLES BETWEEN EACH OUTPUT
         TE=DT2
          DT2R=TE
         NE=MAX(1,INT(DTNOISE/TE))
@@ -98,7 +97,7 @@ C NE : NOMBRE D'ECHANTILLON ENTRE CHAQUE SORTIE
          NE=J(7)
         ENDIF
 C
-C INITIALISATION DES TABLEAUX D'ELEMENTS PAR NOEUDS SAUVES
+C initialization of the arrays of elements by saved nodes
 C
         IF(NOISEP/=0)THEN
           ALLOCATE (NOIADD(NNOISE+1))
@@ -107,10 +106,10 @@ C
           ALLOCATE(ELG(LENGTH))
           CALL INITNOISE2(IN,ELNOI,ELG,NOIADD,IXS,ITAG(1),IPARG,IXQ)
         ENDIF
-C TC PERIODE DE COUPURE
+C tc cutoff period
         DTNOISE=FLOAT(NE)*TE
         TC=2.*DTNOISE
-C NOMBRE DE COEFFICIENTS ET ALLOCATION ; TO DEPHASAGE
+C number of coefficients and allocation; phase shift
         NC=6*NE
         FAC=ONE/FLOAT(NE)
         DEC=FLOAT(3*NE) - HALF
@@ -119,7 +118,7 @@ C NOMBRE DE COEFFICIENTS ET ALLOCATION ; TO DEPHASAGE
           ALLOCATE(C(NC))
         ENDIF
 C
-C COEFF. DU FILTRE PARFAIT AVEC FENETRE DE HAMMING 
+C perfect filter coefficients with hamming window
 C
         PI2 = TWO*PI
         TRANS=0
@@ -134,7 +133,7 @@ C
           TRANS=TRANS+C(I)
         ENDDO
 C
-        IF(IMACH/=3.OR.ISPMD==0) THEN
+        IF(ISPMD==0) THEN
           WRITE(IOUT,1000)ONE/DTNOISE,ONE/TC,NC,TRANS
           WRITE(IOUT,'(1P8E10.3)')(C(I),I=1,NC)
           WRITE(IOUT,'(//)')
@@ -151,7 +150,7 @@ C
          ENDDO
         ENDIF  
       ENDIF
-      IF(IMACH/=3.OR.ISPMD==0) THEN
+      IF(ISPMD==0) THEN
         IF(ABS(1.-DT2/TE)>TOL)THEN
           WRITE(IOUT,1100)
           WRITE(ISTDO,1100)
@@ -166,9 +165,9 @@ C-----------------------------------------------
 C FILTRAGE
 C-----------------------------------------------
 C
-C Anullation buffer noise sur pi, i<>0 en SPMD
+C Noise on pi Buffer Runulation, I <> 0 in SPMD
 C
-      IF(IMACH==3.AND.ISPMD/=0) THEN
+      IF(ISPMD/=0) THEN
         DO I=1,6*NNOISE
           DO L=1,NCNOIS
             BUF(L,I)=ZERO   
@@ -208,19 +207,19 @@ C
 C
 C GATHER SPMD BUF
 C
-      IF(IMACH==3.AND.NSPMD>1) THEN
+      IF(NSPMD>1) THEN
         LEN = 6*NNOISE*NCNOIS
         CALL SPMD_GLOB_DSUM9(BUF,LEN)
       ENDIF
 C-----------------------------------------------------
-C INCREMENTATION DES INDICES ET ECRITURE DES RESULTATS
+C incrementing indices and writing results
 C-----------------------------------------------------
       DO K=1,6
         IF(J(K)==NC)THEN
          J(K)=0
          KK=(K-1)*NNOISE+1
          TTN=TT-TO
-         IF(IMACH/=3.OR.ISPMD==0) THEN
+         IF(ISPMD==0) THEN
            CALL WRTDES(TTN,TTN,1,ITFORM,1)
            CALL WRTDES(TTN,TTN,1,ITFORM,1)
            CALL WRTDES(BUF(1,KK),BUF(1,KK),NCNOIS*NNOISE,ITFORM,1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    check_skew                   ../starter/source/spmd/domain_decomposition/check_skew.F
-      !||--- called by ------------------------------------------------------
-      !||    domdec2                      ../starter/source/spmd/domdec2.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_entity_reference_number   ../starter/source/devtools/hm_reader/hm_entity_reference_number.F
-      !||    ifrontplus                   ../starter/source/spmd/node/frontplus.F
-      !||--- uses       -----------------------------------------------------
-      !||    submodel_mod                 ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    check_skew                   ../starter/source/spmd/domain_decomposition/check_skew.F
+!||--- called by ------------------------------------------------------
+!||    domdec2                      ../starter/source/spmd/domdec2.F
+!||--- calls      -----------------------------------------------------
+!||    hm_entity_reference_number   ../starter/source/devtools/hm_reader/hm_entity_reference_number.F
+!||    ifrontplus                   ../starter/source/spmd/node/frontplus.F
+!||--- uses       -----------------------------------------------------
+!||    submodel_mod                 ../starter/share/modules1/submodel_mod.F
+!||====================================================================
         SUBROUTINE CHECK_SKEW(IXR,IGEO,ISKN,CEP,ISKWP,NSKWP,TAG_SKN,MULTIPLE_SKEW,
      .                        R_SKEW,IPM,OFFSET)
 C-----------------------------------------------
@@ -37,6 +37,7 @@ C   M o d u l e s
 C-----------------------------------------------
         USE SKEW_MOD
         USE SUBMODEL_MOD , ONLY : NSUBMOD
+        use element_mod , only : nixr
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,7 +61,7 @@ C-----------------------------------------------
         INTEGER, DIMENSION(LISKN,SISKWN/LISKN), INTENT(IN) :: ISKN
         INTEGER, DIMENSION(NPROPMI,NUMMAT), INTENT(IN) :: IPM
         TYPE(PLIST_SKEW_), DIMENSION(NUMSKW+1), INTENT(INOUT) :: MULTIPLE_SKEW
-        INTEGER, INTENT(IN) :: OFFSET
+        INTEGER :: OFFSET
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
 !       NSKWP : integer ; dimension = NSPMD
 !               number of skew per processor
@@ -93,10 +94,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: I,J,II,NN
+        INTEGER :: I,J,II
         INTEGER :: NUMBER_SKEW_SP,SPRING_TYPE
         INTEGER :: N1,N2,N3,IMAIN,SUM_NI,SIZE_SKEW,MAT_TYPE
-        INTEGER :: NL, ISKEW, NB
+        INTEGER ::  NB
         INTEGER, DIMENSION(:), ALLOCATABLE :: SKEW_PER_SP,LOCAL_P,P_SKEW
         INTEGER, DIMENSION(NSPMD) :: PROC_SKEW
 C-----------------------------------------------

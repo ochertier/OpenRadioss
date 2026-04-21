@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    section_skewp   ../engine/source/tools/sect/section_skewp.F
-      !||--- called by ------------------------------------------------------
-      !||    section         ../engine/source/tools/sect/section.F
-      !||    section_3n      ../engine/source/tools/sect/section_3n.F
-      !||    section_c       ../engine/source/tools/sect/section_c.F
-      !||    section_p       ../engine/source/tools/sect/section_p.F
-      !||    section_r       ../engine/source/tools/sect/section_r.F
-      !||    section_s       ../engine/source/tools/sect/section_s.F
-      !||    section_s4      ../engine/source/tools/sect/section_s4.F
-      !||    section_s6      ../engine/source/tools/sect/section_s6.F
-      !||    section_t       ../engine/source/tools/sect/section_t.F
-      !||====================================================================
+!||====================================================================
+!||    section_skewp   ../engine/source/tools/sect/section_skewp.F
+!||--- called by ------------------------------------------------------
+!||    section         ../engine/source/tools/sect/section.F
+!||    section_3n      ../engine/source/tools/sect/section_3n.F
+!||    section_c       ../engine/source/tools/sect/section_c.F
+!||    section_p       ../engine/source/tools/sect/section_p.F
+!||    section_r       ../engine/source/tools/sect/section_r.F
+!||    section_s       ../engine/source/tools/sect/section_s.F
+!||    section_s4      ../engine/source/tools/sect/section_s4.F
+!||    section_s6      ../engine/source/tools/sect/section_s6.F
+!||    section_t       ../engine/source/tools/sect/section_t.F
+!||====================================================================
       SUBROUTINE SECTION_SKEWP(
      1   XXC, YYC, ZZC, XX4  , YY4 , ZZ4 ,
      2   XX5, YY5, ZZ5, XX6  , YY6 , ZZ6 ,
@@ -55,7 +55,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N
       my_real XX1, YY1, ZZ1, XX2, YY2, ZZ2, XX3, YY3, ZZ3,
      .        AL4, AL6, AL5, D13, MAS, X1N, Y1N, Z1N
 C
@@ -101,7 +100,7 @@ C
        ZZN=ZZ6
 C
        ELSEIF (N1/=0) THEN
-C      CALCUL DES MOMEMTS/REPERE GLOBAL
+C      CALCUL DES MOMEMTS/GLOBAL REFERENCE FRAME
        XX4=XSEC(2,1)-XSEC(1,1)
        YY4=XSEC(2,2)-XSEC(1,2)
        ZZ4=XSEC(2,3)-XSEC(1,3)
@@ -141,7 +140,7 @@ C
 C
       ENDIF
 C
-C     CALCUL DE L'ORIGINE DU REPERE
+C     CALCULATION OF THE ORIGIN OF THE REFERENCE FRAME
 C
       IF(IFRAM==0)THEN
         D13=(XX3-XX1)*XX4+(YY3-YY1)*YY4+(ZZ3-ZZ1)*ZZ4
@@ -172,7 +171,7 @@ C             XXC=XXC+X(1,N)
 C             YYC=YYC+X(2,N)
 C             ZZC=ZZC+X(3,N)
 C        ENDDO
-C Deja fait dans spmd_exch_sec
+C Already done in spmd_exch_sec
         XXC=XSEC(4,1)
         YYC=XSEC(4,2)
         ZZC=XSEC(4,3)
@@ -188,7 +187,7 @@ C             YYC=YYC+X(2,N)*MS(N)
 C             ZZC=ZZC+X(3,N)*MS(N)
 C             MAS=MAS+MS(N)
 C        ENDDO
-C Deja fait dans spmd_exch_sec
+C Already done in spmd_exch_sec
         XXC=XSEC(4,1)
         YYC=XSEC(4,2)
         ZZC=XSEC(4,3)

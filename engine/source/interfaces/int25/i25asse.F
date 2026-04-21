@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25asse0   ../engine/source/interfaces/int25/i25asse.F
-      !||--- called by ------------------------------------------------------
-      !||    i25for3e   ../engine/source/interfaces/int25/i25for3e.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box    ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25asse0   ../engine/source/interfaces/int25/i25asse.F
+!||--- called by ------------------------------------------------------
+!||    i25for3e   ../engine/source/interfaces/int25/i25for3e.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box    ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25ASSE0(JLT  ,CS_LOC,N1   ,N2   ,M1   ,
      2                   M2   ,HS1   ,HS2  ,HM1  ,HM2  ,
      3                   FX1  ,FY1   ,FZ1  ,FX2  ,FY2  ,
@@ -110,13 +110,13 @@ C
           AFIE(NIN)%P(1,J1+ISHIFT)=AFIE(NIN)%P(1,J1+ISHIFT)+FX1(I)
           AFIE(NIN)%P(2,J1+ISHIFT)=AFIE(NIN)%P(2,J1+ISHIFT)+FY1(I)
           AFIE(NIN)%P(3,J1+ISHIFT)=AFIE(NIN)%P(3,J1+ISHIFT)+FZ1(I)
-          STNFIE(NIN)%P(J1+ISHIFT) = TWO*STNFIE(NIN)%P(J1+ISHIFT) + STIF(I)*ABS(HS1(I))
+          STNFIE(NIN)%P(J1+ISHIFT) = STNFIE(NIN)%P(J1+ISHIFT) + STIF(I)*ABS(HS1(I))
 C
           J1=N2(I)
           AFIE(NIN)%P(1,J1+ISHIFT)=AFIE(NIN)%P(1,J1+ISHIFT)+FX2(I)
           AFIE(NIN)%P(2,J1+ISHIFT)=AFIE(NIN)%P(2,J1+ISHIFT)+FY2(I)
           AFIE(NIN)%P(3,J1+ISHIFT)=AFIE(NIN)%P(3,J1+ISHIFT)+FZ2(I)
-          STNFIE(NIN)%P(J1+ISHIFT) = TWO*STNFIE(NIN)%P(J1+ISHIFT) + STIF(I)*ABS(HS2(I))
+          STNFIE(NIN)%P(J1+ISHIFT) = STNFIE(NIN)%P(J1+ISHIFT) + STIF(I)*ABS(HS2(I))
         END IF
       END DO
 C
@@ -139,13 +139,13 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    i25asse05   ../engine/source/interfaces/int25/i25asse.F
-      !||--- called by ------------------------------------------------------
-      !||    i25for3e    ../engine/source/interfaces/int25/i25for3e.F
-      !||--- uses       -----------------------------------------------------
-      !||    tri7box     ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25asse05   ../engine/source/interfaces/int25/i25asse.F
+!||--- called by ------------------------------------------------------
+!||    i25for3e    ../engine/source/interfaces/int25/i25for3e.F
+!||--- uses       -----------------------------------------------------
+!||    tri7box     ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25ASSE05(JLT  ,CS_LOC ,N1    ,N2   ,M1   ,
      2                    M2   ,HS1   ,HS2   ,HM1  ,HM2  ,
      3                    FX1  ,FY1   ,FZ1   ,FX2  ,FY2  ,
@@ -270,18 +270,18 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    i25asse2      ../engine/source/interfaces/int25/i25asse.F
-      !||--- called by ------------------------------------------------------
-      !||    i25for3e      ../engine/source/interfaces/int25/i25for3e.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    tri25ebox     ../engine/share/modules/tri25ebox.F
-      !||    tri7box       ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25asse2      ../engine/source/interfaces/int25/i25asse.F
+!||--- called by ------------------------------------------------------
+!||    i25for3e      ../engine/source/interfaces/int25/i25for3e.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||    tri25ebox     ../engine/share/modules/tri25ebox.F
+!||    tri7box       ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25ASSE2(JLT   ,CS_LOC ,N1    ,N2    ,M1      ,
      2                   M2    ,HS1    ,HS2   ,HM1   ,HM2     ,
      3                   FX1   ,FY1    ,FZ1   ,FX2   ,FY2     ,
@@ -326,7 +326,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J1, NISKYL1, NISKYL,IGP,IGM, NISKYFIEL
+      INTEGER I, NISKYL1, NISKYL,IGP,IGM, NISKYFIEL
 C     WRITE(6,*) __FILE__,"[IN] I25ASS2"
 C
       NISKYL1 = 0
@@ -498,17 +498,17 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    i25asse25     ../engine/source/interfaces/int25/i25asse.F
-      !||--- called by ------------------------------------------------------
-      !||    i25for3e      ../engine/source/interfaces/int25/i25for3e.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    tri7box       ../engine/share/modules/tri7box.F
-      !||====================================================================
+!||====================================================================
+!||    i25asse25     ../engine/source/interfaces/int25/i25asse.F
+!||--- called by ------------------------------------------------------
+!||    i25for3e      ../engine/source/interfaces/int25/i25for3e.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||    tri7box       ../engine/share/modules/tri7box.F
+!||====================================================================
       SUBROUTINE I25ASSE25(JLT   ,CS_LOC ,N1    ,N2      ,M1    ,
      2                    M2    ,HS1    ,HS2   ,HM1     ,HM2   ,
      3                    FX1   ,FY1    ,FZ1   ,FX2     ,FY2   ,
@@ -554,7 +554,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J1, NISKYL1, NISKYL,IGP,IGM, NISKYFIEL
+      INTEGER I, NISKYL1, NISKYL,IGP,IGM, NISKYFIEL
 C
       NISKYL1 = 0
       DO I = 1, JLT

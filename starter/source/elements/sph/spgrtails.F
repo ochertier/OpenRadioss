@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spgrtails              ../starter/source/elements/sph/spgrtails.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    get_u_geo              ../starter/source/user_interface/uaccess.F
-      !||    zeroin                 ../starter/source/system/zeroin.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spgrtails              ../starter/source/elements/sph/spgrtails.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    get_u_geo              ../starter/source/user_interface/uaccess.F
+!||    zeroin                 ../starter/source/system/zeroin.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+!||====================================================================
       SUBROUTINE SPGRTAILS(KXSP   , IPARG , PM  ,IPART ,
      2                     IPARTSP, EADD,   ND  , CEPSP, DD_IAD,
      3                     IDX,   IXSP, IPM  , IGEO,
@@ -81,7 +81,7 @@ C-----------------------------------------------
       INTEGER NGR1, NG, MT, MLN, I, P, NEL, MODE, NB,
      .        N, IGTYP,JIVF,JHBE,IJK,NE1,
      .        ISSN,IKSNOD,IORDER,IPRT,ISLEEP,IEOS,NEL_PREC,IUN,IG,IFAIL, 
-     .        WORK(70000),NGP(NSPMD+1),K,J,II, MX, NFAIL, IR, IP, STAT,
+     .        WORK(70000),NGP(NSPMD+1),K,J,II, MX, NFAIL, IR,
      .        IPARTR2R, NOD, JALE_FROM_MAT, JALE_FROM_PROP
       INTEGER, DIMENSION(:,:),ALLOCATABLE :: INUM
       INTEGER, DIMENSION(:),ALLOCATABLE :: INDEX     
@@ -97,7 +97,7 @@ C-----------------------------------------------
      .         GET_U_GEO
       EXTERNAL GET_U_GEO
 C--------------------------------------------------------------
-C         BORNAGE DES GROUPES DE MVSIZ
+C         bounding of MVSIZ groups
 C--------------------------------------------------------------
       CALL MY_ALLOC(INUM,13,NUMSPH)
       CALL MY_ALLOC(INDEX,2*NUMSPH)
@@ -108,7 +108,7 @@ C--------------------------------------------------------------
       ENDDO
       NGR1 = NGROUP + 1
 C
-C phase 1 : domain decompostition
+C Phase 1: Domain Decomposition
 C
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
@@ -246,11 +246,11 @@ C Rebuild SOL2SPH, SOL2SPH(1,N)+1<=I<=SOLSPH(2,N) <=> N==SPH2SOL(I)
           END IF
         END DO          
       END IF
-C ne pas oublier renumeroter selection th et surface si concerne
+C do not forget renumeroter selection th and surface if concerns
 C
 C
-C phase 2 : bornage en groupe de mvsiz
-C ngroup est global, iparg est global mais organise en fonction de dd
+C Phase 2: MVSIZ Group Bounds
+C ngroup is global, iparg is global but organized based on dd
 C
       JALE=0
       JEUL=0
@@ -302,6 +302,13 @@ C ngroup global
             JALE=0
             JEUL=1
           ENDIF
+
+          !ALE UVAR REZONING  (81:MAT,  82:EOS)
+          ! n/a with SPH
+          IPARG(81,NGROUP) = 0
+          IPARG(82,NGROUP) = 0
+
+
           IF (JALE+JEUL/=0) THEN
 C           WRITE(ISTDO,*) ' ** ERROR : BAD ANALYSIS TYPE'
 C           WRITE(IOUT,*)  ' ** ERROR : BAD ANALYSIS TYPE'
@@ -343,7 +350,7 @@ C-------------------------------------------------
 C-------------------------------------------------          
           DO IJK = 1, NE1
 C
-C Attention, penser a sauvegarder KXSP(2) si besoin (backtrack spmd si interface)
+C Warning, remember to save KXSP(2) if needed (backtrack spmd if interface)
 C
             KXSP(2,EADD(N)-1+NFT+IJK)=
      .                SIGN(NGROUP,ISLEEP)
@@ -398,7 +405,7 @@ C         equation of state
          NGP(P)=NGROUP-NGP(P)
         ENDIF
        ENDDO
-C DD_IAD => nb groupes par sous domaine
+C Dd_iad => nb groups by sub -domain
        NGP(NSPMD+1)=0
        DO P = 1, NSPMD
          NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)

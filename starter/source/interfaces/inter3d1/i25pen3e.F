@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i25pen3e   ../starter/source/interfaces/inter3d1/i25pen3e.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3     ../starter/source/interfaces/inter3d1/inint3.F
-      !||====================================================================
+!||====================================================================
+!||    i25pen3e   ../starter/source/interfaces/inter3d1/i25pen3e.F
+!||--- called by ------------------------------------------------------
+!||    inint3     ../starter/source/interfaces/inter3d1/inint3.F
+!||====================================================================
       SUBROUTINE I25PEN3E(
      1   JLT   ,IEDGE  ,CAND_S,CAND_M,
      2   N1    ,N2     ,M1    ,M2    ,
@@ -165,7 +165,7 @@ C
        H2S(I) = ONE -H1S(I)
        H2M(I) = ONE -H1M(I)
 C !!!!!!!!!!!!!!!!!!!!!!!
-C  PENE = GAP^2 - DIST^2 UTILISE POUR TESTER SI NON NUL
+C  PENE = GAP^2 - DIST^2 USED TO TEST IF NON-NULL
 C!!!!!!!!!!!!!!!!!!!!!!!!
        NX(I) = H1S(I)*XXS1(I) + H2S(I)*XXS2(I)
      .       - H1M(I)*XXM1(I) - H2M(I)*XXM2(I)
@@ -198,11 +198,11 @@ C                                \
 C                                  \      
 
           P1=ZERO
-          IF(LEDGE(3,CAND_M(I))==0)
+          IF(LEDGE(3,CAND_M(I))==0.AND.LEDGE(7,CAND_M(I))/=3)
      .      P1=-(NX(I)*EX(I)+NY(I)*EY(I)+NZ(I)*EZ(I)) ! (n(M),SM) > 45 degrees
 
           P2=ZERO
-          IF(LEDGE(3,CAND_S(I))==0)
+          IF(LEDGE(3,CAND_S(I))==0.AND.LEDGE(7,CAND_S(I))/=3)
      .      P2=  NX(I)*FX(I)+NY(I)*FY(I)+NZ(I)*FZ(I)  ! (n(S),MS) > 45 degrees
 
 C         NN(I)=SQRT(NN(I)) ! already done above

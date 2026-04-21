@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    xini29       ../starter/source/elements/xelem/xini29.F
-      !||--- called by ------------------------------------------------------
-      !||    xinit3       ../starter/source/elements/xelem/xinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_u_func   ../starter/source/user_interface/uaccess.F
-      !||    get_u_geo    ../starter/source/user_interface/uaccess.F
-      !||    get_u_mat    ../starter/source/user_interface/uaccess.F
-      !||    get_u_mid    ../starter/source/user_interface/uaccess.F
-      !||    get_u_mnu    ../starter/source/user_interface/uaccess.F
-      !||    get_u_pid    ../starter/source/user_interface/uaccess.F
-      !||    get_u_pnu    ../starter/source/user_interface/uaccess.F
-      !||====================================================================
+!||====================================================================
+!||    xini29       ../starter/source/elements/xelem/xini29.F
+!||--- called by ------------------------------------------------------
+!||    xinit3       ../starter/source/elements/xelem/xinit3.F
+!||--- calls      -----------------------------------------------------
+!||    get_u_func   ../starter/source/user_interface/uaccess.F
+!||    get_u_geo    ../starter/source/user_interface/uaccess.F
+!||    get_u_mat    ../starter/source/user_interface/uaccess.F
+!||    get_u_mid    ../starter/source/user_interface/uaccess.F
+!||    get_u_mnu    ../starter/source/user_interface/uaccess.F
+!||    get_u_pid    ../starter/source/user_interface/uaccess.F
+!||    get_u_pnu    ../starter/source/user_interface/uaccess.F
+!||====================================================================
       SUBROUTINE XINI29(NX    ,NAX1D  ,NAX2D ,NAX3D ,
      2                  XEL   ,VEL    ,VREL  ,
      2                  IOUT  ,IPROP  ,IMAT  ,

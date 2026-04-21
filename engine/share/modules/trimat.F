@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    trimat_mod                       ../engine/share/modules/trimat.F
-      !||--- called by ------------------------------------------------------
-      !||    afluxt                           ../engine/source/ale/ale51/afluxt.F
-      !||    ale51_gradient_reconstruction    ../engine/source/ale/alemuscl/ale51_gradient_reconstruction.F
-      !||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
-      !||    restalloc                        ../engine/source/output/restart/arralloc.F
-      !||====================================================================
+!||====================================================================
+!||    trimat_mod                       ../engine/share/modules/trimat.F
+!||--- called by ------------------------------------------------------
+!||    afluxt                           ../engine/source/ale/ale51/afluxt.F
+!||    ale51_gradient_reconstruction    ../engine/source/ale/alemuscl/ale51_gradient_reconstruction.F
+!||    ale51_gradient_reconstruction2   ../engine/source/ale/alemuscl/ale51_gradient_reconstruction2.F
+!||    restalloc                        ../engine/source/output/restart/arralloc.F
+!||====================================================================
       MODULE TRIMAT_MOD
 #include "my_real.inc"
-C tableau tempo entier partage
+C integer tempo array sharing
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: N4_VOIS
 C tableau tempo reel partage
       my_real       ,DIMENSION(:,:), ALLOCATABLE :: FLUX_VOIS

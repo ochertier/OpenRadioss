@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inelts     ../starter/source/interfaces/inter3d1/inelt.F
-      !||--- called by ------------------------------------------------------
-      !||    i1chk3     ../starter/source/interfaces/inter3d1/i1chk3.F
-      !||    i21els3    ../starter/source/interfaces/inter3d1/i21els3.F
-      !||    i2_surfi   ../starter/source/interfaces/inter3d1/i2_surfi.F90
-      !||    i2chk3     ../starter/source/interfaces/inter3d1/i2chk3.F
-      !||    i3sti3     ../starter/source/interfaces/inter3d1/i3sti3.F
-      !||    i7sti3     ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||    i9sti3     ../starter/source/interfaces/int09/i9sti3.F
-      !||--- calls      -----------------------------------------------------
-      !||    norma1     ../starter/source/interfaces/inter3d1/norma1.F
-      !||====================================================================
+!||====================================================================
+!||    inelts        ../starter/source/interfaces/inter3d1/inelt.F
+!||--- called by ------------------------------------------------------
+!||    i1chk3        ../starter/source/interfaces/inter3d1/i1chk3.F
+!||    i21els3       ../starter/source/interfaces/inter3d1/i21els3.F
+!||    i2_surfi      ../starter/source/interfaces/inter3d1/i2_surfi.F90
+!||    i2chk3        ../starter/source/interfaces/inter3d1/i2chk3.F
+!||    i3sti3        ../starter/source/interfaces/inter3d1/i3sti3.F
+!||    i7sti3        ../starter/source/interfaces/inter3d1/i7sti3.F
+!||    i9sti3        ../starter/source/interfaces/int09/i9sti3.F
+!||--- calls      -----------------------------------------------------
+!||    norma1        ../starter/source/interfaces/inter3d1/norma1.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INELTS(X        ,IRECT ,IXS   ,NINT ,NEL       ,
      .                  I        ,AREA  ,NOINT ,IR   ,SURF_ELTYP,
      .                  SURF_ELEM)
+      use element_mod , only :nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,7 +76,7 @@ C
 C
       NEL=SURF_ELEM(I)
 C-----------------------------------------------
-C     VERIFICATION DE L'ORIENTATION DES SEGMENTS
+C     VERIFICATION OF THE ORIENTATION OF THE SEGMENTS
 C-----------------------------------------------
        XS1=0.
        YS1=0.
@@ -116,18 +118,18 @@ C
        RETURN
 C
       END
-      !||====================================================================
-      !||    ineltc     ../starter/source/interfaces/inter3d1/inelt.F
-      !||--- called by ------------------------------------------------------
-      !||    i1chk3     ../starter/source/interfaces/inter3d1/i1chk3.F
-      !||    i20sti3    ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||    i21els3    ../starter/source/interfaces/inter3d1/i21els3.F
-      !||    i24gapm    ../starter/source/interfaces/inter3d1/i24sti3.F
-      !||    i2_surfi   ../starter/source/interfaces/inter3d1/i2_surfi.F90
-      !||    i2chk3     ../starter/source/interfaces/inter3d1/i2chk3.F
-      !||    i3sti3     ../starter/source/interfaces/inter3d1/i3sti3.F
-      !||    i7sti3     ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||====================================================================
+!||====================================================================
+!||    ineltc     ../starter/source/interfaces/inter3d1/inelt.F
+!||--- called by ------------------------------------------------------
+!||    i1chk3     ../starter/source/interfaces/inter3d1/i1chk3.F
+!||    i20sti3    ../starter/source/interfaces/inter3d1/i20sti3.F
+!||    i21els3    ../starter/source/interfaces/inter3d1/i21els3.F
+!||    i24gapm    ../starter/source/interfaces/inter3d1/i24sti3.F
+!||    i2_surfi   ../starter/source/interfaces/inter3d1/i2_surfi.F90
+!||    i2chk3     ../starter/source/interfaces/inter3d1/i2chk3.F
+!||    i3sti3     ../starter/source/interfaces/inter3d1/i3sti3.F
+!||    i7sti3     ../starter/source/interfaces/inter3d1/i7sti3.F
+!||====================================================================
       SUBROUTINE INELTC(NELC ,NELTG ,IS ,SURF_ELTYP, SURF_ELEM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -155,16 +157,18 @@ C-----------------------------------------------
 !---
       RETURN
       END
-      !||====================================================================
-      !||    i20nelts   ../starter/source/interfaces/inter3d1/inelt.F
-      !||--- called by ------------------------------------------------------
-      !||    i20sti3    ../starter/source/interfaces/inter3d1/i20sti3.F
-      !||--- calls      -----------------------------------------------------
-      !||    norma1     ../starter/source/interfaces/inter3d1/norma1.F
-      !||====================================================================
+!||====================================================================
+!||    i20nelts      ../starter/source/interfaces/inter3d1/inelt.F
+!||--- called by ------------------------------------------------------
+!||    i20sti3       ../starter/source/interfaces/inter3d1/i20sti3.F
+!||--- calls      -----------------------------------------------------
+!||    norma1        ../starter/source/interfaces/inter3d1/norma1.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I20NELTS(X        ,IRECT ,IXS   ,NINT ,NEL       ,
      .                    I        ,AREA  ,NOINT ,IR   ,SURF_ELTYP,
      .                    SURF_ELEM)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -204,7 +208,7 @@ C
 C
       NEL=SURF_ELEM(I)
 C-----------------------------------------------
-C     VERIFICATION DE L'ORIENTATION DES SEGMENTS
+C     VERIFICATION OF THE ORIENTATION OF THE SEGMENTS
 C-----------------------------------------------
        XS1=0.
        YS1=0.
@@ -246,16 +250,18 @@ C
        RETURN
 C
       END
-      !||====================================================================
-      !||    ineltigeo   ../starter/source/interfaces/inter3d1/inelt.F
-      !||--- called by ------------------------------------------------------
-      !||    i7sti3      ../starter/source/interfaces/inter3d1/i7sti3.F
-      !||--- calls      -----------------------------------------------------
-      !||    norma1      ../starter/source/interfaces/inter3d1/norma1.F
-      !||====================================================================
+!||====================================================================
+!||    ineltigeo     ../starter/source/interfaces/inter3d1/inelt.F
+!||--- called by ------------------------------------------------------
+!||    i7sti3        ../starter/source/interfaces/inter3d1/i7sti3.F
+!||--- calls      -----------------------------------------------------
+!||    norma1        ../starter/source/interfaces/inter3d1/norma1.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INELTIGEO(XE     ,IRECT  ,IXS   ,NINT     ,NELIG3D   ,
      .                     I      ,AREA   ,NOINT ,IR       ,SURF_ELTYP_IGE,
      .                     IXIG3D ,KXIG3D ,IGEO  ,SURF_ELEM_IGE)
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -297,7 +303,7 @@ C
       NELIG3D=SURF_ELEM_IGE(I)
 
 C-----------------------------------------------
-C     VERIFICATION DE L'ORIENTATION DES SEGMENTS
+C     VERIFICATION OF THE ORIENTATION OF THE SEGMENTS
 C-----------------------------------------------
        XS1=0.
        YS1=0.

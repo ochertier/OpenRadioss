@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    create_ellipse_clause   ../starter/source/model/sets/create_ellipse_clause.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_set                  ../starter/source/model/sets/hm_set.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||    hm_get_floatv           ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv             ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    subrotpoint             ../starter/source/model/submodel/subrot.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod      ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||    submodel_mod            ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    create_ellipse_clause   ../starter/source/model/sets/create_ellipse_clause.F
+!||--- called by ------------------------------------------------------
+!||    hm_set                  ../starter/source/model/sets/hm_set.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||    hm_get_floatv           ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv             ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    subrotpoint             ../starter/source/model/submodel/subrot.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod      ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||    submodel_mod            ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE CREATE_ELLIPSE_CLAUSE(ID        ,TITLE    ,SUB_ID   ,SKEW   ,RTRANS,
      .                                 CLAUSE    ,NRTRANS  ,LSUBMODEL,UNITAB ,ISKN  ,
      .                                 IAD       ,NTRANSF  ,NUMSKW   ,LISKN  ,LSKEW ,
@@ -79,7 +79,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,DGR1,DGR,ISKEW
+      INTEGER J, DGR1, DGR, ISKEW
 !
       MY_REAL  XG,YG,ZG,S_A,S_B,S_C
       LOGICAL :: lFOUND
@@ -90,7 +90,7 @@ C=======================================================================
       CALL HM_GET_INTV('Skew_ID' ,ISKEW,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('n' ,DGR1,IS_AVAILABLE,LSUBMODEL)
 
-      CLAUSE%ELLIPSE_ID_MADYMO=ISKEW ! No de l'entite qui impose le mvt de la surface.
+      CLAUSE%ELLIPSE_ID_MADYMO=ISKEW ! Entity number imposing surface movement.
       !                                --> No systeme Radioss ou MaDyMO.
       !skew:temporary storage of user id
       !get internal id from user id

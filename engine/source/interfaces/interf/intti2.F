@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    intti2          ../engine/source/interfaces/interf/intti2.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    intti12v        ../engine/source/interfaces/interf/intti12.F
-      !||    intti2v         ../engine/source/interfaces/interf/intti2v.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    intti2          ../engine/source/interfaces/interf/intti2.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    intti12v        ../engine/source/interfaces/interf/intti12.F
+!||    intti2v         ../engine/source/interfaces/interf/intti2v.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE INTTI2(IPARI,X     ,V      ,
      .                  A    ,VR    ,AR    ,KHIE  ,MS     ,
      .                  IN   ,WEIGHT,WA    ,SKEW  ,
@@ -45,7 +46,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
@@ -61,10 +61,10 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, NTY, JI, JB, NMN, NINT,K,ITIED,ILAGM
+      INTEGER N, NTY, JI, JB, NMN, NINT,ILAGM
       INTEGER :: ILEV,II,J
 C-----------------------------------------------
-C LES WA NE SONT PLUS UTILISES !!! 
+C wa are no longer used!!!
 C=======================================================================
       DO N=NINTER,1,-1
         NTY   = IPARI(7,N)                                             
@@ -101,7 +101,7 @@ C=======================================================================
                 ENDIF
           ENDIF
         ELSEIF (NTY == 12) THEN                                       
-          IF(IMACH/=3 .OR. ISPMD==0)THEN                            
+          IF(ISPMD==0)THEN                            
             CALL INTTI12V(                                            
      .           IPARI(1,N),INTBUF_TAB(N)      ,X         ,V        , 
      .            A        ,MS       ,WEIGHT   ,WA        ,SKEW     ) 

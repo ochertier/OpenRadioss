@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    get_file_name_info   ../starter/source/system/get_file_name_info.F
-      !||--- called by ------------------------------------------------------
-      !||    starter0             ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_exit              ../starter/source/output/analyse/analyse.c
-      !||    prhelpinfo           ../starter/source/starter/execargcheck.F
-      !||====================================================================
+!||====================================================================
+!||    get_file_name_info   ../starter/source/system/get_file_name_info.F
+!||--- called by ------------------------------------------------------
+!||    starter0             ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    my_exit              ../starter/source/output/analyse/analyse.c
+!||    prhelpinfo           ../starter/source/starter/execargcheck.F
+!||====================================================================
       SUBROUTINE GET_FILE_NAME_INFO(INPUT,LENI,
      *                              ROOTNAME,LENR,
      *                              RUNN,FVERS,IS_DYNA)
@@ -44,7 +44,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ERR,FST,LST,V4RNUM,rd
       CHARACTER ARUN*4,EXT*4,EXT3*3,V4LETTER,V5LETTER
 C-----------------------------------------------      
       IF (LENI < 4) GOTO 1000
@@ -70,7 +69,9 @@ C Rootname
          LENR=LEN_TRIM(ROOTNAME)
          IS_DYNA = 1 
          RUNN = 0  
-      ELSEIF ( INPUT(LENI-3:LENI) == '.key' ) THEN
+      ELSEIF ( INPUT(LENI-3:LENI) == '.key' .OR.  
+     .         INPUT(LENI-3:LENI) == '.dyn' .OR.  
+     .         INPUT(LENI-3:LENI) == '.DYN'  ) THEN
 C Rootname
          WRITE(ROOTNAME,FMT='(A)',ERR=1000) INPUT(1:LENI-4)
          LENR=LEN_TRIM(ROOTNAME)

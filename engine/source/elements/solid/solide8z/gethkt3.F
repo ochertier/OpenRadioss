@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    gethkt3        ../engine/source/elements/solid/solide8z/gethkt3.F
-      !||--- called by ------------------------------------------------------
-      !||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
-      !||--- uses       -----------------------------------------------------
-      !||    imp_ktan       ../engine/share/modules/impbufdef_mod.F
-      !||    imp_ktan_def   ../engine/share/modules/impbufdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    gethkt3        ../engine/source/elements/solid/solide8z/gethkt3.F
+!||--- called by ------------------------------------------------------
+!||    mmstifs        ../engine/source/elements/solid/solide8z/mmstifs.F
+!||--- uses       -----------------------------------------------------
+!||    imp_ktan       ../engine/share/modules/impbufdef_mod.F
+!||    imp_ktan_def   ../engine/share/modules/impbufdef_mod.F
+!||====================================================================
       SUBROUTINE GETHKT3(
      1   JFT,     JLT,     HT,      IR,
      2   IS,      IT,      MTN)
@@ -55,7 +55,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,MX,J,K
+      INTEGER I
 C     REAL
 
       TYPE(L_KTBUFEP_)    , POINTER :: LBUF

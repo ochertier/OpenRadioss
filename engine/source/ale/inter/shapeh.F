@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    shapeh   ../engine/source/ale/inter/shapeh.F
-      !||--- called by ------------------------------------------------------
-      !||    i9avel   ../engine/source/interfaces/int09/i9avel.F
-      !||    i9frms   ../engine/source/interfaces/int09/i9frms.F
-      !||    i9wal3   ../engine/source/interfaces/int09/i9wal3.F
-      !||    iqela1   ../engine/source/ale/inter/iqela1.F
-      !||    iqela2   ../engine/source/ale/inter/iqela2.F
-      !||    iqela3   ../engine/source/ale/inter/iqela3.F
-      !||====================================================================
+!||====================================================================
+!||    shapeh   ../engine/source/ale/inter/shapeh.F
+!||--- called by ------------------------------------------------------
+!||    i9avel   ../engine/source/interfaces/int09/i9avel.F
+!||    i9frms   ../engine/source/interfaces/int09/i9frms.F
+!||    i9wal3   ../engine/source/interfaces/int09/i9wal3.F
+!||    iqela1   ../engine/source/ale/inter/iqela1.F
+!||    iqela2   ../engine/source/ale/inter/iqela2.F
+!||    iqela3   ../engine/source/ale/inter/iqela3.F
+!||====================================================================
       SUBROUTINE SHAPEH(H,S,T)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,16 +23,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 #define NSUB_MAX 21
 #define NIVEAU_MAX 10
 #define NLIGNES_MAX 20
-      !||====================================================================
-      !||    trace_in      ../engine/source/system/trace_back.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2      ../engine/source/engine/radioss2.F
-      !||    resol         ../engine/source/engine/resol.F
-      !||    resol_head    ../engine/source/engine/resol_head.F
-      !||--- calls      -----------------------------------------------------
-      !||    trace_pile    ../engine/source/system/trace_back.F
-      !||    trace_print   ../engine/source/system/trace_back.F
-      !||====================================================================
+!||====================================================================
+!||    trace_in      ../engine/source/system/trace_back.F
+!||--- called by ------------------------------------------------------
+!||    radioss2      ../engine/source/engine/radioss2.F
+!||    resol         ../engine/source/engine/resol.F
+!||    resol_head    ../engine/source/engine/resol_head.F
+!||--- calls      -----------------------------------------------------
+!||    trace_pile    ../engine/source/system/trace_back.F
+!||    trace_print   ../engine/source/system/trace_back.F
+!||====================================================================
       SUBROUTINE TRACE_IN(NSUB,ITAB,ATAB)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -116,16 +116,16 @@ C-----------------------------------------------
       RETURN
 C
       END
-      !||====================================================================
-      !||    trace_out     ../engine/source/system/trace_back.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2      ../engine/source/engine/radioss2.F
-      !||    resol         ../engine/source/engine/resol.F
-      !||    resol_head    ../engine/source/engine/resol_head.F
-      !||--- calls      -----------------------------------------------------
-      !||    trace_pile    ../engine/source/system/trace_back.F
-      !||    trace_print   ../engine/source/system/trace_back.F
-      !||====================================================================
+!||====================================================================
+!||    trace_out     ../engine/source/system/trace_back.F
+!||--- called by ------------------------------------------------------
+!||    radioss2      ../engine/source/engine/radioss2.F
+!||    resol         ../engine/source/engine/resol.F
+!||    resol_head    ../engine/source/engine/resol_head.F
+!||--- calls      -----------------------------------------------------
+!||    trace_pile    ../engine/source/system/trace_back.F
+!||    trace_print   ../engine/source/system/trace_back.F
+!||====================================================================
       SUBROUTINE TRACE_OUT(NSUB)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -151,13 +151,13 @@ C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    trace_pile    ../engine/source/system/trace_back.F
-      !||--- called by ------------------------------------------------------
-      !||    trace_in      ../engine/source/system/trace_back.F
-      !||    trace_out     ../engine/source/system/trace_back.F
-      !||    trace_print   ../engine/source/system/trace_back.F
-      !||====================================================================
+!||====================================================================
+!||    trace_pile    ../engine/source/system/trace_back.F
+!||--- called by ------------------------------------------------------
+!||    trace_in      ../engine/source/system/trace_back.F
+!||    trace_out     ../engine/source/system/trace_back.F
+!||    trace_print   ../engine/source/system/trace_back.F
+!||====================================================================
       INTEGER FUNCTION TRACE_PILE(INOUT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -190,11 +190,11 @@ C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END
-      !||====================================================================
-      !||    trace_cf      ../engine/source/system/trace_back.F
-      !||--- calls      -----------------------------------------------------
-      !||    trace_print   ../engine/source/system/trace_back.F
-      !||====================================================================
+!||====================================================================
+!||    trace_cf      ../engine/source/system/trace_back.F
+!||--- calls      -----------------------------------------------------
+!||    trace_print   ../engine/source/system/trace_back.F
+!||====================================================================
       SUBROUTINE TRACE_CF(SIGNAL,IW)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -212,19 +212,19 @@ C-----------------------------------------------
       CALL TRACE_PRINT(LINE,SIGNAL,IW)
       RETURN
       END
-      !||====================================================================
-      !||    trace_print   ../engine/source/system/trace_back.F
-      !||--- called by ------------------------------------------------------
-      !||    trace_cf      ../engine/source/system/trace_back.F
-      !||    trace_in      ../engine/source/system/trace_back.F
-      !||    trace_out     ../engine/source/system/trace_back.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    trace_pile    ../engine/source/system/trace_back.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    trace_print   ../engine/source/system/trace_back.F
+!||--- called by ------------------------------------------------------
+!||    trace_cf      ../engine/source/system/trace_back.F
+!||    trace_in      ../engine/source/system/trace_back.F
+!||    trace_out     ../engine/source/system/trace_back.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    arret         ../engine/source/system/arret.F
+!||    trace_pile    ../engine/source/system/trace_back.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE TRACE_PRINT(LINE,NS_SIGNAL,IW)
 C-----------------------------------------------
 C   M o d u l e s
@@ -255,7 +255,7 @@ C-----------------------------------------------
       INTEGER CHECK_PILE(NIVEAU_MAX,PARASIZ)
       CHARACTER*80 BLANC
       CHARACTER*132 TEXT(NLIGNES_MAX,PARASIZ)
-      INTEGER I,IP,IL,NLIGNES,IT
+      INTEGER I,NLIGNES,IT
       LOGICAL :: FIRST_CALL = .TRUE.
       SAVE NLIGNES_PILE,TEXT,CHECK_PILE, FIRST_CALL
       INTEGER NS_SIGNAL1,IW1,LAST_IN
@@ -279,7 +279,7 @@ C-----------------------------------------------
 C
       IF(IW1==0) THEN
 C------------------------------------------------------------------------
-C       Ajout d'une ligne a TEXT (1 ou plusieurs X par descente de pile)
+C       adding a line to TEXT (1 or more X per stack descent)
 C------------------------------------------------------------------------
         NLIGNES_PILE(NIVEAU_PILE,IT) 
      .         = NLIGNES_PILE(NIVEAU_PILE,IT) + 1
@@ -291,7 +291,7 @@ C------------------------------------------------------------------------
         CHECK_PILE(NIVEAU_PILE,IT) = NS_SIGNAL
       ELSEIF(IW1==-1) THEN
 C------------------------------------------
-C       remonte de pile 
+C       stack ascent
 C------------------------------------------
         IF(NS_SIGNAL1==CHECK_PILE(NIVEAU_PILE,IT))THEN
           NLIGNES_PILE(NIVEAU_PILE,IT) 
@@ -304,7 +304,7 @@ C------------------------------------------
 C
       IF(IW1>0) THEN
 C------------------------------------------
-C       Ecriture du Trace Back et Arret
+C       writing the Trace Back and stopping
 C------------------------------------------
         IF(NIVEAU_PILE<=0)STOP
         NLIGNES = NLIGNES_PILE(NIVEAU_PILE,IT)

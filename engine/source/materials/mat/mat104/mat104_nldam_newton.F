@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mat104_nldam_newton   ../engine/source/materials/mat/mat104/mat104_nldam_newton.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps104             ../engine/source/materials/mat/mat104/sigeps104.F
-      !||====================================================================
+!||====================================================================
+!||    mat104_nldam_newton   ../engine/source/materials/mat/mat104/mat104_nldam_newton.F
+!||--- called by ------------------------------------------------------
+!||    sigeps104             ../engine/source/materials/mat/mat104/sigeps104.F
+!||====================================================================
       SUBROUTINE MAT104_NLDAM_NEWTON(
-     1     NEL     ,NGL     ,NUPARAM ,NUVAR   , 
+     1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,VOLUME  ,FHEAT   , 
      2     TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFF     ,
      3     RHO0    ,RHO     ,PLA     ,DPLA    ,EPSD    ,SOUNDSP ,
      4     DEPSXX  ,DEPSYY  ,DEPSZZ  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      5     SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6     SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     7     SIGY    ,ET      ,TEMPEL  ,DPLA_NL ,DMG     ,TEMP    ,
-     8     SEQ     ,PLA_NL  ,PLAP_NL )
+     7     SIGY    ,ET      ,DPLA_NL ,DMG     ,TEMP    ,SEQ     ,
+     8     PLA_NL  ,PLAP_NL ,JLAG    )
       !=======================================================================
       !      Implicit types
       !=======================================================================
@@ -46,13 +46,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !      Dummy arguments
       !=======================================================================
       INTEGER NEL,NUPARAM,NUVAR,JTHE
+      INTEGER ,INTENT(IN) :: JLAG
       INTEGER ,DIMENSION(NEL), INTENT(IN)    :: NGL
       my_real 
      .   TIME,TIMESTEP
       my_real,DIMENSION(NUPARAM), INTENT(IN) :: 
      .   UPARAM
+      my_real, DIMENSION(NEL), INTENT(IN)    :: VOLUME
+      my_real ,DIMENSION(NEL), INTENT(INOUT) :: FHEAT
       my_real,DIMENSION(NEL), INTENT(IN)     :: 
-     .   RHO0,RHO,TEMPEL,
+     .   RHO0,RHO,
      .   DEPSXX,DEPSYY,DEPSZZ,DEPSXY,DEPSYZ,DEPSZX,
      .   SIGOXX,SIGOYY,SIGOZZ,SIGOXY,SIGOYZ,SIGOZX,
      .   PLA_NL,PLAP_NL,DPLA_NL
@@ -75,24 +78,24 @@ c
       my_real :: 
      .   YOUNG,BULK,LAM,G,G2,NU,CDR,KDR,HARD,YLD0,QVOCE,BVOCE,JCC,
      .   EPSP0,MTEMP,TINI,TREF,ETA,CP,DPIS,DPAD,ASRATE,AFILTR,HKHI,
-     .   Q1,Q2,ED,AN,EPN,KW,FR,FC,F0
+     .   Q1,Q2,ED,AN,KW,FR,FC,F0
       my_real ::
-     .   DTI,H,LDAV,TRDEP,SIGVM,OMEGA,
+     .   DTI,LDAV,TRDEP,SIGVM,OMEGA,
      .   DTEMP,FCOSH,FSINH,DPDT,DLAM,DDEP
       my_real ::
      .   DSDRDJ2,DSDRDJ3,
      .   DJ3DSXX,DJ3DSYY,DJ3DSZZ,DJ3DSXY,DJ3DSYZ,DJ3DSZX,
-     .   DJ2DSXX,DJ2DSYY,DJ2DSZZ,DJ2DSXY,DJ2DSYZ,DJ2DSZX,
-     .   DFDSXX,DFDSYY,DFDSZZ,DFDSXY,DFDSYZ,DFDSZX,
-     .   NORMSIG,SDPLA,DPHI_DTRSIG,DFDSIG2,SDV_DFDSIG,
-     .   DPHI_DSIG,DPHI_DYLD,DPHI_DFDR,DF_DFS,DFS_DFT,DPHI_DFT,
-     .   DPHI_DFS,DFN_DLAM,DFSH_DLAM,DFG_DLAM,DFT_DLAM,
-     .   DFN,DFSH,DFG,DFT,DYLD_DPLA,DYLD_DTEMP,DTEMP_DLAM
+     .   
+     .   
+     .   NORMSIG,SDPLA,DPHI_DTRSIG,DFDSIG2,
+     .   DPHI_DSIG,DPHI_DYLD,DPHI_DFDR,
+     .   
+     .   DYLD_DPLA
 c
       my_real, DIMENSION(NEL) :: 
-     .   DSIGXX,DSIGYY,DSIGZZ,DSIGXY,DSIGYZ,DSIGZX,TRSIG,
+     .   TRSIG,
      .   SXX,SYY,SZZ,SXY,SYZ,SZX,SIGM,J2,J3,SIGDR,YLD,WEITEMP,
-     .   HARDP,FHARD,FRATE,FTHERM,DTHERM,FDR,PHI0,TRDFDS,TRIAX,
+     .   HARDP,FHARD,FRATE,FTHERM,FDR,TRDFDS,TRIAX,
      .   FDAM,PHI,FT,FS,FG,FN,FSH,DPLA_DLAM,DPHI_DLAM,ETAT,
      .   NORMXX,NORMYY,NORMXY,NORMZZ,NORMYZ,NORMZX,SIG_DFDSIG,
      .   DPXX,DPYY,DPXY,DPYZ,DPZX,DPZZ,SIGDR2,YLD2I,DLAM_NL
@@ -175,7 +178,7 @@ c
 c      
       ! Initialization of damage, temperature and self-heating weight factor
       IF (TIME == ZERO) THEN   
-        TEMP(1:NEL) = TINI 
+        IF (JTHE == 0) TEMP(1:NEL) = TINI 
         IF (ISIGI == 0) THEN 
           DMG(1:NEL,5) = F0
           FT(1:NEL)    = F0
@@ -188,23 +191,19 @@ c
           FS(1:NEL) = DMG(1:NEL,6)
         ENDIF
       ENDIF 
-      IF (CP > ZERO) THEN     
-        IF (JTHE == 0) THEN
-          DO I=1,NEL
-            ! Computation of the weight factor
-            IF (PLAP_NL(I) < DPIS) THEN
-              WEITEMP(I) = ZERO
-            ELSEIF (PLAP_NL(I) > DPAD) THEN
-              WEITEMP(I) = ONE
-            ELSE
-              WEITEMP(I) = ((PLAP_NL(I)-DPIS)**2 )
-     .        * (THREE*DPAD - TWO*PLAP_NL(I) - DPIS)
-     .         / ((DPAD-DPIS)**3)
-            ENDIF
-          ENDDO
-        ELSE
-          TEMP(1:NEL) = TEMPEL(1:NEL)
-        ENDIF
+      IF ((JTHE == 0 .AND. CP > ZERO) .OR. JTHE /= 0) THEN     
+        DO I=1,NEL
+          ! Computation of the weight factor
+          IF (PLAP_NL(I) < DPIS) THEN
+            WEITEMP(I) = ZERO
+          ELSEIF (PLAP_NL(I) > DPAD) THEN
+            WEITEMP(I) = ONE
+          ELSE
+            WEITEMP(I) = ((PLAP_NL(I)-DPIS)**2 )
+     .      * (THREE*DPAD - TWO*PLAP_NL(I) - DPIS)
+     .       / ((DPAD-DPIS)**3)
+          ENDIF
+        ENDDO
       ENDIF
 c      
       !========================================================================
@@ -356,11 +355,9 @@ c
         FS(I)   = MIN (FS(I),ONE/Q1)
 c  
         ! Temperature update
-        IF (CP > ZERO ) THEN                   
-          IF (JTHE == 0) THEN                   
-            DTEMP   = WEITEMP(I)*(ONE-FT(I))*YLD(I)*DPLA_NL(I)*ETA/(RHO0(I)*CP)
-            TEMP(I) = TEMP(I) + DTEMP
-          ENDIF
+        IF (JTHE == 0 .AND. CP > ZERO ) THEN 
+          DTEMP   = WEITEMP(I)*(ONE-FT(I))*YLD(I)*DPLA_NL(I)*ETA/(RHO0(I)*CP)
+          TEMP(I) = TEMP(I) + DTEMP
         ENDIF
       ENDDO      
 c      
@@ -372,8 +369,7 @@ c
         FRATE(I) = ONE
         IF (EPSD(I) > EPSP0) FRATE(I) = FRATE(I) + JCC*LOG(EPSD(I)/EPSP0)
         ! c) - Correction factor for thermal effects
-        FTHERM(I) = ONE
-        IF (CP > ZERO) FTHERM(I) = ONE - MTEMP*(TEMP(I) - TREF)
+        FTHERM(I) = ONE - MTEMP*(TEMP(I) - TREF)
         ! d) - Computation of the yield function
         YLD(I) = FHARD(I)*FRATE(I)*FTHERM(I)
         ! e) - Checking values
@@ -685,5 +681,13 @@ c
         ! Storing the yield stress
         SIGY(I)    = YLD(I)
       ENDDO 
-c
+C-----------------------------------------------
+C     plastic work dissipated as heat - in case of /heat/mat
+C-----------------------------------------------
+      IF (JTHE < 0 .AND. JLAG /= 0) THEN
+        DO I=1,NEL
+          FHEAT(I) = FHEAT(I) + ETA*(ONE-FT(I))*WEITEMP(I)*YLD(I)*DPLA(I)*VOLUME(I)
+        ENDDO
+      END IF
+!-----------
       END

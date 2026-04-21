@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ig3dgrhead     ../starter/source/elements/ige3d/ig3dgrhead.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ig3dgrhead     ../starter/source/elements/ige3d/ig3dgrhead.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod    ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE IG3DGRHEAD(
      1       KXIG3D,  GEO,   INUM,    ITR1,
      2       EADD, INDEX, ITRI,    IPARTIG3D,     
@@ -42,12 +42,12 @@ C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
 C     KXIG3D(NIXIG3D,NUMELIG3D)  TABLEAU CONECS+PID+No ElEMENTS         E
-C     GEO(NPROPG,NUMGEO)TABLEAU DES CARACS DES PID                      E
-C     INUM(8,NUMELIG3D)    TABLEAU DE TRAVAIL                         E/S
-C     ITR1(NSELR)       TABLEAU DE TRAVAIL                            E/S
-C     EADD(NUMELIG3D)      TABLEAU DES ADRESSES DANS IDAM CHGT DAMIER   S
-C     INDEX(NUMELIG3D)     TABLEAU DE TRAVAIL                         E/S
-C     ITRI(4,NUMELIG3D)    TABLEAU DE TRAVAIL                         E/S
+C     GEO(NPROPG,NUMGEO) array of the characteristics of the PID
+C     INUM(8,NUMELIG3D)    WORKING ARRAY                         E/S
+C     ITR1(NSELR)       WORKING ARRAY                            E/S
+C     EADD(NUMELIG3D)      ARRAY OF ADRESSES IN IDAM CHGT DAMIER   S
+C     INDEX(NUMELIG3D)     WORKING ARRAY                         E/S
+C     ITRI(4,NUMELIG3D)    WORKING ARRAY                         E/S
 C     IPARTIG3D(NUMELIG3D)    TABLEAU PART                            E/S
 C     CEP(NUMELIG3D)    TABLEAU PROC                                  E/S
 C     XEP(NUMEX)    TABLEAU PROC                                      E/S
@@ -77,8 +77,8 @@ C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
       INTEGER 
-     .        I, K, NG, ISSN, NPN, NN, N, MID, PID ,
-     .        II, J, II2,JJ2,JJ, II3, JJ3, L,NGROU,
+     .        I, K, NN, MID, PID ,
+     .        II, J, II2,JJ2,JJ, II3, JJ3,
      .        MODE, WORK(70000),NCTRL,MLN,JALE_FROM_MAT,JALE_FROM_PROP
       EXTERNAL MY_SHIFTL,MY_SHIFTR,MY_AND
       INTEGER MY_SHIFTL,MY_SHIFTR,MY_AND
@@ -87,7 +87,7 @@ C-----------------------------------------------
 C
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C----------------------------------------------------------
-C   TRI GLOBAL SUR TOUS LES CRITERES POUR TOUS LES ELEMENTS
+C   global sort on all criteria for all elements
 C----------------------------------------------------------
 C
       DO I=1,NUMELIG3D
@@ -103,12 +103,6 @@ C
         ENDDO
       ENDDO
 
-c      IF (IMACH==3) THEN
-c        DO I=1,NUMELIG3D
-c          XEP(I)=CEP(I)
-c        ENDDO
-c      ENDIF
-C
       DO I = 1, NUMELIG3D
         MID= KXIG3D(1,I)
         MLN = NINT(PM(19,ABS(MID)))
@@ -147,24 +141,20 @@ C
           KNOTLOCEL((I-1)*6+J)=KNOTLOCELINDX((INDEX(I)-1)*6+J)
         ENDDO    
       ENDDO
-c      IF (IMACH==3) THEN
-c        DO I=1,NUMELIG3D
-c          CEP(I)=XEP(INDEX(I))
-c        ENDDO
-c      ENDIF
+
       DO  K=1,NIXIG3D     
         DO  I=1,NUMELIG3D
           KXIG3D(K,I)=INUM(K+1,INDEX(I))
         ENDDO
       ENDDO
 C
-C INVERSION DE INDEX (DANS ITR1)
+C inversion of INDEX (in ITR1)
 C
       DO I=1,NUMELIG3D
         ITR1(INDEX(I))=I
       ENDDO
 C
-C RENUMEROTATION POUR SURFACES
+C renumbering for surfaces
 C
       DO I=1,NSURF
         NN=IGRSURF(I)%NSEG_IGE
@@ -179,7 +169,7 @@ C
       ENDDO
 C
 C--------------------------------------------------------------
-C         DETERMINATION DES SUPER_GROUPES
+C         determination of super_groups
 C--------------------------------------------------------------
       ND=1
       DO I=2,NUMELIG3D

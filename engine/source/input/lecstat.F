@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lecstat        ../engine/source/input/lecstat.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur         ../engine/source/input/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../engine/source/output/message/message.F
-      !||    arret          ../engine/source/system/arret.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    mat_elem_mod   ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    message_mod    ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    lecstat        ../engine/source/input/lecstat.F
+!||--- called by ------------------------------------------------------
+!||    lectur         ../engine/source/input/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg         ../engine/source/output/message/message.F
+!||    arret          ../engine/source/system/arret.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    mat_elem_mod   ../common_source/modules/mat_elem/mat_elem_mod.F90
+!||    message_mod    ../engine/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE LECSTAT(IPART ,IPART_STATE,ELBUF_TAB,IPM,IPARG,
      .                   IPARTS,IPARTC     ,IPARTG,MAT_PARAM)
 C-----------------------------------------------
@@ -64,7 +64,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IDPRT,K_STAT,J,IP,IPID,IGTYP,
+      INTEGER I,IDPRT,J,IP,IPID,
      .        IFAIL,NLAY,FAIL_ID,MAT_ID,IL,IMAT,
      .        NFAIL,NG,ITY,NFT,IPRT
       INTEGER MAT_CHECKED(NUMMAT)
@@ -117,7 +117,7 @@ C-----------------------------------------------
               ENDIF ! IF (ITY == 1 .or. ITY == 3 .or. ITY == 7)
             ENDDO ! DO NG=1,NGROUP
 C---
-          ENDIF ! IF ( part de coque & STAT_C(8) = 1) THEN
+          ENDIF ! If (shell share & stat_c (8) = 1) then
         END DO ! DO I=1,NSTATPRT
       ELSEIF (NSTATALL /= 0) THEN
         DO J=1,NPART

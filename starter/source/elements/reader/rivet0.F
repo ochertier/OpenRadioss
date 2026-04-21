@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    rivet0          ../starter/source/elements/reader/rivet0.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_rivet   ../starter/source/elements/reader/hm_read_rivet.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||    kinset          ../starter/source/constraints/general/kinset.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    rivet0          ../starter/source/elements/reader/rivet0.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_rivet   ../starter/source/elements/reader/hm_read_rivet.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg          ../starter/source/output/message/message.F
+!||    kinset          ../starter/source/constraints/general/kinset.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod     ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE RIVET0(V,VR,MS,IN,IXRI,RIVET,GEO,ITAB,IKINE)
       USE MESSAGE_MOD
 C
@@ -53,7 +53,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, IGL, IG, IROT, K1, K2, IGTYP, IKINE1(3*NUMNOD)
+      INTEGER I, IG, IROT, K1, K2, IGTYP, IKINE1(3*NUMNOD)
 C     REAL
       my_real
      .   XM, XIN

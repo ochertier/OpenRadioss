@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps36c   ../engine/source/materials/mat/mat036/sigeps36c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    vinter      ../engine/source/tools/curve/vinter.F
-      !||    vinter2     ../engine/source/tools/curve/vinter.F
-      !||====================================================================
+!||====================================================================
+!||    sigeps36c   ../engine/source/materials/mat/mat036/sigeps36c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    vinter      ../engine/source/tools/curve/vinter.F
+!||    vinter2     ../engine/source/tools/curve/vinter.F
+!||====================================================================
       SUBROUTINE SIGEPS36C(
      1     NEL    ,NUVAR   ,NVARTMP ,MFUNC  ,
      2     KFUNC  ,NPF    ,IPLAS  ,
      2     TF     ,TIMESTEP,UPARAM  ,RHO0   ,
-     3     THKLY   ,ASRATE  ,
+     3     THKLY  ,ISRATE ,ASRATE  ,EPSD_PG ,EPSD   ,
      4     EPSPXX ,EPSPYY ,EPSPXY  ,
      5     DEPSXX ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
      6     EPSXX  ,EPSYY  ,EPSXY   ,
      7     SIGOXX ,SIGOYY ,SIGOXY  ,SIGOYZ  ,SIGOZX ,
      8     SIGNXX ,SIGNYY ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
      9     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
-     A     VARTMP ,OFF    ,IPM     ,IMAT   ,
-     B     ETSE   ,GS     ,YLD     ,EPSP    ,ISRATE ,
+     A     VARTMP ,OFF    ,IPM     ,IMAT    ,
+     B     ETSE   ,GS     ,YLD     ,
      C     DPLA_I ,GAMA_IMP,SIGNOR ,SHF     ,HARDM  ,
-     D     FACYLDI,INLOC   ,DPLANL  ,DMG    ,PLANL  ,
+     D     FACYLDI,INLOC   ,DPLANL ,DMG     ,PLANL  ,
      E     L_PLANL,SIGBXX,SIGBYY,SIGBXY  ,LOFF)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -112,9 +112,11 @@ C-----------------------------------------------
      .   DEPSXX(NEL),DEPSYY(NEL),DEPSXY(NEL),DEPSYZ(NEL),DEPSZX(NEL),
      .   EPSXX(NEL) ,EPSYY(NEL),EPSXY(NEL),
      .   SIGOXX(NEL),SIGOYY(NEL),SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
-     .   GS(NEL),EPSP(NEL),SHF(NEL),HARDM(NEL),DPLANL(NEL),DMG(NEL),
+     .   GS(NEL),SHF(NEL),HARDM(NEL),DPLANL(NEL),DMG(NEL),
      .   PLANL(NEL*L_PLANL)
-      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
+      my_real, DIMENSION(NEL), INTENT(IN)    :: LOFF
+      my_real, DIMENSION(NEL), INTENT(IN)    :: EPSD_PG  ! global element strain rate
+      my_real, DIMENSION(NEL), INTENT(INOUT) :: EPSD     ! lbuf%epsd
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -284,11 +286,14 @@ C       STRAIN RATE
 C-------------------
         IF (ISRATE == 0) THEN
           DO I=1,NEL
-            EPSP(I) = HALF*( ABS(EPSPXX(I)+EPSPYY(I))
+            EPSD(I) = HALF*( ABS(EPSPXX(I)+EPSPYY(I))
      .              + SQRT( (EPSPXX(I)-EPSPYY(I))*(EPSPXX(I)-EPSPYY(I))
      .              + EPSPXY(I)*EPSPXY(I) ) )
           ENDDO
+        ELSE
+          EPSD(1:NEL) = asrate*epsd_pg(1:nel) + (one-asrate)*epsd(1:nel)
         ENDIF
+        
 c-----------------------------------------------
 c       PRESSURE DEPENDENT YIELD FUNCTION FACTOR
 c-----------------------------------------------
@@ -334,7 +339,7 @@ c
           JJ(1:NEL) = 1
           DO J=2,NRATE-1
             DO I=1,NEL
-              IF (EPSP(I) >= UPARAM(6+J)) JJ(I) = J
+              IF (EPSD(I) >= UPARAM(6+J)) JJ(I) = J
             ENDDO
           ENDDO
           IF (ISMOOTH == 2) THEN      ! log_n  based interpolation of strain rate
@@ -342,7 +347,7 @@ c
             DO I=1,NEL
               EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
               EPSP2 = UPARAM(7+JJ(I))
-              RFAC(I) = LOG(MAX(EPSP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
+              RFAC(I) = LOG(MAX(EPSD(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
               YFAC(I,1) = UPARAM(6+NRATE+JJ(I))  * FACYLDI(I)
               YFAC(I,2) = UPARAM(7+NRATE+JJ(I))  * FACYLDI(I)
             ENDDO
@@ -351,7 +356,7 @@ c
             DO I=1,NEL
               EPSP1 = UPARAM(6+JJ(I))
               EPSP2 = UPARAM(7+JJ(I))
-              RFAC(I) = (EPSP(I) - EPSP1) / (EPSP2 - EPSP1)
+              RFAC(I) = (EPSD(I) - EPSP1) / (EPSP2 - EPSP1)
               YFAC(I,1) = UPARAM(6+NRATE+JJ(I)) * FACYLDI(I)
               YFAC(I,2) = UPARAM(7+NRATE+JJ(I)) * FACYLDI(I)
             ENDDO
@@ -464,7 +469,7 @@ c------------------------------
 C       PROJECTION
 C-------------------
         IF (IPLAS(1) == 0) THEN
-c         projection radiale 
+c         radial projection 
           NU3 = ONE-NU_MNU
           DO I=1,NEL
             SVM2(I)= SIGNXX(I)*SIGNXX(I)
@@ -482,7 +487,7 @@ c         projection radiale
               IF (INLOC == 0) THEN 
                 IF(YLD(I) .NE. 0) THEN
                   !YLD may be 0 when SIGNXX+SIGNYY == 0, that will cause floating point
-                  !exception in debug mode
+                  !Exception in Debug Mode
                   DEZZ = DPLA_I(I) * HALF*(SIGNXX(I)+SIGNYY(I)) / YLD(I)
                 ELSE
                   DEZZ = ZERO 
@@ -496,7 +501,7 @@ c         projection radiale
 C
         ELSEIF (IPLAS(1) == 1) THEN    ! implicit scheme, 3 Newton iterations
 C-------------------------
-C         CRITERE DE VON MISES
+C         VON MISES CRITERION
 C-------------------------
           DO I=1,NEL
             H(I) = MAX(ZERO,H(I))
@@ -588,7 +593,7 @@ C-----       for kin hardening
 c-------------------------------------------
         ELSEIF (IPLAS(1) == 2) THEN
 c-------------------------------------------
-C         CRITERE DE VON MISES
+C         VON MISES CRITERION
 C-------------------------
           DO I=1,NEL
             H(I) = MAX(ZERO,H(I))
@@ -613,7 +618,7 @@ C-------------------------
 C
           IF (NINDX > 0) THEN
 C-------------
-C           PROJ NORMALE AU CRITERE AVEC CALCUL APPROCHE DE LA NORMALE + RETOUR RADIAL
+C           NORMAL PROJECTION ON THE CRITERION WITH APPROXIMATE NORMAL CALCULATION + RADIAL RETURN
 C-------------
             NU3 = ONE-NU_MNU
 #include "vectorize.inc"
@@ -764,7 +769,7 @@ c-------------------------------
            VARTMP(I,2+J2) = IPOS2(I)
           ENDDO
 c-------------------------------
-        ELSEIF (FISOKIN == ONE) THEN  ! ecrouissage cinematique
+        ELSEIF (FISOKIN == ONE) THEN  ! cinematics
 c-------------------------------
 #include "vectorize.inc"
           DO I=1,NEL
@@ -791,7 +796,7 @@ c-------------------------------
             VARTMP(I,2+J2) = IPOS2(I)
           ENDDO
 c-------------------------------
-        ELSE   ! ecrouissage mixte
+        ELSE   ! mixed collapse
 c-------------------------------
 #include "vectorize.inc"
           DO I=1,NEL
@@ -826,7 +831,7 @@ c-------------------------------
 C-------------------
 C       PROJECTION
 C-------------------
-C       CRITERE DE VON MISES
+C       VON MISES CRITERION
 C-------------------------
         DO I=1,NEL
           H(I) = MAX(ZERO,H(I))

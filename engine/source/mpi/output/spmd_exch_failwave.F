@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_failwave_boundaries   ../engine/source/mpi/output/spmd_exch_failwave.F
-      !||--- called by ------------------------------------------------------
-      !||    resol_init                 ../engine/source/engine/resol_init.F
-      !||--- uses       -----------------------------------------------------
-      !||    failwave_mod               ../common_source/modules/failwave_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_failwave_boundaries   ../engine/source/mpi/output/spmd_exch_failwave.F
+!||--- called by ------------------------------------------------------
+!||    resol_init                 ../engine/source/engine/resol_init.F
+!||--- uses       -----------------------------------------------------
+!||    failwave_mod               ../common_source/modules/failwave_mod.F
+!||    spmd_comm_world_mod        ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_FAILWAVE_BOUNDARIES(FAILWAVE,IAD_ELEM,FR_ELEM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -36,6 +37,7 @@ C      USE DEBUG_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -93,14 +95,15 @@ C count the #boundaries failwave nodes
       END
 
 
-      !||====================================================================
-      !||    spmd_exch_failwave   ../engine/source/mpi/output/spmd_exch_failwave.F
-      !||--- called by ------------------------------------------------------
-      !||    update_failwave      ../engine/source/materials/fail/failwave/update_failwave.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    failwave_mod         ../common_source/modules/failwave_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_exch_failwave    ../engine/source/mpi/output/spmd_exch_failwave.F
+!||--- called by ------------------------------------------------------
+!||    update_failwave       ../engine/source/materials/fail/failwave/update_failwave.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    failwave_mod          ../common_source/modules/failwave_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_EXCH_FAILWAVE(FAILWAVE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -110,6 +113,7 @@ C      USE DEBUG_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g

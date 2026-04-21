@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i7stsecnd       ../starter/source/interfaces/inter3d1/i7stslav.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr1         ../starter/source/interfaces/interf1/inintr1.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i7stsecnd       ../starter/source/interfaces/inter3d1/i7stslav.F
+!||--- called by ------------------------------------------------------
+!||    inintr1         ../starter/source/interfaces/interf1/inintr1.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE I7STSECND(IPARI,STIFINT,INTBUF_TAB )
 C-----------------------------------------------
 C   M o d u l e s
@@ -50,7 +50,7 @@ C-----------------------------------------------
      .   I, J,
      .   INACTI,IGAP,MULTIMP,NSN0,ITY,NSNE,S
 C---------------------------------------------
-C     MISE A JOUR DES RIGIDITES NODALES EQUIVALENTES (COTE SECOND)
+C     SET A JOUR DES RIGIDITES NODALES EQUIVALENTES (COTE SECOND)
 C---------------------------------------------
       NSN   =IPARI(5)
       DO I=1,NSN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_preread_bem         ../starter/source/loads/bem/hm_read_bem.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    arret                  ../starter/source/system/arret.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_preread_bem         ../starter/source/loads/bem/hm_read_bem.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    arret                  ../starter/source/system/arret.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_PREREAD_BEM(IGRSURF,IGRNOD, NNFT ,
      .     UNITAB, NOM_OPT, LSUBMODEL)
 C-----------------------------------------------
@@ -243,34 +243,34 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    hm_read_bem                    ../starter/source/loads/bem/hm_read_bem.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                         ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                         ../starter/source/output/message/message.F
-      !||    arret                          ../starter/source/system/arret.F
-      !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
-      !||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
-      !||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_count                ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key             ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start                ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    init_qd                        ../starter/source/fluid/init_qd.F
-      !||    init_tg                        ../starter/source/fluid/init_tg.F
-      !||    mass_fluid_qd                  ../starter/source/fluid/mass-fluid_qd.F
-      !||    mass_fluid_tg                  ../starter/source/fluid/mass-fluid_tg.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod             ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                    ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_bem                    ../starter/source/loads/bem/hm_read_bem.F
+!||--- called by ------------------------------------------------------
+!||    lectur                         ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                         ../starter/source/output/message/message.F
+!||    arret                          ../starter/source/system/arret.F
+!||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+!||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
+!||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_count                ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_option_read_key             ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start                ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    init_qd                        ../starter/source/fluid/init_qd.F
+!||    init_tg                        ../starter/source/fluid/init_tg.F
+!||    mass_fluid_qd                  ../starter/source/fluid/mass-fluid_qd.F
+!||    mass_fluid_tg                  ../starter/source/fluid/mass-fluid_tg.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod             ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                    ../starter/share/message_module/message_mod.F
+!||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_BEM(IGRSURF, IFLOW   , RFLOW  ,
      .                    NPC    , IGRNOD  , MEMFLOW,UNITAB,
-     .                    X      , NOM_OPT , LGAUGE ,IGRV, LSUBMODEL)
+     .                    X      , NOM_OPT , LGAUGE ,IGRV, LSUBMODEL,IRESP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -302,6 +302,7 @@ C-----------------------------------------------
       INTEGER(KIND=8) MEMFLOW(*)
       my_real RFLOW(*), X(3,*)
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
+      INTEGER,INTENT(IN) :: IRESP
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
@@ -331,7 +332,7 @@ C-----------------------------------------------
       CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL :: IS_AVAILABLE
       INTEGER :: HM_NDAA, HM_NFLOW
-      
+C-----------------------------------------------
       HM_NDAA = 0
       HM_NFLOW = 0
       CALL HM_OPTION_COUNT('/BEM/DAA', HM_NDAA)
@@ -570,7 +571,7 @@ C
      .              C2='NO IMPOSED PRESSURE')
             ENDIF
          ENDIF
-C     Tag des elements d'entrees et de sorties
+C     tag of input and output elements
          DO J=1,NNO
             ITAGIO(J)=0
          ENDDO
@@ -1094,17 +1095,17 @@ C-------------------------------------------------------------------------------
 C     Compute arrival time of incident wave, area, direction cosine, distance to charge
 C     Compute fluid mass matrix
 C-----------------------------------------------------------------------------------
-C     Description des tableaux
-C     II1  -> IFLOW    NIFLOW     : parametres entiers
-C     II2  -> IBUF     NNO        : correspondances local-global noeuds surface
-C     II3  -> ELEM     3 ou 5*NEL : connectivite locale des triangles/quadrangles+flag
-C     II4  -> IBUF_L   NNO        : correspondances local-global noeuds surface
-C     II5  -> SHELL_GA NBGAUGE    : correspondances local-gauge 4-node shell
-C     II6  -> CNP      NNO        : nombre de processeur pour chaque noeud nspmd > 1
+C     description of arrays
+C     II1 -> IFlow Niflow: entiers parameters
+C     II2  -> IBUF     NNO        : local-global correspondences surface nodes
+C     II3 -> Elem 3 or 5*nel: local connectivity of triangles/quadrangles+flag
+C     II4  -> IBUF_L   NNO        : local-global correspondences surface nodes
+C     II5  -> SHELL_GA NBGAUGE    : local-gauge correspondences 4-node shell
+C     II6 -> CNP NNO: Number of processor for each NSPMD node> 1
 C     engine
 C     II7  -> IPIV     NEL        : lapack resolution nel > nelmax
-C     II8  -> IBUFELR  NEL        : SPMD ligne   des elements dans la process grid (0 si absent du processeur courant)
-C     II9  -> IBUFELC  NEL        : SPMD colonne des elements dans la process grid (0 si absent du processeur courant)
+C     ii8  -> ibufelr  nel        : spmd row of elements in the process grid (0 if absent from current processor)
+C     ii9  -> ibufelc  nel        : spmd column of elements in the process grid (0 if absent from current processor)
 C     
 C     IR1  -> RFLOW  : parametres reels
 C     IR2  -> NORMAL : normale
@@ -1160,11 +1161,11 @@ C-------------------------------------------------------------------------------
             IF(NEL < NELMAX) THEN
                ALLOCATE(CBEM(NEL,NEL))
                CALL MASS_FLUID_QD(NNO, NEL, IFLOW(II1), IFLOW(II2), IFLOW(II3), X,
-     .              RFLOW(IR2), RFLOW(IR4), RFLOW(IR7), CBEM, RHO)
+     .              RFLOW(IR2), RFLOW(IR4), RFLOW(IR7), CBEM, RHO,IRESP)
                DEALLOCATE(CBEM)
             ELSE
                CALL MASS_FLUID_QD(NNO, NEL, IFLOW(II1), IFLOW(II2), IFLOW(II3),  X,
-     .              RFLOW(IR2), RFLOW(IR4), RFLOW(IR7), RFLOW(IR11), RHO)
+     .              RFLOW(IR2), RFLOW(IR4), RFLOW(IR7), RFLOW(IR11), RHO,IRESP)
             ENDIF
             IF(NBGAUGE > 0) THEN
                WRITE (IOUT,'(/5X,A)') 'GAUGE   ELEMENT   ELEMENT'

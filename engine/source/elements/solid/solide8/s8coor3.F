@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s8coor3   ../engine/source/elements/solid/solide8/s8coor3.F
-      !||--- called by ------------------------------------------------------
-      !||    s8forc3   ../engine/source/elements/solid/solide8/s8forc3.F
-      !||====================================================================
+!||====================================================================
+!||    s8coor3   ../engine/source/elements/solid/solide8/s8coor3.F
+!||--- called by ------------------------------------------------------
+!||    s8forc3   ../engine/source/elements/solid/solide8/s8forc3.F
+!||====================================================================
       SUBROUTINE S8COOR3(
      1   OFFG,    OFF,     X,       V,
      2   IXS,     XLOC,    YLOC,    ZLOC,
@@ -49,7 +49,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NC(8,MVSIZ), MXT(MVSIZ), PID(MVSIZ), NGL(MVSIZ), I, MXT_1 
-      my_real VIS(MVSIZ)
       my_real OFF_L
 C-----------------------------------------------
       OFF_L  = ZERO

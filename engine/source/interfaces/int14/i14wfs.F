@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i14wfs          ../engine/source/interfaces/int14/i14wfs.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    output_mod      ../common_source/modules/output/output_mod.F90
-      !||====================================================================
-      SUBROUTINE I14WFS(IPARI,INTBUF_TAB,IGRSURF,FSAV)
+!||====================================================================
+!||    i14wfs          ../engine/source/interfaces/int14/i14wfs.F
+!||--- called by ------------------------------------------------------
+!||    resol           ../engine/source/engine/resol.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    output_mod      ../common_source/modules/output/output_mod.F90
+!||====================================================================
+      SUBROUTINE I14WFS(OUTPUT,IPARI,INTBUF_TAB,IGRSURF,FSAV)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE OUTPUT_MOD, ONLY : OUTPUT_
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
-      USE OUTPUT_MOD , ONLY : WFEXT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,6 +50,7 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT
       INTEGER IPARI(NPARI,*)
 C     REAL
       my_real
@@ -58,7 +60,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  NTY, N, NRTM, KSURF, NRTS
+      INTEGER  NTY, N, NRTM, KSURF
 C-----------------------------------------------
 C     REAL
       my_real
@@ -68,17 +70,17 @@ C-----------------------------------------------
          NTY=IPARI(7,N)
          IF (NTY/=14.AND.NTY/=15) GOTO 100
 C        Interface Stifnesses at nodes ...
-C        J11+8 : Sauve DE pour calcul Travail des Forces Secnds.
+C        J11+8 : Sauve DE for calculation Travail des Forces Seconds.
          DE=INTBUF_TAB(N)%VARIABLES(9)
          FSAV(7,N)=FSAV(7,N)+DE*DT2*HALF
 C
          NRTM=IPARI(4,N)
-C        Warning : DE doit etre stocke Surface / Surface, dans l'Interface
+C        Warning : DE doit etre stocke Surface / Surface, in l'Interface
 C                  actuellement, NRTM == 1.
          KSURF=INTBUF_TAB(N)%KSURF(1)
          IF (IGRSURF(KSURF)%TYPE==100) THEN
-C          Travail des interfaces avec Madymo.
-           WFEXT=WFEXT+DE*DT2*HALF
+C          Travail des interfaces with Madymo.
+           OUTPUT%TH%WFEXT=OUTPUT%TH%WFEXT+DE*DT2*HALF
          ENDIF
 C-----------------------------------------------
  100  CONTINUE

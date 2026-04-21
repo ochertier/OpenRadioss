@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,19 +22,21 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 C
-      !||====================================================================
-      !||    spmd_collectt   ../engine/source/mpi/output/spmd_collectt.F
-      !||--- called by ------------------------------------------------------
-      !||    resol           ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    inoutfile_mod   ../common_source/modules/inoutfile_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_collectt         ../engine/source/mpi/output/spmd_collectt.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    inoutfile_mod         ../common_source/modules/inoutfile_mod.F
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_COLLECTT(TEMP, ITAB, WEIGHT,NODGLOB,SIZP0)
       USE INOUTFILE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -59,7 +61,7 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGOFF,MSGOFF0,MSGTYP,INFO,I,K,NG,N,
+      INTEGER MSGOFF,MSGOFF0,MSGTYP,I,K,N,
      .        EMPL,SDNODG(NUMNODM),FILEN
       INTEGER STATUS(MPI_STATUS_SIZE),IERROR
       DOUBLE PRECISION

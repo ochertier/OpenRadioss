@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,33 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11mainf                   ../engine/source/interfaces/int11/i11mainf.F
-      !||--- called by ------------------------------------------------------
-      !||    intfop2                    ../engine/source/interfaces/interf/intfop2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                     ../engine/source/output/message/message.F
-      !||    arret                      ../engine/source/system/arret.F
-      !||    frictionparts_model_isot   ../engine/source/interfaces/int07/frictionparts_model.F
-      !||    i11ass3                    ../engine/source/interfaces/int11/i11ass3.F
-      !||    i11cdcor3                  ../engine/source/interfaces/int11/i11cdcor3.F
-      !||    i11cor3                    ../engine/source/interfaces/int11/i11cor3.F
-      !||    i11dst3                    ../engine/source/interfaces/int11/i11dst3.F
-      !||    i11for3                    ../engine/source/interfaces/int11/i11for3.F
-      !||    i11therm                   ../engine/source/interfaces/int11/i11therm.F
-      !||    startime                   ../engine/source/system/timer_mod.F90
-      !||    stoptime                   ../engine/source/system/timer_mod.F90
-      !||    sum_6_float_sens           ../engine/source/system/parit.F
-      !||--- uses       -----------------------------------------------------
-      !||    h3d_mod                    ../engine/share/modules/h3d_mod.F
-      !||    intbuf_fric_mod            ../common_source/modules/interfaces/intbuf_fric_mod.F90
-      !||    message_mod                ../engine/share/message_module/message_mod.F
-      !||    my_alloc_mod               ../common_source/tools/memory/my_alloc.F90
-      !||    timer_mod                  ../engine/source/system/timer_mod.F90
-      !||====================================================================
-      SUBROUTINE I11MAINF(TIMERS,
+!||====================================================================
+!||    i11mainf                   ../engine/source/interfaces/int11/i11mainf.F
+!||--- called by ------------------------------------------------------
+!||    intfop2                    ../engine/source/interfaces/interf/intfop2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                     ../engine/source/output/message/message.F
+!||    arret                      ../engine/source/system/arret.F
+!||    frictionparts_model_isot   ../engine/source/interfaces/int07/frictionparts_model.F
+!||    i11ass3                    ../engine/source/interfaces/int11/i11ass3.F
+!||    i11cdcor3                  ../engine/source/interfaces/int11/i11cdcor3.F
+!||    i11cor3                    ../engine/source/interfaces/int11/i11cor3.F
+!||    i11dst3                    ../engine/source/interfaces/int11/i11dst3.F
+!||    i11for3                    ../engine/source/interfaces/int11/i11for3.F
+!||    i11therm                   ../engine/source/interfaces/int11/i11therm.F
+!||    startime                   ../engine/source/system/timer_mod.F90
+!||    stoptime                   ../engine/source/system/timer_mod.F90
+!||    sum_6_float_sens           ../engine/source/system/parit.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod                    ../engine/share/modules/h3d_mod.F
+!||    intbuf_fric_mod            ../common_source/modules/interfaces/intbuf_fric_mod.F90
+!||    intbufdef_mod              ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    message_mod                ../engine/share/message_module/message_mod.F
+!||    my_alloc_mod               ../common_source/tools/memory/my_alloc.F90
+!||    output_mod                 ../common_source/modules/output/output_mod.F90
+!||    timer_mod                  ../engine/source/system/timer_mod.F90
+!||====================================================================
+      SUBROUTINE I11MAINF(OUTPUT, TIMERS,
      1      IPARI   ,X         ,A       ,
      2      ICODT   ,FSAV      ,V        ,MS     ,DT2T    ,
      3      NELTST  ,ITYPTST   ,ITAB     ,STIFN  ,FSKYI   ,
@@ -61,6 +63,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TIMER_MOD
+      USE OUTPUT_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE INTBUF_FRIC_MOD
@@ -89,6 +92,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(OUTPUT_), intent(inout) :: output
       TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER ,INTENT(IN) :: NODADT_THERM
       INTEGER NELTST,ITYPTST,NIN,NEWFRONT,NSTRF(*)
@@ -97,7 +101,7 @@ C-----------------------------------------------
       INTEGER  , INTENT(IN) :: S_LOADPINTER
       INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
      .         LOADP_HYD_INTER(NLOADP_HYD)
-C statistique interface
+C Interface Statistics
       INTEGER NB_JLT,NB_JLT_NEW,NB_STOK_N,JTASK,
      .        NISKYFI, LINDMAX,ITASK
       INTEGER NUM_IMP,NS_IMP(*),NE_IMP(*), 
@@ -119,17 +123,17 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER KD(50), JD(50), JFI, KFI,
-     .        I, J, H, IBC, NOINT, ISECIN, I_STOK, NSEG, 
+      INTEGER  
+     .        I, J, H, IBC, NOINT, ISECIN, I_STOK, 
      .        JLT , NFT, JLT_NEW, IGAP, IVIS2,
-     .        NB_LOC, I_STOK_LOC,DEBUT,I3N, IGSTI,IFORM,INTTH,IKTHE,
-     .        IFORMTH,SFSAVPARIT,NISUB,INTFRIC,NSETPRTS,NPARTFRIC,MFROT,IFQ,
+     .        NB_LOC, I_STOK_LOC,DEBUT, IGSTI,IFORM,INTTH,IKTHE,
+     .        IFORMTH,SFSAVPARIT,NISUB,INTFRIC,NSETPRTS,NPARTFRIC,MFROT,
      .        IERROR,IORTHFRIC,IFRIC,JJ,NINLOADP
       INTEGER N1(MVSIZ), N2(MVSIZ), M1(MVSIZ), M2(MVSIZ),
-     .        NSVG(MVSIZ), CS_LOC(MVSIZ), CM_LOC(MVSIZ),
+     .         CS_LOC(MVSIZ), CM_LOC(MVSIZ),
      .        NSMS(MVSIZ)
-      INTEGER I_STOK_NEW,CAND_S(MVSIZ),CAND_M(MVSIZ),
-     .        INDEXM1(LINDMAX),IELECI(MVSIZ),IELESI(MVSIZ), IPARTFRICSI(MVSIZ),
+      INTEGER 
+     .        IELECI(MVSIZ),IELESI(MVSIZ), IPARTFRICSI(MVSIZ),
      .         IPARTFRICMI(MVSIZ)
       INTEGER,DIMENSION(:), ALLOCATABLE :: INDEX2
 C     REAL
@@ -176,12 +180,12 @@ C     REAL
 C-----------------------------------------------
       CALL MY_ALLOC(INDEX2,LINDMAX)
 C-----------------------------------------------
-C  Calcul des adresses des buffers d'interfaces. 
-C  Les adresses des buffers J10-JFI et K10-KFI 
-C  sont remplaces systematiquement par des tableaux
+C  calculation of interface buffer addresses
+C  addresses of buffers J10-JFI and K10-KFI
+C  are systematically replaced by arrays
 C  JD(i) et KD(i), en gardant les memes numeros d'indexes.
-C  Les anciens adresses directs Jn, Kn sont modifies
-C  dans la routine sans commentaires additionnels habituels
+C  old direct addresses Jn, Kn are modified
+C  in the routine without usual additional comments
 C----------------------------------------------------
 C
       NRTS  =IPARI(3)
@@ -251,8 +255,8 @@ C
       NINLOADP = IPARI(95) ! load pressure related to inter
 C
       I_STOK = INTBUF_TAB%I_STOK(1)
-C  cette partie est effectuee en // apres le calcul des forces des elem.
-C decoupage statique
+C  this part is done in parallel after the calculation of element forces
+C static decoupage
       NB_LOC = I_STOK / NTHREAD
       IF (JTASK==NTHREAD) THEN
           I_STOK_LOC = I_STOK-NB_LOC*(NTHREAD-1)
@@ -261,7 +265,7 @@ C decoupage statique
       ENDIF
       DEBUT = (JTASK-1)*NB_LOC
       I_STOK = 0
-C recalcul du istok
+C recalculation of istok
       DO I = DEBUT+1, DEBUT+I_STOK_LOC
           IF(INTBUF_TAB%CAND_N(I)<0) THEN
             I_STOK = I_STOK + 1
@@ -306,7 +310,7 @@ C
 C
       DO NFT = 0 , I_STOK - 1 , NVSIZ
           JLT = MIN( NVSIZ, I_STOK - NFT )
-C preparation candidats retenus
+C preparation CANDIDATES retenus
           CALL I11CDCOR3(
      1         JLT,INDEX2(NFT+1),INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,CM_LOC,
      2         CS_LOC)
@@ -364,7 +368,7 @@ C-------------------------------------------------------------------------------
      7   N1         , N2          ,M1               ,M2           ,IFORM       )  
       IF(ITASK==1) CALL STOPTIME(TIMERS,MACRO_TIMER_FRIC)
 
-      CALL I11FOR3(
+      CALL I11FOR3(output,
      1  JLT          ,FSAV    ,GAP                 ,FRIC       ,MS      ,
      2  VISC         ,VISCF   ,NOINT               ,ITAB      ,CS_LOC   ,
      3  CM_LOC       ,STIF    ,DT2T                ,HS1       ,HS2      ,

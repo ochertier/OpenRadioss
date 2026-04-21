@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    spmd_gather_wa   ../engine/source/mpi/anim/spmd_gather_wa.F
-      !||--- called by ------------------------------------------------------
-      !||    dparrws          ../engine/source/output/anim/generate/dparrws.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    spmd_gather_wa        ../engine/source/mpi/anim/spmd_gather_wa.F
+!||--- called by ------------------------------------------------------
+!||    dparrws               ../engine/source/output/anim/generate/dparrws.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE SPMD_GATHER_WA(MODE,SIZE_BUFFER_S,SIZE_BUFFER_R,SINDEX,RINDEX_PROC,
      1                           BUFFER_S,BUFFER_R,SHIFT_R,NB_ELEM_R)
 C-----------------------------------------------    
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include "spmd.inc"
 C-----------------------------------------------
@@ -43,8 +46,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-!       MODE = 0 --> collect the index array for each proc   
-!       MODE = 1 --> collect all the buffer arraies
+!       MODE = 0 --> collect the index array for each proc
+!       MODE = 1 --> collect all the buffer arrays
 !       SIZE_BUFFER_S is the size of the local sended array
         INTEGER, INTENT(IN) :: MODE,SIZE_BUFFER_S
 !       SIZE_BUFFER_R is the size of the global received array, proc 0 
@@ -62,18 +65,18 @@ C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,MSGOFF
-      INTEGER SIZ,MSGTYP,I,K,NG,NREC,STEP
+      INTEGER IERROR,MSGOFF
+      INTEGER I
 
 C-----------------------------------------------
       DATA MSGOFF/7069/
 C-----------------------------------------------
         
         IF(MODE==0) THEN
-        !       collect the local index arraies on the main processor
+        !       collect the local index arrays on the main processor
                 CALL MPI_GATHER(SINDEX,3*(NSECT+1),MPI_INTEGER,
      .                   RINDEX_PROC,3*(NSECT+1),MPI_INTEGER,0,SPMD_COMM_WORLD,ierror)  
-        !       sum all the size of local sended arraies in order to get the size 
+        !       sum all the size of local sended arrays in order to get the size 
         !       of the global array on proc 0                  
                 IF(ISPMD==0) THEN
                         NB_ELEM_R(1:NSPMD) = RINDEX_PROC(NSECT+1,1,1:NSPMD)

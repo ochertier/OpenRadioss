@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    thbcs_imp    ../engine/source/output/th/thbcs_imp.F
-      !||--- called by ------------------------------------------------------
-      !||    resol        ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    bcs1th_imp   ../engine/source/output/th/bcs1th_imp.F
-      !||====================================================================
+!||====================================================================
+!||    thbcs_imp    ../engine/source/output/th/thbcs_imp.F
+!||--- called by ------------------------------------------------------
+!||    resol        ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    bcs1th_imp   ../engine/source/output/th/bcs1th_imp.F
+!||====================================================================
       SUBROUTINE THBCS_IMP(NODFT,NODLAST,A,AR,
      1                     FTHREAC  ,NODREAC ,
      2                     CPTREAC  ,FTHDTM,DT3)
@@ -47,8 +47,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, K, NINDX,
-     .        INDX(1024),L,J,FLAG_MOM
+      INTEGER I, N, NINDX,
+     .        INDX(1024),FLAG_MOM
 C-----------------------------------------------
 C    Time History
 C-----------------------------------------------

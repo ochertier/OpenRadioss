@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s4for_distor   ../engine/source/elements/solid/solide4/s4for_distor.F
-      !||--- called by ------------------------------------------------------
-      !||    s4forc3        ../engine/source/elements/solid/solide4/s4forc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    sfor_n2stria   ../engine/source/elements/solid/solide4/sfor_n2stria.F
-      !||    sfor_visn4     ../engine/source/elements/solid/solide4/sfor_visn4.F
-      !||====================================================================
+!||====================================================================
+!||    s4for_distor   ../engine/source/elements/solid/solide4/s4for_distor.F
+!||--- called by ------------------------------------------------------
+!||    s4forc3        ../engine/source/elements/solid/solide4/s4forc3.F
+!||--- calls      -----------------------------------------------------
+!||    sfor_n2stria   ../engine/source/elements/solid/solide4/sfor_n2stria.F
+!||    sfor_visn4     ../engine/source/elements/solid/solide4/sfor_visn4.F
+!||====================================================================
       SUBROUTINE S4FOR_DISTOR(
      .     X1,        X2,        X3,        X4,
      .     Y1,        Y2,        Y3,        Y4,
@@ -78,15 +78,15 @@ C-----------------------------------------------
      .   XC(MVSIZ),YC(MVSIZ),ZC(MVSIZ),STIF(MVSIZ),
      .   VC(MVSIZ,3),FORC_N(MVSIZ,3),FOR_T1(MVSIZ,3),
      .   FOR_T2(MVSIZ,3),FOR_T3(MVSIZ,3),FOR_T4(MVSIZ,3),
-     .   FCX,FCY,FCZ,FAC,GAP_MAX,GAP_MIN,TOL_T,TOL_C,TOL_V,
-     .   PENMIN(MVSIZ),PENREF(MVSIZ),MARGE(MVSIZ)
-      INTEGER I,J,NCTL,IFCTL,IFC1(MVSIZ)
+     .   FCX,FCY,FCZ,GAP_MAX,GAP_MIN,TOL_C,TOL_V,
+     .   PENMIN(MVSIZ),PENREF(MVSIZ)
+      INTEGER I,NCTL,IFCTL,IFC1(MVSIZ)
 C-----------------------------------------------
 C   S o u r c e   C o d e
 C-----------------------------------------------
          TOL_C= ZEP2
          TOL_V = EIGHT
-C---- element center
+C---- Element center
          DO I=1,NEL
            VC(I,1) = FOURTH*(VX1(I)+VX2(I)+VX3(I)+VX4(I))
            VC(I,2) = FOURTH*(VY1(I)+VY2(I)+VY3(I)+VY4(I))
@@ -109,7 +109,7 @@ C
      .               IFCTL, STIF  ,  MU    ,   NEL  ,
      .               E_DISTOR,DT1 )
          NCTL = NCTL + IFCTL
-C---- element center
+C---- Element center
          DO I=1,NEL
            XC(I) = FOURTH*(X1(I)+X2(I)+X3(I)+X4(I))
            YC(I) = FOURTH*(Y1(I)+Y2(I)+Y3(I)+Y4(I))
@@ -182,7 +182,7 @@ C---- seg 4 : 1,3,4
      .                  E_DISTOR, DT1 )
         NCTL = NCTL + IFCTL
 C---- force assemblage and STI update (dt)
-        IF (NCTL >0) THEN
+!        IF (NCTL >0) THEN : potential P/ON issue
           DO I=1,NEL
              IF (STI_C(I)==ZERO) CYCLE
              FCX = FOURTH*FORC_N(I,1)
@@ -201,9 +201,9 @@ C---- force assemblage and STI update (dt)
              F24(I)=F24(I) + FOR_T4(I,2) + FCY
              F34(I)=F34(I) + FOR_T4(I,3) + FCZ
 C             
-             STI(I) = MAX(STI(I),STIF(I))  ! elem dt will be looked later
+             IF (STIF(I)>STI_C(I)) STI(I) = MAX(STI(I),STIF(I))  
           END DO 
-        END IF !(NCTL >0) THEN
+!        END IF !(NCTL >0) THEN
       
       
        

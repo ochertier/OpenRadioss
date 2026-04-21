@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    inintr_orthdirfric   ../starter/source/interfaces/interf1/inintr_orthdirfric.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur               ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    incoq3               ../starter/source/interfaces/inter3d1/incoq3.F
-      !||    orthdir_proj         ../starter/source/interfaces/interf1/inintr_orthdirfric.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod          ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    inintr_orthdirfric   ../starter/source/interfaces/interf1/inintr_orthdirfric.F
+!||--- called by ------------------------------------------------------
+!||    lectur               ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    incoq3               ../starter/source/interfaces/inter3d1/incoq3.F
+!||    orthdir_proj         ../starter/source/interfaces/interf1/inintr_orthdirfric.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod          ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ININTR_ORTHDIRFRIC(
      A                  IPARI   ,INTBUF_TAB,INTBUF_FRIC_TAB,IGEO  ,GEO      ,
      B                  X       , IXTG     ,IXC          ,IPARTTG , IPARTC  ,
@@ -43,6 +43,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
       USE INTBUF_FRIC_MOD                     
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -178,15 +179,15 @@ C-----------
       RETURN
       END
 
-      !||====================================================================
-      !||    orthdir_proj         ../starter/source/interfaces/interf1/inintr_orthdirfric.F
-      !||--- called by ------------------------------------------------------
-      !||    inintr_orthdirfric   ../starter/source/interfaces/interf1/inintr_orthdirfric.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg               ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod          ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    orthdir_proj         ../starter/source/interfaces/interf1/inintr_orthdirfric.F
+!||--- called by ------------------------------------------------------
+!||    inintr_orthdirfric   ../starter/source/interfaces/interf1/inintr_orthdirfric.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg               ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod          ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ORTHDIR_PROJ(
      .                  I      ,VX    , VY        ,VZ     , PHI   ,          
      .                  IREP   ,X     ,IRECTM     , ITAB  ,
@@ -226,7 +227,7 @@ C-----------------------------------------------
         N3 = IRECTM(3,I)
         N4 = IRECTM(4,I)
 
-C---Element Frame :
+C--- Frame element:
 
         IF (N3 /= N4) THEN
 C---      shell 4N
@@ -282,7 +283,7 @@ C
         E2Y    = E3Z * E1X - E3X * E1Z
         E2Z    = E3X * E1Y - E3Y * E1X
 
-C---    projection of V on element plance
+C---    projection of V on element plane
         V  = VX*E3X + VY*E3Y + VZ*E3Z
         VX = VX-V*E3X
         VY = VY-V*E3Y

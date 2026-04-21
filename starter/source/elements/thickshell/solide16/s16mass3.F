@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s16mass3   ../starter/source/elements/thickshell/solide16/s16mass3.F
-      !||--- called by ------------------------------------------------------
-      !||    s16init3   ../starter/source/elements/thickshell/solide16/s16init3.F
-      !||====================================================================
+!||====================================================================
+!||    s16mass3   ../starter/source/elements/thickshell/solide16/s16mass3.F
+!||--- called by ------------------------------------------------------
+!||    s16init3   ../starter/source/elements/thickshell/solide16/s16init3.F
+!||====================================================================
       SUBROUTINE S16MASS3(
      1   MASS  ,MS  ,PARTSAV,IPART  ,MSS,VOLG,
      2   XX    ,YY  ,ZZ     ,VX     ,VY ,VZ  ,  
@@ -61,7 +61,7 @@ C-----------------------------------------------
       INTEGER I, IP,N1,N2, IPERM1(16),IPERM2(16),N
 C     REAL
       my_real
-     .   AXX,AYY,AZZ,AXY,AYZ,AZX,AM,BM,FAC,MASSCP
+     .   AXX,AYY,AZZ,AXY,AYZ,AZX,AM,BM,MASSCP
 C
       DATA IPERM1/0,0,0,0,0,0,0,0,1,2,3,4,5,6,7,8/
       DATA IPERM2/0,0,0,0,0,0,0,0,2,3,4,1,6,7,8,5/

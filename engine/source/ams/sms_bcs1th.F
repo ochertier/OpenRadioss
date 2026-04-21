@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sms_bcs1th   ../engine/source/ams/sms_bcs1th.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_thbcs    ../engine/source/ams/sms_thbcs.F
-      !||====================================================================
+!||====================================================================
+!||    sms_bcs1th   ../engine/source/ams/sms_bcs1th.F
+!||--- called by ------------------------------------------------------
+!||    sms_thbcs    ../engine/source/ams/sms_thbcs.F
+!||====================================================================
       SUBROUTINE SMS_BCS1TH(NINDX ,INDX   ,ISKEW  ,ICODT  ,A    ,
      2                      SKEW  ,FTHREAC,NODREAC,FLAG   )
 C
@@ -61,7 +61,7 @@ C
 C
         IF(ISK==1) THEN
 C------------------
-C     REPERE GLOBAL
+C     GLOBAL REFERENCE FRAME
 C------------------
           IF(LCOD==1)THEN
           FTHREAC0(N+3) = - A(3,L)
@@ -150,9 +150,9 @@ C
       RETURN
       END
 C
-      !||====================================================================
-      !||    sms_bcs1an   ../engine/source/ams/sms_bcs1th.F
-      !||====================================================================
+!||====================================================================
+!||    sms_bcs1an   ../engine/source/ams/sms_bcs1th.F
+!||====================================================================
       SUBROUTINE SMS_BCS1AN(NINDX ,INDX   ,ISKEW  ,ICODT  ,A    ,
      2                      SKEW  ,FANREAC,FLAG   )
 
@@ -189,7 +189,7 @@ C
 C
         IF(ISK==1) THEN
 C------------------
-C     REPERE GLOBAL
+C     GLOBAL REFERENCE FRAME
 C------------------
           IF(LCOD==1)THEN
           FANREAC0(N+3) = - A(3,L)

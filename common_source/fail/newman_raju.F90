@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,79 +25,79 @@
 !Chd|-- called by -----------
 !Chd|-- calls ---------------
 !Chd|====================================================================
-      !||====================================================================
-      !||    newman_raju_mod       ../common_source/fail/newman_raju.F90
-      !||--- called by ------------------------------------------------------
-      !||    brokmann_crack_init   ../starter/source/materials/fail/windshield_alter/brokmann_crack_init.F90
-      !||    fail_brokmann         ../engine/source/materials/fail/alter/fail_brokmann.F
-      !||====================================================================
+!||====================================================================
+!||    newman_raju_mod       ../common_source/fail/newman_raju.F90
+!||--- called by ------------------------------------------------------
+!||    brokmann_crack_init   ../starter/source/materials/fail/windshield_alter/brokmann_crack_init.F90
+!||    fail_brokmann         ../engine/source/materials/fail/alter/fail_brokmann.F
+!||====================================================================
       module newman_raju_mod
+      implicit none
       contains
 ! ========================================================================================
 ! \brief calculates geometry correction factor according to NewmanRaju 1981 for /fail/alter
 ! \details
 ! ========================================================================================
 
-      !||====================================================================
-      !||    newman_raju           ../common_source/fail/newman_raju.F90
-      !||--- called by ------------------------------------------------------
-      !||    brokmann_crack_init   ../starter/source/materials/fail/windshield_alter/brokmann_crack_init.F90
-      !||    fail_brokmann         ../engine/source/materials/fail/alter/fail_brokmann.F
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod          ../common_source/modules/constant_mod.F
-      !||====================================================================
-      subroutine newman_raju(c,a,t,b,fpi,y)
+!||====================================================================
+!||    newman_raju           ../common_source/fail/newman_raju.F90
+!||--- called by ------------------------------------------------------
+!||    brokmann_crack_init   ../starter/source/materials/fail/windshield_alter/brokmann_crack_init.F90
+!||    fail_brokmann         ../engine/source/materials/fail/alter/fail_brokmann.F
+!||--- uses       -----------------------------------------------------
+!||    constant_mod          ../common_source/modules/constant_mod.F
+!||    precision_mod         ../common_source/modules/precision_mod.F90
+!||====================================================================
+        subroutine newman_raju(c,a,t,b,fpi,y)
 
-!-----------------------------------------------
-!   M o d u l e s
-!-----------------------------------------------
-      use constant_mod ,only : zero,half,one,two,pi
-! ---------------------------------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Modules
+! ----------------------------------------------------------------------------------------------------------------------
+          use constant_mod ,only : zero,half,one,two,pi
+          use precision_mod, only : WP
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Implicit none
+! ----------------------------------------------------------------------------------------------------------------------
           implicit none
-! ---------------------------------------------------------------------------------------------
-!     included files
-! ---------------------------------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Arguments
+! ----------------------------------------------------------------------------------------------------------------------
+          real(kind=WP) :: c, a, t, b, fpi, y
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Local variables
+! ----------------------------------------------------------------------------------------------------------------------
+          real(kind=WP) :: q,m1,m2,m3,g,fphi,fb,fw,f,at,ac,sinp,cosp
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Body
+! ----------------------------------------------------------------------------------------------------------------------
+          if (fpi == half) then
+            sinp = one
+            cosp = zero
+          else if (fpi == zero) then
+            sinp = zero
+            cosp = one
+          else
+            sinp = sin(fpi*pi)
+            cosp = cos(fpi*pi)
+          end if
 
-#include "my_real.inc"
+          ac   = a / c
+          at   = a / t
+          q    = one + 1.464*ac**1.65
 
-!-----------------------------------------------
-!   d u m m y   a r g u m e n t s
-!-----------------------------------------------
-      my_real c, a, t, b, fpi, y
-!-----------------------------------------------
-!   l o c a l   v a r i a b l e s
-!-----------------------------------------------
-      my_real q,m1,m2,m3,g,fphi,fb,fw,f,at,ac,sinp,cosp
-!==========================================================================
-      if (fpi == half) then
-        sinp = one
-        cosp = zero
-      else if (fpi == zero) then
-        sinp = zero
-        cosp = one
-      else
-        sinp = sin(fpi*pi)
-        cosp = cos(fpi*pi)
-      end if
+          m1   = 1.13-0.09*ac
+          m2   = -0.54+0.89/(0.2 + ac)
+          m3   = half - one/(0.65 +ac) + 14.*(one-ac)**24
+          g    = one +(0.1+ 0.35*(at)**2)*(one-sinp)**2
 
-      ac   = a / c
-      at   = a / t
-      q    = one + 1.464*ac**1.65
+          fphi = (ac**2 * cosp**2 + sinp**2 )**0.25
+          fb   = pi*c*sqrt(at)
 
-      m1   = 1.13-0.09*ac
-      m2   = -0.54+0.89/(0.2 + ac)
-      m3   = half - one/(0.65 +ac) + 14.*(one-ac)**24
-      g    = one +(0.1+ 0.35*(at)**2)*(one-sinp)**2
-     
-      fphi = (ac**2 * cosp**2 + sinp**2 )**0.25
-      fb   = pi*c*sqrt(at) 
+          fw   = cos(pi*c/(two*b)*sqrt(at))
 
-      fw   = cos(pi*c/(two*b)*sqrt(at))
-      
-      f    = (m1+m2*(at)**2 + m3*(at)**4)*fphi*g / sqrt(ABS(FW))
-      y    = sqrt(one/q)*f
-!-----------
-      return
-      end subroutine newman_raju
-!-----------
+          f    = (m1+m2*(at)**2 + m3*(at)**4)*fphi*g / sqrt(ABS(FW))
+          y    = sqrt(one/q)*f
+! ----------------------------------------------------------------------------------------------------------------------
+          return
+        end subroutine newman_raju
       end module newman_raju_mod

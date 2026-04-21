@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C======================================================================|
-      !||====================================================================
-      !||    init_int    ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult    ../engine/source/tools/lagmul/lag_mult.F
-      !||    lag_multp   ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    init_int    ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult    ../engine/source/tools/lagmul/lag_mult.F
+!||    lag_multp   ../engine/source/tools/lagmul/lag_mult.F
+!||====================================================================
       SUBROUTINE INIT_INT(I,J)
 C !!!! I est reel a l'appel
       INTEGER I,J
@@ -34,12 +34,12 @@ C !!!! I est reel a l'appel
       RETURN
       END
 C======================================================================|
-      !||====================================================================
-      !||    init_intv   ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult    ../engine/source/tools/lagmul/lag_mult.F
-      !||    lag_multp   ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    init_intv   ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult    ../engine/source/tools/lagmul/lag_mult.F
+!||    lag_multp   ../engine/source/tools/lagmul/lag_mult.F
+!||====================================================================
       SUBROUTINE INIT_INTV(INTV, LEN)
 #include      "implicit_f.inc"
       INTEGER LEN, INTV(*)
@@ -51,13 +51,13 @@ C======================================================================|
       END
 C======================================================================|
 
-      !||====================================================================
-      !||    ltag_bcs       ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult       ../engine/source/tools/lagmul/lag_mult.F
-      !||--- uses       -----------------------------------------------------
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ltag_bcs       ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult       ../engine/source/tools/lagmul/lag_mult.F
+!||--- uses       -----------------------------------------------------
+!||    groupdef_mod   ../common_source/modules/groupdef_mod.F
+!||====================================================================
       SUBROUTINE LTAG_BCS(COMNTAG,NGRNOD,IGRNOD,IBCSLAG)
 C-----------------------------------------------
 C   M o d u l e s
@@ -93,14 +93,15 @@ C---
       RETURN
       END
 
-      !||====================================================================
-      !||    ltag_i2main     ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult        ../engine/source/tools/lagmul/lag_mult.F
-      !||--- calls      -----------------------------------------------------
-      !||    ltag_i2         ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    ltag_i2main     ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult        ../engine/source/tools/lagmul/lag_mult.F
+!||--- calls      -----------------------------------------------------
+!||    ltag_i2         ../engine/source/tools/lagmul/lag_ntag.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod   ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE LTAG_I2MAIN(COMNTAG ,IPARI   ,INTBUF_TAB   )
 C-----------------------------------------------
 C   M o d u l e s
@@ -122,7 +123,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NTY,ILAGM,NSN,NMN,NRTS,NRTM,NIN
+      INTEGER NSN,NMN,NRTS,NRTM,NIN
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
 C======================================================================|
@@ -137,11 +138,11 @@ C======================================================================|
       ENDDO
       RETURN
       END
-      !||====================================================================
-      !||    ltag_i2       ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    ltag_i2main   ../engine/source/tools/lagmul/lag_ntag.F
-      !||====================================================================
+!||====================================================================
+!||    ltag_i2       ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    ltag_i2main   ../engine/source/tools/lagmul/lag_ntag.F
+!||====================================================================
       SUBROUTINE LTAG_I2(IRECT    ,NSV      ,IRTL     ,COMNTAG, NSN    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -172,11 +173,11 @@ C---
       RETURN
       END
 
-      !||====================================================================
-      !||    ltag_fxv   ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult   ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    ltag_fxv   ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult   ../engine/source/tools/lagmul/lag_mult.F
+!||====================================================================
       SUBROUTINE LTAG_FXV(COMNTAG ,IBFV   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -205,11 +206,11 @@ C======================================================================|
 C---
       RETURN
       END
-      !||====================================================================
-      !||    ltag_gjnt   ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult    ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    ltag_gjnt   ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult    ../engine/source/tools/lagmul/lag_mult.F
+!||====================================================================
       SUBROUTINE LTAG_GJNT(COMNTAG ,GJBUFI )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -243,11 +244,11 @@ C---
       RETURN
       END
       
-      !||====================================================================
-      !||    ltag_mpc   ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult   ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    ltag_mpc   ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult   ../engine/source/tools/lagmul/lag_mult.F
+!||====================================================================
       SUBROUTINE LTAG_MPC(COMNTAG  ,IMPCNC   ,IMPCNN   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -278,11 +279,11 @@ C---
       RETURN
       END
       
-      !||====================================================================
-      !||    ltag_rby   ../engine/source/tools/lagmul/lag_ntag.F
-      !||--- called by ------------------------------------------------------
-      !||    lag_mult   ../engine/source/tools/lagmul/lag_mult.F
-      !||====================================================================
+!||====================================================================
+!||    ltag_rby   ../engine/source/tools/lagmul/lag_ntag.F
+!||--- called by ------------------------------------------------------
+!||    lag_mult   ../engine/source/tools/lagmul/lag_mult.F
+!||====================================================================
       SUBROUTINE LTAG_RBY(COMNTAG, NPBYL  ,LPBYL  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

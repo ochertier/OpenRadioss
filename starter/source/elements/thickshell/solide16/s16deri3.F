@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s16deri3      ../starter/source/elements/thickshell/solide16/s16deri3.F
-      !||--- called by ------------------------------------------------------
-      !||    s16init3      ../starter/source/elements/thickshell/solide16/s16init3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    s16deri3      ../starter/source/elements/thickshell/solide16/s16deri3.F
+!||--- called by ------------------------------------------------------
+!||    s16init3      ../starter/source/elements/thickshell/solide16/s16init3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../starter/source/output/message/message.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE S16DERI3(NGL,OFF,R,S,T    ,W     ,
      2   DNIDR ,DNIDS ,DNIDT ,DXDR  ,DYDR  ,DZDR  ,
      3   DXDS  ,DYDS  ,DZDS  ,DXDT  ,DYDT  ,DZDT  ,
@@ -320,7 +320,7 @@ c         print *,'dx y z/dt='
 c         print *,DXDT(1),DYDT(1),DZDT(1)
 C-----------------------------------------------------------------------
 C          -1
-C       [J]          Inversion du jacobien
+C       [J]          Inversion of the jacobian
 C-----------------------------------------------------------------------
         DRDX(I)=DYDS(I)*DZDT(I)-DZDS(I)*DYDT(I)
         DRDY(I)=DZDS(I)*DXDT(I)-DXDS(I)*DZDT(I)
@@ -355,8 +355,8 @@ C      ENDIF
 C
       DO I=LFT,LLT
 C-----------------------------------------------------------------------
-C          -1            Inversion du jacobien suite
-C       [J]              et repere local r,s,t
+C          -1 inversion of the Jacobian suite
+C       [J]              and local frame r,s,t
 C-----------------------------------------------------------------------
         D = 1./DET(I)
         DRDX(I)=D*DRDX(I)
@@ -485,11 +485,11 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    s16rst     ../starter/source/elements/thickshell/solide16/s16deri3.F
-      !||--- called by ------------------------------------------------------
-      !||    s16init3   ../starter/source/elements/thickshell/solide16/s16init3.F
-      !||====================================================================
+!||====================================================================
+!||    s16rst     ../starter/source/elements/thickshell/solide16/s16deri3.F
+!||--- called by ------------------------------------------------------
+!||    s16init3   ../starter/source/elements/thickshell/solide16/s16init3.F
+!||====================================================================
       SUBROUTINE S16RST(R,S,T,
      2   NI   ,DNIDR ,DNIDS ,DNIDT )
 C-----------------------------------------------

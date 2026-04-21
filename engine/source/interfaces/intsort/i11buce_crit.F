@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i11buce_crit       ../engine/source/interfaces/intsort/i11buce_crit.F
-      !||--- called by ------------------------------------------------------
-      !||    i11main_crit_tri   ../engine/source/interfaces/intsort/i11main_crit_tri.F
-      !||--- calls      -----------------------------------------------------
-      !||    spmd_get_penis     ../engine/source/mpi/interfaces/send_cand.F
-      !||====================================================================
+!||====================================================================
+!||    i11buce_crit       ../engine/source/interfaces/intsort/i11buce_crit.F
+!||--- called by ------------------------------------------------------
+!||    i11main_crit_tri   ../engine/source/interfaces/intsort/i11main_crit_tri.F
+!||--- calls      -----------------------------------------------------
+!||    spmd_get_penis     ../engine/source/mpi/interfaces/send_cand.F
+!||====================================================================
        SUBROUTINE I11BUCE_CRIT(
      1    X     ,NSV   ,MSR   ,NSN   ,NMN   ,
      2    ITASK ,XSAV  ,PENIS ,PENIM ,INACTI,
@@ -73,17 +73,17 @@ C
         NRTML = (ITASK+1) * NRTM / NTHREAD
 
 C-----------------------------------------------
-C  maj PENIS sur partie non locale
+C  update PENIS on non -local part
 C-----------------------------------------------
-        IF(NSPMD>1 .AND. TT > ZERO) THEN ! frontieres partiellement baties a tt=0 
+        IF(NSPMD>1 .AND. TT > ZERO) THEN ! Partially BATIE boundarys at tt = 0 
 C
-C Partie non parallele smt
+C SMT non -parallel part
 C
 !$OMP SINGLE
 
           CALL SPMD_GET_PENIS(PENIS,NIN)
 
-C Fin Partie non parallele smt
+C End non -parallel part SMT
 !$OMP END SINGLE
 
         END IF
@@ -102,8 +102,8 @@ C-----------------------------------------------
 !$OMP END DO NOWAIT
       ENDIF
 C
-C si NSPMD > 1 traitement effectue dans SPMD_GET_STIF11
-C car reperage comm sur stfs < ZERO
+C If nspmd> 1 treatment performs in SPMD_Get_Stif11
+C Because LEDRAGE COMM SUR STFS <ZERO
 C
       IF (NSPMD==1) THEN
 !$OMP DO SCHEDULE(guided)
@@ -113,7 +113,7 @@ C
 !$OMP END DO NOWAIT
       END IF
 C
-C     0- CALCUL DU CRITERE POUR SAVOIR SI ON DOIT TRIER OU NON
+C     0- calculation of the criterion to know whether we should sort or not
 C
       XSLV(1) = -EP30
       XSLV(2) = -EP30

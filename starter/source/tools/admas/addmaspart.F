@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    addmaspart             ../starter/source/tools/admas/addmaspart.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    addmaspart             ../starter/source/tools/admas/addmaspart.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ADDMASPART(IPART,IPMAS,PARTSAV,
      .                      PART_AREA,PM,ADDEDMS,NOM_OPT,PARTSAV_PON)
 C-----------------------------------------------
@@ -58,7 +58,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ID_MASS,IPA,IP,NMAS,KAD,II,IMID,ITYPE,IFLAG
+      INTEGER I, ID_MASS, IPA, IP, NMAS, II, ITYPE, IFLAG
       my_real AMAS,MSP,MASST(NODMAS),RATIO,ADDMAS
       CHARACTER(LEN=NCHARTITLE) :: TITR
 C=======================================================================
@@ -78,11 +78,11 @@ C=======================================================================
 ! check for type 4 and 7 :
 ! if AMAS (replacing mass) < MSP (structured mass of concerned parts or list of parts)
         IF (ITYPE == 4) THEN
-          MSP = ZERO ! structured mass of liste of parts
+          MSP = ZERO ! structured mass of list of parts
           AMAS = ZERO
           DO II = 1,NMAS
             IP = IPMAS(I)%PARTID(II)
-            MSP = MSP + PARTSAV_PON(IP) ! structured mass (of list of parts)
+            MSP = MSP + PARTSAV_PON(IP) ! structured mass of list of parts
             AMAS = IPMAS(I)%PART(II)%RPMAS
           ENDDO ! DO II = 1,NMAS
           IF (AMAS > MSP) THEN

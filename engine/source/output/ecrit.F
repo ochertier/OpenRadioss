@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ecrit               ../engine/source/output/ecrit.F
-      !||--- called by ------------------------------------------------------
-      !||    sortie_main         ../engine/source/output/sortie_main.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg              ../engine/source/output/message/message.F
-      !||    elapstime           ../engine/source/system/timer.F
-      !||    fvstats1            ../engine/source/airbag/fvstats1.F
-      !||    my_flush            ../engine/source/system/machine.F
-      !||    spmd_exch_fvstats   ../engine/source/mpi/airbags/spmd_exch_fvstats.F
-      !||    spmd_glob_dsum9     ../engine/source/mpi/interfaces/spmd_th.F
-      !||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
-      !||--- uses       -----------------------------------------------------
-      !||    anim_mod            ../common_source/modules/output/anim_mod.F
-      !||    h3d_mod             ../engine/share/modules/h3d_mod.F
-      !||    imp_dyna            ../engine/share/modules/impbufdef_mod.F
-      !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod       ../common_source/modules/ale/multi_fvm_mod.F90
-      !||    output_mod          ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
-      !||    state_mod           ../common_source/modules/state_mod.F
-      !||    timer_mod           ../engine/source/system/timer_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ecrit               ../engine/source/output/ecrit.F
+!||--- called by ------------------------------------------------------
+!||    sortie_main         ../engine/source/output/sortie_main.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg              ../engine/source/output/message/message.F
+!||    elapstime           ../engine/source/system/timer.F
+!||    fvstats1            ../engine/source/airbag/fvstats1.F
+!||    my_flush            ../engine/source/system/machine.F
+!||    spmd_exch_fvstats   ../engine/source/mpi/airbags/spmd_exch_fvstats.F
+!||    spmd_glob_dsum9     ../engine/source/mpi/interfaces/spmd_th.F
+!||    spmd_rbcast         ../engine/source/mpi/generic/spmd_rbcast.F
+!||--- uses       -----------------------------------------------------
+!||    h3d_mod             ../engine/share/modules/h3d_mod.F
+!||    imp_dyna            ../engine/share/modules/impbufdef_mod.F
+!||    message_mod         ../engine/share/message_module/message_mod.F
+!||    multi_fvm_mod       ../common_source/modules/ale/multi_fvm_mod.F90
+!||    output_mod          ../common_source/modules/output/output_mod.F90
+!||    sensor_mod          ../common_source/modules/sensor_mod.F90
+!||    state_mod           ../common_source/modules/state_mod.F
+!||    timer_mod           ../engine/source/system/timer_mod.F90
+!||====================================================================
       SUBROUTINE ECRIT(TIMERS,PARTSAV    ,MS        ,V        ,IN       ,R          ,
      2                 DMAS       ,WEIGHT    ,ENINTOT  ,EKINTOT  ,
      3                 A          ,AR        ,FXBIPM   ,FXBRPM   ,MONVOL     ,
@@ -58,9 +57,8 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE H3D_MOD
       USE SENSOR_MOD
-      USE ANIM_MOD
       USE STATE_MOD
-      USE OUTPUT_MOD
+      USE OUTPUT_MOD , ONLY : OUTPUT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -112,17 +110,16 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IPRI, INFO, I,M, JPRI, ILIGN,ITHIS, ADRRPM, ISENS,
-     .         NTY,INTHE,IABFIS
-      my_real
-     .   ENTOT, ENTOT1, ERR, ERR1, X99, EMASS,MAS,ENINTOT,EKINTOT,
-     .   VX,VY,VZ,DT05,ENTMP(12)  ,RTMP(10),
-     .   MVX, MVY, MVZ, TS, MAS2, WEWE2, ENTOT1B,DMASND
+      INTEGER IPRI, INFO, I,M, JPRI, ILIGN,ITHIS, ADRRPM, ISENS,NTY,INTHE,IABFIS
+      my_real :: ENTOT, ENTOT1, ERR, ERR1, X99, EMASS,MAS,ENINTOT,EKINTOT,
+     .           VX,VY,VZ,DT05,ENTMP(12)  ,RTMP(10),
+     .           MVX, MVY, MVZ, TS, MAS2, WEWE2, ENTOT1B,DMASND
+      my_real ::   DM_INOUT, DE_INOUT
 
-      DOUBLE PRECISION ETIME, RETIME, TT0,
-     .                 ENCIND, XMOMTD, YMOMTD, ZMOMTD,
-     .                 XMASSD, ENROTD, ENINTD, ENCIND2,
-     .                 ENROTD2, ENTOTB, EAMSD
+      DOUBLE PRECISION :: ETIME, RETIME, TT0,
+     .                    ENCIND, XMOMTD, YMOMTD, ZMOMTD,
+     .                    XMASSD, ENROTD, ENINTD, ENCIND2,
+     .                    ENROTD2, ENTOTB, EAMSD
 
       DATA X99/99.9/
       DATA TT0/-1./
@@ -152,6 +149,7 @@ C-----------------------------------------------
      K           'IGE3D','     ','     ','     ','     '/
       DATA ILIGN/55/
 C=======================================================================
+      DM_INOUT=0
       IPRI=1
       IFLAG =0
       IF(TT0==-ONE)TT0=TT
@@ -178,7 +176,7 @@ C
 C     initialization / see corrections rbodies...
       EAMS=ENCIN 
 C
-C GLOBAL VAR INITIALISES DANS RESOL ET MODIFIE DANS RGBCOR + passage en DOUBLE pour cumul
+C global var initialized in resol and modified in rgbcor + switched to double for accumulation
       ENCIND  = ZERO
       ENROTD  = ZERO
       ENINTD  = ZERO
@@ -343,8 +341,9 @@ C
       DO M=1,NPART
         ENROTD= ENROTD + PARTSAV(7,M)
         ENINTD = ENINTD + PARTSAV(1,M) + PARTSAV(24,M) + PARTSAV(26,M)
-        OUTPUT%WFEXT  = OUTPUT%WFEXT + PARTSAV(27,M)
+        OUTPUT%TH%WFEXT  = OUTPUT%TH%WFEXT + PARTSAV(27,M)
         WFEXTH = WFEXTH + PARTSAV(27,M)
+        WPLAST = WPLAST + PARTSAV(29,M)
       ENDDO
 C
 C  Add Heat generated by Friction to internal energy
@@ -382,7 +381,7 @@ C
         ENROT =ZERO
         ENCIN2 =ZERO
         ENROT2 =ZERO        
-        OUTPUT%WFEXT=ENINT
+        OUTPUT%TH%WFEXT=ENINT
        ELSEIF (IDY_DAMP>0) THEN
 C        IF (NSPMD>1) CALL SPMD_SUM_S(DY_EDAMP)
         ENINT = ENINT + DY_EDAMP
@@ -390,8 +389,8 @@ C        IF (NSPMD>1) CALL SPMD_SUM_S(DY_EDAMP)
       ENDIF
 C
       IF (NSPMD > 1) THEN
-C.....envoyer la contribution au proc 0
-C.....sommer les contributions puis standard
+C..... Send the contribution to Pro 0
+C..... summon the contributions then standard
         ENTMP(1) = ENCIN
         ENTMP(2) = ENROT
         ENTMP(3) = ENINT
@@ -421,7 +420,7 @@ C.....sommer les contributions puis standard
         ENDIF
 C
         IF (ISTAT==2) THEN
-C istat=2 => relaxation : broadcast de encin et enrot
+C istat=2 => relaxation: broadcast of encin and enrot
           CALL SPMD_RBCAST(ENTMP,ENTMP,1,2,0,2)
           IF (ISPMD/=0) THEN
             ENCIN = ENTMP(1)
@@ -430,7 +429,7 @@ C istat=2 => relaxation : broadcast de encin et enrot
             ENROT2 = ENTMP(11)            
           ENDIF
         ELSEIF (ISTAT==3) THEN
-C istat=3 => ADYREL : broadcast de encin et enrot ENINT
+C istat=3 => adyrel: broadcast of encin and enrot enint
           CALL SPMD_RBCAST(ENTMP,ENTMP,1,3,0,3)
           IF (ISPMD/=0) THEN
             ENCIN = ENTMP(1)
@@ -439,30 +438,45 @@ C istat=3 => ADYREL : broadcast de encin et enrot ENINT
           ENDIF
         ENDIF
 C
-        ENTMP(1) = OUTPUT%WFEXT
+        ENTMP(1) = OUTPUT%TH%WFEXT
         ENTMP(2) = EHOUR
         ENTMP(3) = ECONTV
         ENTMP(4) = DMAS
         ENTMP(5) = WFEXTH
         ENTMP(6) = ECONTD   
-        ENTMP(7) = ECONT_CUMU                             
-        CALL SPMD_GLOB_DSUM9(ENTMP,7)
-        IF(ISPMD/=0) THEN
-          OUTPUT%WFEXT = ZERO
+        ENTMP(7) = ECONT_CUMU
+        ENTMP(8) = WPLAST
+        ENTMP(9)  = OUTPUT%DATA%INOUT%DM_IN
+        ENTMP(10) = OUTPUT%DATA%INOUT%DM_OUT
+        ENTMP(11) = OUTPUT%DATA%INOUT%DE_IN
+        ENTMP(12) = OUTPUT%DATA%INOUT%DE_OUT
+        CALL SPMD_GLOB_DSUM9(ENTMP,12)
+        IF(ISPMD /= 0) THEN
+          OUTPUT%TH%WFEXT = ZERO
           EHOUR = ZERO
           ECONTV = ZERO
           DMAS = ZERO  
           WFEXTH = ZERO
           ECONTD = ZERO
           ECONT_CUMU = ZERO
+          WPLAST = ZERO
+          OUTPUT%DATA%INOUT%DM_IN = ZERO
+          OUTPUT%DATA%INOUT%DM_OUT = ZERO
+          OUTPUT%DATA%INOUT%DE_IN = ZERO
+          OUTPUT%DATA%INOUT%DE_OUT = ZERO
         ELSE
-          OUTPUT%WFEXT = ENTMP(1)
+          OUTPUT%TH%WFEXT = ENTMP(1)
           EHOUR = ENTMP(2)
           ECONTV= ENTMP(3)
           DMAS  = ENTMP(4)
           WFEXTH= ENTMP(5)
           ECONTD = ENTMP(6)    
-          ECONT_CUMU = ENTMP(7)                
+          ECONT_CUMU = ENTMP(7)  
+          WPLAST = ENTMP(8)
+          OUTPUT%DATA%INOUT%DM_IN = ENTMP(9)
+          OUTPUT%DATA%INOUT%DM_OUT = ENTMP(10)
+          OUTPUT%DATA%INOUT%DE_IN = ENTMP(11)
+          OUTPUT%DATA%INOUT%DE_OUT = ENTMP(12)
         ENDIF
       ENDIF
 C
@@ -480,17 +494,18 @@ C     EAMS = [ 1/2 v.Mv - 1/2 m v^2 ]/ 1/2 m v^2
 c----------------------------------------------------
       IF (ISPMD == 0) THEN
 c
+        DM_INOUT = OUTPUT%DATA%INOUT%DM_IN+OUTPUT%DATA%INOUT%DM_OUT
+        DE_INOUT = OUTPUT%DATA%INOUT%DE_IN+OUTPUT%DATA%INOUT%DE_OUT
+c
         ENTOT = ENCIN + ENINT + ENROT
-        ENTOTB = ENTOT + ENCIN2 + ENROT2       
+        ENTOTB = ENTOT + ENCIN2 + ENROT2
         IF(NCYCLE==0) THEN
-         ENTOT0=ENTOT - OUTPUT%WFEXT - WFEXT_MD
+         ENTOT0=ENTOT - OUTPUT%TH%WFEXT - OUTPUT%TH%WFEXT_MD - DE_INOUT
          DELTAE=ENCIN2 + ENROT2                
-         MASS0 = XMASS - DMAS
+         MASS0 = XMASS - DMAS - DM_INOUT
         ENDIF
-        MASS0 = MASS0  + DMF
-        ENTOT0= ENTOT0 + DEF       
-        ENTOT1=ENTOT0 + OUTPUT%WFEXT
-        ENTOT1B=ENTOT0 + OUTPUT%WFEXT + DELTAE + WFEXT_MD
+        ENTOT1=ENTOT0 + OUTPUT%TH%WFEXT + DE_INOUT
+        ENTOT1B=ENTOT0 + OUTPUT%TH%WFEXT + DELTAE + OUTPUT%TH%WFEXT_MD + DE_INOUT
         IF(ABS(ENTOT1B)>EM20)THEN
           ERR = ENTOTB/ENTOT1B - ONE
           ERR1 = MAX(-X99, MIN(X99,ERR*HUNDRED))     
@@ -498,7 +513,8 @@ c
          ERR = ZERO
          ERR1 =ZERO
         ENDIF
-        EMASS = (XMASS - MASS0) / MAX(MASS0,EM20)
+        EMASS = (XMASS - (MASS0+DM_INOUT)) / MAX(MASS0+DM_INOUT,EM20)
+        !EMASS = (XMASS - MASS0) / MAX(MASS0,EM20)
         ENINTOT = ENINT
         EKINTOT = ENCIN
 C-----------------------------------------------
@@ -541,7 +557,7 @@ C
           ENDIF
           IF(NANIM/=0)THEN
            MDESS = 1
-           TANIM = TT
+           OUTPUT%TANIM = TT
            IPRI  = 0
           ENDIF                 
         ELSEIF((NERR_POSIT==0.AND.ABS(ERR)>DEMXS).OR.
@@ -556,7 +572,7 @@ C
           ENDIF
           IF(NANIM/=0)THEN
            MDESS = 1
-           TANIM = TT
+           OUTPUT%TANIM = TT
            IPRI  = 0
           ENDIF 
         ENDIF
@@ -571,7 +587,7 @@ C
           ENDIF
           IF(NANIM/=0)THEN
            MDESS = 1
-           TANIM = TT
+           OUTPUT%TANIM = TT
            IPRI  = 0
           ENDIF 
         ELSEIF(EMASS>DMTMXS)THEN
@@ -585,7 +601,7 @@ C
           ENDIF
           IF(NANIM/=0)THEN
            MDESS = 1
-           TANIM = TT
+           OUTPUT%TANIM = TT
            IPRI  = 0
           ENDIF 
         ENDIF
@@ -598,7 +614,7 @@ C---------------------------------
           RTMP(1)  = MSTOP
           RTMP(2)  = MREST
           RTMP(3)  = MDESS
-          RTMP(4)  = TANIM
+          RTMP(4)  = OUTPUT%TANIM
           RTMP(5)  = OUTPUT%TH%THIS
           RTMP(6)  = TSTAT
           RTMP(7)  = TOUTP
@@ -612,7 +628,7 @@ C
         MSTOP = NINT(RTMP(1))
         MREST = NINT(RTMP(2))
         MDESS = NINT(RTMP(3))
-        TANIM = RTMP(4)
+        OUTPUT%TANIM = RTMP(4)
         OUTPUT%TH%THIS =  RTMP(5)
         TSTAT = RTMP(6)
         TOUTP = RTMP(7)
@@ -631,7 +647,7 @@ C-----------------------------------------------
         IF (NLPRI /= 0) ILIGN = NLPRI
         JPRI=MOD(NCYCLE,ILIGN*IABS(NCPRI))
         IF(JPRI==0) WRITE(IOUT,1000)
-        WRITE(IOUT,1100) NCYCLE,TT,DT2,ELTYP(ITYPTS),NELTS,ERR1,ENINT,ENCIN,ENROT,OUTPUT%WFEXT,EMASS,XMASS,XMASS-MASS0
+        WRITE(IOUT,1100) NCYCLE,TT,DT2,ELTYP(ITYPTS),NELTS,ERR1,ENINT,ENCIN,ENROT,OUTPUT%TH%WFEXT,EMASS,XMASS,XMASS-MASS0-DM_INOUT
         CALL MY_FLUSH(IOUT)
         IF(NCPRI<0) THEN
           IF(DEBUG(10)/=0)THEN
@@ -644,7 +660,7 @@ C-----------------------------------------------
             WRITE(ISTDO,'(2(A,I8),A,1PE11.4)') '     LAG_NC=',LAG_NC,',   NITER_GC=',NITER_GC,',   LAG_ERSQ2=',LAG_ERSQ2
           ENDIF
           IF(IMON > 0 .AND. TT-TT0 > ZERO) THEN
-C calcul temps restant
+C compute remaining time
             RETIME = (ETIME*(TSTOP-TT0)) / (TT-TT0) - ETIME
             WRITE(ISTDO,'(A,F14.2,A,A,F14.2,A)')' ELAPSED TIME=',ETIME,' s ',' REMAINING TIME=',RETIME,' s'
           END IF 
@@ -662,13 +678,13 @@ C
        WRITE (IUSC3,'(A,G14.7)',ERR=990)     ' INTERNAL ENERGY   =',ENINT
        WRITE (IUSC3,'(A,G14.7)',ERR=990)     ' KINETIC ENERGY    =',ENCIN
        WRITE (IUSC3,'(A,G14.7)',ERR=990)     ' ROT. KIN. ENERGY  =',ENROT
-       WRITE (IUSC3,'(A,G14.7)',ERR=990)     ' EXTERNAL WORK     =',WFEXT
+       WRITE (IUSC3,'(A,G14.7)',ERR=990)     ' EXTERNAL WORK     =',OUTPUT%TH%WFEXT
        WRITE (IUSC3,'(A,G14.7)',ERR=990)     ' MASS.ERR (M-M0)/M0=',EMASS
 
        CALL FVSTATS1(IUSC3,MONVOL,1)
              
        IF(IMON > 0 .AND. TT > ZERO) THEN
-C calcul temps restant
+C compute remaining time
          RETIME = (ETIME*TSTOP) / TT - ETIME
          WRITE(IUSC3,'(A)',ERR=990)        ' '
          WRITE(IUSC3,'(A,F14.2,A)',ERR=990)' CURRENT ELAPSED TIME    =',ETIME,' s '
@@ -684,13 +700,7 @@ C----------------
  1000 FORMAT('   CYCLE    TIME      TIME-STEP  ELEMENT          ',
      +       'ERROR  I-ENERGY    K-ENERGY T  K-ENERGY R  ',
      +       'EXT-WORK     MAS.ERR     TOTAL MASS  MASS ADDED')
- 1050 FORMAT(1H1,'  CYCLE',4X,'TIME',6X,'TIME-STEP',2X,'ELEMENT',5X,
-     +       'K-ENERGY R',2X,'K-ENERGY T',4X,'I-ENERGY',4X,'ERROR',3X,
-     +       'MASS',7X,'X-MOMENT',4X,'Y-MOMENT',4X,'Z-MOMENT' )
  1100 FORMAT(I8,2(1X,G11.4),1X,A5,1X,I10,1X,F5.1,1H%,7(1X,G11.4))
- 1200 FORMAT(' TIME=',G10.4,
-     +          'I-ENERGY   ','K-ENERGY   ','MASS       ',
-     +          'X-MOMENT   ','Y-MOMENT   ','Z-MOMENT   '  )
 C
       RETURN
       END

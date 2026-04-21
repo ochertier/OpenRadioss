@@ -58,6 +58,8 @@ function my_help()
   echo "    Linux64 Intel compilers"
   echo "      download MUMPS_5.5.1 at http://ftp.mcs.anl.gov/pub/petsc/externalpackages/MUMPS_5.5.1.tar.gz"
   echo "      and uncompress it in extlib directory such that engine/extlib/MUMPS_5.5.1 exists"
+  echo " -preCICE : enable preCICE coupling"
+  echo " -cwipi=[path to cwipi root directory] : enable cwipi coupling"
   echo " "
   echo " -no-python : do not link with python"
   echo " " 
@@ -88,6 +90,7 @@ ADF=""
 MPI="-DMPI=smp"
 pmpi="SMP Only"
 clean=0
+mpi=0
 mpi_os=0
 mpi_root=""
 mpi_libdir=""
@@ -98,6 +101,10 @@ eng_vers="engine"
 mumps_root=""
 scalapack_root=""
 lapack_root=""
+precice="0"
+coupling_exe=""
+cwipi=0
+cwipi_path=""
 com=0
 release=0
 ad=none
@@ -129,6 +136,7 @@ else
          then
             dmpi=_${pmpi}
             MPI=-DMPI=${pmpi}
+            mpi=1
          else 
             pmpi="SMP Only"
          fi
@@ -189,6 +197,25 @@ else
        then
         scalapack_root=`echo $var|awk -F '=' '{print $2}'`
         scalapack_root="-Dscalapack_root=${scalapack_root}"
+       fi
+
+       if [ "$arg" == "-preCICE" ]
+       then
+        precice="1"
+        coupling_exe="_precice"
+       fi
+       
+       if [ "$arg" == "-cwipi" ]
+       then
+	 cwipi=1
+	 coupling_exe="_cwipi"
+	 cwipi_path=`echo $var|awk -F '=' '{print $2}'`
+	 # print cwipi_path 
+	 echo "cwipi_path = ${cwipi_path}"
+	 if [ -z "$cwipi_path" ]
+	 then
+	   cwipi_path="/usr/local/cwipi"
+	 fi
        fi
 
        if [ "$arg" == "-addflag" ]
@@ -260,6 +287,16 @@ else
 
    done
 
+   if [[ $mpi == 0 && ($mpi_os == 1 || -n $mpi_root || -n $mpi_libdir || -n $mpi_incdir) ]]
+   then
+     echo " "
+     echo "Warning:"
+     echo "--------"
+     echo "You have provided MPI options, but not enabled MPI."
+     echo "Set the MPI implementation with -mpi=[mpi]."
+     echo " "
+   fi
+
    if [ $got_arch == 0 ] 
    then
      echo " " 
@@ -277,7 +314,7 @@ else
      ddebug=""
    fi 
 
-engine_exec=${eng_vers}_${arch}${dmpi}${suffix}${ddebug}
+engine_exec=${eng_vers}_${arch}${dmpi}${suffix}${coupling_exe}${ddebug}
 build_directory=cbuild_${engine_exec}${cf}
 
 
@@ -370,10 +407,39 @@ else
     fi
 fi
 
-Fortran_path=`which $Fortran_comp`
-C_path=`which $C_comp`
-CPP_path=`which $CPP_comp`
-CXX_path=`which $CXX_comp`
+Fortran_path=`which $Fortran_comp 2>/dev/null`
+C_path=`which $C_comp 2>/dev/null`
+CPP_path=`which $CPP_comp 2>/dev/null`
+CXX_path=`which $CXX_comp 2>/dev/null`
+
+# Validate compilers are found
+if [ -z "$Fortran_path" ]
+then
+  echo " "
+  echo "-- Error: Fortran compiler '$Fortran_comp' not found in PATH"
+  echo "-- Please install it or add its location to your PATH"
+  echo " "
+  cd ..
+  exit 1
+fi
+if [ -z "$C_path" ]
+then
+  echo " "
+  echo "-- Error: C compiler '$C_comp' not found in PATH"
+  echo "-- Please install it or add its location to your PATH"
+  echo " "
+  cd ..
+  exit 1
+fi
+if [ -z "$CXX_path" ]
+then
+  echo " "
+  echo "-- Error: C++ compiler '$CXX_comp' not found in PATH"
+  echo "-- Please install it or add its location to your PATH"
+  echo " "
+  cd ..
+  exit 1
+fi
 
 
 # Apply cmake
@@ -386,7 +452,7 @@ then
   CXX_path_w=`cygpath.exe -m "${CXX_path}"`
   cmake.exe .. -G "Unix Makefiles" -Darch=${arch} -Dprecision=${prec} ${MPI} -Ddebug=${debug} -DEXEC_NAME=${engine_exec} -Dstatic_link=$static_link -Dmpi_os=${mpi_os} ${mpi_root} ${mpi_libdir} ${mpi_incdir} ${dc} ${mumps_root} ${scalapack_root} ${lapack_root} -DCMAKE_BUILD_TYPE=Release -Dno_python=${no_python}  -Dstatic_link=$static_link -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER="${Fortran_path_w}" -DCMAKE_C_COMPILER="${C_path_w}" -DCMAKE_CPP_COMPILER="${CPP_path_w}" -DCMAKE_CXX_COMPILER="${CXX_path_w}" ${la}
 else
-  cmake .. -Darch=${arch} -Dprecision=${prec} ${MPI} -Ddebug=${debug} -DEXEC_NAME=${engine_exec} -Dstatic_link=$static_link -Dmpi_os=${mpi_os} -Dsanitize=${sanitize} ${mpi_root} ${mpi_libdir} ${mpi_incdir} ${dc} ${mumps_root} ${scalapack_root} ${lapack_root} -Dno_python=${no_python} -Dstatic_link=$static_link -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=${Fortran_path} -DCMAKE_C_COMPILER=${C_path} -DCMAKE_CPP_COMPILER=${CPP_path} -DCMAKE_CXX_COMPILER=${CXX_path}  ${la}
+  cmake .. -Darch=${arch} -Dprecision=${prec} ${MPI} -Ddebug=${debug} -DEXEC_NAME=${engine_exec} -Dstatic_link=$static_link -Dmpi_os=${mpi_os} -Dsanitize=${sanitize} ${mpi_root} ${mpi_libdir} ${mpi_incdir} ${dc} ${mumps_root} ${scalapack_root} ${lapack_root} -Dno_python=${no_python} -Dstatic_link=$static_link -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=${Fortran_path} -DCMAKE_C_COMPILER=${C_path} -DCMAKE_CPP_COMPILER=${CPP_path} -DCMAKE_CXX_COMPILER=${CXX_path}  ${la} -Dprecice=${precice} -Dcwipi=${cwipi} -Dcwipi_path=${cwipi_path}
 
 fi
 
@@ -419,6 +485,17 @@ then
     echo " "
 fi
 
+if [ $debug == 'analysis' ]
+then
+if [ $return_value -eq 0 ]
+then
+    pwd
+    cd ../../scripts
+    python3 ./static_analysis.py engine 
+    return_value=$?
+fi
+fi
+
 if [ $return_value -ne 0 ]
 then
    echo " " 
@@ -427,6 +504,8 @@ then
    cd ..
    exit 1
 fi
+
+
 
 cd ..
 echo " "

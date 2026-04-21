@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    c_gr_entity_e   ../starter/source/model/group/c_gr_entity.F
-      !||--- called by ------------------------------------------------------
-      !||    c_group_str     ../starter/source/restart/ddsplit/c_group_str.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c_gr_entity_e   ../starter/source/model/group/c_gr_entity.F
+!||--- called by ------------------------------------------------------
+!||    c_group_str     ../starter/source/restart/ddsplit/c_group_str.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE C_GR_ENTITY_E(IGR  ,NGR  ,LENIGR ,CEP,
      .                         CEL    ,PROC ,ESHIFT ,LENIGR_L)
 C-----------------------------------------------
@@ -102,10 +102,10 @@ C-----------------------------------------------
 !---------
       RETURN
       END
-      !||====================================================================
-      !||    c_gr_entity_p   ../starter/source/model/group/c_gr_entity.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c_gr_entity_p   ../starter/source/model/group/c_gr_entity.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE C_GR_ENTITY_P(IGR  ,NGR  ,LENIGR ,CEP,
      .                         CEL  ,PROC ,LENIGR_L)
 C-----------------------------------------------
@@ -181,12 +181,12 @@ C-----------------------------------------------
 !---------
       RETURN
       END
-      !||====================================================================
-      !||    c_gr_entity_n   ../starter/source/model/group/c_gr_entity.F
-      !||--- called by ------------------------------------------------------
-      !||    c_group_str     ../starter/source/restart/ddsplit/c_group_str.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    c_gr_entity_n   ../starter/source/model/group/c_gr_entity.F
+!||--- called by ------------------------------------------------------
+!||    c_group_str     ../starter/source/restart/ddsplit/c_group_str.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE C_GR_ENTITY_N(IGR  ,NGR     ,LENIGR    ,NODLOCAL,
      .                         PROC ,LENIGR_L,FRONTB_R2R,NUMNOD_L)
 C-----------------------------------------------
@@ -249,7 +249,7 @@ C-----------------------------------------------
 !
 !        IGROUP_L(L_GROUP+1) = ID
           L_GROUP = L_GROUP+1
-!        IGROUP_L(L_GROUP+1) = NNOD_LOC(IGU)
+!        Igroup_l (l_group+1) = nnod_loc (igu)
           L_GROUP = L_GROUP+1
 !        IGROUP_L(L_GROUP+1) = GRTYPE
           L_GROUP = L_GROUP+1

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dtcdk_reg        ../engine/source/elements/sh3n/coquedk/dtcdk_reg.F
-      !||--- called by ------------------------------------------------------
-      !||    cdkforc3         ../engine/source/elements/sh3n/coquedk/cdkforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dtcdk_reg        ../engine/source/elements/sh3n/coquedk/dtcdk_reg.F
+!||--- called by ------------------------------------------------------
+!||    cdkforc3         ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+!||--- uses       -----------------------------------------------------
+!||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+!||====================================================================
       SUBROUTINE DTCDK_REG(NLOC_DMG,THK     ,NEL     ,OFF     ,
      .                     LE      ,IMAT    ,NDDL    ,DT2T    )
 C-----------------------------------------------
@@ -56,9 +56,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
       my_real 
-     .  L2,ZETA,DTNL_TH,DTNL,DAMPFAC,LE_MAX
-      ! Coefficient for non-local stability to take into account damping
-      my_real, PARAMETER :: CDAMP = 0.7D0
+     .  L2,ZETA,DTNL_TH,DTNL,LE_MAX
 C=======================================================================
       ! Recovering non-local parameters
       L2     = NLOC_DMG%LEN(IMAT)**2 ! Non-local internal length ** 2

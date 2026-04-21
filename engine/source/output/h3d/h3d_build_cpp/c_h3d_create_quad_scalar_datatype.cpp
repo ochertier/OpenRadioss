@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2025 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2026 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -123,26 +123,7 @@ void c_h3d_create_quad_scalar_datatype_(int *cpt_data, char *name1, int *size1, 
 #else
              RES_STRING = strcat(RES_STRING,cname);
 #endif
-
-    if(*id > 0)
-    {
-        sprintf(ID_STRING, " ID %d",*id);
-#ifdef _WIN64
-        strcat_s(RES_STRING,100,ID_STRING);
-#else
-        RES_STRING = strcat(RES_STRING,ID_STRING);
-#endif
-    }
-
-    if (*mode > 0)
-    {
-        sprintf(MODE_STRING, " Mode %d", *mode);
-#ifdef _WIN64
-        strcat_s(RES_STRING, 100, MODE_STRING);
-#else
-        RES_STRING = strcat(RES_STRING, MODE_STRING);
-#endif
-    }    
+   
     
      if(*nuvar > 0)
     {

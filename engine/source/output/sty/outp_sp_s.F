@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    outp_sp_s             ../engine/source/output/sty/outp_sp_s.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp               ../engine/source/output/sty/genoutp.F
-      !||--- calls      -----------------------------------------------------
-      !||    initbuf               ../engine/share/resol/initbuf.F
-      !||    spmd_rgather9_1comm   ../engine/source/mpi/interfaces/spmd_outp.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    initbuf_mod           ../engine/share/resol/initbuf.F
-      !||====================================================================
+!||====================================================================
+!||    outp_sp_s             ../engine/source/output/sty/outp_sp_s.F
+!||--- called by ------------------------------------------------------
+!||    genoutp               ../engine/source/output/sty/genoutp.F
+!||--- calls      -----------------------------------------------------
+!||    initbuf               ../engine/share/resol/initbuf.F
+!||    spmd_rgather9_1comm   ../engine/source/mpi/interfaces/spmd_outp.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    initbuf_mod           ../engine/share/resol/initbuf.F
+!||====================================================================
       SUBROUTINE OUTP_SP_S(NBX  ,KEY   ,TEXT,ELBUF_TAB,IPARG,
      2                     EANI,DD_IAD,KXSP,IPM ,
      3                     SPBUF,SIZLOC,SIZP0,SIZ_WR)
@@ -67,14 +67,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,II(6),JJ,N,NN,NG,NEL,MLW,JJ_OLD,NGF,NGL, LEN,WRTLEN,
+      INTEGER I, J, II(6), JJ, N, NN, NG, NEL, MLW, JJ_OLD, NGF, NGL, WRTLEN, 
      .        NUVAR,IUS,RESP0,RES,COMPTEUR,L,K
       INTEGER, DIMENSION(NSPGROUP) :: JJ_LOC
       INTEGER, DIMENSION(NSPGROUP+1,NSPMD) :: ADRESS 
       my_real
      .   WA(SIZLOC),WAP0(SIZ_WR),WAP0_LOC(SIZP0)
       my_real
-     .   FUNC(6),S1 ,S2 ,S3,P,VONM2
+     .   S1 ,S2 ,S3,P,VONM2
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
       TYPE(BUF_MAT_) ,POINTER :: MBUF     
 C=======================================================================
@@ -231,7 +231,7 @@ c---
           ENDDO
           RESP0=RES
          END IF
-        ENDDO   ! nn=1,nspgroup
+        ENDDO   ! nn = 1, nspgroup
 
         IF (RESP0 > 0) THEN
           IF (OUTYY_FMT == 2) THEN                           
@@ -244,12 +244,12 @@ c---
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    count_arsz_sps   ../engine/source/output/sty/outp_sp_s.F
-      !||--- called by ------------------------------------------------------
-      !||    genoutp          ../engine/source/output/sty/genoutp.F
-      !||    outp_arsz_sps    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||====================================================================
+!||====================================================================
+!||    count_arsz_sps   ../engine/source/output/sty/outp_sp_s.F
+!||--- called by ------------------------------------------------------
+!||    genoutp          ../engine/source/output/sty/genoutp.F
+!||    outp_arsz_sps    ../engine/source/mpi/interfaces/spmd_outp.F
+!||====================================================================
       SUBROUTINE COUNT_ARSZ_SPS(IPARG,DD_IAD,WASZ,SIZ_WRITE_LOC)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -270,8 +270,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NGF,NGL,NN,ITY,NEL,NG,JJ,
-     .        P0ARSZ2,WASZ2
+      INTEGER NGF,NGL,NN,ITY,NEL,NG,JJ
 C-----------------------------------------------
       WASZ = 0
 

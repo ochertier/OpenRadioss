@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i12chk3                ../starter/source/interfaces/inter3d1/i12chk3.F
-      !||--- called by ------------------------------------------------------
-      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    i12sol3                ../starter/source/interfaces/inter3d1/insol3.F
-      !||    icinv3                 ../starter/source/interfaces/inter3d1/icinv3.F
-      !||    local_index            ../starter/source/interfaces/interf1/local_index.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod             ../starter/share/modules1/format_mod.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    i12chk3                ../starter/source/interfaces/inter3d1/i12chk3.F
+!||--- called by ------------------------------------------------------
+!||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    i12sol3                ../starter/source/interfaces/inter3d1/insol3.F
+!||    icinv3                 ../starter/source/interfaces/inter3d1/icinv3.F
+!||    local_index            ../starter/source/interfaces/interf1/local_index.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod             ../starter/share/modules1/format_mod.F90
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE I12CHK3(X   ,IRECT,IXS,NRT   ,IXC,
      .                  NINT,NSN  ,NSV,NOINT ,MWA,
      .                  IXTG,PM,ISEG,ALE_CONNECTIVITY,
@@ -45,6 +45,7 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE FORMAT_MOD , ONLY : FMW_10I
+      use element_mod , only :nixs,nixc,nixtg
 C-----------------------------------
 C     CHECK ELEMENT FOR TYPE 12
 C------------------------------------
@@ -126,7 +127,7 @@ C-----------------------------------------------
       END IF !(ITIED/=3)
       
       !------------------------------------------------------------------------!
-      !     LE NOEUD GLOBAL EST REMPLACE PAR LE NOEUD LOCAL DANS IRECT         !
+      ! !     THE GLOBAL NODE IS REPLACED BY THE LOCAL NODE IN IRECT         !
       !------------------------------------------------------------------------!
       DO I=1,NRT
         DO J=1,4
@@ -136,7 +137,7 @@ C-----------------------------------------------
         ENDDO
       ENDDO
       !------------------------------------------------------------------------!
-      !     COMPTAGE DU NOMBRE DE FACETTES CONNECTEES PAR NOEUD (SECONDARY ONLY!)  !
+      ! !     COUNTING THE NUMBER OF FACETS CONNECTED BY NODE (SECONDARY ONLY!)  !
       !------------------------------------------------------------------------!
       IF(NINT>0)THEN
          DO  I=1,NSN

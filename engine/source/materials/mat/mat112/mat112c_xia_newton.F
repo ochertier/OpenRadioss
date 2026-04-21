@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mat112c_xia_newton    ../engine/source/materials/mat/mat112/mat112c_xia_newton.F
-      !||--- called by ------------------------------------------------------
-      !||    sigeps112c            ../engine/source/materials/mat/mat112/sigeps112c.F
-      !||--- calls      -----------------------------------------------------
-      !||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
-      !||--- uses       -----------------------------------------------------
-      !||    interface_table_mod   ../engine/share/modules/table_mod.F
-      !||    table_mod             ../engine/share/modules/table_mod.F
-      !||====================================================================
+!||====================================================================
+!||    mat112c_xia_newton    ../engine/source/materials/mat/mat112/mat112c_xia_newton.F
+!||--- called by ------------------------------------------------------
+!||    sigeps112c            ../engine/source/materials/mat/mat112/sigeps112c.F
+!||--- calls      -----------------------------------------------------
+!||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
+!||--- uses       -----------------------------------------------------
+!||    interface_table_mod   ../engine/share/modules/table_mod.F
+!||    table_mod             ../engine/share/modules/table_mod.F
+!||====================================================================
       SUBROUTINE MAT112C_XIA_NEWTON(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
      2     UPARAM  ,UVAR    ,JTHE    ,OFF     ,RHO     ,
@@ -82,17 +82,17 @@ c
       !=======================================================================
       !      Local Variables
       !=======================================================================
-      INTEGER I,K,II,NINDX,INDEX(NEL),NITER,ITER,NINDX2,INDEX2(NEL),
+      INTEGER I,II,NINDX,INDEX(NEL),NITER,ITER,NINDX2,INDEX2(NEL),
      .        ITAB,ISMOOTH,IPOS(NEL,2)
 c
       my_real 
-     .   YOUNG1,YOUNG2,NU12,NU21,G12,A11,A12,A21,A22,C1,
+     .   YOUNG1,YOUNG2,NU12,NU21,G12,A11,A12,A21,A22,
      .   DEUXK,NU1P,NU2P,NU4P,NU5P,S01,A01,B01,C01,
      .   S02,A02,B02,C02,S03,A03,B03,C03,
      .   S04,A04,B04,C04,S05,A05,B05,C05,ASIG,BSIG,CSIG,
      .   TAU0,ATAU,BTAU,N3,N6,G23,G31
       my_real 
-     .   NORMSIG,H,DPDT,DLAM,DDEP,DEPXX,DEPYY
+     .   NORMSIG,DPDT,DLAM,DDEP
       my_real 
      .   NORMXX,NORMYY,NORMXY,NORMPXX,NORMPYY,NORMPXY,
      .   DPHI_DLAM,DFDSIG2,DPHI_DPLA,DPXX,DPYY,DPXY,

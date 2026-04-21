@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    execargcheck            ../engine/source/engine/execargcheck.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss0                ../engine/source/engine/radioss0.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                   ../engine/source/system/arret.F
-      !||    build_msg               ../common_source/tools/memory/my_alloc.F90
-      !||    isanargument            ../engine/source/engine/execargcheck.F
-      !||    pexecinfo               ../engine/source/engine/execargcheck.F
-      !||    phelpinfo               ../engine/source/engine/execargcheck.F
-      !||    read_msgfile            ../engine/source/output/message/read_msgfile.F
-      !||    upcase                  ../engine/source/engine/execargcheck.F
-      !||--- uses       -----------------------------------------------------
-      !||    check_mod               ../common_source/modules/check_mod.F
-      !||    command_line_args_mod   ../engine/share/modules/command_line_args.F
-      !||    inoutfile_mod           ../common_source/modules/inoutfile_mod.F
-      !||    message_mod             ../engine/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    execargcheck            ../engine/source/engine/execargcheck.F
+!||--- called by ------------------------------------------------------
+!||    radioss0                ../engine/source/engine/radioss0.F
+!||--- calls      -----------------------------------------------------
+!||    arret                   ../engine/source/system/arret.F
+!||    build_msg               ../common_source/tools/memory/my_alloc.F90
+!||    isanargument            ../engine/source/engine/execargcheck.F
+!||    pexecinfo               ../engine/source/engine/execargcheck.F
+!||    phelpinfo               ../engine/source/engine/execargcheck.F
+!||    read_msgfile            ../engine/source/output/message/read_msgfile.F
+!||    upcase                  ../engine/source/engine/execargcheck.F
+!||--- uses       -----------------------------------------------------
+!||    check_mod               ../common_source/modules/check_mod.F
+!||    command_line_args_mod   ../engine/share/modules/command_line_args.F
+!||    inoutfile_mod           ../common_source/modules/inoutfile_mod.F
+!||    message_mod             ../engine/share/message_module/message_mod.F
+!||    spmd_comm_world_mod     ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE EXECARGCHECK(GOT_INPUT,INPUT,LENI, 
      *                        GOT_PATH,  PATH,  LENP)
       USE MESSAGE_MOD
@@ -47,6 +48,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -120,7 +122,7 @@ C-----------------------------------------------
        !    default = write restart files
        RESTART_FILE = 1
        ! ---------------------
-       ! infile / outfile cdl line
+       ! Infile / Outfile CDL Line
        INFILE_NAME_LEN = 0
        INFILE_NAME(1:INFILE_CHAR_LEN) = ''
        INFILE_BOOL=.FALSE.
@@ -222,7 +224,7 @@ C -NORST : no restart file command
           CASE ( '-NORST')
              RESTART_FILE = 0
 C------------------------------------------------
-C Lignes de commande qui ne sont pas definies
+C Command lines that are not defined
           CASE DEFAULT
              ERR = 0
              IF (I == 1)THEN
@@ -476,7 +478,6 @@ C check if -dylib has got an argument or if the next string is an input command
 
          ENDIF     !         IF (PUSERLNAMI+1  > ARGN) THEN
        ENDIF
- 3000  CONTINUE
 C------------------------------------------------
 C -MDS_LIBPATH
 C------------------------------------------------
@@ -549,15 +550,18 @@ C------------------------------------------------
 
 
 
-      !||====================================================================
-      !||    upcase         ../engine/source/engine/execargcheck.F
-      !||--- called by ------------------------------------------------------
-      !||    execargcheck   ../engine/source/engine/execargcheck.F
-      !||====================================================================
+!||====================================================================
+!||    upcase                ../engine/source/engine/execargcheck.F
+!||--- called by ------------------------------------------------------
+!||    execargcheck          ../engine/source/engine/execargcheck.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE UPCASE (STRING) 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -580,15 +584,18 @@ C
        END DO
        RETURN
        END
-      !||====================================================================
-      !||    isanargument   ../engine/source/engine/execargcheck.F
-      !||--- called by ------------------------------------------------------
-      !||    execargcheck   ../engine/source/engine/execargcheck.F
-      !||====================================================================
+!||====================================================================
+!||    isanargument          ../engine/source/engine/execargcheck.F
+!||--- called by ------------------------------------------------------
+!||    execargcheck          ../engine/source/engine/execargcheck.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE ISANARGUMENT(ARGLIST,LENLIST,ARG,ISIN)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -619,18 +626,21 @@ C-----------------------------------------------
 
 
 
-      !||====================================================================
-      !||    pexecinfo           ../engine/source/engine/execargcheck.F
-      !||--- called by ------------------------------------------------------
-      !||    execargcheck        ../engine/source/engine/execargcheck.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_exit             ../engine/source/system/my_exit.c
-      !||    prexecinfo          ../engine/source/engine/execargcheck.F
-      !||====================================================================
+!||====================================================================
+!||    pexecinfo             ../engine/source/engine/execargcheck.F
+!||--- called by ------------------------------------------------------
+!||    execargcheck          ../engine/source/engine/execargcheck.F
+!||--- calls      -----------------------------------------------------
+!||    my_exit               ../engine/source/system/my_exit.c
+!||    prexecinfo            ../engine/source/engine/execargcheck.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
           SUBROUTINE PEXECINFO(IDUM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -673,15 +683,18 @@ C-----------------------------------------------
         CALL MY_EXIT(0)
         END
 
-      !||====================================================================
-      !||    prexecinfo   ../engine/source/engine/execargcheck.F
-      !||--- called by ------------------------------------------------------
-      !||    pexecinfo    ../engine/source/engine/execargcheck.F
-      !||====================================================================
+!||====================================================================
+!||    prexecinfo            ../engine/source/engine/execargcheck.F
+!||--- called by ------------------------------------------------------
+!||    pexecinfo             ../engine/source/engine/execargcheck.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
           SUBROUTINE PREXECINFO(IDUM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 #include      "r4r8_p.inc"
 C-----------------------------------------------
@@ -719,19 +732,22 @@ C-----------------------------------------------
 
         END
 
-      !||====================================================================
-      !||    phelpinfo            ../engine/source/engine/execargcheck.F
-      !||--- called by ------------------------------------------------------
-      !||    execargcheck         ../engine/source/engine/execargcheck.F
-      !||    get_file_name_info   ../engine/source/system/get_file_name_info.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                ../engine/source/system/arret.F
-      !||    prhelpinfo           ../engine/source/engine/execargcheck.F
-      !||====================================================================
+!||====================================================================
+!||    phelpinfo             ../engine/source/engine/execargcheck.F
+!||--- called by ------------------------------------------------------
+!||    execargcheck          ../engine/source/engine/execargcheck.F
+!||    get_file_name_info    ../engine/source/system/get_file_name_info.F
+!||--- calls      -----------------------------------------------------
+!||    arret                 ../engine/source/system/arret.F
+!||    prhelpinfo            ../engine/source/engine/execargcheck.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
           SUBROUTINE PHELPINFO(ERRN,EMSG,SMSG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -777,15 +793,18 @@ C-----------------------------------------------
         CALL ARRET(7)
         END
 
-      !||====================================================================
-      !||    prhelpinfo   ../engine/source/engine/execargcheck.F
-      !||--- called by ------------------------------------------------------
-      !||    phelpinfo    ../engine/source/engine/execargcheck.F
-      !||====================================================================
+!||====================================================================
+!||    prhelpinfo            ../engine/source/engine/execargcheck.F
+!||--- called by ------------------------------------------------------
+!||    phelpinfo             ../engine/source/engine/execargcheck.F
+!||--- uses       -----------------------------------------------------
+!||    spmd_comm_world_mod   ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
        SUBROUTINE PRHELPINFO(ERRN,EMSG,SMSG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s

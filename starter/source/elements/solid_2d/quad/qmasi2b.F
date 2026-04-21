@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    qmasi2b   ../starter/source/elements/solid_2d/quad/qmasi2b.F
-      !||--- called by ------------------------------------------------------
-      !||    binit2    ../starter/source/ale/bimat/binit2.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    qmasi2b   ../starter/source/elements/solid_2d/quad/qmasi2b.F
+!||--- called by ------------------------------------------------------
+!||    binit2    ../starter/source/ale/bimat/binit2.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE QMASI2B(PM,MAT,MS,VOL,MSQ,WMA,IPART,PARTSAV,
      .     IX1, IX2, IX3, IX4 ,X ,V)
 C-----------------------------------------------
@@ -63,7 +63,7 @@ C-----------------------------------------------
         MASS(I)=PM(89,MAT(I))*VOL(I)*FOURTH
       ENDDO
 
-C calcul mass initiale en arithmetique // pour le spmd
+C initial mass calculation in arithmetic // for spmd
         DO I=LFT,LLT
           MSQ(I)=MSQ(I)+MASS(I)
         ENDDO

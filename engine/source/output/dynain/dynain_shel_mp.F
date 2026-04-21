@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    dynain_shel_mp   ../engine/source/output/dynain/dynain_shel_mp.F
-      !||--- called by ------------------------------------------------------
-      !||    gendynain        ../engine/source/output/dynain/gendynain.F
-      !||--- calls      -----------------------------------------------------
-      !||    my_orders        ../common_source/tools/sort/my_orders.c
-      !||    strs_txt50       ../engine/source/output/sta/sta_txt.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    state_mod        ../common_source/modules/state_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dynain_shel_mp   ../engine/source/output/dynain/dynain_shel_mp.F
+!||--- called by ------------------------------------------------------
+!||    gendynain        ../engine/source/output/dynain/gendynain.F
+!||--- calls      -----------------------------------------------------
+!||    my_orders        ../common_source/tools/sort/my_orders.c
+!||    strs_txt50       ../engine/source/output/sta/sta_txt.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod      ../common_source/modules/elements/element_mod.F90
+!||    state_mod        ../common_source/modules/state_mod.F
+!||====================================================================
       SUBROUTINE DYNAIN_SHEL_MP(ITAB   ,ITABG   ,LENG    ,IGEO     ,IXC    ,
      .                          IXTG   ,IPARTC  ,IPARTTG ,DYNAIN_DATA      ,
      .                          NODTAG ,DYNAIN_INDXC,DYNAIN_INDXTG,IPARG   ,
@@ -40,6 +41,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD 
       USE STATE_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,7 +70,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, JJ, IPRT0, IPRT, K, II
+      INTEGER I, N, JJ, IPRT, K, II
       INTEGER NG, NEL, NFT, LFT, LLT, ITY, MLW, ITHK,IOFF,
      .        IPROP,ID_PROP,IERR , N4SHELL, N3SHELL, IGTYP, IGTYP0
       INTEGER WORK(70000)

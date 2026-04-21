@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sortho3     ../starter/source/elements/solid/solide/sortho3.F
-      !||--- called by ------------------------------------------------------
-      !||    s4refsta3   ../starter/source/elements/solid/solide4/s4refsta3.F
-      !||    srcoor3     ../starter/source/elements/solid/solide/srcoor3.F
-      !||    srefsta3    ../starter/source/elements/solid/solide/srefsta3.F
-      !||====================================================================
+!||====================================================================
+!||    sortho3     ../starter/source/elements/solid/solide/sortho3.F
+!||--- called by ------------------------------------------------------
+!||    s4refsta3   ../starter/source/elements/solid/solide4/s4refsta3.F
+!||    s6zrcoor3   ../starter/source/elements/solid/solide6z/s6zrcoor3.F90
+!||    srcoor3     ../starter/source/elements/solid/solide/srcoor3.F
+!||    srefsta3    ../starter/source/elements/solid/solide/srefsta3.F
+!||====================================================================
       SUBROUTINE SORTHO3(
      .    RX   ,RY   ,RZ   ,SX   ,SY   ,SZ   ,TX   ,TY   ,TZ   ,     
      .    E1X  ,E1Y  ,E1Z  ,E2X  ,E2Y  ,E2Z  ,E3X  ,E3Y  ,E3Z  )
@@ -137,7 +138,7 @@ c
 c
  100  CONTINUE
       IF (N<NITER) GOTO 111
-c     norme et orthogonalisation
+c     norm and orthogonalization
 c~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       DO 200 I=LFT,LLT
       e1x(I) = ux(I)

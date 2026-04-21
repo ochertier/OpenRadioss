@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fixflux               ../engine/source/constraints/thermic/fixflux.F
-      !||--- called by ------------------------------------------------------
-      !||    resol                 ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    arret                 ../engine/source/system/arret.F
-      !||    finter                ../engine/source/tools/curve/finter.F
-      !||    s4volume              ../engine/source/elements/solid/solide4/s4volume.F
-      !||    s8evolume             ../engine/source/elements/solid/solide8e/s8evolume.F
-      !||--- uses       -----------------------------------------------------
-      !||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    fixflux               ../engine/source/constraints/thermic/fixflux.F
+!||--- called by ------------------------------------------------------
+!||    resol                 ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    arret                 ../engine/source/system/arret.F
+!||    finter                ../engine/source/tools/curve/finter.F
+!||    s4volume              ../engine/source/elements/solid/solide4/s4volume.F
+!||    s8evolume             ../engine/source/elements/solid/solide8e/s8evolume.F
+!||--- uses       -----------------------------------------------------
+!||    element_mod           ../common_source/modules/elements/element_mod.F90
+!||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
+!||    python_funct_mod      ../common_source/modules/python_mod.F90
+!||    sensor_mod            ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE FIXFLUX (IBFFLUX ,FBFFLUX ,NPC   ,TF  ,X  ,IXS,
      .                    NSENSOR ,SENSOR_TAB,FTHE  ,IAD ,FTHESKY, PYTHON,
      .                    GLOB_THERM)
@@ -43,6 +44,7 @@ C-----------------------------------------------
       USE PYTHON_FUNCT_MOD
       USE SENSOR_MOD
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

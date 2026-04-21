@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    wrweight_rm   ../starter/source/restart/ddsplit/wrweight_rm.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    nlocal        ../starter/source/spmd/node/ddtools.F
-      !||====================================================================
+!||====================================================================
+!||    wrweight_rm   ../starter/source/restart/ddsplit/wrweight_rm.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    nlocal        ../starter/source/spmd/node/ddtools.F
+!||====================================================================
       SUBROUTINE  WRWEIGHT_RM(FRONT_RM,NR,PROC)
 C-----------------------------------------------
 C   M o d u l e s
@@ -47,7 +47,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER WEIGHT(NR),I,N,P,G
+      INTEGER WEIGHT(NR), I, P
       DO I = 1, NR
         WEIGHT(I) = 0
         DO P = 1, PROC-1

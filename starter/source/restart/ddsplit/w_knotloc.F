@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    w_knotloc     ../starter/source/restart/ddsplit/w_knotloc.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    w_knotlocpc   ../starter/source/restart/ddsplit/w_knotlocpc.F
-      !||====================================================================
+!||====================================================================
+!||    w_knotloc     ../starter/source/restart/ddsplit/w_knotloc.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit       ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    w_knotlocpc   ../starter/source/restart/ddsplit/w_knotlocpc.F
+!||====================================================================
       SUBROUTINE W_KNOTLOC(KXIG3D,NUMELIG3D_L,ISUMNIG3D_L,IXIG3D,CEP,
      .                  PROC,NODLOCAL,LEN_IA,KNOTLOCPC,KNOTLOCEL,NUMNOD_L,
      .                  NUMCONV,NUMRADIA)
@@ -84,7 +84,7 @@ c        ENDIF
         KNOTLOCEL_L(J) = KNOTLOCEL(J)
       ENDDO
 C
-      KNOTLOCPC_L = 0  ! il faut que els autre cases knotlocpc vides pour les neodus soient mises a 0
+      KNOTLOCPC_L = 0  ! The other KNOT LCPC boxes must be empty for neodus are put to 0
 
       CALL W_KNOTLOCPC(KNOTLOCPC,KNOTLOCPC_L,MAXGEO,NUMNOD_L,NODLOCAL)
 C

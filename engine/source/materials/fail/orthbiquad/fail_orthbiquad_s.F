@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fail_orthbiquad_s   ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_s.F
-      !||--- called by ------------------------------------------------------
-      !||    mmain               ../engine/source/materials/mat_share/mmain.F90
-      !||    mmain8              ../engine/source/materials/mat_share/mmain8.F
-      !||    mulaw               ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8              ../engine/source/materials/mat_share/mulaw8.F90
-      !||    usermat_solid       ../engine/source/materials/mat_share/usermat_solid.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter              ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    fail_orthbiquad_s   ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_s.F
+!||--- called by ------------------------------------------------------
+!||    mmain               ../engine/source/materials/mat_share/mmain.F90
+!||    mmain8              ../engine/source/materials/mat_share/mmain8.F
+!||    mulaw               ../engine/source/materials/mat_share/mulaw.F90
+!||    mulaw8              ../engine/source/materials/mat_share/mulaw8.F90
+!||    usermat_solid       ../engine/source/materials/mat_share/usermat_solid.F
+!||--- calls      -----------------------------------------------------
+!||    finter              ../engine/source/tools/curve/finter.F
+!||====================================================================
       SUBROUTINE FAIL_ORTHBIQUAD_S (
      1     NEL      ,NUPARAM  ,NUVAR    ,MFUNC    ,KFUNC    ,
      2     NPF      ,TF       ,TIME     ,TIMESTEP ,UPARAM   ,
@@ -95,7 +95,7 @@ C!-----------------------------------------------
       INTEGER I,K,J,INDX(MVSIZ),NINDX,SEL,NANGLE,IREG,IRATE
       my_real 
      .        DF,P,triaxs,SVM,SXX,SYY,SZZ,EPS_FAIL,
-     .        P1X,P1Y,S1X,S1Y,S2Y,A1,B1,C1,REF_EL_LEN,LAMBDA,FAC,
+     .        P1X,P1Y,S1X,S1Y,A1,B1,C1,REF_EL_LEN,LAMBDA,FAC,
      .        X_1(3),X_2(3),COS2(10,10),EPSD0,CJC,RATE_SCALE,FRATE,
      .        MOHR_RADIUS,COS2THETA(NEL)
       my_real SIG1(NEL),SIG2(NEL),MOHR_CENTER

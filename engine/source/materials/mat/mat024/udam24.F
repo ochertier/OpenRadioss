@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    udam24    ../engine/source/materials/mat/mat024/udam24.F
-      !||--- called by ------------------------------------------------------
-      !||    m24anim   ../engine/source/materials/mat/mat024/m24anim.F
-      !||====================================================================
+!||====================================================================
+!||    udam24    ../engine/source/materials/mat/mat024/udam24.F
+!||--- called by ------------------------------------------------------
+!||    m24anim   ../engine/source/materials/mat/mat024/m24anim.F
+!||====================================================================
       SUBROUTINE UDAM24(SIG,ANG,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -62,7 +62,7 @@ C
         S33(I) = S11(I)*S22(I)-S21(I)*S12(I)
       ENDDO
 C . . . . . . . . . . . . . . . . . .
-C     ROTATION INVERSE DES CONTRAINTES
+C     inverse rotation of the stresses
 C . . . . . . . . . . . . . . . . . .
       DO I = 1,NEL
         A11(I)=SIG(I,1)*S11(I)+SIG(I,4)*S12(I)+SIG(I,6)*S13(I)
@@ -89,11 +89,11 @@ c-----------
       END
 
 
-      !||====================================================================
-      !||    udam24n   ../engine/source/materials/mat/mat024/udam24.F
-      !||--- called by ------------------------------------------------------
-      !||    conc24    ../engine/source/materials/mat/mat024/conc24.F
-      !||====================================================================
+!||====================================================================
+!||    udam24n   ../engine/source/materials/mat/mat024/udam24.F
+!||--- called by ------------------------------------------------------
+!||    conc24    ../engine/source/materials/mat/mat024/conc24.F
+!||====================================================================
       SUBROUTINE UDAM24N(SIG,ANG,NBDAMA,DAMAI,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -109,7 +109,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,K
-      my_real ANGA,
+      my_real 
      .   S11(NEL), S12(NEL), S13(NEL), S21(NEL), S22(NEL), S23(NEL), S31(NEL),
      .   S32(NEL), S33(NEL), A11(NEL), A12(NEL), A13(NEL), A21(NEL), A22(NEL), 
      .   A23(NEL), A31(NEL), A32(NEL), A33(NEL)
@@ -127,7 +127,7 @@ C=======================================================================
         S33(I)=S11(I)*S22(I)-S21(I)*S12(I)
       ENDDO
 C . . . . . . . . . . . . . . . . . .
-C     ROTATION INVERSE DES CONTRAINTES
+C     inverse rotation of the stresses
 C . . . . . . . . . . . . . . . . . .
       DO K=1,NBDAMA
        I = DAMAI(K)

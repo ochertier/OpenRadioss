@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    h3d_write_sh_tensor_array   ../engine/source/output/h3d/h3d_results/h3d_write_sh_tensor_array.F
-      !||--- called by ------------------------------------------------------
-      !||    h3d_shell_tensor            ../engine/source/output/h3d/h3d_results/h3d_shell_tensor.F
-      !||====================================================================
+!||====================================================================
+!||    h3d_write_sh_tensor_array   ../engine/source/output/h3d/h3d_results/h3d_write_sh_tensor_array.F
+!||--- called by ------------------------------------------------------
+!||    h3d_shell_tensor            ../engine/source/output/h3d/h3d_results/h3d_shell_tensor.F
+!||====================================================================
       SUBROUTINE H3D_WRITE_SH_TENSOR_ARRAY(
      .           IOK_PART  ,ISELECT   ,NEL       ,OFFSET    ,NFT       ,
      .           IS_WRITTEN,TENSOR    ,VALUE     )

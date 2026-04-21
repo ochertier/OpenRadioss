@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,35 +20,36 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    qinit2                 ../starter/source/elements/solid_2d/quad/qinit2.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    aturi2                 ../starter/source/ale/ale2d/aturi2.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    edlen2                 ../starter/source/ale/ale2d/edlen2.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    qcoor2                 ../starter/source/elements/solid_2d/quad/qcoor2.F
-      !||    qdlen2                 ../starter/source/elements/solid_2d/quad/qdlen2.F
-      !||    qmasi2                 ../starter/source/elements/solid_2d/quad/qmasi2.F
-      !||    qmorth2                ../starter/source/elements/solid_2d/quad/qmorth2.F
-      !||    qrcoor2                ../starter/source/elements/solid_2d/quad/qrcoor2.F
-      !||    qvoli2                 ../starter/source/elements/solid_2d/quad/qvoli2.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    qinit2                 ../starter/source/elements/solid_2d/quad/qinit2.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    aturi2                 ../starter/source/ale/ale2d/aturi2.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    edlen2                 ../starter/source/ale/ale2d/edlen2.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    qcoor2                 ../starter/source/elements/solid_2d/quad/qcoor2.F
+!||    qdlen2                 ../starter/source/elements/solid_2d/quad/qdlen2.F
+!||    qmasi2                 ../starter/source/elements/solid_2d/quad/qmasi2.F
+!||    qmorth2                ../starter/source/elements/solid_2d/quad/qmorth2.F
+!||    qrcoor2                ../starter/source/elements/solid_2d/quad/qrcoor2.F
+!||    qvoli2                 ../starter/source/elements/solid_2d/quad/qvoli2.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE QINIT2(ELBUF_STR   ,MS     ,IXQ       ,PM      ,X      ,
      .                  DETONATORS  ,GEO    ,VEUL      ,ALE_CONNECTIVITY   ,IPARG  ,
      .                  DTELEM      ,SIGI    ,IGEO   ,
      .                  NEL         ,SKEW   ,MSQ       ,IPART   ,IPARTQ ,
      .                  IPM         ,NSIGS  ,
      .                  WMA         ,PTQUAD ,BUFMAT    ,NPF     ,TF     ,
-     .                  IPARGG      ,ILOADP ,FACLOAD   ,PARTSAV ,V      )
+     .                  IPARGG      ,ILOADP ,FACLOAD   ,PARTSAV ,V      ,MAT_PARAM,
+     .                  STIFN )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -57,6 +58,8 @@ C-----------------------------------------------
       USE DETONATORS_MOD
       USE ALE_CONNECTIVITY_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE MATPARAM_DEF_MOD
+      use element_mod , only : nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -86,28 +89,27 @@ C-----------------------------------------------
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
       INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*)
       my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
+      my_real,DIMENSION(NUMNOD), INTENT(INOUT) :: STIFN
       TYPE(DETONATORS_STRUCT_)::DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ)
-      INTEGER NF1, IELVS, IX, I, IGTYP, IP, IBID, IPID1
-      my_real
-     .   E1Y(MVSIZ),E1Z(MVSIZ),E2Y(MVSIZ),E2Z(MVSIZ),
-     .   BID(1), DTX(MVSIZ),
-     .   SY(MVSIZ) ,SZ(MVSIZ) ,TY(MVSIZ) ,TZ(MVSIZ)
-      my_real
-     .   FV
+      INTEGER NF1, I, IGTYP, IP, IBID, IPID1
+      my_real E1Y(MVSIZ),E1Z(MVSIZ),E2Y(MVSIZ),E2Z(MVSIZ),
+     .        BID(1), DTX(MVSIZ),
+     .        SY(MVSIZ) ,SZ(MVSIZ) ,TY(MVSIZ) ,TZ(MVSIZ)
+      my_real FV,STI,MAS
       CHARACTER(LEN=NCHARTITLE)::TITR
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
       TYPE(L_BUFEL_), POINTER :: LBUF     
       TYPE(BUF_MAT_) ,POINTER :: MBUF
-      my_real
-     .     X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ),
-     .     Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
-     .     Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
-     .     AIRE(MVSIZ), DELTAX(MVSIZ)
+      my_real Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
+     .        Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
+     .        AIRE(MVSIZ), DELTAX(MVSIZ)
+      my_real :: TEMPEL(NEL)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
@@ -120,6 +122,7 @@ c
       JCVT  = IPARG(37)
       IBID = 0
       BID = ZERO
+      TEMPEL(:) = ZERO
       NF1 = NFT+1
 c
       IF(JCVT == 0)THEN
@@ -157,21 +160,21 @@ C
      .            MAT     ,IPM     ,NSIGS     ,NUMQUAD   ,PTQUAD  ,
      .            IP      ,NGL     ,NPF       ,TF        ,BUFMAT  ,
      .            GBUF    ,LBUF    ,MBUF      ,ELBUF_STR ,ILOADP  ,
-     .            FACLOAD, DELTAX)
+     .            FACLOAD, DELTAX  ,TEMPEL    ,MAT_PARAM )
 C----------------------------------------
-C     INITIALISATION DE LA THERMIQUE ET TURBULENCE
+C     initialization of thermal and turbulence
 C----------------------------------------
       IF (JTHE/=0) CALL ATHERI(MAT,PM,GBUF%TEMP)
       IF (JTUR/=0) CALL ATURI2(IPARGG ,GBUF%RHO,PM,IXQ,X,
      .                        GBUF%RK,GBUF%RE, AIRE)
 C------------------------------------------
-C     INITIALISATION DE LA MATRICE DE MASSE
+C     initialization of the mass matrix
 C------------------------------------------
       IF (JLAG+JALE+JEUL/=0)
      .  CALL QMASI2(PM,MAT,MS,GBUF%VOL,MSQ(NF1),WMA,IPARTQ(NFT+1),PARTSAV,
      .     IX1, IX2, IX3, IX4 ,X ,V)
 C-------------------------------------------
-C      CALCUL DES DT ELEMENTAIRES
+C      calculation of elementary timesteps (dt)
 C-------------------------------------------
       CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,
      .     GBUF%EINT ,GBUF%TEMP ,GBUF%DELTAX ,GBUF%RK ,GBUF%RE ,BUFMAT, DELTAX, AIRE, 
@@ -192,6 +195,15 @@ c
           ENDIF
         ENDIF
         DTELEM(NFT+I)=DTX(I)
+!        MSQ(NFT+I) = FOURTH * PM(89,MAT(I))*AIRE(I) ! nodal mass in engine->fac=V/a
+        STI = HALF * PM(89,MAT(I))*GBUF%VOL(I) / MAX(EM20,DTX(I)*DTX(I)) ! =fac*sti(engine)
+        MAS = PM(89,MAT(I))*AIRE(I)
+        IP = IPARTQ(NFT+I)
+        PARTSAV(2,IP)=PARTSAV(2,IP) + MAS ! PARTSAV(2,IP) used for total nodal mass (engine initia_mass_ratio) 
+        STIFN(IX1(I))=STIFN(IX1(I))+STI
+        STIFN(IX2(I))=STIFN(IX2(I))+STI
+        STIFN(IX3(I))=STIFN(IX3(I))+STI
+        STIFN(IX4(I))=STIFN(IX4(I))+STI
       ENDDO
 C-----------
       RETURN

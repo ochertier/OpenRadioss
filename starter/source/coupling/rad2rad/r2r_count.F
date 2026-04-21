@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    r2r_count      ../starter/source/coupling/rad2rad/r2r_count.F
-      !||--- called by ------------------------------------------------------
-      !||    r2r_prelec     ../starter/source/coupling/rad2rad/r2r_prelec.F
-      !||--- calls      -----------------------------------------------------
-      !||    incoq3         ../starter/source/interfaces/inter3d1/incoq3.F
-      !||    insol3         ../starter/source/interfaces/inter3d1/insol3.F
-      !||--- uses       -----------------------------------------------------
-      !||    nod2el_mod     ../starter/share/modules1/nod2el_mod.F
-      !||    r2r_mod        ../starter/share/modules1/r2r_mod.F
-      !||    restmod        ../starter/share/modules1/restart_mod.F
-      !||====================================================================
+!||====================================================================
+!||    r2r_count      ../starter/source/coupling/rad2rad/r2r_count.F
+!||--- called by ------------------------------------------------------
+!||    r2r_prelec     ../starter/source/coupling/rad2rad/r2r_prelec.F
+!||--- calls      -----------------------------------------------------
+!||    incoq3         ../starter/source/interfaces/inter3d1/incoq3.F
+!||    insol3         ../starter/source/interfaces/inter3d1/insol3.F
+!||--- uses       -----------------------------------------------------
+!||    nod2el_mod     ../starter/share/modules1/nod2el_mod.F
+!||    r2r_mod        ../starter/share/modules1/r2r_mod.F
+!||    restmod        ../starter/share/modules1/restart_mod.F
+!||====================================================================
       SUBROUTINE R2R_COUNT(PASSE,IPARTS,
      2           IPARTC,IPARTG,IGRPP_R2R ,PM_STACK , IWORKSH,
      3           IGRNOD,IGRSURF,IGRSLIN,IGRBRIC,IXS10,
@@ -66,18 +66,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I,J,L,IAD,IP,CUR_ID,CUR_TYP,TAG1,TAG2,COMPT,CCPL
-        INTEGER ID_ELC,ID_ELTG,ID_ELS,IRECT(4,1),COMPT2,COMPT3
-        INTEGER CCPL_T4_EXPO,CCPL_T4_IMPO,OFF,TAG10,TAG20
+        INTEGER I,J,L,IP,CUR_ID,CUR_TYP,TAG1,TAG2,COMPT,CCPL
+        INTEGER ID_ELC,ID_ELTG,ID_ELS,IRECT(4,1)
+        INTEGER CCPL_T4_EXPO,CCPL_T4_IMPO,OFF
         my_real AREA
 C=======================================================================
-C---Pre-counting of nodes/elements/surfaces/lines kept after split------
+C---Precounting of nodes/elements/surfaces/lines kept after split-------
 C=======================================================================
 
         OFF = NPART + NUMNOD
 
 C--------------------------------------------------------------------C
-C------Precounting of nb of taged nodes of GRNOD---------------------C
+C------Precounting of nb of tagged nodes of GRNOD--------------------C
 C--------------------------------------------------------------------C
         DO I=1,NGRNOD
 

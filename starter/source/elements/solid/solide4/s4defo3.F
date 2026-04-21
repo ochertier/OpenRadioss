@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    s4defo3     ../starter/source/elements/solid/solide4/s4defo3.F
-      !||--- called by ------------------------------------------------------
-      !||    s4refsta3   ../starter/source/elements/solid/solide4/s4refsta3.F
-      !||====================================================================
+!||====================================================================
+!||    s4defo3     ../starter/source/elements/solid/solide4/s4defo3.F
+!||--- called by ------------------------------------------------------
+!||    s4refsta3   ../starter/source/elements/solid/solide4/s4refsta3.F
+!||====================================================================
       SUBROUTINE S4DEFO3(
      .   PX1, PX2, PX3, PX4, PY1, PY2, PY3, PY4,
      .   PZ1, PZ2, PZ3, PZ4, VX1, VX2, VX3, VX4,

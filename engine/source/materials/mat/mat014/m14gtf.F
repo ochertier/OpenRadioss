@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    m14gtf   ../engine/source/materials/mat/mat014/m14gtf.F
-      !||--- called by ------------------------------------------------------
-      !||    m12law   ../engine/source/materials/mat/mat012/m12law.F
-      !||    m14law   ../engine/source/materials/mat/mat014/m14law.F
-      !||====================================================================
+!||====================================================================
+!||    m14gtf   ../engine/source/materials/mat/mat014/m14gtf.F
+!||--- called by ------------------------------------------------------
+!||    m12law   ../engine/source/materials/mat/mat012/m12law.F
+!||    m14law   ../engine/source/materials/mat/mat014/m14law.F
+!||====================================================================
       SUBROUTINE M14GTF(SIG,AX ,AY ,AZ ,BX ,BY,  
      2                  BZ ,CX ,CY ,CZ ,D1 ,D2,
      3                  D3 ,D4 ,D5 ,D6 ,T1 ,T2,

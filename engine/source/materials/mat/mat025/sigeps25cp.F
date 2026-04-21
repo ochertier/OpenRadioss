@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps25cp         ../engine/source/materials/mat/mat025/sigeps25cp.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc             ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    m25cplrp2          ../engine/source/materials/mat/mat025/m25cplrc2.F
-      !||--- uses       -----------------------------------------------------
-      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sigeps25cp         ../engine/source/materials/mat/mat025/sigeps25cp.F
+!||--- called by ------------------------------------------------------
+!||    mulawc             ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    m25cplrp2          ../engine/source/materials/mat/mat025/m25cplrc2.F
+!||--- uses       -----------------------------------------------------
+!||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||====================================================================
       SUBROUTINE SIGEPS25CP(MAT_PARAM,
      1                      JFT    ,JLT    ,OFF    ,DIR    ,
      2                      SHF    ,NPT    ,NGL    ,IPT    ,OFF_OLD,
-     3                      THK0   ,EPSPL  ,SIGY   ,ZCFAC  ,NEL    ,
+     3                      THK0   ,EPSD   ,SIGY   ,ZCFAC  ,NEL    ,
      4                      DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX ,
      5                      SIGOXX ,SIGOYY ,SIGOXY ,SIGOYZ ,SIGOZX ,
      6                      SIGNXX ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX ,
-     7                      WPLAR  ,IOFF_DUCT,PLA  ,ISRATE ,TSAIWU )
+     7                      WPLAR  ,IOFF_DUCT,PLA  ,ISRATE ,ASRATE ,
+     8                      EPSD_PG,TSAIWU )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -59,9 +60,12 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT,JLT,NPT,NEL,IPT
       INTEGER NGL(MVSIZ),IOFF_DUCT(MVSIZ),ISRATE
+      my_real ,INTENT(IN) :: ASRATE
+      my_real ,DIMENSION(NEL) ,INTENT(IN)    :: EPSD_PG
+      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: EPSD
       my_real
      .   THK0(MVSIZ),
-     .   OFF(*),DIR(*),SHF(*),EPSPL(*),SIGY(*),ZCFAC(MVSIZ,2),
+     .   OFF(*),DIR(*),SHF(*),SIGY(*),ZCFAC(MVSIZ,2),
      .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
      .   DEPSZX(MVSIZ),SIGOXX(NEL),SIGOYY(NEL),SIGOXY(NEL),
      .   SIGOYZ(NEL),SIGOZX(NEL),SIGNXX(NEL),SIGNYY(NEL),SIGNXY(NEL),
@@ -71,7 +75,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ICC(MVSIZ),I,ILAYER,ICC_1
+      INTEGER ICC(MVSIZ),I,ICC_1
       my_real
      .   YLD(MVSIZ),ETSE(MVSIZ),DEGMB(MVSIZ),CB(MVSIZ),CN(MVSIZ),
      .   E11(MVSIZ),E22(MVSIZ),NU12(MVSIZ),NU21(MVSIZ),G12(MVSIZ),
@@ -144,10 +148,10 @@ C=======================================================================
      3                 WWPLA  ,SHF    ,FMAX   ,CB     ,CN     ,NEL    ,
      4                 DEGMB  ,F1     ,F2     ,F12    ,F11    ,F22    ,
      5                 F33    ,E11    ,E22    ,NU12   ,NU21   ,G12    ,
-     6                 G23    ,G31    ,DE     ,EPSPL  ,ISRATE ,YLD    ,
+     6                 G23    ,G31    ,DE     ,EPSD   ,ISRATE ,YLD    ,
      7                 DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX ,SIGOXX ,
      8                 SIGOYY ,SIGOXY ,SIGOYZ ,SIGOZX ,SIGNXX ,SIGNYY ,
-     9                 SIGNXY ,SIGNYZ ,SIGNZX ,TSAIWU )
+     9                 SIGNXY ,SIGNYZ ,SIGNZX ,TSAIWU ,ASRATE ,EPSD_PG)
 !
         DO I=JFT,JLT
           WPLAR(I) = MAX(WPLAR(I),WWPLA(I))
@@ -161,7 +165,7 @@ C-----------------------
          SIGY(I) = SIGY(I) + YLD(I)/NPT
        ENDDO
 C----------------------------
-C     TEST DE RUPTURE DUCTILE
+C     Ductile rupture test
 C---------------------------
       DO I=JFT,JLT
         IF ( OFF(I) == OFF_OLD(I) .and. OFF_OLD(I) < EM01 ) OFF(I)=ZERO

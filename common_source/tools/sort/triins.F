@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    triins   ../common_source/tools/sort/triins.F
-      !||--- called by ------------------------------------------------------
-      !||    trirap   ../common_source/tools/sort/trirap.F
-      !||--- calls      -----------------------------------------------------
-      !||    echang   ../common_source/tools/sort/echang.F
-      !||    icompc   ../common_source/tools/sort/icompc.F
-      !||====================================================================
+!||====================================================================
+!||    triins   ../common_source/tools/sort/triins.F
+!||--- called by ------------------------------------------------------
+!||    trirap   ../common_source/tools/sort/trirap.F
+!||--- calls      -----------------------------------------------------
+!||    echang   ../common_source/tools/sort/echang.F
+!||    icompc   ../common_source/tools/sort/icompc.F
+!||====================================================================
       SUBROUTINE TRIINS(N,TAB,N2)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -37,31 +37,31 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER N, N2
+        INTEGER N, N2
 C     REAL
-      my_real
-     .   TAB(*)
+        my_real
+     .     TAB(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K, L
+        INTEGER K, L
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER ICOMPC
+        INTEGER ICOMPC
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-      DO 10 K=2,N
+        DO 10 K=2,N
           L=K-1
  150      IF(L>=1) THEN
-               IF(ICOMPC(L,L+1,TAB)>0) THEN
-               CALL ECHANG(L,L+1,TAB)
-               CALL ECHANG(N2+L,N2+L+1,TAB)
-               L=L-1
-               GO TO 150
-               ENDIF
+            IF(ICOMPC(L,L+1,TAB)>0) THEN
+              CALL ECHANG(L,L+1,TAB)
+              CALL ECHANG(N2+L,N2+L+1,TAB)
+              L=L-1
+              GO TO 150
+            ENDIF
           ENDIF
-   10     CONTINUE
-      RETURN
+   10   CONTINUE
+        RETURN
       END

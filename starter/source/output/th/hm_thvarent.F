@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_thvarvent             ../starter/source/output/th/hm_thvarent.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_thgrki_vent           ../starter/source/output/th/hm_thgrki_vent.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_get_string_index      ../starter/source/devtools/hm_reader/hm_get_string_index.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_thvarvent             ../starter/source/output/th/hm_thvarent.F
+!||--- called by ------------------------------------------------------
+!||    hm_thgrki_vent           ../starter/source/output/th/hm_thgrki_vent.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_get_string_index      ../starter/source/devtools/hm_reader/hm_get_string_index.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_THVARVENT(VARE,NV,IVAR,VARG,NVG,IVARG,NV0,ID,TITR,
      .                     VARVENT,NBVENT_MAX, LSUBMODEL)
 C-----------------------------------------------
@@ -53,13 +53,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t 
 C-----------------------------------------------
-      INTEGER NV,NVG,IVAR(*),IVARG(18,*),NV0,VARVENT(*),NBVENT_MAX,KK,IDSMAX
+      INTEGER NV, NVG, IVAR(*), IVARG(18,*), NV0, VARVENT(*), NBVENT_MAX, KK
       CHARACTER*10 VARE(NV),VARG(NVG)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s 
 C-----------------------------------------------
       CHARACTER VAR*10
-        INTEGER JREC,TRU,N,L,M,I,J,K,OK
+        INTEGER TRU, N, I, J, OK
       INTEGER ID,NMONV,IMONV,NLABEL
       CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER NVAR

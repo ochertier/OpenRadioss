@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fxbwrestp          ../starter/source/restart/ddsplit/wrrest.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit            ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtsqi             ../starter/source/output/tools/wrtsqi.F
-      !||    wrtsqr             ../starter/source/output/tools/wrtsqr.F
-      !||====================================================================
+!||====================================================================
+!||    fxbwrestp          ../starter/source/restart/ddsplit/wrrest.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit            ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||    wrtsqi             ../starter/source/output/tools/wrtsqi.F
+!||    wrtsqr             ../starter/source/output/tools/wrtsqr.F
+!||====================================================================
       SUBROUTINE FXBWRESTP(
      .   FXBIPM_L , FXBRPM   , FXBNOD_L , FXBMOD_L, FXBGLM_L,
      .   FXBCPM_L , FXBCPS_L , FXBLM_L  , FXBFLS_L, FXBDLS_L,
@@ -70,7 +70,7 @@ C-----------------------------------------------
       CHARACTER(LEN=256) :: SCR_FILE_NAME,SCR_FILE_NAME2
       CHARACTER(LEN=4) :: CIT
 C--------------------------------------
-C     ECRITURE DES ENTIERS
+C     writing of integers
 C--------------------------------------
       LEN_IPM=NBIPM*NFXBODY
       IF (IRFORM/5<=1) THEN
@@ -89,7 +89,7 @@ C--------------------------------------
         IF (LENGRVI_L>0) LEN_AM = LEN_AM + LENGRVI_L
       ENDIF
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
       LEN_MOD=LENMOD_L*6
       IF (IRFORM/5<=1) THEN
@@ -149,7 +149,7 @@ C--------------------------------------
             LEN_AM = LEN_AM + LENGRVR_L
         ENDIF
       ENDIF
-C Ecriture des fichiers de modes et de contraintes
+C writing of mode and constraint files
       NRECM=0
       NRECS=0
       DO I=1,NFXBODY
@@ -193,12 +193,12 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    eigwrest    ../starter/source/restart/ddsplit/wrrest.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtsqi      ../starter/source/output/tools/wrtsqi.F
-      !||    wrtsqr      ../starter/source/output/tools/wrtsqr.F
-      !||====================================================================
+!||====================================================================
+!||    eigwrest    ../starter/source/restart/ddsplit/wrrest.F
+!||--- calls      -----------------------------------------------------
+!||    wrtsqi      ../starter/source/output/tools/wrtsqi.F
+!||    wrtsqr      ../starter/source/output/tools/wrtsqr.F
+!||====================================================================
       SUBROUTINE EIGWREST(EIGIPM, EIGIBUF, EIGRPM)      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -224,7 +224,7 @@ C-----------------------------------------------
       my_real
      .        VV(6)
 C--------------------------------------
-C     ECRITURE DES ENTIERS
+C     writing of integers
 C--------------------------------------
       IF (IRFORM/5<=1) THEN
         CALL WRTSQI (EIGIPM,NEIG*NEIPM,IRFORM)
@@ -234,14 +234,14 @@ C--------------------------------------
         CALL WRITE_I_C(EIGIBUF,LEIBUF)
       ENDIF
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
       IF (IRFORM/5<=1) THEN
         CALL WRTSQR (EIGRPM,NEIG*NERPM,IRFORM)
       ELSE
         CALL WRITE_DB(EIGRPM,NEIG*NERPM)
       ENDIF
-C Ecriture du fichier des modes additionnels
+C writing of the additional modes file
       NRECM=0
       IAD=1
       DO I=1,NEIG
@@ -262,12 +262,12 @@ C
 C
       RETURN
       END
-      !||====================================================================
-      !||    eigwrestp   ../starter/source/restart/ddsplit/wrrest.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    eigwrestp   ../starter/source/restart/ddsplit/wrrest.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE EIGWRESTP(EIGIPM, EIGIBUF, EIGRPM, LEIBUF_L,LEN_AM)      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -288,12 +288,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C--------------------------------------
-C     ECRITURE DES ENTIERS
+C     writing of integers
 C--------------------------------------
       CALL WRITE_I_C(EIGIPM,NEIG*NEIPM)
       CALL WRITE_I_C(EIGIBUF,LEIBUF_L)
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
       CALL WRITE_DB(EIGRPM,NEIG*NERPM)
       LEN_AM = LEN_AM + NEIG*NEIPM + LEIBUF_L + NEIG*NERPM
@@ -301,14 +301,14 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    dswrest       ../starter/source/restart/ddsplit/wrrest.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtsqi        ../starter/source/output/tools/wrtsqi.F
-      !||    wrtsqr        ../starter/source/output/tools/wrtsqr.F
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod   ../starter/share/modules1/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dswrest       ../starter/source/restart/ddsplit/wrrest.F
+!||--- calls      -----------------------------------------------------
+!||    wrtsqi        ../starter/source/output/tools/wrtsqi.F
+!||    wrtsqr        ../starter/source/output/tools/wrtsqr.F
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod   ../starter/share/modules1/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE DSWREST(GRAPHE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -336,7 +336,7 @@ C-----------------------------------------------
 C
       DO I=1,NSPROC
 C--------------------------------------
-C Ecriture des parametres entiers
+C writing of integer parameters
 C--------------------------------------
          DSNDDL=GRAPHE(I)%NDDL
          DSLEN=GRAPHE(I)%NSUPEL
@@ -355,7 +355,7 @@ C--------------------------------------
             CALL WRITE_I_C(TN, N)
          ENDIF
 C--------------------------------------
-C Ecriture des parametres reels
+C writing of real parameters
 C--------------------------------------
          N=1
          CUTFREQ=GRAPHE(I)%CUTFREQ
@@ -365,7 +365,7 @@ C--------------------------------------
             CALL WRITE_DB(CUTFREQ, N)
          ENDIF
 C--------------------------------------
-C Ecriture du tableau des ddls
+C writing of the dof array
 C--------------------------------------
          DO J=1,2
             IF (IRFORM/5<=1) THEN
@@ -382,7 +382,7 @@ C--------------------------------------
          ENDIF
          DEALLOCATE(GRAPHE(I)%LSDDL_GLOB)
 C--------------------------------------
-C Ecriture des superelements
+C writing of superelements
 C--------------------------------------
          DO J=1,DSLEN
             TN(1)=GRAPHE(I)%DGRAPH(J)%NDDL_I
@@ -424,12 +424,12 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    dswrestp      ../starter/source/restart/ddsplit/wrrest.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod   ../starter/share/modules1/dsgraph_mod.F
-      !||====================================================================
+!||====================================================================
+!||    dswrestp      ../starter/source/restart/ddsplit/wrrest.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    dsgraph_mod   ../starter/share/modules1/dsgraph_mod.F
+!||====================================================================
       SUBROUTINE DSWRESTP(PGRAPH,LEN_IA,LEN_AM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -446,12 +446,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, TN(7), N, NDDL, DSNDDL, DSLEN, K, NSDEC,
-     .        DSNDDL_GLOB,LEN_IA,LEN_AM
+      INTEGER  J, TN(7), N, NDDL, DSNDDL, DSLEN, K, NSDEC,
+     .        LEN_IA,LEN_AM
       my_real
      .        CUTFREQ
 C--------------------------------------
-C Ecriture des parametres entiers
+C writing of integer parameters
 C--------------------------------------
       DSNDDL=PGRAPH%NDDL
       DSLEN=PGRAPH%NSUPEL
@@ -467,14 +467,14 @@ C--------------------------------------
       CALL WRITE_I_C(TN, N)
       LEN_IA = LEN_IA + N
 C--------------------------------------
-C Ecriture des parametres reels
+C writing of real parameters
 C--------------------------------------
       N=1
       CUTFREQ=PGRAPH%CUTFREQ
       CALL WRITE_DB(CUTFREQ, N)
       LEN_AM = LEN_AM + N
 C--------------------------------------
-C Ecriture du tableau des ddls
+C writing of the dof array
 C--------------------------------------
       DO J=1,2
          CALL WRITE_I_C(PGRAPH%LSDDL(J,:), DSNDDL)
@@ -485,7 +485,7 @@ C--------------------------------------
       LEN_IA = LEN_IA + DSNDDL
       DEALLOCATE(PGRAPH%LSDDL_GLOB)
 C--------------------------------------
-C Ecriture des superelements
+C writing of superelements
 C--------------------------------------
       DO J=1,DSLEN
          TN(1)=PGRAPH%DGRAPH(J)%NDDL_I
@@ -515,12 +515,12 @@ C
       RETURN
       END
 
-      !||====================================================================
-      !||    nfwrest     ../starter/source/restart/ddsplit/wrrest.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtsqi      ../starter/source/output/tools/wrtsqi.F
-      !||    wrtsqr      ../starter/source/output/tools/wrtsqr.F
-      !||====================================================================
+!||====================================================================
+!||    nfwrest     ../starter/source/restart/ddsplit/wrrest.F
+!||--- calls      -----------------------------------------------------
+!||    wrtsqi      ../starter/source/output/tools/wrtsqi.F
+!||    wrtsqr      ../starter/source/output/tools/wrtsqr.F
+!||====================================================================
       SUBROUTINE NFWREST(IFLOW, RFLOW)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -541,7 +541,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C--------------------------------------
-C     ECRITURE DES ENTIERS
+C     writing of integers
 C--------------------------------------
       IF (IRFORM/5<=1) THEN
         CALL WRTSQI (IFLOW,LIFLOW,IRFORM)
@@ -549,7 +549,7 @@ C--------------------------------------
         CALL WRITE_I_C(IFLOW,LIFLOW)
       ENDIF
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
       IF (IRFORM/5<=1) THEN
         CALL WRTSQR (RFLOW,LRFLOW,IRFORM)
@@ -559,12 +559,12 @@ C--------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    nfwrestp    ../starter/source/restart/ddsplit/wrrest.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    nfwrestp    ../starter/source/restart/ddsplit/wrrest.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE NFWRESTP(IFLOW, RFLOW,LEN_IA,LEN_AM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -584,12 +584,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C--------------------------------------
-C     ECRITURE DES ENTIERS
+C     writing of integers
 C--------------------------------------
       CALL WRITE_I_C(IFLOW,LIFLOW)
       LEN_IA = LEN_IA + LIFLOW
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
       CALL WRITE_DB(RFLOW,LRFLOW)
       LEN_AM = LEN_AM + LRFLOW
@@ -599,11 +599,11 @@ C
 C
 
 C for shell heat transfer
-      !||====================================================================
-      !||    thcwrest   ../starter/source/restart/ddsplit/wrrest.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtsqr     ../starter/source/output/tools/wrtsqr.F
-      !||====================================================================
+!||====================================================================
+!||    thcwrest   ../starter/source/restart/ddsplit/wrrest.F
+!||--- calls      -----------------------------------------------------
+!||    wrtsqr     ../starter/source/output/tools/wrtsqr.F
+!||====================================================================
       SUBROUTINE THCWREST(MCP,TEMP)      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -623,7 +623,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
       IF (IRFORM/5 <= 1) THEN
         CALL WRTSQR (MCP,NUMNOD,IRFORM)
@@ -635,13 +635,13 @@ C--------------------------------------
       RETURN
       END
 
-C convection flux 
-      !||====================================================================
-      !||    convwrest   ../starter/source/restart/ddsplit/wrrest.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtsqi      ../starter/source/output/tools/wrtsqi.F
-      !||    wrtsqr      ../starter/source/output/tools/wrtsqr.F
-      !||====================================================================
+C convection flow 
+!||====================================================================
+!||    convwrest   ../starter/source/restart/ddsplit/wrrest.F
+!||--- calls      -----------------------------------------------------
+!||    wrtsqi      ../starter/source/output/tools/wrtsqi.F
+!||    wrtsqr      ../starter/source/output/tools/wrtsqr.F
+!||====================================================================
       SUBROUTINE CONVWREST(IBCV,FCONV,NUMCONV,NICONV,LFACTHER)      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -662,7 +662,7 @@ C-----------------------------------------------
       INTEGER :: IBCV(*)
       my_real :: FCONV(*)
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
       IF (IRFORM/5 <= 1) THEN
         CALL WRTSQR (FCONV,LFACTHER*NUMCONV,IRFORM)
@@ -675,12 +675,12 @@ C--------------------------------------
       END
 
 C for rigid_ material     
-      !||====================================================================
-      !||    rigmatwrest   ../starter/source/restart/ddsplit/wrrest.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtsqi        ../starter/source/output/tools/wrtsqi.F
-      !||    wrtsqr        ../starter/source/output/tools/wrtsqr.F
-      !||====================================================================
+!||====================================================================
+!||    rigmatwrest   ../starter/source/restart/ddsplit/wrrest.F
+!||--- calls      -----------------------------------------------------
+!||    wrtsqi        ../starter/source/output/tools/wrtsqi.F
+!||    wrtsqr        ../starter/source/output/tools/wrtsqr.F
+!||====================================================================
       SUBROUTINE RIGMATWREST(RBYM  ,IRBYM    ,LCRBYM, WEIGHT)      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -701,7 +701,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
       IF (IRFORM/5 <= 1) THEN
         CALL WRTSQR (RBYM,NFRBYM*NRBYM,IRFORM)
@@ -719,12 +719,12 @@ C--------------------------------------
       END
 
 C for shell composite xfem 
-      !||====================================================================
-      !||    plyxfem_wrest   ../starter/source/restart/ddsplit/wrrest.F
-      !||--- calls      -----------------------------------------------------
-      !||    wrtsqi          ../starter/source/output/tools/wrtsqi.F
-      !||    wrtsqr          ../starter/source/output/tools/wrtsqr.F
-      !||====================================================================
+!||====================================================================
+!||    plyxfem_wrest   ../starter/source/restart/ddsplit/wrrest.F
+!||--- calls      -----------------------------------------------------
+!||    wrtsqi          ../starter/source/output/tools/wrtsqi.F
+!||    wrtsqr          ../starter/source/output/tools/wrtsqr.F
+!||====================================================================
       SUBROUTINE PLYXFEM_WREST(MS_PLY,ZI_PLY,IEL,INOD,ICODE,ISKEW)      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -747,7 +747,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C--------------------------------------
-C     ECRITURE DES REELS
+C     writing of reals
 C--------------------------------------
        IF(IPLYXFEM > 0 ) THEN
            IF (IRFORM/5 <= 1) THEN

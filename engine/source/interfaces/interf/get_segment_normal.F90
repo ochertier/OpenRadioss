@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,34 +20,38 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    get_segment_normal_mod                   ../engine/source/interfaces/interf/get_segment_normal.F90
-      !||--- called by ------------------------------------------------------
-      !||    get_neighbour_surface                    ../engine/source/interfaces/interf/get_neighbour_surface.F90
-      !||    get_neighbour_surface_from_remote_proc   ../engine/source/interfaces/interf/get_neighbour_surface_from_remote_proc.F90
-      !||    get_segment_orientation                  ../engine/source/interfaces/interf/get_segment_orientation.F90
-      !||====================================================================
+!||====================================================================
+!||    get_segment_normal_mod                   ../engine/source/interfaces/interf/get_segment_normal.F90
+!||--- called by ------------------------------------------------------
+!||    get_neighbour_surface                    ../engine/source/interfaces/interf/get_neighbour_surface.F90
+!||    get_neighbour_surface_from_remote_proc   ../engine/source/interfaces/interf/get_neighbour_surface_from_remote_proc.F90
+!||    get_segment_orientation                  ../engine/source/interfaces/interf/get_segment_orientation.F90
+!||====================================================================
       module get_segment_normal_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   procedures
 ! ======================================================================================================================
 !! \brief This routine computes the normals of a segment
-      !||====================================================================
-      !||    get_segment_normal                       ../engine/source/interfaces/interf/get_segment_normal.F90
-      !||--- called by ------------------------------------------------------
-      !||    get_neighbour_surface                    ../engine/source/interfaces/interf/get_neighbour_surface.F90
-      !||    get_neighbour_surface_from_remote_proc   ../engine/source/interfaces/interf/get_neighbour_surface_from_remote_proc.F90
-      !||    get_segment_orientation                  ../engine/source/interfaces/interf/get_segment_orientation.F90
-      !||--- uses       -----------------------------------------------------
-      !||    constant_mod                             ../common_source/modules/constant_mod.F
-      !||====================================================================
+!||====================================================================
+!||    get_segment_normal                       ../engine/source/interfaces/interf/get_segment_normal.F90
+!||--- called by ------------------------------------------------------
+!||    get_neighbour_surface                    ../engine/source/interfaces/interf/get_neighbour_surface.F90
+!||    get_neighbour_surface_from_remote_proc   ../engine/source/interfaces/interf/get_neighbour_surface_from_remote_proc.F90
+!||    get_segment_orientation                  ../engine/source/interfaces/interf/get_segment_orientation.F90
+!||--- uses       -----------------------------------------------------
+!||    constant_mod                             ../common_source/modules/constant_mod.F
+!||    intbufdef_mod                            ../common_source/modules/interfaces/intbufdef_mod.F90
+!||    precision_mod                            ../common_source/modules/precision_mod.F90
+!||====================================================================
         subroutine get_segment_normal( segment_id,segment_node_id,segment_position,normal,intbuf_tab,numnod,x )
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   modules
 ! ----------------------------------------------------------------------------------------------------------------------
           use constant_mod , only : zero,em20,fourth,third
           use intbufdef_mod , only : intbuf_struct_
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -55,30 +59,28 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   arguments
 ! ----------------------------------------------------------------------------------------------------------------------
           integer, intent(in) :: segment_id  !< id of the segment
           integer, intent(in) :: numnod !< number of node
           integer, dimension(4),intent(inout) :: segment_node_id
-          my_real, dimension(3), intent(inout) :: segment_position !< coordinates of the segment barycentre
-          my_real, dimension(3), intent(inout) :: normal !< normal of the segment
-          type(intbuf_struct_), intent(in) :: intbuf_tab    !< interface data 
-          my_real, dimension(3,numnod), intent(in) :: x !< nodal position
+          real(kind=WP), dimension(3), intent(inout) :: segment_position !< coordinates of the segment barycentre
+          real(kind=WP), dimension(3), intent(inout) :: normal !< normal of the segment
+          type(intbuf_struct_), intent(in) :: intbuf_tab    !< interface data
+          real(kind=WP), dimension(3,numnod), intent(in) :: x !< nodal position
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer :: i,j
-          integer :: node_id,elem_id
+          integer :: i
+          integer :: node_id
           integer :: node_id_3,node_id_4
           integer :: node_number
-          my_real :: xx13,yy13,zz13,xx24,yy24,zz24
-          my_real :: nor1,nor2,nor3
-          my_real :: area,dds
-          my_real :: xc,yc,zc
-          my_real :: ratio
-          my_real, dimension(4) :: xx1,xx2,xx3
+          real(kind=WP) :: xx13,yy13,zz13,xx24,yy24,zz24
+          real(kind=WP) :: nor1,nor2,nor3
+          real(kind=WP) :: area
+          real(kind=WP) :: ratio
+          real(kind=WP), dimension(4) :: xx1,xx2,xx3
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   external functions
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -90,8 +92,8 @@
           ! -------------------------
           ! loop over the new active segment/surface
           ! normal to the segment
-          segment_position(1) = zero 
-          segment_position(2) = zero 
+          segment_position(1) = zero
+          segment_position(2) = zero
           segment_position(3) = zero
           node_number = 4
           node_id_3 = intbuf_tab%irectm(4*(segment_id-1)+3)
@@ -100,7 +102,7 @@
           if(node_id_3==node_id_4) then
             node_number = 3
             ratio = third
-          endif
+          end if
           do i=1,node_number
             node_id = intbuf_tab%irectm(4*(segment_id-1)+i) ! get the node id
             segment_node_id(i) = node_id
@@ -109,15 +111,15 @@
             xx3(i) = x(3,node_id)
             segment_position(1) = segment_position(1)+ratio*x(1,node_id)
             segment_position(2) = segment_position(2)+ratio*x(2,node_id)
-            segment_position(3) = segment_position(3)+ratio*x(3,node_id)   
-          enddo    
+            segment_position(3) = segment_position(3)+ratio*x(3,node_id)
+          end do
           if(node_id_3==node_id_4) then
             node_id = intbuf_tab%irectm(4*(segment_id-1)+4) ! get the node id
             segment_node_id(4) = node_id
             xx1(4) = x(1,node_id)
             xx2(4) = x(2,node_id)
             xx3(4) = x(3,node_id)
-          endif
+          end if
 
           xx13 =xx1(3)-xx1(1)
           yy13 =xx2(3)-xx2(1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    iqela2        ../engine/source/ale/inter/iqela2.F
-      !||--- called by ------------------------------------------------------
-      !||    intal2        ../engine/source/ale/inter/intal2.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    bcs2          ../engine/source/constraints/general/bcs/bcs2.F
-      !||    shapeh        ../engine/source/ale/inter/shapeh.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||====================================================================
-      SUBROUTINE IQELA2(
-     1                  X,SKEW,A,E,MSM,IRECT,LMSR,CRST,MSR,NSV,
-     2                  ILOC,IRTL,LCODE,V,ISKEW,NOR,ITAB,NSN,NMN
-     .                  )
+!||====================================================================
+!||    iqela2        ../engine/source/ale/inter/iqela2.F
+!||--- called by ------------------------------------------------------
+!||    intal2        ../engine/source/ale/inter/intal2.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg        ../engine/source/output/message/message.F
+!||    bcs2          ../engine/source/constraints/general/bcs/bcs2.F
+!||    shapeh        ../engine/source/ale/inter/shapeh.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod   ../engine/share/message_module/message_mod.F
+!||====================================================================
+      SUBROUTINE IQELA2(SKEW,A,E,MSM,IRECT,CRST,MSR,NSV,IRTL,LCODE,V,ISKEW,NOR,ITAB,NSN,NMN)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -55,8 +52,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IRECT(4,*), LMSR(4,*), MSR(*), NSV(*), ILOC(*), IRTL(*), LCODE(*), ISKEW(*), ITAB(*)
-      my_real X(3,NUMNOD), SKEW(LSKEW,*), A(SA), E(*), MSM(*), CRST(2,*), V(SV),NOR(3,*)
+      INTEGER IRECT(4,*), MSR(*), NSV(*), IRTL(*), LCODE(*), ISKEW(*), ITAB(*)
+      my_real SKEW(LSKEW,*), A(SA), E(*), MSM(*), CRST(2,*), V(SV),NOR(3,*)
       INTEGER, INTENT(IN) :: NSN,NMN
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -91,7 +88,7 @@ C-------------------------------------
         IF(LCOD>0)CALL BCS2(A(J1),SKEW(1,ISK),ISK,LCOD)
       ENDDO
 C------------------------------------
-C     ACCELERATION ON SECND NODES
+C     ACCELERATION ON SECOND NODES
 C------------------------------------
       DO II=1,NSN
         I=NSV(II)

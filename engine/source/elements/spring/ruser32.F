@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ruser32      ../engine/source/elements/spring/ruser32.F
-      !||--- called by ------------------------------------------------------
-      !||    rforc3       ../engine/source/elements/spring/rforc3.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_u_func   ../engine/source/user_interface/ufunc.F
-      !||    get_u_mid    ../engine/source/user_interface/upidmid.F
-      !||    get_u_mnu    ../engine/source/user_interface/upidmid.F
-      !||    get_u_pid    ../engine/source/user_interface/upidmid.F
-      !||    get_u_pnu    ../engine/source/user_interface/upidmid.F
-      !||    get_u_sens   ../engine/source/user_interface/usensor.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod   ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ruser32      ../engine/source/elements/spring/ruser32.F
+!||--- called by ------------------------------------------------------
+!||    rforc3       ../engine/source/elements/spring/rforc3.F
+!||--- calls      -----------------------------------------------------
+!||    get_u_func   ../engine/source/user_interface/ufunc.F
+!||    get_u_mid    ../engine/source/user_interface/upidmid.F
+!||    get_u_mnu    ../engine/source/user_interface/upidmid.F
+!||    get_u_pid    ../engine/source/user_interface/upidmid.F
+!||    get_u_pnu    ../engine/source/user_interface/upidmid.F
+!||    get_u_sens   ../engine/source/user_interface/usensor.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod   ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE RUSER32(
      1             NEL     ,IOUT    ,IPROP  ,UVAR   ,NUVAR  ,
      2             FX      ,FY      ,FZ     ,XMOM   ,YMOM   ,
@@ -145,7 +145,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,IFUNC1,IFUNC2,ISENS,ITYP,IACT,ILOCK
       my_real 
-     .   STIF0,STIF1,DSCAL,FSCAL,TSCAL,X,DXDY,DX,TACTI,F0,FF,D1,
+     .   STIF0,STIF1,DSCAL,FSCAL,TSCAL,X,DXDY,TACTI,F0,FF,D1,
      .   DXDY2,FF2
 C=======================================================================
       STIF0  = GET_U_GEO(2,IPROP)       

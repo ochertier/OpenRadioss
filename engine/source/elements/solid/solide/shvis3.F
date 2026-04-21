@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    shvis3    ../engine/source/elements/solid/solide/shvis3.F
-      !||--- called by ------------------------------------------------------
-      !||    sforc3    ../engine/source/elements/solid/solide/sforc3.F
-      !||--- uses       -----------------------------------------------------
-      !||    ale_mod   ../common_source/modules/ale/ale_mod.F
-      !||====================================================================
+!||====================================================================
+!||    shvis3    ../engine/source/elements/solid/solide/shvis3.F
+!||--- called by ------------------------------------------------------
+!||    sforc3    ../engine/source/elements/solid/solide/sforc3.F
+!||--- uses       -----------------------------------------------------
+!||    ale_mod   ../common_source/modules/ale/ale_mod.F
+!||====================================================================
       SUBROUTINE SHVIS3(
      1   PM,       RHO,      OFF,      VX1,
      2   VX2,      VX3,      VX4,      VX5,
@@ -112,7 +112,7 @@ C-----------------------------------------------
      .   G52(MVSIZ),G62(MVSIZ),G72(MVSIZ),G82(MVSIZ),
      .   G13(MVSIZ),G23(MVSIZ),G33(MVSIZ),G43(MVSIZ),
      .   G53(MVSIZ),G63(MVSIZ),G73(MVSIZ),G83(MVSIZ),
-     .   LEN(MVSIZ),RHO0(MVSIZ),
+     .   RHO0(MVSIZ),
      .   EHOURT,AA
 !       SP issue, need double precision for these variables   
         REAL(kind=8) ::
@@ -459,9 +459,8 @@ C
             ENDIF
           ENDDO
         ENDIF
-#include "atomic.inc"
+!$OMP ATOMIC
           EHOUR = EHOUR + EHOURT
-#include "atomend.inc"
       ENDIF
 C
 #include "vectorize.inc"

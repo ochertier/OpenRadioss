@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    i24main_opt_tri   ../engine/source/interfaces/intsort/i24main_opt_tri.F
-      !||--- called by ------------------------------------------------------
-      !||    inttri            ../engine/source/interfaces/intsort/inttri.F
-      !||--- calls      -----------------------------------------------------
-      !||    i24optcd          ../engine/source/interfaces/intsort/i24optcd.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    i24main_opt_tri   ../engine/source/interfaces/intsort/i24main_opt_tri.F
+!||--- called by ------------------------------------------------------
+!||    inttri            ../engine/source/interfaces/intsort/inttri.F
+!||--- calls      -----------------------------------------------------
+!||    i24optcd          ../engine/source/interfaces/intsort/i24optcd.F
+!||--- uses       -----------------------------------------------------
+!||    intbufdef_mod     ../common_source/modules/interfaces/intbufdef_mod.F90
+!||====================================================================
       SUBROUTINE I24MAIN_OPT_TRI(
      1                  IPARI   ,INTBUF_TAB,X    ,V      ,
      2                  NIN     ,ITASK ,COUNT_REMSLV,T2MAIN_SMS,LSKYI_SMS_NEW)
@@ -58,8 +59,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER KK, I, IFQ, I_STOK,CT,
-     .        IEDGE,IGSTI,NSNEL,NRTSE,IEDG4,IFIT,NFIT
+      INTEGER  IFQ, I_STOK,
+     .        IEDGE,IGSTI,NSNEL,NRTSE,IEDG4
 C     REAL
       my_real
      .   STARTT,GAP,STOPT
@@ -83,8 +84,8 @@ C
       GAP =INTBUF_TAB%VARIABLES(2)
 C
 C-----------------------------------------------------------
-C     Filtrage des candidats a l'impact
-C     (si candidat retenu, cand_n(i) = - cand_n(i))
+C     Filtering of impact candidates
+C     (if candidate retained, cand_n(i) = - cand_n(i))
 C-----------------------------------------------------------
        I_STOK = INTBUF_TAB%I_STOK(1)
        CALL I24OPTCD(

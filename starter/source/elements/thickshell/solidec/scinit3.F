@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,31 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    scinit3                ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    failini                ../starter/source/elements/solid/solide/failini.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
-      !||    sccoor3                ../starter/source/elements/thickshell/solidec/sccoor3.F
-      !||    scderi3                ../starter/source/elements/thickshell/solidec/scderi3.F
-      !||    scmorth3               ../starter/source/elements/thickshell/solidec/scmorth3.F
-      !||    sczero3                ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sdlen3                 ../starter/source/elements/solid/solide/sdlen3.F
-      !||    sdlensh                ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
-      !||    smass3                 ../starter/source/elements/solid/solide/smass3.F
-      !||    svalue0                ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- uses       -----------------------------------------------------
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    scinit3                ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    failini                ../starter/source/elements/solid/solide/failini.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+!||    sccoor3                ../starter/source/elements/thickshell/solidec/sccoor3.F
+!||    scderi3                ../starter/source/elements/thickshell/solidec/scderi3.F
+!||    scmorth3               ../starter/source/elements/thickshell/solidec/scmorth3.F
+!||    sczero3                ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sdlen3                 ../starter/source/elements/solid/solide/sdlen3.F
+!||    sdlensh                ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
+!||    smass3                 ../starter/source/elements/solid/solide/smass3.F
+!||    svalue0                ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- uses       -----------------------------------------------------
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SCINIT3(ELBUF_STR,
      .                  MAS       ,IXS       ,PM       ,X         ,MSS   ,
      .                  DETONATORS,GEO       ,VEUL     ,ALE_CONNECTIVITY,IPARG ,
@@ -55,7 +55,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                  BNS       ,WMA       ,PTSOL    ,BUFMAT    ,MCP   ,
      .                  MCPS      ,TEMP      ,NPF      ,TF        ,MSSA  ,
      .                  STRSGLOB  ,STRAGLOB ,ORTHOGLOB ,FAIL_INI  ,ILOADP,
-     .                  FACLOAD   ,RNOISE   ,PERTURB   ,GLOB_THERM)
+     .                  FACLOAD   ,RNOISE   ,PERTURB   ,GLOB_THERM,MAT_PARAM)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C   Initialize 8-nodes thick shell HQEPH, co-rotational formulation
@@ -67,7 +67,9 @@ C-----------------------------------------------
       USE DETONATORS_MOD             
       USE ALE_CONNECTIVITY_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
-      use glob_therm_mod
+      USE GLOB_THERM_MOD
+      USE MATPARAM_DEF_MOD
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -105,6 +107,7 @@ C-----------------------------------------------
       TYPE(DETONATORS_STRUCT_)::DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       type (glob_therm_) ,intent(in)      :: glob_therm
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -133,6 +136,7 @@ C-----------------------------------------------
      .   DELTAX(MVSIZ), AIRE(MVSIZ),LLSH(MVSIZ)
       my_real, DIMENSION(8,MVSIZ) :: BID8MVSIZ
       my_real, DIMENSION(MVSIZ) :: BIDMVSIZ
+      my_real :: TEMPEL(NEL)
 C--------------------------------
 C-----------------------------------------------
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
@@ -277,6 +281,17 @@ C
         ENDDO
       END IF        
 C
+      IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+        DO I=1,NEL
+          TEMPEL(I) = ONE_OVER_8 *(TEMP(IXS(2,I+NFT)) + TEMP(IXS(3,I+NFT))
+     .                           + TEMP(IXS(4,I+NFT)) + TEMP(IXS(5,I+NFT))        
+     .                           + TEMP(IXS(6,I+NFT)) + TEMP(IXS(7,I+NFT))        
+     .                           + TEMP(IXS(8,I+NFT)) + TEMP(IXS(9,I+NFT))) 
+        ENDDO
+      ELSE
+        TEMPEL(1:NEL) = TEMP0(1:NEL)
+      END IF
+!
       IP=0
       CALL MATINI(PM      ,IXS    ,NIXS       ,X      ,
      .            GEO     ,ALE_CONNECTIVITY  ,DETONATORS ,IPARG     ,
@@ -285,7 +300,7 @@ C
      .            MAT     ,IPM    ,NSIGS      ,NUMSOL    ,PTSOL  ,
      .            IP      ,NGL    ,NPF        ,TF        ,BUFMAT ,
      .            GBUF    ,LBUF   ,MBUF       ,ELBUF_STR ,ILOADP ,
-     .            FACLOAD, DELTAX)
+     .            FACLOAD, DELTAX ,TEMPEL     ,MAT_PARAM )
 C
       IF (IGTYP == 22) CALL SCZERO3(GBUF%RHO,GBUF%SIG,GBUF%EINT,NEL)
 C----------------------------------------
@@ -323,7 +338,18 @@ C
      .         E1X  ,E1Y  ,E1Z  ,E2X  ,E2Y  ,E2Z  ,E3X  ,E3Y  ,E3Z  ,
      .         NGL  ,ANGLE,NSIGI,SIGSP,NSIGS,SIGI ,IXS(1,NF1) ,IS   ,
      .         ORTHOGLOB,PTSOL,NEL)
-c
+C
+        IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+          DO I=1,NEL
+            TEMPEL(I) = ONE_OVER_8 *(TEMP(IXS(2,I+NFT)) + TEMP(IXS(3,I+NFT))
+     .                             + TEMP(IXS(4,I+NFT)) + TEMP(IXS(5,I+NFT))      
+     .                             + TEMP(IXS(6,I+NFT)) + TEMP(IXS(7,I+NFT))      
+     .                             + TEMP(IXS(8,I+NFT)) + TEMP(IXS(9,I+NFT))) 
+          ENDDO
+        ELSE
+          TEMPEL(1:NEL) = TEMP0(1:NEL)
+        END IF
+!
         CALL MATINI(PM     ,IXS    ,NIXS        ,X        ,
      .             GEO     ,ALE_CONNECTIVITY  ,DETONATORS  ,IPARG    ,
      .             SIGI    ,NEL    ,SKEW        ,IGEO     ,
@@ -331,7 +357,7 @@ c
      .             MAT     ,IPM    ,NSIGS       ,NUMSOL   ,PTSOL,
      .             IS      ,NGL    ,NPF         ,TF       ,BUFMAT,
      .             GBUF    ,LBUF   ,MBUF        ,ELBUF_STR,ILOADP,
-     .             FACLOAD, DELTAX)
+     .             FACLOAD, DELTAX ,TEMPEL      ,MAT_PARAM )
 c
          NUVAR = ELBUF_STR%BUFLY(IS)%NVAR_MAT
          IF(MTN>=28)THEN
@@ -408,7 +434,7 @@ C Warning : IX1, IX2 ... IX8 <=> NC(MVSIZ,8)
      3              BID   ,GBUF%FILL)
       ENDIF
 C------------------------------------------
-C Element time step
+C Time Step element
        AIRE(:) = ZERO
        CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,
      .      LBUF%EINT ,LBUF%TEMP ,LBUF%DELTAX ,LBUF%RK ,LBUF%RE ,BUFMAT, DELTAX, AIRE, 
@@ -449,15 +475,15 @@ C       STI = 0.25 * RHO * VOL / (DT*DT)
 C-----------
       RETURN
       END SUBROUTINE SCINIT3
-      !||====================================================================
-      !||    svalue0     ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3dinit3   ../starter/source/elements/ige3d/ig3dinit3.F
-      !||    s6cinit3    ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||    s8cinit3    ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||    s8zinit3    ../starter/source/elements/solid/solide8z/s8zinit3.F
-      !||    scinit3     ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||====================================================================
+!||====================================================================
+!||    svalue0     ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- called by ------------------------------------------------------
+!||    ig3dinit3   ../starter/source/elements/ige3d/ig3dinit3.F
+!||    s6cinit3    ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||    s8cinit3    ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||    s8zinit3    ../starter/source/elements/solid/solide8z/s8zinit3.F
+!||    scinit3     ../starter/source/elements/thickshell/solidec/scinit3.F
+!||====================================================================
       SUBROUTINE SVALUE0(RHO ,VOL ,OFF ,SIG ,EINT ,DTX ,
      .                   RHOG,VOLG,OFFG,SIGG,EINTG,DTXG,
      .                   NEL )
@@ -496,15 +522,15 @@ C
       RETURN
       END SUBROUTINE SVALUE0
 C.....
-      !||====================================================================
-      !||    sczero3     ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    ig3dinit3   ../starter/source/elements/ige3d/ig3dinit3.F
-      !||    s6cinit3    ../starter/source/elements/thickshell/solide6c/s6cinit3.F
-      !||    s8cinit3    ../starter/source/elements/thickshell/solide8c/s8cinit3.F
-      !||    s8zinit3    ../starter/source/elements/solid/solide8z/s8zinit3.F
-      !||    scinit3     ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||====================================================================
+!||====================================================================
+!||    sczero3     ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- called by ------------------------------------------------------
+!||    ig3dinit3   ../starter/source/elements/ige3d/ig3dinit3.F
+!||    s6cinit3    ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+!||    s8cinit3    ../starter/source/elements/thickshell/solide8c/s8cinit3.F
+!||    s8zinit3    ../starter/source/elements/solid/solide8z/s8zinit3.F
+!||    scinit3     ../starter/source/elements/thickshell/solidec/scinit3.F
+!||====================================================================
       SUBROUTINE SCZERO3(RHOG,SIGG,EINTG,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -534,13 +560,13 @@ C
 C
       RETURN
       END SUBROUTINE SCZERO3
-      !||====================================================================
-      !||    sdlensh   ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    scinit3   ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    clsys3    ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||====================================================================
+!||====================================================================
+!||    sdlensh   ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- called by ------------------------------------------------------
+!||    scinit3   ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- calls      -----------------------------------------------------
+!||    clsys3    ../starter/source/elements/thickshell/solidec/scinit3.F
+!||====================================================================
       SUBROUTINE SDLENSH(NEL,LLSH,
      .   X1, X2, X3, X4, X5, X6, X7, X8,
      .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
@@ -682,12 +708,12 @@ C
 C
       RETURN
       END SUBROUTINE SDLENSH
-      !||====================================================================
-      !||    clsys3      ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    sdlensh     ../starter/source/elements/thickshell/solidec/scinit3.F
-      !||    sdlensh14   ../starter/source/elements/thickshell/solide8c/sdlensh14.F
-      !||====================================================================
+!||====================================================================
+!||    clsys3      ../starter/source/elements/thickshell/solidec/scinit3.F
+!||--- called by ------------------------------------------------------
+!||    sdlensh     ../starter/source/elements/thickshell/solidec/scinit3.F
+!||    sdlensh14   ../starter/source/elements/thickshell/solide8c/sdlensh14.F
+!||====================================================================
       SUBROUTINE CLSYS3(RX, RY, RZ, SX, SY, SZ, VQ, DET, NEL,MVSIZ)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

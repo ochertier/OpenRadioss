@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_inter_type11   ../starter/source/interfaces/int11/hm_read_inter_type11.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    definter               ../starter/source/interfaces/interf1/definter.F
-      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
-      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    inter_dcod_friction    ../starter/source/interfaces/reader/inter_dcod_friction.F
-      !||    inter_dcod_sensor      ../starter/source/interfaces/reader/inter_dcod_sensor.F
-      !||    ngr2usr                ../starter/source/system/nintrr.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_inter_type11   ../starter/source/interfaces/int11/hm_read_inter_type11.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    definter               ../starter/source/interfaces/interf1/definter.F
+!||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+!||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    inter_dcod_friction    ../starter/source/interfaces/reader/inter_dcod_friction.F
+!||    inter_dcod_sensor      ../starter/source/interfaces/reader/inter_dcod_sensor.F
+!||    ngr2usr                ../starter/source/system/nintrr.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE11(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT       ,NI             ,
      2        IGRSLIN    ,SENSORS    ,DEF_INTER  ,TITR        ,
@@ -88,7 +88,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ISU1,ISU2,IBC1, IBC2, IBC3, NTYP,INTTH,
      .    INACTI, IBC1M, IBC2M, IBC3M, IGSTI, IS1, IS2,
-     .    IGAP,MULTIMP, IDEL11,KK,II, IDSENS,
+     .    IGAP,MULTIMP, IDEL11,IDSENS,
      .    IPRINT,INTFRIC,IASSIGN,IFORM,IFORM_TH,IDELKEEP,
      .    IKTHE,FIELD6,FLAGREMNOD,IEDGE,IB1,IB2,IB3,NTYP0,
      .    NLIN1,NLIN2,I,MODFR
@@ -612,10 +612,6 @@ C--------------------------------------------------------------
       ENDIF
 C
 C--------------------------------------------------------------
- 1000 FORMAT(/1X,'  INTERFACE NUMBER :',I10,1X,A)
- 1300 FORMAT(    /1X,'   INTERFACES               ' /
-     .            1X,' --------------             '// )
-C------------
       RETURN
 C------------
  1518 FORMAT( '    FRICTION FORMULATION: INCREMENTAL (STIFFNESS) ',

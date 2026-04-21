@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_interfaces           ../starter/source/interfaces/reader/hm_read_interfaces.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                       ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                       ../starter/source/output/message/message.F
-      !||    hm_option_read_key           ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start              ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_read_inter_fsi            ../starter/source/interfaces/reader/hm_read_inter_fsi.F
-      !||    hm_read_inter_lagdt_type07   ../starter/source/interfaces/int07/hm_read_inter_lagdt_type07.F
-      !||    hm_read_inter_lagmul         ../starter/source/interfaces/reader/hm_read_inter_lagmul.F
-      !||    hm_read_inter_struct         ../starter/source/interfaces/reader/hm_read_inter_struct.F
-      !||    hm_sz_r2r                    ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    ifrontplus                   ../starter/source/spmd/node/frontplus.F
-      !||    usr2sys                      ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod           ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                  ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                      ../starter/share/modules1/r2r_mod.F
-      !||    submodel_mod                 ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_interfaces           ../starter/source/interfaces/reader/hm_read_interfaces.F
+!||--- called by ------------------------------------------------------
+!||    lectur                       ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                       ../starter/source/output/message/message.F
+!||    hm_option_read_key           ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start              ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    hm_read_inter_fsi            ../starter/source/interfaces/reader/hm_read_inter_fsi.F
+!||    hm_read_inter_lagdt_type07   ../starter/source/interfaces/int07/hm_read_inter_lagdt_type07.F
+!||    hm_read_inter_lagmul         ../starter/source/interfaces/reader/hm_read_inter_lagmul.F
+!||    hm_read_inter_struct         ../starter/source/interfaces/reader/hm_read_inter_struct.F
+!||    hm_sz_r2r                    ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    ifrontplus                   ../starter/source/spmd/node/frontplus.F
+!||    usr2sys                      ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod           ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod                  ../starter/share/message_module/message_mod.F
+!||    r2r_mod                      ../starter/share/modules1/r2r_mod.F
+!||    submodel_mod                 ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_INTERFACES(
      1           IPARI           ,FRIGAP   ,ITAB       ,ITABM1     ,
      2           IGRNOD          ,IGRSURF  ,IGRSLIN    ,IGRBRIC    ,IGRSH3N    ,
@@ -79,7 +79,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "r2r_c.inc"
 #include      "inter22.inc"
@@ -153,6 +152,7 @@ C READING INTERFACES
      .                           OPTION_TITR=TITR,KEYWORD2=KEY,KEYWORD3=KEY2)
          ! CHECK IF READ OPTION IS /INTER/SUB
          IF(KEY(1:LEN_TRIM(KEY)) == 'SUB') CYCLE
+         IF(KEY(1:LEN_TRIM(KEY)) == 'GUIDED_CABLE') CYCLE
          NI=NI+1
          DO I = 1,NPARI
             IPARI(I,NI) = 0
@@ -236,20 +236,16 @@ C--------------------------------------------------
 
         IF(IPARI(39,NI) == 1)THEN
           IPARI(40,NI)=USR2SYS(IPARI(40,NI),ITABM1,MESS,IPARI(15,NI))
-          IF(IMACH == 3)THEN
-            DO P = 1, NSPMD
-                CALL IFRONTPLUS(IPARI(40,NI),P)
-            END DO
-          END IF
+          DO P = 1, NSPMD
+            CALL IFRONTPLUS(IPARI(40,NI),P)
+          END DO
         ELSEIF(IPARI(39,NI) == 2)THEN
           IPARI(40,NI)=USR2SYS(IPARI(40,NI),ITABM1,MESS,IPARI(15,NI))
           IPARI(41,NI)=USR2SYS(IPARI(41,NI),ITABM1,MESS,IPARI(15,NI))
-          IF(IMACH == 3)THEN
-             DO P = 1, NSPMD
-               CALL IFRONTPLUS(IPARI(40,NI),P)
-               CALL IFRONTPLUS(IPARI(41,NI),P)
-             END DO
-           END IF
+          DO P = 1, NSPMD
+            CALL IFRONTPLUS(IPARI(40,NI),P)
+            CALL IFRONTPLUS(IPARI(41,NI),P)
+          END DO
         ENDIF
 
         IF(NINTLOADP > 0)IPARI(95,NI) = KLOADPINTER(NI+1)  - KLOADPINTER(NI)

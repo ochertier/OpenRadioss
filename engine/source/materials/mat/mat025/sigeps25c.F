@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,27 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps25c             ../engine/source/materials/mat/mat025/sigeps25c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc                ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    m25crak               ../engine/source/materials/mat/mat025/m25crak.F
-      !||    mat25_crasurv_c       ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
-      !||    mat25_tsaiwu_c        ../engine/source/materials/mat/mat025/mat25_tsaiwu_c.F90
-      !||    prony25c              ../engine/source/materials/mat/mat025/prony25c.F
-      !||--- uses       -----------------------------------------------------
-      !||    mat25_crasurv_c_mod   ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
-      !||    mat25_tsaiwu_c_mod    ../engine/source/materials/mat/mat025/mat25_tsaiwu_c.F90
-      !||    matparam_def_mod      ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sigeps25c             ../engine/source/materials/mat/mat025/sigeps25c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc                ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    m25crak               ../engine/source/materials/mat/mat025/m25crak.F
+!||    mat25_crasurv_c       ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
+!||    mat25_tsaiwu_c        ../engine/source/materials/mat/mat025/mat25_tsaiwu_c.F90
+!||    prony25c              ../engine/source/materials/mat/mat025/prony25c.F
+!||--- uses       -----------------------------------------------------
+!||    mat25_crasurv_c_mod   ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
+!||    mat25_tsaiwu_c_mod    ../engine/source/materials/mat/mat025/mat25_tsaiwu_c.F90
+!||    matparam_def_mod      ../common_source/modules/mat_elem/matparam_def_mod.F90
+!||====================================================================
       SUBROUTINE SIGEPS25C(MAT_PARAM,
      1                    NEL      ,PM       ,OFF     ,GSTR    ,
      2                    DIR      ,THLY    ,TIME     ,TIMESTEP,SHF     ,
      3                    NGL      ,THK0    ,EXX      ,OFF_OLD ,
      4                    EYY      ,EXY     ,EXZ      ,EYZ     ,KXX     ,
-     5                    KYY      ,KXY     ,ZZ       ,EPSPL   ,RHO0    ,
-     6                    SOUNDSP  ,UPARAM  ,OFFL     ,
+     5                    KYY      ,KXY     ,ZZ       ,EPSD_PG ,RHO0    ,
+     6                    SOUNDSP  ,UPARAM  ,OFFL     ,EPSD    ,ASRATE  ,
      7                    SIGY     ,ZCFAC   ,NPTT     ,ILAY    ,
      8                    NFIS1    ,NFIS2   ,NFIS3    ,WPLAR   ,
      9                    NPTTOT   ,IGTYP   ,SIGV     ,SIGPLY  ,
@@ -83,12 +83,15 @@ C-----------------------------------------------
       INTEGER ,DIMENSION(NEL) ,INTENT(INOUT) :: NFIS1,NFIS2,NFIS3
       my_real ,INTENT(IN) :: TIME
       my_real ,INTENT(IN) :: TIMESTEP
+      my_real ,INTENT(IN) :: ASRATE
+      my_real ,DIMENSION(NEL)   ,INTENT(IN)    :: EPSD_PG
+      my_real ,DIMENSION(NEL)   ,INTENT(INOUT) :: EPSD
       my_real ,DIMENSION(NEL)   ,INTENT(INOUT) :: WPLAR
       my_real :: 
      .   PM(NPROPM),OFF(*),OFF_OLD(*),GSTR(NEL,8),DIR(*),
      .   THLY(*),SHF(*),THK0(MVSIZ),EXX(MVSIZ),EYY(MVSIZ),
      .   EXY(MVSIZ),EXZ(MVSIZ),EYZ(MVSIZ),KXX(MVSIZ),KYY(MVSIZ),
-     .   KXY(MVSIZ),ZZ(*),EPSPL(*),RHO0(*),SOUNDSP(*),UPARAM(*),
+     .   KXY(MVSIZ),ZZ(*),RHO0(*),SOUNDSP(*),UPARAM(*),
      .   SIGY(*),ZCFAC(MVSIZ,2),SIGNXX(MVSIZ),
      .   SIGNYY(MVSIZ),SIGNXY(MVSIZ),SIGNYZ(MVSIZ),SIGNZX(MVSIZ),
      .   SIGVXX(MVSIZ),SIGVYY(MVSIZ),SIGVXY(MVSIZ),SIGVYZ(MVSIZ),
@@ -103,7 +106,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,J,IFLAG,IOFF,JOFF,FAILNPT,NPRONY
+      INTEGER :: I,IFLAG,IOFF,JOFF,FAILNPT,NPRONY
       my_real :: ZT,RATIO,KV,DTINV,EPST1,EPST2,EPSM1,EPSM2,DMAX
       my_real ::
      .   EPS(MVSIZ,5),STRN1(MVSIZ),STRN2(MVSIZ),STRN3(MVSIZ),
@@ -192,8 +195,8 @@ C-----------------------
      3                      NFIS1    ,NFIS2   ,NFIS3   ,ILAY    ,SHF   ,
      4                      NGL      ,EPS     ,IGTYP   ,WPLAR   ,STRN1 ,
      5                      STRN2    ,STRN3   ,STRP1   ,STRP2   ,SIGE  ,
-     6                      EPSPL    ,ISRATE  ,OFFL    ,YLD     ,ETSE  ,
-     7                      ISHPLYXFEM,PLY_EXX(1,IPT),PLY_EYY(1,IPT),
+     6                      EPSD_PG  ,EPSD    ,ISRATE  ,ASRATE  ,OFFL    ,
+     7                      YLD      ,ETSE,ISHPLYXFEM,PLY_EXX(1,IPT),PLY_EYY(1,IPT),
      8                      PLY_EXY(1,IPT),SIGPLY,SIGPE,PLY_ID ,
      9                      SIGNXX   ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX,
      A                      IPG      ,TSAIWU  ,IPLYXFEM,TIME    ,TIMESTEP,
@@ -207,8 +210,8 @@ C-----------------------
      3                       NFIS1    ,NFIS2   ,NFIS3   ,ILAY    ,SHF   ,
      4                       NGL      ,EPS     ,WPLAR   ,STRN1 ,
      5                       STRN2    ,STRN3   ,STRP1   ,STRP2   ,SIGE  ,
-     6                       EPSPL    ,ISRATE  ,OFFL    ,YLD     ,ETSE  ,
-     7                       IERR     ,ISHPLYXFEM,PLY_EXX(1,IPT),PLY_EYY(1,IPT),
+     6                       EPSD_PG  ,EPSD    ,ISRATE  ,ASRATE  ,OFFL    ,
+     7                       YLD      ,ETSE    ,IERR,ISHPLYXFEM,PLY_EXX(1,IPT),PLY_EYY(1,IPT),
      8                       PLY_EXY(1,IPT),SIGPLY,SIGPE,PLY_ID ,
      9                       SIGNXX   ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX,
      A                       IPG      ,TSAIWU  ,IPLYXFEM,TIME    ,TIMESTEP,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    pornod                 ../starter/source/ale/pornod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    ifrontplus             ../starter/source/spmd/node/frontplus.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
-      SUBROUTINE PORNOD(GEO  ,IXS   ,IXQ   ,NODPOR ,ICODE  ,
-     .                  ITAB ,NPBY  ,LPBY  ,IGEO)
+!||====================================================================
+!||    pornod                 ../starter/source/ale/pornod.F
+!||--- called by ------------------------------------------------------
+!||    lectur                 ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    ifrontplus             ../starter/source/spmd/node/frontplus.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
+      SUBROUTINE PORNOD(GEO  ,IXS   ,IXQ   ,NODPOR ,ICODE  ,ITAB ,NPBY  ,LPBY  ,IGEO)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -42,6 +41,7 @@ C   M o d u l e s
 C----------------------------------------------- 
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use element_mod , only : nixs,nixq
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,7 +52,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -67,7 +66,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(NUMNOD) :: ITAG
       INTEGER IG,N,I,J,K,IC,IC1,IC2,IC3,IC4,JWARN,IRB,KRB,P
       INTEGER, DIMENSION(:,:),ALLOCATABLE :: INDEX
-      INTEGER SORT,IWORK(70000),IT
+      INTEGER IWORK(70000),IT
       CHARACTER(len=nchartitle) :: TITR
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -163,11 +162,9 @@ C-----------------------------------------------
           CALL ANCMSG(MSGID=360,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=IGEO(1,IG),C1=TITR,I2=IRB)
         ELSE
         ! main node RB replicate on all procs for SPMD calculation of porosity
-          IF(IMACH == 3) THEN
-            DO P = 1, NSPMD
-                CALL IFRONTPLUS(IRB,P) 
-            ENDDO
-          ENDIF
+          DO P = 1, NSPMD
+           CALL IFRONTPLUS(IRB,P) 
+          ENDDO
         ENDIF !IF (GEO(33,IG) == ZERO)
       ENDIF !IF(IRB /= 0)
       END DO !IG=1,NUMGEO

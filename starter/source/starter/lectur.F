@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,514 +20,539 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    lectur                              ../starter/source/starter/lectur.F
-      !||--- called by ------------------------------------------------------
-      !||    starter0                            ../starter/source/starter/starter0.F
-      !||--- calls      -----------------------------------------------------
-      !||    add_mass_stat                       ../starter/source/tools/admas/add_mass_stat.F
-      !||    addmast10                           ../starter/source/tools/admas/addmast10.F
-      !||    admbcs                              ../starter/source/model/remesh/admbcs.F
-      !||    alelec                              ../starter/source/ale/alelec.F
-      !||    alloc_constraint_struct             ../starter/source/modules/constaint_mod.F90
-      !||    allocxfem                           ../starter/source/elements/xfem/allocxfem.F
-      !||    ancmsg                              ../starter/source/output/message/message.F
-      !||    ani_fasolfr1                        ../starter/source/output/anim/ani_fasolfr.F
-      !||    ani_fasolfr2                        ../starter/source/output/anim/ani_fasolfr.F
-      !||    ani_segquadfr1                      ../starter/source/output/anim/ani_segquadfr.F
-      !||    ani_segquadfr2                      ../starter/source/output/anim/ani_segquadfr.F
-      !||    anodin                              ../starter/source/output/analyse/analyse_node.c
-      !||    apartin                             ../starter/source/output/analyse/analyse_part.c
-      !||    applysort2flux                      ../starter/source/restart/ddsplit/w_ithflux.F
-      !||    applysort2fvm                       ../starter/source/airbag/fvmesh0.F
-      !||    arret                               ../starter/source/system/arret.F
-      !||    bcscycmodif_nd                      ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    bcsmodif_nd                         ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    brokmann_elem_renum                 ../starter/source/materials/fail/windshield_alter/brokmann_elem_spmd_renum.F90
-      !||    build_addcnel_sub                   ../starter/source/model/mesh/build_addcnel_sub.F
-      !||    build_admesh                        ../starter/source/model/remesh/build_admesh.F
-      !||    build_cnel                          ../starter/source/model/mesh/build_cnel.F
-      !||    build_cnel_sub                      ../starter/source/model/mesh/build_cnel_sub.F
-      !||    build_csrect                        ../starter/source/model/mesh/build_cnel.F
-      !||    bulkfakeigeo3                       ../starter/source/elements/ige3d/bulkfakeigeo3.F
-      !||    c3grhead                            ../starter/source/elements/sh3n/coque3n/c3grhead.F
-      !||    c3grtails                           ../starter/source/elements/sh3n/coque3n/c3grtails.F
-      !||    cdk6inx                             ../starter/source/elements/sh3n/coquedk6/cdk6inx.F
-      !||    cgrhead                             ../starter/source/elements/shell/coque/cgrhead.F
-      !||    cgrtails                            ../starter/source/elements/shell/coque/cgrtails.F
-      !||    check_dynain                        ../starter/source/starter/check_dynain.F
-      !||    check_mat_elem_prop_compatibility   ../starter/source/materials/mat/check_mat_elem_prop_compatibility.F
-      !||    check_pthickfail                    ../starter/source/materials/fail/check_pthickfail.F
-      !||    check_qeph_stra                     ../starter/source/starter/check_qeph_stra.F
-      !||    check_surf                          ../starter/source/groups/check_surf.F
-      !||    checkrby                            ../starter/source/constraints/general/rbody/checkrby.F
-      !||    chk_dttsh                           ../starter/source/elements/thickshell/solidec/scdtchk3.F
-      !||    chk_shell_offset                    ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
-      !||    chkfunct                            ../starter/source/tools/curve/lecfun.F
-      !||    chktyp2                             ../starter/source/interfaces/interf1/chktyp2.F
-      !||    compute_connect_partelm             ../starter/source/model/sets/compute_connect_partelm.F
-      !||    copy_to_monvol                      ../starter/share/modules1/monvol_struct_mod.F
-      !||    copy_to_volmon                      ../starter/share/modules1/monvol_struct_mod.F
-      !||    create_map_tables                   ../starter/source/model/sets/map_tables.F
-      !||    create_seatbelt                     ../starter/source/tools/seatbelts/create_seatbelt.F
-      !||    dampdtnoda                          ../starter/source/general_controls/damping/dampdtnoda.F
-      !||    damping_rby_spmdset                 ../starter/source/general_controls/damping/damping_rby_spmdset.F90
-      !||    ddprint                             ../starter/source/spmd/domdec2.F
-      !||    ddsplit                             ../starter/source/restart/ddsplit/ddsplit.F
-      !||    dealloc_constraint_struct           ../starter/source/modules/constaint_mod.F90
-      !||    deallocate_detonators               ../starter/share/modules1/detonators_mod.F
-      !||    deallocate_elbuf                    ../starter/source/elements/elbuf_init/deallocate_buffer.F
-      !||    deallocate_igrsurf_split            ../starter/source/spmd/deallocate_igrsurf_split.F
-      !||    deallocate_joint                    ../starter/source/constraints/general/cyl_joint/deallocate_joint.F
-      !||    deallocate_split_cfd_solide         ../starter/source/spmd/split_cfd_solide.F
-      !||    desout                              ../starter/source/output/outp/desout.F
-      !||    dim_s10edg                          ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    domdec1                             ../starter/source/spmd/domain_decomposition/domdec1.F
-      !||    domdec2                             ../starter/source/spmd/domdec2.F
-      !||    dometis                             ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    dsdim0                              ../starter/source/implicit/dsolve/dsdim.F
-      !||    elbuf_ini                           ../starter/source/elements/elbuf_init/elbuf_ini.F
-      !||    failwave_init                       ../starter/source/materials/fail/failwave_init.F
-      !||    fictivmassigeo                      ../starter/source/groups/ssurftagigeo.F
-      !||    fill_intercep                       ../starter/source/spmd/node/ddtools.F
-      !||    fillcncnd                           ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    fillcne                             ../starter/source/spmd/domdec2.F
-      !||    fillcne_pxfem                       ../starter/source/properties/composite_options/stack/preplyxfem.F
-      !||    fillcne_xfem                        ../starter/source/elements/xfem/fillcne_xfem.F
-      !||    fillcni2                            ../starter/source/spmd/domdec2.F
-      !||    fixmodif_nd                         ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    flowdec                             ../starter/source/fluid/flowdec.F
-      !||    fractal_elem_renum                  ../starter/source/materials/fail/fractal/fractal_elem_spmd_renum.F90
-      !||    fsdcod                              ../starter/source/system/fsdcod.F
-      !||    fvdim                               ../starter/source/airbag/fvmesh.F
-      !||    fvmesh0                             ../starter/source/airbag/fvmesh0.F
-      !||    fxbelnum                            ../starter/source/constraints/fxbody/fxbelnum.F
-      !||    fxbgrav                             ../starter/source/constraints/fxbody/fxbgrav.F
-      !||    fxbtagn                             ../starter/source/constraints/fxbody/fxbtagn.F
-      !||    genani1                             ../starter/source/output/anim/genani1.F
-      !||    get_size_inter24                    ../starter/source/spmd/get_size_tag.F
-      !||    get_size_numnod_local               ../starter/source/spmd/get_size_tag.F
-      !||    globmat                             ../starter/source/materials/globmat.F
-      !||    globvars                            ../starter/source/spmd/globvars.F
-      !||    group_ini                           ../starter/source/model/group/group_ini.F
-      !||    hm_grogronod                        ../starter/source/groups/hm_grogronod.F
-      !||    hm_lecgrn                           ../starter/source/groups/hm_lecgrn.F
-      !||    hm_lines_of_lines                   ../starter/source/groups/hm_lines_of_lines.F
-      !||    hm_option_count                     ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_pre_read_link                    ../starter/source/constraints/rigidlink/hm_pre_read_rlink.F
-      !||    hm_pre_read_preload                 ../starter/source/loads/general/preload/hm_pre_read_preload.F
-      !||    hm_pre_read_preload_axial           ../starter/source/loads/general/preload/hm_read_preload_axial.F90
-      !||    hm_prelecgrns                       ../starter/source/groups/hm_prelecgrns.F
-      !||    hm_prelecjoi                        ../starter/source/constraints/general/cyl_joint/hm_prelecjoi.F
-      !||    hm_preread_bcscyc                   ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||    hm_preread_bem                      ../starter/source/loads/bem/hm_read_bem.F
-      !||    hm_preread_cload                    ../starter/source/loads/general/cload/hm_preread_cload.F
-      !||    hm_preread_convec                   ../starter/source/loads/thermic/hm_preread_convec.F
-      !||    hm_preread_eig                      ../starter/source/general_controls/computation/hm_read_eig.F
-      !||    hm_preread_grav                     ../starter/source/loads/general/grav/hm_preread_grav.F
-      !||    hm_preread_impacc                   ../starter/source/constraints/general/impvel/hm_preread_impacc.F
-      !||    hm_preread_impdisp                  ../starter/source/constraints/general/impvel/hm_preread_impdisp.F
-      !||    hm_preread_impflux                  ../starter/source/constraints/thermic/hm_preread_impflux.F
-      !||    hm_preread_imptemp                  ../starter/source/constraints/thermic/hm_preread_imptemp.F
-      !||    hm_preread_impvel                   ../starter/source/constraints/general/impvel/hm_preread_impvel.F
-      !||    hm_preread_impvel0                  ../starter/source/constraints/general/impvel/hm_preread_impvel0.F
-      !||    hm_preread_inivel                   ../starter/source/initial_conditions/general/inivel/hm_preread_inivel.F90
-      !||    hm_preread_load_centri              ../starter/source/loads/general/load_centri/hm_preread_load_centri.F
-      !||    hm_preread_load_pressure            ../starter/source/loads/general/load_pressure/hm_preread_load_pressure.F
-      !||    hm_preread_merge                    ../starter/source/constraints/general/merge/hm_preread_merge.F
-      !||    hm_preread_part                     ../starter/source/model/assembling/hm_read_part.F
-      !||    hm_preread_pblast                   ../starter/source/loads/pblast/hm_preread_pblast.F
-      !||    hm_preread_pfluid                   ../starter/source/loads/general/pfluid/hm_preread_pfluid.F
-      !||    hm_preread_pload                    ../starter/source/loads/general/pload/hm_preread_pload.F
-      !||    hm_preread_radiation                ../starter/source/loads/thermic/hm_preread_radiation.F
-      !||    hm_preread_rbe2                     ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
-      !||    hm_preread_rbe3                     ../starter/source/constraints/general/rbe3/hm_preread_rbe3.F
-      !||    hm_preread_rbody                    ../starter/source/constraints/general/rbody/hm_preread_rbody.F
-      !||    hm_preread_sphio                    ../starter/source/loads/sph/hm_preread_sphio.F
-      !||    hm_preread_xelem                    ../starter/source/elements/reader/hm_preread_xelem.F
-      !||    hm_read_activ                       ../starter/source/tools/activ/hm_read_activ.F
-      !||    hm_read_admas                       ../starter/source/tools/admas/hm_read_admas.F
-      !||    hm_read_ale_link                    ../starter/source/constraints/ale/hm_read_ale_link_vel.F
-      !||    hm_read_alebcs                      ../starter/source/constraints/ale/hm_read_alebcs.F
-      !||    hm_read_bcs                         ../starter/source/constraints/general/bcs/hm_read_bcs.F
-      !||    hm_read_bcs_wall                    ../starter/source/boundary_conditions/hm_read_bcs_wall.F90
-      !||    hm_read_beam                        ../starter/source/elements/reader/hm_read_beam.F
-      !||    hm_read_bem                         ../starter/source/loads/bem/hm_read_bem.F
-      !||    hm_read_box                         ../starter/source/model/box/hm_read_box.F
-      !||    hm_read_cload                       ../starter/source/loads/general/cload/hm_read_cload.F
-      !||    hm_read_cluster                     ../starter/source/output/cluster/hm_read_cluster.F
-      !||    hm_read_convec                      ../starter/source/loads/thermic/hm_read_convec.F
-      !||    hm_read_cyljoint                    ../starter/source/constraints/general/cyl_joint/hm_read_cyljoint.F
-      !||    hm_read_damp                        ../starter/source/general_controls/damping/hm_read_damp.F
-      !||    hm_read_drape                       ../starter/source/properties/composite_options/drape/hm_read_drape.F
-      !||    hm_read_eig                         ../starter/source/general_controls/computation/hm_read_eig.F
-      !||    hm_read_eref                        ../starter/source/loads/reference_state/eref/hm_read_eref.F
-      !||    hm_read_friction_models             ../starter/source/interfaces/friction/reader/hm_read_friction_models.F
-      !||    hm_read_friction_orientations       ../starter/source/interfaces/friction/reader/hm_read_friction_orientations.F
-      !||    hm_read_frm                         ../starter/source/tools/skew/hm_read_frm.F
-      !||    hm_read_func2d                      ../starter/source/tools/curve/hm_read_func2d.F
-      !||    hm_read_funct                       ../starter/source/tools/curve/hm_read_funct.F
-      !||    hm_read_funct_python                ../starter/source/tools/curve/hm_read_funct_python.F90
-      !||    hm_read_fxb1                        ../starter/source/constraints/fxbody/hm_read_fxb.F
-      !||    hm_read_fxb2                        ../starter/source/constraints/fxbody/hm_read_fxb.F
-      !||    hm_read_gauge                       ../starter/source/output/gauge/hm_read_gauge.F
-      !||    hm_read_gjoint                      ../starter/source/constraints/general/gjoint/hm_read_gjoint.F
-      !||    hm_read_grav                        ../starter/source/loads/general/grav/hm_read_grav.F
-      !||    hm_read_grpart                      ../starter/source/groups/hm_read_grpart.F
-      !||    hm_read_impacc                      ../starter/source/constraints/general/impvel/hm_read_impacc.F
-      !||    hm_read_impflux                     ../starter/source/constraints/thermic/hm_read_impflux.F
-      !||    hm_read_imptemp                     ../starter/source/constraints/thermic/hm_read_imptemp.F
-      !||    hm_read_impvel                      ../starter/source/constraints/general/impvel/hm_read_impvel.F
-      !||    hm_read_inicrack                    ../starter/source/initial_conditions/inicrack/hm_read_inicrack.F
-      !||    hm_read_inigrav                     ../starter/source/initial_conditions/inigrav/hm_read_inigrav.F
-      !||    hm_read_inimap1d                    ../starter/source/initial_conditions/inimap/hm_read_inimap1d.F
-      !||    hm_read_inimap2d                    ../starter/source/initial_conditions/inimap/hm_read_inimap2d.F
-      !||    hm_read_initemp                     ../starter/source/initial_conditions/thermic/hm_read_initemp.F
-      !||    hm_read_inivel                      ../starter/source/initial_conditions/general/inivel/hm_read_inivel.F
-      !||    hm_read_inivol                      ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
-      !||    hm_read_interfaces                  ../starter/source/interfaces/reader/hm_read_interfaces.F
-      !||    hm_read_intsub                      ../starter/source/output/subinterface/hm_read_intsub.F
-      !||    hm_read_lines                       ../starter/source/groups/hm_read_lines.F
-      !||    hm_read_link                        ../starter/source/constraints/rigidlink/hm_read_rlink.F
-      !||    hm_read_load_centri                 ../starter/source/loads/general/load_centri/hm_read_load_centri.F
-      !||    hm_read_load_pressure               ../starter/source/loads/general/load_pressure/hm_read_load_pressure.F
-      !||    hm_read_merge                       ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||    hm_read_merge_node                  ../starter/source/elements/reader/hm_read_merge_node.F
-      !||    hm_read_move_funct                  ../starter/source/tools/curve/hm_read_move_funct.F
-      !||    hm_read_mpc                         ../starter/source/constraints/general/mpc/hm_read_mpc.F
-      !||    hm_read_mpc0                        ../starter/source/constraints/general/mpc/hm_read_mpc.F
-      !||    hm_read_nbcs                        ../starter/source/constraints/general/bcs/hm_read_nbcs.F
-      !||    hm_read_node                        ../starter/source/elements/reader/hm_read_node.F
-      !||    hm_read_part                        ../starter/source/model/assembling/hm_read_part.F
-      !||    hm_read_pblast                      ../starter/source/loads/pblast/hm_read_pblast.F
-      !||    hm_read_pcyl                        ../starter/source/loads/general/load_pcyl/hm_read_pcyl.F
-      !||    hm_read_perturb                     ../starter/source/general_controls/computation/hm_read_perturb.F
-      !||    hm_read_pfluid                      ../starter/source/loads/general/pfluid/hm_read_pfluid.F
-      !||    hm_read_pload                       ../starter/source/loads/general/pload/hm_read_pload.F
-      !||    hm_read_prelecdrape                 ../starter/source/properties/composite_options/drape/hm_read_drape.F
-      !||    hm_read_preload                     ../starter/source/loads/general/preload/hm_read_preload.F
-      !||    hm_read_preload_axial               ../starter/source/loads/general/preload/hm_read_preload_axial.F90
-      !||    hm_read_prethgrou                   ../starter/source/output/th/hm_read_prethgrou.F
-      !||    hm_read_properties                  ../starter/source/properties/hm_read_properties.F
-      !||    hm_read_quad                        ../starter/source/elements/reader/hm_read_quad.F
-      !||    hm_read_radiation                   ../starter/source/loads/thermic/hm_read_radiation.F
-      !||    hm_read_rand                        ../starter/source/general_controls/computation/hm_read_rand.F
-      !||    hm_read_rbe2                        ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
-      !||    hm_read_rbe3                        ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||    hm_read_rbody                       ../starter/source/constraints/general/rbody/hm_read_rbody.F
-      !||    hm_read_rbody_lagmul                ../starter/source/constraints/general/rbody/hm_read_rbody_lagmul.F
-      !||    hm_read_retractor                   ../starter/source/tools/seatbelts/hm_read_retractor.F
-      !||    hm_read_rivet                       ../starter/source/elements/reader/hm_read_rivet.F
-      !||    hm_read_sensors                     ../starter/source/tools/sensor/hm_read_sensors.F
-      !||    hm_read_sh3n                        ../starter/source/elements/reader/hm_read_sh3n.F
-      !||    hm_read_shell                       ../starter/source/elements/reader/hm_read_shell.F
-      !||    hm_read_skw                         ../starter/source/tools/skew/hm_read_skw.F
-      !||    hm_read_slipring                    ../starter/source/tools/seatbelts/hm_read_slipring.F
-      !||    hm_read_solid                       ../starter/source/elements/reader/hm_read_solid.F
-      !||    hm_read_spcnd                       ../starter/source/constraints/sph/hm_read_spcnd.F
-      !||    hm_read_sphcel                      ../starter/source/elements/reader/hm_read_sphcel.F
-      !||    hm_read_sphio                       ../starter/source/loads/sph/hm_read_sphio.F
-      !||    hm_read_spring                      ../starter/source/elements/reader/hm_read_spring.F
-      !||    hm_read_subset                      ../starter/source/model/assembling/hm_read_subset.F
-      !||    hm_read_surf                        ../starter/source/groups/hm_read_surf.F
-      !||    hm_read_surfsurf                    ../starter/source/groups/hm_read_surfsurf.F
-      !||    hm_read_table1                      ../starter/source/tools/curve/hm_read_table.F
-      !||    hm_read_table2                      ../starter/source/tools/curve/hm_read_table.F
-      !||    hm_read_thgrou                      ../starter/source/output/th/hm_read_thgrou.F
-      !||    hm_read_thpart                      ../starter/source/output/thpart/hm_read_thpart.F
-      !||    hm_read_tria                        ../starter/source/elements/reader/hm_read_tria.F
-      !||    hm_read_truss                       ../starter/source/elements/reader/hm_read_truss.F
-      !||    hm_read_window_user                 ../starter/source/tools/userwi/hm_read_window_user.F
-      !||    hm_read_xelem                       ../starter/source/elements/reader/hm_read_xelem.F
-      !||    hm_read_xref                        ../starter/source/loads/reference_state/xref/hm_read_xref.F
-      !||    hm_set                              ../starter/source/model/sets/hm_set.F
-      !||    hm_setfxrbyon                       ../starter/source/constraints/fxbody/hm_setfxrbyon.F
-      !||    hm_yctrl                            ../starter/source/elements/initia/hm_yctrl.F
-      !||    i24setnodes                         ../starter/source/interfaces/inter3d1/i24setnodes.F
-      !||    iedge_xfem                          ../starter/source/elements/xfem/iedge_xfem.F
-      !||    ifrontplus                          ../starter/source/spmd/node/frontplus.F
-      !||    ig3dgrhead                          ../starter/source/elements/ige3d/ig3dgrhead.F
-      !||    ig3dgrtails                         ../starter/source/elements/ige3d/ig3dgrtails.F
-      !||    igrsurf_split                       ../starter/source/spmd/igrsurf_split.F
-      !||    ind_s10edg                          ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    ini_bcscyc                          ../starter/source/constraints/general/bcs/lecbcscyc.F
-      !||    ini_h3dtmax_engine                  ../starter/source/starter/contrl.F
-      !||    ini_ifront                          ../starter/source/spmd/node/ddtools.F
-      !||    inicrkfill                          ../starter/source/elements/xfem/inicrkfill.F
-      !||    iniebcs                             ../starter/source/boundary_conditions/ebcs/iniebcs.F
-      !||    iniebcs_propergol                   ../starter/source/boundary_conditions/ebcs/iniebcs_propergol.F90
-      !||    iniebcsp0                           ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
-      !||    inimu2                              ../starter/source/ale/bimat/inimu2.F
-      !||    inimu3                              ../starter/source/ale/bimat/inimu3.F
-      !||    inimul                              ../starter/source/ale/bimat/inimul.F
-      !||    inintr                              ../starter/source/interfaces/interf1/inintr.F
-      !||    inintr1                             ../starter/source/interfaces/interf1/inintr1.F
-      !||    inintr2                             ../starter/source/interfaces/inter3d1/inintr2.F
-      !||    inintr_orthdirfric                  ../starter/source/interfaces/interf1/inintr_orthdirfric.F
-      !||    inintr_thkvar                       ../starter/source/interfaces/interf1/inintr_thkvar.F
-      !||    inintsub                            ../starter/source/interfaces/interf1/inintsub.F
-      !||    inirbe3                             ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
-      !||    inisen                              ../starter/source/tools/sensor/inisen.F
-      !||    inisms                              ../starter/source/general_controls/computation/hm_read_sms.F
-      !||    init_joint                          ../starter/source/constraints/general/cyl_joint/init_joint.F
-      !||    init_mat_weight                     ../starter/source/user_interface/set_dd_mat_weight.F
-      !||    init_mlaw_tag                       ../starter/source/elements/elbuf_init/init_mlaw_tag.F
-      !||    init_monvol                         ../starter/source/airbag/init_monvol.F
-      !||    init_permutation                    ../starter/source/starter/lectur.F
-      !||    init_random                         ../starter/source/general_controls/computation/init_random.F
-      !||    initia                              ../starter/source/elements/initia/initia.F
-      !||    inivchk                             ../starter/source/constraints/general/kinchk.F
-      !||    inivel                              ../starter/source/initial_conditions/general/inivel/inivel.F
-      !||    int18_law151_alloc                  ../starter/source/interfaces/int18/int18_law151_alloc.F
-      !||    int18_law151_init                   ../starter/source/interfaces/int18/int18_law151_init.F
-      !||    int8_ini                            ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
-      !||    intbuf_fric_copy                    ../starter/source/interfaces/interf1/intbuf_fric_copy.F
-      !||    intbuf_fric_ini_starter             ../starter/source/interfaces/intbuf/intbufFric_ini_starter.F
-      !||    intbuf_ini_starter                  ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
-      !||    inter_offset_itag                   ../starter/source/elements/shell/shell_offset/inter_offset_itag.F90
-      !||    intstamp_zero                       ../starter/share/modules1/intstamp_mod.F
-      !||    inverted_group_dealloc              ../starter/source/model/sets/inverted_group_dealloc.F
-      !||    inverted_group_init                 ../starter/source/model/sets/inverted_group_init.F
-      !||    islin_ini                           ../starter/source/model/group/islin_ini.F
-      !||    isurf_ini                           ../starter/source/model/group/isurf_ini.F
-      !||    kinchk                              ../starter/source/constraints/general/kinchk.F
-      !||    kinini                              ../starter/source/constraints/general/kinini.F
-      !||    kinrem                              ../starter/source/constraints/general/kinchk.F
-      !||    lagm_ini                            ../starter/source/tools/lagmul/lagm_ini.F
-      !||    lagm_nhf                            ../starter/source/tools/lagmul/lagm_nhf.F
-      !||    laserp1                             ../starter/source/loads/laser/laserp.F
-      !||    laserp3                             ../starter/source/loads/laser/laserp.F
-      !||    lce16q3                             ../starter/source/elements/solid_2d/quad/lce16q.F
-      !||    lce16s3                             ../starter/source/elements/reader/hm_read_solid.F
-      !||    lce16s4                             ../starter/source/elements/reader/hm_read_solid.F
-      !||    lec_ddw                             ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    lec_ddw_poin                        ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    lec_inistate                        ../starter/source/elements/initia/lec_inistate.F
-      !||    lecacc                              ../starter/source/tools/accele/lecacc.F
-      !||    lecextlnk                           ../starter/source/coupling/rad2rad/lecextlnk.F
-      !||    lecfill                             ../starter/source/elements/initia/lecfill.F
-      !||    lecggroup                           ../starter/source/groups/lecggroup.F
-      !||    lecgroup                            ../starter/source/groups/lecgroup.F
-      !||    lecig3d                             ../starter/source/elements/ige3d/lecig3d.F
-      !||    lecins                              ../starter/source/interfaces/interf1/lecins.F
-      !||    lecint                              ../starter/source/interfaces/interf1/lecint.F
-      !||    leclas                              ../starter/source/loads/laser/leclas.F
-      !||    lecrefsta                           ../starter/source/loads/reference_state/refsta/lecrefsta.F
-      !||    lecsec0                             ../starter/source/tools/sect/hm_read_sect.F
-      !||    lecsec42                            ../starter/source/tools/sect/hm_read_sect.F
-      !||    lecsec4bolt                         ../starter/source/tools/sect/lecsec4bolt.F
-      !||    lecstack_ply                        ../starter/source/properties/composite_options/stack/lecstack_ply.F
-      !||    lecstamp                            ../starter/source/interfaces/interf1/lecstamp.F
-      !||    lecsubmod                           ../starter/source/model/submodel/lecsubmod.F
-      !||    lectrans                            ../starter/source/model/transformation/lectrans.F
-      !||    lectranssub                         ../starter/source/model/submodel/lectranssub.F
-      !||    lgmini_i7                           ../starter/source/tools/lagmul/lgmini_i7.F
-      !||    lgmini_rwl                          ../starter/source/tools/lagmul/lgmini_rwl.F
-      !||    line_decomp                         ../starter/source/model/group/line_decomp.F
-      !||    m20dcod                             ../starter/source/system/fsdcod.F
-      !||    merge                               ../starter/source/model/submodel/merge.F
-      !||    merge_node                          ../starter/source/elements/nodes/merge_node.F
-      !||    monvol_allocate                     ../starter/share/modules1/monvol_struct_mod.F
-      !||    monvol_deallocate                   ../starter/share/modules1/monvol_struct_mod.F
-      !||    multi_connectivity                  ../starter/source/multifluid/multi_connectivity.F
-      !||    multi_unplug_neighbors              ../starter/source/multifluid/multi_unplug_neighbors.F
-      !||    nbfunct                             ../starter/source/tools/curve/nbfunc.F
-      !||    nlocal                              ../starter/source/spmd/node/ddtools.F
-      !||    nodm11                              ../starter/source/materials/mat/mat011/nodm11.F
-      !||    outri                               ../starter/source/materials/time_step/outri.F
-      !||    outrin                              ../starter/source/materials/time_step/outri.F
-      !||    paroi                               ../starter/source/materials/mat/mat006/paroi.F
-      !||    pgrhead                             ../starter/source/elements/beam/pgrhead.F
-      !||    pgrtails                            ../starter/source/elements/beam/pgrtails.F
-      !||    pornod                              ../starter/source/ale/pornod.F
-      !||    pre_cndpon                          ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    pre_stackgroup                      ../starter/source/stack/pres_stackgroup.F
-      !||    precrkxfem                          ../starter/source/elements/xfem/precrkxfem.F
-      !||    prelec_ddw                          ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    prelec_ddw_poin                     ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    prelecig3d                          ../starter/source/elements/ige3d/prelecig3d.F
-      !||    prelecsec                           ../starter/source/tools/sect/prelecsec.F
-      !||    prelecsec4bolt                      ../starter/source/tools/sect/prelecsec4bolt.F
-      !||    prepare_int25                       ../starter/source/model/mesh/build_cnel.F
-      !||    prepare_split_i25e2e                ../starter/source/spmd/prepare_split_i25e2e.F
-      !||    preplyxfem                          ../starter/source/properties/composite_options/stack/preplyxfem.F
-      !||    prerafig3d                          ../starter/source/elements/ige3d/prerafig3d.F
-      !||    preread_rbody_lagmul                ../starter/source/constraints/general/rbody/preread_rbody_lagmul.F
-      !||    preread_rbody_set                   ../starter/source/model/sets/preread_rbody_set.F
-      !||    prescrint                           ../starter/source/interfaces/interf1/prescrint.F
-      !||    presearchigeo3d                     ../starter/source/elements/ige3d/searchigeo3d.F
-      !||    pretag_xfem                         ../starter/source/elements/xfem/pretag_xfem.F
-      !||    printbcs                            ../starter/source/constraints/general/bcs/printbcs.F
-      !||    printgroup                          ../starter/source/output/outfile/printgroup.F
-      !||    printstsz                           ../starter/source/spmd/node/st_array_size.F
-      !||    python_duplicate_nodes              ../starter/source/spmd/domain_decomposition/python_duplicate_nodes.F90
-      !||    qgrhead                             ../starter/source/elements/solid_2d/quad/qgrhead.F
-      !||    qgrtails                            ../starter/source/elements/solid_2d/quad/qgrtails.F
-      !||    r2r_check                           ../starter/source/coupling/rad2rad/r2r_check.F
-      !||    r2r_clean_inter                     ../starter/source/coupling/rad2rad/r2r_clean_inter.F
-      !||    r2r_domdec                          ../starter/source/coupling/rad2rad/r2r_domdec.F
-      !||    r2r_group                           ../starter/source/coupling/rad2rad/r2r_group.F
-      !||    r2r_matparam_copy                   ../starter/source/elements/elbuf_init/r2r_matparam_copy.F
-      !||    r2r_nom_opt                         ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    r2r_speedup                         ../starter/source/coupling/rad2rad/r2r_speedup.F
-      !||    r2r_split                           ../starter/source/coupling/rad2rad/r2r_split.F
-      !||    r2r_void                            ../starter/source/coupling/rad2rad/r2r_void.F
-      !||    rbe2modif1_nd                       ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    read_detonators                     ../starter/source/initial_conditions/detonation/read_detonators.F
-      !||    read_ebcs                           ../starter/source/boundary_conditions/ebcs/read_ebcs.F
-      !||    read_engine_driver                  ../starter/source/general_controls/engine/read_engine_driver.F
-      !||    read_material_models                ../starter/source/materials/read_material_models.F
-      !||    read_monvol                         ../starter/source/airbag/read_monvol.F
-      !||    read_rwall                          ../starter/source/constraints/general/rwall/read_rwall.F
-      !||    reconnect                           ../starter/source/elements/nodes/reconnect.F
-      !||    reini_matprop                       ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    reini_matprop2                      ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    reord_icnd                          ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    rgrhead                             ../starter/source/elements/spring/rgrhead.F
-      !||    rgrtails                            ../starter/source/elements/spring/rgrtails.F
-      !||    rigid_mat                           ../starter/source/materials/mat/mat019/rigid_mat.F
-      !||    rigmodif1_nd                        ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    s10edg_rlink                        ../starter/source/elements/solid/solide10/s10edg_rlink.F
-      !||    scrint                              ../starter/source/interfaces/interf1/scrint.F
-      !||    searchigeo3d                        ../starter/source/elements/ige3d/searchigeo3d.F
-      !||    sensor_user_convert_local_id        ../starter/source/tools/sensor/sensor_user_convert_local_id.F
-      !||    sensor_user_init                    ../starter/source/tools/sensor/sensor_user_init.F
-      !||    set_admesh                          ../starter/source/model/remesh/set_admesh.F
-      !||    set_elgroup_param                   ../starter/source/elements/shell/coque/set_elgroup_param.F
-      !||    set_front8                          ../starter/source/spmd/node/ddtools.F
-      !||    set_ibufssg_io                      ../starter/source/starter/lectur.F
-      !||    set_intercep                        ../starter/source/spmd/node/ddtools.F
-      !||    set_poin_ump                        ../starter/source/system/set_poin_ump.F
-      !||    set_usrtos                          ../starter/source/model/sets/ipartm1.F
-      !||    seteloff                            ../starter/source/constraints/general/rbody/hm_read_rbody.F
-      !||    seteloff2                           ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
-      !||    setlenwa                            ../starter/source/restart/ddsplit/setlenwa.F
-      !||    setmulti                            ../starter/source/restart/ddsplit/setlenwa.F
-      !||    setrb2on                            ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
-      !||    setrbyon                            ../starter/source/constraints/general/rbody/hm_read_rbody.F
-      !||    sgrhead                             ../starter/source/elements/solid/solide/sgrhead.F
-      !||    sgrtails                            ../starter/source/elements/solid/solide/sgrtails.F
-      !||    shell_offset_ini                    ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
-      !||    shell_offsetp                       ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
-      !||    shellthk_upd                        ../starter/source/properties/composite_options/drape/shellthk_upd.F
-      !||    sms_ini_jad_1                       ../starter/source/ams/sms_init.F
-      !||    sms_ini_jad_2                       ../starter/source/ams/sms_init.F
-      !||    sms_ini_jad_3                       ../starter/source/ams/sms_init.F
-      !||    sms_ini_kad                         ../starter/source/ams/sms_init.F
-      !||    sms_ini_kdi                         ../starter/source/ams/sms_init.F
-      !||    sms_init                            ../starter/source/ams/sms_init.F
-      !||    sort_surf                           ../starter/source/groups/sort_surf.F
-      !||    sortgroup                           ../starter/source/system/nintrr.F
-      !||    spdometis                           ../starter/source/spmd/domain_decomposition/grid2mat.F
-      !||    spgrhead                            ../starter/source/elements/sph/spgrhead.F
-      !||    spgrtails                           ../starter/source/elements/sph/spgrtails.F
-      !||    sphdcod                             ../starter/source/elements/sph/sphdcod.F
-      !||    sphonf0                             ../starter/source/elements/sph/sphonf0.F
-      !||    spinih                              ../starter/source/elements/sph/spinih.F
-      !||    split_bcs_wall                      ../starter/source/restart/ddsplit/split_bcs_wall.F90
-      !||    split_cfd_solide                    ../starter/source/spmd/split_cfd_solide.F
-      !||    split_pcyl                          ../starter/source/loads/general/load_pcyl/split_pcyl.F
-      !||    split_rwall                         ../starter/source/constraints/general/rwall/split_rwall.F90
-      !||    spmd_anim_ply_init                  ../starter/source/spmd/spmd_anim_ply_init.F
-      !||    sptri                               ../starter/source/elements/sph/sptri.F
-      !||    st_qaprint_driver                   ../starter/source/output/qaprint/st_qaprint_driver.F
-      !||    stackgroup                          ../starter/source/stack/stackgroup.F
-      !||    stackgroup_drape                    ../starter/source/stack/stackgroup_drape.F
-      !||    startime                            ../starter/source/system/timer.F
-      !||    state_admesh                        ../starter/source/model/remesh/state_admesh.F
-      !||    stifint_icontrol                    ../starter/source/interfaces/interf1/stifint_icontrol.F90
-      !||    stifn0_nd                           ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    stifn1_nd                           ../starter/source/elements/solid/solide10/dim_s10edg.F
-      !||    stoptime                            ../starter/source/system/timer.F
-      !||    subset_ini                          ../starter/source/model/group/subset_ini.F
-      !||    surfext_tagn                        ../starter/source/groups/ssurftag.F
-      !||    t3grhead                            ../starter/source/elements/solid_2d/tria/t3grhead.F
-      !||    t3grtails                           ../starter/source/elements/solid_2d/tria/t3grtails.F
-      !||    table_zero                          ../starter/source/tools/curve/table_tools.F
-      !||    tet4_10                             ../starter/source/starter/lectur.F
-      !||    tgrhead                             ../starter/source/elements/truss/tgrhead.F
-      !||    tgrtails                            ../starter/source/elements/truss/tgrtails.F
-      !||    th_surf_load_pressure               ../starter/source/output/th/th_surf_load_pressure.F
-      !||    thpinit                             ../starter/source/output/th/thpinit.F
-      !||    thskewc                             ../starter/source/output/th/thskewc.F
-      !||    titre2                              ../starter/source/output/outfile/titre2.F
-      !||    titre3                              ../starter/source/output/outfile/titre3.F
-      !||    trace_in1                           ../starter/source/system/trace_back.F
-      !||    trace_out1                          ../starter/source/system/trace_back.F
-      !||    triintfric                          ../starter/source/interfaces/interf1/trintfric.F
-      !||    update_weight_rbe3                  ../starter/source/spmd/domain_decomposition/update_weight_rbe3.F
-      !||    updfail                             ../starter/source/materials/updfail.F90
-      !||    updmat                              ../starter/source/materials/updmat.F
-      !||    upgrade_ixint                       ../starter/source/interfaces/interf1/upgrade_ixint.F
-      !||    xfem_crack_init                     ../starter/source/elements/xfem/xfem_crack_init.F
-      !||    xgrhead                             ../starter/source/elements/xelem/xgrhead.F
-      !||    xgrtails                            ../starter/source/elements/xelem/xgrtails.F
-      !||    yctrl                               ../starter/source/initial_conditions/inista/yctrl.F
-      !||--- uses       -----------------------------------------------------
-      !||    bpreload_mod                        ../starter/share/modules1/bpreload_mod.F
-      !||    brokmann_elem_renum_mod             ../starter/source/materials/fail/windshield_alter/brokmann_elem_spmd_renum.F90
-      !||    chk_shell_offset_mod                ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
-      !||    cluster_mod                         ../starter/share/modules1/cluster_mod.F
-      !||    constraint_mod                      ../starter/source/modules/constaint_mod.F90
-      !||    damping_rby_spmdset_mod             ../starter/source/general_controls/damping/damping_rby_spmdset.F90
-      !||    ddweights_mod                       ../starter/share/modules1/ddweights_mod.F
-      !||    defaults_mod                        ../starter/source/modules/defaults_mod.F90
-      !||    detonators_mod                      ../starter/share/modules1/detonators_mod.F
-      !||    drape_mod                           ../starter/share/modules1/drape_mod.F
-      !||    dsgraph_mod                         ../starter/share/modules1/dsgraph_mod.F
-      !||    elbuftag_mod                        ../starter/share/modules1/elbuftag_mod.F
-      !||    fractal_elem_renum_mod              ../starter/source/materials/fail/fractal/fractal_elem_spmd_renum.F90
-      !||    front_mod                           ../starter/share/modules1/front_mod.F
-      !||    func2d_mod                          ../starter/share/modules1/func2d_mod.F
-      !||    fvbag_mod                           ../starter/share/modules1/fvbag_mod.F
-      !||    group_mod                           ../starter/share/modules1/group_mod.F
-      !||    hm_option_read_mod                  ../starter/share/modules1/hm_option_read_mod.F
-      !||    hm_preread_inivel_mod               ../starter/source/initial_conditions/general/inivel/hm_preread_inivel.F90
-      !||    hm_read_inivol_mod                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
-      !||    hm_read_preload_axial_mod           ../starter/source/loads/general/preload/hm_read_preload_axial.F90
-      !||    iniebcs_propergol_                  ../starter/source/boundary_conditions/ebcs/iniebcs_propergol.F90
-      !||    inigrav                             ../starter/share/modules1/inigrav_mod.F
-      !||    inimap1d_mod                        ../starter/share/modules1/inimap1d_mod.F
-      !||    inimap2d_mod                        ../starter/share/modules1/inimap2d_mod.F
-      !||    inivol_def_mod                      ../starter/share/modules1/inivol_mod.F
-      !||    intbufmod                           ../starter/share/modules1/restart_mod.F
-      !||    intbufscratch_mod                   ../starter/source/interfaces/interf1/intbufscratch_mod.F
-      !||    inter_cand_mod                      ../starter/share/modules1/inter_cand_mod.F
-      !||    inter_offset_itag_mod               ../starter/source/elements/shell/shell_offset/inter_offset_itag.F90
-      !||    intstamp_glob_mod                   ../starter/share/modules1/intstamp_glob_mod.F
-      !||    inverted_group_mod                  ../starter/share/modules1/inverted_group_mod.F
-      !||    joint_mod                           ../starter/share/modules1/joint_mod.F
-      !||    mapping_option_mod                  ../starter/share/modules1/dichotomy_mod.F
-      !||    meshsurfig3d_mod                    ../starter/source/elements/ige3d/meshsurfig3d_mod.F
-      !||    message_mod                         ../starter/share/message_module/message_mod.F
-      !||    mid_pid_mod                         ../starter/share/modules1/mid_pid_mod.F
-      !||    monvol_struct_mod                   ../starter/share/modules1/monvol_struct_mod.F
-      !||    nod2el_mod                          ../starter/share/modules1/nod2el_mod.F
-      !||    option_mod                          ../starter/share/modules1/options_mod.F
-      !||    r2r_mod                             ../starter/share/modules1/r2r_mod.F
-      !||    random_mod                          ../starter/share/modules1/random_mod.F
-      !||    read_funct_python_mod               ../starter/source/tools/curve/hm_read_funct_python.F90
-      !||    reorder_mod                         ../starter/share/modules1/reorder_mod.F
-      !||    restmod                             ../starter/share/modules1/restart_mod.F
-      !||    set_mod                             ../starter/share/modules1/set_mod.F
-      !||    shell_offset_ini_mod                ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
-      !||    shell_offsetp_mod                   ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
-      !||    sms_mod                             ../starter/share/modules1/sms_mod.F
-      !||    sph_mod                             ../starter/share/modules1/sph_mod.F
-      !||    split_cfd_mod                       ../starter/share/modules1/split_cfd_mod.F
-      !||    split_rwall_mod                     ../starter/source/constraints/general/rwall/split_rwall.F90
-      !||    stack_mod                           ../starter/share/modules1/stack_mod.F
-      !||    stack_var_mod                       ../starter/share/modules1/stack_var_mod.F
-      !||    stifint_icontrol_mod                ../starter/source/interfaces/interf1/stifint_icontrol.F90
-      !||    submodel_mod                        ../starter/share/modules1/submodel_mod.F
-      !||    table_glob_mod                      ../starter/share/modules1/table_glob_mod.F
-      !||    updfail_mod                         ../starter/source/materials/updfail.F90
-      !||    user_sensor_mod                     ../starter/source/modules/user_interface_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    lectur                              ../starter/source/starter/lectur.F
+!||--- called by ------------------------------------------------------
+!||    starter0                            ../starter/source/starter/starter0.F
+!||--- calls      -----------------------------------------------------
+!||    add_mass_stat                       ../starter/source/tools/admas/add_mass_stat.F
+!||    addmast10                           ../starter/source/tools/admas/addmast10.F
+!||    admbcs                              ../starter/source/model/remesh/admbcs.F
+!||    alelec                              ../starter/source/ale/alelec.F
+!||    alloc_constraint_struct             ../starter/source/modules/constaint_mod.F90
+!||    allocxfem                           ../starter/source/elements/xfem/allocxfem.F
+!||    ancmsg                              ../starter/source/output/message/message.F
+!||    ani_fasolfr1                        ../starter/source/output/anim/ani_fasolfr.F
+!||    ani_fasolfr2                        ../starter/source/output/anim/ani_fasolfr.F
+!||    ani_segquadfr1                      ../starter/source/output/anim/ani_segquadfr.F
+!||    ani_segquadfr2                      ../starter/source/output/anim/ani_segquadfr.F
+!||    anodin                              ../starter/source/output/analyse/analyse_node.c
+!||    apartin                             ../starter/source/output/analyse/analyse_part.c
+!||    applysort2flux                      ../starter/source/restart/ddsplit/w_ithflux.F
+!||    applysort2fvm                       ../starter/source/airbag/fvmesh0.F
+!||    arret                               ../starter/source/system/arret.F
+!||    bcscycmodif_nd                      ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    bcsmodif_nd                         ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    brokmann_elem_renum                 ../starter/source/materials/fail/windshield_alter/brokmann_elem_spmd_renum.F90
+!||    build_addcnel_sub                   ../starter/source/model/mesh/build_addcnel_sub.F
+!||    build_admesh                        ../starter/source/model/remesh/build_admesh.F
+!||    build_cnel                          ../starter/source/model/mesh/build_cnel.F
+!||    build_cnel_sub                      ../starter/source/model/mesh/build_cnel_sub.F
+!||    build_csrect                        ../starter/source/model/mesh/build_cnel.F
+!||    bulkfakeigeo3                       ../starter/source/elements/ige3d/bulkfakeigeo3.F
+!||    c3grhead                            ../starter/source/elements/sh3n/coque3n/c3grhead.F
+!||    c3grtails                           ../starter/source/elements/sh3n/coque3n/c3grtails.F
+!||    cdk6inx                             ../starter/source/elements/sh3n/coquedk6/cdk6inx.F
+!||    cgrhead                             ../starter/source/elements/shell/coque/cgrhead.F
+!||    cgrtails                            ../starter/source/elements/shell/coque/cgrtails.F
+!||    check_dynain                        ../starter/source/starter/check_dynain.F
+!||    check_mat_elem_prop_compatibility   ../starter/source/materials/mat/check_mat_elem_prop_compatibility.F
+!||    check_pthickfail                    ../starter/source/materials/fail/check_pthickfail.F
+!||    check_qeph_stra                     ../starter/source/starter/check_qeph_stra.F
+!||    check_surf                          ../starter/source/groups/check_surf.F
+!||    checkrby                            ../starter/source/constraints/general/rbody/checkrby.F
+!||    chk_dttsh                           ../starter/source/elements/thickshell/solidec/scdtchk3.F
+!||    chk_shell_offset                    ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
+!||    chkfunct                            ../starter/source/tools/curve/lecfun.F
+!||    chktyp2                             ../starter/source/interfaces/interf1/chktyp2.F
+!||    compute_connect_partelm             ../starter/source/model/sets/compute_connect_partelm.F
+!||    copy_to_monvol                      ../starter/share/modules1/monvol_struct_mod.F
+!||    copy_to_volmon                      ../starter/share/modules1/monvol_struct_mod.F
+!||    create_map_tables                   ../starter/source/model/sets/map_tables.F
+!||    create_seatbelt                     ../starter/source/tools/seatbelts/create_seatbelt.F
+!||    dampdtnoda                          ../starter/source/general_controls/damping/dampdtnoda.F
+!||    damping_rby_spmdset                 ../starter/source/general_controls/damping/damping_rby_spmdset.F90
+!||    ddprint                             ../starter/source/spmd/domdec2.F
+!||    ddsplit                             ../starter/source/restart/ddsplit/ddsplit.F
+!||    dealloc_constraint_struct           ../starter/source/modules/constaint_mod.F90
+!||    deallocate_detonators               ../starter/share/modules1/detonators_mod.F
+!||    deallocate_elbuf                    ../starter/source/elements/elbuf_init/deallocate_buffer.F
+!||    deallocate_igrsurf_split            ../starter/source/spmd/deallocate_igrsurf_split.F
+!||    deallocate_joint                    ../starter/source/constraints/general/cyl_joint/deallocate_joint.F
+!||    deallocate_split_cfd_solide         ../starter/source/spmd/split_cfd_solide.F
+!||    desout                              ../starter/source/output/outp/desout.F
+!||    dim_s10edg                          ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    domdec1                             ../starter/source/spmd/domain_decomposition/domdec1.F
+!||    domdec2                             ../starter/source/spmd/domdec2.F
+!||    dometis                             ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    dsdim0                              ../starter/source/implicit/dsolve/dsdim.F
+!||    elbuf_ini                           ../starter/source/elements/elbuf_init/elbuf_ini.F
+!||    failwave_init                       ../starter/source/materials/fail/failwave_init.F
+!||    fictivmassigeo                      ../starter/source/groups/ssurftagigeo.F
+!||    fill_intercep                       ../starter/source/spmd/node/ddtools.F
+!||    fillcncnd                           ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    fillcne                             ../starter/source/spmd/domdec2.F
+!||    fillcne_pxfem                       ../starter/source/properties/composite_options/stack/preplyxfem.F
+!||    fillcne_xfem                        ../starter/source/elements/xfem/fillcne_xfem.F
+!||    fillcni2                            ../starter/source/spmd/domdec2.F
+!||    fixmodif_nd                         ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    flowdec                             ../starter/source/fluid/flowdec.F
+!||    fractal_elem_renum                  ../starter/source/materials/fail/fractal/fractal_elem_spmd_renum.F90
+!||    fsdcod                              ../starter/source/system/fsdcod.F
+!||    fvdim                               ../starter/source/airbag/fvmesh.F
+!||    fvmesh0                             ../starter/source/airbag/fvmesh0.F
+!||    fxbelnum                            ../starter/source/constraints/fxbody/fxbelnum.F
+!||    fxbgrav                             ../starter/source/constraints/fxbody/fxbgrav.F
+!||    fxbtagn                             ../starter/source/constraints/fxbody/fxbtagn.F
+!||    genani1                             ../starter/source/output/anim/genani1.F
+!||    get_element_group                   ../starter/source/elements/get_element_group.F90
+!||    get_size_inter24                    ../starter/source/spmd/get_size_tag.F
+!||    get_size_numnod_local               ../starter/source/spmd/get_size_tag.F
+!||    globmat                             ../starter/source/materials/globmat.F
+!||    globvars                            ../starter/source/spmd/globvars.F
+!||    group_ini                           ../starter/source/model/group/group_ini.F
+!||    hierarchy_rbody                     ../starter/source/constraints/general/rbody/hierarchy_rbody.F90
+!||    hierarchy_rbody_ddm                 ../starter/source/constraints/general/rbody/hierarchy_rbody.F90
+!||    hm_grogronod                        ../starter/source/groups/hm_grogronod.F
+!||    hm_lecgrn                           ../starter/source/groups/hm_lecgrn.F
+!||    hm_lines_of_lines                   ../starter/source/groups/hm_lines_of_lines.F
+!||    hm_option_count                     ../starter/source/devtools/hm_reader/hm_option_count.F
+!||    hm_pre_read_link                    ../starter/source/constraints/rigidlink/hm_pre_read_rlink.F
+!||    hm_pre_read_preload                 ../starter/source/loads/general/preload/hm_pre_read_preload.F
+!||    hm_pre_read_preload_axial           ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+!||    hm_prelecgrns                       ../starter/source/groups/hm_prelecgrns.F
+!||    hm_prelecjoi                        ../starter/source/constraints/general/cyl_joint/hm_prelecjoi.F
+!||    hm_preread_bcscyc                   ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||    hm_preread_bem                      ../starter/source/loads/bem/hm_read_bem.F
+!||    hm_preread_cload                    ../starter/source/loads/general/cload/hm_preread_cload.F
+!||    hm_preread_convec                   ../starter/source/loads/thermic/hm_preread_convec.F
+!||    hm_preread_eig                      ../starter/source/general_controls/computation/hm_read_eig.F
+!||    hm_preread_grav                     ../starter/source/loads/general/grav/hm_preread_grav.F
+!||    hm_preread_impacc                   ../starter/source/constraints/general/impvel/hm_preread_impacc.F
+!||    hm_preread_impdisp                  ../starter/source/constraints/general/impvel/hm_preread_impdisp.F
+!||    hm_preread_impflux                  ../starter/source/constraints/thermic/hm_preread_impflux.F
+!||    hm_preread_imptemp                  ../starter/source/constraints/thermic/hm_preread_imptemp.F
+!||    hm_preread_impvel                   ../starter/source/constraints/general/impvel/hm_preread_impvel.F
+!||    hm_preread_impvel0                  ../starter/source/constraints/general/impvel/hm_preread_impvel0.F
+!||    hm_preread_inivel                   ../starter/source/initial_conditions/general/inivel/hm_preread_inivel.F90
+!||    hm_preread_load_centri              ../starter/source/loads/general/load_centri/hm_preread_load_centri.F
+!||    hm_preread_load_pressure            ../starter/source/loads/general/load_pressure/hm_preread_load_pressure.F
+!||    hm_preread_merge                    ../starter/source/constraints/general/merge/hm_preread_merge.F
+!||    hm_preread_part                     ../starter/source/model/assembling/hm_read_part.F
+!||    hm_preread_pblast                   ../starter/source/loads/pblast/hm_preread_pblast.F
+!||    hm_preread_pfluid                   ../starter/source/loads/general/pfluid/hm_preread_pfluid.F
+!||    hm_preread_pload                    ../starter/source/loads/general/pload/hm_preread_pload.F
+!||    hm_preread_radiation                ../starter/source/loads/thermic/hm_preread_radiation.F
+!||    hm_preread_rbe2                     ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
+!||    hm_preread_rbe3                     ../starter/source/constraints/general/rbe3/hm_preread_rbe3.F
+!||    hm_preread_rbody                    ../starter/source/constraints/general/rbody/hm_preread_rbody.F
+!||    hm_preread_skw                      ../starter/source/tools/skew/hm_preread_skw.F90
+!||    hm_preread_sphio                    ../starter/source/loads/sph/hm_preread_sphio.F
+!||    hm_preread_xelem                    ../starter/source/elements/reader/hm_preread_xelem.F
+!||    hm_print_inter_guided_cable         ../starter/source/tools/seatbelts/hm_print_inter_guided_cable.F90
+!||    hm_read_activ                       ../starter/source/tools/activ/hm_read_activ.F
+!||    hm_read_admas                       ../starter/source/tools/admas/hm_read_admas.F
+!||    hm_read_ale_link                    ../starter/source/constraints/ale/hm_read_ale_link_vel.F
+!||    hm_read_alebcs                      ../starter/source/constraints/ale/hm_read_alebcs.F
+!||    hm_read_bcs                         ../starter/source/constraints/general/bcs/hm_read_bcs.F
+!||    hm_read_bcs_nrf                     ../starter/source/boundary_conditions/hm_read_bcs_nrf.F90
+!||    hm_read_bcs_wall                    ../starter/source/boundary_conditions/hm_read_bcs_wall.F90
+!||    hm_read_beam                        ../starter/source/elements/reader/hm_read_beam.F
+!||    hm_read_bem                         ../starter/source/loads/bem/hm_read_bem.F
+!||    hm_read_box                         ../starter/source/model/box/hm_read_box.F
+!||    hm_read_cload                       ../starter/source/loads/general/cload/hm_read_cload.F
+!||    hm_read_cluster                     ../starter/source/output/cluster/hm_read_cluster.F
+!||    hm_read_convec                      ../starter/source/loads/thermic/hm_read_convec.F
+!||    hm_read_cyljoint                    ../starter/source/constraints/general/cyl_joint/hm_read_cyljoint.F
+!||    hm_read_damp                        ../starter/source/general_controls/damping/hm_read_damp.F
+!||    hm_read_drape                       ../starter/source/properties/composite_options/drape/hm_read_drape.F
+!||    hm_read_eig                         ../starter/source/general_controls/computation/hm_read_eig.F
+!||    hm_read_eref                        ../starter/source/loads/reference_state/eref/hm_read_eref.F
+!||    hm_read_friction_models             ../starter/source/interfaces/friction/reader/hm_read_friction_models.F
+!||    hm_read_friction_orientations       ../starter/source/interfaces/friction/reader/hm_read_friction_orientations.F
+!||    hm_read_frm                         ../starter/source/tools/skew/hm_read_frm.F
+!||    hm_read_func2d                      ../starter/source/tools/curve/hm_read_func2d.F
+!||    hm_read_funct                       ../starter/source/tools/curve/hm_read_funct.F
+!||    hm_read_funct_python                ../starter/source/tools/curve/hm_read_funct_python.F90
+!||    hm_read_fxb1                        ../starter/source/constraints/fxbody/hm_read_fxb.F
+!||    hm_read_fxb2                        ../starter/source/constraints/fxbody/hm_read_fxb.F
+!||    hm_read_gauge                       ../starter/source/output/gauge/hm_read_gauge.F
+!||    hm_read_gjoint                      ../starter/source/constraints/general/gjoint/hm_read_gjoint.F
+!||    hm_read_grav                        ../starter/source/loads/general/grav/hm_read_grav.F
+!||    hm_read_grpart                      ../starter/source/groups/hm_read_grpart.F
+!||    hm_read_impacc                      ../starter/source/constraints/general/impvel/hm_read_impacc.F
+!||    hm_read_impflux                     ../starter/source/constraints/thermic/hm_read_impflux.F
+!||    hm_read_imptemp                     ../starter/source/constraints/thermic/hm_read_imptemp.F
+!||    hm_read_impvel                      ../starter/source/constraints/general/impvel/hm_read_impvel.F
+!||    hm_read_inicrack                    ../starter/source/initial_conditions/inicrack/hm_read_inicrack.F
+!||    hm_read_inigrav                     ../starter/source/initial_conditions/inigrav/hm_read_inigrav.F
+!||    hm_read_inimap1d                    ../starter/source/initial_conditions/inimap/hm_read_inimap1d.F
+!||    hm_read_inimap2d                    ../starter/source/initial_conditions/inimap/hm_read_inimap2d.F
+!||    hm_read_initemp                     ../starter/source/initial_conditions/thermic/hm_read_initemp.F
+!||    hm_read_inivel                      ../starter/source/initial_conditions/general/inivel/hm_read_inivel.F
+!||    hm_read_inivol                      ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
+!||    hm_read_inter_guided_cable          ../starter/source/tools/seatbelts/hm_read_guided_cable.F90
+!||    hm_read_interfaces                  ../starter/source/interfaces/reader/hm_read_interfaces.F
+!||    hm_read_intsub                      ../starter/source/output/subinterface/hm_read_intsub.F
+!||    hm_read_lines                       ../starter/source/groups/hm_read_lines.F
+!||    hm_read_link                        ../starter/source/constraints/rigidlink/hm_read_rlink.F
+!||    hm_read_load_centri                 ../starter/source/loads/general/load_centri/hm_read_load_centri.F
+!||    hm_read_load_pressure               ../starter/source/loads/general/load_pressure/hm_read_load_pressure.F
+!||    hm_read_merge                       ../starter/source/constraints/general/merge/hm_read_merge.F
+!||    hm_read_merge_node                  ../starter/source/elements/reader/hm_read_merge_node.F
+!||    hm_read_move_funct                  ../starter/source/tools/curve/hm_read_move_funct.F
+!||    hm_read_mpc                         ../starter/source/constraints/general/mpc/hm_read_mpc.F
+!||    hm_read_mpc0                        ../starter/source/constraints/general/mpc/hm_read_mpc.F
+!||    hm_read_nbcs                        ../starter/source/constraints/general/bcs/hm_read_nbcs.F
+!||    hm_read_node                        ../starter/source/elements/reader/hm_read_node.F
+!||    hm_read_part                        ../starter/source/model/assembling/hm_read_part.F
+!||    hm_read_pblast                      ../starter/source/loads/pblast/hm_read_pblast.F
+!||    hm_read_pcyl                        ../starter/source/loads/general/load_pcyl/hm_read_pcyl.F
+!||    hm_read_perturb                     ../starter/source/general_controls/computation/hm_read_perturb.F
+!||    hm_read_pfluid                      ../starter/source/loads/general/pfluid/hm_read_pfluid.F
+!||    hm_read_pload                       ../starter/source/loads/general/pload/hm_read_pload.F
+!||    hm_read_prelecdrape                 ../starter/source/properties/composite_options/drape/hm_read_drape.F
+!||    hm_read_preload                     ../starter/source/loads/general/preload/hm_read_preload.F
+!||    hm_read_preload_axial               ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+!||    hm_read_prethgrou                   ../starter/source/output/th/hm_read_prethgrou.F
+!||    hm_read_properties                  ../starter/source/properties/hm_read_properties.F
+!||    hm_read_quad                        ../starter/source/elements/reader/hm_read_quad.F
+!||    hm_read_radiation                   ../starter/source/loads/thermic/hm_read_radiation.F
+!||    hm_read_rand                        ../starter/source/general_controls/computation/hm_read_rand.F
+!||    hm_read_rbe2                        ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
+!||    hm_read_rbe3                        ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||    hm_read_rbody                       ../starter/source/constraints/general/rbody/hm_read_rbody.F
+!||    hm_read_rbody_lagmul                ../starter/source/constraints/general/rbody/hm_read_rbody_lagmul.F
+!||    hm_read_retractor                   ../starter/source/tools/seatbelts/hm_read_retractor.F
+!||    hm_read_rivet                       ../starter/source/elements/reader/hm_read_rivet.F
+!||    hm_read_sensors                     ../starter/source/tools/sensor/hm_read_sensors.F
+!||    hm_read_sh3n                        ../starter/source/elements/reader/hm_read_sh3n.F
+!||    hm_read_shell                       ../starter/source/elements/reader/hm_read_shell.F
+!||    hm_read_skw                         ../starter/source/tools/skew/hm_read_skw.F
+!||    hm_read_slipring                    ../starter/source/tools/seatbelts/hm_read_slipring.F
+!||    hm_read_solid                       ../starter/source/elements/reader/hm_read_solid.F
+!||    hm_read_spcnd                       ../starter/source/constraints/sph/hm_read_spcnd.F
+!||    hm_read_sphcel                      ../starter/source/elements/reader/hm_read_sphcel.F
+!||    hm_read_sphio                       ../starter/source/loads/sph/hm_read_sphio.F
+!||    hm_read_spring                      ../starter/source/elements/reader/hm_read_spring.F
+!||    hm_read_subset                      ../starter/source/model/assembling/hm_read_subset.F
+!||    hm_read_surf                        ../starter/source/groups/hm_read_surf.F
+!||    hm_read_surfsurf                    ../starter/source/groups/hm_read_surfsurf.F
+!||    hm_read_table1                      ../starter/source/tools/curve/hm_read_table.F
+!||    hm_read_table2                      ../starter/source/tools/curve/hm_read_table.F
+!||    hm_read_thgrou                      ../starter/source/output/th/hm_read_thgrou.F
+!||    hm_read_thpart                      ../starter/source/output/thpart/hm_read_thpart.F
+!||    hm_read_tria                        ../starter/source/elements/reader/hm_read_tria.F
+!||    hm_read_truss                       ../starter/source/elements/reader/hm_read_truss.F
+!||    hm_read_window_user                 ../starter/source/tools/userwi/hm_read_window_user.F
+!||    hm_read_xelem                       ../starter/source/elements/reader/hm_read_xelem.F
+!||    hm_read_xref                        ../starter/source/loads/reference_state/xref/hm_read_xref.F
+!||    hm_set                              ../starter/source/model/sets/hm_set.F
+!||    hm_setfxrbyon                       ../starter/source/constraints/fxbody/hm_setfxrbyon.F
+!||    hm_yctrl                            ../starter/source/elements/initia/hm_yctrl.F
+!||    i24setnodes                         ../starter/source/interfaces/inter3d1/i24setnodes.F
+!||    iedge_xfem                          ../starter/source/elements/xfem/iedge_xfem.F
+!||    ifrontplus                          ../starter/source/spmd/node/frontplus.F
+!||    ig3dgrhead                          ../starter/source/elements/ige3d/ig3dgrhead.F
+!||    ig3dgrtails                         ../starter/source/elements/ige3d/ig3dgrtails.F
+!||    igrsurf_split                       ../starter/source/spmd/igrsurf_split.F
+!||    ind_s10edg                          ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    ini_bcscyc                          ../starter/source/constraints/general/bcs/lecbcscyc.F
+!||    ini_h3dtmax_engine                  ../starter/source/starter/contrl.F
+!||    ini_ifront                          ../starter/source/spmd/node/ddtools.F
+!||    inicrkfill                          ../starter/source/elements/xfem/inicrkfill.F
+!||    iniebcs                             ../starter/source/boundary_conditions/ebcs/iniebcs.F
+!||    iniebcs_propellant                  ../starter/source/boundary_conditions/ebcs/iniebcs_propellant.F90
+!||    iniebcsp0                           ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
+!||    inimu2                              ../starter/source/ale/bimat/inimu2.F
+!||    inimu3                              ../starter/source/ale/bimat/inimu3.F
+!||    inimul                              ../starter/source/ale/bimat/inimul.F
+!||    inintr                              ../starter/source/interfaces/interf1/inintr.F
+!||    inintr1                             ../starter/source/interfaces/interf1/inintr1.F
+!||    inintr2                             ../starter/source/interfaces/inter3d1/inintr2.F
+!||    inintr_orthdirfric                  ../starter/source/interfaces/interf1/inintr_orthdirfric.F
+!||    inintr_thkvar                       ../starter/source/interfaces/interf1/inintr_thkvar.F
+!||    inintsub                            ../starter/source/interfaces/interf1/inintsub.F
+!||    inirbe3                             ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
+!||    inisen                              ../starter/source/tools/sensor/inisen.F
+!||    inisms                              ../starter/source/general_controls/computation/hm_read_sms.F
+!||    init_joint                          ../starter/source/constraints/general/cyl_joint/init_joint.F
+!||    init_mat_weight                     ../starter/source/user_interface/set_dd_mat_weight.F
+!||    init_mlaw_tag                       ../starter/source/elements/elbuf_init/init_mlaw_tag.F
+!||    init_monvol                         ../starter/source/airbag/init_monvol.F
+!||    init_permutation                    ../starter/source/starter/lectur.F
+!||    init_random                         ../starter/source/general_controls/computation/init_random.F
+!||    initia                              ../starter/source/elements/initia/initia.F
+!||    inivchk                             ../starter/source/constraints/general/kinchk.F
+!||    inivel                              ../starter/source/initial_conditions/general/inivel/inivel.F
+!||    int18_law151_alloc                  ../starter/source/interfaces/int18/int18_law151_alloc.F
+!||    int18_law151_init                   ../starter/source/interfaces/int18/int18_law151_init.F
+!||    int8_ini                            ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
+!||    intbuf_fric_copy                    ../starter/source/interfaces/interf1/intbuf_fric_copy.F
+!||    intbuf_fric_ini_starter             ../starter/source/interfaces/intbuf/intbufFric_ini_starter.F
+!||    intbuf_ini_starter                  ../starter/source/interfaces/intbuf/intbuf_ini_starter.F
+!||    inter_offset_itag                   ../starter/source/elements/shell/shell_offset/inter_offset_itag.F90
+!||    intstamp_zero                       ../starter/share/modules1/intstamp_mod.F
+!||    inverted_group_dealloc              ../starter/source/model/sets/inverted_group_dealloc.F
+!||    inverted_group_init                 ../starter/source/model/sets/inverted_group_init.F
+!||    islin_ini                           ../starter/source/model/group/islin_ini.F
+!||    isurf_ini                           ../starter/source/model/group/isurf_ini.F
+!||    kinchk                              ../starter/source/constraints/general/kinchk.F
+!||    kinini                              ../starter/source/constraints/general/kinini.F
+!||    kinrem                              ../starter/source/constraints/general/kinchk.F
+!||    lagm_ini                            ../starter/source/tools/lagmul/lagm_ini.F
+!||    lagm_nhf                            ../starter/source/tools/lagmul/lagm_nhf.F
+!||    laserp1                             ../starter/source/loads/laser/laserp.F
+!||    laserp3                             ../starter/source/loads/laser/laserp.F
+!||    lce16q3                             ../starter/source/elements/solid_2d/quad/lce16q.F
+!||    lce16s3                             ../starter/source/elements/reader/hm_read_solid.F
+!||    lce16s4                             ../starter/source/elements/reader/hm_read_solid.F
+!||    lec_ddw                             ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    lec_ddw_poin                        ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    lec_inistate                        ../starter/source/elements/initia/lec_inistate.F
+!||    lecacc                              ../starter/source/tools/accele/lecacc.F
+!||    lecextlnk                           ../starter/source/coupling/rad2rad/lecextlnk.F
+!||    lecfill                             ../starter/source/elements/initia/lecfill.F
+!||    lecggroup                           ../starter/source/groups/lecggroup.F
+!||    lecgroup                            ../starter/source/groups/lecgroup.F
+!||    lecig3d                             ../starter/source/elements/ige3d/lecig3d.F
+!||    lecins                              ../starter/source/interfaces/interf1/lecins.F
+!||    lecint                              ../starter/source/interfaces/interf1/lecint.F
+!||    leclas                              ../starter/source/loads/laser/leclas.F
+!||    lecrefsta                           ../starter/source/loads/reference_state/refsta/lecrefsta.F
+!||    lecsec0                             ../starter/source/tools/sect/hm_read_sect.F
+!||    lecsec42                            ../starter/source/tools/sect/hm_read_sect.F
+!||    lecsec4bolt                         ../starter/source/tools/sect/lecsec4bolt.F
+!||    lecstack_ply                        ../starter/source/properties/composite_options/stack/lecstack_ply.F
+!||    lecstamp                            ../starter/source/interfaces/interf1/lecstamp.F
+!||    lecsubmod                           ../starter/source/model/submodel/lecsubmod.F
+!||    lectrans                            ../starter/source/model/transformation/lectrans.F
+!||    lectranssub                         ../starter/source/model/submodel/lectranssub.F
+!||    lgmini_i7                           ../starter/source/tools/lagmul/lgmini_i7.F
+!||    lgmini_rwl                          ../starter/source/tools/lagmul/lgmini_rwl.F
+!||    line_decomp                         ../starter/source/model/group/line_decomp.F
+!||    m20dcod                             ../starter/source/system/fsdcod.F
+!||    merge                               ../starter/source/model/submodel/merge.F
+!||    merge_node                          ../starter/source/elements/nodes/merge_node.F
+!||    monvol_allocate                     ../starter/share/modules1/monvol_struct_mod.F
+!||    monvol_deallocate                   ../starter/share/modules1/monvol_struct_mod.F
+!||    multi_connectivity                  ../starter/source/multifluid/multi_connectivity.F
+!||    multi_unplug_neighbors              ../starter/source/multifluid/multi_unplug_neighbors.F
+!||    my_real_tot_int_transfer            ../starter/source/system/my_real_to_int_transfer.F90
+!||    nbfunct                             ../starter/source/tools/curve/nbfunc.F
+!||    nlocal                              ../starter/source/spmd/node/ddtools.F
+!||    nodm11                              ../starter/source/materials/mat/mat011/nodm11.F
+!||    outri                               ../starter/source/materials/time_step/outri.F
+!||    outrin                              ../starter/source/materials/time_step/outri.F
+!||    paroi                               ../starter/source/materials/mat/mat006/paroi.F
+!||    pgrhead                             ../starter/source/elements/beam/pgrhead.F
+!||    pgrtails                            ../starter/source/elements/beam/pgrtails.F
+!||    pornod                              ../starter/source/ale/pornod.F
+!||    pre_cndpon                          ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    pre_stackgroup                      ../starter/source/stack/pres_stackgroup.F
+!||    precrkxfem                          ../starter/source/elements/xfem/precrkxfem.F
+!||    prelec_ddw                          ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    prelec_ddw_poin                     ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    prelecig3d                          ../starter/source/elements/ige3d/prelecig3d.F
+!||    prelecsec                           ../starter/source/tools/sect/prelecsec.F
+!||    prelecsec4bolt                      ../starter/source/tools/sect/prelecsec4bolt.F
+!||    prepare_int25                       ../starter/source/model/mesh/build_cnel.F
+!||    prepare_split_i25e2e                ../starter/source/spmd/prepare_split_i25e2e.F
+!||    preplyxfem                          ../starter/source/properties/composite_options/stack/preplyxfem.F
+!||    prerafig3d                          ../starter/source/elements/ige3d/prerafig3d.F
+!||    preread_rbody_lagmul                ../starter/source/constraints/general/rbody/preread_rbody_lagmul.F
+!||    preread_rbody_set                   ../starter/source/model/sets/preread_rbody_set.F
+!||    prescrint                           ../starter/source/interfaces/interf1/prescrint.F
+!||    presearchigeo3d                     ../starter/source/elements/ige3d/searchigeo3d.F
+!||    pretag_xfem                         ../starter/source/elements/xfem/pretag_xfem.F
+!||    printbcs                            ../starter/source/constraints/general/bcs/printbcs.F
+!||    printgroup                          ../starter/source/output/outfile/printgroup.F
+!||    printstsz                           ../starter/source/spmd/node/st_array_size.F
+!||    python_duplicate_nodes              ../starter/source/spmd/domain_decomposition/python_duplicate_nodes.F90
+!||    qgrhead                             ../starter/source/elements/solid_2d/quad/qgrhead.F
+!||    qgrtails                            ../starter/source/elements/solid_2d/quad/qgrtails.F
+!||    r2r_check                           ../starter/source/coupling/rad2rad/r2r_check.F
+!||    r2r_clean_inter                     ../starter/source/coupling/rad2rad/r2r_clean_inter.F
+!||    r2r_domdec                          ../starter/source/coupling/rad2rad/r2r_domdec.F
+!||    r2r_group                           ../starter/source/coupling/rad2rad/r2r_group.F
+!||    r2r_matparam_copy                   ../starter/source/elements/elbuf_init/r2r_matparam_copy.F
+!||    r2r_nom_opt                         ../starter/source/coupling/rad2rad/routines_r2r.F
+!||    r2r_speedup                         ../starter/source/coupling/rad2rad/r2r_speedup.F
+!||    r2r_split                           ../starter/source/coupling/rad2rad/r2r_split.F
+!||    r2r_void                            ../starter/source/coupling/rad2rad/r2r_void.F
+!||    rbe2modif1_nd                       ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    read_detonators                     ../starter/source/initial_conditions/detonation/read_detonators.F
+!||    read_ebcs                           ../starter/source/boundary_conditions/ebcs/read_ebcs.F
+!||    read_engine_driver                  ../starter/source/general_controls/engine/read_engine_driver.F
+!||    read_material_models                ../starter/source/materials/read_material_models.F
+!||    read_monvol                         ../starter/source/airbag/read_monvol.F
+!||    read_rwall                          ../starter/source/constraints/general/rwall/read_rwall.F
+!||    reconnect                           ../starter/source/elements/nodes/reconnect.F
+!||    reini_matprop                       ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    reini_matprop2                      ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    reord_icnd                          ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    rgrhead                             ../starter/source/elements/spring/rgrhead.F
+!||    rgrtails                            ../starter/source/elements/spring/rgrtails.F
+!||    rigid_mat                           ../starter/source/materials/mat/mat019/rigid_mat.F
+!||    rigmodif1_nd                        ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    s10edg_rlink                        ../starter/source/elements/solid/solide10/s10edg_rlink.F
+!||    scrint                              ../starter/source/interfaces/interf1/scrint.F
+!||    searchigeo3d                        ../starter/source/elements/ige3d/searchigeo3d.F
+!||    sensor_user_convert_local_id        ../starter/source/tools/sensor/sensor_user_convert_local_id.F
+!||    sensor_user_init                    ../starter/source/tools/sensor/sensor_user_init.F
+!||    set_admesh                          ../starter/source/model/remesh/set_admesh.F
+!||    set_elgroup_param                   ../starter/source/elements/shell/coque/set_elgroup_param.F
+!||    set_front8                          ../starter/source/spmd/node/ddtools.F
+!||    set_ibufssg_io                      ../starter/source/starter/lectur.F
+!||    set_intercep                        ../starter/source/spmd/node/ddtools.F
+!||    set_poin_ump                        ../starter/source/system/set_poin_ump.F
+!||    set_usrtos                          ../starter/source/model/sets/ipartm1.F
+!||    seteloff                            ../starter/source/constraints/general/rbody/hm_read_rbody.F
+!||    seteloff2                           ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
+!||    setlenwa                            ../starter/source/restart/ddsplit/setlenwa.F
+!||    setmulti                            ../starter/source/restart/ddsplit/setlenwa.F
+!||    setrb2on                            ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
+!||    setrbyon                            ../starter/source/constraints/general/rbody/hm_read_rbody.F
+!||    sfem_exclude_dim                    ../starter/source/elements/solid/solide4/sfem_exclude.F90
+!||    sfem_exclude_ini                    ../starter/source/elements/solid/solide4/sfem_exclude.F90
+!||    sgrhead                             ../starter/source/elements/solid/solide/sgrhead.F
+!||    sgrtails                            ../starter/source/elements/solid/solide/sgrtails.F
+!||    shell_offset_ini                    ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
+!||    shell_offsetp                       ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
+!||    shellthk_upd                        ../starter/source/properties/composite_options/drape/shellthk_upd.F
+!||    sms_ini_jad_1                       ../starter/source/ams/sms_init.F
+!||    sms_ini_jad_2                       ../starter/source/ams/sms_init.F
+!||    sms_ini_jad_3                       ../starter/source/ams/sms_init.F
+!||    sms_ini_kad                         ../starter/source/ams/sms_init.F
+!||    sms_ini_kdi                         ../starter/source/ams/sms_init.F
+!||    sms_init                            ../starter/source/ams/sms_init.F
+!||    sort_surf                           ../starter/source/groups/sort_surf.F
+!||    sortgroup                           ../starter/source/system/nintrr.F
+!||    spdometis                           ../starter/source/spmd/domain_decomposition/grid2mat.F
+!||    spgrhead                            ../starter/source/elements/sph/spgrhead.F
+!||    spgrtails                           ../starter/source/elements/sph/spgrtails.F
+!||    sphdcod                             ../starter/source/elements/sph/sphdcod.F
+!||    sphonf0                             ../starter/source/elements/sph/sphonf0.F
+!||    spinih                              ../starter/source/elements/sph/spinih.F
+!||    split_bcs_nrf                       ../starter/source/restart/ddsplit/split_bcs_nrf.F90
+!||    split_bcs_wall                      ../starter/source/restart/ddsplit/split_bcs_wall.F90
+!||    split_cfd_solide                    ../starter/source/spmd/split_cfd_solide.F
+!||    split_pcyl                          ../starter/source/loads/general/load_pcyl/split_pcyl.F
+!||    split_rwall                         ../starter/source/constraints/general/rwall/split_rwall.F90
+!||    spmd_anim_ply_init                  ../starter/source/spmd/spmd_anim_ply_init.F
+!||    sptri                               ../starter/source/elements/sph/sptri.F
+!||    st_qaprint_driver                   ../starter/source/output/qaprint/st_qaprint_driver.F
+!||    stackgroup                          ../starter/source/stack/stackgroup.F
+!||    stackgroup_drape                    ../starter/source/stack/stackgroup_drape.F
+!||    startime                            ../starter/source/system/timer.F
+!||    state_admesh                        ../starter/source/model/remesh/state_admesh.F
+!||    stifint_icontrol                    ../starter/source/interfaces/interf1/stifint_icontrol.F90
+!||    stifn0_nd                           ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    stifn1_nd                           ../starter/source/elements/solid/solide10/dim_s10edg.F
+!||    stoptime                            ../starter/source/system/timer.F
+!||    subset_ini                          ../starter/source/model/group/subset_ini.F
+!||    surfext_tagn                        ../starter/source/groups/ssurftag.F
+!||    t3grhead                            ../starter/source/elements/solid_2d/tria/t3grhead.F
+!||    t3grtails                           ../starter/source/elements/solid_2d/tria/t3grtails.F
+!||    table_zero                          ../starter/source/tools/curve/table_tools.F
+!||    tet4_10                             ../starter/source/starter/lectur.F
+!||    tgrhead                             ../starter/source/elements/truss/tgrhead.F
+!||    tgrtails                            ../starter/source/elements/truss/tgrtails.F
+!||    th_surf_load_pressure               ../starter/source/output/th/th_surf_load_pressure.F
+!||    thpinit                             ../starter/source/output/th/thpinit.F
+!||    thskewc                             ../starter/source/output/th/thskewc.F
+!||    titre2                              ../starter/source/output/outfile/titre2.F
+!||    titre3                              ../starter/source/output/outfile/titre3.F
+!||    trace_in1                           ../starter/source/system/trace_back.F
+!||    trace_out1                          ../starter/source/system/trace_back.F
+!||    triintfric                          ../starter/source/interfaces/interf1/trintfric.F
+!||    update_weight_rbe3                  ../starter/source/spmd/domain_decomposition/update_weight_rbe3.F
+!||    updfail                             ../starter/source/materials/updfail.F90
+!||    updmat                              ../starter/source/materials/updmat.F
+!||    upgrade_ixint                       ../starter/source/interfaces/interf1/upgrade_ixint.F
+!||    xfem_crack_init                     ../starter/source/elements/xfem/xfem_crack_init.F
+!||    xgrhead                             ../starter/source/elements/xelem/xgrhead.F
+!||    xgrtails                            ../starter/source/elements/xelem/xgrtails.F
+!||    yctrl                               ../starter/source/initial_conditions/inista/yctrl.F
+!||--- uses       -----------------------------------------------------
+!||    bpreload_mod                        ../starter/share/modules1/bpreload_mod.F
+!||    brokmann_elem_renum_mod             ../starter/source/materials/fail/windshield_alter/brokmann_elem_spmd_renum.F90
+!||    chk_shell_offset_mod                ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
+!||    cluster_mod                         ../starter/share/modules1/cluster_mod.F
+!||    constraint_mod                      ../starter/source/modules/constaint_mod.F90
+!||    damping_rby_spmdset_mod             ../starter/source/general_controls/damping/damping_rby_spmdset.F90
+!||    ddweights_mod                       ../starter/share/modules1/ddweights_mod.F
+!||    defaults_mod                        ../starter/source/modules/defaults_mod.F90
+!||    detonators_mod                      ../starter/share/modules1/detonators_mod.F
+!||    drape_mod                           ../starter/share/modules1/drape_mod.F
+!||    dsgraph_mod                         ../starter/share/modules1/dsgraph_mod.F
+!||    elbuftag_mod                        ../starter/share/modules1/elbuftag_mod.F
+!||    elm_group_mod                       ../starter/source/modules/elm_group_mod.F90
+!||    fractal_elem_renum_mod              ../starter/source/materials/fail/fractal/fractal_elem_spmd_renum.F90
+!||    front_mod                           ../starter/share/modules1/front_mod.F
+!||    func2d_mod                          ../starter/share/modules1/func2d_mod.F
+!||    fvbag_mod                           ../starter/share/modules1/fvbag_mod.F
+!||    get_element_group_mod               ../starter/source/elements/get_element_group.F90
+!||    group_mod                           ../starter/share/modules1/group_mod.F
+!||    hierarchy_rbody_mod                 ../starter/source/constraints/general/rbody/hierarchy_rbody.F90
+!||    hm_option_read_mod                  ../starter/share/modules1/hm_option_read_mod.F
+!||    hm_preread_inivel_mod               ../starter/source/initial_conditions/general/inivel/hm_preread_inivel.F90
+!||    hm_preread_skw_mod                  ../starter/source/tools/skew/hm_preread_skw.F90
+!||    hm_print_inter_guided_cable_mod     ../starter/source/tools/seatbelts/hm_print_inter_guided_cable.F90
+!||    hm_read_bcs_nrf_mod                 ../starter/source/boundary_conditions/hm_read_bcs_nrf.F90
+!||    hm_read_bcs_wall_mod                ../starter/source/boundary_conditions/hm_read_bcs_wall.F90
+!||    hm_read_inivol_mod                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
+!||    hm_read_inter_guided_cable_mod      ../starter/source/tools/seatbelts/hm_read_guided_cable.F90
+!||    hm_read_preload_axial_mod           ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+!||    iniebcs_propellant_                 ../starter/source/boundary_conditions/ebcs/iniebcs_propellant.F90
+!||    inigrav                             ../starter/share/modules1/inigrav_mod.F
+!||    inimap1d_mod                        ../starter/share/modules1/inimap1d_mod.F
+!||    inimap2d_mod                        ../starter/share/modules1/inimap2d_mod.F
+!||    init_monvol_mod                     ../starter/source/airbag/init_monvol.F
+!||    inivol_def_mod                      ../starter/share/modules1/inivol_mod.F
+!||    intbufmod                           ../starter/share/modules1/restart_mod.F
+!||    intbufscratch_mod                   ../starter/source/interfaces/interf1/intbufscratch_mod.F
+!||    inter_cand_mod                      ../starter/share/modules1/inter_cand_mod.F
+!||    inter_offset_itag_mod               ../starter/source/elements/shell/shell_offset/inter_offset_itag.F90
+!||    intstamp_glob_mod                   ../starter/share/modules1/intstamp_glob_mod.F
+!||    inverted_group_mod                  ../starter/share/modules1/inverted_group_mod.F
+!||    joint_mod                           ../starter/share/modules1/joint_mod.F
+!||    mapping_option_mod                  ../starter/share/modules1/dichotomy_mod.F
+!||    meshsurfig3d_mod                    ../starter/source/elements/ige3d/meshsurfig3d_mod.F
+!||    message_mod                         ../starter/share/message_module/message_mod.F
+!||    mid_pid_mod                         ../starter/share/modules1/mid_pid_mod.F
+!||    monvol_struct_mod                   ../starter/share/modules1/monvol_struct_mod.F
+!||    my_real_tot_int_transfer_mod        ../starter/source/system/my_real_to_int_transfer.F90
+!||    nod2el_mod                          ../starter/share/modules1/nod2el_mod.F
+!||    option_mod                          ../starter/share/modules1/options_mod.F
+!||    python_duplicate_nodes_mod          ../starter/source/spmd/domain_decomposition/python_duplicate_nodes.F90
+!||    r2r_mod                             ../starter/share/modules1/r2r_mod.F
+!||    random_mod                          ../starter/share/modules1/random_mod.F
+!||    read_funct_python_mod               ../starter/source/tools/curve/hm_read_funct_python.F90
+!||    reorder_mod                         ../starter/share/modules1/reorder_mod.F
+!||    restmod                             ../starter/share/modules1/restart_mod.F
+!||    set_mod                             ../starter/share/modules1/set_mod.F
+!||    sfem_exclude_mod                    ../starter/source/elements/solid/solide4/sfem_exclude.F90
+!||    shell_offset_ini_mod                ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
+!||    shell_offsetp_mod                   ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
+!||    sms_mod                             ../starter/share/modules1/sms_mod.F
+!||    sph_mod                             ../starter/share/modules1/sph_mod.F
+!||    split_bcs_nrf_mod                   ../starter/source/restart/ddsplit/split_bcs_nrf.F90
+!||    split_bcs_wall_mod                  ../starter/source/restart/ddsplit/split_bcs_wall.F90
+!||    split_cfd_mod                       ../starter/share/modules1/split_cfd_mod.F
+!||    split_rwall_mod                     ../starter/source/constraints/general/rwall/split_rwall.F90
+!||    stack_mod                           ../starter/share/modules1/stack_mod.F
+!||    stack_var_mod                       ../starter/share/modules1/stack_var_mod.F
+!||    stifint_icontrol_mod                ../starter/source/interfaces/interf1/stifint_icontrol.F90
+!||    submodel_mod                        ../starter/share/modules1/submodel_mod.F
+!||    table_glob_mod                      ../starter/share/modules1/table_glob_mod.F
+!||    updfail_mod                         ../starter/source/materials/updfail.F90
+!||    user_sensor_mod                     ../starter/source/modules/user_interface_mod.F90
+!||====================================================================
       SUBROUTINE LECTUR(MULTI_FVM                   ,LSUBMODEL          ,IS_DYNA         ,DETONATORS   ,EBCS_TAB,
      .                  SEATBELT_CONVERTED_ELEMENTS ,NB_SEATBELT_SHELLS ,NB_DYNA_INCLUDE ,USER_WINDOWS ,OUTPUT  ,
      .                  MAT_ELEM,NAMES_AND_TITLES,DEFAULTS,glob_therm,pblast,
-     .                  SENSOR_USER_STRUCT)
+     .                  SENSOR_USER_STRUCT,CHECK_USED,N_NRBODY,NRBODY_TO_PART)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -627,7 +652,23 @@ C-----------------------------------------------
       use glob_therm_mod
       use hm_read_inivol_mod
       use pblast_mod
-      use iniebcs_propergol_
+      use iniebcs_propellant_
+      use init_monvol_mod ,only : init_monvol
+      use python_duplicate_nodes_mod
+      use split_bcs_wall_mod , only : split_bcs_wall
+      use split_bcs_nrf_mod , only : split_bcs_nrf
+      use hm_read_bcs_wall_mod , only : hm_read_bcs_wall
+      use hm_read_bcs_nrf_mod , only : hm_read_bcs_nrf
+      use element_mod , only : nixs,nixq,nixc,nixp,nixt,nixr,nixtg
+      use hm_preread_skw_mod, ONLY : hm_preread_skw
+      use hierarchy_rbody_mod
+      use sfem_exclude_mod
+      use hm_read_inter_guided_cable_mod, ONLY : hm_read_inter_guided_cable
+      use hm_print_inter_guided_cable_mod, ONLY : hm_print_inter_guided_cable
+      use get_element_group_mod , only : get_element_group
+      use elm_group_mod , only : elm_group_
+      use my_real_tot_int_transfer_mod , only : my_real_tot_int_transfer
+      use rbody_part_modif_mod,     ONLY : rbody_part_check,rpart_inivel_check
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -650,6 +691,9 @@ C-----------------------------------------------
       type(glob_therm_) ,intent(inout)      :: glob_therm
       TYPE(PBLAST_),INTENT(INOUT)           :: PBLAST
       TYPE(SENSOR_USER_STRUCT_)              :: SENSOR_USER_STRUCT
+      INTEGER,INTENT(IN)                     :: CHECK_USED                          !< Flag to check if node is used
+      INTEGER,INTENT(IN)                     :: N_NRBODY                            !< Number of rigid bodies by part
+      INTEGER,DIMENSION(N_NRBODY),INTENT(IN) :: NRBODY_TO_PART                      !< rigid body to part mapping
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -792,6 +836,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:),ALLOCATABLE ::
      *        ISOLNOD,ISOLOFF,ISHEOFF,ITRUOFF,IPOUOFF,
      *        IRESOFF,ITRIOFF,IGRNRBY,IQUAOFF
+      integer, dimension(:), allocatable :: isolnod0,ishell3nod0
 C
       INTEGER(KIND=8) :: KVOISPH8,NUMSPH8,SIXSP8,LIMIT8
       INTEGER :: INTEGER_LIMIT32
@@ -834,6 +879,10 @@ c tab IBUFSSG_IO specific inlet/outlet
 
       INTEGER, DIMENSION(:), ALLOCATABLE :: IXR_KJ,R_SKEW
 C
+C  initial direction for beams
+      INTEGER, DIMENSION(:), ALLOCATABLE :: IBEAM_VECTOR
+      my_real, DIMENSION(:,:), ALLOCATABLE :: RBEAM_VECTOR
+C
 C Sol2sph
       INTEGER, DIMENSION(:), ALLOCATABLE :: SOL2SPH_TYP
 c tab /BCS/CYCLIC
@@ -844,7 +893,7 @@ C
      .       , DIMENSION(:,:), ALLOCATABLE :: QP_RPERTURB,RBY_INIAXIS
 C
       my_real
-     .  EANIT2(10),COST_R2R,TOTMAS
+     .  EANIT2(10),COST_R2R,TOTMAS,TOTMAS1
       TARGET :: EANIT2
 C OpenMP specific
        INTEGER ITASK, NP
@@ -911,6 +960,12 @@ C-----------------------------------------------
       INTEGER NUSPHCEL
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: IXSPS
       LOGICAL MAT20_DISCRETE_FILL
+      INTEGER, DIMENSION(:,:), ALLOCATABLE :: FLAG_ELEM_INTER25     
+      INTEGER, DIMENSION(:), ALLOCATABLE :: LIST_NIN25
+      INTEGER, DIMENSION(:), ALLOCATABLE :: ISKEW_TMP
+      my_real, DIMENSION(:), ALLOCATABLE :: SKEW_TMP
+      INTEGER NE_SFEM
+      INTEGER, DIMENSION(:), ALLOCATABLE :: IN_SFEM
 C-----------------------------------------------
 C Model Checker Memory
       DATA IUN/1/
@@ -1013,6 +1068,7 @@ C---  Bolt preload/axial
       INTEGER, ALLOCATABLE, DIMENSION(:)       :: ITAGPRLD_BEAM
       INTEGER, ALLOCATABLE, DIMENSION(:)       :: ITAGPRLD_TRUSS
       TYPE(PREL1D_), DIMENSION(:), ALLOCATABLE :: PRELOAD_A
+      INTEGER, ALLOCATABLE, DIMENSION(:)       :: IPRELOAD_FUN    !  workarray fun_id,sen_id
 C======================================================================|
 C   Allocations AM (Reels)
 C======================================================================|
@@ -1079,7 +1135,7 @@ C--- INterface Friction model
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_NM,INDX_NM
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_SCRATCH,INDX_SCRT
 C FLEXIBLE BODY
-      INTEGER  FXB_LAST_ADRESS(10)
+      INTEGER  FXB_LAST_ADDRESS(10)
       CHARACTER, DIMENSION(:), ALLOCATABLE :: FXBFILE_TAB*2148
 C
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1182,8 +1238,13 @@ C
       INTEGER , DIMENSION(:), ALLOCATABLE :: INDXSH  
       INTEGER :: NUMBER_LOAD_CYL
       INTEGER :: S_NOD2ELS,S_NOD2ELTG,S_NOD2EL1D
-C SEATBELTS      
+C DAMPING   
       INTEGER :: NDAMP_VREL_RBY
+      INTEGER :: NDAMP_FREQ_RANGE
+      INTEGER , DIMENSION(:), ALLOCATABLE :: DAMP_RANGE_PART  
+C SPH
+      INTEGER :: PRE_SEARCH,SZ_INTP_DIST 
+      my_real :: MAX_INTP_DIST_PART
 
       TYPE(INTER_CAND_) :: INTER_CAND
       TYPE (FAIL_FRACTAL_)  :: FAIL_FRACTAL
@@ -1191,9 +1252,18 @@ C SEATBELTS
       INTEGER DEF_INTER(100)
       ! constraint structure
       type(constraint_) :: constraint_struct
+C RWALL PENALTY   
+      INTEGER :: SLN_PEN
+      my_real, DIMENSION(:), ALLOCATABLE :: RWSTIF_PEN
+
+      integer, parameter :: nb_key = 8 
+      integer :: iwarnhb,n_entity
+      integer :: sh4tree_dim1,sh4tree_dim2,sh3tree_dim1,sh3tree_dim2
+      type(elm_group_) :: elm_group
 c=======================================================================
       IREAC = 0 
       PYTHON%NB_FUNCTS = 0
+      PYTHON%NB_SENSORS = 0
 !     domain decomposition statistic
       DDSTAT(1:50,1:PARASIZ)=0
       I22LEN_L = 0 
@@ -1224,6 +1294,8 @@ c=======================================================================
       NXLAYMAX = 0   ! max layer nb in parts xfem
 C     /DAMP/VREL + RBY      
       NDAMP_VREL_RBY = 0
+C     /DAMP/FREQUENCY_RANGE      
+      NDAMP_FREQ_RANGE = 0
 C ply xfem
       IPLYXFEM  = 0
       NPLYXFE = 0
@@ -1270,7 +1342,7 @@ C
         NULLIFY(INTERCEP(3,I)%P)
       ENDDO
 C------------------------------------------------------------------
-C Initialisations variables NNOISE (pour fichiers Rad2noise Engine
+C Initializations of NNOISE variables (for Rad2noise Engine files
 C------------------------------------------------------------------
       NNOISE_SAV = 0
       SINOISE = 0
@@ -1278,7 +1350,7 @@ C------------------------------------------------------------------
       ALLOCATE(INOISE(0))
       ALLOCATE(FNOISE(0))
 C------------------------------------------------------------------
-C Initialisation size for INISHCEL
+C Initialization size for INISHCEL
 C------------------------------------------------------------------
       NUSPHCEL = 0
 C----------------------------------------------
@@ -1375,7 +1447,7 @@ C
      .                         C1='IQUAOFF')
 C Float
 C----------------------------------------------
-C     ALLOC TABLES INTEGER IGEO et IPM
+C     ALLOC INTEGER TABLES IGEO and IPM
 C----------------------------------------------
       LEN_G = NPROPGI*NUMGEO
       LEN_M = NPROPMI*NUMMAT
@@ -1403,16 +1475,16 @@ C----------------------------------------------
       END IF
       CALL TRACE_OUT1()
 C----------------------------------------------
-C     ALLOC ET INIT DU TAB. TAG NOEUDS UTILISES SUR P0
+C     ALLOC AND INIT OF TAG TABLE FOR NODES USED ON P0
 C----------------------------------------------
       ERR_CATEGORY='INTERNAL'
 c obsolete code, replaced by new chained-list IFRONT
-C     codage des differents types de noeuds frontiere:
-C     0 noeud pas sur le proc
-C     1 frontiere acceleration
-C     10 frontiere cinematique
-C     100 frontitere interface
-C     combinaisons possibles
+C     coding of different types of boundary nodes:
+C     0 node not on proc
+C     1 acceleration boundary
+C     10 kinematic boundary
+C     100 interface boundary
+C     possible combinations
 
 
 c SIFRONT minimum size NUMNOD. Value set to 2*NUMNOD
@@ -1445,7 +1517,7 @@ C----------------------------------------------
 
 c      IF(FLAG_GOTO == 1) GOTO 207 !!go to traitement rad2rad
 C--------------------------------------------
-C     CALCUL ISECUT
+C     CALCULATE ISECUT
 C--------------------------------------------
       ISECUT=0
       CALL LECSEC0(LSUBMODEL)
@@ -1477,6 +1549,8 @@ C--------------------------------------------
       IF(NDAMP > 0) THEN
         SDAMPR = NRDAMP*NDAMP
         SDAMP  = 3*(1+MAX(IRODDL,IRODDL0))*NUMNOD
+        CALL HM_OPTION_COUNT('/DAMP/FREQUENCY_RANGE',NDAMP_FREQ_RANGE)
+        IF (NDAMP == NDAMP_FREQ_RANGE) SDAMP = 0
         ALLOCATE(DAMPR(SDAMPR+SDAMP)     ,STAT=stat)
         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                             MSGTYPE=MSGERROR,
@@ -1495,6 +1569,11 @@ C--------------------------------------------
      .                             MSGTYPE=MSGERROR,
      .                         C1='DAMP')
       ENDIF
+      ALLOCATE(DAMP_RANGE_PART(NPART),STAT=stat)        
+      IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                             MSGTYPE=MSGERROR,
+     .                         C1='DAMP_RANGE_PART')      
+      DAMP_RANGE_PART = 0
       ALLOCATE(X(SX)       ,STAT=stat)
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                           MSGTYPE=MSGERROR,
@@ -1550,7 +1629,7 @@ C--------------------------------------------
       ELSE
         THKEC => THKE
       END IF
-      IF(STHKE > 0) THKE = 0
+      IF ((STHKE > 0).AND.(FLAG_GOTO==0)) THKE = 0
       IF(NUMELC > 0) SH4ANG = 0
       IF(NUMELTG > 0) SH3ANG = 0
 c
@@ -1607,7 +1686,8 @@ c
      +          NGJOINT+NUNIT0+NFUNCT+NADMESH+
      +          NSPHIO+NSPCOND+NRBYKIN+NEBCS+
      +          NINICRACK+NODMAS+NBGAUGE+NCLUSTER+NINTERFRIC+
-     +          NRBMERGE+NUMBCSN+NSLIPRING+NRETRACTOR
+     +          NRBMERGE+NUMBCSN+NSLIPRING+NRETRACTOR+
+     +          NGUIDED_CABLE
       SNOM_OPT = SNOM_OPT1*LNOPT1+1
       SINOM_OPT= 33
       SNOM_SECT= ncharline*NSECT
@@ -1717,6 +1797,15 @@ C---  Allocations
      .                           MSGTYPE=MSGERROR,
      .                           C1='R_SKEW')
 C
+      ALLOCATE(IBEAM_VECTOR(NUMELP) ,STAT=stat)
+      IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                          MSGTYPE=MSGERROR,
+     .                          C1='IBEAM_VECTOR') 
+      ALLOCATE(RBEAM_VECTOR(3,NUMELP) ,STAT=stat)
+      IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                          MSGTYPE=MSGERROR,
+     .                          C1='RBEAM_VECTOR')     
+C
       IF(ABS(ISIGI)==3.OR.ABS(ISIGI)== 4.OR.ABS(ISIGI)==5)THEN
          ALLOCATE (PTSHEL(NUMELC)   ,STAT=stat) 
          PTSHEL = 0
@@ -1740,10 +1829,12 @@ C --- Initialisations
       IF(SNOM_OPT > 0) NOM_OPT = 0
       IF(SINOM_OPT > 0) INOM_OPT = 0
       IF(NUMELR > 0) IXR_KJ = 0
-      IF(NUMELC+NUMELTG > 0) IWORKSH = 0
+      IF(NUMELC+NUMELTG > 0) IWORKSH(:,:) = 0
       IF(NUMELR > 0) R_SKEW = 0
+      IF(NUMELP > 0) IBEAM_VECTOR(1:NUMELP) = ZERO
+      IF(NUMELP > 0) RBEAM_VECTOR(1:3,1:NUMELP) = ZERO
 C
-C---  Pointeurs : sous-tableaux
+C---  Pointers: sub-arrays
       IF(SISKWN-SIFRAME<SISKWN) THEN
       IFRAME => ISKWN(SISKWN-SIFRAME+1:SISKWN)
       ELSE
@@ -1922,7 +2013,7 @@ C     .. TO BE MAINTAINED (cf doc/inom_opt.txt) ..
       INOM_OPT(2) = INOM_OPT(1) + NACCELM
       INOM_OPT(3) = INOM_OPT(2) + NVOLU + NMONVOL
       INOM_OPT(4) = INOM_OPT(3) + NINTER
-      INOM_OPT(5) = INOM_OPT(4) + NINTSUB
+      INOM_OPT(5) = INOM_OPT(4) + NINTSUB + NGUIDED_CABLE
       INOM_OPT(6) = INOM_OPT(5) + NRWALL
       INOM_OPT(7) = INOM_OPT(6) + 0 !obsolete option removed
       INOM_OPT(8) = INOM_OPT(7) + NJOINT
@@ -1962,7 +2053,7 @@ C
       CALL APARTIN(NPART)
       END IF
 C--------------------------------------------
-C     LECTURE DES FONCTIONS & TABLES
+C     READING FUNCTIONS & TABLES
 C--------------------------------------------
       ERR_MSG='FUNCTIONS & TABLES'
       ERR_CATEGORY='FUNCTIONS & TABLES'
@@ -2021,14 +2112,14 @@ C       TABLES
 
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES FONCTIONS 2D
+C     READING 2D FUNCTIONS
 C--------------------------------------------
       ALLOCATE(FUNC2D(NFUNC2D))
       IF(NFUNC2D > 0) THEN
          CALL HM_READ_FUNC2D(FUNC2D, LSUBMODEL, UNITAB)
       ENDIF
 C--------------------------------------------
-C     STOCKAGE DYNAMIQUE (GENERAL) REEL - suite
+C     Dynamic storage (General) Reel - Suite
 C-------------------------------------------
       ERR_MSG='DYNAMIC STORAGE'
       ERR_MSG='INTERNAL'
@@ -2047,7 +2138,7 @@ C-------------------------------------------
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='PM')
       ALLOCATE(GEO(SGEO),STAT=stat)
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='GEO')
-c dans le skew, on met tous les skew du modele
+c in the skew, we put all the skews of the model
       ALLOCATE(SKEW(SSKEW) ,STAT=stat)
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='SKEW')
       IF(SSKEW-SXFRAME<SSKEW) THEN
@@ -2056,7 +2147,7 @@ c dans le skew, on met tous les skew du modele
         XFRAME => SKEW
       END IF
 c      ALLOCATE(XFRAME(SXFRAME) ,STAT=stat)
-      ALLOCATE(EANI(SEANI) ,STAT=stat)
+      ALLOCATE(EANI(SEANI) ,STAT=stat)      
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='EANI')
       IF(SEANI > 0) EANI = 0
       IF(NUMELTG > 0) THEN
@@ -2064,6 +2155,8 @@ c      ALLOCATE(XFRAME(SXFRAME) ,STAT=stat)
       ELSE
         EANIT => EANIT2
       ENDIF
+      allocate(isolnod0(numels))
+      allocate(ishell3nod0(numeltg))
       PM   = 0
       SKEW = 0
       GEO  = 0
@@ -2075,7 +2168,7 @@ C--------------------------------------------
       CALL KININI(D      )
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES MATERIAUX
+C     READING MATERIALS
 C--------------------------------------------
       ERR_MSG='MATERIALS'
       ERR_CATEGORY='MATERIALS'
@@ -2098,10 +2191,11 @@ c------------------------------------
 c---------------------------------------------------------------
       CALL READ_MATERIAL_MODELS(
      .     MAT_ELEM    ,MLAW_TAG ,FAIL_TAG ,EOS_TAG    ,
-     .     RWORK       ,SBUFMAT  ,IPM      ,PM         ,UNITAB    ,
+     .     RWORK       ,SRWORK   ,IPM      ,PM         ,UNITAB    ,
      .     MULTI_FVM   ,FAILWAVE ,NLOC_DMG ,LSUBMODEL  ,TABLE     ,
-     .     LTITR       ,MAT20_DISCRETE_FILL,USERL_AVAIL,MAT_NUMBER,
-     .     NPC         ,TF       ,SNPC     ,NPTS       ,SBUFMAT   )
+     .     LTITR       ,USERL_AVAIL,MAT_NUMBER,
+     .     NPC         ,TF       ,SNPC     ,NPTS       ,SBUFMAT   ,
+     .     IRESP       )
 c---------------------------------------------------------------
       ALLOCATE(BUFMAT(SBUFMAT)    ,STAT=stat)
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
@@ -2117,7 +2211,7 @@ c
 c
       CALL TITRE3
 C--------------------------------------------
-C     INITIALISATION DES POINTEURS UTILISATEUR
+C     INITIALIZATION OF USER POINTERS
 C--------------------------------------------
         CALL SAV_BUF_POINT(PM     ,1)
         CALL SAV_BUF_POINT(BUFMAT ,2)
@@ -2149,7 +2243,27 @@ C
 
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES SUBMODELS & TRANSFORMATION DE SUBMODEL
+C     PRE-READING SKEW DEFINITIONS
+C--------------------------------------------
+      IF(NUMSKW > 0) THEN
+        ALLOCATE(ISKEW_TMP(SISKWN)     ,STAT=stat)
+        IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                             MSGTYPE=MSGERROR,
+     .                             C1='SKEW')
+        ALLOCATE(SKEW_TMP(SSKEW)     ,STAT=stat)
+        IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                             MSGTYPE=MSGERROR,
+     .                             C1='SKEW')
+        SKEW_TMP = 0
+        CALL HM_PREREAD_SKW(SKEW_TMP  ,ISKEW_TMP ,X      ,ITAB   ,ITABM1    ,
+     .                      LSUBMODEL ,UNITAB    ,NUMNOD ,NUMSKW ,CHECK_USED,
+     .                      LISKN     ,LSKEW     ,N2D    ,SISKWN ,SSKEW     )
+      ELSE
+        ALLOCATE(ISKEW_TMP(0))
+        ALLOCATE(SKEW_TMP(0))
+      ENDIF
+C--------------------------------------------
+C     READING SUBMODELS & SUBMODEL TRANSFORMATION
 C--------------------------------------------
       ERR_MSG='SUBMODELS'
       ERR_CATEGORY='SUBMODELS'
@@ -2165,17 +2279,22 @@ C--------------------------------------------
         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                             MSGTYPE=MSGERROR,
      .                         C1='RTRANS')
-        CALL LECTRANSSUB(X      ,IGRNOD  ,ITAB   ,ITABM1 ,UNITAB,
-     .                 RTRANS   ,LSUBMODEL,IS_DYNA)
-        CALL LECSUBMOD(ISUBMOD,X,UNITAB,ITABM1,RTRANS,ITAB,LSUBMODEL,IS_DYNA)
+        CALL LECTRANSSUB(X      ,IGRNOD   ,ITAB   ,ITABM1   ,UNITAB,
+     .                 RTRANS   ,LSUBMODEL,IS_DYNA,ISKEW_TMP,LISKN ,
+     .                 NSPCOND  ,NUMSPH   ,SISKWN )
+        CALL LECSUBMOD(ISUBMOD  ,X         ,UNITAB  ,ITABM1    ,RTRANS,
+     .                 ITAB     ,LSUBMODEL ,IS_DYNA ,ISKEW_TMP ,LISKN ,
+     .                 SKEW_TMP ,LSKEW     ,SISKWN  ,SSKEW     )
       ENDIF
 
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES REPERES OBLIQUES
-C   + LECTURE DES REFERENTIELS
+C     READING OBLIQUE COORDINATE SYSTEMS
+C   + READING REFERENCE FRAMES
 C--------------------------------------------
 C     SKEWS
+      IF(ALLOCATED(ISKEW_TMP)) DEALLOCATE(ISKEW_TMP)
+      IF(ALLOCATED(SKEW_TMP)) DEALLOCATE(SKEW_TMP)
       ERR_MSG='SKEWS'
       ERR_CATEGORY='SKEWS'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
@@ -2190,7 +2309,7 @@ C
      .                   NOM_OPT(LNOPT1*INOM_OPT(10)+1),UNITAB)
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     PRELECTURE DES DRAPE
+C     PRE-READING PLY DEFINITIONS
 C--------------------------------------------
       IF(NDRAPE > 0) THEN
         ALLOCATE(IDRAPEID(NDRAPE)     ,STAT=stat)
@@ -2203,7 +2322,7 @@ C--------------------------------------------
         ALLOCATE(IDRAPEID(0))
       ENDIF
 C--------------------------------------------
-C     LECTURE DES PROPRIETES
+C     READING PROPERTIES
 C--------------------------------------------
       IF(NSPHSOL/=0)THEN
         CALL HM_PREREAD_PART(IPART,IGEO,LSUBMODEL)
@@ -2236,7 +2355,8 @@ C
      .                          DBRWORK    , SBUFGEO     , ISKWN    , IGEO     ,IPM       ,
      .                          NPC        , TF          , UNITAB   , RTRANS   ,LSUBMODEL ,
      .                          PROP_TAG   , IPART       , KNOT     , IDRAPEID ,STACK_INFO,
-     .                          NUMGEOSTACK, NPROP_STACK , MULTI_FVM, IADGEO   ,DEFAULTS)
+     .                          NUMGEOSTACK, NPROP_STACK , MULTI_FVM, IADGEO   ,DEFAULTS  ,
+     .                          MAT_ELEM%MAT_PARAM)
 C
         ALLOCATE(BUFGEO(SBUFGEO)    ,STAT=stat)
         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
@@ -2250,7 +2370,7 @@ C
       ENDIF
 C
       IF(NUMPLY /= 0) THEN
-        ALLOCATE(PLY_INFO(2,NUMPLY),STAT=stat)
+        ALLOCATE(PLY_INFO(3,NUMPLY),STAT=stat)
         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                            MSGTYPE=MSGERROR,
      .                            C1='PLY')
@@ -2260,7 +2380,7 @@ C
       ENDIF
 c
       IF(NUMSTACK > 0) THEN
-C prelecture
+C pre-reading
          LEN_G = NPROPGI*(NUMSTACK + NUMPLY)
          ALLOCATE(IGEO_STACK(LEN_G),STAT=stat)
          IGEO_STACK = 0
@@ -2316,10 +2436,10 @@ C
 C
       CALL TRACE_OUT1()
 C-----------------------------------------------------
-C     LECTURE DES PARTS
-C     REMPLACEMENT DES NUMEROS EXTERNES DES MATERIAUX
-C     REMPLACEMENT DES NUMEROS EXTERNES DES PROPRIETES
-C     PAR LES NUMEROS INTERNES
+C     READING PARTS
+C     REPLACEMENT OF EXTERNAL MATERIAL NUMBERS
+C     REPLACEMENT OF EXTERNAL PROPERTY NUMBERS
+C     BY INTERNAL NUMBERS
 C-----------------------------------------------------
       ERR_MSG='PARTS'
       ERR_CATEGORY='PARTS'
@@ -2332,7 +2452,7 @@ C-----------------------------------------------------
      .                           MSGTYPE=MSGERROR,
      .                         C1='IWORK')
       IWORK = 0
-      ALLOCATE(THK_PART(NPART)    ,STAT=stat)
+      ALLOCATE(THK_PART(NPART)    ,STAT=stat)   
 C
       CALL HM_READ_PART(IPART  ,PM      ,GEO       ,IPM     ,IGEO ,IWORK ,THK_PART,
      .                  UNITAB,LSUBMODEL,MULTI_FVM ,MLAW_TAG,MAT_ELEM%MAT_PARAM,GLOB_THERM)
@@ -2407,6 +2527,7 @@ C--------------------------------------------
         NL_DDR2R = 4
         R2R_SIU = 1
 c       complete mlaw_tag for new void materials
+        !Material Buffer copy for R2R (rad2rad) with R2R_MATPARAM_COPY
         IF(NUMMAT > NUMMAT0) THEN
           ALLOCATE(MTAG_R2R(NUMMAT))
           ALLOCATE(MPARAM_R2R(NUMMAT))
@@ -2448,13 +2569,14 @@ C
       POIN_PART_SOL(1:2,1:NPART,1:7) = 0
 
       ALLOCATE(POIN_UMP(NUMMAT), STAT=stat)
+      POIN_UMP(1:NUMMAT) = 0
       ALLOCATE(TAB_UMP_LOC(5,NPART), STAT=stat)
       TAB_UMP_LOC(1:5,1:NPART) = 0
 C
       CALL SET_POIN_UMP(IPART,IPM,TAB_UMP_LOC,POIN_UMP,TAILLE2)
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES SOLIDES
+C     READING SOLIDS
 C--------------------------------------------
       ERR_MSG='ELEMENTS'
       ERR_CATEGORY='ELEMENTS'
@@ -2469,7 +2591,7 @@ C--------------------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES ELEMENTS 2D
+C     READING 2D ELEMENTS
 C--------------------------------------------
       IF(NUMELQ/=0)THEN
         WRITE(ISTDO,'(A)')TITRE(16)
@@ -2477,7 +2599,7 @@ C--------------------------------------------
      .             IPM     ,IGEO   ,UNITAB ,LSUBMODEL)
       ENDIF
 C--------------------------------------------
-C     LECTURE DES COQUES
+C     READING SHELLS
 C--------------------------------------------
        ALLOCATE(ITAG(NUMNOD),STAT=stat)
        IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
@@ -2491,12 +2613,12 @@ C
      .             THKE   ,IPM     ,IGEO   ,UNITAB ,ITAG   ,SH4ANG, LSUBMODEL)
       ENDIF
 C
-C          ATTENTION, LES ELEMENTS COQUE SONT PERMUTES
-C          POUR GENERER DES GROUPES OPTIMISES
-C          APRES LA LECTURE DES PID
+C          WARNING, SHELL ELEMENTS ARE PERMUTED
+C          TO GENERATE OPTIMIZED GROUPS
+C          AFTER READING PIDs
 C
 C--------------------------------------------
-C     LECTURE DES BARRES
+C     READING TRUSSES
 C--------------------------------------------
       IF(NUMELT/=0)THEN
        WRITE(ISTDO,'(A)')TITRE(18)
@@ -2504,15 +2626,15 @@ C--------------------------------------------
      .             IPM    ,IGEO    ,LSUBMODEL)
       ENDIF
 C--------------------------------------------
-C     LECTURE DES POUTRES
+C     READING BEAMS
 C--------------------------------------------
       IF(NUMELP/=0)THEN
        WRITE(ISTDO,'(A)')TITRE(19)
        CALL HM_READ_BEAM(IXP    ,ITAB   ,ITABM1 ,IPART  ,IPARTP  ,
-     .             IPM    ,IGEO    ,LSUBMODEL)
+     .                   IPM    ,IGEO   ,LSUBMODEL,IBEAM_VECTOR,RBEAM_VECTOR)
       ENDIF
 C--------------------------------------------
-C     LECTURE DES RESSORTS
+C     READING SPRINGS
 C--------------------------------------------
       REINT = ZERO
       IF(NUMELR/=0)THEN
@@ -2521,7 +2643,7 @@ C--------------------------------------------
      .             IGEO  ,IXR_KJ ,LSUBMODEL,ISKWN,R_SKEW,IPM)
       ENDIF
 C--------------------------------------------
-C     LECTURE DES COQUES TRIANGLE
+C     READING TRIANGULAR SHELLS
 C--------------------------------------------
       IF(NUMELTG/=0)THEN
         IF(N2D==0 .AND. NUMELTRIA==0)THEN
@@ -2558,7 +2680,7 @@ C--------------------------------------------
 C     Check XFEM FLAG
       IF(NUMELTG + NUMELC == 0) ICRACK3D = 0
 C--------------------------------------------
-C     LECTURE DES ELEMENTS ISO-GEOMETRIQUES
+C     READING ISO-GEOMETRIC ELEMENTS
 C--------------------------------------------
       NCTRLMAX = 0
       IF(NUMELIG3D/=0)THEN
@@ -2586,9 +2708,9 @@ C--------------------------------------------
      .           ITAB    ,IPART   ,IPARTIG3D  ,IPM     ,IGEO    ,
      .           KXIG3D  ,IXIG3D  ,ITABM1     ,NCTRLMAX,TABCONPATCH)
 
-       SKNOTLOCPC = DEG_MAX*3*(NUMNOD+L_TAB_NEWFCT)*NUMGEO  ! IL FAUDRAIT AVOIR ONE NOMBRE DE POINT IGE ET DES INDICES
-cc Sknotlocpc est un peu surdimmensionne car il prend en compte les points de travail temporaire
-       IF(SKNOTLOCPC > INTMAX .OR. SKNOTLOCPC < ZERO) THEN ! L_TAB_NEWFCT pour se laisser la taille de travail
+       SKNOTLOCPC = DEG_MAX*3*(NUMNOD+L_TAB_NEWFCT)*NUMGEO  ! THERE SHOULD BE A NUMBER OF IGE POINTS AND INDICES
+cSknotlocpc is slightly oversized as it takes into account temporary work points
+       IF(SKNOTLOCPC > INTMAX .OR. SKNOTLOCPC < ZERO) THEN ! L_TAB_NEWFCT to allow for workspace size
          SKNOTLOCPC = INTMAX
        ELSE
          SKNOTLOCPC = INT(SKNOTLOCPC)
@@ -2627,14 +2749,14 @@ c
         ALLOCATE(KNOTLOCPC(0) ,STAT=stat)
       ENDIF
 C--------------------------------------------
-C     PRELECTURE GRNOD/NODENS
+C     PRE-READING GRNOD/NODENS
 C--------------------------------------------
       IF(NUMELX > 0 .AND. NGRNOD > 0 )THEN
         WRITE(ISTDO,'(A)')' .. NODENS GROUP '
         CALL HM_PRELECGRNS(ITABM1 ,IGRNOD, LSUBMODEL)
       ENDIF
 C---------------------------------------------
-C      PRELECTURE DES ELEMENTS MULTI-PURPOSE.
+C      PRE-READING MULTI-PURPOSE ELEMENTS.
 C---------------------------------------------
       ERR_MSG='MULTI-PURPOSE ELEMENTS'
       ERR_CATEGORY='MULTI-PURPOSE ELEMENTS'
@@ -2679,6 +2801,19 @@ C--------------------------------------------
       LEVELMAX=0
       LSH4TRIM=0
       LSH3TRIM=0
+
+      if(nadmesh==0) then
+        sh4tree_dim1 = 0
+        sh4tree_dim2 = 0
+        sh3tree_dim1 = 0
+        sh3tree_dim2 = 0
+      else
+        sh4tree_dim1 = ksh4tree
+        sh4tree_dim2 = numelc
+        sh3tree_dim1 = ksh3tree
+        sh3tree_dim2 = numeltg
+      endif
+
       IF(NADMESH/=0)THEN
 
         ALLOCATE(SH4TREE(KSH4TREE,NUMELC),STAT=stat)
@@ -2735,6 +2870,8 @@ C--------------------------------------------
         ALLOCATE(SH4TRIM(0))
         ALLOCATE(SH3TRIM(0))
       END IF
+
+      
 
       IF(ISTATCND/=0)THEN
         ALLOCATE(MSCND(NUMNOD),INCND(NUMNOD),STAT=stat)
@@ -2818,7 +2955,7 @@ c
 c
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES PARAMETRES GLOBAUX + PARTICULES SPH.
+C     READING GLOBAL PARAMETERS + SPH PARTICLES.
 C---------------------------------------------
       ERR_MSG='SPH'
       ERR_CATEGORY='SPH'
@@ -3049,7 +3186,7 @@ C--------------------------------------------
       IF(ALLOCATED(IWORK)) DEALLOCATE(IWORK)
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES SUBSETS
+C     READING SUBSETS
 C--------------------------------------------
       TAGSURFIGE = 0
       SIBUFSSG = 0  ! to be removed
@@ -3066,7 +3203,7 @@ C--------------------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES BOXES (BOX et BOX des BOX)
+C     READING BOXES (BOX and BOX of BOX)
 C--------------------------------------------
       CALL STARTIME(19,1)
 C--------------------------------------------
@@ -3141,7 +3278,7 @@ C---
      2     IXT_S ,IXT_S_IND,IXP_S,IXP_S_IND,IXR_S,IXR_S_IND,
      3     IXTG_S,IXTG_S_IND)
 C--------------------------------------------
-C    LECTURE DES GROUPES DE PARTS (1st LEVEL)
+C    READING PART GROUPS (1st LEVEL)
 C--------------------------------------------
       WRITE(ISTDO,'(A)')' .. PART GROUPS'
       ERR_CATEGORY='PART GROUPS'
@@ -3152,7 +3289,7 @@ C--------------------------------------------
       FLAGG = 1 !BUILD GROUPS
       CALL HM_READ_GRPART(IGRPART , IPART, ISUBMOD, FLAGG ,NGRPART,LSUBMODEL, SUBSETS )
 C--------------------------------------------
-C    LECTURE DES GROUPES DES GROUPES
+C    READING GROUPS OF GROUPS
 C--------------------------------------------
       ERR_CATEGORY='GROUP OF GROUPS'
       ICOUNT = 1
@@ -3176,7 +3313,7 @@ C---
      .       LSUBMODEL)
       ENDDO
 C--------------------------------------------
-C    LECTURE DES SURFACES
+C    READING SURFACES
 C--------------------------------------------
 
       ! allocation for pre-read of Rbody needed for /SET
@@ -3481,7 +3618,7 @@ c
       ENDIF
 c
 C-------
-C       LECTURE DES SURFACES DES SURFACES
+C       READING SURFACES OF SURFACES
 C-------
         ICOUNT = 1
         ITER   = 0
@@ -3535,7 +3672,7 @@ C---
       ENDDO
       NSEGS=NSEGS+NSEGSMAX
 C--------------------------------------------
-C     LECTURE DES LIGNES
+C     READING LINES
 C--------------------------------------------
       IF(NSLIN > 0) THEN
         WRITE(ISTDO,'(A)')' .. LINES '
@@ -3567,7 +3704,7 @@ C---
      8           IPARTX  ,KXX     ,IXX     ,IADBOXMAX,SUBSETS,
      9           IGRTRUSS,IGRBEAM,IGRSPRING,NSETS   ,MAP_TABLES)
 C-------
-C       LECTURE DES LIGNES DES LIGNES
+C       READING LINES OF LINES
 C-------
         ICOUNT = 1
         ITER   = 0
@@ -3584,7 +3721,7 @@ C---
         ENDDO
       ENDIF
 C--------------------------------------------
-C     LECTURE DES INIITAL CRACKS
+C     READING INITIAL CRACKS
 C--------------------------------------------
       IF(NINICRACK > 0) THEN
         WRITE(ISTDO,'(A)')' .. INITIAL CRACK '
@@ -3603,7 +3740,7 @@ C---
       ENDIF
 C
 C--------------------------------------------
-C     LECTURE DES GROUPES DE NOEUDS
+C     READING NODE GROUPS
 C--------------------------------------------
       IF(NGRNOD > 0)THEN
         WRITE(ISTDO,'(A)')' .. NODE GROUP'
@@ -3643,7 +3780,7 @@ C--------------------------------------------
      C           IGRBEAM ,IGRSPRING,IGRSURF,NSETS   )
 
 C-------
-C       LECTURE DES GROUPES DES GROUPES
+C       READING GROUPS OF GROUPS
         ICOUNT = 1
         ITER   = 0
         DO WHILE (ICOUNT == 1)
@@ -3669,18 +3806,19 @@ C--------------------------------------------
         WRITE(ISTDO,'(A)')' .. SET'
         ERR_CATEGORY='SET'
 
-        CALL HM_SET(SET      ,LSUBMODEL ,INV_GROUP ,MAP_TABLES,IPART     ,
-     *              IGRSURF  ,IGRNOD    ,IGRSLIN   ,IGRPART  ,IGRBRIC   ,
-     *              IGRQUAD  ,IGRSH4N   ,IGRSH3N   ,IGRTRUSS ,IGRBEAM   ,
-     *              IGRSPRING,IXS       ,IXS10     ,IXC      ,IXTG      ,
-     *              KNOD2ELS ,NOD2ELS   ,KNOD2ELC  ,NOD2ELC  ,KNOD2ELTG ,
-     *              NOD2ELTG ,IPARTC    ,IPARTG    ,IPARTS   ,SH4TREE   ,
-     *              SH3TREE  ,IXQ  ,KNOD2ELQ  ,NOD2ELQ  ,X   ,
-     *              IXT      ,IXP       ,IXR       ,IXX      ,KXX       ,
-     *              KXSP     ,IXS20     ,IXS16     ,GEO      ,ITABM1    ,
-     *              IBOX     ,SKEW      ,IPARTQ    ,IPARTT   ,IPARTP    ,
-     *              IPARTR   ,SUBSETS   ,RBY_MSN   ,ISKWN    ,RTRANS    ,
-     *              UNITAB   ,RWORK     ,SBUFSF    ,SISKWN   ,SSKEW     )
+        CALL HM_SET(SET      ,LSUBMODEL ,INV_GROUP   ,MAP_TABLES ,IPART     ,
+     *              IGRSURF  ,IGRNOD    ,IGRSLIN     ,IGRPART    ,IGRBRIC   ,
+     *              IGRQUAD  ,IGRSH4N   ,IGRSH3N     ,IGRTRUSS   ,IGRBEAM   ,
+     *              IGRSPRING,IXS       ,IXS10       ,IXC        ,IXTG      ,
+     *              KNOD2ELS ,NOD2ELS   ,KNOD2ELC    ,NOD2ELC    ,KNOD2ELTG ,
+     *              NOD2ELTG ,IPARTC    ,IPARTG      ,IPARTS     ,SH4TREE   ,
+     *              SH3TREE  ,IXQ       ,KNOD2ELQ    ,NOD2ELQ    ,X         ,
+     *              IXT      ,IXP       ,IXR         ,IXX        ,KXX       ,
+     *              KXSP     ,IXS20     ,IXS16       ,GEO        ,ITABM1    ,
+     *              IBOX     ,SKEW      ,IPARTQ      ,IPARTT     ,IPARTP    ,
+     *              IPARTR   ,SUBSETS   ,RBY_MSN     ,ISKWN      ,RTRANS    ,
+     *              UNITAB   ,RWORK     ,SBUFSF      ,SISKWN     ,SSKEW     ,
+     *              ROOTNAM  ,ROOTLEN   ,INFILE_NAME ,INFILE_NAME_LEN   )
      
      
 C        IF(ALLOCATED(RBY_MSN)) DEALLOCATE(RBY_MSN)
@@ -3704,13 +3842,14 @@ C        IF(ALLOCATED(RBY_MSN)) DEALLOCATE(RBY_MSN)
 C--------------------------------------------
       CALL STOPTIME(17,1)
 C--------------------------------------------
-C     LECTURE DES DRAPES
+C     READING DRAPES
 C--------------------------------------------
       ERR_MSG='DRAPE'
       ERR_CATEGORY='DRAPE'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
       NUMELC_DRAPE = 0
       NUMELTG_DRAPE = 0
+      stack%s_pm2 = 0      
       IF(NDRAPE > 0) THEN
         WRITE(ISTDO,'(A)')' .. DRAPE'
         ALLOCATE(DRAPE_WRK(NUMELC + NUMELTG),DRAPEG%INDX(NUMELC + NUMELTG))
@@ -3767,7 +3906,7 @@ C-------------------------
                ENDDO ! nbre of slice
              ENDDO                                                                                  
            ENDDO 
-           !! Dallocation of work drape momory 
+           !! Deallocation of work drape memory 
            DO I=1,NUMELC_DRAPE + NUMELTG_DRAPE
              IDSHEL = INDXSH(I)                                                 
              NPT = IWORKSH(1,IDSHEL)  
@@ -3791,10 +3930,11 @@ C-------------------------
      .                   IGEO       ,GEO        ,THKE       , STACK    ,
      .                   IGEO_STACK ,GEO_STACK , STACK_INFO ,
      .                   NUMGEOSTACK,NPROP_STACK,PLY_INFO)
+            stack%s_pm2 = size(stack%pm,dim=2)
          ELSE
             ALLOCATE(STACK%GEO(0,0))
             ALLOCATE(STACK%IGEO(0,0))
-            ALLOCATE(STACK%PM(0,0))
+            ALLOCATE(STACK%PM(stack_s_pm1,stack%s_pm2))
          ENDIF        
       ELSE ! with out drape
         ALLOCATE(DRAPE(0))
@@ -3805,10 +3945,11 @@ C-------------------------
      .                   IGEO       ,GEO        ,IWORKSH    ,THKE      ,
      .                   STACK      ,IPM        ,IGEO_STACK ,GEO_STACK ,
      .                   STACK_INFO ,NUMGEOSTACK,NPROP_STACK)
+            stack%s_pm2 = size(stack%pm,dim=2)     
          ELSE
             ALLOCATE(STACK%GEO(0,0))
             ALLOCATE(STACK%IGEO(0,0))
-            ALLOCATE(STACK%PM(0,0))
+            ALLOCATE(STACK%PM(stack_s_pm1,stack%s_pm2))
          ENDIF  
       ENDIF
 C--------------------------------------------
@@ -3858,7 +3999,7 @@ C---
      .                           MSGTYPE=MSGERROR,
      .                           C1='DT_R2R')
          DT_R2R(:) = 0
-C---  Premiere Passe -> comptage
+C--- First pass-> count
          CALL R2R_GROUP(NGRNOD,
      1        INNOD,FLAGG,IPARTS,IPARTQ,IPARTC,IPARTT,IPARTP,
      2        IPARTR,IPARTG,IPARTSP,IXS10,IXS20,IXS16,1,
@@ -3867,8 +4008,8 @@ C---  Premiere Passe -> comptage
      5        STACK%PM ,IWORKSH  ,IGRBRIC ,IGRQUAD   ,IGRSH4N ,
      6        IGRSH3N  ,IGRTRUSS ,IGRBEAM ,IGRSPRING ,IGRNOD  ,
      7        IGRSURF  ,IGRSLIN, LSUBMODEL,ALE_EULER ,IGEO    ,
-     8        NLOC_DMG ,DETONATORS,SENSORS%NSENSOR,SEATBELT_SHELL_TO_SPRING,
-     9        NB_SEATBELT_SHELLS,MAT_ELEM%MAT_PARAM)
+     8        NLOC_DMG ,DETONATORS,SEATBELT_SHELL_TO_SPRING,
+     9        NB_SEATBELT_SHELLS,MAT_ELEM%MAT_PARAM,NEBCS)
 C---
          ALLOCATE(IBUFTMP(IDX2)%ptr(SIBUFSSG+INNOD)   ,STAT=stat)
          IF(STAT /= 0) THEN
@@ -3886,7 +4027,7 @@ C---
 
          FLAGG = 1
 
-C---  Deuxieme Passe -> creation des interfaces
+C---  Second Pass -> interface creation
          CALL R2R_GROUP(NGRNOD,
      1        INNOD,FLAGG,IPARTS,IPARTQ,IPARTC,IPARTT,IPARTP,
      2        IPARTR,IPARTG,IPARTSP,IXS10,IXS20,IXS16,2,
@@ -3895,13 +4036,13 @@ C---  Deuxieme Passe -> creation des interfaces
      5        STACK%PM ,IWORKSH  ,IGRBRIC ,IGRQUAD   ,IGRSH4N ,
      6        IGRSH3N  ,IGRTRUSS ,IGRBEAM ,IGRSPRING ,IGRNOD  ,
      7        IGRSURF  ,IGRSLIN, LSUBMODEL,ALE_EULER ,IGEO    ,
-     8        NLOC_DMG ,DETONATORS,SENSORS%NSENSOR,SEATBELT_SHELL_TO_SPRING,
-     9        NB_SEATBELT_SHELLS,MAT_ELEM%MAT_PARAM)
+     8        NLOC_DMG ,DETONATORS,SEATBELT_SHELL_TO_SPRING,
+     9        NB_SEATBELT_SHELLS,MAT_ELEM%MAT_PARAM,NEBCS)
 C--------------------------------------------
-C     MULTIDOMAINS - SPLIT DES TABLEAUX
+C     MULTIDOMAINS - ARRAY SPLITTING
 C--------------------------------------------
          WRITE(ISTDO,'(A)')' .. MULTIDOMAINS DATA SPLIT '
-C---  Premiere Passe -> comptage
+C--- First pass-> count
          CALL R2R_SPLIT(
      1             NSLIN,
      2             NSURF,0,EANI,IBUFTMP(IDX2)%ptr,IXR_KJ,
@@ -3910,7 +4051,7 @@ C---  Premiere Passe -> comptage
      5             IGRSH4N,IGRSH3N,IGRTRUSS,IGRBEAM,IGRSPRING,
      6             IGRPART,IGRSLIN,LSUBMODEL,RBY_MSN,IWORKSH,
      7             SEATBELT_SHELL_TO_SPRING,NB_SEATBELT_SHELLS)
-C---  Deuxieme Passe -> split
+C--- second pass-> split
          CALL R2R_SPLIT(
      1             NSLIN,
      2             NSURF,1,EANI,IBUFTMP(IDX2)%ptr,IXR_KJ,
@@ -3921,7 +4062,7 @@ C---  Deuxieme Passe -> split
      7             SEATBELT_SHELL_TO_SPRING,NB_SEATBELT_SHELLS)
          DEALLOCATE(IBUFTMP(IDX2)%ptr)
 C--------------------------------------------
-C     MULTIDOMAINS - MISE A JOUR DES STRUCTURES DE DONNEES
+C     MULTIDOMAINS - DATA STRUCTURE UPDATE
 C--------------------------------------------
 
          WRITE(ISTDO,'(A)')' .. MULTIDOMAINS DATA UPDATE '
@@ -3934,7 +4075,7 @@ C--------------------------------------------
      .                         C1='XYZREF')
          FLAG_GOTO = 1
 
-C-----on realloue le tableau FRONT-------------
+C-----reallocating FRONT array-------------
          CALL INI_IFRONT()
          IENTRY2(1:NUMNOD) = -1
          FLAGKIN(1:NUMNOD) = 0
@@ -3964,19 +4105,19 @@ C----- OPTION name update ----------
 211      CONTINUE
          CALL R2R_NOM_OPT(NOM_OPT,INOM_OPT,IN10,IN20,SNOM_OPT_OLD)
 
-C-----on repointe les tableaux IXS10,20,16--
+C-----repointing IXS10,20,16 arrays--
          GOTO 212
 213      CONTINUE
 
-C-----on realloue les NOD2EL----------------
+C-----reallocating NOD2EL----------------
          GOTO 214
 215      CONTINUE
 
-C-----on repointe les tableaux IPART--------
+C-----repointing IPART arrays--------
          GOTO 216
 217      CONTINUE
 
-C-----on recalcule les connectivit   s inverses--------
+C-----recalculating inverse connectivities--------
 
          CALL BUILD_CNEL(
      2   IXS        ,IXQ        ,IXC        ,IXT      ,IXP      ,
@@ -3988,7 +4129,7 @@ C-----on recalcule les connectivit   s inverses--------
      8   NOD2ELQ    )
          IF(ALLOCATED(IWORK)) DEALLOCATE(IWORK)
 
-C-----on reinitialise les pointeurs utilisateurs-------
+C-----reinitializing user pointers-------
          CALL SAV_BUF_POINT(PM     ,1)
          CALL SAV_BUF_POINT(BUFMAT ,2)
          CALL SAV_BUF_POINT(GEO    ,3)
@@ -4004,14 +4145,14 @@ C--------------------------------------------
          IF(.NOT. ALLOCATED(NALE_R2R)) ALLOCATE(NALE_R2R(0))
          IF(.NOT. ALLOCATED(DT_R2R)) ALLOCATE(DT_R2R(0))
 C--------------------------------------------
-C     MULTIDOMAINS - CHECK DES INTERFACES
+C     MULTIDOMAINS - INTERFACE CHECK
 C--------------------------------------------
 
 C---  Check multidomains datas
       IF(NR2RLNK/=0) THEN
          CALL R2R_CHECK(IEXLNK,IGRNOD,IPART)
       ENDIF
-C---  Allocation de FRONTB_R2R
+C--- Allocation of FRONTB_R2R
       ALLOCATE(FRONTB_R2R(SFRONTB_R2R,NSPMD),STAT=stat)
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                           MSGTYPE=MSGERROR,
@@ -4019,7 +4160,7 @@ C---  Allocation de FRONTB_R2R
       FRONTB_R2R = 0
 
 C ------------------------------------------------
-C Tri des surfaces pour les Airbags et Modif files
+C Sorting of surfaces for airbags and modification files
 C ------------------------------------------------
       CALL SORT_SURF(IGRSURF,IXS,IXC,IXTG,IXQ,IXP,IXR,IXT, KXX,NIXX)
 C--------------------------------------------
@@ -4040,7 +4181,9 @@ C--------------------------------------------
       ERR_CATEGORY='TRANSFORMATIONS'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
       CALL LECTRANS(X        ,IGRNOD  ,ITAB   ,ITABM1 ,UNITAB,
-     .              LSUBMODEL,RTRANS)
+     .              LSUBMODEL,RTRANS  ,IGRSURF,ISKWN  ,SKEW  ,
+     .              LISKN    ,LSKEW   ,NSPCOND,NUMSPH ,SISKWN,
+     .              SSKEW    )
       CALL TRACE_OUT1()
       CLOSE(UNIT=IUSBM)
 C--------------------------------------------
@@ -4138,7 +4281,7 @@ C
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DE RANDOM NOISE
+C     READING RANDOM NOISE
 C--------------------------------------------
       ERR_MSG='RANDOM NOISE'
       ERR_CATEGORY='RANDOM NOISE'
@@ -4156,7 +4299,7 @@ C--------------------------------------------
 
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES SLIPRINGS AND RETRACTORS
+C     READING SLIPRINGS AND RETRACTORS AND /INTER/GUIDED_CABLE
 C--------------------------------------------
       ERR_MSG='SEATBELTS'
       ERR_CATEGORY='SEATBELTS'
@@ -4180,9 +4323,18 @@ C
       IF(NRETRACTOR > 0) CALL HM_READ_RETRACTOR(
      1                                           LSUBMODEL,ITABM1,IXR,ITAB,UNITAB,
      2                                           X,NPC1,NOM_OPT(LNOPT1*INOM_OPT(32)+1),ALEA,IPM)
+C     
+      IF (NGUIDED_CABLE > 0) CALL HM_READ_INTER_GUIDED_CABLE(LSUBMODEL,IGRNOD,NGRNOD,IGRPART,NGRPART,
+     .                                                       NPART,UNITAB,NUMELR,IPARTR,IXR,
+     .                                                       NIXR,NUMELP,IPARTP,IXP,NIXP,
+     .                                                       NUMELT,IPARTT,IXT,NIXT,NSPMD,
+     .                                                       KNOD2EL1D,NOD2EL1D,S_NOD2EL1D,NUMNOD,X,
+     .                                                       NUMELS,NUMELQ,NUMELC,NINTSUB,LTITR,
+     .                                                       LNOPT1,NOM_OPT(LNOPT1*INOM_OPT(4)+1),ITAB)
+C      
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES CONDITIONS LIMITES
+C     READING BOUNDARY CONDITIONS
 C--------------------------------------------
       ERR_MSG='BCS'
       ERR_CATEGORY='BCS'
@@ -4229,7 +4381,7 @@ C     Adaptive meshing : Sending down the bcs
       END IF
       CALL TRACE_OUT1()
 C--------------------------------------------------------------------------
-C     TRI DES BRICK ET QUAD, CLASSEMENT PAR LOI
+C     SORTING BRICKS AND QUADS, CLASSIFICATION BY LAW
 C--------------------------------------------------------------------------
       ERR_MSG='SOLIDS SORT'
       ERR_CATEGORY='INTERNAL'
@@ -4270,7 +4422,7 @@ C--------------------------------------------
       IF(SRBMPC > 0) RBMPC = ZERO
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     STOCKAGE DYNAMIQUE REEL
+C     DYNAMIC REAL STORAGE
 C--------------------------------------------
       ERR_MSG='DYNAMIC STORAGE REAL'
       ERR_CATEGORY='INTERNAL'
@@ -4349,7 +4501,7 @@ C
       IF(SASAVE > 0)   ASAVE   = ZERO
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES JOINTS COMPLEXES (GJOINT)
+C     READING COMPLEX JOINTS (GJOINT)
 C--------------------------------------------
       ERR_MSG='GJOINTS'
       ERR_CATEGORY='GJOINTS'
@@ -4362,9 +4514,20 @@ C--------------------------------------------
      3           D       ,UNITAB  ,IKINE1LAG,NOM_OPT(LNOPT1*INOM_OPT(18)+1),LSUBMODEL)
       CALL TRACE_OUT1()
 C--------------------------------------------
+C     READER FOR DETONATOR OPTIONS (/DFS/DET*)
+C--------------------------------------------
+      ERR_MSG='DETONATORS'
+      ERR_CATEGORY='DETONATORS'
+      CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
+      !new Reader
+      CALL READ_DETONATORS(ITABM1   ,ITAB      ,IGRNOD  ,
+     .                     PM       ,IPM       ,X       ,UNITAB ,
+     .                     LSUBMODEL,DETONATORS,XFRAME  ,IFRAME)
+      CALL TRACE_OUT1()
+C--------------------------------------------
 C     A.L.E.
-C     TABLEAUX DE VOISINS (OU FACETTES) DES ELEMENTS
-C     TABLEAUX DES NOEUDS VOISINS
+C     ELEMENT NEIGHBOR (OR FACET) ARRAYS
+C     NEIGHBOR NODE ARRAYS
 C--------------------------------------------
       CALL ALE_CONNECTIVITY%ALE_CONNECTIVITY_INIT()
       ERR_MSG='ALE LINKS'
@@ -4381,17 +4544,17 @@ C--------------------------------------------
         ENDIF
         CALL HM_READ_ALE_LINK(ICODE, ISKEW, ITAB, ITABM1, D,
      .       IGRNOD, IBCSLAG, LAG_NCF, LAG_NKF, LAG_NHF,
-     .       IKINE1LAG, LINALE, LSUBMODEL, UNITAB)
+     .       IKINE1LAG, LINALE, LSUBMODEL, UNITAB,NSUBDOM)
       ELSE
         ALLOCATE(LINALE(0))
       ENDIF
       ERR_MSG='ALE NEIGHBOURS'
-      IF(IALE+IEULER+IALELAG/=0)THEN
+      IF(IALE+IEULER+IALELAG /= 0)THEN
        WRITE(ISTDO,'(A)')TITRE(30)
        CALL ALELEC(
      1     ICODE    ,IXS      ,IXQ       ,IXC               ,IXT     ,
      2     IXTG     ,PM       ,IGEO      ,ITAB              ,GEO     ,
-     3     NALE_R2R ,NSUBDOM  ,MULTI_FVM ,ALE_CONNECTIVITY,GLOB_THERM%ITHERM)
+     3     NALE_R2R ,NSUBDOM  ,MULTI_FVM ,ALE_CONNECTIVITY,GLOB_THERM%ITHERM,DETONATORS%IS_SHADOWING_REQUIRED)
 C     ---------------------------------------------------------------
 C     Unplug neighbor elements in case of direct lagrangian coupling
 C     ---------------------------------------------------------------
@@ -4400,8 +4563,8 @@ C     ---------------------------------------------------------------
        ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     MULTIMATERIAUX
-C     INITIALISATION DES POURCENTAGES NODAUX
+C     MULTIMATERIALS
+C     INITIALIZATION OF NODAL PERCENTAGES
 C--------------------------------------------
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
        IF(NMULT>0)THEN
@@ -4415,7 +4578,7 @@ C--------------------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C---------------------------------------------------
-C     DETECTION DES ELEMENTS LOIS 6 PAROI---->LOI 17
+C     DETECTION OF ELEMENT LAW 6 WALL---->LAW 17
 C---------------------------------------------------
       ERR_MSG='CFD BOUNDARY ELEMENTS'
       ERR_CATEGORY='CFD BOUNDARY ELEMENTS'
@@ -4424,9 +4587,9 @@ C---------------------------------------------------
      +   CALL PAROI(PM     ,IXS    ,IXQ    ,ICODE  ,ALE_CONNECTIVITY%NALE   )
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     STOCKAGE DYNAMIQUE (CHARGEMENT) ENTIER
+C     DYNAMIC INTEGER STORAGE (LOADING)
 C--------------------------------------------
-C      LECTURE DES ELEMENTS MULTI-PURPOSE.
+C      READING MULTI-PURPOSE ELEMENTS.
 C---------------------------------------------
       ERR_MSG='MULTI-PURPOSE ELEMENTS'
       ERR_CATEGORY='MULTI-PURPOSE ELEMENTS'
@@ -4463,7 +4626,7 @@ C---------------------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES CONDITIONS DE SYMETRIE SPH.
+C     READING SPH SYMMETRY CONDITIONS.
 C---------------------------------------------
       ERR_MSG='SPH SYM'
       ERR_CATEGORY='SPH SYM'
@@ -4488,7 +4651,7 @@ C---------------------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C---------------------------------------------
-C      LECTURE DES INLET/OUTLET SPH.
+C      READING SPH INLET/OUTLET.
 C---------------------------------------------
       ERR_MSG='SPH I/O'
       ERR_CATEGORY='SPH I/O'
@@ -4524,9 +4687,9 @@ c         VSPHIO2(1:SVSPHIO2)=ZERO
          CALL HM_READ_SPHIO(ISPHIO   ,VSPHIO   ,IPART    ,IGRSURF  ,
      .                      NOD2SP   ,IPARTSP  ,ITAB     ,X        ,
      .                      LVSPHIO  ,LWASPIO  ,ITABM1   ,UNITAB   ,
-     .                      LSUBMODEL)
+     .                      LSUBMODEL,RTRANS   ,NRTRANS )
 C---- -----------------------------------------
-C        PREPARATION de la LISTE TRIEE des PARTICULES ON/OFF par PART.
+C        PREPARING SORTED LIST of ON/OFF PARTICLES by PART.
 C---------------------------------------------
          SLPRTSPH = 2*(NPART+1)
          SLONFSPH = NUMSPH
@@ -4559,18 +4722,23 @@ c         ALLOCATE(VSPHIO2(SVSPHIO2)      ,STAT=stat)
       ENDIF
       IF(NUMSPH > 0)THEN
 C---------------------------------------------
-C        REMPLISSAGE de SPBUF(2) = H
+C       FILLING SPBUF(2) = H
 C---------------------------------------------
-        CALL SPINIH(KXSP    ,IPART  ,IPARTSP ,SPBUF  ,PM     )
+        CALL SPINIH(KXSP    ,IPART  ,IPARTSP ,SPBUF  ,PM,
+     .              IXSP    ,NOD2SP ,X       ,LPRTSPH,LONFSPH,
+     .              SNOD2SP ,SLONFSPH,NUMNOD,NPART,ITAB)
 C---------------------------------------------
-C        TRI STARTER : Remplissage de IXSP
+C        STARTER SORTING : Filling IXSP
 C---------------------------------------------
+        PRE_SEARCH = 0
+        SZ_INTP_DIST = 1     ! Array MAX_INTP_DIST_PART not used for full search siz=1
         CALL SPTRI(KXSP    ,IXSP    ,NOD2SP  ,X      ,SPBUF  ,
-     .             LPRTSPH ,LONFSPH )
+     .             LPRTSPH ,LONFSPH ,IPARTSP ,SZ_INTP_DIST,MAX_INTP_DIST_PART,
+     .             PRE_SEARCH)
       END IF
       CALL TRACE_OUT1()
 C---------------------------------------------
-C       Masses nodales fluides
+C       Fluid nodal masses
 C---------------------------------------------
       ERR_MSG='FLUID NODAL MASSES'
       ERR_CATEGORY='FLUID NODAL MASSES'
@@ -4583,7 +4751,7 @@ C---------------------------------------------
       MSNF = ZERO
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     PRE-LECTURE DES FORCES CONCENTREES & PRESSIONS
+C     PRE-READING CONCENTRATED FORCES & PRESSURES
 C--------------------------------------------
       ERR_MSG='CONCENTRED LOADS'
       ERR_CATEGORY='CONCENTRED LOADS'
@@ -4623,11 +4791,11 @@ C--------------------------------------------
       DPL0CLD = ZERO
       VEL0CLD = ZERO
 C--------------------------------------------
-C     LECTURE DES FORCES CONCENTREES
+C     READING CONCENTRATED FORCES
 C--------------------------------------------
       IF(NCONLD/=0) THEN
         WRITE(ISTDO,'(A)')TITRE(33)
-C       NCONLD ET NPRELD sont modifies dans LECCLD et LECPRE
+C       NCONLD AND NPRELD are modified in LECCLD and LECPRE
         CALL HM_READ_CLOAD(IBCL   ,FORC   ,NCONLD,ITAB   ,ITABM1 ,
      .                     IGRNOD ,IBCL   ,UNITAB,ISKWN ,LSUBMODEL,
      .                     LOADS  )
@@ -4644,7 +4812,7 @@ C       NCONLD ET NPRELD sont modifies dans LECCLD et LECPRE
       END IF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES PRESSIONS
+C     READING PRESSURES
 C--------------------------------------------
       ERR_MSG='PRESSURE LOADS'
       ERR_CATEGORY='PRESSURE LOADS'
@@ -4655,11 +4823,11 @@ C--------------------------------------------
      .                     IGRSURF ,UNITAB ,LSUBMODEL ,LOADS   )
         NCONLD=NCONLD+NPRELD
       ENDIF
-C NCONLD ET NPRELD sont modifies dans LECCLD et LECPRE
+C NCONLD AND NPRELD are modified in LECCLD and LECPRE
       CALL TRACE_OUT1()
       IF(NSUBDOM>0) DEALLOCATE(NNCL)
 c
-c     pressure load in cylindrical coordintes
+c     pressure load in cylindrical coordinates
 c
       CALL HM_READ_PCYL(LOADS   ,IGRSURF ,SENSORS%NSENSOR,SENSORS%SENSOR_TAB ,TABLE   ,
      .                  IFRAME  ,UNITAB  ,LSUBMODEL,NUMBER_LOAD_CYL  )
@@ -4760,113 +4928,108 @@ C /BCS/CYCLIC ini&check
         ALLOCATE(ITAGCYC(0))
       END IF
 C--------------------------------------------
-      SFSAV = NTHVKI * (NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+NMONVOL+NFXBODY+NINTSUB)
+      SFSAV = NTHVKI * (NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+NMONVOL+NFXBODY
+     .                 +NINTSUB+NGUIDED_CABLE)
       ALLOCATE(FSAV(SFSAV)  ,STAT=stat)
       FSAV = ZERO
       CALL TRACE_OUT1()
 C     *****************************************************************    C
 C     Check if ALE or EULER materials are used with lagrangian thermics
 C     *****************************************************************    C
-
+C
+C--------------------------------------------
+C     READ INITIAL TEMPERATURE
+C--------------------------------------------
       NINTEMP = GLOB_THERM%NINTEMP
       IF (IALE + IEULER /= 0) THEN
-         IF (GLOB_THERM%ITHERM_FE == 0 .AND. (GLOB_THERM%NIMTEMP /= 0 .OR. NINTEMP /= 0)) THEN
-            CALL ANCMSG(MSGID=1724, ANMODE=ANINFO, MSGTYPE=MSGWARNING)
-         ENDIF
+        IF (GLOB_THERM%ITHERM_FE == 0 .AND. (GLOB_THERM%NIMTEMP /= 0 .OR. NINTEMP /= 0)) THEN
+          CALL ANCMSG(MSGID=1724, ANMODE=ANINFO, MSGTYPE=MSGWARNING)
+        ENDIF
       ENDIF
-
-C--------------------------------------------
-C     LECTURE DES TEMPURATURES INITIALES
-C--------------------------------------------
-C
       ERR_MSG='INITIAL TEMPERATURES'
       ERR_CATEGORY='INITIAL TEMPERATURES'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
+!
+      IF (GLOB_THERM%NINTEMP > 0) THEN
+        WRITE(ISTDO,'(A)')TITRE(35)
+        ALLOCATE(TEMP(NUMNOD))
+        TEMP(1:NUMNOD) = ZERO
+        ALLOCATE(INTIDS(NINTEMP))
+        CALL HM_READ_INITEMP(TEMP    ,NINTEMP ,GLOB_THERM%ITHERM_FE,ITAB  ,ITABM1  ,
+     .                       IGRNOD  ,INTIDS  ,UNITAB,LSUBMODEL )
+        DEALLOCATE(INTIDS)
+      END IF
+!
       IF (GLOB_THERM%ITHERM_FE > 0 ) THEN
-         ALLOCATE(MCP(NUMNOD),TEMP(NUMNOD))
-         MCP (1:NUMNOD) = ZERO
-         TEMP(1:NUMNOD) = ZERO
-C ----
-         IF (GLOB_THERM%NINTEMP > 0) THEN
-           WRITE(ISTDO,'(A)')TITRE(35)
-           ALLOCATE(INTIDS(NINTEMP))
-           CALL HM_READ_INITEMP(TEMP    ,NINTEMP ,GLOB_THERM%ITHERM_FE,ITAB  ,ITABM1  ,
-     .                          IGRNOD  ,INTIDS  ,UNITAB,LSUBMODEL )
-           DEALLOCATE(INTIDS)
-         ENDIF
+        ALLOCATE(MCP(NUMNOD))
+        IF (.NOT.ALLOCATED(TEMP)) THEN
+          ALLOCATE(TEMP(NUMNOD))
+          TEMP(1:NUMNOD) = ZERO
+        END IF
+        MCP (1:NUMNOD) = ZERO
 C
-         CALL HM_PREREAD_IMPTEMP(IGRSURF, IGRNOD, IGRBRIC, UNITAB, LSUBMODEL,
-     .                           GLOB_THERM%NIMTEMP,GLOB_THERM%NFXTEMP)
+        CALL HM_PREREAD_IMPTEMP(IGRSURF, IGRNOD, IGRBRIC, UNITAB, LSUBMODEL,
+     .                          GLOB_THERM%NIMTEMP,GLOB_THERM%NFXTEMP)
 c
-         CALL HM_PREREAD_CONVEC(IGRSURF, IGRNOD, IGRBRIC, UNITAB, LSUBMODEL,
-     .                          GLOB_THERM%NCONVEC ,GLOB_THERM%NUMCONV )
+        CALL HM_PREREAD_CONVEC(IGRSURF, IGRNOD, IGRBRIC, UNITAB, LSUBMODEL,
+     .                         GLOB_THERM%NCONVEC ,GLOB_THERM%NUMCONV )
 c
-         CALL HM_PREREAD_RADIATION(IGRSURF, IGRNOD, IGRBRIC,UNITAB, LSUBMODEL,
-     .                             GLOB_THERM%NRADIA ,GLOB_THERM%NUMRADIA)
+        CALL HM_PREREAD_RADIATION(IGRSURF, IGRNOD, IGRBRIC,UNITAB, LSUBMODEL,
+     .                            GLOB_THERM%NRADIA ,GLOB_THERM%NUMRADIA)
 c
-         CALL HM_PREREAD_IMPFLUX(IGRSURF, IGRNOD, IGRBRIC,UNITAB, LSUBMODEL,
-     .                           GLOB_THERM%NIMPFLUX,GLOB_THERM%NFXFLUX)
+        CALL HM_PREREAD_IMPFLUX(IGRSURF, IGRNOD, IGRBRIC,UNITAB, LSUBMODEL,
+     .                          GLOB_THERM%NIMPFLUX,GLOB_THERM%NFXFLUX)
 c
 
-         ALLOCATE(IBCV(GLOB_THERM%NICONV*GLOB_THERM%NUMCONV)     ,STAT=stat)
-         ALLOCATE(FCONV(GLOB_THERM%LFACTHER*GLOB_THERM%NUMCONV)  ,STAT=stat)
-         ALLOCATE(IBFTEMP(GLOB_THERM%NIFT*GLOB_THERM%NFXTEMP)    ,STAT=stat)
-         ALLOCATE(FBFTEMP(GLOB_THERM%LFACTHER*GLOB_THERM%NFXTEMP),STAT=stat)
-         ALLOCATE(IBFFLUX(GLOB_THERM%NITFLUX*GLOB_THERM%NFXFLUX) ,STAT=stat)
-         ALLOCATE(FBFFLUX(GLOB_THERM%LFACTHER*GLOB_THERM%NFXFLUX),STAT=stat)
-         ALLOCATE(IBCR(GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA)   ,STAT=stat)
-         ALLOCATE(FRADIA(GLOB_THERM%LFACTHER*GLOB_THERM%NUMRADIA),STAT=stat)
-     .            
-         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                              MSGTYPE=MSGERROR,
-     .                              C1='THERMAL DATA')
-          IBCR(1:GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA) = 0
+        ALLOCATE(IBCV(GLOB_THERM%NICONV*GLOB_THERM%NUMCONV)     ,STAT=stat)
+        ALLOCATE(FCONV(GLOB_THERM%LFACTHER*GLOB_THERM%NUMCONV)  ,STAT=stat)
+        ALLOCATE(IBFTEMP(GLOB_THERM%NIFT*GLOB_THERM%NFXTEMP)    ,STAT=stat)
+        ALLOCATE(FBFTEMP(GLOB_THERM%LFACTHER*GLOB_THERM%NFXTEMP),STAT=stat)
+        ALLOCATE(IBFFLUX(GLOB_THERM%NITFLUX*GLOB_THERM%NFXFLUX) ,STAT=stat)
+        ALLOCATE(FBFFLUX(GLOB_THERM%LFACTHER*GLOB_THERM%NFXFLUX),STAT=stat)
+        ALLOCATE(IBCR(GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA)   ,STAT=stat)
+        ALLOCATE(FRADIA(GLOB_THERM%LFACTHER*GLOB_THERM%NUMRADIA),STAT=stat)
+     .           
+        IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                             MSGTYPE=MSGERROR,
+     .                             C1='THERMAL DATA')
+         IBCR(1:GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA) = 0
 C
-         IF (GLOB_THERM%NUMCONV > 0 ) THEN
-           IBCV = 0
-           FCONV = ZERO
-           CALL HM_READ_CONVEC(IBCV,FCONV,ITAB,IXS,IGRSURF,UNITAB,LSUBMODEL,
-     .          GLOB_THERM%NCONVEC ,GLOB_THERM%NICONV,GLOB_THERM%NUMCONV,GLOB_THERM%LFACTHER)
-         ENDIF
+        IF (GLOB_THERM%NUMCONV > 0 ) THEN
+          IBCV = 0
+          FCONV = ZERO
+          CALL HM_READ_CONVEC(IBCV,FCONV,ITAB,IXS,IGRSURF,UNITAB,LSUBMODEL,
+     .         GLOB_THERM%NCONVEC ,GLOB_THERM%NICONV,GLOB_THERM%NUMCONV,GLOB_THERM%LFACTHER)
+        ENDIF
 C
-         IF (GLOB_THERM%NUMRADIA > 0 ) THEN
-           CALL HM_READ_RADIATION(IBCR,FRADIA,ITAB,IXS,IGRSURF,UNITAB,LSUBMODEL,
-     .          GLOB_THERM%NRADIA ,GLOB_THERM%NUMRADIA,GLOB_THERM%NIRADIA,GLOB_THERM%LFACTHER)
-         ENDIF
+        IF (GLOB_THERM%NUMRADIA > 0 ) THEN
+          CALL HM_READ_RADIATION(IBCR,FRADIA,ITAB,IXS,IGRSURF,UNITAB,LSUBMODEL,
+     .         GLOB_THERM%NRADIA ,GLOB_THERM%NUMRADIA,GLOB_THERM%NIRADIA,GLOB_THERM%LFACTHER)
+        ENDIF
 C
-         IF (GLOB_THERM%NFXTEMP > 0) THEN
-           IBFTEMP = 0
-           FBFTEMP = ZERO
-           CALL HM_READ_IMPTEMP(IBFTEMP,FBFTEMP,GLOB_THERM%NFXTEMP,ITABM1,
-     .                    IGRNOD ,IBFTEMP,ITAB   ,UNITAB,LSUBMODEL,
-     .                    GLOB_THERM%NIMTEMP,GLOB_THERM%NIFT,GLOB_THERM%LFACTHER)
-         ENDIF
+        IF (GLOB_THERM%NFXTEMP > 0) THEN
+          IBFTEMP = 0
+          FBFTEMP = ZERO
+          CALL HM_READ_IMPTEMP(IBFTEMP,FBFTEMP,GLOB_THERM%NFXTEMP,ITABM1,
+     .                   IGRNOD ,IBFTEMP,ITAB   ,UNITAB,LSUBMODEL,
+     .                   GLOB_THERM%NIMTEMP,GLOB_THERM%NIFT,GLOB_THERM%LFACTHER)
+        ENDIF
 C
-         IF (GLOB_THERM%NFXFLUX > 0 ) THEN
-           IBFFLUX = 0
-           FBFFLUX = ZERO
-           CALL HM_READ_IMPFLUX(IBFFLUX ,FBFFLUX ,ITAB   ,IXS    ,IGRSURF   ,
-     .                    UNITAB  ,IGRNOD  ,IGRBRIC, LSUBMODEL,
-     .                    GLOB_THERM%NIMPFLUX,GLOB_THERM%NITFLUX,GLOB_THERM%LFACTHER)
-         ENDIF
+        IF (GLOB_THERM%NFXFLUX > 0 ) THEN
+          IBFFLUX = 0
+          FBFFLUX = ZERO
+          CALL HM_READ_IMPFLUX(IBFFLUX ,FBFFLUX ,ITAB   ,IXS    ,IGRSURF   ,
+     .                   UNITAB  ,IGRNOD  ,IGRBRIC, LSUBMODEL,
+     .                   GLOB_THERM%NIMPFLUX,GLOB_THERM%NITFLUX,GLOB_THERM%LFACTHER)
+        ENDIF
 C
-       ELSE
-         ALLOCATE(MCP(0),TEMP(0))
-         ALLOCATE(IBCV(0),FCONV(0),IBFTEMP(0),FBFTEMP(0),
-     .            IBFFLUX(0),FBFFLUX(0),IBCR(0),FRADIA(0))
-       ENDIF
+      ELSE
+        ALLOCATE(MCP(0))
+        ALLOCATE(IBCV(0),FCONV(0),IBFTEMP(0),FBFTEMP(0),
+     .           IBFFLUX(0),FBFFLUX(0),IBCR(0),FRADIA(0))
+        IF (.NOT. ALLOCATED(TEMP)) ALLOCATE(TEMP(0))
+      ENDIF
 C
-      CALL TRACE_OUT1()
-C--------------------------------------------
-C     LECTURE DES POINTS DE DETONATION
-C--------------------------------------------
-      ERR_MSG='DETONATORS'
-      ERR_CATEGORY='DETONATORS'
-      CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
-      !new Reader
-      CALL READ_DETONATORS(ITABM1   ,ITAB   ,IGRNOD  ,
-     .                     IPM      ,X      ,UNITAB  ,
-     .                     LSUBMODEL,DETONATORS)
       CALL TRACE_OUT1()
 C--------------------------------------------
       IF(ISIGI==2 .OR. ISIGI==4) THEN
@@ -4879,7 +5042,7 @@ C--------------------------------------------
       ALLOCATE(FZERO(SFZERO)  ,STAT=stat)
       IF(SFZERO > 0) FZERO = ZERO
 C--------------------------------------------
-C     LECTURE DES IMPACT LASER
+C     READING LASER IMPACTS
 C--------------------------------------------
       ERR_MSG='LASER IMPACTS'
       ERR_CATEGORY='LASER IMPACTS'
@@ -4887,7 +5050,7 @@ C--------------------------------------------
       CALL LECLAS(LSUBMODEL)
       CALL TRACE_OUT1()
 C-------------------------------------------------
-C     GENERATION FACETTES EXTERNES (FICHIERS ANIM)
+C     GENERATING EXTERNAL FACETS (ANIM FILES)
 C     ALE-EULER SEULEMENT
 C-------------------------------------------------
       NFACX=0
@@ -4895,18 +5058,18 @@ C-------------------------------------------------
       ERR_CATEGORY='ELEMENTARY BOUNDARY CONDITIONS'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
       EBCS_TAG_CELL_SPMD(1:NUMELQ+NUMELTG+NUMELS)=0
-      CALL READ_EBCS(IGRSURF,MULTI_FVM,NPC1,LSUBMODEL,EBCS_TAB)
+      CALL READ_EBCS(IGRSURF,MULTI_FVM,NPC1,LSUBMODEL,EBCS_TAB,N2D)
       IF(NEBCS > 0)THEN
         !allocate & count
         IF(.NOT. ALLOCATED(SENSOR_TMP)) ALLOCATE( SENSOR_TMP(0) )
         CALL INIEBCS(ALE_CONNECTIVITY, 0, IGRSURF, IXS, IXQ, IXTG,
      .               PM, IGEO, X, SENSOR_TMP, MONVOl, MULTI_FVM%IS_USED,
-     .               EBCS_TAB, EBCS_TAG_CELL_SPMD)
+     .               EBCS_TAB, EBCS_TAG_CELL_SPMD, ITABM1)
         DEALLOCATE(SENSOR_TMP)
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES ACCELEROMETRES
+C     READING ACCELEROMETERS
 C--------------------------------------------
       ERR_MSG='ACCELEROMETERS'
       ERR_CATEGORY='ACCELEROMETERS'
@@ -4919,7 +5082,7 @@ C--------------------------------------------
      2          ISKWN,NOM_OPT(LNOPT1*INOM_OPT(1)+1), LSUBMODEL)
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES GAUGES
+C     READING GAUGES
 C--------------------------------------------
       ERR_MSG='GAUGES'
       ERR_CATEGORY='GAUGES'
@@ -4934,12 +5097,10 @@ C--------------------------------------------
      .                           MSGTYPE=MSGERROR,
      .                         C1='GAUGE')
       IF(NBGAUGE > 0) GAUGE=ZERO
-      IF(NBGAUGE > 0) CALL HM_READ_GAUGE(
-     1          LGAUGE,GAUGE ,ITABM1 ,UNITAB,IXC,
-     2          ISKWN,NOM_OPT(LNOPT1*INOM_OPT(27)+1),LSUBMODEL)
+      IF(NBGAUGE > 0) CALL HM_READ_GAUGE(LGAUGE,GAUGE,ITABM1,UNITAB,IXC,NOM_OPT(LNOPT1*INOM_OPT(27)+1),LSUBMODEL)
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES SENSORS
+C     READING SENSORS
 C--------------------------------------------
       ERR_MSG='SENSORS'
       ERR_CATEGORY='SENSORS'
@@ -4950,10 +5111,11 @@ c
       CALL SENSOR_USER_INIT(SENSOR_USER_STRUCT)
       ! -------------
 c
+      PYTHON%NB_SENSORS = 0
       CALL HM_READ_SENSORS(PYTHON,
      .     SENSORS   ,LACCELM  ,ITABM1    ,IPART     ,LGAUGE    ,
-     .     SUBSETS   ,NSETS    ,IGRSURF   ,IGRNOD    ,BUFSF     ,
-     .     SKEW      ,ISKWN    ,UNITAB    ,LSUBMODEL ,HM_NSENSOR,
+     .     SUBSETS   ,NSETS    ,IGRNOD    ,
+     .     ISKWN    ,UNITAB    ,LSUBMODEL ,HM_NSENSOR,
      .     SENSOR_USER_STRUCT)
       ! -----------------
       ! check if a user sensor is used with a list of node
@@ -4970,7 +5132,7 @@ c
       CALL TRACE_OUT1()
 
 C--------------------------------------------
-C     LECTURE DES VITESSES INITIALES
+C     READING INITIAL VELOCITIES
 C--------------------------------------------
       ERR_MSG='INITIAL VELOCITIES'
       ERR_CATEGORY='INITIAL VELOCITIES'
@@ -5024,9 +5186,16 @@ C--------------------------------------------
 C READ /BCS/WALL
         CALL HM_READ_BCS_WALL(UNITAB, LSUBMODEL, IGRNOD, NGRNOD, SENSORS, ITABM1, NUMNOD, MULTI_FVM)
       ENDIF
+C--------------------------------------------
+C     /BCS/NRF - NON REFLECTING BOUNDARY CONDITION
+C--------------------------------------------
+      IF(BCS%NUM_NRF /= 0) THEN
+C READ /BCS/WALL
+        CALL HM_READ_BCS_NRF(LSUBMODEL, IGRNOD, NGRNOD, ITABM1, NUMNOD, MULTI_FVM)
+      ENDIF
 
 C--------------------------------------------
-C     LECTURE DES PRELOADS
+C     READING PRELOADS
 C--------------------------------------------
       ERR_MSG='BOLT PRELOADING'
       ERR_CATEGORY='BOLT PRELOADING'
@@ -5065,14 +5234,20 @@ c
        IF(STAT /= 0) CALL ANCMSG(MSGID= 268,ANMODE=ANINFO,
      .                          MSGTYPE= MSGERROR,
      .                               C1= 'IFLAG_BPRELOAD')
+       ALLOCATE(IPRELOAD_FUN(2*NUMPRELOAD)    ,STAT=stat)
+       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                             MSGTYPE=MSGERROR,
+     .                         C1='IPRELOAD_FUN')
        IPRELOAD       = 0
        IFLAG_BPRELOAD = 0
        PRELOAD        = ZERO
+       IPRELOAD_FUN   = 0
 
        WRITE(ISTDO,'(A)')TITRE(34)
        CALL HM_READ_PRELOAD(IXS   ,IXS10     ,IPRELOAD ,PRELOAD,IFLAG_BPRELOAD,
      .                      NSTRF ,SENSORS   ,UNITAB ,X        ,
-     .                      EANI  ,ITAB      ,LSUBMODEL)
+     .                      EANI  ,ITAB      ,LSUBMODEL,
+     .                     SNPC   ,NPC       ,IPRELOAD_FUN)
 c
        IF(ALLOCATED(NSTRF))  DEALLOCATE(NSTRF)
        IF(ALLOCATED(SECBUF)) DEALLOCATE(SECBUF)
@@ -5091,6 +5266,7 @@ c
         IF(STAT /= 0) CALL ANCMSG(MSGID= 268,ANMODE=ANINFO,
      .                          MSGTYPE= MSGERROR,
      .                               C1= 'IFLAG_BPRELOAD')
+        ALLOCATE(IPRELOAD_FUN(0))
       ENDIF
 !      /PRELOAD/AXIAL  2 int 2 real per preload, itag_spring...
        ALLOCATE(PRELOAD_A(NPRELOAD_A)    ,STAT=stat)
@@ -5116,7 +5292,7 @@ c
        END IF 
       CALL TRACE_OUT1()
 C-------------------------------------------------
-C     LECTURE DES LIENS RIGIDES
+C     READING RIGID LINKS
 C--------------------------------------------
       ERR_MSG='RIGID LINKS'
       ERR_CATEGORY='RIGID LINKS'
@@ -5149,7 +5325,7 @@ C
 c--------------------------------------------
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES ANCIENS POIDS
+C     READING OLD WEIGHTS
 C--------------------------------------------
       CALL PRELEC_DDW(FILNAM,LEN_FILNAM,MARQUEUR3)
       IF(MARQUEUR3) THEN
@@ -5197,7 +5373,7 @@ C
       ENDIF
       CALL TRACE_OUT1()
 C---------------------------
-C Calcul ELEM RBY ON/OFF pour domdec
+C Calculate ELEM RBY ON/OFF for domdec
 C---------------------------
       ERR_MSG='RIGID BODIES ON'
       ERR_CATEGORY='RIGID BODIES'
@@ -5216,7 +5392,7 @@ C---------------------------
      6   IQUAOFF  ,KNOD2ELQ,NOD2ELQ,LSUBMODEL)
       CALL TRACE_OUT1()
 C---------------------------
-C Calcul ELEM OFF (RBE2) pour domdec
+C Calculate ELEM OFF (RBE2) for domdec
 C---------------------------
       ERR_MSG='RBE2 ON'
       ERR_CATEGORY='RBE2'
@@ -5227,7 +5403,7 @@ C---------------------------
      3   LSUBMODEL)
       CALL TRACE_OUT1()
 C---------------------------------------------
-C Calcul FLEXIBLE BODY - ELEM OFF pour domdec
+C Calculate FLEXIBLE BODY - ELEM OFF for domdec
 C---------------------------------------------
       ERR_MSG='FLEXIBLE BODIES ON'
       ERR_CATEGORY='FLEXIBLE BODIES'
@@ -5240,7 +5416,7 @@ C---------------------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES CLUSTERS DES ELEMENTS
+C     READING ELEMENT CLUSTERS
 C--------------------------------------------
       ERR_MSG='CLUSTERS'
       ERR_CATEGORY='CLUSTERS'
@@ -5250,7 +5426,7 @@ C--------------------------------------------
      .       IXS      ,IXR      ,NOM_OPT(LNOPT1*INOM_OPT(28)+1),
      .       LSUBMODEL)
 C--------------------------------------------
-C     LECTURE DES INITIAL VOLUME FRACTIONS
+C     READING INITIAL VOLUME FRACTIONS
 C--------------------------------------------
       CALL HM_READ_INIVOL(INIVOL, KVOL, IGRSURF ,IPART, MULTI_FVM, BUFMAT, 
      *                    IPM, NBSUBMAT, LSUBMODEL, UNITAB,
@@ -5300,14 +5476,12 @@ C----------------------------------
      .       UNITAB, NPC1, NPC, TF, IGRSURF, IGRBRIC, NOM_OPT(LNOPT1*INOM_OPT(2)+1),IFRAME, XFRAME,
      .       LSUBMODEL)
 
-        CALL INIT_MONVOL(T_MONVOL   , T_MONVOL_METADATA,
-     2       GEO     ,PM      ,
-     3       IXC     ,IXTG    ,X       ,NPC1    ,
-     4       ITABM1  ,ITAB      ,IGRSURF ,
-     5       SENSORS ,IGRBRIC  ,SBUFALE ,
-     6       NAIRWA  ,IXS     ,V       ,LIBAGALE,
-     7       NPC     ,TF      ,LRBAGALE,IPM     ,IGEO    ,
-     8       UNITAB  )
+        CALL INIT_MONVOL(T_MONVOL, T_MONVOL_METADATA,
+     3                   IXC     , IXTG             ,X       ,NPC1    ,
+     4                   ITAB    , IGRSURF          ,
+     5                   SENSORS , IGRBRIC          ,SBUFALE ,
+     6                   IXS     , V                ,LIBAGALE,
+     7                   LRBAGALE      )
 
         LIBAGJET=0
         LRBAGJET=0
@@ -5339,7 +5513,7 @@ C----------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C---------------------------
-C Calcul de DOF pour domdec implicite
+C Calculate DOF for implicit domdec
 C---------------------------
       ERR_MSG='IMPLICIT DOMAIN DECOMPOSITION'
       ERR_CATEGORY='IMPLICIT DOMAIN DECOMPOSITION'
@@ -5349,13 +5523,13 @@ C---------------------------
      2    IXP  ,IXR , IXTG, KXX,
      3    IXX  ,GEO )
 C---------------------------
-C DOMAIN DECOMPOSITION SUR MODELE COMPLET
-C CEP tableau donnant pour chaque element le proc associe.
-C allocation de taille NELEM
+C DOMAIN DECOMPOSITION ON COMPLETE MODEL
+C CEP array giving the associated processor for each element.
+C Allocation of size NELEM
 C---------------------------
-C IDDLEVEL indique le niveau de la domdec :
-C 0 == niveau 1) non prise en compte des interfaces (input v31)
-C 1 == niveau 2) prise en compte des interfaces dans la dd (input v41)
+C IDDLEVEL indicates the domdec level :
+C 0 == level 1) interfaces not taken into account (input v31)
+C 1 == level 2) interfaces taken into account in dd (input v41)
 C---------------------------
       IDDLEVEL = 0
       NELEMINT = 0
@@ -5396,7 +5570,7 @@ c FRONT(I,NSPMD+1) = FRONT(I,1)
           TRITELT(I)=ZERO
         ENDDO
         TPSREF = ZERO
-C       Sauvegarde longueurs tableaux lagmult
+C       Save lagmult array lengths
         LAG_NCF0 = LAG_NCF
         LAG_NKF0 = LAG_NKF
         LAG_NHF0 = LAG_NHF
@@ -5411,7 +5585,7 @@ C-------------------------
      .                     IGEO      ,IWORKSH     ,DRAPEG%INDX)
       ENDIF
 C-----------------------------------------------------
-C     LECTURE DES /PERTURB( random noise sur les epaisseurs des shells/part )
+C     READING /PERTURB( random noise on shell/part thicknesses )
 C-----------------------------------------------------
       ERR_MSG='PERTURB'
       ERR_CATEGORY='PERTURB'
@@ -5447,9 +5621,10 @@ C-----------------------------------------------------
 C-----------------
 C  Global Mat for PID 11 and PID51 (for shell)
 C-------------------------
-!!      IF(IGLOBMAT > 0) THEN ! global flag can be added
-      CALL GLOBMAT(IGEO  , GEO   ,PM ,STACK%PM, STACK%GEO,STACK%IGEO)
-!!      ENDIF
+
+      CALL GLOBMAT(IGEO  , GEO   ,PM ,STACK%PM, STACK%GEO,STACK%IGEO,
+     .             MAT_ELEM%MAT_PARAM)
+
 C-------------------------
 C Fill index to renumber Solid elements after Domain Decomposition
 C Array has 2 parts :
@@ -5463,18 +5638,19 @@ C PERMUTATION%SOLID(NUMELS+1:2*NUMELS) : INDEX(OLD)=NEW_ID
       PERMUTATION%SOLID = 0
 
 C------------------------------------------------------------------------
-C     REMPLACEMENT DES NOS EXTERNES DES FCTS ET SKEW PAR LES NOS SYSTEMES
+C     REPLACING EXTERNAL IDS OF FCTS AND SKEW BY SYSTEM IDS
 C------------------------------------------------------------------------
       ERR_MSG='USER TO SYSTEM RENUMBERING'
       ERR_CATEGORY='INTERNAL'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
-      CALL FSDCOD(BUFMAT   ,PM       ,GEO      ,IBCL      ,IPRES              ,
+      CALL FSDCOD(PYTHON, BUFMAT   ,PM       ,GEO      ,IBCL      ,IPRES              ,
      .            IBFV     ,ISKEW    ,ISKWN    ,SENSORS   ,MAT_ELEM%MAT_PARAM ,
      .            ITABM1   ,SKEW     ,LACCELM  ,BID13     ,BUFGEO             ,
      .            IBCSLAG  ,IGEO     ,IPM      ,
      .            IBFTEMP  ,IBCV     ,IBFV      ,
      .            IBCR     ,TABLE    ,NPC1     ,NPC       ,TF                 ,
-     .            NOM_OPT(LNOPT1*INOM_OPT(3)+1),IBFFLUX   ,GLOB_THERM)
+     .            NOM_OPT(LNOPT1*INOM_OPT(3)+1),IBFFLUX   ,GLOB_THERM,NIMPVEL,NIMPDISP,
+     .            NIMPACC)
 C
 c------------------------------------------------------------------------
 c     Update & check parameters of material laws
@@ -5491,7 +5667,7 @@ C
       CALL TRACE_OUT1()
 C------------------------------------------------------------------------
 C     OPTIONS SPH:
-C     REMPLACEMENT DES NOS EXTERNES DES FCTS
+C     REPLACING EXTERNAL IDS OF FCTS
 C------------------------------------------------------------------------
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
       IF(NSPHIO/=0)
@@ -5502,7 +5678,7 @@ C------------------------------------------------------------------------
 C
 CXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 C
-C 100 return adress for domain decomposition after reading of contact interfaces or AMS element selection
+C 100 return address for domain decomposition after reading of contact interfaces or AMS element selection
 C
 CXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -5545,6 +5721,20 @@ C
      .                       ISKWN   ,TF      ,NPC)
         CALL TRACE_OUT1()
       ENDIF
+C      
+C------------------------------------------------------------------
+C     RAYLEIGH DAMPING
+C--------------------------------------------
+      IF (NDAMP > 0) THEN
+        IF(IDDLEVEL==0)THEN
+          ERR_MSG='DAMPING'
+          ERR_CATEGORY='DAMPING'
+          CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))             
+          IF(NDAMP > 0) CALL HM_READ_DAMP(DAMPR,IGRNOD,ISKWN,LSUBMODEL,UNITAB,
+     .                                    SNPC1,NPC1,NDAMP_VREL_RBY,IGRPART,DAMP_RANGE_PART)
+          CALL TRACE_OUT1()
+        ENDIF     
+      ENDIF      
 C
 c-----------------------------------------------------------------------
 C
@@ -5740,6 +5930,24 @@ C
       ERR_MSG='DOMAIN DECOMPOSITION'
       ERR_CATEGORY='DOMAIN DECOMPOSITION'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
+
+      iwarnhb = 0 
+      call my_real_tot_int_transfer(numels,eani,isolnod0)
+      call my_real_tot_int_transfer(numeltg,eanit,ishell3nod0)
+
+      call get_element_group(numels,numelc,numeltg,nb_key, 
+     .                       nummat,numgeo,npart,npropgi, 
+     .                       npropmi,npropm,npropg,lipart1, 
+     .                       isms,idtgrs,npreload,icrack3d, 
+     .                       sh4tree_dim1,sh4tree_dim2,sh3tree_dim1,sh3tree_dim2, 
+     .                       ltitr,iwarnhb,trimat,nadmesh,iddlevel, 
+     .                       iparts,ipartc,ipartg,ipart,
+     .                       isoloff,isheoff,itrioff,isolnod0,ishell3nod0,
+     .                       iflag_bpreload,damp_range_part,tagprt_sms, 
+     .                       iworksh,ixs,ixc,ixtg, 
+     .                       igeo,ipm,sh4tree,sh3tree, 
+     .                       pm,geo,stack,mat_elem%mat_param,elm_group)
+      
       IF(IDDLEVEL==1) THEN
          NGROUP = 0
          LBUFEL = 0
@@ -5753,9 +5961,9 @@ c reset with savec IENTRY2
              CALL IFRONTPLUS(I,1)
            ENDIF
          ENDDO
-C        Remise a jour de FRONT pour les procs differents de 0
-C        IL faut prendre en compte les options ou front(i,p) = 1, p<>1
-C        les sensors de type 2 modifient front sur p<>1
+C        Update of FRONT for processors different from 0
+C        You have to take into account the options or front (i, p) = 1, p <> 1
+C        Type 2 sensors modify front on p<>1
       ELSEIF(IDDLEVEL==0) THEN
          IF(NELEM+NCONLD+GLOB_THERM%NUMCONV+GLOB_THERM%NUMRADIA+GLOB_THERM%NFXFLUX+SLCFIELD>0) THEN
            SCEP = NELEM+NCONLD+GLOB_THERM%NUMCONV+GLOB_THERM%NUMRADIA+GLOB_THERM%NFXFLUX+SLLOADP+NUMBER_LOAD_CYL
@@ -5779,7 +5987,7 @@ C        les sensors de type 2 modifient front sur p<>1
       K6 = K5 + NELEM
       K7 = K6 + NELEM
       K8 = K7 + NELEM
-C allocation moyenne normalement suffisante si taille de groupe moyenne > NVSIZ/2
+C Average allowance normally sufficient if average group size> NVSIZ/2
       LDD_IAD =  ((NELEM+NUMSPH)/NVSIZ/2)*(NSPMD+1)
       ALLOCATE(DD_TMP(LDD_IAD) ,STAT=stat)
       DD_TMP = 0
@@ -5811,7 +6019,6 @@ C allocation moyenne normalement suffisante si taille de groupe moyenne > NVSIZ/
       IF(.NOT. ALLOCATED(NPBY)) ALLOCATE(NPBY(0))
       IF(.NOT. ALLOCATED(LPBY)) ALLOCATE(LPBY(0))
       IF(.NOT. ALLOCATED( RBY)) ALLOCATE( RBY(0))
-
           CALL DOMETIS(
      1     IXS       ,IXQ      ,IXC      ,IXT     ,IXP      ,
      2     IXR       ,IXTG     ,CEP     ,GEO      ,
@@ -5827,10 +6034,11 @@ C allocation moyenne normalement suffisante si taille de groupe moyenne > NVSIZ/
      3     NSNT, NMNT_2,TABMP_L,IQUAOFF,
      4     IGRSURF  , FVMAIN,
      5     ITAB      ,IPART    ,IPARTC   ,IPARTG   ,IPARTS,
+     .     IPARTT, IPARTP  ,IPARTR   ,IPARTX   , IPARTQ,
      6     POIN_PART_SHELL,POIN_PART_TRI,POIN_PART_SOL,
      7     MID_PID_SHELL,MID_PID_TRI,MID_PID_SOL,T_MONVOL,
-     8     EBCS_TAG_CELL_SPMD,NPBY,LPBY,MAT_ELEM%MAT_PARAM)
-
+     8     EBCS_TAG_CELL_SPMD,NPBY,LPBY,MAT_ELEM%MAT_PARAM,
+     9     iworksh,elm_group)
       DEALLOCATE(IWORK)
 C---------------------------
 C     Domdec SPH
@@ -5880,8 +6088,8 @@ C---------------------------
       NUMELIG3DK8  =    NUMELIG3D
       NUMSPHK8     =    NUMSPH
 ! working int8 to avoid integer overflow for large models
-      EMAX = MAX(23*NUMELCK8,24*NUMELTGK8+1,29*NUMELSK8+1,19*NUMELRK8,
-     .           18*NUMELPK8+1,17*NUMELTK8,19*NUMELQK8,
+      EMAX = MAX(24*NUMELCK8,25*NUMELTGK8+1,30*NUMELSK8+1,19*NUMELRK8,
+     .           19*NUMELPK8+1,17*NUMELTK8,19*NUMELQK8,
      .           15*NUMELXK8+1,24*NUMELIG3DK8+1,NUMSPHK8) + 1
 
       ALLOCATE(IPARGTMP(NPARG,NUMEL)    ,STAT=stat)
@@ -5893,18 +6101,18 @@ C---------------------------
      .              ANMODE=ANSTOP,
      .              C1='IPARG')
       ENDIF
-C     REMPLACEMENT DES NOS EXTERNES DES SS-MATERIAUX PAR LES NOS SYSTEMES
+C     REPLACEMENT OF OUR EXTERNALS OF SS-MATERIAUX BY OUR SYSTEMS
       IF(IDDLEVEL == 0) CALL M20DCOD(MLAW_TAG,IPM, PM, MAT_ELEM%MAT_PARAM)
 C
-C adresse temporaire de DD_IAD
-C nombre de super groupes
+C Temporary address of DD_IAD
+C Number of super groups
       NSPGROUP = 0
-C buffer max (super groupe)
+C Buffer Max (super group)
       LB_MAX = 0
 C
       WRITE(ISTDO,'(A)')TITRE(37)
 C---------------------------------
-C-  PRE TRI + SUPER GROUPES
+C-  PRE-SORTING + SUPER GROUPS
 C---------------------------------
       NGR_SOL = 0
       IF(NUMELS/=0) THEN
@@ -5913,7 +6121,7 @@ C---------------------------------
         K2 = K1 + NUMELS
         K3 = K2 + NUMELS+1
         K4 = K3 + NUMELS*2
-        K5 = K4 + NUMELS*7
+        K5 = K4 + NUMELS*8
         !K5B= K4 + NUMELS
         K6 = K5 + NUMELS
         !warning: please also update any index change
@@ -5928,18 +6136,19 @@ C---------------------------------
 C
 C
         CALL SGRHEAD(
-     1       IXS     ,PM     ,GEO    ,INUM   ,BID13   ,
+     1       IXS     ,PM     ,GEO    ,INUM   ,
      2       ITRI1   ,EADD   ,INDEX1 ,ITRI2  ,IPARTS  ,
      3       ND      ,IGRSURF,IGRBRIC,EANI   ,
      4       CEP(OFF),ITRI3  ,IXS10  ,IXS20  ,IXS16   ,
      5       IGEO   ,IPM    ,NOD2ELS,ISOLOFF ,
      6       TAGPRT_SMS,SPH2SOL,SOL2SPH,MAT_ELEM%MAT_PARAM,
      7       SOL2SPH_TYP    ,IFLAG_BPRELOAD, CLUSTERS ,
-     8       RNOISE(1,MIN(SRNOISE2,NUMELC+NUMELTG+1)))
+     8       RNOISE(1,MIN(SRNOISE2,NUMELC+NUMELTG+1)),
+     9       DAMP_RANGE_PART,TRIMAT)
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
         IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
           ALLOCATE(DD_TMP2(IDX-1))
           DO I = 1, IDX-1
@@ -5952,7 +6161,7 @@ C test non depassement de LDD_IAD
           END DO
           DEALLOCATE(DD_TMP2)
         END IF
-C
+C 
         GRSOL_ID1 = NGROUP
         CALL SGRTAILS(
      1       IXS      ,PM       ,IPARGTMP ,GEO      ,
@@ -5963,7 +6172,7 @@ C
      6       IPM      ,NOD2ELS  ,ISOLOFF  ,ISOLNOD  ,
      7       TAGPRT_SMS,INIVOL  ,SPH2SOL  ,SOL2SPH  ,SOL2SPH_TYP,
      8       IFLAG_BPRELOAD, CLUSTERS ,MAT_ELEM%MAT_PARAM ,RNOISE(1,MIN(SRNOISE2,NUMELC+NUMELTG+1)),
-     9       IPRI)
+     9       IPRI     ,DAMP_RANGE_PART,IPRELOAD_FUN)
         GRSOL_ID2 = NGROUP
         NGR_SOL   = GRSOL_ID2 - GRSOL_ID1
 C
@@ -6004,11 +6213,11 @@ C
      1      IXQ       ,PM       ,GEO       ,INUM     ,BID13    ,
      2      ITR1      ,EADD     ,INDEX1    ,ITRI1    ,IPARTQ   ,
      4      ND        ,IGRSURF  ,IGRQUAD   ,CEP(OFF) ,MAT_ELEM%MAT_PARAM,
-     5      XEP       ,IGEO      ,IPM      ,IQUAOFF  )
+     5      XEP       ,IGEO      ,IPM      ,IQUAOFF  ,TRIMAT)
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
           IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
             ALLOCATE(DD_TMP2(IDX-1))
             DO I = 1, IDX-1
@@ -6035,16 +6244,16 @@ C---- COQUES
 C
       IF(NUMELC/=0) THEN
 C---------------------------------
-C-  PRE TRI + SUPER GROUPES
+C-  PRE-SORTING + SUPER GROUPS
 C---------------------------------
        K0 = 1
        K1 = 9*NUMELC
        K2 = 11*NUMELC
        K3 = 12*NUMELC+1
        K4 = 14*NUMELC+1
-       K5 = 21*NUMELC+1
-       K6 = 22*NUMELC+1
-       K7 = 23*NUMELC+1
+       K5 = 22*NUMELC+1
+       K6 = 23*NUMELC+1
+       K7 = 24*NUMELC+1
        !warning: please also update any index change
        !         for MODIF option (MODIF_SPMD.F)
        IWORK  = 0
@@ -6059,18 +6268,19 @@ C---------------------------------
        XNUM = ZERO
 C
        CALL CGRHEAD(
-     1   IXC     ,PM      ,GEO     ,INUM    ,BID13   ,
+     1   IXC     ,PM      ,GEO     ,INUM    ,
      2   ITR1    ,EADD    ,INDEX1  ,ITRI1   ,XNUM    ,
      3   IPARTC  ,ND      ,THKE    ,IGRSURF ,IGRSH4N ,
      4   CEP(OFF),XEP     ,IGEO    ,IPM     ,
      5   IPART   ,SH4TREE ,NOD2ELC ,ISHEOFF ,SH4TRIM ,
      6   TAGPRT_SMS,LGAUGE,IWORKSH ,MAT_ELEM%MAT_PARAM,
-     7   STACK   ,DRAPE   ,RNOISE  ,SH4ANG,DRAPEG, PTSHEL)
+     7   STACK   ,DRAPE   ,RNOISE  ,SH4ANG,DRAPEG, PTSHEL,
+     8   DAMP_RANGE_PART)
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
 c
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
          IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
            ALLOCATE(DD_TMP2(IDX-1))
            DO I = 1, IDX-1
@@ -6094,7 +6304,7 @@ C
      6        IPART    ,SH4TREE  ,NOD2ELC  ,ISHEOFF ,
      7        SH4TRIM  ,TAGPRT_SMS, LGAUGE,IWORKSH    ,
      8        STACK    ,DRAPE   ,RNOISE  ,MAT_ELEM%MAT_PARAM,
-     9        SH4ANG, IDDLEVEL , DRAPEG,IPRI, PTSHEL)
+     9        SH4ANG, IDDLEVEL , DRAPEG,IPRI, PTSHEL,DAMP_RANGE_PART)
 
          OFF = OFF + NUMELC
 
@@ -6132,7 +6342,7 @@ C
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
           IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
             ALLOCATE(DD_TMP2(IDX-1))
             DO I = 1, IDX-1
@@ -6158,12 +6368,12 @@ C
 C
 C-----
       IF(NUMELP > 0) THEN
-       K1 = 8*NUMELP
-       K2 = 9*NUMELP
-       K3 = 10*NUMELP+1
-       K4 = 12*NUMELP+1
-       K5 = 17*NUMELP+1
-       K6 = 18*NUMELP+1
+       K1 = 9*NUMELP
+       K2 = 10*NUMELP
+       K3 = 11*NUMELP+1
+       K4 = 13*NUMELP+1
+       K5 = 18*NUMELP+1
+       K6 = 19*NUMELP+1
       !warning: please also update any index change
       !         for MODIF option (MODIF_SPMD.F)
        IWORK  = 0
@@ -6173,16 +6383,20 @@ C-----
        INDEX1 => IWORK(K3+1:K4)
        ITRI1  => IWORK(K4+1:K5)
        XEP    => IWORK(K5+1:K6)
+C      
+        ALLOCATE(XNUM(3*NUMELP) ,STAT=stat)
+        XNUM(1:3*NUMELP) = ZERO
+C
        CALL PGRHEAD(
      1   IXP      ,PM       ,GEO      ,INUM     ,
      2   ITR1     ,EADD     ,INDEX1   ,ITRI1    ,IPARTP   ,
      3   ND       ,IGRSURF  ,IGRBEAM  ,CEP(OFF) ,
      4   XEP      ,IGEO     ,IPOUOFF  ,TAGPRT_SMS , IPM   ,
-     5   ITAGPRLD_BEAM)
+     5   ITAGPRLD_BEAM,IBEAM_VECTOR,RBEAM_VECTOR,XNUM)
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
           IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
             ALLOCATE(DD_TMP2(IDX-1))
             DO I = 1, IDX-1
@@ -6203,8 +6417,11 @@ C
      4      ITR1   ,IGRSURF ,IGRBEAM    ,IGEO    ,
      5      IPM    ,IPOUOFF ,TAGPRT_SMS,
      6      NOD2EL1D, IPRI  ,ITAGPRLD_BEAM,PRELOAD_A,
-     7      NPRELOAD_A)
+     7      NPRELOAD_A,IBEAM_VECTOR,RBEAM_VECTOR,XNUM)
+C    
           OFF = OFF + NUMELP
+C          
+          DEALLOCATE(XNUM)
         ENDIF
 C
 C-----
@@ -6235,7 +6452,7 @@ C
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
           IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
             ALLOCATE(DD_TMP2(IDX-1))
             DO I = 1, IDX-1
@@ -6261,16 +6478,16 @@ C
 C
       IF(NUMELTG/=0) THEN
 C---------------------------------
-C-  PRE TRI + SUPER GROUPES
+C-  PRE-SORTING + SUPER GROUPS
 C---------------------------------
        K1 = 10*NUMELTG
        K2 = 12*NUMELTG
        K3 = 13*NUMELTG+1
        K4 = 15*NUMELTG+1
-       K5 = 22*NUMELTG+1
-       K6 = 23*NUMELTG+1
-       K7 = 24*NUMELTG+1
-       K8 = 25*NUMELTG+1
+       K5 = 23*NUMELTG+1
+       K6 = 24*NUMELTG+1
+       K7 = 25*NUMELTG+1
+       K8 = 26*NUMELTG+1
        !warning: please also update any index change
        !         for MODIF option (MODIF_SPMD.F)
        IWORK  = 0
@@ -6289,14 +6506,15 @@ C---------------------------------
        ENDIF
        IF(N2D==0)THEN
          CALL C3GRHEAD(
-     1     IXTG    ,PM      ,GEO      ,INUM    ,BID13   ,
+     1     IXTG    ,PM      ,GEO      ,INUM    ,
      2     ITR1    ,EADD    ,INDEX1   ,ITRI1   ,XNUM   ,
      3     IPARTG  ,ND      ,THKEC    ,IGRSURF ,IGRSH3N ,
      4     CEP(OFF),XEP      ,IXTG1   ,EANIT   ,
      5     IGEO    ,IPM     ,IPART    ,SH3TREE ,NOD2ELTG,
      6     ITRIOFF ,SH3TRIM ,TAGPRT_SMS,
      7     IWORKSH , STACK  ,DRAPE  ,RNOISE(1,MIN(SRNOISE2,NUMELC+1)),
-     8     MULTI_FVM , SH3ANG,DRAPEG,PTSH3N,MAT_ELEM%MAT_PARAM)
+     8     SH3ANG,DRAPEG,PTSH3N,MAT_ELEM%MAT_PARAM,
+     9     DAMP_RANGE_PART)
        ELSE
          CALL T3GRHEAD(
      1     IXTG    ,PM      ,GEO      ,INUM    ,BID13   ,
@@ -6311,7 +6529,7 @@ C---------------------------------
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
          IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
            ALLOCATE(DD_TMP2(IDX-1))
            DO I = 1, IDX-1
@@ -6335,7 +6553,7 @@ C
      6          IPART    ,SH3TREE  ,NOD2ELTG ,ITRIOFF  ,
      7          SH3TRIM  ,TAGPRT_SMS,IWORKSH ,STACK      ,
      8          DRAPE   ,RNOISE(1,MIN(SRNOISE2,NUMELC+1)) ,
-     9          MAT_ELEM%MAT_PARAM,SH3ANG,DRAPEG,IPRI ,PTSH3N)
+     9          MAT_ELEM%MAT_PARAM,SH3ANG,DRAPEG,IPRI ,PTSH3N,DAMP_RANGE_PART)
          ELSE
            CALL T3GRTAILS(
      1          IXTG     ,PM       ,IPARGTMP ,GEO      ,
@@ -6357,13 +6575,8 @@ C
        DEALLOCATE(XNUM)
       ENDIF
 
-      IF(TETRAMESHER_USED) THEN
-         CALL APPLYSORT2FVM(T_MONVOL, IXS_TEMP, IXC, IXTG,
-     .        ITAB, NOM_OPT(LNOPT1*INOM_OPT(2)+1), NB_TOTAL_NODE)
-      ELSE
-         CALL APPLYSORT2FVM(T_MONVOL, IXS, IXC, IXTG,
-     .        ITAB, NOM_OPT(LNOPT1*INOM_OPT(2)+1), NUMNOD)
-      ENDIF
+      CALL APPLYSORT2FVM(T_MONVOL)
+
 C---------------------------------
       IF(NUMSPH/=0) THEN
             if ( .NOT. ALLOCATED(IXSPS) ) ALLOCATE(IXSPS(KVOISPH,NUMSPH),STAT=stat)
@@ -6380,7 +6593,7 @@ C---------------------------------
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
           IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
             ALLOCATE(DD_TMP2(IDX-1))
             DO I = 1, IDX-1
@@ -6429,7 +6642,7 @@ C---------------------------------
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
           IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
             ALLOCATE(DD_TMP2(IDX-1))
             DO I = 1, IDX-1
@@ -6502,7 +6715,7 @@ C
 C--------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
-C test non depassement de LDD_IAD
+C LDD_IAD Non -Department Test
         IF(IDX+ND*(NSPMD+1)>LDD_IAD)THEN
           ALLOCATE(DD_TMP2(IDX-1))
           DO I = 1, IDX-1
@@ -6521,7 +6734,7 @@ C
      2    DD_TMP    ,IDX       ,LB_MAX    ,INUM      ,INDEX1    ,
      3    CEP(OFF)  ,IPARTIG3D ,ITR1      ,IGRSURF   ,
      4    IXIG3D    ,IGEO      ,
-     5    PM        ,NIGE      ,KNOTLOCEL)
+     5    PM        ,NIGE      ,KNOTLOCEL, MAT_ELEM%MAT_PARAM)
         OFF = OFF + NUMELIG3D
       ENDIF
       DEALLOCATE(IWORK)
@@ -6643,7 +6856,7 @@ C-------------------------------------------------
       ENDDO
       DEALLOCATE(IPARGTMP)
 C-------------------------------------------------
-C provisoire
+C provisional
       IF(ISMS/=0)THEN
         DO N=1,NGROUP
           IPARG(NPARG*(N-1)+52)=1
@@ -6694,10 +6907,12 @@ C--------------------------------------------
        ALLOCATE(ITAGND(0),STAT=stat)
       END IF
 
+!     replace old /MAT/RIGID by RBODY by part	  
+      IF (N_NRBODY>0) IRIGID_MAT = 0
 C--------------------------------------------
-C     DOMAIN DECOMPOSITION 1 (reconstruction des tableaux)
+C     Domain Decomposition 1 (Reconstruction of Tables)
 C--------------------------------------------
-C si NSPMD = 1 il faut qd meme construire dd_iad et fr_iad
+C If nspmd = 1 you have to build dd_iad and fr_iad
       ERR_MSG='DOMAIN DECOMPOSITION ARRAYS'
       ERR_CATEGORY='DOMAIN DECOMPOSITION'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
@@ -6742,7 +6957,7 @@ C--------------------------------------------
       ERR_CATEGORY='GRAVITY'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
 c      CALL PRELECGRAV(NUMGRAV ,IGRNOD)
-      CALL HM_PREREAD_GRAV(NUMGRAV ,IGRNOD , LSUBMODEL)
+      CALL HM_PREREAD_GRAV(NUMGRAV ,IGRNOD , LSUBMODEL,N_NRBODY)
       SIGRV = NIGRV*NGRAV
       SLGRAV = NUMGRAV
       IF(IDDLEVEL==0)THEN
@@ -6761,7 +6976,7 @@ c      CALL PRELECGRAV(NUMGRAV ,IGRNOD)
      .                 ITAGND  ,LSUBMODEL)
       CALL TRACE_OUT1()
 C----------------------------------
-C     LECTURE DES CARTES INIGRAV
+C     READING OF INIGRAV MAPS
 C----------------------------------
       ERR_MSG='INIGRAV'
       ERR_CATEGORY='GRAVITY'
@@ -6788,7 +7003,7 @@ C----------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C----------------------------------
-C     LECTURE DES CARTES INIMAP1D
+C     READING OF INIMAP1D MAPS
 C----------------------------------
       ERR_MSG = 'INIMAP1D'
       ERR_CATEGORY= 'INITIALIZATION'
@@ -6811,7 +7026,7 @@ C----------------------------------
       ENDIF
       CALL TRACE_OUT1()
 C----------------------------------
-C     LECTURE DES CARTES INIMAP2D
+C     Reading INIMAP2D cards
 C----------------------------------
       ERR_MSG = 'INIMAP2D'
       ERR_CATEGORY= 'INITIALIZATION'
@@ -6924,7 +7139,7 @@ C        PFLUID & PBLAST & LOAD PRESSURE
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES RBE2 Constraints
+C     Reading RBE2 constraints
 C--------------------------------------------
       ERR_MSG='RBE2'
       ERR_CATEGORY='RBE2'
@@ -6958,7 +7173,7 @@ C--------------------------------------------
       ENDDO
 
 C--------------------------------------------
-C     LECTURE DES RBE3 Interpolation Constraints
+C     READING RBE3 Interpolation Constraints
 C--------------------------------------------
       CALL TRACE_OUT1()
       ERR_MSG='RBE3'
@@ -7007,8 +7222,9 @@ C    CHECK ENGINE FILE DYNAIN or STATE if to use F.I. total strain for QEPH
 C-------------------------------------------
       ISTR_24 = 0
       IF(NUMELC/=0) CALL CHECK_QEPH_STRA(ISTR_24)
+      IF (ISIGI < 0) ISTR_24=1 
 C--------------------------------------------
-C     LECTURE DES ELEMENTS DESACTIVABLES
+C     Reading deactivatable elements
 C--------------------------------------------
       ERR_MSG='ELEMENTS DEACTIVATION'
       ERR_CATEGORY='ELEMENTS DEACTIVATION'
@@ -7262,13 +7478,13 @@ C--------------------------------------------
       CALL ALE_CONNECTIVITY%ALE_CONNECTIVITY_INIT()
       IF(ALE_CONNECTIVITY%has_ne_connect) THEN
          CALL ALE_CONNECTIVITY%ALE_COMPUTE_CONNECTIVITY(NUMNOD, NUMELQ, NUMELTG, NUMELS,
-     .        NIXQ, NIXTG, NIXS, ITAB,
+     .        NIXQ, NIXTG, NIXS,
      .        IXQ, IXTG, IXS)
       ENDIF
       CALL ALE_CONNECTIVITY%ALE_COMPUTE_EE_CONNECTIVITY(PM,IGEO,
      .     NPROPGI,NUMGEO, NPROPM, NUMMAT , NUMNOD, NUMELQ, NUMELTG, NUMELS, N2D,
-     .     IALE  , IEULER, GLOB_THERM%ITHERM, IALELAG,
-     .     NIXQ  , NIXTG , NIXS  , ITAB   ,
+     .     IALE  , IEULER, GLOB_THERM%ITHERM, IALELAG,DETONATORS%IS_SHADOWING_REQUIRED,
+     .     NIXQ  , NIXTG , NIXS  ,
      .     IXQ   , IXTG  , IXS   )
 C--------------------------------------------
       IF(NSUBDOM > 0) THEN
@@ -7289,32 +7505,40 @@ C--------------------------------------------
      .                      NGROUP,    NPARG,      IPARG,        NPROPG,
      .                      NUMGEO,      GEO,     DEFAULTS%SHELL%IOFFSET)
       IF (DEFAULTS%SHELL%IOFFSET>0) THEN
+
         IF (IDDLEVEL == 0) THEN 
           NULLIFY(X_C) 
           IF (DEFAULTS%SHELL%IOFFSET==1) THEN
             ALLOCATE(ITAGOSET(NUMELC+NUMELTG), STAT=Stat)
-            ITAGOSET = 0
             ALLOCATE(XYZ(3*NUMNOD), STAT=Stat)
+          ELSE
+            ALLOCATE(ITAGOSET(0), STAT=Stat)
+          END IF
+        END IF
+
+          NULLIFY(X_C) 
+          IF (DEFAULTS%SHELL%IOFFSET==1) THEN
             XYZ(1:3*NUMNOD) = X(1:3*NUMNOD)
             X_C=>XYZ
           ELSE
-            ALLOCATE(ITAGOSET(0), STAT=Stat)
             X_C=>X
           END IF
+
+
+          ITAGOSET = 0
           CALL SHELL_OFFSETP(
      .                NGROUP,    NPARG,      IPARG,        NPROPG,
      .                NUMGEO,      GEO,     NUMELC,          NIXC,
      .                   IXC,  NUMELTG,      NIXTG,          IXTG,
      .                NUMNOD,      X_C,       THKE,      ITAGOSET,
      .                DEFAULTS%SHELL)
-        END IF
       ELSEIF (IDDLEVEL == 0) THEN
         NULLIFY(X_C) 
         X_C=>X
       END IF
 C
 C--------------------------------------------
-C     LECTURE DES INTERFACES
+C     Reading interfaces
 C--------------------------------------------
       ERR_MSG='INTERFACES'
       ERR_CATEGORY='INTERFACES'
@@ -7322,7 +7546,7 @@ C--------------------------------------------
       NINTSTAMP=0
       NMNT   = 0
       INTERFACES%PARAMETERS%ISTIF_DT = 0
-C PROBINT egalement initialisee dans ENGINE (rdresa)
+C Also initialized in Engine (RDRESA)
       PROBINT=HALF
       INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 0
 
@@ -7331,7 +7555,9 @@ C PROBINT egalement initialisee dans ENGINE (rdresa)
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_1)
       ENDIF
-
+C--------------------------------------------------------------   
+      IF(NINTER + NGUIDED_CABLE> 0) WRITE(ISTDO,'(A)')TITRE(38)   
+C      
       IF(NINTER > 0)THEN
        IF(IDDLEVEL == 0) THEN
          ALLOCATE(XFILTR(NINTER)       ,STAT=stat)
@@ -7353,8 +7579,7 @@ C PROBINT egalement initialisee dans ENGINE (rdresa)
 C
        IF(IDDLEVEL == 0) CALL STARTIME(10,1)
        IF(IDDLEVEL == 1) CALL STARTIME(11,1)
-
-       WRITE(ISTDO,'(A)')TITRE(38)
+C 
        IF(NINTSUB/=0)THEN
           CALL HM_READ_INTSUB(IGRNOD ,IGRSURF,NOM_OPT(LNOPT1*INOM_OPT(3)+1),IGRSLIN,LSUBMODEL)
        END IF
@@ -7382,6 +7607,17 @@ C--------------------------------------------------------------
 C
        IF(.NOT. ALLOCATED(ALE_CONNECTIVITY%NALE)) ALLOCATE(ALE_CONNECTIVITY%NALE(0))
 
+       IF(NINTER > 0) THEN 
+         ALLOCATE(LIST_NIN25(NINTER))
+         LIST_NIN25(1:NINTER) = 0
+       ENDIF
+       IF(NINTER25 >0.AND.NUMELS > 0)  THEN
+         ALLOCATE(FLAG_ELEM_INTER25(NINTER25,NUMELS))
+         FLAG_ELEM_INTER25 (1:NINTER25,1:NUMELS) = 0
+       ELSE
+         ALLOCATE(FLAG_ELEM_INTER25(0,0))
+       ENDIF
+
        CALL LECINT (IPARI       ,NINTER    ,IPM                           ,BUFMAT         ,
      .              NMNT        ,ITAB      ,ITABM1                        ,GEO            ,
      .              PM          ,X         ,IGRNOD                        ,IGRSURF        ,IGRSLIN  ,
@@ -7395,7 +7631,8 @@ C
      .              IXS16       ,IXS20     ,DEF_INTER                     ,MAXNSNE        ,
      .              NPC1        ,MULTI_FVM ,NOM_OPT(LNOPT1*INOM_OPT(29)+1),INTBUF_FRIC_TAB,            
      .              IGRBRIC     ,IGRSH3N   ,IGRTRUSS                      ,MAXRTM_T2      ,NSN_MULTI_CONNEC,
-     .              T2_NB_CONNEC,IDDLEVEL  ,ALE_CONNECTIVITY%NALE         ,INTERFACES     ,SNPC1)
+     .              T2_NB_CONNEC,IDDLEVEL  ,ALE_CONNECTIVITY%NALE         ,INTERFACES     ,SNPC1   ,
+     .              FLAG_ELEM_INTER25      ,LIST_NIN25)
 
        !need to allocate only once at first passage in lectur
        FLAG_ALLOCATE = 1
@@ -7457,7 +7694,7 @@ C
      .             NOD2ELTG ,INTBUF_TAB,KNOD2ELS ,NOD2ELS                      ,IXS10  ,
      .             IXS16    ,IXS20     ,NIGE     ,RIGE                         ,XIGE   ,
      .             VIGE     ,IGRBRIC   ,MULTI_FVM,ALE_CONNECTIVITY%NALE        ,IGEO   ,
-     .             INTERFACES)
+     .             INTERFACES,S_NOD2ELS,S_NOD2ELTG,FLAG_ELEM_INTER25           ,LIST_NIN25)
 C
 cc     DEALLOCATE(XFILTR)
 cc     DEALLOCATE(STFAC)
@@ -7473,7 +7710,7 @@ c      CALL ANCHECK(IDS)
          CALL ININTSUB(
      .          ITAB      ,IGRNOD  ,IGRSURF   ,
      .          IPARI  ,MAXRTM,NOM_OPT(LNOPT1*INOM_OPT(3)+1),
-     .          INTBUF_TAB,MAXRTMS ,IGRSLIN   )
+     .          INTBUF_TAB,MAXRTMS ,IGRSLIN   ,MAXNSNE)
        ENDIF
 C----
        IF(IDDLEVEL == 0) THEN
@@ -7565,7 +7802,7 @@ C read /INIBRI/FILL before interfaces stiffness
 
 C
 C fill interface structure to be used by sorting 
-c set INTERCEP for INT7 only to avoid bug with INT20 dur to renumerotation
+c set INTERCEP for INT7 only to avoid bug with INT20 due to renumbering
 c in I20NLG (other interface types still done in SET_INTERCEP)
         CALL FILL_INTERCEP(IPARI,INTBUF_TAB,INTERCEP)
 C
@@ -7580,12 +7817,13 @@ C
      A               KNOD2EL1D ,IXS10      ,INTER_CAND                   ,FRIGAP           ,IXS16       ,
      B               IXS20     ,IPM        ,NOM_OPT(LNOPT1*INOM_OPT(3)+1),IPARTS           ,SISKWN      ,
      C               KXX       ,IXX        ,IGEO                         ,INTERCEP         ,LELX        ,
-     D               INTBUF_TAB,FILLSOL    ,STACK%PM                     ,IWORKSH          ,NSNT        ,
+     D               INTBUF_TAB,FILLSOL    ,STACK                        ,IWORKSH          ,NSNT        ,
      E               NMNT_2    ,KXIG3D     ,IXIG3D                       ,KNOD2ELQ         ,NOD2ELQ     ,
      F               SEGQUADFR ,TAGPRT_FRIC,INTBUF_FRIC_TAB              ,IPARTT           ,
      G               IPARTP    ,IPARTX     ,IPARTR                       ,NSN_MULTI_CONNEC ,T2_NB_CONNEC,
      H               SICODE    ,ICODE      ,ISKEW                        ,MULTI_FVM        ,S_NOD2ELS   ,
-     I               SITAB     ,SITABM1)
+     I               SITAB     ,SITABM1    ,FLAG_ELEM_INTER25            ,LIST_NIN25       ,IRESP       ,
+     J               NIXX      ,S_NOD2EL1D )
       IF(IDDLEVEL == 0) CALL STOPTIME(12,1)
       IF(IDDLEVEL == 1) CALL STOPTIME(13,1)
 
@@ -7596,7 +7834,10 @@ C
          ENDIF
       ENDDO
       IF(IDEL_SOLID == 0) INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 0
-         
+ 
+        DEALLOCATE (FLAG_ELEM_INTER25)  
+        DEALLOCATE (LIST_NIN25)  
+      
         DEALLOCATE (T2_NB_CONNEC)
         DEALLOCATE (RWORK)
         DEALLOCATE (IWORK)
@@ -7606,7 +7847,7 @@ C
           DEALLOCATE(FRIC_P)
           DEALLOCATE(FRIGAP)
         END IF
-C-------------RBE3 use IXINT--pour opt.
+C------------ RBE3 uses IXINT-POUR opt.
         IF(LXINTD>0.AND.NSPMD>1)THEN
          IF(LIXINT+LXINTD > INTER_CAND%S_IXINT_2)THEN
            CALL UPGRADE_IXINT(INTER_CAND,NELEMINT,LXINTD)
@@ -7634,10 +7875,16 @@ C
         !--------------------------------------------!
 C
       ENDIF
-
+C--------------------------------------------------------------
+C     Printout for /INTER/GUIDED_CABLE
+C--------------------------------------------------------------
+      IF ((NGUIDED_CABLE > 0).AND.(IDDLEVEL==0)) THEN
+        CALL HM_PRINT_INTER_GUIDED_CABLE(NINTER,NINTSUB,NGRNOD,NGRPART,IGRNOD,IGRPART,
+     .                                   NPARI,IPARI,LTITR,LNOPT1,NOM_OPT(LNOPT1*INOM_OPT(4)+1))
+      ENDIF
 
 C--------------------------------------------
-C     LECTURE DES MURS RIGIDES
+C     Reading rigid walls
 C--------------------------------------------
         ERR_MSG='RIGID WALLS'
         ERR_CATEGORY='RIGID WALLS'
@@ -7658,6 +7905,7 @@ C
         ALLOCATE(RWORK(SRWORK)    ,STAT=stat)
         RWORK = ZERO
         NRWLAG = 0
+        SLN_PEN = 0
 c
         IF(NRWALL > 0) THEN
           WRITE(ISTDO,'(A)')TITRE(39)
@@ -7667,12 +7915,14 @@ c
      3         IXQ      ,NPC1     ,D        ,IGRNOD   ,
      4         SRWBUF   ,IMERGE   ,UNITAB   ,
      5         IKINE1LAG,IDDLEVEL ,LSUBMODEL ,RTRANS  ,
-     6         NOM_OPT(LNOPT1*INOM_OPT(5)+1),ITAGND)
+     6         NOM_OPT(LNOPT1*INOM_OPT(5)+1),ITAGND   ,SLN_PEN )
         ENDIF
 C
 
         IF(IDDLEVEL==0) THEN
           ALLOCATE(LPRW(SLPRW)  ,STAT=stat)
+          CALL MY_ALLOC(RWSTIF_PEN,SLN_PEN)
+          RWSTIF_PEN = ZERO
         END IF
         LPRW = IWORK(1:SLPRW)
         DEALLOCATE(IWORK)
@@ -7692,7 +7942,7 @@ C
         CALL TRACE_OUT1()
 C
 C--------------------------------------------
-C     LECTURE DES MASSES AJOUTEES
+C     Reading added masses
 C--------------------------------------------
         ERR_MSG='ADDED MASSES'
         ERR_CATEGORY='ADDED MASSES'
@@ -7731,7 +7981,7 @@ C---
         ENDIF
         CALL TRACE_OUT1()
 C--------------------------------------------
-C     LECTURE DES STRUCTURES RIGIDES
+C     Reading rigid structures
 C--------------------------------------------
         ERR_MSG='RIGID ENTITIES'
         ERR_CATEGORY='RIGID BODY'
@@ -7785,10 +8035,10 @@ C
      3       SENSORS   ,IMERGE  ,UNITAB  ,ISKWN   ,NOM_OPT   ,
      4       SLRBODY   ,KNOD2ELS,KNOD2ELC,KNOD2ELTG,KNOD2EL1D,
      5       KNOD2ELQ  ,ITAGND  ,ICNDS10 ,LSUBMODEL,ICFIELD  ,
-     6       LCFIELD   )
+     6       LCFIELD   ,SLRBODY ,N_NRBODY,NRBODY_TO_PART)
         ENDIF
 C--------------------------------------------
-C     LECTURE DES FUSIONS DE RIGID BODY
+C     Reading rigid body merges
 C--------------------------------------------
       IF(NRBMERGE > 0) THEN
         CALL HM_READ_MERGE(
@@ -7798,34 +8048,46 @@ C--------------------------------------------
      .      LSUBMODEL)
       ENDIF
 C--------------------------------------------
-C     CHECK DES STRUCTURES RIGIDES
+C     rigid body hierarchy
+C--------------------------------------------
+      IF(NRBYKIN > 0) THEN
+        call hierarchy_rbody(NRBYKIN ,NNPBY ,NPBY  ,SLRBODY ,LPBY  ,
+     .                       NRBY    ,RBY   ,NUMNOD,IOUT    ,LNOPT1,
+     .                       NOM_OPT )
+      ENDIF
+C--------------------------------------------
+C     Checking rigid structures
 C--------------------------------------------
       IF(NRBYKIN > 0) THEN
         CALL CHECKRBY(
      1       RBY    ,NPBY    ,LPBY   ,ITAB   ,
-     2       D      ,IDDLEVEL,NOM_OPT,SLRBODY)
+     2       D      ,IDDLEVEL,NOM_OPT,SLRBODY,
+     3       ROOTNAM,ROOTLEN )
       ENDIF
 C--------------------------------------------
-C     LECTURE RB LAGRANGE
+C     Checking rigid part
+C--------------------------------------------
+      IF(N_NRBODY > 0) THEN
+        CALL RBODY_PART_CHECK(NRBYKIN ,NNPBY ,NPBY  ,SLRBODY ,LPBY  ,       
+     .                        NUMNOD  ,ITAB  ,NPART ,IPART   ,LIPART1,       
+     .                        ICODE   ,ISKEW ,NFXVEL,NIFV    ,IBFV ,
+     .                        NGRAV   ,NIGRV ,IGRV  ,SLGRAV  ,LGRAV) 
+        CALL RPART_INIVEL_CHECK(NRBYKIN ,NNPBY ,NPBY  ,SLPBY    ,LPBY   ,        
+     .                        HM_NINVEL ,NUMNOD,ITABM1,LSUBMODEL,UNITAB ,        
+     .                        NTRANSF   ,NRTRANS,RTRANS,RBY_INIAXIS,ISKWN,     
+     .                         LISKN    ,NUMSKW ,LSKEW  ,SKEW   ,IFRAME  ,        
+     .                         NUMFRAM  ,NXFRAME,XFRAME ,NGRNOD ,IGRNOD  , 
+     .                         N2D      ,X      ,V     ,VR  )
+
+      END IF
+C--------------------------------------------
+C     READING RB LAGRANGE
 C--------------------------------------------
       IF(NRBYLAG > 0) THEN
          CALL HM_READ_RBODY_LAGMUL(RBYL    ,NPBYL   ,LPBYL   ,IGRNOD   ,LSUBMODEL ,
      .                             ITAB    ,ITABM1  ,D       ,IKINE1LAG,NOM_OPT)
       ENDIF
       CALL TRACE_OUT1()
-C------------------------------------------------------------------
-C     RAYLEIGH DAMPING
-C--------------------------------------------
-      IF (NDAMP > 0) THEN
-        IF(IDDLEVEL==0)THEN
-          ERR_MSG='DAMPING'
-          ERR_CATEGORY='DAMPING'
-          CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
-          IF(NDAMP > 0) CALL HM_READ_DAMP(DAMPR,IGRNOD,ISKWN,LSUBMODEL,UNITAB,NPBY,
-     .                                    SNPC1,NPC1,NDAMP_VREL_RBY)
-          CALL TRACE_OUT1()
-        ENDIF     
-      ENDIF
 C--------------------------------------------
       IF(NINTER > 0) THEN
 C--------------------------------------------
@@ -7871,7 +8133,7 @@ C---------------------------------
 C---------------------------------
 #ifdef DNC
 C--------------------------------------------
-C     LECTURE et PREPARATION DES ELEMENTS FINIS A ENVOYER A MADYMO :
+C     READING AND PREPARATION OF FINITE ELEMENTS TO SEND TO MADYMO:
 C     "EXTENDED COUPLING".
 C--------------------------------------------
       ERR_MSG='MADYMO INTERFACED FEM'
@@ -7929,7 +8191,7 @@ C--------------------------------------------
       IF(.NOT. ALLOCATED(ICONX)) ALLOCATE(ICONX(0))
 #endif
 C---------------------------------------------
-C     LECTURE DES CORPS FLEXIBLES
+C     Reading flexible bodies
 C---------------------------------------------
       ERR_MSG='FLEXIBLE BODIES'
       ERR_CATEGORY='FLEXIBLE BODIES'
@@ -8024,7 +8286,7 @@ C
 C
          CALL HM_READ_FXB2(FXBIPM,  FXBRPM, FXBNOD, FXBGLM,
      .                FXBCPM,   FXBCPS,  FXBLM,  FXBFLS, FXBDLS,
-     .                FXBMOD, ITAB    , ITABM1 , NOM_OPT(LNOPT1*INOM_OPT(11)+1),FXB_LAST_ADRESS,
+     .                FXBMOD, ITAB    , ITABM1 , NOM_OPT(LNOPT1*INOM_OPT(11)+1),FXB_LAST_ADDRESS,
      .                LSUBMODEL)
 C
 C
@@ -8257,7 +8519,7 @@ c
 C
       CALL ELBUF_INI(ELBUF_TAB,MAT_ELEM%MAT_PARAM,
      .               MLAW_TAG ,PROP_TAG ,FAIL_TAG ,
-     .               IGEO     ,IPM      ,PM       ,IPARG      ,IPART     ,
+     .               IGEO     ,IPM      ,IPARG      ,IPART     ,
      .               IPARTSP  ,IXS      ,IXQ      ,IXC        ,IXTG      ,
      .               FLAG_XFEM,IPARTIG3D,STACK    ,IGEO_STACK ,
      .               IXT      ,IXP      ,IXR      ,KXX        ,GEO       ,
@@ -8273,7 +8535,7 @@ c
         DO IXEL=1,NXEL
           CALL ELBUF_INI(XFEM_TAB(1:NGROUP,IXEL),MAT_ELEM%MAT_PARAM,
      .         MLAW_TAG ,PROP_TAG ,FAIL_TAG ,
-     .         IGEO                   ,IPM      ,PM       ,IPARG    ,IPART     ,
+     .         IGEO                   ,IPM      ,IPARG    ,IPART     ,
      .         IPARTSP                ,IXS      ,IXQ      ,IXC      ,IXTG      ,
      .         FLAG_XFEM              ,IPARTIG3D,STACK    ,IGEO_STACK,
      .         IXT                    ,IXP      ,IXR      ,KXX      ,GEO       ,
@@ -8334,7 +8596,7 @@ C
       NSIGTRUSS = 0
       IF(ISIGI/=0)THEN
         NSIGSH = NVSHELL
-        NSIGRS = 54  ! not cover NUVAR --> to be replaced by NSIGRS = NVSPRI
+        NSIGRS = NVSPRI  
         NSIGBEAM = NVBEAM
         NSIGTRUSS = NVTRUSS
         IF(NUBEAM > 0) NSIGBEAM = NSIGBEAM + NUBEAM
@@ -8510,7 +8772,7 @@ C----
         ALLOCATE(NSHNOD(0)     ,STAT=stat)
       ENDIF
 
-C-- Rot. Stiffness parithon computation -> allocated even if no interfaces, to avoid "if" in element routines
+C-- Rot. Stiffness parith/on computation -> allocated even if no interfaces, to avoid "if" in element routines
       ALLOCATE(STRC(NUMELC)       ,STAT=stat)
       ALLOCATE(STRP(NUMELP)       ,STAT=stat)
       ALLOCATE(STRR(NUMELR)       ,STAT=stat)
@@ -8542,7 +8804,7 @@ C
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
 C
 C----------------------------------
-C -- LECTURE OF INITIAL STATE DATA
+C -- READING OF INITIAL STATE DATA
 C----------------------------------
 C
       ALLOCATE(SIGI(NSIGS,LSIGI)                  ,STAT=stat)
@@ -8607,10 +8869,10 @@ C
      &            IGRNOD     , IGRSURF        , BUFSF            , VR                 ,
      &            BUFMAT     , XLAS           , ILAS             , DTELEM             , MSS      ,
      &            MSQ        , MSC            , MSTR             , MSP                , MSR      ,
-     &            MSTG       , PTG            , INC              , 
+     &            MSTG       , PTG            , INC              , NOD2ELTG           , KNOD2ELTG,
      &            INP        , INR            , INTG             , INDEX              ,
      &            ITRI       , KXX            , IXX              , XELEMWA            ,
-     &            IWA        ,
+     &            IWA        , NOD2ELQ        , KNOD2ELQ         , NOD2ELS            , KNOD2ELS ,
      &            KXSP       , IXSP           , NOD2SP           , ISPCOND            , ICODE    ,
      &            ISKEW      , ISKWN          , ISPSYM           , XFRAME             , ISPTAG   ,
      &            SPBUF      , MSSX           , NSIGI            ,
@@ -8650,11 +8912,15 @@ C
      &            IGRQUAD    , IGRSH4N        , IGRSH3N          , IGRPART            , TOTMAS   ,
      &            KNOTLOCPC  , KNOTLOCEL      , VNIGE            , BNIGE              , FXBGLM   ,
      &            FXBCPM     , FXBCPS         , FXBLM            , FXBFLS             , FXBDLS   ,
-     &            FXB_MATRIX , FXB_MATRIX_ADD , FXB_LAST_ADRESS  , INOM_OPT(11)       , R_SKEW   ,
+     &            FXB_MATRIX , FXB_MATRIX_ADD , FXB_LAST_ADDRESS  , INOM_OPT(11)       , R_SKEW   ,
      &            KNOD2EL1D  , NOD2EL1D       , EBCS_TAB         , RBY_INIAXIS        , ALEA     ,
      &            KNOD2ELC   , NOD2ELC        , DR               , SLRBODY            , DRAPEG   ,
      &            IPARI      , INTBUF_TAB     , INTERFACES       , MAT_ELEM%MAT_PARAM ,
-     &            NPRELOAD_A , PRELOAD_A      , FAIL_FRACTAL     ,FAIL_BROKMANN       ,DEFAULTS  )
+     &            NPRELOAD_A , PRELOAD_A      , FAIL_FRACTAL     ,FAIL_BROKMANN       ,DEFAULTS  ,
+     &            NDAMP_FREQ_RANGE,DAMPR      , IBEAM_VECTOR     , RBEAM_VECTOR       ,D         ,
+     &            LSIGI      ,LSIGSP          , SRNOISE2         ,NPRW               ,LPRW       ,
+     &            RWSTIF_PEN ,SLN_PEN         ,ROOTLEN           ,ROOTNAM          ,NGUIDED_CABLE,
+     &            TOTMAS1   )
 
 
       IF(NINTER>0.AND.NUMELIG3D>0) THEN
@@ -8663,6 +8929,23 @@ C
           CALL BULKFAKEIGEO3(ELBUF_TAB,IPARG,PM,KXIG3D,IGRSURF,STIFINT)
         ENDIF
       ENDIF
+C----------------------------------
+C -- SFEM (nodal pressure) exception initialization
+C----------------------------------
+      NE_SFEM = 0
+      IF(ISFEM>0) THEN
+        CALL SFEM_EXCLUDE_DIM(
+     &             NUMNOD,  NPARG,  NGROUP,  IPARG,      IXS,                   
+     &             NUMELS,NE_SFEM)
+      ENDIF
+      IF(NE_SFEM > 0) THEN
+          call my_alloc(IN_SFEM,NE_SFEM) 
+      ELSEIF(.NOT. ALLOCATED(IN_SFEM)) THEN
+          ALLOCATE(IN_SFEM(0))
+      END IF
+      CALL SFEM_EXCLUDE_INI(
+     &             NUMNOD,  NPARG,  NGROUP,  IPARG,      IXS,                   
+     &             NUMELS,IN_SFEM, NE_SFEM)
 C
 C----------------------------------
 C
@@ -8672,7 +8955,7 @@ C
       CALL TRACE_OUT1()
 !---
 C--------------------------------------------
-C     INITIALISATION DES BUFFERS  --- IGRNOD, IGRBRIC, ..., IGRSURF, ... ---
+C     INITIALIZATION OF BUFFERS  --- IGRNOD, IGRBRIC, ..., IGRSURF, ... ---
 C--------------------------------------------
       ERR_MSG='GROUP ENTITIES BUFFER INITIALIZATION'
       ERR_CATEGORY='INTERNAL'
@@ -8828,8 +9111,10 @@ C
 C
 C  NFRBYM = 28 (
 C  NIRBYM = 2
-         ALLOCATE(RBYM(NFRBYM*NRBYM),IRBYM(NRBYM*NIRBYM),
-     .                                         LNRBYM(NGSLNRBYM))
+         ALLOCATE(RBYM(NFRBYM*NRBYM),IRBYM(NRBYM*NIRBYM),LNRBYM(NGSLNRBYM))
+         RBYM = 0
+         IRBYM = 0
+         LNRBYM = 0
 C
          CALL RIGID_MAT(NRBYM   ,NGSLNRBYM ,SLNRBM, NSLNRBM ,RMSTIFN,
      .                  RMSTIFR ,X     ,V       ,MS      , IN       ,
@@ -8930,8 +9215,8 @@ c------------------------------
 c
       INDX_CRK = 0  ! For Anim
       NCRKPART = 0  ! Nombre des parts xfem  (local proc)
-      NCRKXFE  = 0  ! Nombre des noeuds xfem
-      ECRKXFE  = 0  ! Nombre des elements xfem
+      NCRKXFE  = 0  ! number of xfem nodes
+      ECRKXFE  = 0  ! number of xfem elements
       ECRKXFEC = 0  ! Nombre des shells 4N xfem
       ECRKXFETG= 0  ! Nombre des shells 3N xfem
 c------------------------------
@@ -8945,19 +9230,19 @@ c-----
           WRITE(ISTDO,'(A)')' .. XFEM MIXED MONO/MULTI-LAYER SHELL'
         ENDIF
 c-----
-c       numerotation locale des noeuds et elems fantomes des parts xfem
-c       IEL_CRKXFEM  : local system numerotation of Xfem shells
-c       INOD_CRKXFEM : local system numerotation of Xfem nodes
+c       local numbering of ghost nodes and elements of xfem parts
+c       IEL_CRKXFEM  : local system numbering of Xfem shells
+c       INOD_CRKXFEM : local system numbering of Xfem nodes
 c--------------------------------------------------
 c       build local Xfem node and element tables
         CALL PRETAG_XFEM(IPARG  ,ITAGE   ,IEL_CRKXFEM,ITAGN   ,INOD_CRKXFEM)
 c
-c       build xfem sky adress table
+c       build xfem sky address table
         CALL PRECRKXFEM(IPARG ,IXC  ,IXTG   ,NCRKXFE ,
      .                  IEL_CRKXFEM ,INOD_CRKXFEM    ,ADDCNE_CRKXFEM)
 c--------------------------------------------------
-c       ADDCNE_CRKXFEM = tableau adresses sky Xfem
-        LCNE_CRKXFEM = ADDCNE_CRKXFEM(NCRKXFE+1) - 1    ! longueur tableau sky CNE_CRKXFEM
+c       Addcne_crkxfem = Sky Xfem addresses table
+        LCNE_CRKXFEM = ADDCNE_CRKXFEM(NCRKXFE+1) - 1    ! Table length Sky CNE_CRKXFEM
         ALLOCATE(CRKNODIAD(LCNE_CRKXFEM)    ,STAT=stat)
         ALLOCATE(CNE_CRKXFEM(LCNE_CRKXFEM)  ,STAT=stat)
         ALLOCATE(CEL_CRKXFEM(ECRKXFE)       ,STAT=stat)
@@ -8982,9 +9267,9 @@ c
 c--------------------------------------------------
         DEALLOCATE(ITAGN,ITAGE)
 C       NODGLOBXFE
-        SNODGLOBXFE = 4*ECRKXFE*NLEVMAX  ! nb max de noeuds phant, tous les plis. faux si mixte
+        SNODGLOBXFE = 4*ECRKXFE*NLEVMAX  ! NB max of Phant nodes, all folds.fake
 C
-        NUMEDGES = 0   ! nb des edges glob (pareil tous les plis)
+        NUMEDGES = 0   ! number of global edges (same for all plies)
         SIEDGESH = 4*ECRKXFEC + 3*ECRKXFETG
 c
         ALLOCATE(IEDGESH(SIEDGESH),STAT=stat)
@@ -9098,7 +9383,7 @@ C----------------------------------
      3              ITRUOFF,IPOUOFF,IRESOFF,ITRIOFF,IGRNRB2,
      4               IGRNOD ,IRBE2  )
 C----------------------------------
-C     RBODY Desactivation des elements des rigid body (on par defaut)
+C     rbody deactivation of rigid body elements (on by default)
 C----------------------------------
       CALL SETELOFF(IXS    ,IXC    ,IXT    ,IXP    ,IXR    ,
      2              IXTG   ,IPARG  ,        ISOLOFF,ISHEOFF,
@@ -9152,7 +9437,7 @@ C-------------------------------------------------------------
 
 C-------------------------------------------------------------
 C----------------------------------
-C     Interf. type 7 et 21 : affectation des rigidites cote second
+C     Interf.Type 7 and 21: Assignment of rigidites on the second side
 C----------------------------------
       ERR_MSG='INTERFACES STIFFNESS'
       ERR_CATEGORY='INTERFACES'
@@ -9198,7 +9483,7 @@ C---------------------------
         ENDIF
       CALL TRACE_OUT1()
 C----------------------------------
-C     LECTURE DES RIVETS
+C     reading rivets
 C----------------------------------
       ERR_MSG='RIVETS'
       ERR_CATEGORY='RIVETS'
@@ -9257,7 +9542,7 @@ c
           SEATBELT_SHELL_TO_SPRING(1,2) = 0
         ENDIF
 C----------------------------------
-C     LECTURE DES SECTIONS
+C     reading sections
 C----------------------------------
       ERR_MSG='SECTIONS'
       ERR_CATEGORY='SECTIONS'
@@ -9274,13 +9559,14 @@ C----------------------------------
         NSTRF  = 0
         SECBUF = ZERO
         CALL LECSEC42(IXS    ,IXQ    ,IXC    ,IXT    ,IXP    ,IXR    ,
-     2                IXTG   ,X      ,NSTRF  ,ITAB   ,ITABM1 ,
+     2                IXTG   ,X      ,ITAB   ,ITABM1 ,
      3                IGRNOD   ,SECBUF ,
      4                IPARI  ,IXS10  ,IXS20  ,IXS16  ,UNITAB ,
      5                ISKWN  ,XFRAME ,ISOLNOD,NOM_SECT,RTRANS,
      6                LSUBMODEL,NOM_OPT(LNOPT1*INOM_OPT(8)+1),IGRBRIC,IGRQUAD,IGRSH4N,
      7                IGRTRUSS ,IGRBEAM,IGRSPRING,IGRSH3N,SEATBELT_SHELL_TO_SPRING,
      8                NB_SEATBELT_SHELLS)
+       SNSTRF = SIZE(NSTRF)
       ELSE
         SNSTRF  = 0
         SSECBUF = 0
@@ -9298,7 +9584,7 @@ c
      .            NSECT   ,NINTER ,NINTSUB ,NRWALL   ,NRBODY  )
 c
 C----------------------------------
-C     LECTURE DES JOINTS
+C     reading joints
 C----------------------------------
       ERR_MSG='JOINTS'
       ERR_CATEGORY='JOINTS'
@@ -9318,7 +9604,7 @@ C----------------------------------
 c      CALL ANCHECK(83)
       CALL TRACE_OUT1()
 C-------------------------------------------------
-C     BLOCAGE DES NOEUDS MAT 11 HORS DOMAINE CALCULE
+C     BLOCKING MAT 11 NODES OUTSIDE COMPUTED DOMAIN
 C-------------------------------------------------
       ERR_MSG='BLOCK BOUNDARY MATERIAL NODES'
       ERR_CATEGORY='BLOCK BOUNDARY MATERIAL NODES'
@@ -9379,13 +9665,9 @@ C
       ERR_CATEGORY='FVMBAG MESHING'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
       IF(TETRAMESHER_USED) THEN
-         CALL FVMESH0(T_MONVOL, NODE_COORD,  IXS_TEMP, IXC, IXTG, PM,
-     .        IPM, ITAB,  IGRSURF, XYZREF  ,
-     .        NOM_OPT(LNOPT1*INOM_OPT(2)+1), NB_TOTAL_NODE)
+         CALL FVMESH0(T_MONVOL, NODE_COORD, IXS_TEMP, IXC, IXTG, PM,IPM, IGRSURF, XYZREF ,NB_TOTAL_NODE)
       ELSE
-         CALL FVMESH0(T_MONVOL, X,  IXS, IXC, IXTG, PM,
-     .        IPM, ITAB,  IGRSURF, XYZREF  ,
-     .        NOM_OPT(LNOPT1*INOM_OPT(2)+1), NUMNOD)
+         CALL FVMESH0(T_MONVOL, X,          IXS,      IXC, IXTG, PM,IPM, IGRSURF, XYZREF ,NUMNOD)
       ENDIF
 
       CALL COPY_TO_VOLMON(T_MONVOL, LRCBAG, T_MONVOL_METADATA%RCBAG, SVOLMON, VOLMON)
@@ -9397,7 +9679,7 @@ C
       ERR_CATEGORY='BEM FLOW'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
 C----------------------------------
-C     LECTURE DES ECOULEMENTS (FLUIDE INCOMPRESSIBLE OU THERMIQUE)
+C     reading flows (incompressible fluid or thermal)
 C----------------------------------
       IF(NFLOW>0) THEN
          CALL HM_PREREAD_BEM(IGRSURF, IGRNOD , NNFT  ,
@@ -9414,7 +9696,7 @@ C
 C
          CALL HM_READ_BEM(IGRSURF, IFLOW,   RFLOW,
      .                 NPC1   , IGRNOD , MEMFLOW(1,1),UNITAB,
-     .                 X, NOM_OPT(LNOPT1*INOM_OPT(12)+1),LGAUGE, IGRV, LSUBMODEL)
+     .                 X, NOM_OPT(LNOPT1*INOM_OPT(12)+1),LGAUGE, IGRV, LSUBMODEL,IRESP)
 C
       ELSE
          ALLOCATE(IFLOW(0), RFLOW(0))
@@ -9428,14 +9710,14 @@ c
          SEGINDX = 0
          !update due to domain decomposition
          CALL INIEBCS(ALE_CONNECTIVITY, 1,IGRSURF, IXS, IXQ, IXTG,
-     .        PM, IGEO, X, SENSORS, MONVOl, MULTI_FVM%IS_USED, EBCS_TAB, EBCS_TAG_CELL_SPMD)
+     .        PM, IGEO, X, SENSORS, MONVOl, MULTI_FVM%IS_USED, EBCS_TAB, EBCS_TAG_CELL_SPMD,ITAB)
          !initialization
         CALL INIEBCSP0(X, IPARG, ELBUF_TAB, EBCS_TAB, IXS, IXQ, IXTG, IPARTS, IPARTQ, IPARTG, PM, IPM, MAT_ELEM%MAT_PARAM)
-        CALL INIEBCS_PROPERGOL(IXS,IXQ,IXTG,MULTI_FVM%IS_USED,EBCS_TAB,MAT_ELEM%MAT_PARAM,SIXS,SIXQ,SIXTG,NUMMAT)
+        CALL INIEBCS_PROPELLANT(IXS,IXQ,IXTG,MULTI_FVM%IS_USED,EBCS_TAB,MAT_ELEM%MAT_PARAM,SIXS,SIXQ,SIXTG,NUMMAT)
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     MULTIPLICATEURS DE LAGRANGE
+C     Multiplier Lagrange
 C--------------------------------------------
       ERR_MSG='LAGRANGE MULTIPLIERS'
       ERR_CATEGORY='LAGRANGE MULTIPLIERS'
@@ -9490,17 +9772,18 @@ C---
       NHMAX = LAG_NHF + LAG_NHL
       LWAT  = 0
       IF(LAG_NCL/=0) LWAT  = MAX(6*(NUMELS16+NUMELS20),6*NUMNOD)
-      L_MUL_LAG1 = 2*NCMAX + 4*NKMAX + LWAT + NUMNOD + 2
+      L_MUL_LAG1 = 2*NCMAX + 4*NKMAX + LWAT +  2
       IF(NCMAX>0) THEN
-          L_MUL_LAG = MAX(L_MUL_LAG1,
+          L_MUL_LAG = MAX(L_MUL_LAG1+NUMNOD,
      .                11*NCMAX + 4*NKMAX + 3*NHMAX + 6*NUMNOD + 2)
       ENDIF
+
       SLAMBDA = NCMAX
       ALLOCATE(LAMBDA(SLAMBDA),  STAT=stat)
       IF(SLAMBDA > 0)  LAMBDA = ZERO
       CALL TRACE_OUT1()
 C----------------------------------
-C     CALCUL FORCES GRAVITE MODALES
+C     COMPUTATION OF MODAL GRAVITY FORCES
 C----------------------------------
       ERR_MSG='GRAVITY NODAL FORCES'
       ERR_CATEGORY='GRAVITY NODAL FORCES'
@@ -9590,9 +9873,9 @@ c
 c
       ! New routine to pre-read /TH with hm_reader and old reader
       ! (needed to estimate sizes of buffers)
-      CALL HM_READ_PRETHGROU(LITHBUFMX,NVARTOT0,LSUBMODEL,0)
+      CALL HM_READ_PRETHGROU(LITHBUFMX,NVARTOT0,LSUBMODEL,0,OUTPUT)
       DO I=1,9
-        CALL HM_READ_PRETHGROU(LITHBUFI,NVARTOT,LSUBMODEL,I)
+        CALL HM_READ_PRETHGROU(LITHBUFI,NVARTOT,LSUBMODEL,I,OUTPUT)
         LITHBUFMX  = MAX(LITHBUFMX,LITHBUFI,NVARTOT,NVARTOT0)
         NVARTOTMAX = MAX(NVARTOTMAX,NVARTOT,NVARTOT0)
       ENDDO
@@ -9629,7 +9912,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 0,INOM_OPT(31),INOM_OPT(32),SENSORS   ,
-     F       INTERFACES,IPARI   ,OUTPUT%TH%DUMP_THNMS1_FILE,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,OUTPUT%TH%DUMP_THNMS1_FILE,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
       CALL MY_ALLOC(OUTPUT%TH%ITHBUF,OUTPUT%TH%SITHBUF)
       OUTPUT%TH%ITHBUF(1:OUTPUT%TH%SITHBUF) = ITHBUFTMP(1:OUTPUT%TH%SITHBUF)
@@ -9674,7 +9958,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 1,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFA,OUTPUT%TH%SITHBUFA)
         OUTPUT%TH%ITHBUFA = ITHBUFTMP(1:OUTPUT%TH%SITHBUFA)
@@ -9717,7 +10002,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 2,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFB,OUTPUT%TH%SITHBUFB)
         OUTPUT%TH%ITHBUFB = ITHBUFTMP(1:OUTPUT%TH%SITHBUFB)
@@ -9760,7 +10046,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 3,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFC, OUTPUT%TH%SITHBUFC)
         OUTPUT%TH%ITHBUFC(1:OUTPUT%TH%SITHBUFC) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFC)
@@ -9803,7 +10090,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 4,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFD,OUTPUT%TH%SITHBUFD)
         OUTPUT%TH%ITHBUFD(1:OUTPUT%TH%SITHBUFD) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFD)
@@ -9847,7 +10135,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 5,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFE,OUTPUT%TH%SITHBUFE)
         OUTPUT%TH%ITHBUFE = ITHBUFTMP(1:OUTPUT%TH%SITHBUFE)
@@ -9890,7 +10179,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 6,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFF,OUTPUT%TH%SITHBUFF)
         OUTPUT%TH%ITHBUFF(1:OUTPUT%TH%SITHBUFF) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFF)
@@ -9933,7 +10223,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 7,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFG,OUTPUT%TH%SITHBUFG)
         OUTPUT%TH%ITHBUFG(1:OUTPUT%TH%SITHBUFG) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFG)
@@ -9976,7 +10267,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 8,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFH,OUTPUT%TH%SITHBUFH)
         OUTPUT%TH%ITHBUFH(1:OUTPUT%TH%SITHBUFH) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFH)
@@ -10019,7 +10311,8 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 9,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE,OUTPUT%CHECKSUM,
+     G       NSUBDOM,IPRI)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFI,OUTPUT%TH%SITHBUFI)
         OUTPUT%TH%ITHBUFI = ITHBUFTMP(1:OUTPUT%TH%SITHBUFI)
@@ -10043,8 +10336,8 @@ C -------------------------------------------------
      .                           NSURF    ,NUMNOD   )
 C
 C------------------------- CHECK -------------------
-C-- La variable NSMAT (nb de Material ds TH),
-C     est disponible uniquement apres THGROU en version block
+Cthe nsmat variable (number of materials in th)
+C     is available only after thgrou in block version
 c      CALL ANCHECK(4)
 C
 c      CALL ANCHECK(8)
@@ -10088,7 +10381,7 @@ C
 c      CALL ANCHECK(80)
 C
 C
-C affectation du numero de processeur (spmd)
+C assignment of processor number (spmd)
 C
       CALL THPINIT(OUTPUT%TH%ITHGRP,OUTPUT%TH%ITHBUF,IPARG  ,DD_IAD ,LRIVET ,
      .             0       ,NTHGRP )
@@ -10121,11 +10414,11 @@ C
      .               I      ,NTHGRP1(9)   )
       CALL TRACE_OUT1()
 C--------------------------------------------
-C     Multidomains -> deallocation des tableaux.
+C     multidomains -> deallocation of arrays
 C--------------------------------------------
       IF(NSUBDOM>0) THEN
         DEALLOCATE(TAG_PART,TAGMON,TAGRBY,TAGINT,TAGCYL,TAGLNK)
-        DEALLOCATE(TAGRB3,TAGRB2,TAGJOIN,TAGMPC,TAG_MAT)
+        DEALLOCATE(TAGRB3,TAGRB2,TAGJOIN,TAGMPC,TAG_MAT,TAG_ALELINK)
       ENDIF
 C--------------------------------------------
 C     STOCKAGE DYNAMIQUE (CONNEXIONS RIGIDES a MADYMO).
@@ -10137,22 +10430,22 @@ C--------------------------------------------
       ALLOCATE(RCONX(SRCONX)    ,STAT=stat)
       RCONX = ZERO
 C--------------------------------------------
-C     RECALCUL DE NRBODY (NRBYKIN MIS A JOUR EN AMONT)
+C     RECOMPUTATION OF NRBODY (NRBYKIN UPDATED UPSTREAM)
 C---------------------------------------------------------------------
       IF(NRBMERGE > 0) THEN
         NRBODY = NRBYKIN + NRBYLAG
       ENDIF
 C--------------------------------------------
 C     TABLEAU DE TRAVAIL WA(LENWA)
-C     PARTIE NON SAUVEGARDEE SUR LE FICHIER DE RESTART
+C     part not saved in the restart file
 C--------------------------------------------
       NRCVVOIS0 = 0
-C appel a routine generique ici et dans ddsplit
+C call to generic routine here and in ddsplit
       CALL SETLENWA(
      1      LENWA ,NTHWA  ,NAIRWA    ,NUMELS   ,NUMELQ,
      2      NUMELC,NUMELTG,NUMELT    ,NUMELP   ,NUMELR,
      3      NUMNOD,NMNT   ,L_MUL_LAG1,L_MUL_LAG,MAXNX ,
-     4      LWASPH,NUMSPH    ,LWASPIO, NRCVVOIS0,
+     4      LWASPH,NUMSPH    ,LWASPIO, NRCVVOIS0,NGROUP,
      5      LWAMP_L,LWANMP_L ,GLOB_THERM%ITHERM)
       LWAMP  = LWAMP_L   !< Copy values in common
       LWANMP = LWANMP_L  !< Copy values in common
@@ -10162,9 +10455,9 @@ C init MULTIMAX
       CALL SETMULTI(IPARI  )
       CALL TRACE_OUT1()
 C---------------------------------------------------------------------
-C      INITIALISATION DES INTERFACES DEUXIEME PARTIE
-C     INIT INTERFACE TYPE 6 + STATISTIQUES BUCKET SORT TYPE 4
-C     MISE DANS FRONTIERE(1) DES NOEUDS DS INTERFACE
+C      INITIALIZATION OF INTERFACES SECOND PART
+C     INIT INTERFACE TYPE 6 + BUCKET SORT TYPE 4 STATISTICS
+C     PUT INTERFACE NODES INTO FRONTIERE(1)
 C---------------------------------------------------------------------
       ERR_MSG='INTERFACE INITIALIZATION PHASE 2'
       ERR_CATEGORY='INTERFACES'
@@ -10200,12 +10493,12 @@ C--------------------------------------------
       IF(NDAMP>0) CALL DAMPDTNODA(MS_B,IN_B,STIFFN,STIFFN(NUMNOD+1),
      1                            IGRNOD,DAMPR )
 C--------------------------------------------
-C     TRI ET IMPRESSION DES DT ELEM
+C     sorting and printing of element dt
 C--------------------------------------------
       CALL OUTRI(DTELEM,IXS,IXQ,IXC,IXT,IXP,IXR,IXTG,
      .           KXX,KXSP,KXIG3D,IGEO,NUMEL)
 C--------------------------------------------
-C     TRI ET IMPRESSION DES DT NODAUX
+C     sorting and printing of nodal dt
 C--------------------------------------------
       CALL OUTRIN(MS_B,IN_B,STIFFN,STIFFN(NUMNOD+1),ITAB,DTNODA)
 C---------------------------------------------
@@ -10214,7 +10507,7 @@ C--------------------------------------------
       ERR_MSG='ADDED MASS ESTIMATION'
       ERR_CATEGORY='ADDED MASS ESTIMATION'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
-      IF(N2D==0) CALL ADD_MASS_STAT(MS_B,IN_B,STIFFN,STIFFN(NUMNOD+1),ITAB,TOTMAS)
+      CALL ADD_MASS_STAT(MS_B,IN_B,STIFFN,STIFFN(NUMNOD+1),ITAB,TOTMAS,TOTMAS1)
 C---------------------------------
 C     MULTIDOMAINS SPEEDUP ESTIMATION
 C---------------------------------
@@ -10224,7 +10517,6 @@ C---------------------------------
      .                   IQUAOFF)
       ENDIF
 C--------------------------------------------
-      DEALLOCATE(STIFFN)
       DEALLOCATE(STIFINT)
       DEALLOCATE(STIFINTR)
       DEALLOCATE(MS_B)
@@ -10239,9 +10531,10 @@ C--------------------------------------------
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
       IF(SIRBE3 > 0) THEN
         CALL INIRBE3(IRBE3  ,LRBE3  ,FRBE3  ,SKEW   ,X     ,
-     .               MS     ,IN     ,
-     .               NOM_OPT(LNOPT1*INOM_OPT(14)+1))
+     .               MS     ,IN     ,NOM_OPT(LNOPT1*INOM_OPT(14)+1),
+     .               STIFFN,STIFFN(NUMNOD+1),ICODE,ITAB )
       ENDIF
+      DEALLOCATE(STIFFN)
       CALL TRACE_OUT1()
 C--------------------------------------------
       ERR_MSG='KINEMATIC CONDITIONS CHECK'
@@ -10253,14 +10546,16 @@ C--------------------------------------------
       IF(NS10E>0) THEN
        CALL RIGMODIF1_ND(NPBY,LPBY,ITAGND)
        CALL RBE2MODIF1_ND(IRBE2,LRBE2,ITAGND)
-       CALL BCSMODIF_ND(ICODE, ITAGND,ICNDS10,ITAB)
+       CALL BCSMODIF_ND(ICODE, ITAGND,ICNDS10,ITAB,
+     .                  NNPBY,SLRBODY,NRBE2L ,SLRBE2,
+     .                  NPBY ,LPBY   ,IRBE2  ,LRBE2 )
        CALL FIXMODIF_ND(IBFV , ITAGND,ICNDS10,ITAB)
        CALL BCSCYCMODIF_ND(IBCSCYC,LBCSCYC,ITAGND,ITAB)
       END IF
 C--------------------------------------------
-C     CHECK DE CONDITIONS CINEMATIQUES
+C     checking kinematic conditions
 C--------------------------------------------
-C D(3,NUMNOD) UTILISE DANS LE STARTER COMME FLAG
+C d(3,numnod) used in the starter as a flag
 C DE CONDITION CINEMATIQUE IKINE(NUMNOD)
 C--------------------------------------------
       CALL KINCHK(D       ,RWBUF   ,ITAB   ,NPRW   ,LPRW    ,KINET  ,
@@ -10363,8 +10658,8 @@ C
      J    SENSOR_USER_STRUCT)
 
 C      ELSE
-C       mise a 1 de front i.e. tous les noeuds sur Proc1, poids 1
-C en SMP FRONT => WEIGHT a la meme addresse initialise a 1
+C       set front to 1 i.e. all nodes on proc1, weight 1
+C In SMP Front => Weight has the same address initialized at 1
 C        SFR_IAD = 0
 C        SDD_FRONT = 0
 C        ALLOCATE(FR_IAD(SFR_IAD))
@@ -10390,7 +10685,14 @@ C--------------------------------------------
         END IF
        END IF
       END IF
-C   Preparation traitement SPMD des ecoulements par BEM
+C--------------------------------------------
+C     traitement for hierarchy_rbody
+C--------------------------------------------
+      IF(NRBYKIN > 0) THEN
+        call hierarchy_rbody_ddm(NRBYKIN ,NNPBY ,NPBY  ,SLRBODY ,LPBY  ,
+     .                           NUMNOD  ,NSPMD )
+      ENDIF
+C   preparation of spmd processing of flows by bem
       CALL TRACE_OUT1()
       ERR_MSG='PROCESS BEM FOR SPMD'
       ERR_CATEGORY='PROCESS BEM FOR SPMD'
@@ -10555,7 +10857,8 @@ C----------------------------------------------
      K        SIGI        ,NSIGBEAM   ,SIGBEAM         ,NSIGTRUSS     ,SIGTRUSS         ,
      L        NSIGRS      ,SIGRS      ,MERGE_NODE_TAB  ,MERGE_NODE_TOL,
      M        IMERGE      ,NMERGE_TOT ,IEXLNK ,DRAPEG  ,USER_WINDOWS  ,OUTPUT           ,
-     N        DEFAULTS    ,GLOB_THERM ,PBLAST)
+     N        DEFAULTS    ,GLOB_THERM ,PBLAST          ,IBEAM_VECTOR  ,RBEAM_VECTOR     ,
+     O        DAMP_RANGE_PART)
 !
       DEALLOCATE(SIGI)
       DEALLOCATE(SIGSH)
@@ -10563,6 +10866,8 @@ C----------------------------------------------
       DEALLOCATE(SIGRS)
       DEALLOCATE(SIGBEAM)
       DEALLOCATE(SIGTRUSS)
+      DEALLOCATE(IBEAM_VECTOR)
+      DEALLOCATE(RBEAM_VECTOR)
 C--------------------------------------------
 C     DELETE HM_MODEL IN MEMORY
 C--------------------------------------------
@@ -10608,7 +10913,7 @@ C--------------------------------------------
           IF(RESTART_FILE==1) WRITE(ISTDO,'(A)')TITRE(50)
           IF(RESTART_FILE==0) WRITE(ISTDO,'(A)')CHECK_MESSAGE(1)( 1:len_trim(CHECK_MESSAGE(1)) )
 C--------------------------------------------
-C Matrice de connectivite globale
+C global connectivity matrix
 C--------------------------------------------
           ILEN = MAX(NUMELS,NUMELQ,NUMELC,NUMELT,NUMELP,NUMELR,NUMELTG)
           IF(LCNE>0) ALLOCATE(CNE(LCNE),STAT=stat)
@@ -10638,7 +10943,7 @@ C
 
           LENTHG = OUTPUT%TH%SITHBUF
           LENTHGR = SRTHBUF
-Clongueur BUFMAT et BUFGEO
+Clength of bufmat and bufgeo
           LBUFMAT = SBUFMAT
           LBUFGEO = SBUFGEO
           LBUFSF  = SBUFSF
@@ -10660,7 +10965,7 @@ C----------------------------------------------------------------------
             CALL BUILD_CNEL_SUB(NLOC_DMG%CNE,NLOC_DMG%ADDCNE,CNE,ADDCNE,NLOC_DMG%INDX,NLOC_DMG%NNOD)
           ENDIF
 C--------------------------------------------
-C     Multidomains -> transfert de la domdec
+C     multidomains -> transfer of domdec
 C--------------------------------------------
           IF((NSUBDOM>0).AND.(FLG_R2R_ERR==0)) THEN
             CALL R2R_CLEAN_INTER(IPARI,INTBUF_TAB,IPARTC,IPARTG,IPARTS,ISOLNOD)
@@ -10700,13 +11005,13 @@ C-------------------------------------------------------------
             CALL SET_FRONT8(IPARI,INTERCEP,INTBUF_TAB,INTERT8,NBT8,ITAB)
           ENDIF
 C--------------------------------------------
-C         /INTER/TYPE25 connectivit sommets => segments
+C         /Inter/Type25 Connectivit Sommets => Segments
 C-------------------------------------------------------------
 C
 C         Dimensioning (computes NUMNOR == Nb of normals or vertices wrt ALL Interfaces TYPE25)
 C         and Initialization of IRT>LM(3:4,1:NSN)
           CALL PREPARE_INT25(INTBUF_TAB, IPARI, INTERCEP, NRTMT_25)
-          CALL PREPARE_SPLIT_I25E2E(NSPMD,INTBUF_TAB,IPARI,INTERCEP)
+          CALL PREPARE_SPLIT_I25E2E(NSPMD,INTBUF_TAB,IPARI,INTERCEP,CEP,SCEP)
 
 C
           ALLOCATE(ADDCSRECT(NUMNOR+1),CSRECT(4*NRTMT_25),STAT=stat)
@@ -10739,7 +11044,7 @@ C LINES : SET A CPU for splitting
           CALL LINE_DECOMP(IGRSLIN)
 !--------------------------------------------
 C--------------------------------------------
-C Calcul de variables globales SPMD
+C Computation of SPMD global variables
 C--------------------------------------------
 C CARE TO be computed right before DDSPLIT
 C This routine computes array sizes for Animation file.
@@ -10767,7 +11072,7 @@ c         start CPU timer for ddsplit
           ENDIF
           ! -----------------------------------------
           ! reverse connectivity for FVM solver : useful to ensure the parith/on
-          IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG/=0) THEN
+          IF((IALE+IEULER+GLOB_THERM%ITHERM+IALELAG/=0).OR.(DETONATORS%IS_SHADOWING_REQUIRED)) THEN
                 ALLOCATE( INDX_S(NUMELS) )
                 ALLOCATE( INDX_Q(NUMELQ) )
                 ALLOCATE( INDX_TG(NUMELTG) )
@@ -10802,8 +11107,9 @@ c         start CPU timer for ddsplit
           ! -----------------------------------------            
 
           ! -----------------------------------------
-          ! split the BCs wall data structure
+          ! split the BCs data structure
           CALL SPLIT_BCS_WALL(BCS_PER_PROC, CEP, SCEP, NSPMD)
+          CALL SPLIT_BCS_NRF(BCS_PER_PROC, CEP, SCEP, NSPMD)
           ! -----------------------------------------
 
           ! -----------------------------------------
@@ -10880,7 +11186,7 @@ c
      1         P            ,CEP         ,CEL            ,IGEO        ,MAT_ELEM   ,
      2         IPM          ,ICODE       ,ISKEW          ,ISKWN       ,BID13      ,
      3         IBCSLAG      ,IPART       ,IPARTS         ,IPARTQ      ,IPARTC     ,
-     4         IPARTT       ,IPARTP      ,IPARTR         ,IPARTG     ,
+     4         IPARTT       ,IPARTP      ,IPARTR         ,IPARTG      ,DETONATORS ,
      5         IPARTX       ,NPC         ,IXTG           ,GROUP_PARAM_TAB,
      6         IXTG1        ,IXS         ,IXS10          ,IXS20       ,IXS16      ,
      7         IXQ          ,IXC         ,IXT            ,IXP         ,IXR        ,
@@ -10970,7 +11276,8 @@ c
      D         KLOADPINTER  ,LOADPINTER   ,DGAPLOADINT   ,S_LOADPINTER, SCEP,DYNAIN_DATA,
      E         DRAPEG       ,USER_WINDOWS ,OUTPUT        ,INTERFACES  ,NUMBER_LOAD_CYL ,
      F         LOADS_PER_PROC(P), PYTHON,DPL0CLD,VEL0CLD ,NAMES_AND_TITLES,
-     G         BCS_PER_PROC(P),constraint_struct,glob_therm,PBLAST)
+     G         BCS_PER_PROC(P),constraint_struct,glob_therm,PBLAST,RWSTIF_PEN ,SLN_PEN ,
+     H         IN_SFEM, NE_SFEM)
       GOTO 220
  221  CONTINUE
 
@@ -11131,6 +11438,15 @@ C
             ENDDO
             DEALLOCATE(RETRACTOR)
           ENDIF
+C
+          IF (NGUIDED_CABLE > 0) THEN
+            DO I=1,NGUIDED_CABLE
+               IF (NSPMD > 1) DEALLOCATE(GUIDE(I)%NODES)
+               DEALLOCATE(GUIDE(I)%CONT)      
+            ENDDO
+            DEALLOCATE(GUIDE)
+          ENDIF
+C          
           IF((IPART_STACK > 0 .OR. IPART_PCOMPP > 0) .AND. NDRAPE > 0) DEALLOCATE(IWORK_T)
 
           IF(ALLOCATED(MPARAM_R2R))THEN
@@ -11233,6 +11549,7 @@ C
       IF(ALLOCATED(IPRELOAD)) DEALLOCATE(IPRELOAD)
       IF(ALLOCATED(PRELOAD))  DEALLOCATE(PRELOAD)
       IF(ALLOCATED(IFLAG_BPRELOAD))  DEALLOCATE(IFLAG_BPRELOAD)
+      IF(ALLOCATED(IPRELOAD_FUN)) DEALLOCATE(IPRELOAD_FUN)
       IF(ALLOCATED(EOS_TAG))DEALLOCATE(EOS_TAG)
       CALL C_DELETE_HASH(H_NODE)
       CALL DEALLOCATE_DETONATORS(DETONATORS)
@@ -11241,6 +11558,7 @@ C
       IF(ALLOCATED(IRAND)) DEALLOCATE(IRAND)
       IF(ALLOCATED(SENSORS%SENSOR_TAB)) DEALLOCATE(SENSORS%SENSOR_TAB )
       IF(ALLOCATED(SENSORS%LOGICAL_SENSORS_LIST)) DEALLOCATE(SENSORS%LOGICAL_SENSORS_LIST)
+      IF(ALLOCATED(DAMP_RANGE_PART)) DEALLOCATE(DAMP_RANGE_PART)
 C
       CALL EBCS_TAB%destroy()
       IF(NINIMAP1D > 0 .AND. .NOT. MULTI_FVM%IS_USED) THEN
@@ -11266,6 +11584,8 @@ C
          CLOSE(IFXM)
          CLOSE(IFXS) 
       ENDIF
+      if(allocated(isolnod0)) deallocate(isolnod0)
+      if(allocated(ishell3nod0)) deallocate(ishell3nod0)
 
       IF(ALLOCATED( DGAPINT ))  DEALLOCATE(DGAPINT)
 
@@ -11276,14 +11596,14 @@ C----------------------------------------------
 
       RETURN
       END
-      !||====================================================================
-      !||    set_ibufssg_io   ../starter/source/starter/lectur.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur           ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ifrontplus       ../starter/source/spmd/node/frontplus.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    set_ibufssg_io   ../starter/source/starter/lectur.F
+!||--- called by ------------------------------------------------------
+!||    lectur           ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ifrontplus       ../starter/source/spmd/node/frontplus.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE SET_IBUFSSG_IO(ISPHIO, IGRSURF, IBUFSSG_IO)
 C-----------------------------------------------
 C   M o d u l e s
@@ -11353,13 +11673,13 @@ C-----------------------------------------------
 C=======================================================================
       RETURN
       END
-      !||====================================================================
-      !||    init_permutation   ../starter/source/starter/lectur.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur             ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    reorder_mod        ../starter/share/modules1/reorder_mod.F
-      !||====================================================================
+!||====================================================================
+!||    init_permutation   ../starter/source/starter/lectur.F
+!||--- called by ------------------------------------------------------
+!||    lectur             ../starter/source/starter/lectur.F
+!||--- uses       -----------------------------------------------------
+!||    reorder_mod        ../starter/share/modules1/reorder_mod.F
+!||====================================================================
       SUBROUTINE INIT_PERMUTATION()
 C-----------------------------------------------
 C   M o d u l e s
@@ -11391,11 +11711,11 @@ C-----------------------------------------------
 
       RETURN
       END
-      !||====================================================================
-      !||    tet4_10   ../starter/source/starter/lectur.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur    ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    tet4_10   ../starter/source/starter/lectur.F
+!||--- called by ------------------------------------------------------
+!||    lectur    ../starter/source/starter/lectur.F
+!||====================================================================
       SUBROUTINE TET4_10(IGEO,ITET4_10)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

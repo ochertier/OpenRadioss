@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    cfailini              ../starter/source/elements/shell/coque/cfailini.F
-      !||--- called by ------------------------------------------------------
-      !||    c3init3               ../starter/source/elements/sh3n/coque3n/c3init3.F
-      !||    cbainit3              ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||    cinit3                ../starter/source/elements/shell/coque/cinit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    biquad_coefficients   ../starter/source/materials/fail/biquad/biquad_coefficients.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    cfailini              ../starter/source/elements/shell/coque/cfailini.F
+!||--- called by ------------------------------------------------------
+!||    c3init3               ../starter/source/elements/sh3n/coque3n/c3init3.F
+!||    cbainit3              ../starter/source/elements/shell/coqueba/cbainit3.F
+!||    cinit3                ../starter/source/elements/shell/coque/cinit3.F
+!||--- calls      -----------------------------------------------------
+!||    biquad_coefficients   ../starter/source/materials/fail/biquad/biquad_coefficients.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE CFAILINI(ELBUF_STR,MAT_PARAM,
      .           NPTT    ,NLAY     ,SIGSH    ,NSIGSH  ,PTSH    ,
      .           RNOISE  ,PERTURB  ,ALDT     ,THK     )
@@ -60,9 +60,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IIP,JPT, IFL,II, JJ, IPT, IPP,IUS,IPSU,
-     .        IFLAGINI,JPS,IL,IT,NV,NVAR_RUPT,NVMAX,
-     .        NFAIL,N,IMAT,L,IRUP
+      INTEGER I,J, IFL,II, JJ,IUS,
+     .        JPS,IL,IT,NV,NVAR_RUPT,NVMAX,
+     .        NFAIL,IMAT,L,IRUP
       my_real, DIMENSION(:), POINTER :: UVARF,DFMAX
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
       TYPE(BUF_FAIL_),POINTER :: FBUF
@@ -167,14 +167,14 @@ c
 c-----------
       RETURN
       END
-      !||====================================================================
-      !||    cfailini4             ../starter/source/elements/shell/coque/cfailini.F
-      !||--- called by ------------------------------------------------------
-      !||    cbainit3              ../starter/source/elements/shell/coqueba/cbainit3.F
-      !||--- calls      -----------------------------------------------------
-      !||    biquad_coefficients   ../starter/source/materials/fail/biquad/biquad_coefficients.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    cfailini4             ../starter/source/elements/shell/coque/cfailini.F
+!||--- called by ------------------------------------------------------
+!||    cbainit3              ../starter/source/elements/shell/coqueba/cbainit3.F
+!||--- calls      -----------------------------------------------------
+!||    biquad_coefficients   ../starter/source/materials/fail/biquad/biquad_coefficients.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE CFAILINI4(
      .           ELBUF_STR,NPTR    ,NPTS    ,NPTT     ,NLAY    ,
      .           SIGSH    ,NSIGSH  ,PTSH    ,RNOISE   ,PERTURB ,
@@ -207,8 +207,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IIP,JPT,IFL, II, JJ, IPT, IPP,IUS,IPSU,
-     .        IFLAGINI,JPS,IL,IR,IS,IT,NV,NVAR_RUPT,NVMAX,NFAIL,N,
+      INTEGER I,J,IFL, II, JJ,IUS,
+     .        JPS,IL,IR,IS,IT,NV,NVAR_RUPT,NVMAX,NFAIL,
      .        IMAT,L,IRUP
       my_real ,DIMENSION(:), POINTER  :: UVARF,DFMAX
       my_real :: c1,c2,c3,c4,c5,X_1(2),X_2(3)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sigeps158c   ../engine/source/materials/mat/mat158/sigeps158c.F
-      !||--- called by ------------------------------------------------------
-      !||    mulawc       ../engine/source/materials/mat_share/mulawc.F90
-      !||--- calls      -----------------------------------------------------
-      !||    vinter2      ../engine/source/tools/curve/vinter.F
-      !||--- uses       -----------------------------------------------------
-      !||    sensor_mod   ../common_source/modules/sensor_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    sigeps158c   ../engine/source/materials/mat/mat158/sigeps158c.F
+!||--- called by ------------------------------------------------------
+!||    mulawc       ../engine/source/materials/mat_share/mulawc.F90
+!||--- calls      -----------------------------------------------------
+!||    vinter2      ../engine/source/tools/curve/vinter.F
+!||--- uses       -----------------------------------------------------
+!||    sensor_mod   ../common_source/modules/sensor_mod.F90
+!||====================================================================
       SUBROUTINE SIGEPS158C(
      1           NEL       ,NUPARAM   ,NUVAR     ,NFUNC     ,IFUNC     ,
      2           NPF       ,TF        ,TIME      ,TIMESTEP  ,UPARAM    ,
@@ -127,7 +127,7 @@ C-----------------------------------------------
       INTEGER :: I,ITER,NITER,ISENS,IFUNCC,IFUNCT,IFUNCS,IFUNF1,IFUNF2
       INTEGER ,DIMENSION(NEL) :: IADF1,IADF2,IAD1,IAD2,IAD3,ILEN1,ILEN2,ILEN3,
      .   ILENF1,ILENF2,IPOS,IPOS1,IPOS2
-      my_real :: KMAX,GMAX,GFROT,GSH,STIFF,LOGC,LOGT,KFLEX,KFLEX1,KFLEX2,
+      my_real :: KMAX,GMAX,GFROT,GSH,STIFF,KFLEX,KFLEX1,KFLEX2,
      .   MASS,DYC,DYT,DC0,DT0,H0,HC0,HT0,VISCE,VISCG,LC0,LT0,HDC,HDT,
      .   TFROT,SIGG,EC2,ET2,SINN,TAN2,DAMP,V1,V2,DTINV,ETC,ETT,TRACE,
      .   ZEROSTRESS,DSIG,LMIN,TSTART,PHI1,PHI2,J11,J12,J21,J22,DET

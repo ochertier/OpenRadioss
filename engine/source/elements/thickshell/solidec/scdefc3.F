@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    scdefc3   ../engine/source/elements/thickshell/solidec/scdefc3.F
-      !||--- called by ------------------------------------------------------
-      !||    scforc3   ../engine/source/elements/thickshell/solidec/scforc3.F
-      !||====================================================================
+!||====================================================================
+!||    scdefc3   ../engine/source/elements/thickshell/solidec/scdefc3.F
+!||--- called by ------------------------------------------------------
+!||    scforc3   ../engine/source/elements/thickshell/solidec/scforc3.F
+!||====================================================================
       SUBROUTINE SCDEFC3(
      1   PX1,     PX2,     PX3,     PX4,
      2   PY1,     PY2,     PY3,     PY4,
@@ -83,15 +83,15 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  I, J
+      INTEGER  I
 C     REAL
       my_real
      .   VX17(MVSIZ), VY17(MVSIZ), VZ17(MVSIZ),
      .   VX28(MVSIZ), VY28(MVSIZ), VZ28(MVSIZ),
      .   VX35(MVSIZ), VY35(MVSIZ), VZ35(MVSIZ),
-     .   VX46(MVSIZ), VY46(MVSIZ), VZ46(MVSIZ), DT1D2,DT1D1
+     .   VX46(MVSIZ), VY46(MVSIZ), VZ46(MVSIZ)
       my_real 
-     .   PXX2,PYY2,PZZ2,PXX2P,PYY2P,PZZ2P,
+     .   
      .   HGY1(MVSIZ), HGX2(MVSIZ),
      .   H1VX,H1VY,H1VZ,H2VX,H2VY,H2VZ,NU1,
      .   X1VX,X2VX,Y1VY,Y2VY,Y2VY_NU,X1VX_NU

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,32 +20,33 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_preload_axial_mod   ../starter/source/loads/general/preload/hm_read_preload_axial.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                      ../starter/source/starter/lectur.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_preload_axial_mod   ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                      ../starter/source/starter/lectur.F
+!||====================================================================
       module hm_read_preload_axial_mod
+      implicit none
       contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !
 !=======================================================================================================================
-!!\brief This subroutine do the dimensioning of hm-reader of /PRELOAD/AXIAL
+!!\brief This subroutine performs the dimensioning of hm-reader of /PRELOAD/AXIAL
 !=======================================================================================================================
-      !||====================================================================
-      !||    hm_pre_read_preload_axial   ../starter/source/loads/general/preload/hm_read_preload_axial.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                      ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    hm_get_intv                 ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key          ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start             ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_pre_read_preload_axial   ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                      ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    hm_get_intv                 ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key          ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start             ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+!||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+!||====================================================================
         subroutine hm_pre_read_preload_axial(ngrspri,igrspring,npreload_a,lsubmodel)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -54,6 +55,7 @@
           use submodel_mod
           use groupdef_mod
           use names_and_titles_mod
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -65,39 +67,39 @@
           integer, intent (in   )             :: ngrspri          !< number of spring elem group
           type (group_)  , dimension(ngrspri) :: igrspring        !< array of spring group
           integer, intent (inout)             :: npreload_a       !< number /PRELOAD/AXIAL
-          type(submodel_data) lsubmodel(*)                        !< submodel structure
+          type(submodel_data) :: lsubmodel(*)                        !< submodel structure
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i,nld,iset,nn,id,uid,ifun,is,np
+          integer :: i,nld,iset,nn,id,uid,ifun,is,np
           character (len=nchartitle) :: titr
           character (len=ncharline)  :: key
 !
-          logical is_available
+          logical :: is_available
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
 !
           is_available = .false.
 !
-          call hm_option_start('/PRELOAD')
+          call hm_option_start("/PRELOAD")
 !
           nld  = npreload_a
           np = 0
           do i=1,nld
             ! read title, id and unit id
-            titr = ''
+            titr = ""
             call hm_option_read_key(lsubmodel,                                   &
               option_id      = id,                          &
               unit_id        = uid,                         &
               option_titr    = titr,                        &
               keyword2       = key)
 !
-            if (key(1:len_trim(key))/='AXIAL') cycle
+            if (key(1:len_trim(key))/="AXIAL") cycle
 
-            call hm_get_intv('curveid' ,ifun  ,is_available,lsubmodel)
+            call hm_get_intv("curveid" ,ifun  ,is_available,lsubmodel)
             if (ifun ==0) cycle
-            call hm_get_intv('set_id'  ,iset  ,is_available,lsubmodel)
+            call hm_get_intv("set_id"  ,iset  ,is_available,lsubmodel)
 
             nn = 0
             if (iset > 0) then
@@ -105,11 +107,11 @@
                 if (iset==igrspring(is)%ID) then
                   nn = 1
                   exit
-                endif
-              enddo
-            endif
-            if (nn>0) np = np + 1
-          enddo
+                end if
+              end do
+            end if
+            if ((iset+nn) > 0) np = np + 1
+          end do
           npreload_a = np
 !
 
@@ -119,24 +121,24 @@
 ! ======================================================================================================================
 !
 !=======================================================================================================================
-!!\brief This subroutine do hm-reader of /PRELOAD/AXIAL
+!!\brief This subroutine performs hm-reader of /PRELOAD/AXIAL
 !=======================================================================================================================
-      !||====================================================================
-      !||    hm_read_preload_axial   ../starter/source/loads/general/preload/hm_read_preload_axial.F90
-      !||--- called by ------------------------------------------------------
-      !||    lectur                  ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                  ../starter/source/output/message/message.F
-      !||    hm_get_floatv           ../starter/source/devtools/hm_reader/hm_get_floatv.F
-      !||    hm_get_intv             ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key      ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start         ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||--- uses       -----------------------------------------------------
-      !||    bpreload_mod            ../starter/share/modules1/bpreload_mod.F
-      !||    hm_option_read_mod      ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||    submodel_mod            ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_preload_axial   ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+!||--- called by ------------------------------------------------------
+!||    lectur                  ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                  ../starter/source/output/message/message.F
+!||    hm_get_floatv           ../starter/source/devtools/hm_reader/hm_get_floatv.F
+!||    hm_get_intv             ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key      ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start         ../starter/source/devtools/hm_reader/hm_option_start.F
+!||--- uses       -----------------------------------------------------
+!||    bpreload_mod            ../starter/share/modules1/bpreload_mod.F
+!||    hm_option_read_mod      ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod             ../starter/share/message_module/message_mod.F
+!||    submodel_mod            ../starter/share/modules1/submodel_mod.F
+!||====================================================================
         subroutine hm_read_preload_axial(                                     &
           npreload_a,    ngrspri,    igrspring, itagprld_spring,     &
           unitab    ,  lsubmodel,    preload_a, numelr         ,     &
@@ -156,12 +158,12 @@
           use bpreload_mod
           use constant_mod, only : zero,one
           use sensor_mod
+          use precision_mod, only : WP
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -185,16 +187,16 @@
           type (prel1d_), target ,dimension(npreload_a)   :: preload_a        !< structure data of /PRELOAD/AXIAL
           type (unit_type_),intent(in)                    :: unitab           !< structure data of unity
           type (sensors_) ,intent(in)                     :: sensors          !< structure data of sensor
-          type(submodel_data) lsubmodel(*)                                    !< structure data of submodel
+          type(submodel_data) :: lsubmodel(*)                                    !< structure data of submodel
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer i,j,nld,iset,nn,id,uid,ifun,is,np,iflagunit,isens,itype
+          integer :: i,j,iset,nn,id,uid,ifun,is,np,iflagunit,isens,itype
           character (len=nchartitle) :: titr
           character (len=ncharline)  :: key
-          my_real loadval,damp
+          real(kind=WP) :: loadval,damp
 !
-          logical is_available
+          logical :: is_available
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -202,11 +204,11 @@
           is_available = .false.
           write(iout,2000)
 !
-          call hm_option_start('/PRELOAD/AXIAL')
+          call hm_option_start("/PRELOAD/AXIAL")
 !
           do i=1,npreload_a
 ! read title, id and unit id
-            titr = ''
+            titr = ""
             call hm_option_read_key(lsubmodel,                                   &
               option_id      = id,                         &
               unit_id        = uid,                        &
@@ -218,40 +220,40 @@
               if (unitab%unit_id(j) == uid) then
                 iflagunit = 1
                 exit
-              endif
-            enddo
+              end if
+            end do
             if (uid/=0.and.iflagunit==0) then
               call ancmsg(msgid=659,anmode=aninfo,msgtype=msgerror,              &
-                i2=uid,i1=id,c1='bolt preload',                        &
-                c2='bolt preload_axial',                              &
+                i2=uid,i1=id,c1="bolt preload",                        &
+                c2="bolt preload_axial",                              &
                 c3=titr)
-            endif
+            end if
 
-            call hm_get_intv('set_id'  ,iset  ,is_available,lsubmodel)
-            call hm_get_intv('sens_id' ,isens ,is_available,lsubmodel)
+            call hm_get_intv("set_id"  ,iset  ,is_available,lsubmodel)
+            call hm_get_intv("sens_id" ,isens ,is_available,lsubmodel)
             is = 0
             do j=1,sensors%nsensor
               if(sensors%sensor_tab(j)%sens_id==isens) is=j
-            enddo
+            end do
             if(is==0.and.isens/=0)then
               call ancmsg(msgid=521,anmode=aninfo,msgtype=msgerror,              &
                 i2=isens,i1=id,c1=titr)
-            endif
+            end if
             preload_a(i)%sens_id = is
 !
-            call hm_get_intv('curveid' ,ifun  ,is_available,lsubmodel)
+            call hm_get_intv("curveid" ,ifun  ,is_available,lsubmodel)
             is = 0
             do j=1,nfunct
               if(npc(nfunct+j+1)==ifun) is=j
-            enddo
+            end do
             if(is==0)then
               call ancmsg(msgid=154,anmode=aninfo,msgtype=msgerror,              &
                 i2=ifun,i1=id,c1=titr)
-            endif
+            end if
             preload_a(i)%fun_id  = is
 !
-            call hm_get_floatv('Preload',loadval,is_available, lsubmodel, unitab)
-            call hm_get_floatv('Damp',damp,is_available, lsubmodel, unitab)
+            call hm_get_floatv("Preload",loadval,is_available, lsubmodel, unitab)
+            call hm_get_floatv("Damp",damp,is_available, lsubmodel, unitab)
 !
             if (loadval==zero) loadval = one
             preload_a(i)%preload = loadval
@@ -265,9 +267,9 @@
                   nn = is
                   itype = 6
                   exit
-                endif
-              enddo
-            endif
+                end if
+              end do
+            end if
             if (iset > 0 .and. nn==0) then
               do is=1,ngrbeam
                 if (igrbeam(is)%nentity == 0) cycle
@@ -275,9 +277,9 @@
                   nn = is
                   itype = 5
                   exit
-                endif
-              enddo
-            endif
+                end if
+              end do
+            end if
             if (iset > 0 .and. nn==0) then
               do is=1,ngrtrus
                 if (igrtruss(is)%nentity == 0) cycle
@@ -285,9 +287,9 @@
                   nn = is
                   itype = 4
                   exit
-                endif
-              enddo
-            endif
+                end if
+              end do
+            end if
             if (nn==0) then
               call ancmsg(msgid=3052,anmode=aninfo,msgtype=msgerror,              &
                 i2=iset,i1=id,c1=titr)
@@ -298,33 +300,33 @@
                 do j=1,np
                   is = igrtruss(nn)%entity(j)      ! sys_id already
                   if(is>0) itagprld_truss(is)=i
-                enddo
-                key ='TRUSS'
+                end do
+                key ="TRUSS"
                case(5)
                 np=igrbeam(nn)%nentity
                 do j=1,np
                   is = igrbeam(nn)%entity(j)
                   if(is>0) itagprld_beam(is)=i
-                enddo
-                key ='BEAM'
+                end do
+                key ="BEAM"
                case(6)
                 np=igrspring(nn)%nentity
                 do j=1,np
                   is = igrspring(nn)%entity(j)
                   if(is>0) itagprld_spring(is)=i
-                enddo
-                key ='SPRING'
+                end do
+                key ="SPRING"
               end select
             end if
 !
-            write(iout,'(I10,1X,I10,4X,A6,1X,I10,1X,I10,2(1X,1PE10.3))')         &
+            write(iout,"(I10,1X,I10,4X,A6,1X,I10,1X,I10,2(1X,1PE10.3))")         &
               id,iset,key,isens,ifun,loadval,Damp
-          enddo
+          end do
 !
 2000      FORMAT(//                                                                &
-            '     BOLT 1D-ELEMENT PRELOADINGS  '/                                    &
-            '     ----------------  '/                                               &
-            '        ID     SET_ID   1D-ELEM    SENS_ID    FUNC_ID    PRELOAD       DAMP ')
+            "     BOLT 1D-ELEMENT PRELOADINGS  "/                                    &
+            "     ----------------  "/                                               &
+            "        ID     SET_ID   1D-ELEM    SENS_ID    FUNC_ID    PRELOAD       DAMP ")
 !-----------
         end subroutine hm_read_preload_axial
 ! ======================================================================================================================
@@ -334,14 +336,14 @@
 !=======================================================================================================================
 !!\brief This subroutine initialize itag array for 1D-element which use /PRELOAD/AXIAL
 !=======================================================================================================================
-      !||====================================================================
-      !||    initag_preload_a   ../starter/source/loads/general/preload/hm_read_preload_axial.F90
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../starter/source/output/message/message.F
-      !||    uel2sys            ../starter/source/initial_conditions/inista/yctrl.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod        ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    initag_preload_a   ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+!||--- calls      -----------------------------------------------------
+!||    ancmsg             ../starter/source/output/message/message.F
+!||    uel2sys            ../starter/source/initial_conditions/inista/yctrl.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod        ../starter/share/message_module/message_mod.F
+!||====================================================================
         subroutine initag_preload_a(nlist,ilist,ix,nix,nx,pl_id,itag)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -352,7 +354,6 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
-#include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -365,15 +366,15 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer ie, stat, ipl, ne, j
-          integer works(70000)
+          integer :: ie, stat, ipl, ne, j
+          integer :: works(70000)
           integer, dimension(:), allocatable ::itris
           integer, dimension(:), allocatable ::indexs
           integer, dimension(:), allocatable ::ksysusrs
 ! ----------------------------------------------------------------------------------------------------------------------
 !   e x t e r n a l   f u n c t i o n s
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer uel2sys
+          integer :: uel2sys
           external uel2sys
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
@@ -382,21 +383,21 @@
           if (stat /= 0) then
             call ancmsg(msgid=268,anmode=aninfo,                                 &
               msgtype=msgerror,                           &
-              c1='preload_a_itris')
+              c1="preload_a_itris")
             return
           end if
           allocate (indexs(2*nx) ,stat=stat)
           if (stat /= 0) then
             call ancmsg(msgid=268,anmode=aninfo,                                 &
               msgtype=msgerror,                           &
-              c1='preload_a_indexs')
+              c1="preload_a_indexs")
             return
           end if
           allocate (ksysusrs(2*nx),stat=stat)
           if (stat /= 0) then
             call ancmsg(msgid=268,anmode=aninfo,                                 &
               msgtype=msgerror,                           &
-              c1='preload_a_ksysusrs')
+              c1="preload_a_ksysusrs")
             return
           end if
           itris = 0
@@ -423,8 +424,8 @@
               else
 ! error out
               end if
-            endif
-          enddo
+            end if
+          end do
 !-----------
           deallocate(ksysusrs,indexs,itris)
 !---

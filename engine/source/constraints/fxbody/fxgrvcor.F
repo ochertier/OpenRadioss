@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    fxgrvcor   ../engine/source/constraints/fxbody/fxgrvcor.F
-      !||--- called by ------------------------------------------------------
-      !||    resol      ../engine/source/engine/resol.F
-      !||--- calls      -----------------------------------------------------
-      !||    finter     ../engine/source/tools/curve/finter.F
-      !||====================================================================
+!||====================================================================
+!||    fxgrvcor           ../engine/source/constraints/fxbody/fxgrvcor.F
+!||--- called by ------------------------------------------------------
+!||    resol              ../engine/source/engine/resol.F
+!||--- calls      -----------------------------------------------------
+!||    finter             ../engine/source/tools/curve/finter.F
+!||--- uses       -----------------------------------------------------
+!||    finter_mixed_mod   ../engine/source/tools/finter_mixed.F90
+!||    python_funct_mod   ../common_source/modules/python_mod.F90
+!||====================================================================
       SUBROUTINE FXGRVCOR(FXBIPM, FXBGRVI , A      , IGRV, AGRV,
      .                    NPC   , TF      , MS     , V   , SKEW,
-     .                    FXBGRW, IAD_ELEM, FR_ELEM, WFEXT)
+     .                    FXBGRW, IAD_ELEM, FR_ELEM, WFEXT,python)
+        use python_funct_mod, only : python_
+        use finter_mixed_mod, only : finter_mixed
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,13 +54,14 @@ C-----------------------------------------------
       INTEGER FXBIPM(NBIPM,*), FXBGRVI(*), IGRV(NIGRV,*), NPC(*), IAD_ELEM(2,*), FR_ELEM(*)
       my_real  A(3,*), AGRV(LFACGRV,*), TF(*), MS(*), V(3,*), SKEW(LSKEW,*), FXBGRW(*)
       DOUBLE PRECISION, INTENT(INOUT) :: WFEXT
+      TYPE(python_), intent(inout) :: python
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NFX, NLG, AGRVI, IADG, IG, NL, NNO, ISK, N2, N1, IFUNC,
      .        I, K1, K2, K3, IAGRV(NUMNOD), J, JJ
       my_real
-     .        FI0, FI, DYDX, WFEXTT, VV
+     .        FI0, FI, WFEXTT, VV
       my_real FINTER
       EXTERNAL FINTER
 C
@@ -83,8 +89,8 @@ C
             N2=IGRV(2,NL)-10*ISK
             IFUNC=IGRV(3,NL)
             IF (IFUNC > 0) THEN
-              FI0=AGRV(1,NL)*FINTER(IFUNC,(TT-DT1)*AGRV(2,NL),NPC,TF,DYDX)
-              FI =AGRV(1,NL)*FINTER(IFUNC,TT*AGRV(2,NL),NPC,TF,DYDX)
+              FI0=AGRV(1,NL)*FINTER_MIXED(python,nfunct,IFUNC,(TT-DT1)*AGRV(2,NL),NPC,TF)
+              FI =AGRV(1,NL)*FINTER_MIXED(python,nfunct,IFUNC,TT*AGRV(2,NL),NPC,TF)
             ELSE
               FI0= AGRV(1,NL)
               FI = AGRV(1,NL)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,20 +21,22 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-      !||====================================================================
-      !||    spmd_collect_seatbelt   ../engine/source/mpi/output/spmd_collect_seatbelt.F
-      !||--- called by ------------------------------------------------------
-      !||    hist2                   ../engine/source/output/th/hist2.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    seatbelt_mod            ../common_source/modules/seatbelt_mod.F
-      !||====================================================================
+!||====================================================================
+!||    spmd_collect_seatbelt   ../engine/source/mpi/output/spmd_collect_seatbelt.F
+!||--- called by ------------------------------------------------------
+!||    hist2                   ../engine/source/output/th/hist2.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    seatbelt_mod            ../common_source/modules/seatbelt_mod.F
+!||    spmd_comm_world_mod     ../engine/source/mpi/spmd_comm_world.F90
+!||====================================================================
       SUBROUTINE SPMD_COLLECT_SEATBELT()
 C-----------------------------------------------
       USE SEATBELT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+        USE SPMD_COMM_WORLD_MOD, ONLY : SPMD_COMM_WORLD
 #include      "implicit_f.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -50,8 +52,8 @@ C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER MSGTYP,MSGOFF,IERROR,LOC_PROC,NN,L,I,K,M,N,II,J,
-     .        IDEB,SIZ,A_AR,NBIRECV,INDEX,
+      INTEGER MSGTYP,MSGOFF,IERROR,LOC_PROC,L,I,K,M,N,II,
+     .        IDEB,SIZ,INDEX,
      .        IRINDEX(NSPMD),REQ_R(NSPMD),IAD_RECV(NSPMD),
      .        STATUS(MPI_STATUS_SIZE)
       my_real

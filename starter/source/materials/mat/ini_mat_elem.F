@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    ini_mat_elem           ../starter/source/materials/mat/ini_mat_elem.F
-      !||--- called by ------------------------------------------------------
-      !||    read_material_models   ../starter/source/materials/read_material_models.F
-      !||--- uses       -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    ini_mat_elem           ../starter/source/materials/mat/ini_mat_elem.F
+!||--- called by ------------------------------------------------------
+!||    read_material_models   ../starter/source/materials/read_material_models.F
+!||--- uses       -----------------------------------------------------
+!||====================================================================
       SUBROUTINE INI_MAT_ELEM(MAT_ELEM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -72,9 +72,9 @@ c
         MAT_ELEM%MAT_PARAM(IMAT)%IXFEM        = 0
 c
         MAT_ELEM%MAT_PARAM(IMAT)%NMOD         = 0        ! Number of damage modes
-c
-c       initialize viscosity parameters
-c
+!
+!       ! initialize viscosity model parameters
+!
         MAT_ELEM%MAT_PARAM(IMAT)%VISC%ILAW    = 0
         MAT_ELEM%MAT_PARAM(IMAT)%VISC%NUPARAM = 0
         MAT_ELEM%MAT_PARAM(IMAT)%VISC%NIPARAM = 0
@@ -103,6 +103,34 @@ c
         MAT_ELEM%MAT_PARAM(IMAT)%STIFF_CONTACT = ZERO
         MAT_ELEM%MAT_PARAM(IMAT)%STIFF_HGLASS  = ZERO
         MAT_ELEM%MAT_PARAM(IMAT)%STIFF_TSTEP   = ZERO
+
+        ! EOS model parameters
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%TITLE = ''
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%NUPARAM = 0
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%NIPARAM = 0
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%NFUNC = 0
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%NTABLE = 0
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%ISFLUID = 0
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%CV = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%CP = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%PSH = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%P0 = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%PMIN = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%EOS%E0 = ZERO
+c        
+        ! Thermal parameters
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%iform      = 0
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%func_thexp = 0
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%TINI       = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%TREF       = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%TMELT      = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%RHOCP      = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%AS         = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%BS         = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%AL         = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%BL         = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%EFRAC      = ZERO
+        MAT_ELEM%MAT_PARAM(IMAT)%THERM%scale_thexp= ZERO
 c        
       END DO
 c-----------

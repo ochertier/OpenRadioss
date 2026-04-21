@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,23 +21,24 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  
-C   Node definition for secnd side of Interface Type18.
-C   Input for secnd side is a GRBRIC. Nodes are extracted 
+C   Node definition for second side of Interface Type18.
+C   Input for second side is a GRBRIC. Nodes are extracted 
 C   from it into a sorted list
-      !||====================================================================
-      !||    ingrbric_nodes   ../starter/source/interfaces/interf1/ingrbric_nodes.F
-      !||--- called by ------------------------------------------------------
-      !||    lecins           ../starter/source/interfaces/interf1/lecins.F
-      !||    lecint           ../starter/source/interfaces/interf1/lecint.F
-      !||--- uses       -----------------------------------------------------
-      !||    format_mod       ../starter/share/modules1/format_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    ingrbric_nodes   ../starter/source/interfaces/interf1/ingrbric_nodes.F
+!||--- called by ------------------------------------------------------
+!||    lecins           ../starter/source/interfaces/interf1/lecins.F
+!||    lecint           ../starter/source/interfaces/interf1/lecint.F
+!||--- uses       -----------------------------------------------------
+!||    format_mod       ../starter/share/modules1/format_mod.F90
+!||====================================================================
       SUBROUTINE INGRBRIC_NODES(MSN,IBUFSSG,ITAB,MSV, IXS, NBRIC, NALE, IPM, BUFMAT, S_MSV)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
         USE ALE_MOD
         USE FORMAT_MOD , ONLY : FMW_10I
+        use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -95,7 +96,7 @@ C-----------------------------------------------
             NPAR   = IPM(9,IMAT)                
             IADBUF = IPM(7,IMAT)                
             IADBUF = MAX(1,IADBUF)                
-            UPARAM => BUFMAT(IADBUF:IADBUF+NPAR)  
+            UPARAM => BUFMAT(IADBUF:IADBUF+NPAR-1)
             IFORM  = NINT(UPARAM(31))
             IF(IFORM>=2 .AND. IFORM<=6)IS_ELEM_A_BOUNDARY_MAT=.TRUE.
           ELSEIF(ILAW == 11)THEN

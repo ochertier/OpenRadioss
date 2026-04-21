@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_option_read         ../starter/source/devtools/hm_reader/hm_option_read.F
-      !||--- calls      -----------------------------------------------------
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_option_read         ../starter/source/devtools/hm_reader/hm_option_read.F
+!||--- calls      -----------------------------------------------------
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_OPTION_READ(ID,UID,SUB_INDEX,TITR,LSUBMODEL)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -50,7 +50,7 @@ C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD       
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -60,16 +60,16 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C INPUT ARGUMENTS
-      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(NSUBMOD)
 C OUTPUT ARGUMENTS
-      INTEGER,INTENT(OUT)::ID
-      INTEGER,INTENT(OUT)::UID
-      INTEGER,INTENT(OUT)::SUB_INDEX
-      CHARACTER*(*),INTENT(OUT)::TITR
+      INTEGER,INTENT(OUT) :: ID
+      INTEGER,INTENT(OUT) :: UID
+      INTEGER,INTENT(OUT) :: SUB_INDEX
+      CHARACTER*(*),INTENT(OUT) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,OFFSET_CATEGORY,S_KEYWORD,S_TITR_TMP,POS
+      INTEGER OFFSET_CATEGORY,S_KEYWORD,S_TITR_TMP,POS
       CHARACTER(LEN=NCHARLINE) :: KEYWORD,TITR_TMP
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

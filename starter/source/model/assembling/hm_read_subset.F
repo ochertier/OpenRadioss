@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    hm_read_subset           ../starter/source/model/assembling/hm_read_subset.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur                   ../starter/source/starter/lectur.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    ecrsub2                  ../starter/source/model/assembling/hm_read_subset.F
-      !||    fretitl2                 ../starter/source/starter/freform.F
-      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
-      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
-      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    udouble_igr              ../starter/source/system/sysfus.F
-      !||--- uses       -----------------------------------------------------
-      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
+!||====================================================================
+!||    hm_read_subset           ../starter/source/model/assembling/hm_read_subset.F
+!||--- called by ------------------------------------------------------
+!||    lectur                   ../starter/source/starter/lectur.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                   ../starter/source/output/message/message.F
+!||    ecrsub2                  ../starter/source/model/assembling/hm_read_subset.F
+!||    fretitl2                 ../starter/source/starter/freform.F
+!||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+!||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+!||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+!||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+!||    udouble_igr              ../starter/source/system/sysfus.F
+!||--- uses       -----------------------------------------------------
+!||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+!||    message_mod              ../starter/share/message_module/message_mod.F
+!||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+!||====================================================================
       SUBROUTINE HM_READ_SUBSET(SUBSET,IPART,NSUBS,NPART,LSUBMODEL)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -107,7 +107,7 @@ C  SUBSET(ISU)%ID  ::SUBSET identifier
 C  SUBSET(ISU)%TITLE  : SUBSET title
 C  SUBSET(ISU)%TH_FLAG : TIME HISTORY flag
 C  SUBSET(ISU)%PARENT : SUBSET PARENT
-C  SUBSET(ISU)%NCHILD : SUBSETS number of childs
+C  SUBSET(ISU)%NCHILD : SUBSETS number of children
 C  SUBSET(ISU)%NPART : SUBSET number of part (within one subset)
 C  SUBSET(ISU)%NTPART : Total number of parts (within parent subset)
 C  SUBSET(ISU)%THIAD : IAD for global ITHBUF storage variables
@@ -384,15 +384,15 @@ c-----------
       RETURN
       END
 c
-      !||====================================================================
-      !||    ecrsub2                ../starter/source/model/assembling/hm_read_subset.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_subset         ../starter/source/model/assembling/hm_read_subset.F
-      !||--- calls      -----------------------------------------------------
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    ecrsub2                ../starter/source/model/assembling/hm_read_subset.F
+!||--- called by ------------------------------------------------------
+!||    hm_read_subset         ../starter/source/model/assembling/hm_read_subset.F
+!||--- calls      -----------------------------------------------------
+!||    fretitl2               ../starter/source/starter/freform.F
+!||--- uses       -----------------------------------------------------
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE ECRSUB2(SUBSET,NSUBS,ISU,IPART,NIVMAX)
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
@@ -433,7 +433,7 @@ C=======================================================================
 
       L = MIN(10,MAX(2,22/(NIVMAX+1)))
       
-c     lignes vides avant subset 
+c     Empty lines before subset 
       K = 3
       DO I=1,NIVEAU
         LIGNE(K:K+L) = BAR(I)(1:L)
@@ -478,7 +478,7 @@ c     ligne subset
       ENDDO
       WRITE(IOUT,'(A)')LIGNE(1:K)
       
-c    subset souligne + ligne vide apres subset
+c    Subset underlines + empty line after subset
       K=3
       LIGNE=' '
       DO I=1,NIVEAU

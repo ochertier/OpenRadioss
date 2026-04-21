@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    pke3           ../engine/source/elements/beam/pke3.F
-      !||--- called by ------------------------------------------------------
-      !||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
-      !||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
-      !||--- calls      -----------------------------------------------------
-      !||    assem_p        ../engine/source/implicit/assem_p.F
-      !||    pcoork3        ../engine/source/elements/beam/pcoork3.F
-      !||    peoff          ../engine/source/elements/beam/peoff.F
-      !||    pkeg3          ../engine/source/elements/beam/pke3.F
-      !||    pmat3          ../engine/source/elements/beam/pmat3.F
-      !||    psumg3         ../engine/source/elements/beam/psumg3.F
-      !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||====================================================================
+!||====================================================================
+!||    pke3           ../engine/source/elements/beam/pke3.F
+!||--- called by ------------------------------------------------------
+!||    imp_glob_k     ../engine/source/implicit/imp_glob_k.F
+!||    imp_glob_k0    ../engine/source/implicit/imp_glob_k.F
+!||--- calls      -----------------------------------------------------
+!||    assem_p        ../engine/source/implicit/assem_p.F
+!||    pcoork3        ../engine/source/elements/beam/pcoork3.F
+!||    peoff          ../engine/source/elements/beam/peoff.F
+!||    pkeg3          ../engine/source/elements/beam/pke3.F
+!||    pmat3          ../engine/source/elements/beam/pmat3.F
+!||    psumg3         ../engine/source/elements/beam/psumg3.F
+!||--- uses       -----------------------------------------------------
+!||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod    ../common_source/modules/elements/element_mod.F90
+!||====================================================================
       SUBROUTINE PKE3(JFT   ,JLT    ,NEL  ,MTN      ,ISMSTR,
      1                 PM   ,NCC    ,X    ,ELBUF_TAB,GEO   ,
      2                 OFFSET, IKGEO,
@@ -44,6 +45,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      use element_mod , only : nixp
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,8 +69,8 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NB1, NB2, NB3, NB4, NB5, NB6, NB7, NB8, NB10, 
-     .        NB11, NB12,NB13, NB14, I ,J
+      INTEGER         
+     .           I 
       INTEGER  MAT(MVSIZ),PID(MVSIZ),NGL(MVSIZ)
       my_real
      .    YM(MVSIZ),G(MVSIZ),AL(MVSIZ),ALI(MVSIZ),
@@ -93,7 +95,7 @@ C-----------------------------------------------
      3           AL     ,ALI    ,SH1    ,SH2    ,MTN      ,
      4           MAT    ,PID    )
 C-------------------------
-C     MATRICE de RIGIDITE
+C     STIFFNESS MATRIX
 C-------------------------
       CALL PSUMG3(JFT    ,JLT    ,YM      ,G      ,AREA   ,
      2           B1     ,B2     ,B3      ,AL     ,ALI    ,
@@ -118,12 +120,12 @@ C-------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    pkeg3    ../engine/source/elements/beam/pke3.F
-      !||--- called by ------------------------------------------------------
-      !||    pke3     ../engine/source/elements/beam/pke3.F
-      !||    r13ke3   ../engine/source/elements/spring/r13ke3.F
-      !||====================================================================
+!||====================================================================
+!||    pkeg3    ../engine/source/elements/beam/pke3.F
+!||--- called by ------------------------------------------------------
+!||    pke3     ../engine/source/elements/beam/pke3.F
+!||    r13ke3   ../engine/source/elements/spring/r13ke3.F
+!||====================================================================
           SUBROUTINE PKEG3(JFT     ,JLT     ,
      1                   FX      ,AL      ,KE11    ,KE12    ,KE22   )
 C-----------------------------------------------
@@ -140,7 +142,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER EP,I,J
+      INTEGER EP,I
       MY_REAL 
      .    H(MVSIZ)
 C-----------

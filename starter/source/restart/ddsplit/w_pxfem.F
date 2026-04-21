@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    w_pxfem     ../starter/source/restart/ddsplit/w_pxfem.F
-      !||--- called by ------------------------------------------------------
-      !||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
-      !||--- calls      -----------------------------------------------------
-      !||====================================================================
+!||====================================================================
+!||    w_pxfem     ../starter/source/restart/ddsplit/w_pxfem.F
+!||--- called by ------------------------------------------------------
+!||    ddsplit     ../starter/source/restart/ddsplit/ddsplit.F
+!||--- calls      -----------------------------------------------------
+!||====================================================================
       SUBROUTINE W_PXFEM(IEL_L   ,INOD_L ,INDEX,VEL1      ,VEL2 ,
      .             NUMELC_L,NUMNOD_L,NELPXFE_L,NNODPXFE_L,
      .             LEN_AM,LEN_IA,VEL3)
@@ -48,7 +48,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N_L, N,II,NEL_L,NEL1_L,JJ
+      INTEGER I, J, JJ
       my_real
      .  VELTMP1(NNODPXFE_L,NPLYMAX), VELTMP2(NNODPXFE_L,NPLYMAX),
      .  VELTMP3(NNODPXFE_L)

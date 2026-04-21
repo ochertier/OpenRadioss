@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    stat_c_strsfg       ../engine/source/output/sta/stat_c_strsfg.F
-      !||--- called by ------------------------------------------------------
-      !||    genstat             ../engine/source/output/sta/genstat.F
-      !||--- calls      -----------------------------------------------------
-      !||    get_q4lsys          ../engine/source/output/sta/sta_c_get_q4lsys.F
-      !||    get_t3lsys          ../engine/source/output/sta/sta_c_get_t3lsys.F
-      !||    layini              ../engine/source/elements/shell/coque/layini.F
-      !||    orth2loc            ../engine/source/output/sta/stat_c_strsfg.F
-      !||    shell2g             ../engine/source/output/sta/stat_c_strafg.F
-      !||    sheml2g             ../engine/source/output/sta/stat_c_strsfg.F
-      !||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
-      !||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
-      !||    strs_txt50          ../engine/source/output/sta/sta_txt.F
-      !||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
-      !||--- uses       -----------------------------------------------------
-      !||    drape_mod           ../engine/share/modules/drape_mod.F
-      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    stack_mod           ../engine/share/modules/stack_mod.F
-      !||====================================================================
+!||====================================================================
+!||    stat_c_strsfg       ../engine/source/output/sta/stat_c_strsfg.F
+!||--- called by ------------------------------------------------------
+!||    genstat             ../engine/source/output/sta/genstat.F
+!||--- calls      -----------------------------------------------------
+!||    get_q4lsys          ../engine/source/output/sta/sta_c_get_q4lsys.F
+!||    get_t3lsys          ../engine/source/output/sta/sta_c_get_t3lsys.F
+!||    layini              ../engine/source/elements/shell/coque/layini.F
+!||    orth2loc            ../engine/source/output/sta/stat_c_strsfg.F
+!||    shell2g             ../engine/source/output/sta/stat_c_strafg.F
+!||    sheml2g             ../engine/source/output/sta/stat_c_strsfg.F
+!||    spmd_rgather9_dp    ../engine/source/mpi/interfaces/spmd_outp.F
+!||    spmd_stat_pgather   ../engine/source/mpi/output/spmd_stat.F
+!||    strs_txt50          ../engine/source/output/sta/sta_txt.F
+!||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
+!||--- uses       -----------------------------------------------------
+!||    drape_mod           ../engine/share/modules/drape_mod.F
+!||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+!||    element_mod         ../common_source/modules/elements/element_mod.F90
+!||    my_alloc_mod        ../common_source/tools/memory/my_alloc.F90
+!||    stack_mod           ../engine/share/modules/stack_mod.F
+!||====================================================================
       SUBROUTINE STAT_C_STRSFG(ELBUF_TAB,
      1                        X    ,IPARG ,IPM ,IGEO ,IXC ,
      2                        IXTG  ,WA,WAP0 ,IPARTC, IPARTTG,
@@ -51,6 +53,8 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD         
       USE STACK_MOD
       USE DRAPE_MOD
+      USE MY_ALLOC_MOD
+      use element_mod , only : nixc,nixtg
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,7 +73,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SIZLOC,SIZP0
+      INTEGER SIZP0
       INTEGER IXC(NIXC,*),IXTG(NIXTG,*),
      .        IPARG(NPARG,*),IPM(NPROPMI,*),IGEO(NPROPGI,*),
      .        IPARTC(*), IPARTTG(*), IPART_STATE(*),
@@ -89,8 +93,8 @@ C-----------------------------------------------
      .   NPG,IPG,MPT,IPT,NPTR,NPTS,NPTT,NLAY,L_PLA,ITHK,NF3,
      .   IGTYP,NPT_ALL,IL,KK(12),NF1,IREL,IBID0,MAT_1,PID_1,ILAY,IDRAPE,
      .   SEDRAPE,NUMEL_DRAPE
-      INTEGER PTWA(MAX(STAT_NUMELC ,STAT_NUMELTG)),
-     .        PTWA_P0(0:MAX(1,STAT_NUMELC_G,STAT_NUMELTG_G))
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA
+      INTEGER,DIMENSION(:),ALLOCATABLE :: PTWA_P0
       double precision   
      .  THK, EM, EB, H1, H2, H3
       my_real   
@@ -120,7 +124,8 @@ C-----------------------------------------------
       DATA DELIMIT(61:100)
      ./'----7----|----8----|----9----|----10---|'/
 !
-
+      CALL MY_ALLOC(PTWA,MAX(STAT_NUMELC ,STAT_NUMELTG))
+      ALLOCATE(PTWA_P0(0:MAX(1,STAT_NUMELC_G,STAT_NUMELTG_G)))
 C=======================================================================
 C     4-NODE SHELLS
 C----------------------------------------------- 
@@ -319,8 +324,8 @@ c
                     WA(JJ) = ZERO              
                   ENDIF                        
                 ELSE  ! NPG > 1
-                  DO IR=1,NPTR                                                         
-                    DO IS=1,NPTS 
+                  DO IS=1,NPTS 
+                    DO IR=1,NPTR                                                         
                       LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(IR,IS,1)
                       IPG = NPTR*(IS-1) + IR
                       K = (IPG-1)*NEL*5
@@ -513,7 +518,7 @@ c
             ENDIF
 C
             IE=IE+1
-C         pointeur de fin de zone dans WA
+C         end-of-zone pointer in wa
             PTWA(IE)=JJ
           ENDDO  !  DO I=LFT,LLT
 c------- end loop over 4 node shell elements
@@ -537,7 +542,7 @@ c-----------------------------------------------------------------------
           WAP0(J)=WA(J)
         ENDDO
       ELSE
-C       construit les pointeurs dans le tableau global WAP0
+C       builds the pointers in the global array wap0
         CALL SPMD_STAT_PGATHER(PTWA,STAT_NUMELC,PTWA_P0,STAT_NUMELC_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
@@ -546,9 +551,9 @@ c-------------------------------------
       IF (ISPMD == 0.AND.LEN > 0) THEN
         IPRT0=0
         DO N=1,STAT_NUMELC_G
-C         retrouve le nieme elt dans l'ordre d'id croissant
+C         find the nieme elt in the order of an increasing id
           K=STAT_INDXC(N)
-C         retrouve l'adresse dans WAP0
+C         Find the address in WAP0
           J=PTWA_P0(K-1)
 
           IOFF = NINT(WAP0(J + 1))
@@ -643,6 +648,7 @@ c
                   CALL TAB_STRS_TXT50(WAP0(1),9,J,SIZP0,3)
                   CALL TAB_STRS_TXT50(WAP0(10),4,J,SIZP0,4)
                 ENDIF
+                J = J + 13
               ENDDO
             ELSE
               DO IT=1,NPT
@@ -837,10 +843,8 @@ c
                     WA(JJ) = ZERO              
                   ENDIF                        
               ELSE                                              
-                  DO IR=1,NPTR                                                         
-                    DO IS=1,NPTS 
-                      LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(IR,IS,1)
-                      IPG = NPTR*(IS-1) + IR
+                  DO IPG=1,NPG                                     
+                      LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(IPG,1,1)
                       K = (IPG-1)*NEL*5
 C                      
                       TENS(1:5) = GBUF%FORPG(K+KK(1:5)+I)
@@ -852,7 +856,7 @@ C
 c
                       JJ = JJ + 1
                       IF (GBUF%G_PLA > 0) THEN    
-                  WA(JJ) = LBUF%PLA(I)
+                        WA(JJ) = LBUF%PLA(I)
                       ELSE                         
                         WA(JJ) = ZERO              
                       ENDIF                        
@@ -864,7 +868,6 @@ c
                        JJ = JJ + 1                                      
                        WA(JJ) = TENS(J)             
                       END DO
-                    ENDDO                                                               
                   ENDDO
               ENDIF  !  IF (MLW == 0 .or. MLW == 13)
             ELSE ! MPT > 0
@@ -912,7 +915,7 @@ c
             ENDIF  !  IF (MPT == 0)
 C
             IE=IE+1
-C         pointeur de fin de zone
+C         end-of-zone pointer
             PTWA(IE)=JJ
           ENDDO  !  DO I=LFT,LLT
          
@@ -934,7 +937,7 @@ c-----------------------------------------------------------------------
           PTWA_P0(N)=PTWA(N)
         ENDDO
       ELSE
-C       construit les pointeurs dans le tableau global WAP0
+C       builds the pointers in the global array wap0
         CALL SPMD_STAT_PGATHER(PTWA,STAT_NUMELTG,PTWA_P0,STAT_NUMELTG_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
@@ -943,9 +946,9 @@ C       construit les pointeurs dans le tableau global WAP0
       IF (ISPMD == 0.AND.LEN > 0) THEN
         IPRT0=0
         DO N=1,STAT_NUMELTG_G
-C         retrouve le nieme elt dans l'ordre d'id croissant
+C         find the nieme elt in the order of an increasing id
           K=STAT_INDXTG(N)
-C         retrouve l'adresse dans WAP0
+C         Find the address in WAP0
           J=PTWA_P0(K-1)
 C
           IOFF = NINT(WAP0(J + 1))
@@ -1042,6 +1045,7 @@ C
                   CALL TAB_STRS_TXT50(WAP0(1),9,J,SIZP0,3)
                   CALL TAB_STRS_TXT50(WAP0(10),4,J,SIZP0,4)
                 ENDIF
+                J = J + 13
               ENDDO
             ELSE
               DO IT=1,NPT
@@ -1062,6 +1066,10 @@ C
       ENDIF  !  IF (ISPMD == 0.AND.LEN > 0)
 
 C
+c----------
+      DEALLOCATE(PTWA)
+      DEALLOCATE(PTWA_P0)
+c-----------
       RETURN
       END
 c                        TENS(JFT:JLT,1) = SIGNXX(JFT:JLT)                     
@@ -1069,13 +1077,13 @@ c                        TENS(JFT:JLT,2) = SIGNYY(JFT:JLT)
 c                        TENS(JFT:JLT,3) = SIGNXY(JFT:JLT)
 c                        TENS(JFT:JLT,4) = SIGNYZ(JFT:JLT)
 c                        TENS(JFT:JLT,5) = SIGNZX(JFT:JLT)
-      !||====================================================================
-      !||    orth2loc        ../engine/source/output/sta/stat_c_strsfg.F
-      !||--- called by ------------------------------------------------------
-      !||    stat_c_strsfg   ../engine/source/output/sta/stat_c_strsfg.F
-      !||--- calls      -----------------------------------------------------
-      !||    urotovs         ../engine/source/output/sta/stat_c_strsfg.F
-      !||====================================================================
+!||====================================================================
+!||    orth2loc        ../engine/source/output/sta/stat_c_strsfg.F
+!||--- called by ------------------------------------------------------
+!||    stat_c_strsfg   ../engine/source/output/sta/stat_c_strsfg.F
+!||--- calls      -----------------------------------------------------
+!||    urotovs         ../engine/source/output/sta/stat_c_strsfg.F
+!||====================================================================
       SUBROUTINE ORTH2LOC(TENS,DIR_A,DIR_B,II,ILAW,IGTYP,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1090,7 +1098,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J
+ 
       my_real
      .   R1,R2,R3,S1,S2,S3,R12A,R22A,S12B,S22B,RS1,RS2,RS3,
      .   T1,T2,T3,PHI,SUM1,SUM2,FACT,R3R3,S3S3 
@@ -1156,11 +1164,11 @@ c
 C
       RETURN
       END
-      !||====================================================================
-      !||    urotovs    ../engine/source/output/sta/stat_c_strsfg.F
-      !||--- called by ------------------------------------------------------
-      !||    orth2loc   ../engine/source/output/sta/stat_c_strsfg.F
-      !||====================================================================
+!||====================================================================
+!||    urotovs    ../engine/source/output/sta/stat_c_strsfg.F
+!||--- called by ------------------------------------------------------
+!||    orth2loc   ../engine/source/output/sta/stat_c_strsfg.F
+!||====================================================================
       SUBROUTINE UROTOVS(SIG,DIR1,DIR2)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1174,7 +1182,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I
+ 
       my_real
      .   S1, S2, S3, S4, S5
 C-----------------------------------------------
@@ -1195,11 +1203,11 @@ C-----------------------------------------------
 C
       RETURN
       END
-      !||====================================================================
-      !||    sheml2g         ../engine/source/output/sta/stat_c_strsfg.F
-      !||--- called by ------------------------------------------------------
-      !||    stat_c_strsfg   ../engine/source/output/sta/stat_c_strsfg.F
-      !||====================================================================
+!||====================================================================
+!||    sheml2g         ../engine/source/output/sta/stat_c_strsfg.F
+!||--- called by ------------------------------------------------------
+!||    stat_c_strsfg   ../engine/source/output/sta/stat_c_strsfg.F
+!||====================================================================
       SUBROUTINE SHEML2G(MOM,QT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -1213,7 +1221,7 @@ C-----------------------------------------------
 C------------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I
+ 
       my_real 
      .       TXX,TYY,TZZ,TXY,TYZ,TZX,UXX,UYY,UZZ,UXY,UYZ,UZX,A,B,C
 C--convention input MOM : mxx,myy,mxy,0,0,0; output mxx,myy,mzz,mxy,myz,mzx

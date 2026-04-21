@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2026 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,45 +20,45 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    sinit3                 ../starter/source/elements/solid/solide/sinit3.F
-      !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
-      !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    atheri                 ../starter/source/ale/atheri.F
-      !||    aturi3                 ../starter/source/ale/ale3d/aturi3.F
-      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
-      !||    edlen3                 ../starter/source/ale/ale3d/edlen3.F
-      !||    enorm3                 ../starter/source/ale/ale3d/enorm3.F
-      !||    failini                ../starter/source/elements/solid/solide/failini.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    inimom_fvm             ../starter/source/elements/solid/solide/inimom_fvm.F
-      !||    m115_perturb           ../starter/source/materials/mat/mat115/m115_perturb.F
-      !||    matini                 ../starter/source/materials/mat_share/matini.F
-      !||    s8erefcoor3            ../starter/source/elements/solid/solide8z/s8erefcoor3.F
-      !||    sboltini               ../starter/source/loads/bolt/sboltini.F
-      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
-      !||    scoor3                 ../starter/source/elements/solid/solide/scoor3.F
-      !||    sderi3                 ../starter/source/elements/solid/solide/sderi3.F
-      !||    sderi3b                ../starter/source/elements/solid/solid8p/sderi3b.F
-      !||    sdlen3                 ../starter/source/elements/solid/solide/sdlen3.F
-      !||    sigin3b                ../starter/source/elements/solid/solid8p/sigin3b.F
-      !||    sjacidp                ../starter/source/elements/solid/solide/sjacidp.F
-      !||    smass3                 ../starter/source/elements/solid/solide/smass3.F
-      !||    smass3b                ../starter/source/elements/solid/solid8p/smass3b.F
-      !||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
-      !||    soltosphv8             ../starter/source/elements/sph/soltosph.F
-      !||    srcoor3                ../starter/source/elements/solid/solide/srcoor3.F
-      !||    sveok3                 ../starter/source/elements/solid/solide/sveok3.F
-      !||    szderi3                ../starter/source/elements/solid/solidez/szderi3.F
-      !||    userin3                ../starter/source/elements/solid/solide/userin3.F
-      !||    ustrsin3               ../starter/source/elements/solid/solide/userin3.F
-      !||--- uses       -----------------------------------------------------
-      !||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
-      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||====================================================================
+!||====================================================================
+!||    sinit3                 ../starter/source/elements/solid/solide/sinit3.F
+!||--- called by ------------------------------------------------------
+!||    initia                 ../starter/source/elements/initia/initia.F
+!||--- calls      -----------------------------------------------------
+!||    ancmsg                 ../starter/source/output/message/message.F
+!||    atheri                 ../starter/source/ale/atheri.F
+!||    aturi3                 ../starter/source/ale/ale3d/aturi3.F
+!||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+!||    edlen3                 ../starter/source/ale/ale3d/edlen3.F
+!||    enorm3                 ../starter/source/ale/ale3d/enorm3.F
+!||    failini                ../starter/source/elements/solid/solide/failini.F
+!||    fretitl2               ../starter/source/starter/freform.F
+!||    inimom_fvm             ../starter/source/elements/solid/solide/inimom_fvm.F
+!||    m115_perturb           ../starter/source/materials/mat/mat115/m115_perturb.F
+!||    matini                 ../starter/source/materials/mat_share/matini.F
+!||    s8erefcoor3            ../starter/source/elements/solid/solide8z/s8erefcoor3.F
+!||    sboltini               ../starter/source/loads/bolt/sboltini.F
+!||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+!||    scoor3                 ../starter/source/elements/solid/solide/scoor3.F
+!||    sderi3                 ../starter/source/elements/solid/solide/sderi3.F
+!||    sderi3b                ../starter/source/elements/solid/solid8p/sderi3b.F
+!||    sdlen3                 ../starter/source/elements/solid/solide/sdlen3.F
+!||    sigin3b                ../starter/source/elements/solid/solid8p/sigin3b.F
+!||    sjacidp                ../starter/source/elements/solid/solide/sjacidp.F
+!||    smass3                 ../starter/source/elements/solid/solide/smass3.F
+!||    smass3b                ../starter/source/elements/solid/solid8p/smass3b.F
+!||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
+!||    soltosphv8             ../starter/source/elements/sph/soltosph.F
+!||    srcoor3                ../starter/source/elements/solid/solide/srcoor3.F
+!||    sveok3                 ../starter/source/elements/solid/solide/sveok3.F
+!||    szderi3                ../starter/source/elements/solid/solidez/szderi3.F
+!||    userin3                ../starter/source/elements/solid/solide/userin3.F
+!||    ustrsin3               ../starter/source/elements/solid/solide/userin3.F
+!||--- uses       -----------------------------------------------------
+!||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
+!||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+!||    message_mod            ../starter/share/message_module/message_mod.F
+!||====================================================================
       SUBROUTINE SINIT3(ELBUF_STR,MAS      ,IXS    ,PM      ,X       ,
      .                  DETONATORS,GEO     ,VEUL   ,ALE_CONNECTIVITY ,IPARG_GR,
      .                  DTELEM   ,SIGI     ,NEL    ,SKEW    ,IGEO    ,
@@ -84,6 +84,7 @@ C-----------------------------------------------
       USE MATPARAM_DEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       use glob_therm_mod
+      use element_mod , only : nixs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -165,6 +166,7 @@ C-----------------------------------------------
      .   YD5(MVSIZ), YD6(MVSIZ), YD7(MVSIZ), YD8(MVSIZ),
      .   ZD1(MVSIZ), ZD2(MVSIZ), ZD3(MVSIZ), ZD4(MVSIZ),
      .   ZD5(MVSIZ), ZD6(MVSIZ), ZD7(MVSIZ), ZD8(MVSIZ)     
+      my_real :: TEMPEL(NEL)
 C-----------------------------------------------
       CHARACTER(LEN=NCHARTITLE)::TITR1
 C
@@ -253,7 +255,7 @@ C Orthotropy wrt reference geometry
      .           XD1  ,XD2  ,XD3  ,XD4  ,XD5  ,XD6  ,XD7  ,XD8   ,
      .           YD1  ,YD2  ,YD3  ,YD4  ,YD5  ,YD6  ,YD7  ,YD8   ,
      .           ZD1  ,ZD2  ,ZD3  ,ZD4  ,ZD5  ,ZD6  ,ZD7  ,ZD8   )
-      ELSE
+      ELSE 
         CALL SRCOOR3(X,XREFS(1,1,NF1),IXS(1,NF1),GEO  ,MAT  ,PID  ,NGL  ,JHBE ,
      .           IX1  ,IX2  ,IX3  ,IX4  ,IX5  ,IX6  ,IX7  ,IX8  ,
      .           X1   ,X2   ,X3   ,X4   ,X5   ,X6   ,X7   ,X8   ,
@@ -267,14 +269,27 @@ C Orthotropy wrt reference geometry
      .           ZD1  ,ZD2  ,ZD3  ,ZD4  ,ZD5  ,ZD6  ,ZD7  ,ZD8   )
 
       ENDIF
-C
+!
+!     Initialize element temperature from /initemp
+!      
+      IF (JTHE == 0 .and. GLOB_THERM%NINTEMP > 0) THEN
+        DO I=1,NEL
+          TEMPEL(I) = ONE_OVER_8 *(TEMP(IXS(2,NFT+I)) + TEMP(IXS(3,NFT+I))
+     .                           + TEMP(IXS(4,NFT+I)) + TEMP(IXS(5,NFT+I))        
+     .                           + TEMP(IXS(6,NFT+I)) + TEMP(IXS(7,NFT+I))        
+     .                           + TEMP(IXS(8,NFT+I)) + TEMP(IXS(9,NFT+I))) 
+        ENDDO
+      ELSE
+        TEMPEL(1:NEL) = TEMP0(1:NEL)
+      END IF
+!
 C Orthotropy
       IF (ISORTH == 1)
      .  CALL SMORTH3(PID  ,GEO  ,IGEO ,SKEW ,IREP ,GBUF%GAMA  , 
      .         RX   ,RY   ,RZ   ,SX   ,SY   ,SZ   ,TX   ,TY   ,TZ   ,
      .         E1X  ,E1Y  ,E1Z  ,E2X  ,E2Y  ,E2Z  ,E3X  ,E3Y  ,E3Z  ,
      .         F1X  ,F1Y  ,F1Z  ,F2X  ,F2Y  ,F2Z  ,NSIGI,SIGSP,NSIGS,
-     .         SIGI ,IXS  ,X    ,JHBE ,PTSOL,NEL  ,IPARG_GR(28))
+     .         SIGI ,IXS  ,X    ,JHBE ,PTSOL,NEL  ,IPARG_GR(28), JCVT)
 C
       CALL SVEOK3(NVC,8, IX1, IX2, IX3, IX4, IX5, IX6, IX7, IX8)
 C
@@ -342,7 +357,7 @@ c
      5            MAT      ,IPM    ,NSIGS      ,NUMSOL    ,PTSOL  ,
      6            IPT      ,NGL    ,NPF        ,TF        ,BUFMAT ,
      7            GBUF     ,LBUF   ,MBUF       ,ELBUF_STR ,ILOADP ,
-     8            FACLOAD, DELTAX)
+     8            FACLOAD, DELTAX  ,TEMPEL     ,MAT_PARAM )
           END DO
         END DO
       END DO
